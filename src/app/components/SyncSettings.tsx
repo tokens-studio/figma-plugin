@@ -5,7 +5,6 @@ import { track } from '@/utils/analytics';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
-import ProviderSelector from './StorageProviderSelector';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import useStorage from '../store/useStorage';
@@ -18,9 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
+  DropdownMenuItem,
 } from './DropdownMenu';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
@@ -28,6 +25,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import { Flex } from './Flex';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import LocalStorageItem from './LocalStorageItem';
+import { getProviderIcon } from '@/utils/getProviderIcon';
 
 const providers = [
   {
@@ -166,7 +164,7 @@ const SyncSettings = () => {
             </Stack>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }}>
               <Flex>
                 <Text size="small">Add new</Text>
               </Flex>
@@ -176,22 +174,14 @@ const SyncSettings = () => {
               side="bottom"
               css={{ minWidth: '180px' }}
             >
-              <DropdownMenuRadioGroup>
-                {
+              {
                   providers.map((provider) => (
-                    <DropdownMenuRadioItem
-                      key={provider.type}
-                      value={provider.type}
-                      onSelect={handleProviderClick(provider.type)}
-                    >
-                      <DropdownMenuItemIndicator />
-                      <ProviderSelector
-                        text={provider.text}
-                      />
-                    </DropdownMenuRadioItem>
+                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3', padding: '$5' }}>
+                      {getProviderIcon(provider.type)}
+                      {provider.text}
+                    </DropdownMenuItem>
                   ))
                 }
-              </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </Stack>

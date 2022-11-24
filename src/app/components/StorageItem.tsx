@@ -10,14 +10,14 @@ import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 import Box from './Box';
 import useConfirm from '../hooks/useConfirm';
-import { IconDotaVertical, IconGithub } from '@/icons';
+import { IconDotaVertical } from '@/icons';
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from './DropdownMenu';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { getProviderIcon } from '@/utils/getProviderIcon';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -47,25 +47,6 @@ const StorageItem = ({ item, onEdit }: Props) => {
     restoreStoredProvider(item);
   }, [item, restoreStoredProvider]);
 
-  const getProviderIcon = React.useCallback(() => {
-    switch (provider) {
-      case StorageProviderType.URL:
-        return <IconGithub />;
-      case StorageProviderType.GITHUB:
-        return <IconGithub />;
-      case StorageProviderType.GITLAB:
-        return <IconGithub />;
-      case StorageProviderType.ADO:
-        return <IconGithub />;
-      case StorageProviderType.BITBUCKET:
-        return <IconGithub />;
-      case StorageProviderType.JSONBIN:
-        return <IconGithub />;
-      default:
-        return null;
-    }
-  }, [provider]);
-
   return (
     <StyledStorageItem
       data-cy={`storageitem-${provider}-${id}`}
@@ -77,7 +58,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
       }}
       >
         <Box>
-          { getProviderIcon() }
+          { getProviderIcon(provider) }
         </Box>
         <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
         <Box css={{
