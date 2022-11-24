@@ -131,27 +131,42 @@ export default function useRemoteTokens() {
     dispatch.uiState.setApiData(context);
     dispatch.tokenState.setEditProhibited(false);
     setStorageType({ provider: context, shouldSetInDocument: true });
+    let content: RemoteResponseData | null = null;
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
-        await syncTokensWithGitHub(context);
+        content = await syncTokensWithGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
-        await syncTokensWithGitLab(context);
+        content = await syncTokensWithGitLab(context);
         break;
       }
       case StorageProviderType.BITBUCKET: {
-        await syncTokensWithBitbucket(context);
+        content = await syncTokensWithBitbucket(context);
         break;
       }
       case StorageProviderType.ADO: {
-        await syncTokensWithADO(context);
+        content = await syncTokensWithADO(context);
         break;
       }
       default:
-        await pullTokens({ context });
+        content = await pullTokens({ context });
     }
-    return null;
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
+    if (content) {
+      return {
+        status: 'success',
+      };
+    }
+    return {
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    };
   }, [
     dispatch,
     setStorageType,

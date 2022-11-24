@@ -1,6 +1,6 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
@@ -25,6 +25,8 @@ type Props = {
 };
 
 const StorageItem = ({ item, onEdit }: Props) => {
+  const [hasErrored, setHasErrored] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>();
   const storageType = useSelector(storageTypeSelector);
   const { provider, id, name } = item;
   const branch = isGitProvider(item) ? item.branch : null;
@@ -43,31 +45,53 @@ const StorageItem = ({ item, onEdit }: Props) => {
     if (await askUserIfDelete()) deleteProvider(item);
   }, [deleteProvider, item, askUserIfDelete]);
 
-  const handleRestore = React.useCallback(() => {
-    restoreStoredProvider(item);
+  const handleRestore = React.useCallback(async () => {
+    const response = await restoreStoredProvider(item);
+    if (response.status === 'success') {
+      setHasErrored(false);
+    } else {
+      setHasErrored(true);
+      setErrorMessage(response?.errorMessage);
+    }
   }, [item, restoreStoredProvider]);
 
   return (
     <StyledStorageItem
       data-cy={`storageitem-${provider}-${id}`}
+      css={{ alignItems: 'center' }}
       key={`${provider}-${id}`}
       active={isActive()}
     >
       <Box css={{
-        alignItems: 'center', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
+        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
       }}
       >
-        <Box>
-          { getProviderIcon(provider) }
-        </Box>
-        <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
         <Box css={{
-          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
+          alignItems: 'flex-start', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3',
         }}
         >
-          {id}
-          {' '}
-          {branch && ` (${branch})`}
+          <Box>
+            { getProviderIcon(provider) }
+          </Box>
+          <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
+          <Box css={{
+            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
+          }}
+          >
+            {id}
+            {' '}
+            {branch && ` (${branch})`}
+          </Box>
+        </Box>
+        <Box>
+          {hasErrored && isActive() && (
+          <Box css={{ display: 'flex', color: '$fgDanger' }}>
+            <Box css={{ marginRight: '$3' }}>
+              <ExclamationTriangleIcon />
+            </Box>
+            {errorMessage}
+          </Box>
+          )}
         </Box>
       </Box>
       <Box css={{ marginRight: '$3' }}>
