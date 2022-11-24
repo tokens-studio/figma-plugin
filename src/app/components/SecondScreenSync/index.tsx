@@ -19,6 +19,7 @@ export default function SecondScreenSync() {
     let dbUpdateChannel: RealtimeChannel | null = null;
     // Supabase client setup
     if (user && secondScreenOn) {
+      console.log('subscribe');
       dbUpdateChannel = supabase
         .channel('value-db-changes')
         .on(
@@ -29,20 +30,14 @@ export default function SecondScreenSync() {
             table: 'tokens',
             filter: `owner_email=eq.${user.email}`,
           },
+          // TODO: add some types
           (payload: any) => {
-            if (payload.new.ftData) {
+            if (payload.new.last_updated_by !== 'plugin' && payload.new.ftData) {
               const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.ftData;
 
-              if (sets && JSON.stringify(sets) !== JSON.stringify(tokens)) {
-                dispatch.tokenState.setTokens(sets);
-              }
-
-              if (newUsedTokenSets && JSON.stringify(newUsedTokenSets) !== JSON.stringify(usedTokenSets)) {
-                dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
-              }
-              if (newThemes && JSON.stringify(newThemes) !== JSON.stringify(themes)) {
-                dispatch.tokenState.setThemes(newThemes);
-              }
+              dispatch.tokenState.setTokens(sets);
+              dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
+              dispatch.tokenState.setThemes(newThemes);
             }
           },
         )
@@ -55,13 +50,16 @@ export default function SecondScreenSync() {
         if (dbUpdateChannel) supabase.realtime.removeChannel(dbUpdateChannel);
       }
     };
-  }, [user, secondScreenOn, dispatch.tokenState, usedTokenSets, themes, tokens]);
+  }, [user, secondScreenOn, dispatch.tokenState]);
 
   useEffect(() => {
     async function updateRemoteData(email: string, ftData: string) {
       await supabase.postgrest
         .from('tokens')
-        .upsert({ ftData, owner_email: email }, { onConflict: 'owner_email', ignoreDuplicates: false })
+        .upsert(
+          { ftData, owner_email: email, last_updated_by: 'plugin' },
+          { onConflict: 'owner_email', ignoreDuplicates: false },
+        )
         .eq('owner_email', email);
     }
 
