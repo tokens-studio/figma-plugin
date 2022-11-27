@@ -70,19 +70,19 @@ export default function ApplySelector() {
 
       <DropdownMenuContent side="top">
         <DropdownMenuRadioGroup value={updateMode}>
-          <DropdownMenuRadioItem value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+          <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
             Apply to page
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
+          <DropdownMenuRadioItem data-testid="apply-to-document" value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
             Apply to document
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
+          <DropdownMenuRadioItem data-testid="apply-to-selection" value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
