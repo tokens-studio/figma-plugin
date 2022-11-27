@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
@@ -10,7 +10,6 @@ import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 import Box from './Box';
 import useConfirm from '../hooks/useConfirm';
-import { IconDotaVertical } from '@/icons';
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -18,6 +17,8 @@ import {
   DropdownMenuContent,
 } from './DropdownMenu';
 import { getProviderIcon } from '@/utils/getProviderIcon';
+import Stack from './Stack';
+import Badge from './Badge';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -62,27 +63,40 @@ const StorageItem = ({ item, onEdit }: Props) => {
       key={`${provider}-${id}`}
       active={isActive()}
     >
-      <Box css={{
-        alignItems: 'flex-start', flexDirection: 'column', flexGrow: '1', display: 'flex', overflow: 'hidden',
-      }}
-      >
-        <Box css={{
-          alignItems: 'flex-start', flexDirection: 'row', flexGrow: '1', display: 'flex', overflow: 'hidden', gap: '$3', maxWidth: 'stretch',
+      <Stack
+        direction="column"
+        gap={1}
+        css={{
+          flexGrow: '1', overflow: 'hidden',
         }}
+      >
+        <Stack
+          direction="row"
+          gap={3}
+          css={{
+            flexGrow: '1', overflow: 'hidden', maxWidth: 'stretch',
+          }}
         >
-          <Box>
+          <Box css={{ color: '$fgDefault' }}>
             { getProviderIcon(provider) }
           </Box>
-          <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{name}</Box>
-          <Box css={{
-            whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
-          }}
-          >
-            {id}
-            {' '}
-            {branch && ` (${branch})`}
-          </Box>
-        </Box>
+          <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
+            <Box css={{
+              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$bold',
+            }}
+            >
+              {name}
+            </Box>
+            <Box css={{
+              whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
+            }}
+            >
+              {id}
+              {' '}
+              {branch && ` (${branch})`}
+            </Box>
+          </Stack>
+        </Stack>
         {hasErrored && isActive() && (
           <Box
             css={{
@@ -94,15 +108,17 @@ const StorageItem = ({ item, onEdit }: Props) => {
             {errorMessage}
           </Box>
         )}
-      </Box>
+      </Stack>
       <Box css={{ marginRight: '$3' }}>
-        <Button id="button-storage-item-apply" variant={isActive() ? 'primary' : 'secondary'} onClick={handleRestore}>
-          {isActive() ? 'Active' : 'Apply'}
-        </Button>
+        {isActive() ? <Badge text="Active" /> : (
+          <Button id="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
+            Apply
+          </Button>
+        )}
       </Box>
       <DropdownMenu>
-        <DropdownMenuTrigger css={{ padding: '$1', background: 'none' }} data-testid="storage-item-tools-dropdown">
-          <IconDotaVertical />
+        <DropdownMenuTrigger css={{ padding: '$2', borderRadius: '$button', background: 'none' }} data-testid="storage-item-tools-dropdown">
+          <DotsVerticalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem textValue="Edit" onSelect={onEdit}>Edit</DropdownMenuItem>
