@@ -177,7 +177,12 @@ const SyncSettings = () => {
             >
               {
                   providers.map((provider) => (
-                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3', padding: '$5' }} data-testid={`add-${provider.text}-credential`}>
+                    <DropdownMenuItem
+                      css={{ display: 'flex', gap: '$3', padding: '$5' }}
+                      key={provider.type}
+                      data-testid={`add-${provider.text}-credential`}
+                      onSelect={handleProviderClick(provider.type)}
+                    >
                       {getProviderIcon(provider.type)}
                       {provider.text}
                     </DropdownMenuItem>
