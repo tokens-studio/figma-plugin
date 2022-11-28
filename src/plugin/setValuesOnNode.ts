@@ -39,6 +39,7 @@ export default async function setValuesOnNode(
     : null;
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
+
   try {
     // BORDER RADIUS
     if (
