@@ -55,7 +55,6 @@ export class FileTokenStorage extends RemoteTokenStorage {
         const jsonFileContents = await Promise.all(filePromises);
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { webkitRelativePath } = jsonFiles[index];
-          console.log('web', webkitRelativePath);
           if (fileContent) {
             const name = webkitRelativePath?.substring(webkitRelativePath.indexOf('/') + 1)?.replace('.json', '');
             if (name === SystemFilenames.THEMES && Array.isArray(fileContent)) {
