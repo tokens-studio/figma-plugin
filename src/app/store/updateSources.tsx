@@ -34,6 +34,7 @@ type UpdateTokensOnSourcesPayload = {
   lastUpdatedAt: string;
   api: StorageTypeCredentials;
   checkForChanges: boolean;
+  shouldSwapStyles?: boolean;
 };
 
 async function updateRemoteTokens({
@@ -92,6 +93,7 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
   checkForChanges,
+  shouldSwapStyles,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -117,5 +119,6 @@ export default async function updateTokensOnSources({
     usedTokenSet,
     checkForChanges,
     activeTheme,
+    shouldSwapStyles,
   });
 }

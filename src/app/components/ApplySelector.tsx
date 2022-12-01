@@ -16,14 +16,17 @@ import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { useFlags } from './LaunchDarkly';
 
 export default function ApplySelector() {
   const {
-    updateMode, updateRemote, updateOnChange, updateStyles,
+    updateMode, updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
+  const { swapStylesAlpha } = useFlags();
+
   const {
-    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
+    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles, setShouldSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
@@ -50,9 +53,13 @@ export default function ApplySelector() {
     setUpdateStyles(!updateStyles);
   }, [updateStyles, setUpdateStyles]);
 
+  const handleShouldSwapStyles = React.useCallback(() => {
+    setShouldSwapStyles(!shouldSwapStyles);
+  }, [shouldSwapStyles, setShouldSwapStyles]);
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger bordered>
+      <DropdownMenuTrigger bordered data-testid="apply-selector">
         <span>
           Apply to
           {' '}
@@ -63,19 +70,19 @@ export default function ApplySelector() {
 
       <DropdownMenuContent side="top">
         <DropdownMenuRadioGroup value={updateMode}>
-          <DropdownMenuRadioItem value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+          <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
             Apply to page
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
+          <DropdownMenuRadioItem data-testid="apply-to-document" value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
             Apply to document
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
+          <DropdownMenuRadioItem data-testid="apply-to-selection" value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
@@ -85,24 +92,32 @@ export default function ApplySelector() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuCheckboxItem checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
+        <DropdownMenuCheckboxItem data-testid="update-on-change" checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update on change
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
+        <DropdownMenuCheckboxItem data-testid="update-remote" checked={updateRemote} onCheckedChange={handleUpdateRemote}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update remote
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
+        <DropdownMenuCheckboxItem data-testid="update-styles" checked={updateStyles} onCheckedChange={handleUpdateStyles}>
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
           Update styles
         </DropdownMenuCheckboxItem>
+        {swapStylesAlpha && (
+        <DropdownMenuCheckboxItem data-testid="swap-styles-alpha" checked={shouldSwapStyles} onCheckedChange={handleShouldSwapStyles}>
+          <DropdownMenuItemIndicator>
+            <CheckIcon />
+          </DropdownMenuItemIndicator>
+          Swap styles (Alpha)
+        </DropdownMenuCheckboxItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -109,8 +109,9 @@ const SyncSettings = () => {
       provider: { provider: StorageProviderType.LOCAL },
       shouldSetInDocument: true,
     });
+    dispatch.tokenState.setEditProhibited(false);
     showConfirmModal(false);
-  }, [dispatch.uiState, setStorageType]);
+  }, [dispatch.tokenState, dispatch.uiState, setStorageType]);
 
   const handleHideStorageModal = React.useCallback(() => {
     setShowEditStorageModalVisible(false);

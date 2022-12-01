@@ -39,6 +39,7 @@ export default async function setValuesOnNode(
     : null;
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
+
   try {
     // BORDER RADIUS
     if (
@@ -421,7 +422,7 @@ export default async function setValuesOnNode(
       }
 
       if (values.asset && typeof values.asset === 'string') {
-        if ('fills' in node && data.asset) {
+        if ('fills' in node) {
           await setImageValuesOnTarget(node, { value: values.asset });
         }
       }
