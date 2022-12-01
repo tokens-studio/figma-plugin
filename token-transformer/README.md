@@ -1,4 +1,4 @@
-****# Token Transformer
+# Token Transformer
 
 Converts tokens from Figma Tokens to something Style Dictionary can read, removing any math operations or aliases, only resulting in raw values.
 
