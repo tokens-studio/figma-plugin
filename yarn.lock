@@ -2263,10 +2263,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.47.0":
-  version "1.48.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.48.0.tgz#722ae2e1464598982b255f05930ab601e2d464a2"
-  integrity sha512-GPQTfxolu0O6Yzw2UbZndt4+lKPT8JTnFsl+ERdZtvKU3aBQBfWenlIHuHHmUdzg4TocsFHTZz2HWvRS6S9Pjw==
+"@figma/plugin-typings@^1.55.1":
+  version "1.55.1"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.55.1.tgz#b974e929c2d1bdf051104ec89701b25c8ac2bcd7"
+  integrity sha512-gNyAFMA83oNJ8X4xrMjs49CCPwfRRdNepvZUx4gxS5/GBnZqV+rhEkM9crgJrynrE1VgxILLjQIPgUxxSNBWJQ==
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"
