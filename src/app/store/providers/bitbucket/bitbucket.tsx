@@ -19,6 +19,7 @@ import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -26,6 +27,7 @@ type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: Sto
 export function useBitbucket() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
 
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
@@ -71,7 +73,7 @@ export function useBitbucket() {
     }
     if (
       content
-      && isEqual(content.tokens, tokens)
+      && isEqual(content.tokens, tokensWithoutInternalProperty)
       && isEqual(content.themes, themes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
@@ -98,10 +100,10 @@ export function useBitbucket() {
         };
         await storage.save({
           themes,
-          tokens,
+          tokens: tokensWithoutInternalProperty,
           metadata,
         }, { commitMessage });
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        saveLastSyncedState(dispatch, tokensWithoutInternalProperty, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -140,8 +142,7 @@ export function useBitbucket() {
     };
   }, [
     storageClientFactory,
-    dispatch.uiState,
-    dispatch.tokenState,
+    dispatch,
     pushDialog,
     closeDialog,
     tokens,
@@ -149,6 +150,7 @@ export function useBitbucket() {
     localApiState,
     usedTokenSet,
     activeTheme,
+    tokensWithoutInternalProperty,
   ]);
 
   const checkAndSetAccess = useCallback(
@@ -223,7 +225,7 @@ export function useBitbucket() {
         }
         if (content) {
           if (
-            !isEqual(content.tokens, tokens)
+            !isEqual(content.tokens, tokensWithoutInternalProperty)
             || !isEqual(content.themes, themes)
             || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
           ) {
@@ -263,6 +265,7 @@ export function useBitbucket() {
       themes,
       tokens,
       checkAndSetAccess,
+      tokensWithoutInternalProperty,
     ],
   );
 

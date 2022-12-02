@@ -30,7 +30,7 @@ export const useADO = () => {
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
+  const tokensWithoutInternalProperty = React.useMemo(() => filterInternalProperty(tokens), [tokens]);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();

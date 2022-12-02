@@ -18,6 +18,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null,
@@ -76,6 +77,7 @@ export function useJSONbin() {
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
+  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
@@ -83,7 +85,7 @@ export function useJSONbin() {
     const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
     if (result) {
       await updateJSONBinTokens({
-        tokens,
+        tokens: tokensWithoutInternalProperty,
         context: {
           id: result.metadata.id,
           secret,
@@ -107,7 +109,7 @@ export function useJSONbin() {
     }
     notifyToUI('Something went wrong. See console for details', { error: true });
     return null;
-  }, [dispatch, themes, tokens]);
+  }, [dispatch, themes, tokensWithoutInternalProperty]);
 
   // Read tokens from JSONBin
   const pullTokensFromJSONBin = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.JSONBIN }>): Promise<RemoteResponseData | null> => {
