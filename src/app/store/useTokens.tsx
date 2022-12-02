@@ -27,6 +27,7 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -71,9 +72,9 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
+      tokens: filterInternalProperty(tokens), tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
     });
-  }, [tokens, activeTokenSet]);
+  }, [tokens, activeTokenSet, tokensContext.resolvedTokens]);
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (

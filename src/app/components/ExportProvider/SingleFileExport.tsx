@@ -37,7 +37,7 @@ export default function SingleFileExport({ onClose }: Props) {
     setIncludeParent(!includeParent);
   }, [includeParent]);
 
-  const handleToggleExpandTypograhy = React.useCallback(() => {
+  const handleToggleExpandTypography = React.useCallback(() => {
     setExpandTypography(!expandTypography);
   }, [expandTypography]);
 
@@ -100,7 +100,7 @@ export default function SingleFileExport({ onClose }: Props) {
             id="expandTypography"
             checked={expandTypography}
             defaultChecked={expandTypography}
-            onCheckedChange={handleToggleExpandTypograhy}
+            onCheckedChange={handleToggleExpandTypography}
           />
           <Label htmlFor="expandTypography">Expand Typography</Label>
         </Box>

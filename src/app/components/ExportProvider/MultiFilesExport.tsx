@@ -11,6 +11,7 @@ import { IconFile } from '@/icons';
 import { tokensSelector, themesListSelector } from '@/selectors';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 type Props = {
   onClose: () => void;
@@ -19,11 +20,12 @@ type Props = {
 export default function MultiFilesExport({ onClose }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const tokensWithoutInternalProperty = React.useMemo(() => filterInternalProperty(tokens), [tokens]);
   const seed = useUIDSeed();
 
   const filesChangeset = React.useMemo(() => {
     const changeObj: Record<string, string> = {};
-    Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
+    Object.entries(convertTokensToObject(tokensWithoutInternalProperty)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
     changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
@@ -32,7 +34,7 @@ export default function MultiFilesExport({ onClose }: Props) {
     };
     changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, 2);
     return changeObj;
-  }, [tokens, themes]);
+  }, [tokens, themes, tokensWithoutInternalProperty]);
 
   const downLoadDataAsZip = React.useCallback(() => {
     const zip = new JSZip();
