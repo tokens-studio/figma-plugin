@@ -20,6 +20,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -33,6 +34,7 @@ export function useGitHub() {
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closeDialog } = usePushDialog();
+  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -63,7 +65,7 @@ export function useGitHub() {
     }
     if (
       content
-      && isEqual(content.tokens, tokens)
+      && isEqual(content.tokens, tokensWithoutInternalProperty)
       && isEqual(content.themes, themes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
@@ -90,12 +92,12 @@ export function useGitHub() {
         };
         await storage.save({
           themes,
-          tokens,
+          tokens: tokensWithoutInternalProperty,
           metadata,
         }, {
           commitMessage,
         });
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        saveLastSyncedState(dispatch, tokensWithoutInternalProperty, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -134,11 +136,11 @@ export function useGitHub() {
     };
   }, [
     storageClientFactory,
-    dispatch.uiState,
-    dispatch.tokenState,
     pushDialog,
     closeDialog,
     tokens,
+    tokensWithoutInternalProperty,
+    dispatch,
     themes,
     localApiState,
     usedTokenSet,
@@ -218,7 +220,7 @@ export function useGitHub() {
       }
       if (content) {
         if (
-          !isEqual(content.tokens, tokens)
+          !isEqual(content.tokens, tokensWithoutInternalProperty)
           || !isEqual(content.themes, themes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
@@ -257,6 +259,7 @@ export function useGitHub() {
     themes,
     tokens,
     checkAndSetAccess,
+    tokensWithoutInternalProperty,
   ]);
 
   const addNewGitHubCredentials = useCallback(async (context: GithubFormValues): Promise<RemoteResponseData> => {
@@ -283,11 +286,8 @@ export function useGitHub() {
     };
   }, [
     syncTokensWithGitHub,
-    tokens,
     themes,
-    dispatch.tokenState,
-    usedTokenSet,
-    activeTheme,
+    tokens,
   ]);
 
   const fetchGithubBranches = useCallback(async (context: GithubCredentials) => {

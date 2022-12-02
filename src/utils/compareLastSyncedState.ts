@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 import { isEqual } from './isEqual';
 import { tryParseJson } from './tryParseJson';
 import type { ThemeObjectsList } from '@/types';
@@ -22,6 +23,6 @@ export function compareLastSyncedState<Metadata = null>(
   }
   return isEqual(
     compact([parsedState[0] ?? defaultSyncedState[0], parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
-    compact([tokens, themes, metadata ?? defaultSyncedState[2]]),
+    compact([filterInternalProperty(tokens), themes, metadata ?? defaultSyncedState[2]]),
   );
 }
