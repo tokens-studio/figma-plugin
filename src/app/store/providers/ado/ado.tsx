@@ -19,6 +19,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -29,6 +30,7 @@ export const useADO = () => {
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -64,7 +66,7 @@ export const useADO = () => {
     }
     if (
       content
-      && isEqual(content.tokens, tokens)
+      && isEqual(content.tokens, tokensWithoutInternalProperty)
       && isEqual(content.themes, themes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
@@ -88,13 +90,13 @@ export const useADO = () => {
         };
         await storage.save({
           themes,
-          tokens,
+          tokens: tokensWithoutInternalProperty,
           metadata,
         }, {
           commitMessage,
         });
 
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        saveLastSyncedState(dispatch, tokensWithoutInternalProperty, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -140,6 +142,9 @@ export const useADO = () => {
     pushDialog,
     closeDialog,
     localApiState,
+    tokensWithoutInternalProperty,
+    activeTheme,
+    usedTokenSet,
   ]);
 
   const checkAndSetAccess = React.useCallback(async (context: AdoCredentials, receivedFeatureFlags?: LDProps['flags']) => {
@@ -210,7 +215,7 @@ export const useADO = () => {
       }
       if (content) {
         if (
-          !isEqual(content.tokens, tokens)
+          !isEqual(content.tokens, tokensWithoutInternalProperty)
           || !isEqual(content.themes, themes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
@@ -249,6 +254,7 @@ export const useADO = () => {
     activeTheme,
     usedTokenSet,
     checkAndSetAccess,
+    tokensWithoutInternalProperty,
   ]);
 
   const addNewADOCredentials = React.useCallback(
@@ -277,11 +283,8 @@ export const useADO = () => {
       };
     },
     [
-      dispatch,
       tokens,
       themes,
-      usedTokenSet,
-      activeTheme,
       syncTokensWithADO,
     ],
   );

@@ -21,6 +21,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import filterInternalProperty from '@/utils/filterInternalProperty';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
@@ -44,6 +45,7 @@ export function useGitLab() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  const tokensWithoutInternalProperty = useMemo(() => filterInternalProperty(tokens), [tokens]);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
@@ -73,7 +75,7 @@ export function useGitLab() {
 
     if (
       content
-      && isEqual(content.tokens, tokens)
+      && isEqual(content.tokens, tokensWithoutInternalProperty)
       && isEqual(content.themes, themes)
       && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
     ) {
@@ -98,12 +100,12 @@ export function useGitLab() {
         };
         await storage.save({
           themes,
-          tokens,
+          tokens: tokensWithoutInternalProperty,
           metadata,
         }, {
           commitMessage,
         });
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        saveLastSyncedState(dispatch, tokensWithoutInternalProperty, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -152,6 +154,7 @@ export function useGitLab() {
     usedTokenSet,
     activeTheme,
     multiFileSync,
+    tokensWithoutInternalProperty,
   ]);
 
   const checkAndSetAccess = useCallback(async ({
@@ -222,7 +225,7 @@ export function useGitLab() {
       }
       if (content) {
         if (
-          !isEqual(content.tokens, tokens)
+          !isEqual(content.tokens, tokensWithoutInternalProperty)
           || !isEqual(content.themes, themes)
           || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
         ) {
@@ -253,8 +256,6 @@ export function useGitLab() {
     }
   }, [
     storageClientFactory,
-    dispatch.branchState,
-    dispatch.tokenState,
     pushTokensToGitLab,
     tokens,
     themes,
@@ -263,6 +264,8 @@ export function useGitLab() {
     activeTheme,
     checkAndSetAccess,
     multiFileSync,
+    dispatch,
+    tokensWithoutInternalProperty,
   ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
@@ -291,9 +294,6 @@ export function useGitLab() {
     syncTokensWithGitLab,
     tokens,
     themes,
-    dispatch.tokenState,
-    usedTokenSet,
-    activeTheme,
   ]);
 
   const fetchGitLabBranches = useCallback(async (context: GitlabCredentials) => {
