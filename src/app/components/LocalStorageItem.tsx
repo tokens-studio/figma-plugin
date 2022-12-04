@@ -25,7 +25,7 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => (
       {isActive ? <Badge text="Active" /> : (
 
         <Button id="button-storage-item-apply" variant="secondary" onClick={onClick}>
-          Set to local
+          Apply
         </Button>
       )}
     </Box>
