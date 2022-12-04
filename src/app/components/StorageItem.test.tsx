@@ -94,7 +94,7 @@ describe('StorageItem', () => {
         <StorageItem item={gitProvider} onEdit={onEdit} />
       </Provider>,
     );
-    await result.queryByText('Active')?.click();
+    await result.queryByText('Apply')?.click();
     expect(result.getByTestId('error-message')).toBeInTheDocument();
   });
 });
