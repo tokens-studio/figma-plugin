@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@/stitches.config';
 
-export const StyledBadge = styled('a', {
+export const StyledBadge = styled('div', {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',

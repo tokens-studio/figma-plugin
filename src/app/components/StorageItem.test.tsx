@@ -1,11 +1,8 @@
 import React from 'react';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
-import { Provider } from 'react-redux';
-import { render, createMockStore } from '../../../tests/config/setupTest';
+import { render } from '../../../tests/config/setupTest';
 import StorageItem from './StorageItem';
-import { ErrorMessages } from '@/constants/ErrorMessages';
-import { StorageType } from '@/types/StorageType';
 
 const gitProvider = {
   id: 'other',
@@ -35,12 +32,6 @@ jest.mock('../store/remoteTokens', () => ({
 }));
 
 describe('StorageItem', () => {
-  const defaultStore = {
-    uiState: {
-      storageType: gitProvider as StorageType,
-    },
-  };
-
   it('should render storageItem', async () => {
     const result = render(
       <StorageItem item={gitProvider} onEdit={onEdit} />,
@@ -79,22 +70,5 @@ describe('StorageItem', () => {
     );
     await result.queryByText('Apply')?.click();
     expect(mockRestoreStoredProvider).toBeCalledTimes(1);
-  });
-
-  it('should be able to display error message', async () => {
-    const mockStore = createMockStore(defaultStore);
-    mockRestoreStoredProvider.mockImplementationOnce(() => (
-      Promise.resolve({
-        status: 'failure',
-        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
-      })
-    ));
-    const result = render(
-      <Provider store={mockStore}>
-        <StorageItem item={gitProvider} onEdit={onEdit} />
-      </Provider>,
-    );
-    await result.queryByText('Apply')?.click();
-    expect(result.getByTestId('error-message')).toBeInTheDocument();
   });
 });
