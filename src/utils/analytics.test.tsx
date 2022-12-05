@@ -34,7 +34,7 @@ describe('with mixpanel env', () => {
   describe('identify', () => {
     it('should identify user', () => {
       identify({ userId: '123456', figmaId: 'figma-123', name: 'John Doe' });
-      expect(mockIdentify).toBeCalledWith('123456');
+      expect(mockIdentify).toBeCalledWith('figma-123');
       expect(mockPeopleSet).toBeCalledWith({
         USER_ID: '123456',
         FIGMA_USER_ID: 'figma-123',
