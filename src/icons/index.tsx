@@ -21,7 +21,6 @@ import IconFigmaLoading from './figma-loading.svg';
 import IconFigmaMark from './figma-mark.svg';
 import IconFolder from './folder.svg';
 import IconGap from './gap.svg';
-import IconGithub from './github.svg';
 import IconGrabber from './grabber.svg';
 import IconGrid from './grid.svg';
 import IconHelp from './help.svg';
@@ -65,7 +64,6 @@ import IconCollapseArrow from './collapse-arrow.svg';
 import IconExpandArrow from './expand-arrow.svg';
 import IconBorder from './border.svg';
 import IconImage from './image.svg';
-import IconDotaVertical from './dota-vertical.svg';
 import IconExclamationTriangle from './exclamation-triangle.svg';
 
 export {
@@ -92,7 +90,6 @@ export {
   IconFigmaMark,
   IconFolder,
   IconGap,
-  IconGithub,
   IconGrabber,
   IconGrid,
   IconHelp,
@@ -136,6 +133,5 @@ export {
   IconExpandArrow,
   IconBorder,
   IconImage,
-  IconDotaVertical,
   IconExclamationTriangle,
 };
