@@ -16,7 +16,6 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode,
     });
-
     // Go through allWithData and update all appearances of oldName to newName
     const updatedNodes: NodeManagerNode[] = [];
     const updatedNodesWithOldTokens: NodeManagerNode[] = [];
@@ -50,7 +49,6 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
         });
       }
     });
-
     if (updateMode === UpdateMode.SELECTION && category && tokens) {
       const tokensMap = tokenArrayGroupToMap(tokens);
       if (category === TokenTypes.COMPOSITION) {

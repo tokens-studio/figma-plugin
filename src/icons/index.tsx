@@ -63,7 +63,10 @@ import IconUnlink from './unlink.svg';
 import IconFile from './file.svg';
 import IconCollapseArrow from './collapse-arrow.svg';
 import IconExpandArrow from './expand-arrow.svg';
+import IconBorder from './border.svg';
 import IconImage from './image.svg';
+import IconDotaVertical from './dota-vertical.svg';
+import IconExclamationTriangle from './exclamation-triangle.svg';
 
 export {
   IconAdd,
@@ -131,5 +134,8 @@ export {
   IconFile,
   IconCollapseArrow,
   IconExpandArrow,
+  IconBorder,
   IconImage,
+  IconDotaVertical,
+  IconExclamationTriangle,
 };

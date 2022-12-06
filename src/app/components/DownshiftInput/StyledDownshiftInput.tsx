@@ -10,30 +10,28 @@ type Props = {
   suffix?: React.ReactNode;
   getInputProps: <T>(options?: T) => T & GetInputPropsOptions;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
-export const StyledDownshiftInput: React.FC<Props> = ({
+export const StyledDownshiftInput = React.forwardRef<HTMLInputElement, Props>(({
   type,
   name,
   value,
   placeholder,
   suffix,
   onChange,
-  getInputProps,
-}) => {
-  const { ref, size, ...inputProps } = getInputProps({
-    label: type || null,
-    name: name || 'value',
-    placeholder,
-    value: value || '',
-    onChange,
-  });
-
-  return (
-    <StyledInput
-      ref={ref as React.MutableRefObject<HTMLInputElement>}
-      hasSuffix={!!suffix}
-      {...inputProps}
-    />
-  );
-};
+  onBlur,
+  ...inputProps
+}, ref) => (
+  <StyledInput
+    ref={ref}
+    hasSuffix={!!suffix}
+    type={type}
+    name={name || 'value'}
+    value={value || ''}
+    placeholder={placeholder}
+    onChange={onChange}
+    onBlur={onBlur}
+    {...inputProps}
+  />
+));

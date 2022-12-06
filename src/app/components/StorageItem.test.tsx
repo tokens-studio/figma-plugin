@@ -1,6 +1,11 @@
 import React from 'react';
-import { render } from '../../../tests/config/setupTest';
+import { act } from 'react-dom/test-utils';
+import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import { render, createMockStore } from '../../../tests/config/setupTest';
 import StorageItem from './StorageItem';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { StorageType } from '@/types/StorageType';
 
 const gitProvider = {
   id: 'other',
@@ -10,11 +15,86 @@ const gitProvider = {
 };
 const onEdit = () => {};
 
+const mockConfirm = jest.fn();
+const mockRestoreStoredProvider = jest.fn();
+const mockDeleteProvider = jest.fn();
+
+jest.mock('../hooks/useConfirm', () => ({
+  __esModule: true,
+  default: () => ({
+    confirm: mockConfirm,
+  }),
+}));
+
+jest.mock('../store/remoteTokens', () => ({
+  __esModule: true,
+  default: () => ({
+    restoreStoredProvider: mockRestoreStoredProvider,
+    deleteProvider: mockDeleteProvider,
+  }),
+}));
+
 describe('StorageItem', () => {
-  it('should render storageItem', () => {
-    const { getByText } = render(<StorageItem item={gitProvider} onEdit={onEdit} />);
-    expect(getByText('Edit')).toBeInTheDocument();
-    expect(getByText('Apply')).toBeInTheDocument();
-    expect(getByText('Delete local credentials')).toBeInTheDocument();
+  const defaultStore = {
+    uiState: {
+      storageType: gitProvider as StorageType,
+    },
+  };
+
+  it('should render storageItem', async () => {
+    const result = render(
+      <StorageItem item={gitProvider} onEdit={onEdit} />,
+    );
+    expect(result.queryByText('Apply')).toBeInTheDocument();
+  });
+
+  it('should be able delete storageItem', async () => {
+    mockConfirm.mockImplementationOnce(() => (
+      Promise.resolve(true)
+    ));
+    const result = render(
+      <StorageItem item={gitProvider} onEdit={onEdit} />,
+    );
+    await act(async () => {
+      const trigger = await result.findByTestId('storage-item-tools-dropdown');
+      trigger.focus();
+      await userEvent.keyboard('[Enter]');
+    });
+    await act(async () => {
+      const deleteButton = await result.getByText('Delete');
+      deleteButton?.focus();
+      await userEvent.keyboard('[Enter]');
+    });
+    expect(mockDeleteProvider).toBeCalledTimes(1);
+  });
+
+  it('should be able restore storageItem', async () => {
+    mockRestoreStoredProvider.mockImplementationOnce(() => (
+      Promise.resolve({
+        status: 'success',
+      })
+    ));
+    const result = render(
+      <StorageItem item={gitProvider} onEdit={onEdit} />,
+    );
+    await result.queryByText('Apply')?.click();
+    expect(mockRestoreStoredProvider).toBeCalledTimes(1);
+  });
+
+  it('should be able to display error message', async () => {
+    const mockStore = createMockStore(defaultStore);
+    mockRestoreStoredProvider.mockImplementationOnce(() => (
+      Promise.resolve({
+        status: 'failure',
+        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+      })
+    ));
+    const result = render(
+      <Provider store={mockStore}>
+        <StorageItem item={gitProvider} onEdit={onEdit} />
+      </Provider>,
+    );
+    await result.queryByText('Active')?.click();
+    expect(result.getByTestId('error-message')).toBeInTheDocument();
   });
 });

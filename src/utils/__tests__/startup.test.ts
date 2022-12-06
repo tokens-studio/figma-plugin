@@ -9,6 +9,11 @@ describe('startup', () => {
       settings: {},
       activeTheme: null,
       lastOpened: 0,
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,
@@ -39,6 +44,11 @@ describe('startup', () => {
       settings: {},
       activeTheme: null,
       lastOpened: 0,
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,

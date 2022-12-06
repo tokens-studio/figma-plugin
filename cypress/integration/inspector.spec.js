@@ -8,6 +8,11 @@ describe('Inspector tokens', () => {
   const mockStartupParams = {
     activeTheme: null,
     lastOpened: Date.now(),
+    onboardingExplainer: {
+      sets: true,
+      inspect: true,
+      syncProviders: true,
+    },
     localApiProviders: [],
     licenseKey: null,
     settings: {
@@ -56,20 +61,20 @@ describe('Inspector tokens', () => {
       version: '5',
       values: {
         options: [{
-            name: 'sizing.xs',
-            value: 4,
-            type: 'sizing'
-          },
-          {
-            name: 'opacity.50',
-            value: '50%',
-            type: 'opacity'
-          },
-          {
-            name: 'font-size.12',
-            value: '12px',
-            type: 'fontSizes'
-          }
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        },
+        {
+          name: 'opacity.50',
+          value: '50%',
+          type: 'opacity'
+        },
+        {
+          name: 'font-size.12',
+          value: '12px',
+          type: 'fontSizes'
+        }
         ],
         global: [{
           name: 'sizing.xs',
@@ -80,35 +85,35 @@ describe('Inspector tokens', () => {
     });
     cy.receiveSelectionValues({
       selectionValues: [{
-          category: "sizing",
-          type: "sizing",
-          value: "sizing.xs",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "opacity",
-          type: "opacity",
-          value: "opacity.50",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "fontSizes",
-          type: "fontSizes",
-          value: "font-size.12",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
+        category: "sizing",
+        type: "sizing",
+        value: "sizing.xs",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "opacity",
+        type: "opacity",
+        value: "opacity.50",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "fontSizes",
+        type: "fontSizes",
+        value: "font-size.12",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
       ],
       selectedNodes: 1,
       mainNodeSelectionValues: {
@@ -132,25 +137,25 @@ describe('Inspector tokens', () => {
       version: '5',
       values: {
         options: [{
-            name: 'sizing.xs',
-            value: 4,
-            type: 'sizing'
-          },
-          {
-            name: 'opacity.50',
-            value: '50%',
-            type: 'opacity'
-          },
-          {
-            name: 'opacity.100',
-            value: '100%',
-            type: 'opacity'
-          },
-          {
-            name: 'font-size.12',
-            value: '12px',
-            type: 'fontSizes'
-          }
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        },
+        {
+          name: 'opacity.50',
+          value: '50%',
+          type: 'opacity'
+        },
+        {
+          name: 'opacity.100',
+          value: '100%',
+          type: 'opacity'
+        },
+        {
+          name: 'font-size.12',
+          value: '12px',
+          type: 'fontSizes'
+        }
         ],
         global: [{
           name: 'sizing.xs',
@@ -161,35 +166,35 @@ describe('Inspector tokens', () => {
     });
     cy.receiveSelectionValues({
       selectionValues: [{
-          category: "sizing",
-          type: "sizing",
-          value: "sizing.xs",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "opacity",
-          type: "opacity",
-          value: "opacity.50",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "fontSizes",
-          type: "fontSizes",
-          value: "font-size.12",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
+        category: "sizing",
+        type: "sizing",
+        value: "sizing.xs",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "opacity",
+        type: "opacity",
+        value: "opacity.50",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "fontSizes",
+        type: "fontSizes",
+        value: "font-size.12",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
       ],
       selectedNodes: 1,
       mainNodeSelectionValues: {
@@ -205,35 +210,35 @@ describe('Inspector tokens', () => {
     cy.get(`input[name=value]`).type('$opacity.100').type('{enter}');
     cy.receiveSelectionValues({
       selectionValues: [{
-          category: "sizing",
-          type: "sizing",
-          value: "sizing.xs",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "opacity",
-          type: "opacity",
-          value: "opacity.100",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
-        {
-          category: "fontSizes",
-          type: "fontSizes",
-          value: "font-size.12",
-          nodes: [{
-            id: "1",
-            name: "Rectangle",
-            type: "RECTANGLE",
-          }],
-        },
+        category: "sizing",
+        type: "sizing",
+        value: "sizing.xs",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "opacity",
+        type: "opacity",
+        value: "opacity.100",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
+      {
+        category: "fontSizes",
+        type: "fontSizes",
+        value: "font-size.12",
+        nodes: [{
+          id: "1",
+          name: "Rectangle",
+          type: "RECTANGLE",
+        }],
+      },
       ],
       selectedNodes: 1,
       mainNodeSelectionValues: {

@@ -66,26 +66,6 @@ describe('setColorValuesOnTarget', () => {
       value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
     }, 'fills');
 
-    expect(mockNode.fills).toEqual([{
-      type: 'GRADIENT_LINEAR',
-      gradientTransform: [
-        [1, 0, 0],
-        [0, 1, 0],
-      ],
-      gradientStops: [
-        {
-          position: 0,
-          color: {
-            r: 0, g: 0, b: 0, a: 1,
-          },
-        },
-        {
-          position: 1,
-          color: {
-            r: 1, g: 1, b: 1, a: 1,
-          },
-        },
-      ],
-    }]);
+    expect(mockNode.fills).toMatchSnapshot();
   });
 });

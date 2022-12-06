@@ -46,7 +46,7 @@ export default function JSONBinForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
+        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input
           full
           label="Secret"
@@ -66,12 +66,12 @@ export default function JSONBinForm({
           required={!isNew}
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (

@@ -113,13 +113,14 @@ export const tokenState = createModel<RootModel>()({
         return state;
       }
 
+      const indexOf = Object.keys(state.tokens).indexOf(name);
       const newName = `${name}_Copy`;
       return updateTokenSetsInState(
         state,
         null,
         [newName, state.tokens[name].map((token) => (
           extend(true, {}, token) as typeof token
-        ))],
+        )), indexOf + 1],
       );
     },
     deleteTokenSet: (state, name: string) => updateTokenSetsInState(
@@ -493,6 +494,7 @@ export const tokenState = createModel<RootModel>()({
           storageType: rootState.uiState.storageType,
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
           checkForChanges: rootState.tokenState.checkForChanges,
+          shouldSwapStyles: rootState.settings.shouldSwapStyles,
         });
       } catch (e) {
         console.error('Error updating document', e);

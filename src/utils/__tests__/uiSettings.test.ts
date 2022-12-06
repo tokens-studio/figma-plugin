@@ -19,6 +19,7 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      shouldSwapStyles: false,
     });
     expect(mockSetAsync).toBeCalledWith('uiSettings', JSON.stringify({
       width: 400,
@@ -31,6 +32,7 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      shouldSwapStyles: false,
     }));
   });
 
@@ -50,6 +52,7 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      shouldSwapStyles: false,
     });
   });
 

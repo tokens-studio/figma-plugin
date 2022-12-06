@@ -1,6 +1,7 @@
 import { ApiProvidersProperty, LicenseKeyProperty } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
+import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
@@ -14,6 +15,7 @@ export async function startup() {
     activeTheme,
     userId, // the user ID is used for license key binding
     lastOpened,
+    onboardingExplainer,
     storageType,
     localApiProviders,
     licenseKey,
@@ -24,6 +26,7 @@ export async function startup() {
     getActiveTheme(),
     getUserId(),
     getLastOpened(),
+    getOnboardingExplainer(),
     getSavedStorageType(),
     ApiProvidersProperty.read(),
     LicenseKeyProperty.read(),
@@ -34,6 +37,7 @@ export async function startup() {
     settings,
     activeTheme,
     lastOpened,
+    onboardingExplainer,
     storageType,
     localApiProviders,
     licenseKey,

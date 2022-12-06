@@ -2,6 +2,8 @@ import React from 'react';
 import { DownshiftInput } from './DownshiftInput';
 import { render } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 const resolvedTokens = [
   {
@@ -52,6 +54,42 @@ const resolvedTokens = [
     rawValue: '1',
     type: 'sizing',
     value: 1,
+  },
+  {
+    internal__Parent: 'core',
+    name: 'typography.regular',
+    rawValue: {
+      fontFamily: 'arial',
+      fontSize: '12px',
+      fontWeight: 'bold',
+    },
+    type: TokenTypes.TYPOGRAPHY,
+    value: {
+      fontFamily: 'arial',
+      fontSize: '12px',
+      fontWeight: 'bold',
+    },
+  },
+  {
+    internal__Parent: 'core',
+    name: 'boxShadow.regular',
+    rawValue: [{
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    }],
+    type: TokenTypes.BOX_SHADOW,
+    value: [{
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    }],
   },
 ] as SingleToken[];
 
@@ -119,6 +157,6 @@ describe('DownShiftInput', () => {
       />,
     );
     result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(7);
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(9);
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "token-transformer",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
   "repository": {
     "type": "git",
@@ -14,10 +14,11 @@
     "build-light-test": "node index.js tokens.json temp/dark.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing",
     "build-dark-test": "node index.js tokens.json temp/light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
     "build-single-file-test-theme-config": "node index.js tokens.json --theme --themeOutputPath temp",
+    "build-single-file-test-order-config": "node index.js order.json --theme --themeOutputPath temp",
     "build-folder-test": "node index.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
     "build-folder-test-theme-config": "node index.js tokens --theme --themeOutputPath temp",
     "build-resolve-false-test": "node index.js tokens.json temp/resolve-false.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing --resolveReferences=false",
-    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-single-file-test-theme-config && npm run build-folder-test && npm run build-folder-test-theme-config && npm run build-resolve-false-test && npm run build-composition-test && jest"
+    "test": "npm run build-typography-test && npm run build-light-test && npm run build-dark-test && npm run build-single-file-test-theme-config && npm run build-folder-test && npm run build-folder-test-theme-config && npm run build-resolve-false-test && npm run build-composition-test && npm run build-single-file-test-order-config && jest"
   },
   "author": "six7",
   "license": "MIT",

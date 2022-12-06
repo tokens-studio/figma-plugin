@@ -22,7 +22,7 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.borderRadiusBottomRight:
       type = Properties.borderRadius;
       break;
-    case Properties.border:
+    case Properties.borderColor:
       type = Properties.fill;
       break;
     case Properties.borderWidthTop:
@@ -30,6 +30,18 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.borderWidthRight:
     case Properties.borderWidthBottom:
       type = Properties.borderWidth;
+      break;
+    case 'fontFamily':
+      type = Properties.fontFamilies;
+      break;
+    case 'fontSize':
+      type = Properties.fontSizes;
+      break;
+    case 'fontWeight':
+      type = Properties.fontWeights;
+      break;
+    case 'lineHeights':
+      type = Properties.lineHeights;
       break;
     default:
       type = property;

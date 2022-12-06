@@ -41,6 +41,21 @@
       "value": { "type": "string" }
     }
   },
+  "border": {
+    "label": "Border",
+    "property": "Border",
+    "type": "border",
+    "schemas": {
+      "value": {
+        "type": "object",
+        "properties": {
+          "color": { "type": "string" },
+          "width": { "type": "string" },
+          "style": { "type": "string" }
+        }
+      }
+    }
+  },
   "opacity": {
     "label": "Opacity",
     "property": "Opacity",
@@ -175,6 +190,14 @@
     "property": "Asset",
     "type": "asset",
     "explainer": "Public URL of your asset",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "dimension": {
+    "label": "Dimension",
+    "property": "Dimension",
+    "type": "dimension",
     "schemas": {
       "value": { "type": "string" }
     }
