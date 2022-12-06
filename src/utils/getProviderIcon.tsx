@@ -1,6 +1,9 @@
 import React from 'react';
-import { ArchiveIcon } from '@radix-ui/react-icons';
-import { IconFile, IconGithub } from '@/icons';
+import { ArchiveIcon, GitHubLogoIcon, Link2Icon } from '@radix-ui/react-icons';
+import { IconFile } from '@/icons';
+import GitLabIcon from '@/icons/gitlab.svg';
+import ADOIcon from '@/icons/azure.svg';
+import JSONBinIcon from '@/icons/jsonbin.svg';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function getProviderIcon(provider: StorageProviderType) {
@@ -8,17 +11,17 @@ export function getProviderIcon(provider: StorageProviderType) {
     case StorageProviderType.LOCAL:
       return <IconFile />;
     case StorageProviderType.URL:
-      return <IconGithub />;
+      return <Link2Icon />;
     case StorageProviderType.GITHUB:
-      return <IconGithub />;
+      return <GitHubLogoIcon />;
     case StorageProviderType.GITLAB:
-      return <IconGithub />;
+      return <GitLabIcon />;
     case StorageProviderType.ADO:
-      return <IconGithub />;
+      return <ADOIcon />;
     case StorageProviderType.BITBUCKET:
-      return <IconGithub />;
+      return <Link2Icon />;
     case StorageProviderType.JSONBIN:
-      return <IconGithub />;
+      return <JSONBinIcon />;
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
       return <ArchiveIcon />;
     default:
