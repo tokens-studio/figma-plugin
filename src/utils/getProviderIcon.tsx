@@ -22,6 +22,6 @@ export function getProviderIcon(provider: StorageProviderType) {
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
       return <ArchiveIcon />;
     default:
-      return null;
+      return '';
   }
 }
