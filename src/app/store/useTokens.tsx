@@ -78,8 +78,8 @@ export default function useTokens() {
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokensContext.resolvedTokens)
-  ), [tokensContext]);
+    stringifyTokens(tokens, activeTokenSet)
+  ), [tokens, activeTokenSet]);
 
   // Calls Figma asking for all local text- and color styles
   const pullStyles = useCallback(async () => {

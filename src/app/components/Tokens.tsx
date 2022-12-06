@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
-import { mergeTokenGroups, resolveTokenValues, ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -105,7 +105,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const updateMode = useSelector(updateModeSelector);
   const { confirm } = useConfirm();
   const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
-  const [resolvedTokens, setResolvedTokens] = React.useState<ResolveTokenValuesResult[]>([]);
+
   React.useEffect(() => {
     if (tokenDiv.current) {
       tokenDiv.current.addEventListener('scroll', () => {}, false);
@@ -118,26 +118,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [activeTokenSet]);
 
-  React.useEffect(() => {
-    const value = resolveTokenValues(mergeTokenGroups(tokens, {
+  const resolvedTokens = React.useMemo(
+    () => resolveTokenValues(mergeTokenGroups(tokens, {
       ...usedTokenSet,
       [activeTokenSet]: TokenSetStatus.ENABLED,
-    }));
-    setResolvedTokens(value);
-  }, [tokens, usedTokenSet, activeTokenSet]);
-
-  React.useEffect(() => {
-    console.log('resolve', resolvedTokens);
-  }, [resolvedTokens]);
-
-  // const resolvedTokens = React.useMemo(
-  //   () => resolveTokenValues(mergeTokenGroups(tokens, {
-  //     ...usedTokenSet,
-  //     [activeTokenSet]: TokenSetStatus.ENABLED,
-  //   })),
-  //   [tokens, usedTokenSet, activeTokenSet],
-  // );
-
+    })),
+    [tokens, usedTokenSet, activeTokenSet],
+  );
   const [stringTokens, setStringTokens] = React.useState(
     JSON.stringify(tokens[activeTokenSet], null, 2),
   );
