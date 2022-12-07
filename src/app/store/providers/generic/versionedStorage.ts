@@ -160,6 +160,17 @@ export function useGenericVersionedStorage() {
     } = context;
     if (!id) return null;
 
+    // Always attempt create first if required
+    const updatedAt = new Date().toISOString();
+    const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
+
+    if (!result) {
+      return {
+        status: 'failure',
+        errorMessage: 'Failed to create endpoint',
+      };
+    }
+
     const content = await pullTokensFromGenericVersionedStorage(context);
 
     if (content?.status === 'failure') {

@@ -43,7 +43,7 @@ export default function GenericVersionedForm({
 }: Props) {
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validationResult = zodSchema.safeParse(values);
+    const validationResult = zodSchema.safeParse({ additionalHeaders: [], ...values });
     if (validationResult.success) {
       const formFields = {
         ...validationResult.data,
@@ -51,6 +51,8 @@ export default function GenericVersionedForm({
         internalId: validationResult.data.internalId || generateId(24),
       } as ValidatedFormValues;
       onSubmit(formFields);
+    } else {
+      console.log(validationResult, values);
     }
   }, [values, onSubmit]);
 
