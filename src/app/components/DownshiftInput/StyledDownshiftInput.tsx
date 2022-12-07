@@ -26,7 +26,6 @@ export const StyledDownshiftInput = React.forwardRef<HTMLInputElement, Props>(({
   <StyledInput
     ref={ref}
     hasSuffix={!!suffix}
-    type={type}
     name={name || 'value'}
     value={value || ''}
     placeholder={placeholder}
