@@ -1,4 +1,4 @@
-# Tokens Studio for Figma (formerlly known as Figma Tokens)
+# Tokens Studio for Figma (formerly known as Figma Tokens)
 
 <a href="https://www.producthunt.com/posts/figma-design-tokens?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-figma-design-tokens" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=217712&theme=light" alt="Figma Design Tokens - Making design tokens a single source of truth for Figma. | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
