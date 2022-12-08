@@ -19,7 +19,7 @@ import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 
 const StyledFigmaTokensLogo = styled(FigmaLetter, {
-  width: '90px',
+  width: '130px',
   height: '55px',
 });
 
@@ -80,20 +80,20 @@ function StartScreen() {
           <StyledFigmaTokensLogo />
         </Stack>
         <Text muted>
-          Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
+          Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
         </Text>
         <Stack direction="column" gap={4}>
           <Heading size="large">Guides</Heading>
           <Stack direction="column" gap={3}>
-            <HelpfulLink href="https://docs.figmatokens.com/getting-started" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/getting-started" target="_blank">
               <BookmarkIcon />
               Getting started
             </HelpfulLink>
-            <HelpfulLink href="https://docs.figmatokens.com/" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/" target="_blank">
               <ReaderIcon />
               Documentation
             </HelpfulLink>
-            <HelpfulLink href="https://figmatokens.com/slack" target="_blank">
+            <HelpfulLink href="https://tokens.studio/slack" target="_blank">
               <ChatBubbleIcon />
               Join our Slack
             </HelpfulLink>
@@ -116,7 +116,7 @@ function StartScreen() {
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
-          <a href="https://github.com/six7/figma-tokens" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
+          <a href="https://github.com/tokens-studio/figma-plugin" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
             Found an issue? We&#39;re on GitHub!
           </a>
         </Stack>

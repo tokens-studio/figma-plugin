@@ -111,7 +111,7 @@ export default function Footer() {
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
-          <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
+          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
         </Stack>
       </Stack>
     </Box>

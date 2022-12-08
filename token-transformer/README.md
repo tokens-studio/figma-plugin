@@ -1,6 +1,6 @@
 ****# Token Transformer
 
-Converts tokens from Figma Tokens to something Style Dictionary can read, removing any math operations or aliases, only resulting in raw values.
+Converts tokens from Tokens Studio for Figma to something Style Dictionary can read, removing any math operations or aliases, only resulting in raw values.
 
 ## How to use
 

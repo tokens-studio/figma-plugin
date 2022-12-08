@@ -60,7 +60,6 @@ export const settings = createModel<RootModel>()({
       };
     },
     setWindowSize(state, payload: { width: number; height: number }) {
-      track('Set Window Size', { width: payload.width, height: payload.height });
       return {
         ...state,
         uiWindow: {
