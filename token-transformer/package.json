@@ -1,10 +1,10 @@
 {
   "name": "token-transformer",
   "version": "0.0.28",
-  "description": "A utility that transforms tokens from Figma Tokens to a format that is readable by Style Dictionary.",
+  "description": "A utility that transforms tokens from Tokens Studio for Figma (formerly known as Figma Tokens) to a format that is readable by Style Dictionary.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/six7/figma-tokens.git",
+    "url": "https://github.com/tokens-studio/figma-plugin.git",
     "directory": "token-transformer"
   },
   "main": "index.js",

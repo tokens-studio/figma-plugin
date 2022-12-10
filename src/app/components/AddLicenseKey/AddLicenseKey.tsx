@@ -98,7 +98,7 @@ export default function AddLicenseKey() {
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && !licenseKeyError && (
-            <ManageSubscriptionLink href="https://account.figmatokens.com/" target="_blank">
+            <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
               Manage subscription
             </ManageSubscriptionLink>
           )}
