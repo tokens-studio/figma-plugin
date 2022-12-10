@@ -56,7 +56,7 @@ describe('convertToDefaultProperty', () => {
       output: Properties.borderRadius,
     },
     {
-      input: Properties.border,
+      input: Properties.borderColor,
       output: Properties.fill,
     },
     {

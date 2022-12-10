@@ -1,3 +1,8 @@
+## v0.0.28 (2022-12-01)
+
+Fixed expanded composition token types using the wrong key, those are now using the token types we use in the plugin (fontFamilies, fontWeights). Thanks thomasmattheussen!
+We now respect the order of themes as defined in $metadata.json (or the $metadata key). Thanks thomasmattheussen!
+
 ## v0.0.27 (2022-09-15)
 
 Added support to read $themes.json or $themes key by using --theme=true - this allows you to generate token files easily by providing a $themes key instead of manually running token-transformer multiple times. Thanks forceofseth!

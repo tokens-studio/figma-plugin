@@ -19,7 +19,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
 } from '@/figmaStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -97,6 +97,18 @@ export async function saveStorageType(context: StorageType) {
   await StorageTypeProperty.write(context);
 }
 
+export async function saveOnboardingExplainerSets(onboardingExplainerSets: boolean) {
+  await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
+}
+
+export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: boolean) {
+  await OnboardingExplainerSyncProvidersProperty.write(onboardingExplainerSyncProviders);
+}
+
+export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: boolean) {
+  await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
+}
+
 export async function getSavedStorageType(): Promise<StorageType> {
   // the saved storage types will never contain credentials
   // as they should not be shared across
@@ -148,10 +160,10 @@ export function destructureCompositionTokenForAlias(tokens: Map<string, AnyToken
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue) {
       Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
-        let strExcludedSymbol: string = '';
-        if (String(value).startsWith('$')) strExcludedSymbol = String(value).slice(1, String(value).length);
-        if (String(value).startsWith('{')) strExcludedSymbol = String(value).slice(1, String(value).length - 1);
-        tokensInCompositionToken[property as CompositionTokenProperty] = strExcludedSymbol;
+        let tokenName: string = resolvedToken.name;
+        if (String(value).startsWith('$')) tokenName = String(value).slice(1, String(value).length);
+        if (String(value).startsWith('{')) tokenName = String(value).slice(1, String(value).length - 1);
+        tokensInCompositionToken[property as CompositionTokenProperty] = tokenName;
       });
       const { composition, ...objExcludedCompositionToken } = values;
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };

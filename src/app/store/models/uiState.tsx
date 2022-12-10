@@ -65,6 +65,9 @@ export interface UIState {
   lastUpdatedAt: string | null;
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
+  onboardingExplainerSets: boolean;
+  onboardingExplainerSyncProviders: boolean;
+  onboardingExplainerInspect: boolean;
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
@@ -108,6 +111,9 @@ export const uiState = createModel<RootModel>()({
     lastUpdatedAt: null,
     changelog: [],
     lastOpened: '',
+    onboardingExplainerSets: null,
+    onboardingExplainerSyncProviders: null,
+    onboardingExplainerInspect: null,
     editToken: {
       type: TokenTypes.OTHER,
       status: EditTokenFormStatus.CREATE,
@@ -261,6 +267,24 @@ export const uiState = createModel<RootModel>()({
         lastOpened: payload,
       };
     },
+    setOnboardingExplainerSets(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingExplainerSets: payload,
+      };
+    },
+    setOnboardingExplainerSyncProviders(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingExplainerSyncProviders: payload,
+      };
+    },
+    setOnboardingExplainerInspect(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingExplainerInspect: payload,
+      };
+    },
     setTokenFilter(state, payload: string) {
       return {
         ...state,
@@ -331,6 +355,24 @@ export const uiState = createModel<RootModel>()({
     setLastOpened: (payload) => {
       fetchChangelog(payload, (result) => {
         dispatch.uiState.setChangelog(result);
+      });
+    },
+    setOnboardingExplainerSets: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
+        onboardingExplainerSets: payload,
+      });
+    },
+    setOnboardingExplainerSyncProviders: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
+        onboardingExplainerSyncProviders: payload,
+      });
+    },
+    setOnboardingExplainerInspect: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT,
+        onboardingExplainerInspect: payload,
       });
     },
     setActiveTab: (payload: Tabs) => {

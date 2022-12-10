@@ -5,14 +5,19 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 const createTokenSet = ({ name }) => {
   cy.get('[data-cy="button-new-token-set"]').click({ timeout: 1000 })
-      .get('[data-cy="token-set-input"]')
-      .type(name).type('{enter}');
+    .get('[data-cy="token-set-input"]')
+    .type(name).type('{enter}');
 };
 
 describe('TokenListing', () => {
   const mockStartupParams = {
     activeTheme: null,
     lastOpened: Date.now(),
+    onboardingExplainer: {
+      sets: true,
+      inspect: true,
+      syncProviders: true,
+    },
     localApiProviders: [],
     licenseKey: null,
     settings: {

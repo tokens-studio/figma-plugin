@@ -114,7 +114,7 @@
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.16",
-    "@figma/plugin-typings": "^1.47.0",
+    "@figma/plugin-typings": "^1.55.1",
     "@storybook/addon-actions": "^6.5.8",
     "@storybook/addon-docs": "^6.5.8",
     "@storybook/addon-essentials": "^6.5.8",

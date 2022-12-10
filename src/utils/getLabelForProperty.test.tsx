@@ -17,6 +17,8 @@ describe('getLabelForProperty', () => {
   it('returns labels for label properties that need conversion', () => {
     expect(getLabelForProperty('fontFamily')).toEqual('Font');
     expect(getLabelForProperty('fontWeight')).toEqual('Weight');
+    expect(getLabelForProperty('width')).toEqual('Width');
+    expect(getLabelForProperty('style')).toEqual('Style');
     expect(getLabelForProperty('blur')).toEqual('blur');
   });
 });

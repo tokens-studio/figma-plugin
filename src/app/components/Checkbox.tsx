@@ -18,7 +18,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   justifyContent: 'center',
   width: 12,
   height: 12,
-  '&:focus': { boxShadow: '0 0 0 2px black' },
+  '&:focus': { boxShadow: '$focus' },
   variants: {
     isChecked: {
       true: {

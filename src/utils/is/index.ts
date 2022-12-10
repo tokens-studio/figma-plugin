@@ -10,3 +10,4 @@ export * from './isPrimitiveValue';
 export * from './isSingleBoxShadowValue';
 export * from './isSingleTypographyValue';
 export * from './isMatchingStyle';
+export * from './isSingleBorderToken';

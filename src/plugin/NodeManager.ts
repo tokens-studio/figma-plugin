@@ -80,7 +80,6 @@ export class NodeManager {
 
   private async getNodePluginData(node: BaseNode) {
     const checksum = await HashProperty.read(node);
-
     const registeredPersistentEntry = this.persistentNodesCache.get(node.id);
     if (
       registeredPersistentEntry
@@ -291,6 +290,7 @@ export class NodeManager {
     } else {
       relevantNodes = findAll([figma.root], false);
     }
+
     const unregisteredNodes = relevantNodes
       .filter((node) => {
         const mainKey = getMainKey(node);
