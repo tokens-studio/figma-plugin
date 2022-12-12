@@ -52,11 +52,9 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
         {(!styleInfo.name && !styleInfo.failedToResolve) && (
           <ResolvingLoader />
         )}
-        {(!styleInfo.name && styleInfo.failedToResolve) && (
-          <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
-            <IconUnlink />
-          </StyledUnlinkButton>
-        )}
+        <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
+          <IconUnlink />
+        </StyledUnlinkButton>
         {styleInfo.name && (
           <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
         )}
