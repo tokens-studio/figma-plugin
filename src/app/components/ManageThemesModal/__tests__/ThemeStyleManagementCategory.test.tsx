@@ -48,7 +48,7 @@ describe('ThemeStyleManagementCategory', () => {
     attachLocalStyles.click();
     expect(mockAttachLocalStyles).toBeCalledTimes(1);
 
-    const unlinkButton = await result.findByTestId('themestylemanagementcategorystyleentry-unlink');
+    const unlinkButton = await result.findAllByTestId('themestylemanagementcategorystyleentry-unlink');
     unlinkButton[0].click();
     expect(mockDisconnectStyle).toBeCalledTimes(1);
   });
