@@ -49,7 +49,7 @@ describe('ThemeStyleManagementCategory', () => {
     expect(mockAttachLocalStyles).toBeCalledTimes(1);
 
     const unlinkButton = await result.findByTestId('themestylemanagementcategorystyleentry-unlink');
-    unlinkButton.click();
+    unlinkButton[0].click();
     expect(mockDisconnectStyle).toBeCalledTimes(1);
   });
 });
