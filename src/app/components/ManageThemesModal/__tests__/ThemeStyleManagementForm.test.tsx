@@ -98,8 +98,8 @@ describe('ThemeStyleManagementForm', () => {
     const toggle = (await result.findAllByTestId('accordion-toggle'))[2];
     act(() => toggle.click());
 
-    const unlink = await result.findByTestId('themestylemanagementcategorystyleentry-unlink');
-    act(() => unlink.click());
+    const unlink = await result.findAllByTestId('themestylemanagementcategorystyleentry-unlink');
+    act(() => unlink[0].click());
     expect(store.getState().tokenState.themes[0].$figmaStyleReferences).toEqual({
       'colors.brand.primary': 'S:1234',
       'typography.heading.h1': 'S:2345',
