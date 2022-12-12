@@ -16,7 +16,7 @@ import Button from './Button';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
-import { IconBrokenLink } from '@/icons';
+import { IconBrokenLink, IconValueNone } from '@/icons';
 
 export default function InspectorTokenSingle({
   token,
@@ -39,7 +39,7 @@ export default function InspectorTokenSingle({
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
     if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value)) setIsBrokenLink(true);
-  }, [inspectState.selectedTokens, token]);
+  }, [inspectState.selectedTokens, token, resolvedTokens]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setNewTokenName(newInputValue.replace(/[{}$]/g, ''));
@@ -53,7 +53,7 @@ export default function InspectorTokenSingle({
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName, resolvedTokens);
     setShowDialog(false);
-  }, [token, handleRemap, newTokenName]);
+  }, [token, handleRemap, newTokenName, resolvedTokens]);
 
   const handleClick = React.useCallback(() => {
     setShowDialog(true);
@@ -92,7 +92,15 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
-        {isBrokenLink && <IconBrokenLink />}
+        {
+          isBrokenLink && (
+            token.value === 'none' ? (
+              <IconValueNone />
+            ) : (
+              <IconBrokenLink />
+            )
+          )
+        }
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
         )}

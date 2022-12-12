@@ -6,7 +6,7 @@ import { SingleToken } from '@/types/tokens';
 import IconShadow from '@/icons/shadow.svg';
 import IconComposition from '@/icons/composition.svg';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { IconBorder, IconImage, IconValueNone } from '@/icons';
+import { IconBorder, IconImage } from '@/icons';
 
 export default function InspectorResolvedToken({ token }: { token: SingleToken }) {
   // TODO: Introduce shared component for token tooltips
@@ -28,22 +28,6 @@ export default function InspectorResolvedToken({ token }: { token: SingleToken }
           <IconBrokenLink />
         </Box>
       </Tooltip>
-    );
-  }
-
-  if (token.value) {
-    return (
-      <Box
-        css={{
-          background: '$bgSubtle',
-          fontSize: '$small',
-          padding: '$2 $3',
-          borderRadius: '$default',
-          width: '40px',
-        }}
-      >
-        <IconValueNone />
-      </Box>
     );
   }
 

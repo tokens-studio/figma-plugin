@@ -28,7 +28,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
-  const { removeTokensByValue } = useTokens();
+  const { removeTokensByValue, setNoneValuesOnNode } = useTokens();
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
@@ -81,15 +81,15 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   }, [dispatch]);
 
   const setValueAsNone = React.useCallback(() => {
-    const valuesToRemove = uiState.selectionValues
+    const valuesToSetAsNone = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
       .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
       property: Properties;
       nodes: NodeInfo[];
     }[]);
 
-    removeTokensByValue(valuesToRemove);
-  }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
+    setNoneValuesOnNode(valuesToSetAsNone);
+  }, [inspectState.selectedTokens, uiState.selectionValues, setNoneValuesOnNode]);
 
   return (
     <>

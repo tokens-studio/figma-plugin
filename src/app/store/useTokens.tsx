@@ -40,7 +40,7 @@ type GetFormattedTokensOptions = {
   expandComposition: boolean;
 };
 
-type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
+type TokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 export type SyncOption = 'removeStyle' | 'renameStyle';
 
@@ -111,7 +111,7 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
+  const removeTokensByValue = useCallback((data: TokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
     AsyncMessageChannel.ReactInstance.message({
@@ -272,6 +272,15 @@ export default function useTokens() {
     dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
+  const setNoneValuesOnNode = useCallback((data: TokensByValueData) => {
+    track('setNoneValuesOnNode', { count: data.length });
+
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
+      tokensToRemove: data,
+    });
+  }, []);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -287,6 +296,7 @@ export default function useTokens() {
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,
+    setNoneValuesOnNode,
   }), [
     isAlias,
     getTokenValue,
@@ -302,5 +312,6 @@ export default function useTokens() {
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,
+    setNoneValuesOnNode,
   ]);
 }
