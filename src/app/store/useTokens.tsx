@@ -277,7 +277,7 @@ export default function useTokens() {
 
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
-      tokensToRemove: data,
+      tokensToSet: data,
     });
   }, []);
 

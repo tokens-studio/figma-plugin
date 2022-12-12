@@ -86,7 +86,7 @@ export type RemoveTokensByValueAsyncMessage = AsyncMessage<AsyncMessageTypes.REM
 export type RemoveTokensByValueAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE>;
 
 export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, {
-  tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
+  tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
 }>;
 export type SetNoneValuesOnNodeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE>;
 

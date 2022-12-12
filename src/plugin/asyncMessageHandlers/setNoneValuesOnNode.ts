@@ -7,7 +7,7 @@ import { sendSelectionChange } from '../sendSelectionChange';
 export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NONE_VALUES_ON_NODE] = async (msg) => {
   const nodesToRemove: { [key: string]: string[] } = {};
 
-  msg.tokensToRemove.forEach((token) => {
+  msg.tokensToSet.forEach((token) => {
     token.nodes.forEach(({ id }) => {
       nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
     });
@@ -22,7 +22,7 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
 
       const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
       if (nodeToUpdate) {
-        await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
+        await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: true });
       }
     }),
   );
