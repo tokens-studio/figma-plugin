@@ -15,7 +15,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
-import BulkRemapModal from './modals/BulkRemapModal';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
 import Stack from './Stack';
@@ -30,12 +29,11 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { removeTokensByValue } = useTokens();
-  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
     dispatch.inspectState.setSelectedTokens([]);
-  }, [uiState.selectionValues]);
+  }, [dispatch]);
 
   const groupedSelectionValues = React.useMemo(() => (
     uiState.selectionValues.reduce<Partial<
@@ -70,14 +68,6 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
 
-  const handleShowBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(true);
-  }, []);
-
-  const handleHideBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(false);
-  }, []);
-
   const handleSelectAll = React.useCallback(() => {
     dispatch.inspectState.setSelectedTokens(
       inspectState.selectedTokens.length === uiState.selectionValues.length
@@ -111,8 +101,8 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
           </Label>
         </Box>
         <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-          <Button onClick={handleShowBulkRemap} variant="secondary">
-            Bulk remap
+          <Button variant="secondary">
+            Set to none
           </Button>
           <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
             Remove selected
@@ -129,12 +119,6 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
         {uiState.selectionValues.length > 0 ? (
           <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
             {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
-            {bulkRemapModalVisible && (
-            <BulkRemapModal
-              isOpen={bulkRemapModalVisible}
-              onClose={handleHideBulkRemap}
-            />
-            )}
           </Box>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>

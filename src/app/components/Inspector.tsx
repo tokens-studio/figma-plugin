@@ -19,9 +19,12 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import Button from './Button';
+import BulkRemapModal from './modals/BulkRemapModal';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
+  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -50,6 +53,14 @@ function Inspector() {
       default: return null;
     }
   }
+
+  const handleShowBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(true);
+  }, []);
+
+  const handleHideBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(false);
+  }, []);
 
   return (
     <Box css={{
@@ -81,9 +92,12 @@ function Inspector() {
         </Box>
         <Box
           css={{
-            display: 'flex', gap: '$2', flexDirection: 'row', alignItems: 'center',
+            display: 'flex', gap: '$4', flexDirection: 'row', alignItems: 'center',
           }}
         >
+          <Button onClick={handleShowBulkRemap} variant="secondary">
+            Bulk remap
+          </Button>
           <IconButton
             variant={inspectView === 'multi' ? 'primary' : 'default'}
             dataCy="inspector-multi"
@@ -101,6 +115,12 @@ function Inspector() {
             tooltip="Debug & Annotate"
           />
         </Box>
+        {bulkRemapModalVisible && (
+        <BulkRemapModal
+          isOpen={bulkRemapModalVisible}
+          onClose={handleHideBulkRemap}
+        />
+        )}
       </Box>
 
       {renderInspectView()}
