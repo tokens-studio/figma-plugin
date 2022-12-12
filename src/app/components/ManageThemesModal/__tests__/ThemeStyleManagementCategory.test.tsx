@@ -22,6 +22,10 @@ describe('ThemeStyleManagementCategory', () => {
               id: 'S:1235',
               name: 'body/bold',
             },
+            'typography/body/light': {
+              id: 'S:1235',
+              failedToResolve: false,
+            },
           }}
           icon={(
             <Box data-testid="icon" />
