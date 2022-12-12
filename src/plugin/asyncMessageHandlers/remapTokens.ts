@@ -11,7 +11,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
     const {
-      oldName, newName, updateMode, category, tokens,
+      oldName, newName, updateMode, category,
     } = msg;
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode,
@@ -49,8 +49,8 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
         });
       }
     });
-    if (updateMode === UpdateMode.SELECTION && category && tokens) {
-      const tokensMap = tokenArrayGroupToMap(tokens);
+    if (updateMode === UpdateMode.SELECTION && category && msg.tokens) {
+      const tokensMap = tokenArrayGroupToMap(msg.tokens);
       if (category === TokenTypes.COMPOSITION) {
         await updatePluginData({
           entries: updatedNodesWithOldTokens, values: { [category]: newName }, shouldOverride: true, tokensMap,

@@ -196,7 +196,6 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
-  console.log('entries', entries);
   entries.forEach((entry) => {
     promises.add(
       defaultWorker.schedule(async () => {
