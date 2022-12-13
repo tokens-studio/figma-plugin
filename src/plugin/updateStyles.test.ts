@@ -146,6 +146,7 @@ describe('updateStyles', () => {
     } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
+      undefined,
       false,
     );
     expect(colorSpy).not.toHaveBeenCalled();
@@ -175,6 +176,7 @@ describe('updateStyles', () => {
     } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens,
+      undefined,
       false,
     );
     expect(colorSpy).not.toHaveBeenCalled();

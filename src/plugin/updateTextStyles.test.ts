@@ -49,9 +49,10 @@ describe('updateTextStyles', () => {
 
   it('initiates style creation when no match is found and should create', async () => {
     const newStyle = { id: '123' };
+    const baseFontSize = '16';
     figma.getLocalTextStyles.mockReturnValue([]);
     figma.createTextStyle.mockReturnValue(newStyle);
-    updateTextStyles(typographyTokens, true);
+    updateTextStyles(typographyTokens, baseFontSize, true);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledTimes(2);
     expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
       { ...newStyle, name: 'H1/withValueDescription' },
@@ -60,10 +61,12 @@ describe('updateTextStyles', () => {
   });
 
   it('calls functions with correct transformed values when a matching style was found', () => {
+    const baseFontSize = '16';
     figma.getLocalTextStyles.mockReturnValueOnce([matchingFigmaStyle]);
-    updateTextStyles(typographyTokens);
+    updateTextStyles(typographyTokens, baseFontSize);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
+      16,
       typographyTokens.find((t) => t.name === 'H1.withValue'),
     );
   });

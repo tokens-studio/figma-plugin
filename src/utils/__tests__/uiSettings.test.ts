@@ -53,6 +53,8 @@ describe('uiSettings', () => {
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
+      aliasBaseFontSize: '16',
+      baseFontSize: '16',
     });
   });
 

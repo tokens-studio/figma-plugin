@@ -1,3 +1,4 @@
+import { SettingsState } from '@/app/store/models/settings';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -81,19 +82,19 @@ describe('syncStyles', () => {
   runAfter.push(AsyncMessageChannel.PluginInstance.connect());
 
   it('should remove styles', async () => {
-    expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: false })).toEqual({
+    expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: false }, { baseFontSize: '16' } as SettingsState)).toEqual({
       styleIdsToRemove: ['567', '678'],
     });
   });
 
   it('should rename styles', async () => {
-    expect(await syncStyles(mockValues, { removeStyle: false, renameStyle: true })).toEqual({
+    expect(await syncStyles(mockValues, { removeStyle: false, renameStyle: true }, { baseFontSize: '16' } as SettingsState)).toEqual({
       styleIdsToRemove: [],
     });
   });
 
   it('should rename & remove styles', async () => {
-    expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: true })).toEqual({
+    expect(await syncStyles(mockValues, { removeStyle: true, renameStyle: true }, { baseFontSize: '16' } as SettingsState)).toEqual({
       styleIdsToRemove: ['567', '678'],
     });
   });
