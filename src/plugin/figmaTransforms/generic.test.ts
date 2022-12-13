@@ -12,6 +12,12 @@ describe('convertTypographyNumberToFigma', () => {
     expect(numberStringValue).toBe(144);
     const numberValue = convertTypographyNumberToFigma(72, '16');
     expect(numberValue).toBe(72);
+    const cursomtPxValue = convertTypographyNumberToFigma('2rem', '14px');
+    expect(cursomtPxValue).toBe(28);
+    const nanValue = convertTypographyNumberToFigma('2rem', 'aaa');
+    expect(nanValue).toBe(32);
+    const cursomtRemValue = convertTypographyNumberToFigma('2rem', '14rem');
+    expect(cursomtRemValue).toBe(28);
   });
 });
 
