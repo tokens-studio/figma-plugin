@@ -2,9 +2,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import Button from '../Button';
@@ -13,15 +10,14 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector, tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
+  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
-import DownshiftInput from '../DownshiftInput';
-import { getAliasValue } from '@/utils/alias';
+import RemConfiguration from '../RemConfiguration';
 
 function Settings() {
   const onboardingData = {
@@ -33,10 +29,6 @@ function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const uiState = useSelector(uiStateSelector);
-  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
-  const tokens = useSelector(tokensSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const handleIgnoreChange = React.useCallback(
@@ -66,29 +58,6 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
-
-  const resolvedTokens = React.useMemo(() => (
-    resolveTokenValues(mergeTokenGroups(tokens, {
-      ...usedTokenSet,
-      [activeTokenSet]: TokenSetStatus.ENABLED,
-    }))
-  ), [tokens, usedTokenSet, activeTokenSet]);
-
-  const handleBaseFontSizeChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    dispatch.settings.setAliasBaseFontSize(e.target.value);
-    const resolvedValue = getAliasValue(e.target.value, resolvedTokens);
-    if (typeof resolvedValue === 'string' || typeof resolvedValue === 'number') {
-      dispatch.settings.setBaseFontSize(String(resolvedValue));
-    }
-  }, [dispatch.settings, resolvedTokens]);
-
-  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    dispatch.settings.setAliasBaseFontSize(newInputValue);
-    const resolvedValue = getAliasValue(newInputValue, resolvedTokens);
-    if (typeof resolvedValue === 'string' || typeof resolvedValue === 'number') {
-      dispatch.settings.setBaseFontSize(String(resolvedValue));
-    }
-  }, [dispatch.settings, resolvedTokens]);
 
   return (
     <Box className="content scroll-container">
@@ -123,17 +92,7 @@ function Settings() {
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
           <Heading size="small">Base font size token</Heading>
-          <Box css={{ maxWidth: '300px' }}>
-            <DownshiftInput
-              value={aliasBaseFontSize}
-              type={TokenTypes.FONT_SIZES}
-              resolvedTokens={resolvedTokens}
-              handleChange={handleBaseFontSizeChange}
-              setInputValue={handleDownShiftInputChange}
-              placeholder="Choose a new token"
-              suffix
-            />
-          </Box>
+          <RemConfiguration />
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
           </Box>
