@@ -88,8 +88,8 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
       nodes: NodeInfo[];
     }[]);
 
-    setNoneValuesOnNode(valuesToSetAsNone);
-  }, [inspectState.selectedTokens, uiState.selectionValues, setNoneValuesOnNode]);
+    setNoneValuesOnNode(valuesToSetAsNone, resolvedTokens);
+  }, [inspectState.selectedTokens, uiState.selectionValues, setNoneValuesOnNode, resolvedTokens]);
 
   return (
     <>

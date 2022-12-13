@@ -272,12 +272,13 @@ export default function useTokens() {
     dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
-  const setNoneValuesOnNode = useCallback((data: TokensByValueData) => {
+  const setNoneValuesOnNode = useCallback((data: TokensByValueData, resolvedTokens: SingleToken[]) => {
     track('setNoneValuesOnNode', { count: data.length });
 
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
       tokensToSet: data,
+      tokens: resolvedTokens,
     });
   }, []);
 

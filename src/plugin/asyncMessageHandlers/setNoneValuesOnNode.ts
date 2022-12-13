@@ -1,5 +1,7 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
+import { updateNodes } from '../node';
 import { defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
@@ -12,6 +14,7 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
       nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
     });
   });
+  const tokensMap = tokenArrayGroupToMap(msg.tokens);
 
   await Promise.all(
     Object.entries(nodesToRemove).map(async (node) => {
@@ -22,7 +25,10 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
 
       const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
       if (nodeToUpdate) {
-        await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: true });
+        await updatePluginData({
+          entries: [nodeToUpdate], values: newEntries, shouldRemove: true, tokensMap,
+        });
+        await updateNodes([nodeToUpdate], tokensMap);
       }
     }),
   );

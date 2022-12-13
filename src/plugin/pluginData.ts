@@ -112,7 +112,7 @@ export async function updatePluginData({
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
-      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      if (values.composition === 'delete' || values.composition === 'none') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
