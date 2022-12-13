@@ -53,7 +53,7 @@ export const settings = createModel<RootModel>()({
     prefixStylesWithThemeName: false,
     inspectDeep: false,
     shouldSwapStyles: false,
-    baseFontSize: '16px',
+    baseFontSize: '16',
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
