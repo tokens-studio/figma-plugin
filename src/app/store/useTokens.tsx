@@ -239,14 +239,15 @@ export default function useTokens() {
       const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
-        settings: {
+        options: {
           renameStyle: userConfirmation.data.includes('renameStyles'),
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
+        settings,
       });
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
-  }, [confirm, tokens, dispatch.tokenState]);
+  }, [confirm, tokens, dispatch.tokenState, settings]);
 
   const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
     track('renameStyles', { oldName, newName, parent });

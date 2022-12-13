@@ -13,7 +13,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  baseFontSizeSelector, ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector, tokensSelector, usedTokenSetSelector, activeTokenSetSelector,
+  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector, tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -21,6 +21,7 @@ import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import DownshiftInput from '../DownshiftInput';
+import { getAliasValue } from '@/utils/alias';
 
 function Settings() {
   const onboardingData = {
@@ -32,7 +33,7 @@ function Settings() {
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const uiState = useSelector(uiStateSelector);
-  const baseFontSize = useSelector(baseFontSizeSelector);
+  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const tokens = useSelector(tokensSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -74,12 +75,20 @@ function Settings() {
   ), [tokens, usedTokenSet, activeTokenSet]);
 
   const handleBaseFontSizeChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    dispatch.settings.setBaseFontSize(e.target.value);
-  }, [dispatch.settings]);
+    dispatch.settings.setAliasBaseFontSize(e.target.value);
+    const resolvedValue = getAliasValue(e.target.value, resolvedTokens);
+    if (typeof resolvedValue === 'string' || typeof resolvedValue === 'number') {
+      dispatch.settings.setBaseFontSize(String(resolvedValue));
+    }
+  }, [dispatch.settings, resolvedTokens]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    dispatch.settings.setBaseFontSize(newInputValue);
-  }, [dispatch.settings]);
+    dispatch.settings.setAliasBaseFontSize(newInputValue);
+    const resolvedValue = getAliasValue(newInputValue, resolvedTokens);
+    if (typeof resolvedValue === 'string' || typeof resolvedValue === 'number') {
+      dispatch.settings.setBaseFontSize(String(resolvedValue));
+    }
+  }, [dispatch.settings, resolvedTokens]);
 
   return (
     <Box className="content scroll-container">
@@ -116,7 +125,7 @@ function Settings() {
           <Heading size="small">Base font size token</Heading>
           <Box css={{ maxWidth: '300px' }}>
             <DownshiftInput
-              value={baseFontSize}
+              value={aliasBaseFontSize}
               type={TokenTypes.FONT_SIZES}
               resolvedTokens={resolvedTokens}
               handleChange={handleBaseFontSizeChange}

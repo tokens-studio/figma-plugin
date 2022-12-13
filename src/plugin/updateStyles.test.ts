@@ -1,3 +1,4 @@
+import { SettingsState } from '@/app/store/models/settings';
 import updateStyles from './updateStyles';
 import * as updateColorStyles from './updateColorStyles';
 import * as updateTextStyles from './updateTextStyles';
@@ -41,7 +42,7 @@ describe('updateStyles', () => {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: [{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }],
-      settings: {},
+      settings: {} as SettingsState,
     });
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
@@ -88,7 +89,9 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens]);
+    await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens], {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
@@ -113,7 +116,9 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(colorTokens);
+    await updateStyles(colorTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
@@ -136,7 +141,9 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(typographyTokens);
+    await updateStyles(typographyTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
       false,
@@ -163,7 +170,9 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(effectTokens);
+    await updateStyles(effectTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens,
       false,
@@ -194,9 +203,9 @@ describe('updateStyles', () => {
       })
     ));
 
-    await updateStyles([...colorTokens], false, {
+    await updateStyles([...colorTokens], {
       prefixStylesWithThemeName: true,
-    });
+    } as SettingsState, false);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,

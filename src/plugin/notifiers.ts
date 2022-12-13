@@ -62,6 +62,7 @@ export type SavedSettings = {
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
+  aliasBaseFontSize: string;
 };
 
 export function notifyUISettings(
@@ -78,6 +79,7 @@ export function notifyUISettings(
     inspectDeep,
     shouldSwapStyles,
     baseFontSize,
+    aliasBaseFontSize,
   }: SavedSettings,
 ) {
   postToUI({
@@ -97,6 +99,7 @@ export function notifyUISettings(
       inspectDeep,
       shouldSwapStyles,
       baseFontSize,
+      aliasBaseFontSize,
     },
   });
   postToUI({

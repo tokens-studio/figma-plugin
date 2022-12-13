@@ -45,6 +45,7 @@ export type UiSettingsFromPluginMessage = {
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
     baseFontSize: string;
+    aliasBaseFontSize: string;
   };
 };
 

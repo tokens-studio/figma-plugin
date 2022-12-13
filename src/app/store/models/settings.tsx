@@ -29,6 +29,7 @@ export interface SettingsState {
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
+  aliasBaseFontSize: string;
 }
 
 const setUI = (state: SettingsState) => {
@@ -55,6 +56,7 @@ export const settings = createModel<RootModel>()({
     inspectDeep: false,
     shouldSwapStyles: false,
     baseFontSize: defaultBaseFontSize,
+    aliasBaseFontSize: defaultBaseFontSize,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -98,6 +100,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         baseFontSize: payload,
+      };
+    },
+    setAliasBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        aliasBaseFontSize: payload,
       };
     },
     triggerWindowChange(state) {
@@ -187,6 +195,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setBaseFontSize: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(
