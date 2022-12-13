@@ -27,6 +27,7 @@ export interface SettingsState {
   prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  baseFontSize: string;
 }
 
 const setUI = (state: SettingsState) => {
@@ -52,6 +53,7 @@ export const settings = createModel<RootModel>()({
     prefixStylesWithThemeName: false,
     inspectDeep: false,
     shouldSwapStyles: false,
+    baseFontSize: '16px',
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -89,6 +91,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         ...payload,
+      };
+    },
+    setBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        baseFontSize: payload,
       };
     },
     triggerWindowChange(state) {

@@ -15,6 +15,7 @@ import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import { track } from '@/utils/analytics';
 import OnboardingExplainer from '../OnboardingExplainer';
+import Input from '../Input';
 
 function Settings() {
   const onboardingData = {
@@ -56,6 +57,10 @@ function Settings() {
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
 
+  const handleBaseTokenChange = React.useCallback(() => {
+
+  }, []);
+
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
@@ -88,6 +93,12 @@ function Settings() {
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
+          <Heading size="small">Base font size token</Heading>
+          <Input
+            onChange={handleBaseTokenChange}
+            type="text"
+            name="basetoken"
+          />
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
           </Box>
