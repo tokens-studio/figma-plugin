@@ -80,7 +80,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     dispatch.uiState.setOnboardingExplainerInspect(false);
   }, [dispatch]);
 
-  const setValueAsNone = React.useCallback(() => {
+  const setNoneValues = React.useCallback(() => {
     const valuesToSetAsNone = uiState.selectionValues
       .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
       .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
@@ -112,7 +112,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
           </Label>
         </Box>
         <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-          <Button onClick={setValueAsNone} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+          <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
             Set to none
           </Button>
           <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
