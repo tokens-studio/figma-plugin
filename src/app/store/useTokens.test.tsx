@@ -466,9 +466,7 @@ describe('useToken test', () => {
           renameStyle: true,
           removeStyle: true,
         },
-        settings: {
-          baseFontSize: '16',
-        },
+        settings: store.getState().settings,
       });
     });
   });

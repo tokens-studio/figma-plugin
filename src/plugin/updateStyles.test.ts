@@ -98,10 +98,12 @@ describe('updateStyles', () => {
     );
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
+      undefined,
       false,
     );
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens,
+      undefined,
       false,
     );
   });

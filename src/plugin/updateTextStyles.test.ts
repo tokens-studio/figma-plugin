@@ -57,6 +57,7 @@ describe('updateTextStyles', () => {
     expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
       { ...newStyle, name: 'H1/withValueDescription' },
       typographyTokens.find((t) => t.name === 'H1.withValueDescription'),
+      baseFontSize,
     );
   });
 
@@ -66,8 +67,8 @@ describe('updateTextStyles', () => {
     updateTextStyles(typographyTokens, baseFontSize);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
-      16,
       typographyTokens.find((t) => t.name === 'H1.withValue'),
+      baseFontSize,
     );
   });
 });
