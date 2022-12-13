@@ -61,6 +61,7 @@ export type SavedSettings = {
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  baseFontSize: string;
 };
 
 export function notifyUISettings(
@@ -76,6 +77,7 @@ export function notifyUISettings(
     updateRemote = true,
     inspectDeep,
     shouldSwapStyles,
+    baseFontSize,
   }: SavedSettings,
 ) {
   postToUI({
@@ -94,6 +96,7 @@ export function notifyUISettings(
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,
+      baseFontSize,
     },
   });
   postToUI({

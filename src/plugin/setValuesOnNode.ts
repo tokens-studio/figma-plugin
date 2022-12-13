@@ -22,6 +22,7 @@ import setBorderValuesOnTarget from './setBorderValuesOnTarget';
 import setBackgroundBlurOnTarget from './setBackgroundBlurOnTarget';
 import { isSingleBorderValue } from '@/utils/is/isSingleBorderValue';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 
 // @README values typing is wrong
 
@@ -33,6 +34,7 @@ export default async function setValuesOnNode(
   themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
+  baseFontSize = defaultBaseFontSize,
 ) {
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null

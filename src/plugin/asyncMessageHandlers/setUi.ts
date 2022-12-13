@@ -18,6 +18,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
     prefixStylesWithThemeName: msg.prefixStylesWithThemeName,
     inspectDeep: msg.inspectDeep,
+    baseFontSize: msg.baseFontSize,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

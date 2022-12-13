@@ -7,6 +7,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 
 type WindowSettingsType = {
   width: number;
@@ -53,7 +54,7 @@ export const settings = createModel<RootModel>()({
     prefixStylesWithThemeName: false,
     inspectDeep: false,
     shouldSwapStyles: false,
-    baseFontSize: '16',
+    baseFontSize: defaultBaseFontSize,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -183,6 +184,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUISettings: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(
