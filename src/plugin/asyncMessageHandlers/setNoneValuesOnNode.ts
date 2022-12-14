@@ -26,7 +26,7 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
       const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
       if (nodeToUpdate) {
         await updatePluginData({
-          entries: [nodeToUpdate], values: newEntries, shouldRemove: true, tokensMap,
+          entries: [nodeToUpdate], values: newEntries, tokensMap,
         });
         await updateNodes([nodeToUpdate], tokensMap);
       }

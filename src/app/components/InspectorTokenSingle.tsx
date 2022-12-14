@@ -1,4 +1,5 @@
 import React from 'react';
+import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
@@ -16,7 +17,7 @@ import Button from './Button';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
-import { IconBrokenLink, IconValueNone } from '@/icons';
+import { IconBrokenLink } from '@/icons';
 
 export default function InspectorTokenSingle({
   token,
@@ -93,13 +94,10 @@ export default function InspectorTokenSingle({
           onCheckedChange={onCheckedChanged}
         />
         {
-          isBrokenLink && (
-            token.value === 'none' ? (
-              <IconValueNone />
-            ) : (
-              <IconBrokenLink />
-            )
-          )
+          token.value === 'none' && <ValueNoneIcon />
+        }
+        {
+          isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />

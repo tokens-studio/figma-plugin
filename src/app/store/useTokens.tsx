@@ -13,8 +13,10 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
+  uiStateSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -40,7 +42,7 @@ type GetFormattedTokensOptions = {
   expandComposition: boolean;
 };
 
-type TokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
+type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 export type SyncOption = 'removeStyle' | 'renameStyle';
 
@@ -111,7 +113,7 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const removeTokensByValue = useCallback((data: TokensByValueData) => {
+  const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
     AsyncMessageChannel.ReactInstance.message({
@@ -272,12 +274,21 @@ export default function useTokens() {
     dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
-  const setNoneValuesOnNode = useCallback((data: TokensByValueData, resolvedTokens: SingleToken[]) => {
-    track('setNoneValuesOnNode', { count: data.length });
+  const setNoneValuesOnNode = useCallback((resolvedTokens: SingleToken[]) => {
+    const uiState = uiStateSelector(store.getState());
+    const inspectState = inspectStateSelector(store.getState());
+    const tokensToSet = uiState.selectionValues
+      .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
+      .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
+      property: Properties;
+      nodes: NodeInfo[];
+    }[]);
+
+    track('setNoneValuesOnNode', tokensToSet);
 
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
-      tokensToSet: data,
+      tokensToSet,
       tokens: resolvedTokens,
     });
   }, []);

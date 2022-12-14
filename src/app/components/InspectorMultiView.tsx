@@ -33,7 +33,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
   React.useEffect(() => {
     dispatch.inspectState.setSelectedTokens([]);
-  }, [dispatch]);
+  }, [uiState.selectionValues]);
 
   const groupedSelectionValues = React.useMemo(() => (
     uiState.selectionValues.reduce<Partial<
@@ -81,15 +81,8 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   }, [dispatch]);
 
   const setValueAsNone = React.useCallback(() => {
-    const valuesToSetAsNone = uiState.selectionValues
-      .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
-      .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
-      property: Properties;
-      nodes: NodeInfo[];
-    }[]);
-
-    setNoneValuesOnNode(valuesToSetAsNone, resolvedTokens);
-  }, [inspectState.selectedTokens, uiState.selectionValues, setNoneValuesOnNode, resolvedTokens]);
+    setNoneValuesOnNode(resolvedTokens);
+  }, [setNoneValuesOnNode, resolvedTokens]);
 
   return (
     <>
