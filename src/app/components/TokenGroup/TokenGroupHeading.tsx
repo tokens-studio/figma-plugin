@@ -41,8 +41,8 @@ export function TokenGroupHeading({
   const { remapTokensInGroup } = useTokens();
 
   React.useEffect(() => {
-    setNewTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
-    setOldTokenGroupName(`${path.split('.').pop()}${copyName}` || '');
+    setNewTokenGroupName(path);
+    setOldTokenGroupName(path);
   }, [oldTokenGroupName, isTokenGroupDuplicated, copyName, path]);
 
   const handleDelete = React.useCallback(() => {
