@@ -45,6 +45,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let shouldSwapStyles: boolean;
     let baseFontSize: string;
     let aliasBaseFontSize: string;
+
     if (data) {
       width = data.width || 400;
       height = data.height || 600;

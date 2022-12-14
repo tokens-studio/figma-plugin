@@ -91,18 +91,46 @@ describe('updateStyles', () => {
 
     await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens], {
       prefixStylesWithThemeName: true,
+      ignoreFirstPartForStyles: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
-      colorTokens,
+      [{
+        name: 'primary.500',
+        path: '500',
+        value: '#ff0000',
+        type: 'color',
+      }],
       false,
     );
     expect(textSpy).toHaveBeenCalledWith(
-      typographyTokens,
+      [{
+        name: 'heading.h1',
+        path: 'h1',
+        value: {
+          fontFamily: 'Inter',
+          fontWeight: 'Regular',
+          fontSize: '24',
+        },
+        type: 'typography',
+      }],
       undefined,
       false,
     );
     expect(effectSpy).toHaveBeenCalledWith(
-      effectTokens,
+      [{
+        name: 'shadow.large',
+        path: 'large',
+        type: 'boxShadow',
+        description: 'the one with one shadow',
+        value: {
+          type: 'dropShadow',
+          color: '#00000080',
+          x: 0,
+          y: 0,
+          blur: 10,
+          spread: 0,
+        },
+      }],
       undefined,
       false,
     );

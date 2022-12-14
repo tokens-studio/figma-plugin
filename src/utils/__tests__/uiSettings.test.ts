@@ -20,6 +20,8 @@ describe('uiSettings', () => {
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     });
     expect(mockSetAsync).toBeCalledWith('uiSettings', JSON.stringify({
       width: 400,
@@ -33,6 +35,8 @@ describe('uiSettings', () => {
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     }));
   });
 
@@ -40,6 +44,39 @@ describe('uiSettings', () => {
     mockGetAsync.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
       width: 1000,
       height: 1000,
+    })));
+    expect(await getUISettings()).toEqual({
+      width: 1000,
+      height: 1000,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateRemote: true,
+      updateOnChange: true,
+      updateStyles: true,
+      ignoreFirstPartForStyles: false,
+      prefixStylesWithThemeName: false,
+      inspectDeep: false,
+      shouldSwapStyles: false,
+      aliasBaseFontSize: '16',
+      baseFontSize: '16',
+    });
+  });
+
+  it('can read the UI settings from the plugin', async () => {
+    mockGetAsync.mockImplementationOnce(() => Promise.resolve(JSON.stringify({
+      width: 1000,
+      height: 1000,
+      showEmptyGroups: true,
+      updateMode: UpdateMode.PAGE,
+      updateRemote: true,
+      updateOnChange: true,
+      updateStyles: true,
+      ignoreFirstPartForStyles: false,
+      prefixStylesWithThemeName: false,
+      inspectDeep: false,
+      shouldSwapStyles: false,
+      aliasBaseFontSize: '16',
+      baseFontSize: '16',
     })));
     expect(await getUISettings()).toEqual({
       width: 1000,
