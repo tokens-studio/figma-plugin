@@ -100,7 +100,7 @@ export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseN
       await defaultNodeManager.updateNode(node, (tokens) => (
         omit(tokens, key)
       ));
-      // removeValuesFromNode(node, key);
+      removeValuesFromNode(node, key);
     } else {
       await defaultNodeManager.updateNode(node, (tokens) => (
         omit(tokens, Object.values(Properties))
@@ -108,10 +108,9 @@ export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseN
       Object.values(Properties).forEach((prop) => {
         node.setPluginData(prop, 'none');
         tokensSharedDataHandler.set(node, prop, 'none');
-        // removeValuesFromNode(node, prop);
+        removeValuesFromNode(node, prop);
       });
     }
-    // @deprecated remove deprecated values key
     node.setPluginData('values', 'none');
     store.successfulNodes.add(node);
   }));
