@@ -4,13 +4,17 @@ import Box from './Box';
 
 type Props = {
   stringTokens: string;
-  handleChange: (tokens?: string) => void;
+  handleChange: (tokens: string) => void;
 };
 
 function JSONEditor({
   stringTokens,
   handleChange,
 }: Props) {
+  const handleJsonEditChange = React.useCallback((value?: string) => {
+    if (value) handleChange(value);
+  }, [handleChange]);
+
   return (
     <Box
       css={{
@@ -23,15 +27,7 @@ function JSONEditor({
     >
       <Editor
         language="json"
-        options={{
-          autoClosingBrackets: 'always',
-          autoClosingQuotes: 'always',
-          formatOnPaste: true,
-          formatOnType: true,
-          scrollBeyondLastLine: false,
-          domReadOnly: true,
-        }}
-        onChange={handleChange}
+        onChange={handleJsonEditChange}
         value={stringTokens}
       />
     </Box>

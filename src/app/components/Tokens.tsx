@@ -132,17 +132,15 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleChangeJSON = React.useCallback((val?: string) => {
+  const handleChangeJSON = React.useCallback((val: string) => {
     setError(null);
-    if (val) {
-      try {
-        const parsedTokens = parseJson(val);
-        parseTokenValues(parsedTokens);
-      } catch (e) {
-        setError(`Unable to read JSON: ${JSON.stringify(e)}`);
-      }
-      setStringTokens(val);
+    try {
+      const parsedTokens = parseJson(val);
+      parseTokenValues(parsedTokens);
+    } catch (e) {
+      setError(`Unable to read JSON: ${JSON.stringify(e)}`);
     }
+    setStringTokens(val);
   }, []);
 
   const memoizedTokens = React.useMemo(() => {
