@@ -30,6 +30,7 @@ export default function InspectorResolvedToken({ token }: { token: SingleToken }
       </Tooltip>
     );
   }
+
   switch (token?.type) {
     case TokenTypes.COLOR: {
       return (
