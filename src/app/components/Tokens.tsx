@@ -132,15 +132,17 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleChangeJSON = React.useCallback((val: string) => {
+  const handleChangeJSON = React.useCallback((val?: string) => {
     setError(null);
-    try {
-      const parsedTokens = parseJson(val);
-      parseTokenValues(parsedTokens);
-    } catch (e) {
-      setError(`Unable to read JSON: ${JSON.stringify(e)}`);
+    if (val) {
+      try {
+        const parsedTokens = parseJson(val);
+        parseTokenValues(parsedTokens);
+      } catch (e) {
+        setError(`Unable to read JSON: ${JSON.stringify(e)}`);
+      }
+      setStringTokens(val);
     }
-    setStringTokens(val);
   }, []);
 
   const memoizedTokens = React.useMemo(() => {
@@ -327,7 +329,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           >
             {activeTokensTab === 'json' ? (
               <Box css={{ position: 'relative', height: '100%' }}>
-                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} hasError={Boolean(error)} />
+                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
                 <StatusToast
                   open={Boolean(error)}
                   error={error}

@@ -1,22 +1,16 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import Textarea from './Textarea';
+import Editor from '@monaco-editor/react';
 import Box from './Box';
-import { editProhibitedSelector } from '@/selectors';
 
 type Props = {
   stringTokens: string;
-  handleChange: (tokens: string) => void;
-  hasError: boolean;
+  handleChange: (tokens?: string) => void;
 };
 
 function JSONEditor({
   stringTokens,
   handleChange,
-  hasError,
 }: Props) {
-  const editProhibited = useSelector(editProhibitedSelector);
-
   return (
     <Box
       css={{
@@ -27,13 +21,18 @@ function JSONEditor({
         position: 'relative',
       }}
     >
-      <Textarea
-        isDisabled={editProhibited}
-        placeholder="Enter JSON"
-        rows={21}
+      <Editor
+        language="json"
+        options={{
+          autoClosingBrackets: 'always',
+          autoClosingQuotes: 'always',
+          formatOnPaste: true,
+          formatOnType: true,
+          scrollBeyondLastLine: false,
+          domReadOnly: true,
+        }}
         onChange={handleChange}
         value={stringTokens}
-        css={{ paddingBottom: hasError ? '$9' : '0' }}
       />
     </Box>
   );
