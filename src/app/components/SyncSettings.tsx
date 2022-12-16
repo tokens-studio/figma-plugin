@@ -47,6 +47,10 @@ const providers = [
     text: 'Azure DevOps',
     type: StorageProviderType.ADO,
   },
+  {
+    text: 'Generic Versioned',
+    type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+  },
 ];
 
 const SyncSettings = () => {

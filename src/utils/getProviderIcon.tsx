@@ -1,5 +1,5 @@
 import React from 'react';
-import { GitHubLogoIcon, Link2Icon } from '@radix-ui/react-icons';
+import { ArchiveIcon, GitHubLogoIcon, Link2Icon } from '@radix-ui/react-icons';
 import { IconFile } from '@/icons';
 import GitLabIcon from '@/icons/gitlab.svg';
 import ADOIcon from '@/icons/azure.svg';
@@ -22,6 +22,8 @@ export function getProviderIcon(provider: StorageProviderType) {
       return <Link2Icon />;
     case StorageProviderType.JSONBIN:
       return <JSONBinIcon />;
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
+      return <ArchiveIcon />;
     default:
       return null;
   }
