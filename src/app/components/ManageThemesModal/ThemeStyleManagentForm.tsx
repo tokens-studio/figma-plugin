@@ -99,7 +99,7 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
 
   const handleDisconnectStyle = useCallback((token: string) => {
     if (theme) {
-      track('Disconnect style', token);
+      track('Disconnect style', { token });
       dispatch.tokenState.disconnectStyleFromTheme({
         id: theme.id,
         key: token,
