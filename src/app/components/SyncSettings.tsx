@@ -177,7 +177,7 @@ const SyncSettings = () => {
             >
               {
                   providers.map((provider) => (
-                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                    <DropdownMenuItem key={provider.text} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
                       <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
                       {provider.text}
                     </DropdownMenuItem>

@@ -28,14 +28,14 @@ export async function getUserId() {
   return userId;
 }
 
-export function transformValue(value: string, type: 'fontWeights'): ReturnType<typeof convertFontWeightToFigma>;
-export function transformValue(value: string, type: 'letterSpacing'): LetterSpacing | null;
-export function transformValue(value: string, type: 'lineHeights'): LineHeight | null;
-export function transformValue(value: string, type: 'boxShadowType'): ReturnType<typeof convertBoxShadowTypeToFigma>;
-export function transformValue(value: string, type: 'textCase'): ReturnType<typeof convertTextCaseToFigma>;
-export function transformValue(value: string, type: 'textDecoration'): ReturnType<typeof convertTextDecorationToFigma>;
-export function transformValue(value: string, type: string): number;
-export function transformValue(value: string, type: string) {
+export function transformValue(value: string, type: 'fontWeights', baseFontSize: string): ReturnType<typeof convertFontWeightToFigma>;
+export function transformValue(value: string, type: 'letterSpacing', baseFontSize: string): LetterSpacing | null;
+export function transformValue(value: string, type: 'lineHeights', baseFontSize: string): LineHeight | null;
+export function transformValue(value: string, type: 'boxShadowType', baseFontSize: string): ReturnType<typeof convertBoxShadowTypeToFigma>;
+export function transformValue(value: string, type: 'textCase', baseFontSize: string): ReturnType<typeof convertTextCaseToFigma>;
+export function transformValue(value: string, type: 'textDecoration', baseFontSize: string): ReturnType<typeof convertTextDecorationToFigma>;
+export function transformValue(value: string, type: string, baseFontSize: string): number;
+export function transformValue(value: string, type: string, baseFontSize: string) {
   switch (type) {
     case Properties.borderWidth:
     case Properties.borderWidthTop:
@@ -45,7 +45,7 @@ export function transformValue(value: string, type: string) {
     case 'width':
     case 'height':
     case 'sizing':
-      return fakeZeroForFigma(convertTypographyNumberToFigma(value));
+      return fakeZeroForFigma(convertTypographyNumberToFigma(value, baseFontSize));
     case 'backgroundBlur':
     case 'borderRadius':
     case 'borderRadiusTopLeft':
@@ -63,13 +63,13 @@ export function transformValue(value: string, type: string) {
     case 'paragraphSpacing':
     case 'paragraphIndent':
     case 'fontSizes':
-      return convertTypographyNumberToFigma(value);
+      return convertTypographyNumberToFigma(value, baseFontSize);
     case 'fontWeights':
       return convertFontWeightToFigma(value);
     case 'letterSpacing':
-      return convertLetterSpacingToFigma(value);
+      return convertLetterSpacingToFigma(value, baseFontSize);
     case 'lineHeights':
-      return convertLineHeightToFigma(value);
+      return convertLineHeightToFigma(value, baseFontSize);
     case 'opacity':
       return convertOpacityToFigma(value.toString());
     case 'boxShadowType':

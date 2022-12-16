@@ -147,7 +147,7 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
-  settings: Partial<SettingsState>;
+  settings: SettingsState;
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
@@ -173,7 +173,8 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   tokens: Record<string, AnyTokenList>;
-  settings: Record<SyncOption, boolean>
+  options: Record<SyncOption, boolean>;
+  settings: SettingsState;
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   styleIdsToRemove: string[];
