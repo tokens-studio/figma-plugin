@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
-import { IconArrowRight, IconUnlink } from '@/icons';
+import { LinkBreak2Icon } from '@radix-ui/react-icons';
+import { IconArrowRight } from '@/icons';
 import Box from '../Box';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import { StyledUnlinkButton } from './StyledUnlinkButton';
+import StyledBrokenReferenceIndicator from '../StyledBrokenReferenceIndicator';
 
 export type StyleInfo = {
   id: string
@@ -47,16 +49,26 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
           width: '100%',
         }}
       >
-        <Text size="small">{token}</Text>
-        <IconArrowRight width="16" />
-        {(!styleInfo.name && !styleInfo.failedToResolve) && (
-          <ResolvingLoader />
-        )}
-        <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
-          <IconUnlink />
-        </StyledUnlinkButton>
-        {styleInfo.name && (
-          <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
+        <Box css={{
+          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3',
+        }}
+        >
+          <Text size="small">{token}</Text>
+          <IconArrowRight width="16" />
+          {(!styleInfo.name && !styleInfo.failedToResolve) && (
+            <ResolvingLoader />
+          )}
+          {(!styleInfo.name && styleInfo.failedToResolve) && (
+            <StyledBrokenReferenceIndicator />
+          )}
+          {styleInfo.name && (
+            <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
+          )}
+        </Box>
+        {(styleInfo.name && !styleInfo.failedToResolve) && (
+          <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
+            <LinkBreak2Icon />
+          </StyledUnlinkButton>
         )}
       </Flex>
     </Flex>

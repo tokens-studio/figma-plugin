@@ -6,10 +6,7 @@ export const StyledUnlinkButton = styled('button', {
   justifyContent: 'center',
   color: '$fgDanger',
   padding: '$2',
-  width: '1.2rem',
-  height: '1.2rem',
   borderRadius: '$button',
-  backgroundColor: '$bgDanger',
   '&:hover': {
     color: '$bgDanger',
     backgroundColor: '$dangerBgHover',

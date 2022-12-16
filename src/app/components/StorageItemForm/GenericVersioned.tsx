@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
+import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Button from '../Button';
@@ -15,6 +16,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import Heading from '../Heading';
+import Label from '../Label';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -129,12 +131,13 @@ export default function GenericVersionedForm({
           required
         />
         <DropdownMenu>
-          <DropdownMenuTrigger data-cy="flow-dropdown" data-testid="flow-dropdown">
-            <Box css={{ display: 'flex', gap: '1em' }}>
-              <Text size="small">Flow Type: </Text>
+          <Stack direction="column" gap={0}>
+            <Label htmlFor="flow-dropdown">Flow type</Label>
+            <DropdownMenuTrigger id="flow-dropdown" bordered data-cy="flow-dropdown" data-testid="flow-dropdown">
               <Text size="small">{flow}</Text>
-            </Box>
-          </DropdownMenuTrigger>
+              <TriangleDownIcon />
+            </DropdownMenuTrigger>
+          </Stack>
           <DropdownMenuContent
             side="bottom"
             css={{ minWidth: '100%' }}
