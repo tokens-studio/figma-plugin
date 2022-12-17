@@ -162,7 +162,7 @@ const SyncSettings = () => {
               <LocalStorageItem onClick={handleSetLocalStorage} isActive={storageType.provider === StorageProviderType.LOCAL} />
               {apiProviders.map((item) => (
                 <StorageItem
-                  key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                  key={item?.internalId || `${item.provider}-${item.id}`}
                   onEdit={handleEditClick(item)}
                   item={item}
                 />
@@ -181,7 +181,7 @@ const SyncSettings = () => {
                   providers.map((provider) => {
                     if (provider.type === StorageProviderType.GENERIC_VERSIONED_STORAGE && !genericVersionedAlpha) { return null; }
                     return (
-                      <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                      <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
                         <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
                         {provider.text}
                       </DropdownMenuItem>
