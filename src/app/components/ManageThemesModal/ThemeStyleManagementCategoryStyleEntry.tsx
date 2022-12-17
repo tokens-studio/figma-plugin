@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
-import { LinkBreak2Icon } from '@radix-ui/react-icons';
+import { LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { IconArrowRight } from '@/icons';
 import Box from '../Box';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
-import { StyledUnlinkButton } from './StyledUnlinkButton';
-import StyledBrokenReferenceIndicator from '../StyledBrokenReferenceIndicator';
+import IconButton from '../IconButton';
+import Stack from '../Stack';
 
 export type StyleInfo = {
   id: string
@@ -59,17 +59,16 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
             <ResolvingLoader />
           )}
           {(!styleInfo.name && styleInfo.failedToResolve) && (
-            <StyledBrokenReferenceIndicator />
+            <Stack direction="row" gap={1} css={{ color: '$fgDanger' }}>
+              <LinkBreak1Icon />
+              Reference not found
+            </Stack>
           )}
           {styleInfo.name && (
             <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
           )}
         </Box>
-        {(styleInfo.name && !styleInfo.failedToResolve) && (
-          <StyledUnlinkButton data-testid="themestylemanagementcategorystyleentry-unlink" type="button" onClick={handleDisconnectStyle}>
-            <LinkBreak2Icon />
-          </StyledUnlinkButton>
-        )}
+        <IconButton tooltip="Detach style" icon={<LinkBreak2Icon />} dataCy="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
       </Flex>
     </Flex>
   );
