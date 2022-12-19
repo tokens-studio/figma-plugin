@@ -25,6 +25,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
+import { useFlags } from './LaunchDarkly';
 
 const providers = [
   {
@@ -47,6 +48,10 @@ const providers = [
     text: 'Azure DevOps',
     type: StorageProviderType.ADO,
   },
+  {
+    text: 'Generic Versioned',
+    type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+  },
 ];
 
 const SyncSettings = () => {
@@ -57,6 +62,7 @@ const SyncSettings = () => {
 
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
+  const { genericVersionedAlpha } = useFlags();
 
   const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
@@ -156,7 +162,7 @@ const SyncSettings = () => {
               <LocalStorageItem onClick={handleSetLocalStorage} isActive={storageType.provider === StorageProviderType.LOCAL} />
               {apiProviders.map((item) => (
                 <StorageItem
-                  key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                  key={item?.internalId || `${item.provider}-${item.id}`}
                   onEdit={handleEditClick(item)}
                   item={item}
                 />
@@ -172,12 +178,15 @@ const SyncSettings = () => {
               side="bottom"
             >
               {
-                  providers.map((provider) => (
-                    <DropdownMenuItem onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
-                      <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
-                      {provider.text}
-                    </DropdownMenuItem>
-                  ))
+                  providers.map((provider) => {
+                    if (provider.type === StorageProviderType.GENERIC_VERSIONED_STORAGE && !genericVersionedAlpha) { return null; }
+                    return (
+                      <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                        <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
+                        {provider.text}
+                      </DropdownMenuItem>
+                    );
+                  })
                 }
             </DropdownMenuContent>
           </DropdownMenu>

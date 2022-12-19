@@ -7,11 +7,12 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.BITBUCKET }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;

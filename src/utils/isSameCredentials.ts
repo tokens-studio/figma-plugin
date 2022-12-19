@@ -20,6 +20,7 @@ function isSameCredentials(
         && credential.branch === stored.branch
       );
     }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE:
     case StorageProviderType.JSONBIN:
     case StorageProviderType.URL: {
       return credential.id === stored.id && credential.provider === stored.provider;
