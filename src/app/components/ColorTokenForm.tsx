@@ -42,7 +42,7 @@ export default function ColorTokenForm({
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
   const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
-  const [currentOperaion, setCurrentOperaion] = React.useState(operations[0]);
+  const [currentOperation, setCurrentOperation] = React.useState(operations[0]);
   const [currentColorSpace, setCurrentColorSpace] = React.useState(colorSpaces[0]);
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -52,7 +52,7 @@ export default function ColorTokenForm({
     handleColorDownShiftInputChange(color);
   }, [handleColorDownShiftInputChange]);
 
-  const addToken = useCallback(() => {
+  const addModify = useCallback(() => {
   }, [internalEditToken]);
 
   const removeToken = useCallback(() => {
@@ -67,7 +67,7 @@ export default function ColorTokenForm({
   }, [colorSpaceMenuOpened]);
 
   const onOperationSelected = useCallback((operation: string) => {
-    setCurrentOperaion(operation);
+    setCurrentOperation(operation);
   }, []);
 
   const onColorSpaceSelected = useCallback((colorSpace: string) => {
@@ -75,10 +75,9 @@ export default function ColorTokenForm({
   }, []);
 
   const handleModifyValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-
   }, []);
 
-  const getIconComponent = React.useMemo(() => getLabelForProperty(currentOperaion), [currentOperaion]);
+  const getIconComponent = React.useMemo(() => getLabelForProperty(currentOperation), [currentOperation]);
 
   return (
     <>
@@ -100,7 +99,7 @@ export default function ColorTokenForm({
           >
             {internalEditToken.value}
           </button>
-                )}
+        )}
         suffix
       />
       {inputHelperOpen && (
@@ -111,7 +110,7 @@ export default function ColorTokenForm({
         <IconButton
           tooltip="Add a new modify"
           dataCy="button-add-new-modify"
-          onClick={addToken}
+          onClick={addModify}
           icon={<IconPlus />}
         />
         <IconButton
@@ -139,11 +138,11 @@ export default function ColorTokenForm({
               flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
             }}
           >
-            <span>{currentOperaion || 'Choose a operation'}</span>
+            <span>{currentOperation || 'Choose a operation'}</span>
             <IconToggleableDisclosure />
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-            <DropdownMenuRadioGroup value={currentOperaion}>
+            <DropdownMenuRadioGroup value={currentOperation}>
               {operations.map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
