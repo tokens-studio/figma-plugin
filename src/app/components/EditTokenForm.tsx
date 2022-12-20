@@ -60,6 +60,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
       return false;
     }
+    if (internalEditToken.type === TokenTypes.DIMENSION) {
+      return true;
+    }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
 
@@ -114,6 +117,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
       }
     },
     [internalEditToken],
+  );
+
+  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    () => {
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+      }
+    },
+    [internalEditToken, isValidDimensionToken],
   );
 
   const handleBoxShadowValueChange = React.useCallback(
@@ -420,6 +432,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               resolvedTokens={resolvedTokens}
               initialName={internalEditToken.initialName}
               handleChange={handleChange}
+              handleBlur={handleBlur}
               setInputValue={handleDownShiftInputChange}
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
