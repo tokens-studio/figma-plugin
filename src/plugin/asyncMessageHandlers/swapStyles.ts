@@ -2,7 +2,25 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList } from '@/types';
 import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 import { applySiblingStyleId } from './applySiblingStyle';
-import { defaultNodeManager } from '../NodeManager';
+
+function getRootNode(updateMode: UpdateMode) {
+  const rootNode = [];
+  switch (updateMode) {
+    case UpdateMode.PAGE:
+      if (figma.currentPage.children) rootNode.push(...figma.currentPage.children);
+      break;
+    case UpdateMode.SELECTION:
+      if (figma.currentPage.selection) rootNode.push(...figma.currentPage.selection);
+      break;
+    case UpdateMode.DOCUMENT:
+      figma.root.children.forEach((page) => rootNode.push(...page.children));
+      break;
+    default:
+      rootNode.push(...figma.currentPage.children);
+      break;
+  }
+  return rootNode;
+}
 
 // Go through layers to swap styles
 export async function swapStyles(activeTheme: string, themes: ThemeObjectsList, updateMode: UpdateMode) {
@@ -28,9 +46,7 @@ export async function swapStyles(activeTheme: string, themes: ThemeObjectsList, 
     return;
   }
 
-  const nodes = (await defaultNodeManager.findNodesWithData({ updateMode })).map((node) => node.node);
-
-  nodes.forEach((layer) => {
+  getRootNode(updateMode).forEach((layer) => {
     applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, newTheme);
   });
 }
