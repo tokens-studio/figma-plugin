@@ -1,4 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
+import { ColorModifier } from '../Modifier';
 import {
   SingleColorToken,
   SingleBorderRadiusToken,
@@ -33,6 +34,7 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
   oldName?: string; // only passed when editing token
   shouldUpdate?: boolean
   shouldUpdateDocument?: boolean;
+  $extensions?: { 'com.figmatokens': { modify: ColorModifier } }
 };
 
 export type UpdateTokenPayload =

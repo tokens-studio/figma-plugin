@@ -11,5 +11,8 @@ export function updateTokenPayloadToSingleToken(
     ...(payload.description ? {
       description: payload.description,
     } : {}),
+    ...(payload.$extensions ? {
+      $extensions: payload.$extensions,
+    } : {}),
   } as SingleToken;
 }

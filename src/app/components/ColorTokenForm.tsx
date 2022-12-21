@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
-import chroma, { InterpolationMode } from 'chroma-js';
+import chroma from 'chroma-js';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -49,6 +49,7 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
+    console.log('inter', internalEditToken);
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       setModifyVisible(true);
     }
@@ -58,7 +59,7 @@ export default function ColorTokenForm({
     if (resolvedValue) {
       const baseColor = String(resolvedValue);
       if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-        const amount = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value;
+        const amount = Number(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value);
         switch (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type) {
           case ColorModifierTypes.LIGHTEN:
             return chroma(baseColor).brighten(amount);
@@ -127,7 +128,7 @@ export default function ColorTokenForm({
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       handleColorModifyChange({
         ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
-        value: parseFloat(e.target.value),
+        value: e.target.value,
       });
     }
   }, [internalEditToken, handleColorModifyChange]);
@@ -276,7 +277,7 @@ export default function ColorTokenForm({
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} type="number" />
+              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value} />
             </Box>
           </>
         )

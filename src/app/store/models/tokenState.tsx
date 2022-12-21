@@ -204,6 +204,9 @@ export const tokenState = createModel<RootModel>()({
           ...(data.description ? {
             description: data.description,
           } : {}),
+          ...(data.$extensions ? {
+            $extensions: data.$extensions,
+          } : {}),
         } as SingleToken);
 
         newTokens = {

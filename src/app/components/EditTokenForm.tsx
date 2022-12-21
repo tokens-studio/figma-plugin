@@ -246,7 +246,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   // @TODO update to useCallback
-  const submitTokenValue = async ({ type, value, name }: EditTokenObject) => {
+  const submitTokenValue = async ({
+    type, value, name, $extensions,
+  }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -269,6 +271,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           name: newName,
           type,
           value: trimmedValue as SingleToken['value'],
+          ...($extensions ? { $extensions } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
@@ -281,6 +284,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
+          ...($extensions ? { $extensions } : {}),
         });
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
@@ -329,6 +333,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
+          ...($extensions ? { $extensions } : {}),
         });
       }
     }
