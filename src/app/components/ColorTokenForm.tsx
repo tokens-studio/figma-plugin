@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
-import chroma from 'chroma-js';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -25,6 +24,9 @@ import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { ColorModifier, MixModifier } from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
+import { modifyColor } from '@/utils/modifyColor';
+
+const defaultValue = '0';
 
 export default function ColorTokenForm({
   internalEditToken,
@@ -49,7 +51,6 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('inter', internalEditToken);
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       setModifyVisible(true);
     }
@@ -57,23 +58,14 @@ export default function ColorTokenForm({
 
   const modifiedColor = useMemo(() => {
     if (resolvedValue) {
-      const baseColor = String(resolvedValue);
       if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-        const amount = Number(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value);
-        switch (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type) {
-          case ColorModifierTypes.LIGHTEN:
-            return chroma(baseColor).brighten(amount);
-          case ColorModifierTypes.DARKEN:
-            return chroma(baseColor).darken(amount);
-          case ColorModifierTypes.MIX:
-            return chroma.mix(baseColor, internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, amount, internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space);
-          case ColorModifierTypes.ALPHA:
-            return chroma(baseColor).alpha(amount);
-          default:
-            return baseColor;
+        const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
+        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA || (modifierType === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color)) {
+          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify);
         }
+        return resolvedValue;
       }
-      return baseColor;
+      return resolvedValue;
     }
     return null;
   }, [internalEditToken, resolvedValue]);
@@ -91,10 +83,14 @@ export default function ColorTokenForm({
   }, [handleColorDownShiftInputChange]);
 
   const addModify = useCallback(() => {
-    handleColorModifyChange({} as ColorModifier);
-  }, [handleColorModifyChange]);
+    handleColorModifyChange({
+      type: ColorModifierTypes.LIGHTEN,
+      value: defaultValue,
+      space: ColorSpaceTypes.LCH,
+    });
+  }, [handleColorModifyChange, defaultValue]);
 
-  const removeToken = useCallback(() => {
+  const removeModify = useCallback(() => {
     setModifyVisible(false);
   }, []);
 
@@ -132,6 +128,15 @@ export default function ColorTokenForm({
       });
     }
   }, [internalEditToken, handleColorModifyChange]);
+
+  const resolvedMixValue = React.useMemo(() => {
+    if (internalEditToken) {
+      return typeof internalEditToken?.value === 'string'
+        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        : null;
+    }
+    return null;
+  }, [internalEditToken, resolvedTokens]);
 
   const handleMixColorChange = useCallback((mixColor: string) => {
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
@@ -193,7 +198,7 @@ export default function ColorTokenForm({
             <IconButton
               tooltip="Remove the modify"
               dataCy="button-remove=modify"
-              onClick={removeToken}
+              onClick={removeModify}
               icon={<IconMinus />}
             />
           )
@@ -277,12 +282,12 @@ export default function ColorTokenForm({
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value} />
+              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value || defaultValue} />
             </Box>
           </>
         )
       }
-      {(checkIfContainsAlias(internalEditToken.value) || modifiedColor) && (
+      {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['com.figmatokens']?.modify) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (
           <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(modifiedColor) }} />
