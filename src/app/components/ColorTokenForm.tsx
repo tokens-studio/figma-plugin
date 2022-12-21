@@ -21,7 +21,7 @@ import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import { StyledPrefix, StyledInput } from './Input';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
-import { ColorModifier } from '@/types/Modifier';
+import { ColorModifier, MixModifier } from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
@@ -42,6 +42,7 @@ export default function ColorTokenForm({
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
+  const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
   const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
@@ -57,14 +58,17 @@ export default function ColorTokenForm({
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
+  const handleToggleMixInputHelper = React.useCallback(() => {
+    setInputMixHelperOpen(!inputMixHelperOpen);
+  }, [inputMixHelperOpen]);
+
   const handleColorValueChange = React.useCallback((color: string) => {
     handleColorDownShiftInputChange(color);
   }, [handleColorDownShiftInputChange]);
 
   const addModify = useCallback(() => {
-    setModifyVisible(true);
     handleColorModifyChange({} as ColorModifier);
-  }, []);
+  }, [handleColorModifyChange]);
 
   const removeToken = useCallback(() => {
     setModifyVisible(false);
@@ -105,13 +109,31 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleColorModifyChange]);
 
+  const handleMixColorChange = useCallback((mixColor: string) => {
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      handleColorModifyChange({
+        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+        color: mixColor,
+      } as MixModifier);
+    }
+  }, [internalEditToken, handleColorModifyChange]);
+
+  const handleMixColorInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      handleColorModifyChange({
+        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+        color: e.target.value,
+      } as MixModifier);
+    }
+  }, [internalEditToken, handleColorModifyChange]);
+
   const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type || 'Amount'), [internalEditToken]);
 
   return (
     <>
       <DownshiftInput
         value={internalEditToken.value}
-        type={internalEditToken.type}
+        type={TokenTypes.COLOR}
         label={internalEditToken.schema?.property}
         resolvedTokens={resolvedTokens}
         initialName={internalEditToken.initialName}
@@ -201,6 +223,34 @@ export default function ColorTokenForm({
                 </DropdownMenuContent>
               </DropdownMenu>
             </Box>
+            {
+              internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && (
+                <>
+                  <DownshiftInput
+                    value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color}
+                    type={TokenTypes.COLOR}
+                    resolvedTokens={resolvedTokens}
+                    handleChange={handleMixColorInputChange}
+                    setInputValue={handleMixColorChange}
+                    placeholder="#000000, hsla(), rgba() or {alias}"
+                    prefix={(
+                      <button
+                        type="button"
+                        className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
+                        style={{ background: internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, fontSize: 0 }}
+                        onClick={handleToggleMixInputHelper}
+                      >
+                        {internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color}
+                      </button>
+                    )}
+                    suffix
+                  />
+                  {inputMixHelperOpen && (
+                    <ColorPicker value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color} onChange={handleMixColorChange} />
+                  )}
+                </>
+              )
+            }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
               <StyledInput onChange={handleModifyValueChange} type="number" />

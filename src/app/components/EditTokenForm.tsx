@@ -216,7 +216,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleColorModifyChange = React.useCallback((newModify: ColorModifier) => {
-    console.log('new', newModify);
     setInternalEditToken({
       ...internalEditToken,
       $extensions: {
