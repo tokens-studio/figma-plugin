@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
+import chroma, { InterpolationMode } from 'chroma-js';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -48,21 +49,43 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('inter', internalEditToken);
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       setModifyVisible(true);
     }
   }, [internalEditToken]);
 
-  const handleToggleInputHelper = React.useCallback(() => {
+  const modifiedColor = useMemo(() => {
+    if (resolvedValue) {
+      const baseColor = String(resolvedValue);
+      if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+        const amount = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value;
+        switch (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type) {
+          case ColorModifierTypes.LIGHTEN:
+            return chroma(baseColor).brighten(amount);
+          case ColorModifierTypes.DARKEN:
+            return chroma(baseColor).darken(amount);
+          case ColorModifierTypes.MIX:
+            return chroma.mix(baseColor, internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, amount, internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space);
+          case ColorModifierTypes.ALPHA:
+            return chroma(baseColor).alpha(amount);
+          default:
+            return baseColor;
+        }
+      }
+      return baseColor;
+    }
+    return null;
+  }, [internalEditToken, resolvedValue]);
+
+  const handleToggleInputHelper = useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
 
-  const handleToggleMixInputHelper = React.useCallback(() => {
+  const handleToggleMixInputHelper = useCallback(() => {
     setInputMixHelperOpen(!inputMixHelperOpen);
   }, [inputMixHelperOpen]);
 
-  const handleColorValueChange = React.useCallback((color: string) => {
+  const handleColorValueChange = useCallback((color: string) => {
     handleColorDownShiftInputChange(color);
   }, [handleColorDownShiftInputChange]);
 
@@ -144,7 +167,7 @@ export default function ColorTokenForm({
           <button
             type="button"
             className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-            style={{ background: internalEditToken.value, fontSize: 0 }}
+            style={{ background: String(resolvedValue), fontSize: 0 }}
             onClick={handleToggleInputHelper}
           >
             {internalEditToken.value}
@@ -153,7 +176,7 @@ export default function ColorTokenForm({
         suffix
       />
       {inputHelperOpen && (
-      <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
+        <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="xsmall">Modify</Heading>
@@ -258,12 +281,12 @@ export default function ColorTokenForm({
           </>
         )
       }
-      {checkIfContainsAlias(internalEditToken.value) && (
+      {(checkIfContainsAlias(internalEditToken.value) || modifiedColor) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (
-          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
+          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(modifiedColor) }} />
         ) : null}
-        {resolvedValue?.toString()}
+        {modifiedColor?.toString()}
       </div>
       )}
     </>
