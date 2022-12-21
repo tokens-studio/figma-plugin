@@ -51,6 +51,7 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
+    console.log('inter', internalEditToken.$extensions);
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       setModifyVisible(true);
     }
@@ -80,7 +81,7 @@ export default function ColorTokenForm({
       return resolvedValue;
     }
     return null;
-  }, [internalEditToken, resolvedValue]);
+  }, [internalEditToken, resolvedValue, resolvedMixValue]);
 
   const handleToggleInputHelper = useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -136,7 +137,7 @@ export default function ColorTokenForm({
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       handleColorModifyChange({
         ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
-        value: e.target.value,
+        value: e.target.value.replace(/[^.\d]/g, '').replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2').replace(/^\./, ''), // accept only number
       });
     }
   }, [internalEditToken, handleColorModifyChange]);
@@ -285,7 +286,7 @@ export default function ColorTokenForm({
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value || defaultValue} />
+              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value} required />
             </Box>
           </>
         )

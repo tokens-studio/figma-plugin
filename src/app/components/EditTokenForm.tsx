@@ -33,6 +33,7 @@ import BorderTokenForm from './BorderTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifier } from '@/types/Modifier';
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -54,6 +55,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const { confirm } = useConfirm();
 
   const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
+  const isValidColorToken = React.useMemo(() => {
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX) {
+      return !!internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color;
+    }
+    return true;
+  }, [internalEditToken]);
 
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
@@ -62,6 +69,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     if (internalEditToken.type === TokenTypes.DIMENSION) {
       return isValidDimensionToken;
+    }
+    if (internalEditToken.type === TokenTypes.COLOR) {
+      return isValidColorToken;
     }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
@@ -121,7 +131,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         setError('Value must include either px or rem');
       }
     },
-    [internalEditToken],
+    [internalEditToken, isValidDimensionToken],
   );
 
   const handleBoxShadowValueChange = React.useCallback(
