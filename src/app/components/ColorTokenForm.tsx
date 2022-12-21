@@ -35,6 +35,7 @@ export default function ColorTokenForm({
   handleColorChange,
   handleColorDownShiftInputChange,
   handleColorModifyChange,
+  handleRemoveColorModify,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COLOR }>;
   resolvedTokens: ResolveTokenValuesResult[];
@@ -42,6 +43,7 @@ export default function ColorTokenForm({
   handleColorChange: React.ChangeEventHandler;
   handleColorDownShiftInputChange: (newInputValue: string) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
+  handleRemoveColorModify: () => void;
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
@@ -51,7 +53,6 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
-    console.log('inter', internalEditToken.$extensions);
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
       setModifyVisible(true);
     }
@@ -105,7 +106,8 @@ export default function ColorTokenForm({
 
   const removeModify = useCallback(() => {
     setModifyVisible(false);
-  }, []);
+    handleRemoveColorModify();
+  }, [handleRemoveColorModify]);
 
   const handleOperationToggleMenu = useCallback(() => {
     setOperationMenuOpened(!operationMenuOpened);

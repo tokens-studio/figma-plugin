@@ -74,7 +74,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return isValidColorToken;
     }
     return internalEditToken?.value && !error;
-  }, [internalEditToken, error]);
+  }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
     () => resolvedTokens
@@ -233,6 +233,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
           modify: newModify,
         },
       },
+    });
+  }, [internalEditToken]);
+
+  const removeColorModify = React.useCallback(() => {
+    const newValue = internalEditToken;
+    delete newValue?.$extensions;
+    setInternalEditToken({
+      ...newValue,
     });
   }, [internalEditToken]);
 
@@ -439,6 +447,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleColorChange={handleChange}
             handleColorDownShiftInputChange={handleDownShiftInputChange}
             handleColorModifyChange={handleColorModifyChange}
+            handleRemoveColorModify={removeColorModify}
           />
         );
       }
