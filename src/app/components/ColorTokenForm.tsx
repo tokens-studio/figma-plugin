@@ -56,12 +56,24 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken]);
 
+  const resolvedMixValue = React.useMemo(() => {
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color) {
+      return typeof internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color === 'string'
+        ? getAliasValue(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, resolvedTokens)
+        : null;
+    }
+    return null;
+  }, [internalEditToken, resolvedTokens]);
+
   const modifiedColor = useMemo(() => {
     if (resolvedValue) {
       if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
         const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
-        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA || (modifierType === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color)) {
+        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
           return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify);
+        }
+        if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
+          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) });
         }
         return resolvedValue;
       }
@@ -88,7 +100,7 @@ export default function ColorTokenForm({
       value: defaultValue,
       space: ColorSpaceTypes.LCH,
     });
-  }, [handleColorModifyChange, defaultValue]);
+  }, [handleColorModifyChange]);
 
   const removeModify = useCallback(() => {
     setModifyVisible(false);
@@ -128,15 +140,6 @@ export default function ColorTokenForm({
       });
     }
   }, [internalEditToken, handleColorModifyChange]);
-
-  const resolvedMixValue = React.useMemo(() => {
-    if (internalEditToken) {
-      return typeof internalEditToken?.value === 'string'
-        ? getAliasValue(internalEditToken.value, resolvedTokens)
-        : null;
-    }
-    return null;
-  }, [internalEditToken, resolvedTokens]);
 
   const handleMixColorChange = useCallback((mixColor: string) => {
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
@@ -266,7 +269,7 @@ export default function ColorTokenForm({
                       <button
                         type="button"
                         className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                        style={{ background: internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, fontSize: 0 }}
+                        style={{ background: String(resolvedMixValue), fontSize: 0 }}
                         onClick={handleToggleMixInputHelper}
                       >
                         {internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color}
