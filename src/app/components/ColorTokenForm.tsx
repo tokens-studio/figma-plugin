@@ -21,9 +21,9 @@ import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import { StyledPrefix, StyledInput } from './Input';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
-
-const operations = ['Lighten', 'Darken', 'Mix', 'Alpha'];
-const colorSpaces = ['LCH', 'sRGB', 'P3'];
+import { ColorModifier } from '@/types/Modifier';
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
 export default function ColorTokenForm({
   internalEditToken,
@@ -31,19 +31,28 @@ export default function ColorTokenForm({
   resolvedValue,
   handleColorChange,
   handleColorDownShiftInputChange,
+  handleColorModifyChange,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COLOR }>;
   resolvedTokens: ResolveTokenValuesResult[];
   resolvedValue: ReturnType<typeof getAliasValue>
   handleColorChange: React.ChangeEventHandler;
-  handleColorDownShiftInputChange: (newInputValue: string) => void ;
+  handleColorDownShiftInputChange: (newInputValue: string) => void;
+  handleColorModifyChange: (newModify: ColorModifier) => void;
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
   const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
-  const [currentOperation, setCurrentOperation] = React.useState(operations[0]);
-  const [currentColorSpace, setCurrentColorSpace] = React.useState(colorSpaces[0]);
+  const [modifyVisible, setModifyVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    console.log('inter', internalEditToken);
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      setModifyVisible(true);
+    }
+  }, [internalEditToken]);
+
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
@@ -53,10 +62,13 @@ export default function ColorTokenForm({
   }, [handleColorDownShiftInputChange]);
 
   const addModify = useCallback(() => {
-  }, [internalEditToken]);
+    setModifyVisible(true);
+    handleColorModifyChange({} as ColorModifier);
+  }, []);
 
   const removeToken = useCallback(() => {
-  }, [internalEditToken]);
+    setModifyVisible(false);
+  }, []);
 
   const handleOperationToggleMenu = useCallback(() => {
     setOperationMenuOpened(!operationMenuOpened);
@@ -67,17 +79,33 @@ export default function ColorTokenForm({
   }, [colorSpaceMenuOpened]);
 
   const onOperationSelected = useCallback((operation: string) => {
-    setCurrentOperation(operation);
-  }, []);
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      handleColorModifyChange({
+        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+        type: operation,
+      } as ColorModifier);
+    }
+  }, [internalEditToken, handleColorModifyChange]);
 
   const onColorSpaceSelected = useCallback((colorSpace: string) => {
-    setCurrentColorSpace(colorSpace);
-  }, []);
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      handleColorModifyChange({
+        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+        space: colorSpace,
+      } as ColorModifier);
+    }
+  }, [internalEditToken, handleColorModifyChange]);
 
   const handleModifyValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  }, []);
+    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+      handleColorModifyChange({
+        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+        value: parseFloat(e.target.value),
+      });
+    }
+  }, [internalEditToken, handleColorModifyChange]);
 
-  const getIconComponent = React.useMemo(() => getLabelForProperty(currentOperation), [currentOperation]);
+  const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type || 'Amount'), [internalEditToken]);
 
   return (
     <>
@@ -107,68 +135,79 @@ export default function ColorTokenForm({
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Heading size="xsmall">Modify</Heading>
-        <IconButton
-          tooltip="Add a new modify"
-          dataCy="button-add-new-modify"
-          onClick={addModify}
-          icon={<IconPlus />}
-        />
-        <IconButton
-          tooltip="Remove this style"
-          dataCy="button-style-remove-multiple"
-          onClick={removeToken}
-          icon={<IconMinus />}
-        />
+        {
+          !modifyVisible ? (
+            <IconButton
+              tooltip="Add a new modify"
+              dataCy="button-add-new-modify"
+              onClick={addModify}
+              icon={<IconPlus />}
+            />
+          ) : (
+            <IconButton
+              tooltip="Remove the modify"
+              dataCy="button-remove=modify"
+              onClick={removeToken}
+              icon={<IconMinus />}
+            />
+          )
+        }
       </Box>
-      <Box css={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '$3',
-        '& > .relative ': {
-          flex: '2',
-        },
-      }}
-      >
-        <DropdownMenu open={operationMenuOpened} onOpenChange={handleOperationToggleMenu}>
-          <DropdownMenuTrigger
-            data-cy="colortokenform-operation-selector"
-            bordered
-            css={{
-              flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
+      {
+        modifyVisible && (
+          <>
+            <Box css={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '$3',
+              '& > .relative ': {
+                flex: '2',
+              },
             }}
-          >
-            <span>{currentOperation || 'Choose a operation'}</span>
-            <IconToggleableDisclosure />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-            <DropdownMenuRadioGroup value={currentOperation}>
-              {operations.map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenu open={colorSpaceMenuOpened} onOpenChange={handleColorSpaceToggleMenu}>
-          <DropdownMenuTrigger
-            data-cy="colortokenform-colorspace-selector"
-            bordered
-            css={{
-              flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
-            }}
-          >
-            <span>{currentColorSpace || 'Choose a color space'}</span>
-            <IconToggleableDisclosure />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-            <DropdownMenuRadioGroup value={currentColorSpace}>
-              {colorSpaces.map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </Box>
-      <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
-        <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-        <StyledInput />
-      </Box>
+            >
+              <DropdownMenu open={operationMenuOpened} onOpenChange={handleOperationToggleMenu}>
+                <DropdownMenuTrigger
+                  data-cy="colortokenform-operation-selector"
+                  bordered
+                  css={{
+                    flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
+                  }}
+                >
+                  <span>{internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type || 'Choose a operation'}</span>
+                  <IconToggleableDisclosure />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type}>
+                    {Object.values(ColorModifierTypes).map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu open={colorSpaceMenuOpened} onOpenChange={handleColorSpaceToggleMenu}>
+                <DropdownMenuTrigger
+                  data-cy="colortokenform-colorspace-selector"
+                  bordered
+                  css={{
+                    flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
+                  }}
+                >
+                  <span>{internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space || 'Choose a color space'}</span>
+                  <IconToggleableDisclosure />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space}>
+                    {Object.values(ColorSpaceTypes).map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </Box>
+            <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+              <StyledPrefix isText>{getIconComponent}</StyledPrefix>
+              <StyledInput onChange={handleModifyValueChange} type="number" />
+            </Box>
+          </>
+        )
+      }
       {checkIfContainsAlias(internalEditToken.value) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (

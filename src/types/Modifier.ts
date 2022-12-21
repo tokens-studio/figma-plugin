@@ -1,16 +1,19 @@
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
+
 interface Modifier <T extends string, V> {
   type: T
   value: V
 }
-interface ColorGenericeModifier<T extends string, V> extends Modifier<T, V> {
-  space: 'LCH' | 'sRGB' | 'P3'
+interface ColorGenericModifier<T extends ColorModifierTypes, V> extends Modifier<T, V> {
+  space: ColorSpaceTypes
 }
 
-interface LightenModifier extends ColorGenericeModifier<'lighten', number> {}
-interface DarkenModifier extends ColorGenericeModifier<'darken', number> {}
-interface MixModifier extends ColorGenericeModifier<'mix', number> {
+export interface LightenModifier extends ColorGenericModifier<ColorModifierTypes.LIGHTEN, number> {}
+export interface DarkenModifier extends ColorGenericModifier<ColorModifierTypes.DARKEN, number> {}
+export interface MixModifier extends ColorGenericModifier<ColorModifierTypes.MIX, number> {
   color: string;
 }
-interface AlphaModifier extends ColorGenericeModifier<'alpha', number> {}
+export interface AlphaModifier extends ColorGenericModifier<ColorModifierTypes.ALPHA, number> {}
 
 export type ColorModifier = LightenModifier | DarkenModifier | MixModifier | AlphaModifier;

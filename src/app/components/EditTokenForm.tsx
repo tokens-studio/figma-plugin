@@ -32,6 +32,7 @@ import Heading from './Heading';
 import BorderTokenForm from './BorderTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
+import { ColorModifier } from '@/types/Modifier';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -212,6 +213,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
         value: { ...internalEditToken.value, [property]: newInputValue },
       });
     }
+  }, [internalEditToken]);
+
+  const handleColorModifyChange = React.useCallback((newModify: ColorModifier) => {
+    console.log('new', newModify);
+    setInternalEditToken({
+      ...internalEditToken,
+      $extensions: {
+        'com.figmatokens': {
+          modify: newModify,
+        },
+      },
+    });
   }, [internalEditToken]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
@@ -411,6 +424,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedValue={resolvedValue}
             handleColorChange={handleChange}
             handleColorDownShiftInputChange={handleDownShiftInputChange}
+            handleColorModifyChange={handleColorModifyChange}
           />
         );
       }
