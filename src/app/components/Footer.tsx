@@ -54,6 +54,7 @@ export default function Footer() {
       lastSyncedState,
       [{}, [], defaultMetadata],
     );
+    console.log('haschage', hasChanged);
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
