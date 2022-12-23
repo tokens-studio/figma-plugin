@@ -84,6 +84,10 @@ export default function ColorTokenForm({
     return null;
   }, [internalEditToken, resolvedValue, resolvedMixValue]);
 
+  React.useEffect(() => {
+    console.log('modified', modifiedColor);
+  }, [modifiedColor]);
+
   const handleToggleInputHelper = useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
   }, [inputHelperOpen]);
