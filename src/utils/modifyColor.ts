@@ -10,7 +10,7 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
       case ColorModifierTypes.DARKEN:
         return new Color(baseColor).darken(Number(modifier.value)).toString();
       case ColorModifierTypes.MIX:
-        return new Color(baseColor).mix(modifier.color, Number(modifier.value), { outputSpace: modifier.space });
+        return new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' });
       case ColorModifierTypes.ALPHA:
         // eslint-disable-next-line no-case-declarations
         const newColor = new Color(baseColor);
