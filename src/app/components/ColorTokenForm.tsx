@@ -84,9 +84,22 @@ export default function ColorTokenForm({
     return null;
   }, [internalEditToken, resolvedValue, resolvedMixValue]);
 
-  React.useEffect(() => {
-    console.log('modified', modifiedColor);
-  }, [modifiedColor]);
+  const cssColor = useMemo(() => {
+    if (resolvedValue) {
+      if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+        const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
+        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
+          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify).display();
+        }
+        if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
+          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) }).display();
+        }
+        return resolvedValue;
+      }
+      return resolvedValue;
+    }
+    return null;
+  }, [internalEditToken, resolvedValue, resolvedMixValue]);
 
   const handleToggleInputHelper = useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -300,7 +313,7 @@ export default function ColorTokenForm({
       {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['com.figmatokens']?.modify) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (
-          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(modifiedColor) }} />
+          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(cssColor) }} />
         ) : null}
         {modifiedColor?.toString()}
       </div>

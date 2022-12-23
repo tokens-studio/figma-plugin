@@ -6,20 +6,20 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        return new Color(baseColor).lighten(Number(modifier.value)).toString();
+        return new Color(new Color(baseColor).lighten(Number(modifier.value)).to(modifier.space));
       case ColorModifierTypes.DARKEN:
-        return new Color(baseColor).darken(Number(modifier.value)).toString();
+        return new Color(new Color(baseColor).darken(Number(modifier.value)).to(modifier.space));
       case ColorModifierTypes.MIX:
-        return new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' });
+        return new Color(new Color(new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' }).toString()).to(modifier.space));
       case ColorModifierTypes.ALPHA:
         // eslint-disable-next-line no-case-declarations
         const newColor = new Color(baseColor);
         newColor.alpha = Number(modifier.value);
-        return newColor.toString();
+        return new Color(newColor.to(modifier.space));
       default:
-        return baseColor;
+        return new Color(baseColor);
     }
   } catch (e) {
-    return baseColor;
+    return new Color(baseColor);
   }
 }
