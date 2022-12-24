@@ -495,6 +495,7 @@ export const tokenState = createModel<RootModel>()({
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
+          dispatch,
         });
       } catch (e) {
         console.error('Error updating document', e);

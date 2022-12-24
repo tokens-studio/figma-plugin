@@ -93,6 +93,7 @@ export function useGenericVersionedStorage() {
         },
         themes,
         updatedAt,
+        dispatch,
       });
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
