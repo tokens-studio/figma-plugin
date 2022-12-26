@@ -7,6 +7,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 
 type WindowSettingsType = {
   width: number;
@@ -26,6 +27,9 @@ export interface SettingsState {
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
+  shouldSwapStyles: boolean;
+  baseFontSize: string;
+  aliasBaseFontSize: string;
 }
 
 const setUI = (state: SettingsState) => {
@@ -50,6 +54,9 @@ export const settings = createModel<RootModel>()({
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
     inspectDeep: false,
+    shouldSwapStyles: false,
+    baseFontSize: defaultBaseFontSize,
+    aliasBaseFontSize: defaultBaseFontSize,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -89,6 +96,18 @@ export const settings = createModel<RootModel>()({
         ...payload,
       };
     },
+    setBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        baseFontSize: payload,
+      };
+    },
+    setAliasBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        aliasBaseFontSize: payload,
+      };
+    },
     triggerWindowChange(state) {
       setUI(state);
       return state;
@@ -115,6 +134,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         updateStyles: payload,
+      };
+    },
+    setShouldSwapStyles(state, payload: boolean) {
+      return {
+        ...state,
+        shouldSwapStyles: payload,
       };
     },
     setTokenType(state, payload: TokenModeType) {
@@ -148,6 +173,9 @@ export const settings = createModel<RootModel>()({
     setUpdateStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    setShouldSwapStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
     setUpdateMode: (payload, rootState) => {
       setUI(rootState.settings);
     },
@@ -164,6 +192,12 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUISettings: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setBaseFontSize: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

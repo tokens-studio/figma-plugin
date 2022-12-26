@@ -1,10 +1,12 @@
 /* eslint-disable no-param-reassign */
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
+import { notifyException, notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
   token: Pick<SingleTypographyToken, 'value' | 'description'>,
+  baseFontSize: string,
 ) {
   try {
     const { value, description } = token;
@@ -33,7 +35,7 @@ export default async function setTextValuesOnTarget(
         }
       } catch (e) {
         const splitFontFamily = family.split(',');
-        const candidateStyles = transformValue(style, 'fontWeights');
+        const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
         const candidateFonts: { family: string; style: string }[] = [];
         splitFontFamily?.forEach((candidateFontFamily) => {
           const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
@@ -66,37 +68,38 @@ export default async function setTextValuesOnTarget(
               }
             })
             .catch(() => {
-              // TODO: Track this in mixpanel so we can add missing weights
+              notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+              notifyException('Font not found', { family, style });
             });
           if (isApplied) break;
         }
       }
-      if (fontSize) {
-        target.fontSize = transformValue(fontSize, 'fontSizes');
+      if (typeof fontSize !== 'undefined') {
+        target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
       }
-      if (lineHeight) {
-        const transformedValue = transformValue(String(lineHeight), 'lineHeights');
+      if (typeof lineHeight !== 'undefined') {
+        const transformedValue = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
         if (transformedValue !== null) {
           target.lineHeight = transformedValue;
         }
       }
-      if (letterSpacing) {
-        const transformedValue = transformValue(letterSpacing, 'letterSpacing');
+      if (typeof letterSpacing !== 'undefined') {
+        const transformedValue = transformValue(letterSpacing, 'letterSpacing', baseFontSize);
         if (transformedValue !== null) {
           target.letterSpacing = transformedValue;
         }
       }
-      if (paragraphSpacing) {
-        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
+      if (typeof paragraphSpacing !== 'undefined') {
+        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
       }
-      if (paragraphIndent) {
-        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent');
+      if (typeof paragraphIndent !== 'undefined') {
+        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
       }
       if (textCase) {
-        target.textCase = transformValue(textCase, 'textCase');
+        target.textCase = transformValue(textCase, 'textCase', baseFontSize);
       }
       if (textDecoration) {
-        target.textDecoration = transformValue(textDecoration, 'textDecoration');
+        target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
       }
       if (description && 'description' in target) {
         target.description = description;

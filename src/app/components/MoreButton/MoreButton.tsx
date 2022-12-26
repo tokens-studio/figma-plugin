@@ -78,10 +78,19 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
       await setNodeData(value, tokensContext.resolvedTokens);
       dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
     },
-    [dispatch, tokensContext.resolvedTokens, setNodeData],
+    [dispatch, tokensContext.resolvedTokens, setNodeData]
   );
 
-  const activeStateProperties = React.useMemo(() => [...properties, ...DocumentationProperties], [properties]);
+  const activeStateProperties = React.useMemo(() => {
+    const childProperties: PropertyObject[] = [];
+    properties.forEach((property) => {
+      if (property.childProperties) {
+        childProperties.push(...property.childProperties);
+      }
+    });
+    return [...properties, ...childProperties, ...DocumentationProperties];
+  }, [properties]);
+
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
   const handleClick = React.useCallback(
@@ -96,7 +105,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
 
       setPluginValue(newProps);
     },
-    [active, token.name, setPluginValue],
+    [active, token.name, setPluginValue]
   );
 
   const handleTokenClick = React.useCallback(() => {

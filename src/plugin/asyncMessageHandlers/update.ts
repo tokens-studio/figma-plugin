@@ -6,6 +6,7 @@ import { updateNodes } from '../node';
 import { defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
+import { swapStyles } from './swapStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -20,7 +21,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
   }
   if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
+    receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -29,6 +30,9 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
+    if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
+      await swapStyles(msg.activeTheme, msg.themes);
+    }
   }
 
   return {

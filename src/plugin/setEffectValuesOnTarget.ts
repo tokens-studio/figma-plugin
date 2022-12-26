@@ -10,6 +10,7 @@ export default function setEffectValuesOnTarget(
   // @TODO update this typing
   target: BaseNode | EffectStyle,
   token: Pick<SingleBoxShadowToken, 'value' | 'description'>,
+  baseFontSize: string,
   key: 'effects' = 'effects',
 ) {
   try {
@@ -27,16 +28,16 @@ export default function setEffectValuesOnTarget(
             a,
           },
           type: convertBoxShadowTypeToFigma(v.type),
-          spread: convertTypographyNumberToFigma(v.spread.toString()),
-          radius: convertTypographyNumberToFigma(v.blur.toString()),
-          offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString()), convertTypographyNumberToFigma(v.y.toString())),
+          spread: convertTypographyNumberToFigma(v.spread.toString(), baseFontSize),
+          radius: convertTypographyNumberToFigma(v.blur.toString(), baseFontSize),
+          offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString(), baseFontSize), convertTypographyNumberToFigma(v.y.toString(), baseFontSize)),
           blendMode: v.blendMode || 'NORMAL' as BlendMode,
           visible: true,
           ...v.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[index]) } : {},
         };
       }) as Effect[];
 
-      if ('effects' in target && key === 'effects') target[key] = effectsArray;
+      if ('effects' in target && key === 'effects') target[key] = effectsArray.reverse();
     } else if (typeof value !== 'string') {
       const { color, opacity: a } = convertToFigmaColor(value.color);
       const { r, g, b } = color;
@@ -50,9 +51,9 @@ export default function setEffectValuesOnTarget(
               a,
             },
             type: convertBoxShadowTypeToFigma(value.type),
-            spread: convertTypographyNumberToFigma(value.spread.toString()),
-            radius: convertTypographyNumberToFigma(value.blur.toString()),
-            offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString()), convertTypographyNumberToFigma(value.y.toString())),
+            spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
+            radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
+            offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
             blendMode: (value.blendMode || 'NORMAL') as BlendMode,
             visible: true,
             ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},

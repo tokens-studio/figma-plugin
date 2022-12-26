@@ -18,6 +18,11 @@ describe('Branch switcher', () => {
   const mockStartupParams = {
     activeTheme: null,
     lastOpened: Date.now(),
+    onboardingExplainer: {
+      sets: true,
+      inspect: true,
+      syncProviders: true,
+    },
     localApiProviders: [provider],
     licenseKey: null,
     settings: {

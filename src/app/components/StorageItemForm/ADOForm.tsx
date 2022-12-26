@@ -7,11 +7,12 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.ADO; }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
@@ -50,6 +51,7 @@ export default function ADOForm({
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
         <Input
+          autofocus
           full
           label="Organization Url"
           value={values.baseUrl}
@@ -108,12 +110,12 @@ export default function ADOForm({
           name="name"
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (

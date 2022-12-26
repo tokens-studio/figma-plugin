@@ -1,6 +1,7 @@
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
+import { updateGenericVersionedTokens } from './providers/generic/versionedStorage';
 import { track } from '@/utils/analytics';
 import type { AnyTokenList } from '@/types/tokens';
 import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
@@ -34,6 +35,7 @@ type UpdateTokensOnSourcesPayload = {
   lastUpdatedAt: string;
   api: StorageTypeCredentials;
   checkForChanges: boolean;
+  shouldSwapStyles?: boolean;
 };
 
 async function updateRemoteTokens({
@@ -59,7 +61,19 @@ async function updateRemoteTokens({
       });
       break;
     }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+      track('pushTokens', { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE });
+      notifyToUI('Updating Generic Remote...');
+      await updateGenericVersionedTokens({
+        themes,
+        tokens,
+        context,
+        updatedAt,
+        oldUpdatedAt,
+      });
 
+      break;
+    }
     case StorageProviderType.GITHUB: {
       break;
     }
@@ -92,6 +106,7 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
   checkForChanges,
+  shouldSwapStyles,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -117,5 +132,6 @@ export default async function updateTokensOnSources({
     usedTokenSet,
     checkForChanges,
     activeTheme,
+    shouldSwapStyles,
   });
 }

@@ -30,6 +30,7 @@ export default {
   paragraphSpacing: 'paragraphSpacing',
   textCase: 'textCase',
   textDecoration: 'textDecoration',
+  dimension: 'dimension',
   tokenValue: 'documentation',
   value: 'documentation',
   tokenName: 'documentation',

@@ -11,8 +11,8 @@ import updateTextStyles from './updateTextStyles';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
+  settings: SettingsState,
   shouldCreate = false,
-  settings: Partial<SettingsState> = {},
 ): Promise<Record<string, string>> {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -28,7 +28,7 @@ export default async function updateStyles(
     return {
       ...token,
       path,
-      value: typeof token.value === 'string' ? transformValue(token.value, token.type) : token.value,
+      value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings.baseFontSize) : token.value,
     } as SingleToken<true, { path: string }>;
   });
 
@@ -49,8 +49,8 @@ export default async function updateStyles(
 
   const allStyleIds = {
     ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),
-    ...(textTokens.length > 0 ? updateTextStyles(textTokens, shouldCreate) : {}),
-    ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, shouldCreate) : {}),
+    ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
+    ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, settings.baseFontSize, shouldCreate) : {}),
   };
   return allStyleIds;
 }

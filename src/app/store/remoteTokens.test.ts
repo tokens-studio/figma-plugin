@@ -524,7 +524,10 @@ describe('remoteTokens', () => {
           errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
         })
       ));
-      expect(await result.current.restoreStoredProvider(context as StorageTypeCredentials)).toEqual(null);
+      expect(await result.current.restoreStoredProvider(context as StorageTypeCredentials)).toEqual({
+        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+        status: 'failure',
+      });
     });
   });
 

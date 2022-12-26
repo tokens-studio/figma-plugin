@@ -1,3 +1,4 @@
+import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
@@ -17,6 +18,9 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
+      shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
+      baseFontSize: uiSettings.baseFontSize ?? data?.baseFontSize,
+      aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -38,6 +42,10 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let ignoreFirstPartForStyles: boolean;
     let prefixStylesWithThemeName: boolean;
     let inspectDeep: boolean;
+    let shouldSwapStyles: boolean;
+    let baseFontSize: string;
+    let aliasBaseFontSize: string;
+
     if (data) {
       width = data.width || 400;
       height = data.height || 600;
@@ -48,7 +56,10 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateStyles = typeof data.updateStyles === 'undefined' ? true : data.updateStyles;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
+      baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
+      aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
+      shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
@@ -60,6 +71,9 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         ignoreFirstPartForStyles,
         prefixStylesWithThemeName,
         inspectDeep,
+        shouldSwapStyles,
+        baseFontSize,
+        aliasBaseFontSize,
       };
 
       if (notify) {

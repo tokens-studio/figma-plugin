@@ -621,6 +621,7 @@ describe('Initiator', () => {
         height: 300,
         isMinimized: false,
       },
+      shouldSwapStyles: false,
       tokenType: 'object',
       updateMode: UpdateMode.PAGE,
       updateRemote: false,
@@ -629,6 +630,8 @@ describe('Initiator', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     });
   });
 });

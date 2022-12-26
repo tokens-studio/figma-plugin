@@ -6,7 +6,7 @@ import { StyledButton } from './StyledButton';
 export interface ButtonProps {
   type?: 'button' | 'submit';
   form?: string;
-  variant: 'secondary' | 'primary' | 'ghost';
+  variant: 'secondary' | 'primary' | 'ghost' | 'danger';
   onClick?: () => void;
   size?: 'large' | 'small';
   href?: string;
@@ -49,7 +49,7 @@ const Button: React.FC<ButtonProps> = ({
         href={href}
         data-cy={id}
         data-testid={id}
-        >
+      >
         <StyledButton
           ref={buttonRef}
           disabled={disabled}

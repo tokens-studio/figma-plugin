@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { act } from 'react-dom/test-utils';
+import userEvent from '@testing-library/user-event';
 import {
   createMockStore,
   render,
@@ -42,14 +43,9 @@ describe('ConfirmDialog', () => {
         <SyncSettings />
       </Provider>,
     );
-    expect(result.queryByText('Token Storage')).toBeInTheDocument();
+    expect(result.queryByText('Sync providers')).toBeInTheDocument();
     expect(result.queryByText('Local document')).toBeInTheDocument();
-    expect(result.queryByText('URL')).toBeInTheDocument();
-    expect(result.queryByText('JSONbin')).toBeInTheDocument();
-    expect(result.queryByText('GitHub')).toBeInTheDocument();
-    expect(result.queryByText('GitLab')).toBeInTheDocument();
-    expect(result.queryByText('ADO')).toBeInTheDocument();
-    expect(result.queryByText('Add new credentials')).toBeInTheDocument();
+    expect(result.queryByText('Add new')).toBeInTheDocument();
   });
 
   it('should return ConfirmLocalStorageModal when seleting local storage', async () => {
@@ -61,7 +57,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryByText('Local document')?.click();
+      result.queryAllByText('Apply')[0]?.click();
     });
 
     expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
@@ -76,7 +72,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryByText('Local document')?.click();
+      result.queryAllByText('Apply')[0]?.click();
     });
 
     expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
@@ -97,7 +93,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryByText('Local document')?.click();
+      result.queryAllByText('Apply')[0]?.click();
     });
 
     await act(async () => {
@@ -121,7 +117,15 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryByText('Edit')?.click();
+      const trigger = await result.findByTestId('storage-item-tools-dropdown');
+      trigger.focus();
+      await userEvent.keyboard('[Enter]');
+    });
+
+    await act(async () => {
+      const editButton = await result.queryByText('Edit');
+      editButton?.focus();
+      await userEvent.keyboard('[Enter]');
     });
 
     expect(result.queryByText('Edit credentials')).toBeInTheDocument();
@@ -136,15 +140,22 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryByText('Add new credentials')?.click();
+      const trigger = await result.getByTestId('add-storage-item-dropdown');
+      trigger?.focus();
+      await userEvent.keyboard('[Enter]');
     });
 
-    expect(result.queryAllByText('Add new credentials')).toHaveLength(2);
+    await act(async () => {
+      const githubButton = await result.getByTestId('add-GitHub-credential');
+      githubButton?.focus();
+      await userEvent.keyboard('[Enter]');
+    });
+
     expect(result.queryByText('Personal Access Token')).toBeInTheDocument();
     expect(result.queryByText('Repository (owner/repo)')).toBeInTheDocument();
     expect(result.queryByText('Branch')).toBeInTheDocument();
     expect(result.queryByText('File Path (e.g. tokens.json) or Folder Path (e.g. tokens)')).toBeInTheDocument();
     expect(result.queryByText('baseUrl (optional)')).toBeInTheDocument();
-    expect(result.queryByText('Save')).toBeInTheDocument();
+    expect(result.queryByText('Save credentials')).toBeInTheDocument();
   });
 });

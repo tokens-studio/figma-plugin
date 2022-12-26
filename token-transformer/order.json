@@ -1,0 +1,68 @@
+{
+  "foundations": {
+    "color": {
+      "neutral": {
+        "10": {
+          "value": "#E6EFFF",
+          "type": "color"
+        },
+        "50": {
+          "value": "#2B70E8",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "light": {
+    "default": {
+      "value": "{color.neutral.50}",
+      "type": "color"
+    },
+    "gray": {
+      "value": "{default}",
+      "type": "color"
+    },
+    "background": {
+      "value": "{color.neutral.10}",
+      "type": "color"
+    }
+  },
+  "dark": {
+    "gray": {
+      "value": "{default}",
+      "type": "color"
+    },
+    "background": {
+      "value": "{color.neutral.10}",
+      "type": "color"
+    }
+  },
+  "$metadata": {
+    "tokenSetOrder": [
+      "foundations",
+      "light",
+      "dark"
+    ]
+  },
+  "$themes": [
+    {
+      "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
+      "name": "lightOrder",
+      "selectedTokenSets": {
+        "foundations": "enabled",
+        "light": "enabled"
+      },
+      "$figmaStyleReferences": {}
+    },
+    {
+      "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
+      "name": "darkOrder",
+      "selectedTokenSets": {
+        "foundations": "source",
+        "light": "source",
+        "dark": "enabled"
+      },
+      "$figmaStyleReferences": {}
+    }
+  ]
+}

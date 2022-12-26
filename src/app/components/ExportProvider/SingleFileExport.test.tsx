@@ -171,11 +171,11 @@ describe('SingleFileExport', () => {
           headline: {
             fontFamily: {
               value: 'Inter',
-              type: 'fontFamily',
+              type: 'fontFamilies',
             },
             fontWeight: {
               value: 'Bold',
-              type: 'fontWeight',
+              type: 'fontWeights',
             },
           },
           alias: {
