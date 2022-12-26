@@ -65,7 +65,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
 
   const handleDeleteClick = React.useCallback(() => {
     deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
-  }, [activeTokenSet, deleteSingleToken, token.name]);
+  }, [activeTokenSet, deleteSingleToken, token.name, token.type]);
 
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
@@ -78,7 +78,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
       await setNodeData(value, tokensContext.resolvedTokens);
       dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
     },
-    [dispatch, tokensContext.resolvedTokens, setNodeData]
+    [dispatch, tokensContext.resolvedTokens, setNodeData],
   );
 
   const activeStateProperties = React.useMemo(() => {
@@ -105,7 +105,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
 
       setPluginValue(newProps);
     },
-    [active, token.name, setPluginValue]
+    [active, token.name, setPluginValue],
   );
 
   const handleTokenClick = React.useCallback(() => {
@@ -118,6 +118,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.ContextMenuTrigger>
       <ContextMenu.ContextMenuContent sideOffset={5} collisionTolerance={30}>
+        {/* tslint:disable-next-line: jsx-no-multiline-js */}
         {visibleProperties.map((property) => (
           <MoreButtonProperty
             key={property.name}
@@ -135,13 +136,13 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
             </RightSlot>
           </ContextMenu.ContextMenuTriggerItem>
           <ContextMenu.ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
+            {/* tslint:disable-next-line: jsx-no-multiline-js */}
             {DocumentationProperties.map((property) => (
               <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
             ))}
           </ContextMenu.ContextMenuContent>
         </ContextMenu.ContextMenu>
         <ContextMenu.ContextMenuSeparator />
-
         <ContextMenu.ContextMenuItem onSelect={handleEditClick} disabled={editProhibited}>
           Edit Token
         </ContextMenu.ContextMenuItem>
