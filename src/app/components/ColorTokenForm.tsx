@@ -58,6 +58,10 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken]);
 
+  React.useEffect(() => {
+    console.log('resv', resolvedValue);
+  }, [resolvedValue]);
+
   const resolvedMixValue = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color) {
       return typeof internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color === 'string'
@@ -76,23 +80,6 @@ export default function ColorTokenForm({
         }
         if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
           return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) });
-        }
-        return resolvedValue;
-      }
-      return resolvedValue;
-    }
-    return null;
-  }, [internalEditToken, resolvedValue, resolvedMixValue]);
-
-  const cssColor = useMemo(() => {
-    if (resolvedValue) {
-      if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-        const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
-        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify).display();
-        }
-        if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) }).display();
         }
         return resolvedValue;
       }
@@ -313,7 +300,7 @@ export default function ColorTokenForm({
       {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['com.figmatokens']?.modify) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (
-          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(cssColor) }} />
+          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
         ) : null}
         {modifiedColor?.toString()}
       </div>

@@ -386,7 +386,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
-        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        ? getAliasValue(internalEditToken as SingleToken, resolvedTokens)
         : null;
     }
     return null;

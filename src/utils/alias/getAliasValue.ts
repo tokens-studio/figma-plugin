@@ -2,6 +2,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
+import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
@@ -108,7 +109,11 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-        return convertToRgb(couldBeNumberValue);
+        const rgbColor = convertToRgb(couldBeNumberValue);
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['com.figmatokens']?.modify && rgbColor) {
+          return convertModifiedColorToHex(rgbColor, token.$extensions?.['com.figmatokens']?.modify);
+        }
+        return rgbColor;
       }
     }
   } catch (err) {
