@@ -109,8 +109,12 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
+        console.log('couldBeNumberValue', couldBeNumberValue);
         const rgbColor = convertToRgb(couldBeNumberValue);
         if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['com.figmatokens']?.modify && rgbColor) {
+          console.log('toke', token);
+          console.log('rgbColor', rgbColor);
+          console.log('getalais', convertModifiedColorToHex(rgbColor, token.$extensions?.['com.figmatokens']?.modify));
           return convertModifiedColorToHex(rgbColor, token.$extensions?.['com.figmatokens']?.modify);
         }
         return rgbColor;
