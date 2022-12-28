@@ -98,7 +98,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       returnValue = compositionReturnValue;
     } else {
       // If we're not dealing with special tokens, just return resolved value
-      console.log('t', t);
       returnValue = checkIfAlias(t) ? getAliasValue(t, tokensInProgress) : t.value;
       failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }

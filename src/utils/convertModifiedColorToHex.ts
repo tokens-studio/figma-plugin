@@ -7,8 +7,6 @@ export function convertModifiedColorToHex(baseColor: string, modifier: ColorModi
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        console.log('base', baseColor);
-        console.log('chroma(baseColor).brighten(Number(modifier.value)).hex()', chroma(baseColor).brighten(Number(modifier.value)).hex());
         return chroma(baseColor).brighten(Number(modifier.value)).hex();
         // return new Color(baseColor).lighten(Number(modifier.value)).toString({ format: 'hex' });
       case ColorModifierTypes.DARKEN:

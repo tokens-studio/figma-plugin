@@ -29,9 +29,6 @@ export default function TokenButtonContent({
     getAliasValue(token, tokensContext.resolvedTokens)
   ), [token, tokensContext.resolvedTokens]);
 
-  React.useEffect(() => {
-    console.log('tokensContext.resolvedTokens', tokensContext.resolvedTokens);
-  }, [tokensContext.resolvedTokens]);
   const showValue = React.useMemo(() => {
     let show = true;
     if (type === TokenTypes.COLOR) {
