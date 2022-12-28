@@ -1,3 +1,4 @@
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
@@ -6,6 +7,8 @@ import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
+// eslint-disable-next-line import/no-cycle
+import { checkIfAlias } from './checkIfAlias';
 
 type TokenNameNodeType = string | undefined;
 
@@ -111,6 +114,9 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
         const rgbColor = convertToRgb(couldBeNumberValue);
         if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['com.figmatokens']?.modify && rgbColor) {
+          if (token?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['com.figmatokens']?.modify?.color)) {
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['com.figmatokens']?.modify, color: String(getAliasValue(token?.$extensions?.['com.figmatokens']?.modify?.color, tokens)) ?? '' });
+          }
           return convertModifiedColorToHex(rgbColor, token.$extensions?.['com.figmatokens']?.modify);
         }
         return rgbColor;
