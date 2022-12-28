@@ -1,12 +1,12 @@
-import { InterpolationMode } from 'chroma-js';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
 interface Modifier <T extends string, V> {
   type: T
   value: V
 }
 interface ColorGenericModifier<T extends ColorModifierTypes, V> extends Modifier<T, V> {
-  space: InterpolationMode
+  space: ColorSpaceTypes
 }
 
 export interface LightenModifier extends ColorGenericModifier<ColorModifierTypes.LIGHTEN, string> {}
