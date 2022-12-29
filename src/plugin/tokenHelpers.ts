@@ -98,11 +98,11 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       returnValue = compositionReturnValue;
     } else {
       // If we're not dealing with special tokens, just return resolved value
-      returnValue = t.rawValue ? t.value : getAliasValue(t, tokensInProgress);
+      returnValue = getAliasValue(t, tokensInProgress);
       failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }
     const returnObject = {
-      ...omit(t, 'failedToResolve'),
+      ...omit(t, 'failedToResolve', '$extensions'),
       value: returnValue,
       rawValue: t.rawValue || t.value,
       ...(failedToResolve ? { failedToResolve } : {}),
