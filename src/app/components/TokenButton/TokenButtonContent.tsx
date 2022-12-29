@@ -1,9 +1,8 @@
 import React, { useContext, useMemo } from 'react';
-
 import { useSelector } from 'react-redux';
+import useTokens from '../../store/useTokens';
 import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
-import { getAliasValue } from '@/utils/alias';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from '../TokenTooltip';
@@ -24,11 +23,16 @@ export default function TokenButtonContent({
   const tokensContext = useContext(TokensContext);
   const uiDisabled = useSelector(uiDisabledSelector);
   const displayType = useSelector(displayTypeSelector);
+  const { getTokenValue } = useTokens();
 
   const displayValue = useMemo(() => (
-    getAliasValue(token, tokensContext.resolvedTokens)
-  ), [token, tokensContext.resolvedTokens]);
+    getTokenValue(token.name, tokensContext.resolvedTokens)?.value
+  ), [token, tokensContext.resolvedTokens, getTokenValue]);
 
+  React.useEffect(() => {
+    console.log('resolved', tokensContext.resolvedTokens);
+    console.log('display', displayValue);
+  }, [tokensContext, displayValue]);
   const showValue = React.useMemo(() => {
     let show = true;
     if (type === TokenTypes.COLOR) {
