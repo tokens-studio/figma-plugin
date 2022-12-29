@@ -303,13 +303,13 @@ export const tokenState = createModel<RootModel>()({
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
       const {
-        path, oldName, newName, type, parent,
+        oldName, newName, type, parent,
       } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
-        if (token.name.startsWith(`${path}${oldName}.`) && token.type === type) {
+        if (token.name.startsWith(`${oldName}.`) && token.type === type) {
           const { name, ...rest } = token;
-          const newTokenName = name.replace(`${path}${oldName}`, `${path}${newName}`);
+          const newTokenName = name.replace(`${oldName}`, `${newName}`);
           return {
             ...rest,
             name: newTokenName,
@@ -468,11 +468,11 @@ export const tokenState = createModel<RootModel>()({
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {
-        path, oldName, newName, type, parent,
+        oldName, newName, type, parent,
       } = data;
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${path}${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${path}${newName}`, `${path}${oldName}`), newName: updatedToken.name });
+      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
     },
     updateCheckForChanges() {

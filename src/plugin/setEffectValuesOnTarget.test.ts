@@ -1,3 +1,4 @@
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
@@ -106,7 +107,7 @@ describe('setEffectValuesOnTarget', () => {
   });
 
   it('sets single shadow token', async () => {
-    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMock,
       effects: [
@@ -130,7 +131,7 @@ describe('setEffectValuesOnTarget', () => {
   });
 
   it('sets multiple shadow tokens', async () => {
-    await setEffectValuesOnTarget(rectangleNodeMock, multipleShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, multipleShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMock,
       effects: [
@@ -185,7 +186,7 @@ describe('setEffectValuesOnTarget', () => {
 
   it('sets mixed shadow tokens', async () => {
     const rectangleNodeMockOriginal = rectangleNodeMock;
-    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMockOriginal,
       effects: [
@@ -239,7 +240,7 @@ describe('setEffectValuesOnTarget', () => {
 
   it('respects set show behind setting for mixed shadow tokens', async () => {
     const rectangleNodeMockOriginal = rectangleNodeMock;
-    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMockOriginal,
       effects: [

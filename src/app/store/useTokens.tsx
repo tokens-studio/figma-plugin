@@ -13,8 +13,10 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
+  uiStateSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -239,14 +241,15 @@ export default function useTokens() {
       const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
-        settings: {
+        options: {
           renameStyle: userConfirmation.data.includes('renameStyles'),
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
+        settings,
       });
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
-  }, [confirm, tokens, dispatch.tokenState]);
+  }, [confirm, tokens, dispatch.tokenState, settings]);
 
   const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
     track('renameStyles', { oldName, newName, parent });
@@ -272,6 +275,25 @@ export default function useTokens() {
     dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
+  const setNoneValuesOnNode = useCallback((resolvedTokens: SingleToken[]) => {
+    const uiState = uiStateSelector(store.getState());
+    const inspectState = inspectStateSelector(store.getState());
+    const tokensToSet = uiState.selectionValues
+      .filter((v) => inspectState.selectedTokens.includes(`${v.category}-${v.value}`))
+      .map((v) => ({ nodes: v.nodes, property: v.type })) as ({
+      property: Properties;
+      nodes: NodeInfo[];
+    }[]);
+
+    track('setNoneValuesOnNode', tokensToSet);
+
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
+      tokensToSet,
+      tokens: resolvedTokens,
+    });
+  }, []);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -287,6 +309,7 @@ export default function useTokens() {
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,
+    setNoneValuesOnNode,
   }), [
     isAlias,
     getTokenValue,
@@ -302,5 +325,6 @@ export default function useTokens() {
     handleBulkRemap,
     removeStylesFromTokens,
     syncStyles,
+    setNoneValuesOnNode,
   ]);
 }

@@ -7,6 +7,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 
 type WindowSettingsType = {
   width: number;
@@ -27,6 +28,8 @@ export interface SettingsState {
   prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  baseFontSize: string;
+  aliasBaseFontSize: string;
 }
 
 const setUI = (state: SettingsState) => {
@@ -52,6 +55,8 @@ export const settings = createModel<RootModel>()({
     prefixStylesWithThemeName: false,
     inspectDeep: false,
     shouldSwapStyles: false,
+    baseFontSize: defaultBaseFontSize,
+    aliasBaseFontSize: defaultBaseFontSize,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -89,6 +94,18 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         ...payload,
+      };
+    },
+    setBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        baseFontSize: payload,
+      };
+    },
+    setAliasBaseFontSize(state, payload: string) {
+      return {
+        ...state,
+        aliasBaseFontSize: payload,
       };
     },
     triggerWindowChange(state) {
@@ -175,6 +192,12 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUISettings: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setBaseFontSize: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

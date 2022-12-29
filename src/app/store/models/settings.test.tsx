@@ -4,6 +4,7 @@ import { models } from './index';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { SettingsState } from './settings';
 
 type Store = RematchStore<RootModel, Record<string, never>>;
 
@@ -88,7 +89,7 @@ describe('settings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: true,
-    });
+    } as SettingsState);
     expect(store.getState().settings).toEqual({
       uiWindow: {
         width: 1024,
@@ -164,5 +165,15 @@ describe('settings', () => {
   it('should be able to set ignoreFirstPartForStyles', () => {
     store.dispatch.settings.setIgnoreFirstPartForStyles(true);
     expect(store.getState().settings.ignoreFirstPartForStyles).toEqual(true);
+  });
+
+  it('should be able to set baseFontSize', () => {
+    store.dispatch.settings.setBaseFontSize('24px');
+    expect(store.getState().settings.baseFontSize).toEqual('24px');
+  });
+
+  it('should be able to set aliasBaseFontSize', () => {
+    store.dispatch.settings.setAliasBaseFontSize('{font.base}');
+    expect(store.getState().settings.aliasBaseFontSize).toEqual('{font.base}');
   });
 });

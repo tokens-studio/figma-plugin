@@ -4,12 +4,12 @@ import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 
-export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>) {
+export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>, baseFontSize: string) {
   const { value } = token;
   const { color, width, style } = value;
   try {
     if ('strokeWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width)) {
-      target.strokeWeight = transformValue(String(width), 'borderWidth');
+      target.strokeWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
     if (typeof color !== 'undefined' && typeof color === 'string') {
       setColorValuesOnTarget(target, { value: color }, 'strokes');

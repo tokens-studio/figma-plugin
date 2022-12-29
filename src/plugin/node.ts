@@ -177,7 +177,7 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -212,6 +212,7 @@ export async function updateNodes(
               themeInfo,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
+              baseFontSize,
             );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
