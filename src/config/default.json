@@ -23,7 +23,7 @@
       },
       "xl": {
         "value": "{dimension.lg} * {dimension.scale}",
-        "type": "spacing"
+        "type": "dimension"
       }
     },
     "spacing": {
@@ -44,7 +44,7 @@
         "type": "spacing"
       },
       "xl": {
-        "value": "{dimension.xl",
+        "value": "{dimension.xl}",
         "type": "spacing"
       },
       "multi-value": {
@@ -67,8 +67,8 @@
         "type": "borderRadius"
       },
       "multi-value": {
-        "value": "{dimension.sm} {dimension.xl}",
-        "type": "spacing",
+        "value": "{borderRadius.sm} {borderRadius.lg}",
+        "type": "borderRadius",
         "description": "You can have multiple values in a single radius token. Read more on these: https://docs.tokens.studio/available-tokens/border-radius-tokens#single--multiple-values"
       }
     },
@@ -610,6 +610,14 @@
       "default": {
         "value": "{colors.indigo.400}",
         "type": "color"
+      },
+      "onAccent": {
+        "value": "{colors.white}",
+        "type": "color"
+      },
+      "bg": {
+        "value": "{colors.indigo.200}",
+        "type": "color"
       }
     },
     "shadows": {
@@ -652,11 +660,19 @@
       "default": {
         "value": "{colors.indigo.600}",
         "type": "color"
+      },
+      "onAccent": {
+        "value": "{colors.white}",
+        "type": "color"
+      },
+      "bg": {
+        "value": "{colors.indigo.800}",
+        "type": "color"
       }
     },
     "shadows": {
       "default": {
-        "value": "{colors.gray.100}",
+        "value": "rgba({colors.black}, 0.3)",
         "type": "color"
       }
     }
@@ -667,49 +683,33 @@
         "background": {
           "value": "{accent.default}",
           "type": "color"
-        }
-      },
-      "ghost": {
-        "outline": {
-          "value": "{fg.default}",
-          "type": "color"
         },
         "text": {
-          "value": "{fg.default}",
+          "value": "{accent.onAccent}",
           "type": "color"
         }
-      }
-    },
-    "borderWidth": {
-      "button": {
-        "ghost": {
-          "value": "{dimension.md}",
-          "type": "borderWidth"
-        }
-      }
-    },
-    "borderRadius": {
-      "button": {
-        "ghost": {
-          "value": "{borderRadius.lg}",
-          "type": "borderRadius"
-        }
       },
-      "card": {
-        "value": "{borderRadius.sm}",
+      "borderRadius": {
+        "value": "{borderRadius.md}",
         "type": "borderRadius"
+      },
+      "borderWidth": {
+        "value": "{dimension.sm}",
+        "type": "borderWidth"
       }
     },
-    "fontSizes": {
-      "card": {
-        "title": {
-          "value": "{fontSizes.sm}",
-          "type": "fontSizes"
-        },
-        "content": {
-          "value": "{fontSizes.xs}",
-          "type": "fontSizes"
-        }
+    "card": {
+      "borderRadius": {
+        "value": "{borderRadius.lg}",
+        "type": "borderRadius"
+      },
+      "background": {
+        "value": "{bg.default}",
+        "type": "color"
+      },
+      "padding": {
+        "value": "{dimension.md}",
+        "type": "dimension"
       }
     },
     "boxShadow": {
