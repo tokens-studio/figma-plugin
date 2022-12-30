@@ -17,7 +17,7 @@ export default function ConfirmLocalStorageModal({ isOpen, onToggle, onSuccess }
 
   return (
     <Modal isOpen={isOpen} close={handleClose}>
-      <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+      <Stack direction="column" justify="center" gap={4}>
         <Stack direction="column" gap={2}>
           <Heading>Set to document storage?</Heading>
           <p className="text-xs">You can always go back to remote storage.</p>

@@ -24,7 +24,7 @@ const StyledButton = styled('button', {
   },
   '&:disabled': {
     pointerEvents: 'none',
-    opacity: 0.5,
+    color: '$textDisbled',
   },
   variants: {
     isActive: {

@@ -7,11 +7,12 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
@@ -51,7 +52,7 @@ export default function GitForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
+        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Box css={{ position: 'relative' }}>
           <Input
             full
@@ -102,12 +103,12 @@ export default function GitForm({
           name="baseUrl"
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (

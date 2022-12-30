@@ -1,11 +1,10 @@
 import React from 'react';
 import Modal from '../Modal';
-import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
-import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
   isOpen: boolean
@@ -36,7 +35,7 @@ export default function CreateStorageItemModal({
     }
   }, [addNewProviderItem, onSuccess]);
 
-  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = React.useCallback((e: Eventlike) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
@@ -45,19 +44,16 @@ export default function CreateStorageItemModal({
   }, [handleCreateNewClick]);
 
   return (
-    <Modal large isOpen={isOpen} close={onClose}>
-      <Stack direction="column" gap={4}>
-        <Heading>Add new credentials</Heading>
-        <StorageItemForm
-          isNew
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          onCancel={onClose}
-          values={formFields}
-          hasErrored={hasErrored}
-          errorMessage={errorMessage}
-        />
-      </Stack>
+    <Modal title="Add new credentials" large isOpen={isOpen} close={onClose}>
+      <StorageItemForm
+        isNew
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onCancel={onClose}
+        values={formFields}
+        hasErrored={hasErrored}
+        errorMessage={errorMessage}
+      />
     </Modal>
   );
 }

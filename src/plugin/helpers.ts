@@ -46,6 +46,7 @@ export function transformValue(value: string, type: string) {
     case 'height':
     case 'sizing':
       return fakeZeroForFigma(convertTypographyNumberToFigma(value));
+    case 'backgroundBlur':
     case 'borderRadius':
     case 'borderRadiusTopLeft':
     case 'borderRadiusTopRight':

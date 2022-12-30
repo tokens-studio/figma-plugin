@@ -41,6 +41,11 @@ describe('TokenListing', () => {
   const mockStartupParams = {
     activeTheme: null,
     lastOpened: Date.now(),
+    onboardingExplainer: {
+      sets: true,
+      inspect: true,
+      syncProviders: true,
+    },
     localApiProviders: [],
     licenseKey: null,
     settings: {
@@ -236,43 +241,43 @@ describe('TokenListing', () => {
       version: '5',
       values: {
         options: [{
-            name: 'sizing.xs',
-            value: 4,
-            type: 'sizing'
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        },
+        {
+          name: 'boxshadow.single',
+          value: {
+            blur: "3",
+            color: "red",
+            spread: "3",
+            type: "innerShadow",
+            x: "3",
+            y: "3",
+          },
+          type: 'boxShadow'
+        },
+        {
+          name: 'boxshadow.multi',
+          value: [{
+            blur: "3",
+            color: "red",
+            spread: "3",
+            type: "innerShadow",
+            x: "3",
+            y: "3",
           },
           {
-            name: 'boxshadow.single',
-            value: {
-              blur: "3",
-              color: "red",
-              spread: "3",
-              type: "innerShadow",
-              x: "3",
-              y: "3",
-            },
-            type: 'boxShadow'
-          },
-          {
-            name: 'boxshadow.multi',
-            value: [{
-                blur: "3",
-                color: "red",
-                spread: "3",
-                type: "innerShadow",
-                x: "3",
-                y: "3",
-              },
-              {
-                blur: "1",
-                color: "blue",
-                spread: "1",
-                type: "dropShadow",
-                x: "1",
-                y: "1",
-              }
-            ],
-            type: 'boxShadow'
+            blur: "1",
+            color: "blue",
+            spread: "1",
+            type: "dropShadow",
+            x: "1",
+            y: "1",
           }
+          ],
+          type: 'boxShadow'
+        }
         ],
         global: [{
           name: 'sizing.xs',
@@ -355,37 +360,37 @@ describe('TokenListing', () => {
       version: '5',
       values: {
         options: [{
-            name: 'sizing.xs',
-            value: 4,
-            type: 'sizing'
-          }, {
-            name: 'typography.heading',
-            value: {
-              fontFamily: "Arial",
-              fontSize: "12px",
-              fontWeight: "bold",
-              letterSpacing: "1",
-              lineHeight: "1",
-              paragraphSpacing: "1",
-              textCase: "none",
-              textDecoration: "underline",
-            },
-            type: 'typography'
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }, {
+          name: 'typography.heading',
+          value: {
+            fontFamily: "Arial",
+            fontSize: "12px",
+            fontWeight: "bold",
+            letterSpacing: "1",
+            lineHeight: "1",
+            paragraphSpacing: "1",
+            textCase: "none",
+            textDecoration: "underline",
           },
-          {
-            name: 'typography.label',
-            value: {
-              fontFamily: "Helvetica",
-              fontSize: "24px",
-              fontWeight: "light",
-              letterSpacing: "2",
-              lineHeight: "2",
-              paragraphSpacing: "2",
-              textCase: "none",
-              textDecoration: "none",
-            },
-            type: 'typography'
-          }
+          type: 'typography'
+        },
+        {
+          name: 'typography.label',
+          value: {
+            fontFamily: "Helvetica",
+            fontSize: "24px",
+            fontWeight: "light",
+            letterSpacing: "2",
+            lineHeight: "2",
+            paragraphSpacing: "2",
+            textCase: "none",
+            textDecoration: "none",
+          },
+          type: 'typography'
+        }
         ],
         global: [{
           name: 'sizing.xs',

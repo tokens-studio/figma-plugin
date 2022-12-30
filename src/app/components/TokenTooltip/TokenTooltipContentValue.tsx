@@ -5,13 +5,16 @@ import useTokens from '../../store/useTokens';
 import { SingleToken } from '@/types/tokens';
 import { SingleShadowValueDisplay } from './SingleShadowValueDisplay';
 import { TokensContext } from '@/context';
-import { isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken } from '@/utils/is';
+import {
+  isSingleBoxShadowToken, isSingleTypographyToken, isSingleCompositionToken, isSingleBorderToken,
+} from '@/utils/is';
 import { SingleTypographyValueDisplay } from './SingleTypographyValueDisplay';
-import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { SingleCompositionValueDisplay } from './SingleCompositionValueDisplay';
 import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
 import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { SingleBorderValueDisplay } from './SingleBorderValueDisplay';
 
 type Props = {
   token: SingleToken;
@@ -86,11 +89,20 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
           />
         ) : null}
         <SingleShadowValueDisplay
-        // @TODO strengthen type checking here
+          // @TODO strengthen type checking here
           value={token.value as TokenBoxshadowValue}
           resolvedValue={resolvedValue as TokenBoxshadowValue}
         />
       </div>
+    );
+  }
+
+  if (isSingleBorderToken(token)) {
+    return (
+      <SingleBorderValueDisplay
+        value={token.value as TokenBorderValue}
+        resolvedValue={resolvedValue as TokenBorderValue}
+      />
     );
   }
 

@@ -24,6 +24,9 @@ export enum AsyncMessageTypes {
   SYNC_STYLES = 'async/sync-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
+  SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
+  SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
+  SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
   SET_NODE_DATA = 'async/set-node-data',
@@ -43,6 +46,7 @@ export enum AsyncMessageTypes {
   SET_LICENSE_KEY = 'async/set-license-key',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
+  SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -58,6 +62,15 @@ export type CredentialsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREDE
 export type ChangedTabsAsyncMessage = AsyncMessage<AsyncMessageTypes.CHANGED_TABS, { requiresSelectionValues: boolean; }>;
 export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANGED_TABS>;
 
+export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: boolean; }>;
+export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
+
+export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: boolean; }>;
+export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
+
+export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, { onboardingExplainerInspect: boolean; }>;
+export type SetOnboardingExplainerInspectAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT>;
+
 export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
 
@@ -71,6 +84,12 @@ export type RemoveTokensByValueAsyncMessage = AsyncMessage<AsyncMessageTypes.REM
   tokensToRemove: { nodes: NodeInfo[]; property: Properties }[];
 }>;
 export type RemoveTokensByValueAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE>;
+
+export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, {
+  tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
+  tokens: AnyTokenList
+}>;
+export type SetNoneValuesOnNodeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE>;
 
 export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS, {
   oldName: string;
@@ -169,6 +188,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   usedTokenSet: UsedTokenSetsMap;
   activeTheme: string | null;
   checkForChanges?: boolean
+  shouldSwapStyles?: boolean;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
@@ -218,6 +238,9 @@ export type AsyncMessages =
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
+  | SetOnboardingExplainerSetsAsyncMessage
+  | SetOnboardingExplainerInspectAsyncMessage
+  | SetOnboardingExplainerSyncProvidersAsyncMessage
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
@@ -236,7 +259,8 @@ export type AsyncMessages =
   | SetLicenseKeyMessage
   | StartupMessage
   | AttachLocalStylesToTheme
-  | ResolveStyleInfo;
+  | ResolveStyleInfo
+  | SetNoneValuesOnNodeAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -247,6 +271,9 @@ export type AsyncMessageResults =
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
+  | SetOnboardingExplainerSetsAsyncMessageResult
+  | SetOnboardingExplainerSyncProvidersAsyncMessageResult
+  | SetOnboardingExplainerInspectAsyncMessageResult
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
@@ -265,7 +292,8 @@ export type AsyncMessageResults =
   | SetLicenseKeyMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
-  | ResolveStyleInfoResult;
+  | ResolveStyleInfoResult
+  | SetNoneValuesOnNodeAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

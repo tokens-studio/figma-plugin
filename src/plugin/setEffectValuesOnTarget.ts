@@ -36,7 +36,7 @@ export default function setEffectValuesOnTarget(
         };
       }) as Effect[];
 
-      if ('effects' in target && key === 'effects') target[key] = effectsArray;
+      if ('effects' in target && key === 'effects') target[key] = effectsArray.reverse();
     } else if (typeof value !== 'string') {
       const { color, opacity: a } = convertToFigmaColor(value.color);
       const { r, g, b } = color;

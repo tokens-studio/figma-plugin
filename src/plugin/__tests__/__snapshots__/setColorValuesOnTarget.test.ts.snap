@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`setColorValuesOnTarget should be able to handle a linear gradient 1`] = `
+Array [
+  Object {
+    "gradientStops": Array [
+      Object {
+        "color": Object {
+          "a": 1,
+          "b": 0,
+          "g": 0,
+          "r": 0,
+        },
+        "position": 0,
+      },
+      Object {
+        "color": Object {
+          "a": 1,
+          "b": 1,
+          "g": 1,
+          "r": 1,
+        },
+        "position": 1,
+      },
+    ],
+    "gradientTransform": Array [
+      Array [
+        1,
+        0,
+        0,
+      ],
+      Array [
+        0,
+        1,
+        0,
+      ],
+    ],
+    "type": "GRADIENT_LINEAR",
+  },
+]
+`;

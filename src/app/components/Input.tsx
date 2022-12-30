@@ -157,7 +157,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   suffix,
   step,
   custom = '',
-  inputRef = null,
+  inputRef,
   placeholder = '',
   capitalize = false,
   isMasked = false,
@@ -175,6 +175,16 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
     }
   }, [show, inputRef]);
 
+  const htmlInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (autofocus && htmlInputRef && htmlInputRef.current) {
+      setTimeout(() => {
+        htmlInputRef.current?.focus();
+      }, 50);
+    }
+  }, [autofocus, htmlInputRef]);
+
   return (
     <label htmlFor={name} className="block font-medium text-xxs">
       {(!!label || !!error) && (
@@ -189,7 +199,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
         {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           form={form}
-          ref={inputRef ?? ref}
+          ref={inputRef || ref || htmlInputRef}
           spellCheck={false}
           tabIndex={tabindex ?? undefined}
           type={type}
