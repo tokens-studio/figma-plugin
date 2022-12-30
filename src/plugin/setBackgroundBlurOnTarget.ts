@@ -4,6 +4,7 @@ import { transformValue } from './helpers';
 export default function setBackgroundBlurOnTarget(
   target: BaseNode | EffectStyle,
   token: Pick<SingleDimensionToken, 'value'>,
+  baseFontSize: string,
 ) {
   try {
     if ('effects' in target) {
@@ -12,7 +13,7 @@ export default function setBackgroundBlurOnTarget(
       const blurEffect: BlurEffect = {
         type: 'BACKGROUND_BLUR',
         visible: true,
-        radius: transformValue(String(token.value), 'backgroundBlur'),
+        radius: transformValue(String(token.value), 'backgroundBlur', baseFontSize),
       };
 
       if (existingEffectIndex > -1) {

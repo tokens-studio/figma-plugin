@@ -21,7 +21,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     });
   }
   if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
+    receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);

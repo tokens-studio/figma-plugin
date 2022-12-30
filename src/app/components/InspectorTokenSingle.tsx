@@ -1,4 +1,5 @@
 import React from 'react';
+import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
@@ -39,7 +40,7 @@ export default function InspectorTokenSingle({
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
     if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value)) setIsBrokenLink(true);
-  }, [inspectState.selectedTokens, token]);
+  }, [inspectState.selectedTokens, token, resolvedTokens]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setNewTokenName(newInputValue.replace(/[{}$]/g, ''));
@@ -53,7 +54,7 @@ export default function InspectorTokenSingle({
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName, resolvedTokens);
     setShowDialog(false);
-  }, [token, handleRemap, newTokenName]);
+  }, [token, handleRemap, newTokenName, resolvedTokens]);
 
   const handleClick = React.useCallback(() => {
     setShowDialog(true);
@@ -92,7 +93,12 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
-        {isBrokenLink && <IconBrokenLink />}
+        {
+          token.value === 'none' && <ValueNoneIcon />
+        }
+        {
+          isBrokenLink && token.value !== 'none' && <IconBrokenLink />
+        }
         {(!!mappedToken) && (
           <InspectorResolvedToken token={mappedToken} />
         )}

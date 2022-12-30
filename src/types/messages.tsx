@@ -44,6 +44,8 @@ export type UiSettingsFromPluginMessage = {
     prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
+    baseFontSize: string;
+    aliasBaseFontSize: string;
   };
 };
 

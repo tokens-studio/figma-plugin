@@ -4,6 +4,7 @@ import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
+import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
   isOpen: boolean;
@@ -20,7 +21,7 @@ export default function EditStorageItemModal({
   const { addNewProviderItem } = useRemoteTokens();
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
-  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = React.useCallback((e: Eventlike) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 

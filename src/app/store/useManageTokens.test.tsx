@@ -235,5 +235,4 @@ describe('useManageTokens', () => {
     await act(async () => result.current.deleteSingleToken(tokenToDelete));
     expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
-
 });
