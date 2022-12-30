@@ -34,7 +34,7 @@ type GenericTokenInput<T extends TokenTypes, V = string> = {
   oldName?: string; // only passed when editing token
   shouldUpdate?: boolean
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'com.figmatokens': { modify: ColorModifier } }
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };
 
 export type UpdateTokenPayload =

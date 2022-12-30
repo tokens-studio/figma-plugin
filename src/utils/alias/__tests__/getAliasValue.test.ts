@@ -54,12 +54,12 @@ describe('getAliasValue', () => {
       type: TokenTypes.COLOR,
     },
     {
-      name: 'colors.ligth-extension',
+      name: 'colors.light-extension',
       input: '#ff0000',
       value: '#ff3a1e',
       type: TokenTypes.COLOR,
       $extensions: {
-        'com.figmatokens': {
+        'studio.tokens': {
           modify: {
             type: 'lighten',
             value: '0.5',
@@ -74,7 +74,7 @@ describe('getAliasValue', () => {
       value: '#ff1854',
       type: TokenTypes.COLOR,
       $extensions: {
-        'com.figmatokens': {
+        'studio.tokens': {
           modify: {
             color: '{colors.hex}',
             type: 'mix',

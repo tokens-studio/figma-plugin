@@ -32,8 +32,8 @@ import Heading from './Heading';
 import BorderTokenForm from './BorderTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
-import { ColorModifier } from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { ColorModifier } from '@/types/Modifier';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -56,8 +56,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
   const isValidColorToken = React.useMemo(() => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX) {
-      return !!internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color;
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
+      return !!internalEditToken?.$extensions?.['studio.tokens']?.modify?.color;
     }
     return true;
   }, [internalEditToken]);
@@ -225,22 +225,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken]);
 
-  const handleColorModifyChange = React.useCallback((newModify: ColorModifier) => {
-    setInternalEditToken({
-      ...internalEditToken,
-      $extensions: {
-        'com.figmatokens': {
-          modify: newModify,
-        },
-      },
-    });
-  }, [internalEditToken]);
-
   const removeColorModify = React.useCallback(() => {
     const newValue = internalEditToken;
     delete newValue?.$extensions;
     setInternalEditToken({
       ...newValue,
+    });
+  }, [internalEditToken]);
+
+  const handleColorModifyChange = React.useCallback((newModify: ColorModifier) => {
+    setInternalEditToken({
+      ...internalEditToken,
+      $extensions: {
+        'studio.tokens': {
+          modify: newModify,
+        },
+      },
     });
   }, [internalEditToken]);
 

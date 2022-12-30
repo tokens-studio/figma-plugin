@@ -10,5 +10,5 @@ export type DuplicateTokenPayload = {
   description?: string;
   oldName?: string;
   shouldUpdate?: boolean;
-  $extensions?: { 'com.figmatokens': { modify: ColorModifier } }
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };

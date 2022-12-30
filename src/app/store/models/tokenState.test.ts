@@ -521,7 +521,7 @@ describe('editToken', () => {
       type: TokenTypes.COLOR,
       value: '#000000',
       $extensions: {
-        'com.figmatokens': {
+        'studio.tokens': {
           modify: {
             type: 'lighten',
             value: '0.5',
@@ -595,7 +595,7 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
-          'com.figmatokens': {
+          'studio.tokens': {
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -664,7 +664,7 @@ describe('editToken', () => {
       value: '1',
       type: 'sizing',
       $extensions: {
-        'com.figmatokens': {
+        'studio.tokens': {
           modify: {
             type: 'lighten',
             value: '0.5',
@@ -684,7 +684,7 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
-          'com.figmatokens': {
+          'studio.tokens': {
             modify: {
               type: 'lighten',
               value: '0.5',

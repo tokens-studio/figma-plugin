@@ -54,15 +54,15 @@ export default function ColorTokenForm({
   const [modifyVisible, setModifyVisible] = React.useState(false);
 
   React.useEffect(() => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       setModifyVisible(true);
     }
   }, [internalEditToken]);
 
   const resolvedMixValue = React.useMemo(() => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color) {
-      return typeof internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color === 'string'
-        ? getAliasValue(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color, resolvedTokens)
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && internalEditToken?.$extensions?.['studio.tokens']?.modify?.color) {
+      return typeof internalEditToken?.$extensions?.['studio.tokens']?.modify?.color === 'string'
+        ? getAliasValue(internalEditToken?.$extensions?.['studio.tokens']?.modify?.color, resolvedTokens)
         : null;
     }
     return null;
@@ -70,13 +70,13 @@ export default function ColorTokenForm({
 
   const modifiedColor = useMemo(() => {
     if (resolvedValue) {
-      if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-        const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
+      if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+        const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
         if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify);
+          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['studio.tokens']?.modify);
         }
         if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) });
+          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, color: String(resolvedMixValue) });
         }
         return resolvedValue;
       }
@@ -87,13 +87,13 @@ export default function ColorTokenForm({
 
   const displayColor = useMemo(() => {
     if (resolvedValue) {
-      if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-        const modifierType = internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type;
+      if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+        const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
         if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return convertModifiedColorToHex(String(resolvedValue), internalEditToken?.$extensions?.['com.figmatokens']?.modify);
+          return convertModifiedColorToHex(String(resolvedValue), internalEditToken?.$extensions?.['studio.tokens']?.modify);
         }
         if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return convertModifiedColorToHex(String(resolvedValue), { ...internalEditToken?.$extensions?.['com.figmatokens']?.modify, color: String(resolvedMixValue) });
+          return convertModifiedColorToHex(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, color: String(resolvedMixValue) });
         }
         return resolvedValue;
       }
@@ -114,13 +114,17 @@ export default function ColorTokenForm({
     handleColorDownShiftInputChange(color);
   }, [handleColorDownShiftInputChange]);
 
+  const handleModifyChange = React.useCallback((newModify: ColorModifier) => {
+    handleColorModifyChange(newModify);
+  }, [handleColorModifyChange]);
+
   const addModify = useCallback(() => {
-    handleColorModifyChange({
+    handleModifyChange({
       type: ColorModifierTypes.LIGHTEN,
       value: defaultValue,
       space: ColorSpaceTypes.LCH,
     });
-  }, [handleColorModifyChange]);
+  }, [handleModifyChange]);
 
   const removeModify = useCallback(() => {
     setModifyVisible(false);
@@ -136,51 +140,51 @@ export default function ColorTokenForm({
   }, [colorSpaceMenuOpened]);
 
   const onOperationSelected = useCallback((operation: string) => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-      handleColorModifyChange({
-        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         type: operation,
       } as ColorModifier);
     }
-  }, [internalEditToken, handleColorModifyChange]);
+  }, [internalEditToken, handleModifyChange]);
 
   const onColorSpaceSelected = useCallback((colorSpace: string) => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-      handleColorModifyChange({
-        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         space: colorSpace,
       } as ColorModifier);
     }
-  }, [internalEditToken, handleColorModifyChange]);
+  }, [internalEditToken, handleModifyChange]);
 
   const handleModifyValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-      handleColorModifyChange({
-        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         value: e.target.value.replace(/[^.\d]/g, '').replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2').replace(/^\./, ''), // accept only number
       });
     }
-  }, [internalEditToken, handleColorModifyChange]);
+  }, [internalEditToken, handleModifyChange]);
 
   const handleMixColorChange = useCallback((mixColor: string) => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-      handleColorModifyChange({
-        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         color: mixColor,
       } as MixModifier);
     }
-  }, [internalEditToken, handleColorModifyChange]);
+  }, [internalEditToken, handleModifyChange]);
 
   const handleMixColorInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (internalEditToken?.$extensions?.['com.figmatokens']?.modify) {
-      handleColorModifyChange({
-        ...internalEditToken?.$extensions?.['com.figmatokens']?.modify,
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         color: e.target.value,
       } as MixModifier);
     }
-  }, [internalEditToken, handleColorModifyChange]);
+  }, [internalEditToken, handleModifyChange]);
 
-  const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type || 'Amount'), [internalEditToken]);
+  const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
 
   return (
     <>
@@ -249,11 +253,11 @@ export default function ColorTokenForm({
                     flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
                   }}
                 >
-                  <span>{internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type || 'Choose a operation'}</span>
+                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose a operation'}</span>
                   <IconToggleableDisclosure />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type}>
+                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type}>
                     {Object.values(ColorModifierTypes).map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
@@ -266,21 +270,21 @@ export default function ColorTokenForm({
                     flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
                   }}
                 >
-                  <span>{internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space || 'Choose a color space'}</span>
+                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.space || 'Choose a color space'}</span>
                   <IconToggleableDisclosure />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.space}>
+                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space}>
                     {Object.values(ColorSpaceTypes).map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </Box>
             {
-              internalEditToken?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && (
+              internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && (
                 <>
                   <DownshiftInput
-                    value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color}
+                    value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color}
                     type={TokenTypes.COLOR}
                     resolvedTokens={resolvedTokens}
                     handleChange={handleMixColorInputChange}
@@ -293,25 +297,25 @@ export default function ColorTokenForm({
                         style={{ background: String(resolvedMixValue), fontSize: 0 }}
                         onClick={handleToggleMixInputHelper}
                       >
-                        {internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color}
+                        {internalEditToken?.$extensions?.['studio.tokens']?.modify?.color}
                       </button>
                     )}
                     suffix
                   />
                   {inputMixHelperOpen && (
-                    <ColorPicker value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.color} onChange={handleMixColorChange} />
+                    <ColorPicker value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color} onChange={handleMixColorChange} />
                   )}
                 </>
               )
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['com.figmatokens']?.modify?.value} required />
+              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
             </Box>
           </>
         )
       }
-      {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['com.figmatokens']?.modify) && (
+      {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['studio.tokens']?.modify) && (
       <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
         {internalEditToken.type === 'color' ? (
           <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(displayColor) }} />

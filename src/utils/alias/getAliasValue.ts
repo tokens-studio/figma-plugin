@@ -113,11 +113,11 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
         const rgbColor = convertToRgb(couldBeNumberValue);
-        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['com.figmatokens']?.modify && rgbColor) {
-          if (token?.$extensions?.['com.figmatokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['com.figmatokens']?.modify?.color)) {
-            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['com.figmatokens']?.modify, color: String(getAliasValue(token?.$extensions?.['com.figmatokens']?.modify?.color, tokens)) ?? '' });
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor) {
+          if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
           }
-          return convertModifiedColorToHex(rgbColor, token.$extensions?.['com.figmatokens']?.modify);
+          return convertModifiedColorToHex(rgbColor, token.$extensions?.['studio.tokens']?.modify);
         }
         return rgbColor;
       }
