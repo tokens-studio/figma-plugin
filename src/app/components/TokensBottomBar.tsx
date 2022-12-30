@@ -38,10 +38,6 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
     showPresetModal(false);
   }, []);
 
-  const handleShowExportModal = useCallback(() => {
-    showExportModal(true);
-  }, []);
-
   const handleCloseExportModal = useCallback(() => {
     showExportModal(false);
   }, []);
@@ -73,19 +69,14 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', gap: '$2', padding: '$3 $4',
           }}
           >
-            <ApplySelector />
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$2' }}>
               <Button variant="ghost" disabled={editProhibited} onClick={handleShowPresetModal}>
-                Load
+                Load/Export
               </Button>
-              <Button variant="ghost" onClick={handleShowExportModal}>
-                Export
-              </Button>
+
               <StylesDropdown />
-              <Button variant="primary" onClick={handleUpdate}>
-                Update
-              </Button>
             </Box>
+            <ApplySelector handleUpdate={handleUpdate} />
           </Box>
         )}
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
