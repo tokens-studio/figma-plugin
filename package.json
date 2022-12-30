@@ -22,8 +22,7 @@
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "report": "webpack --profile --json > stats.json; webpack-bundle-analyzer ./stats.json"
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@figma-plugin/helpers": "^0.15.2",
