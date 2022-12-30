@@ -8,6 +8,8 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isWaitingForBackgroundJobSelector } from '@/selectors';
 import { RootState } from '@/app/store';
 import { StyleInfo, ThemeStyleManagementCategoryStyleEntry } from './ThemeStyleManagementCategoryStyleEntry';
+import Stack from '../Stack';
+import { Count } from '../Count';
 
 type Props = {
   label: string
@@ -35,7 +37,12 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
       data-testid={`themestylemanagementcategory-accordion-${label.toLowerCase()}`}
       disabled={stylesEntries.length === 0}
       label={(
-        <Heading size="medium">{label}</Heading>
+        <Stack direction="row" gap={2} align="center">
+          <Heading size="medium">
+            {label}
+          </Heading>
+          {stylesEntries.length > 0 ? <Count count={stylesEntries.length} /> : null}
+        </Stack>
       )}
       extra={(
         <Button

@@ -4,6 +4,7 @@ import { SingleToken } from '@/types/tokens';
 import { updateJSONBinTokens } from '../jsonbin';
 import * as pjs from '../../../../../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { createMockStore } from '../../../../../tests/config/setupTest';
 
 const mockRetrieve = jest.fn();
 const mockSave = jest.fn();
@@ -51,6 +52,7 @@ describe('jsonbin', () => {
     secret: 'jsonbin',
   };
   it('return old data when remote data is older', async () => {
+    const mockStore = createMockStore({});
     const updatedAt = '2022-09-20T08:43:03.844Z';
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
 
@@ -61,7 +63,7 @@ describe('jsonbin', () => {
     }));
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
     expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual({
       tokens: {
         global: [
@@ -90,6 +92,7 @@ describe('jsonbin', () => {
   });
 
   it('notify updating error when remote data is newer', async () => {
+    const mockStore = createMockStore({});
     const updatedAt = '2022-09-20T08:43:03.844Z';
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
 
@@ -100,14 +103,15 @@ describe('jsonbin', () => {
     }));
     mockSave.mockImplementation(() => Promise.resolve(true));
     await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     });
     expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual(null);
   });
 
   it('return error message when there is a error while retrieving the data', async () => {
+    const mockStore = createMockStore({});
     const updatedAt = '2022-09-20T08:43:03.844Z';
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
 
@@ -116,7 +120,7 @@ describe('jsonbin', () => {
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     }));
     expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
