@@ -54,6 +54,7 @@ export default async function setValuesOnNode(
         setBorderValuesOnTarget(node, { value: values.border });
       }
 
+      // if applied border is just a string, it's the older version where border was just a color. apply color then.
       if (values.border && typeof values.border === 'string' && typeof data.border !== 'undefined') {
         setBorderColorValuesOnTarget({
           node, data: data.border, value: values.border, stylePathPrefix, stylePathSlice, styleReferences: activeThemeObject?.$figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
