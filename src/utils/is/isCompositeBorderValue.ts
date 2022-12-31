@@ -3,7 +3,6 @@ import type { SingleBorderToken } from '@/types/tokens';
 import type { TokenBorderValue } from '@/types/values';
 
 export function isCompositeBorderValue(value: MapValuesToTokensResult[string]): value is SingleBorderToken['value'] {
-  console.log('Typeof value', typeof value, value);
   return Boolean(
     value
     && (
