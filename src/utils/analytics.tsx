@@ -2,8 +2,6 @@ import mixpanel from './mixpanel';
 import * as pjs from '../../package.json';
 
 export function track(name: string, opts = {}) {
-  console.log('track', name, opts);
-
   if (process.env.MIXPANEL_ACCESS_TOKEN) {
     mixpanel.track(name, opts);
   }
