@@ -8,6 +8,7 @@ import StylesDropdown from './StylesDropdown';
 import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
 import Button from './Button';
 import { useShortcut } from '@/hooks/useShortcut';
+import Stack from './Stack';
 
 type Props = {
   handleUpdate: () => void;
@@ -65,19 +66,23 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
         </Box>
       )
         : (
-          <Box css={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', gap: '$2', padding: '$3 $4',
-          }}
+          <Stack
+            direction="row"
+            gap={2}
+            justify="between"
+            align="center"
+            css={{
+              padding: '$3',
+            }}
           >
-            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$2' }}>
+            <Stack direction="row" gap={1}>
               <Button variant="ghost" disabled={editProhibited} onClick={handleShowPresetModal}>
                 Load/Export
               </Button>
-
               <StylesDropdown />
-            </Box>
+            </Stack>
             <ApplySelector handleUpdate={handleUpdate} />
-          </Box>
+          </Stack>
         )}
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}

@@ -13,12 +13,13 @@ import {
 } from './DropdownMenu';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
-import { settingsStateSelector } from '@/selectors';
+import { settingsStateSelector, storageTypeSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { useFlags } from './LaunchDarkly';
 import Stack from './Stack';
 import Button from './Button';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   handleUpdate: () => void;
@@ -28,6 +29,7 @@ export default function ApplySelector({ handleUpdate }: Props) {
   const {
     updateMode, updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
+  const storageType = useSelector(storageTypeSelector);
 
   const { swapStylesAlpha } = useFlags();
 
@@ -65,13 +67,13 @@ export default function ApplySelector({ handleUpdate }: Props) {
 
   return (
     <Stack direction="row">
-      <Button variant="primary" onClick={handleUpdate}>
+      <Button variant="primary" css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={handleUpdate}>
         Apply to
         {' '}
         {updateMode}
       </Button>
       <DropdownMenu>
-        <DropdownMenuTrigger bordered data-testid="apply-selector">
+        <DropdownMenuTrigger css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} bordered data-testid="apply-selector">
           <IconChevronDown />
         </DropdownMenuTrigger>
 
@@ -105,13 +107,14 @@ export default function ApplySelector({ handleUpdate }: Props) {
             </DropdownMenuItemIndicator>
             Auto-Apply on changes
           </DropdownMenuCheckboxItem>
+          {storageType.provider === StorageProviderType.JSONBIN && (
           <DropdownMenuCheckboxItem data-testid="update-remote" checked={updateRemote} onCheckedChange={handleUpdateRemote}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
-            Auto-Update remote on changes
+            Auto-Update JSONBin on changes
           </DropdownMenuCheckboxItem>
-          <DropdownMenuSeparator />
+          )}
           <DropdownMenuCheckboxItem data-testid="update-styles" checked={updateStyles} onCheckedChange={handleUpdateStyles}>
             <DropdownMenuItemIndicator>
               <CheckIcon />
