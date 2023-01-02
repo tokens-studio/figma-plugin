@@ -17,6 +17,7 @@ import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
+import { track } from '@/utils/analytics';
 
 const StyledFigmaTokensLogo = styled(FigmaLetter, {
   width: '130px',
@@ -46,9 +47,16 @@ function StartScreen() {
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
 
-  const onSetDefaultTokens = React.useCallback(() => {
+  const onSetEmptyTokens = React.useCallback(() => {
+    track('Start with empty set');
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
+  }, [dispatch]);
+
+  const onSetDefaultTokens = React.useCallback(() => {
+    track('Start with exmaple set');
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    dispatch.tokenState.setDefaultTokens();
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {
@@ -85,11 +93,11 @@ function StartScreen() {
         <Stack direction="column" gap={4}>
           <Heading size="large">Guides</Heading>
           <Stack direction="column" gap={3}>
-            <HelpfulLink href="https://docs.tokens.studio/getting-started" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/getting-started?ref=startscreen" target="_blank">
               <BookmarkIcon />
               Getting started
             </HelpfulLink>
-            <HelpfulLink href="https://docs.tokens.studio/" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/?ref=startscreen" target="_blank">
               <ReaderIcon />
               Documentation
             </HelpfulLink>
@@ -110,9 +118,14 @@ function StartScreen() {
             }}
           />
         ) : (
-          <Button id="button-configure" size="small" variant="primary" onClick={onSetDefaultTokens}>
-            Get started with a new file
-          </Button>
+          <Stack direction="row" gap={2}>
+            <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
+              New empty file
+            </Button>
+            <Button id="button-configure-preset" size="small" variant="secondary" onClick={onSetDefaultTokens}>
+              Load example tokens
+            </Button>
+          </Stack>
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
