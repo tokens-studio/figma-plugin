@@ -2,7 +2,9 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { mockUiPostMessage } from '../../../tests/__mocks__/figmaMock';
-import { notifyException, notifySelection, notifySetTokens } from '../notifiers';
+import {
+  notifyException, notifySelection, notifySetTokens, trackFromPlugin,
+} from '../notifiers';
 
 describe('notifySelection', () => {
   it('should work', () => {
@@ -52,6 +54,18 @@ describe('notifyException', () => {
     expect(mockUiPostMessage).toBeCalledWith({
       type: MessageFromPluginTypes.NOTIFY_EXCEPTION,
       error: 'does not work',
+      opts: { foo: 'bar' },
+    });
+  });
+});
+
+describe('trackFromPlugin', () => {
+  it('should work', () => {
+    trackFromPlugin('does work', { foo: 'bar' });
+    expect(mockUiPostMessage).toBeCalledTimes(1);
+    expect(mockUiPostMessage).toBeCalledWith({
+      type: MessageFromPluginTypes.TRACK_FROM_PLUGIN,
+      title: 'does work',
       opts: { foo: 'bar' },
     });
   });

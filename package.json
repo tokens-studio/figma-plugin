@@ -1,7 +1,7 @@
 {
   "name": "tokens-studio-for-figma",
   "version": "1.0.0",
-  "plugin_version": "132-next",
+  "plugin_version": "133",
   "description": "Tokens Studio for Figma",
   "license": "MIT",
   "scripts": {
@@ -64,7 +64,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^6.3.11",
     "ignore-styles": "^5.0.1",
-    "json5": "^2.2.0",
+    "json5": "^2.2.2",
     "jszip": "^3.10.0",
     "just-compact": "^3.0.1",
     "just-debounce-it": "^3.0.1",
