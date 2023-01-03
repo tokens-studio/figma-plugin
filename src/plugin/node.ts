@@ -179,7 +179,7 @@ async function migrateTokens(entry: NodeManagerNode, values: MapValuesToTokensRe
   if (typeof values.border === 'string' && typeof tokens.border !== 'undefined') {
     values.borderColor = values.border;
     await updatePluginData({
-      entries: [entry], values: { [Properties.borderColor]: tokens.border, [Properties.border]: 'delete' },
+      entries: [entry], values: { [Properties.borderColor]: tokens.border, [Properties.border]: 'delete' }, shouldRemove: false,
     });
     await defaultNodeManager.updateNode(entry.node, (t) => (
       omit(t, [Properties.border])

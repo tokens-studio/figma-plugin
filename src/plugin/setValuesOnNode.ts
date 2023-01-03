@@ -55,6 +55,18 @@ export default async function setValuesOnNode(
       if (values.border && isCompositeBorderValue(values.border)) {
         setBorderValuesOnTarget(node, { value: values.border }, baseFontSize);
       }
+      if (values.borderTop && isCompositeBorderValue(values.borderTop)) {
+        setBorderValuesOnTarget(node, { value: values.borderTop }, 'top');
+      }
+      if (values.borderRight && isCompositeBorderValue(values.borderRight)) {
+        setBorderValuesOnTarget(node, { value: values.borderRight }, 'right');
+      }
+      if (values.borderBottom && isCompositeBorderValue(values.borderBottom)) {
+        setBorderValuesOnTarget(node, { value: values.borderBottom }, 'bottom');
+      }
+      if (values.borderLeft && isCompositeBorderValue(values.borderLeft)) {
+        setBorderValuesOnTarget(node, { value: values.borderLeft }, 'left');
+      }
 
       // if applied border is just a string, it's the older version where border was just a color. apply color then.
       if (values.border && typeof values.border === 'string' && typeof data.border !== 'undefined') {
