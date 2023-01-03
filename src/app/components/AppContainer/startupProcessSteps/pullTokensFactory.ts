@@ -13,6 +13,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { isGitProvider } from '@/utils/is';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -50,7 +51,8 @@ export function pullTokensFactory(
       if (matchingSet) {
         // found API credentials
         try {
-          track('Fetched from remote', { provider: matchingSet.provider });
+          const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
+          track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
           if (!matchingSet.internalId) {
             track('missingInternalId', { provider: matchingSet.provider });
           }
