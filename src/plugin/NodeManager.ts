@@ -100,9 +100,8 @@ export class NodeManager {
 
     const currentPluginVersion = parseInt(pkg.plugin_version, 10);
     const version = parseIntOrDefault(await VersionProperty.read(node), 0);
-    const versionBeforeSharedData = 72;
     const migrationFlags = {
-      v72: version && version >= versionBeforeSharedData,
+      v72: version && version >= currentPluginVersion,
     };
     let tokens: NodeTokenRefMap | null = null;
 
@@ -192,14 +191,10 @@ export class NodeManager {
     };
 
     if (Object.keys(entry.tokens).length) {
-      console.log('Writing object', entry.tokens);
-
       if (entry.hash !== checksum) {
         await HashProperty.write(checksum, node);
       }
       if (version !== currentPluginVersion) {
-        console.log('Updating version', version, currentPluginVersion);
-
         await VersionProperty.write(String(currentPluginVersion), node);
       }
 
