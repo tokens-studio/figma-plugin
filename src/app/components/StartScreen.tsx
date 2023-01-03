@@ -122,8 +122,8 @@ function StartScreen() {
             <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
               New empty file
             </Button>
-            <Button id="button-configure-preset" size="small" variant="secondary" onClick={onSetDefaultTokens}>
-              Load example tokens
+            <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
+              Load example
             </Button>
           </Stack>
         )}
