@@ -177,8 +177,9 @@ export default function GenericVersionedForm({
                 label="Value"
                 value={x.value}
                 disabled={!x.name}
+                isMasked
                 onChange={onHeaderChange}
-                type="text"
+                type="password"
                 name="value"
                 data-index={i}
               />
