@@ -5,6 +5,12 @@ import Button from './Button';
 import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
 import Stack from './Stack';
+import { styled } from '@/stitches.config';
+
+const StyledReadMoreLink = styled('a', {
+  color: '$fgAccent',
+  fontSize: '$xsmall',
+});
 
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
@@ -25,7 +31,7 @@ export default function Changelog() {
   }, []);
 
   return (
-    <Modal showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
+    <Modal title="Changelog" showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <div>
           {changelog.map((item, index) => (
@@ -34,21 +40,20 @@ export default function Changelog() {
               key={item._uid}
               direction="column"
               gap={2}
-              align="center"
-              css={{ textAlign: 'center', display: index === activeIndex ? 'flex' : 'none' }}
+              align="start"
+              css={{ display: index === activeIndex ? 'flex' : 'none' }}
             >
               {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
               <Heading>{item.title}</Heading>
               <p className="text-xs">{item.excerpt}</p>
               {item.read_more_link && (
-                <a
+                <StyledReadMoreLink
                   target="_blank"
                   rel="noreferrer"
                   href={item.read_more_link}
-                  className="inline-flex text-xs text-primary-500"
                 >
                   {item.read_more_text ? item.read_more_text : 'Read more'}
-                </a>
+                </StyledReadMoreLink>
               )}
             </Stack>
           ))}
