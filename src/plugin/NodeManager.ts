@@ -109,7 +109,8 @@ export class NodeManager {
     if (!migrationFlags.v72) {
       // @deprecated - moved to separated token values
       const deprecatedValuesProp = node.getPluginData('values');
-      if (deprecatedValuesProp) {
+      // There was a bug in the previous version that would save the values as an 'none' string. Once we get rid of the migration this is fine.'
+      if (deprecatedValuesProp && deprecatedValuesProp !== 'none') {
         tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
         // migrate values to new format
         // there's no need to keep supporting deprecated data structures
@@ -153,7 +154,9 @@ export class NodeManager {
                 tokensSharedDataHandler.set(node, property, value);
                 try {
                   // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+                  // we're storing `none` as a string without quotes
+                  const parsedValue = value === 'none' ? 'none' : JSON.parse(value);
+                  return [property, parsedValue] as [Properties, NodeTokenRefValue];
                 } catch (err) {
                   console.warn(err);
                 }
@@ -165,7 +168,9 @@ export class NodeManager {
               if (value) {
                 try {
                   // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+                  // we're storing `none` as a string without quotes
+                  const parsedValue = value === 'none' ? 'none' : JSON.parse(value);
+                  return [property, parsedValue] as [Properties, NodeTokenRefValue];
                 } catch (err) {
                   console.warn(err);
                 }

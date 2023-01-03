@@ -121,3 +121,11 @@ export function notifyException(error: string, opts = {}) {
     opts,
   });
 }
+
+export function trackFromPlugin(title: string, opts = {}) {
+  postToUI({
+    type: MessageFromPluginTypes.TRACK_FROM_PLUGIN,
+    title,
+    opts,
+  });
+}
