@@ -100,8 +100,9 @@ export class NodeManager {
 
     const currentPluginVersion = parseInt(pkg.plugin_version, 10);
     const version = parseIntOrDefault(await VersionProperty.read(node), 0);
+    const versionBeforeSharedData = 72;
     const migrationFlags = {
-      v72: version && version >= currentPluginVersion,
+      v72: version && version >= versionBeforeSharedData,
     };
     let tokens: NodeTokenRefMap | null = null;
 
@@ -109,7 +110,8 @@ export class NodeManager {
     if (!migrationFlags.v72) {
       // @deprecated - moved to separated token values
       const deprecatedValuesProp = node.getPluginData('values');
-      if (deprecatedValuesProp) {
+      // There was a bug in the previous version that would save the values as an 'none' string. Once we get rid of the migration this is fine.'
+      if (deprecatedValuesProp && deprecatedValuesProp !== 'none') {
         tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
         // migrate values to new format
         // there's no need to keep supporting deprecated data structures
@@ -153,7 +155,9 @@ export class NodeManager {
                 tokensSharedDataHandler.set(node, property, value);
                 try {
                   // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+                  // we're storing `none` as a string without quotes
+                  const parsedValue = value === 'none' ? 'none' : JSON.parse(value);
+                  return [property, parsedValue] as [Properties, NodeTokenRefValue];
                 } catch (err) {
                   console.warn(err);
                 }
@@ -165,7 +169,9 @@ export class NodeManager {
               if (value) {
                 try {
                   // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+                  // we're storing `none` as a string without quotes
+                  const parsedValue = value === 'none' ? 'none' : JSON.parse(value);
+                  return [property, parsedValue] as [Properties, NodeTokenRefValue];
                 } catch (err) {
                   console.warn(err);
                 }
@@ -186,10 +192,14 @@ export class NodeManager {
     };
 
     if (Object.keys(entry.tokens).length) {
+      console.log('Writing object', entry.tokens);
+
       if (entry.hash !== checksum) {
         await HashProperty.write(checksum, node);
       }
       if (version !== currentPluginVersion) {
+        console.log('Updating version', version, currentPluginVersion);
+
         await VersionProperty.write(String(currentPluginVersion), node);
       }
 

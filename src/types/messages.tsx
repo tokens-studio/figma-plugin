@@ -19,6 +19,7 @@ export enum MessageFromPluginTypes {
   COMPLETE_JOB_TASKS = 'complete_job_tasks',
   SET_TOKENS = 'set_tokens',
   NOTIFY_EXCEPTION = 'notify_exception',
+  TRACK_FROM_PLUGIN = 'track_from_plugin',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -94,6 +95,12 @@ export type NotifyExceptionFromPluginMessage = {
   opts?: Record<string, unknown>;
 };
 
+export type TrackFromPluginMessage = {
+  type: MessageFromPluginTypes.TRACK_FROM_PLUGIN;
+  title: string;
+  opts?: Record<string, unknown>;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -107,4 +114,6 @@ export type PostToUIMessage =
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
   | SetTokensFromPluginMessage
-  | NotifyExceptionFromPluginMessage;
+  | SetTokensFromPluginMessage
+  | NotifyExceptionFromPluginMessage
+  | TrackFromPluginMessage;

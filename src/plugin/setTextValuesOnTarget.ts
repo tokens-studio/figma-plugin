@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
-import { notifyException, notifyUI } from './notifiers';
+import { trackFromPlugin, notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
@@ -79,7 +79,7 @@ export default async function setTextValuesOnTarget(
         }
         if (hasErrored) {
           notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
-          notifyException('Font not found', { family, style });
+          trackFromPlugin('Font not found', { family, style });
         }
       }
       if (typeof fontSize !== 'undefined') {
