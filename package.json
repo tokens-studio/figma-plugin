@@ -1,7 +1,7 @@
 {
   "name": "tokens-studio-for-figma",
   "version": "1.0.0",
-  "plugin_version": "131",
+  "plugin_version": "132",
   "description": "Tokens Studio for Figma",
   "license": "MIT",
   "scripts": {
