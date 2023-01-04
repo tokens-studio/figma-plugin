@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import supabase from '@/supabase';
 import { Dispatch } from '@/app/store';
+import stringifyTokens from '@/utils/stringifyTokens';
 
 export default function SecondScreenSync() {
   const secondScreenOn = useSelector(secondScreenSelector);
@@ -19,7 +20,6 @@ export default function SecondScreenSync() {
     let dbUpdateChannel: RealtimeChannel | null = null;
     // Supabase client setup
     if (user && secondScreenOn) {
-      console.log('subscribe');
       dbUpdateChannel = supabase
         .channel('value-db-changes')
         .on(
@@ -63,8 +63,15 @@ export default function SecondScreenSync() {
         .eq('owner_email', email);
     }
 
+    const setsObject: Record<any, any> = {};
+    Object.keys(tokens).forEach((setName) => {
+      const tokensString = stringifyTokens(tokens, setName);
+
+      setsObject[setName] = JSON.parse(tokensString);
+    });
+
     if (secondScreenOn && user) {
-      const data = JSON.stringify({ sets: tokens, themes, usedTokenSets });
+      const data = JSON.stringify({ sets: setsObject, themes, usedTokenSets });
       updateRemoteData(user.email, data);
     }
   }, [tokens, themes, secondScreenOn, user, usedTokenSets]);
