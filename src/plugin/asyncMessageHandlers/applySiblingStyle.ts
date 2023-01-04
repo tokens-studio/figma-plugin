@@ -45,12 +45,14 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
       case 'VECTOR':
       case 'COMPONENT':
       case 'INSTANCE':
+      case 'COMPONENT_SET':
       case 'FRAME':
+      case 'SECTION':
       case 'BOOLEAN_OPERATION':
         {
-          const newFillStyleId = await getNewStyleId(node.fillStyleId as string, styleIds, styleMap, newTheme);
-          const newStrokeStyleId = await getNewStyleId(node.strokeStyleId as string, styleIds, styleMap, newTheme);
-          const newEffectStyleId = await getNewStyleId(node.effectStyleId as string, styleIds, styleMap, newTheme);
+          const newFillStyleId = 'fillStyleId' in node && await getNewStyleId(node.fillStyleId as string, styleIds, styleMap, newTheme);
+          const newStrokeStyleId = 'strokeStyleId' in node && await getNewStyleId(node.strokeStyleId as string, styleIds, styleMap, newTheme);
+          const newEffectStyleId = 'effectStyleId' in node && await getNewStyleId(node.effectStyleId as string, styleIds, styleMap, newTheme);
           if (newFillStyleId) {
             node.fillStyleId = newFillStyleId;
           }
@@ -60,7 +62,7 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
           if (newEffectStyleId) {
             node.effectStyleId = newEffectStyleId;
           }
-          if (['COMPONENT', 'INSTANCE', 'FRAME', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
+          if (['COMPONENT', 'COMPONENT_SET', 'SECTION', 'INSTANCE', 'FRAME', 'BOOLEAN_OPERATION'].includes(node.type) && 'children' in node) {
             await Promise.all(node.children.map((child) => applySiblingStyleId(child, styleIds, styleMap, newTheme)));
           }
         }
