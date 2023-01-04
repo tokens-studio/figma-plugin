@@ -1,4 +1,5 @@
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
 import { updateGenericVersionedTokens } from './providers/generic/versionedStorage';
@@ -18,6 +19,7 @@ type UpdateRemoteTokensPayload = {
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
+  dispatch: Dispatch
 };
 
 type UpdateTokensOnSourcesPayload = {
@@ -36,6 +38,7 @@ type UpdateTokensOnSourcesPayload = {
   api: StorageTypeCredentials;
   checkForChanges: boolean;
   shouldSwapStyles?: boolean;
+  dispatch: Dispatch
 };
 
 async function updateRemoteTokens({
@@ -45,6 +48,7 @@ async function updateRemoteTokens({
   context,
   updatedAt,
   oldUpdatedAt,
+  dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
   switch (provider) {
@@ -58,6 +62,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        dispatch,
       });
       break;
     }
@@ -70,6 +75,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        dispatch,
       });
 
       break;
@@ -107,6 +113,7 @@ export default async function updateTokensOnSources({
   lastUpdatedAt,
   checkForChanges,
   shouldSwapStyles,
+  dispatch,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -116,6 +123,7 @@ export default async function updateTokensOnSources({
       context: api,
       updatedAt,
       oldUpdatedAt: lastUpdatedAt,
+      dispatch,
     });
   }
 

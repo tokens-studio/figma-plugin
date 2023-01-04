@@ -13,7 +13,7 @@ type Props = {
   onBlur?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
-export const StyledDownshiftInput = React.forwardRef<HTMLInputElement, Props>(({
+export const StyledDownshiftInput: React.FC<Props> = ({
   type,
   name,
   value,
@@ -21,16 +21,22 @@ export const StyledDownshiftInput = React.forwardRef<HTMLInputElement, Props>(({
   suffix,
   onChange,
   onBlur,
-  ...inputProps
-}, ref) => (
-  <StyledInput
-    ref={ref}
-    hasSuffix={!!suffix}
-    name={name || 'value'}
-    value={value || ''}
-    placeholder={placeholder}
-    onChange={onChange}
-    onBlur={onBlur}
-    {...inputProps}
-  />
-));
+  getInputProps,
+}) => {
+  const { ref, size, ...inputProps } = getInputProps({
+    label: type || null,
+    name: name || 'value',
+    placeholder,
+    value: value || '',
+    onChange,
+    onBlur,
+  });
+
+  return (
+    <StyledInput
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
+      hasSuffix={!!suffix}
+      {...inputProps}
+    />
+  );
+};

@@ -61,7 +61,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return false;
     }
     if (internalEditToken.type === TokenTypes.DIMENSION) {
-      return isValidDimensionToken;
+      return true;
     }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
@@ -125,7 +125,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         setError('Value must include either px or rem');
       }
     },
-    [internalEditToken],
+    [internalEditToken, isValidDimensionToken],
   );
 
   const handleBoxShadowValueChange = React.useCallback(
@@ -340,6 +340,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+        return;
+      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);
