@@ -1,14 +1,17 @@
 import chroma from 'chroma-js';
 import Color from 'colorjs.io';
+import 'colorjs.io/dist/color.legacy.cjs';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+
+// const Color = require('colorjs.io/dist/color.legacy.cjs').default;
 
 export function convertModifiedColorToHex(baseColor: string, modifier: ColorModifier) {
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        return chroma(baseColor).brighten(Number(modifier.value)).hex();
-        // return new Color(baseColor).lighten(Number(modifier.value)).toString({ inGamut: false, format: 'hex' });
+        // return chroma(baseColor).brighten(Number(modifier.value)).hex();
+        return new Color(baseColor).lighten(Number(modifier.value)).toString({ inGamut: false, format: 'hex' });
       case ColorModifierTypes.DARKEN:
         return chroma(baseColor).darken(Number(modifier.value)).hex();
         // return new Color(baseColor).darken(Number(modifier.value)).toString({ inGamut: false, format: 'hex' });
