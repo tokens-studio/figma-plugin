@@ -79,7 +79,7 @@ export default async function setTextValuesOnTarget(
           }
         }
         if (hasErrored) {
-          notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+          notifyUI(`Error setting font family/weight combination for ${family}/${style}`);
           trackFromPlugin('Font not found', { family, style });
         }
       }
