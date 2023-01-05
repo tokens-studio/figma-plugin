@@ -1,4 +1,4 @@
-import Color from 'colorjs.io/dist/color.legacy';
+import Color from 'colorjs.io';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 
