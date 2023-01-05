@@ -176,17 +176,17 @@ describe('pullStyles', () => {
         {
           name: 'paragraphIndent.0',
           type: 'dimension',
-          value: '0',
+          value: '0px',
         },
         {
           name: 'paragraphIndent.1',
           type: 'dimension',
-          value: '3',
+          value: '3px',
         },
         {
           name: 'paragraphIndent.2',
           type: 'dimension',
-          value: '7',
+          value: '7px',
         },
       ],
     });

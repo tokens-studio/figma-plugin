@@ -136,7 +136,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .sort((a, b) => a - b)
       .map((size, idx) => ({
         name: `paragraphIndent.${idx}`,
-        value: size.toString(),
+        value: `${size.toString()}px`,
         type: TokenTypes.DIMENSION,
       }));
 
@@ -176,7 +176,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         (el: SingleToken) => el.value === style.paragraphSpacing.toString(),
       );
       const foundParagraphIndent = paragraphIndent.find(
-        (el: SingleToken) => el.value === style.paragraphIndent.toString(),
+        (el: SingleToken) => el.value === `${style.paragraphIndent.toString()}px`,
       );
       const foundTextCase = textCase.find(
         (el: SingleToken) => el.value === convertFigmaToTextCase(style.textCase.toString()),
