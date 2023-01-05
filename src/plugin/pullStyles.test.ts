@@ -172,6 +172,23 @@ describe('pullStyles', () => {
         { name: 'paragraphSpacing.2', type: 'paragraphSpacing', value: '7' }],
       textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
       textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
+      paragraphIndent: [
+        {
+          name: 'paragraphIndent.0',
+          type: 'dimension',
+          value: '0',
+        },
+        {
+          name: 'paragraphIndent.1',
+          type: 'dimension',
+          value: '3',
+        },
+        {
+          name: 'paragraphIndent.2',
+          type: 'dimension',
+          value: '7',
+        },
+      ],
     });
   });
 
