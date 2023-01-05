@@ -137,6 +137,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .map((size, idx) => ({
         name: `paragraphIndent.${idx}`,
         value: size.toString(),
+        type: TokenTypes.DIMENSION,
       }));
 
     letterSpacing = rawLetterSpacing
@@ -265,6 +266,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     typography,
     textCase,
     textDecoration,
+    paragraphIndent,
   };
 
   type ResultObject = Record<string, AnyTokenList>;
