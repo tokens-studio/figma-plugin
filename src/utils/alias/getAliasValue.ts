@@ -9,7 +9,7 @@ import { checkAndEvaluateMath } from '../math';
 type TokenNameNodeType = string | undefined;
 
 function getReturnedValue(token: SingleToken | string | number) {
-  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY)) {
+  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY || token?.type === TokenTypes.BORDER)) {
     return token.value;
   }
   if (isSingleTokenValueObject(token)) {
