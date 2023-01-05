@@ -115,6 +115,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.16",
