@@ -56,7 +56,7 @@ describe('getAliasValue', () => {
     {
       name: 'colors.light-extension',
       input: '#ff0000',
-      value: '#ff3a1e',
+      value: '#ffdbd2',
       type: TokenTypes.COLOR,
       $extensions: {
         'studio.tokens': {
@@ -71,7 +71,7 @@ describe('getAliasValue', () => {
     {
       name: 'colors.mix-extension',
       input: '#ff2277',
-      value: '#ff1854',
+      value: '#ff1445',
       type: TokenTypes.COLOR,
       $extensions: {
         'studio.tokens': {
