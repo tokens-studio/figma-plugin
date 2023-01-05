@@ -36,6 +36,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         });
       }
     });
+
     return acc;
   }, []);
 
@@ -61,6 +62,8 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
     mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
   }
   const selectedNodes = figma.currentPage.selection.length;
+  console.log('selection', selectionValues);
+  console.log('mainnode', mainNodeSelectionValues);
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
   return { selectionValues, mainNodeSelectionValues, selectedNodes };
 }
