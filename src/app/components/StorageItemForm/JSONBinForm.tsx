@@ -7,6 +7,7 @@ import Stack from '../Stack';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN; }>;
 type Props = {
@@ -75,9 +76,9 @@ export default function JSONBinForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

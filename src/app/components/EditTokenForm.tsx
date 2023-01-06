@@ -456,12 +456,24 @@ function EditTokenForm({ resolvedTokens }: Props) {
               <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
             )}
             {checkIfContainsAlias(internalEditToken.value) && (
-              <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
+              <Box css={{
+                display: 'flex',
+                padding: '$3',
+                marginTop: '$3',
+                fontFamily: '$mono',
+                color: '$textMuted',
+                backgroundColor: '$bgSubtle',
+                borderColor: '$borderSubtle',
+                borderRadius: '$card',
+                fontSize: '$xxs',
+                alignItems: 'center',
+              }}
+              >
                 {internalEditToken.type === 'color' ? (
                   <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
                 ) : null}
                 {resolvedValue?.toString()}
-              </div>
+              </Box>
             )}
           </div>
         );

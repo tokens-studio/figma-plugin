@@ -5,6 +5,8 @@ import Stack from '../Stack';
 import XIcon from '@/icons/x.svg';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
+import Box from '../Box';
+import { styled } from '@/stitches.config';
 
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
@@ -41,6 +43,16 @@ export type ModalProps = {
   showClose?: boolean;
   close: () => void;
 };
+
+const StyledButton = styled('button', {
+  padding: '$4',
+  '&:hover': {
+    backgroundColor: '$bgSubtle',
+  },
+  '&:focus': {
+    outline: 'none',
+  },
+});
 
 export function Modal({
   id,
@@ -85,19 +97,18 @@ export function Modal({
         <ModalHeader>
           <Stack direction="row" justify="between" align="center">
             {title && (
-              <div className="pl-4">
+              <Box css={{ paddingLeft: '$4' }}>
                 <Heading size="small">{title}</Heading>
-              </div>
+              </Box>
             )}
-            <button
+            <StyledButton
               type="button"
               onClick={handleClose}
-              className="p-4 hover:bg-gray-100 rounded focus:outline-none"
               data-cy="close-button"
               data-testid="close-button"
             >
               <XIcon />
-            </button>
+            </StyledButton>
           </Stack>
         </ModalHeader>
       )}
