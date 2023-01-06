@@ -27,7 +27,7 @@ import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 import { modifyColor } from '@/utils/modifyColor';
 import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 
-const defaultValue = '0';
+const defaultValue = 0;
 
 export default function ColorTokenForm({
   internalEditToken,
@@ -161,7 +161,7 @@ export default function ColorTokenForm({
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        value: e.target.value.replace(/[^.\d]/g, '').replace(/^(\d*\.?)|(\d*)\.?/g, '$1$2').replace(/^\./, ''), // accept only number
+        value: e.target.valueAsNumber, // accept only number
       });
     }
   }, [internalEditToken, handleModifyChange]);
@@ -217,14 +217,14 @@ export default function ColorTokenForm({
         {
           !modifyVisible ? (
             <IconButton
-              tooltip="Add a new modify"
+              tooltip="Add new modifier"
               dataCy="button-add-new-modify"
               onClick={addModify}
               icon={<IconPlus />}
             />
           ) : (
             <IconButton
-              tooltip="Remove the modify"
+              tooltip="Remove modifier"
               dataCy="button-remove=modify"
               onClick={removeModify}
               icon={<IconMinus />}
@@ -253,7 +253,7 @@ export default function ColorTokenForm({
                     flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
                   }}
                 >
-                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose a operation'}</span>
+                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'}</span>
                   <IconToggleableDisclosure />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
@@ -310,7 +310,7 @@ export default function ColorTokenForm({
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
+              <StyledInput type="number" onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
             </Box>
           </>
         )
