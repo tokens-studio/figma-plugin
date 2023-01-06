@@ -50,7 +50,7 @@
     "buffer": "^6.0.3",
     "case": "^1.6.3",
     "classnames": "^2.3.1",
-    "color2k": "^1.2.4",
+    "color2k": "^2.0.1",
     "core-js": "^3.9.1",
     "cypress-react-selector": "^2.3.6",
     "dnd-core": "^12.0.1",
