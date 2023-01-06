@@ -160,21 +160,21 @@ function PushDialog() {
     case 'success': {
       return (
         <Modal large isOpen close={onCancel}>
-          <div className="text-center">
-            <div className="mb-8 space-y-4">
+          <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
+            <Stack direction="column" gap={4}>
               <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
-              <div className="text-xs">
+              <Text size="small">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
-              </div>
-            </div>
+              </Text>
+            </Stack>
             <Button variant="primary" href={redirectHref}>
               Create Pull Request
             </Button>
-          </div>
+          </Stack>
         </Modal>
       );
     }

@@ -6,6 +6,7 @@ import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
 import Input from './Input';
+import Text from './Text';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
@@ -498,7 +499,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         />
         {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+        {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
         <Box>
           <Heading size="xsmall">Description</Heading>
           <Textarea

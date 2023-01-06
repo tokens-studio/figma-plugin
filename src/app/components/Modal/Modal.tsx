@@ -54,6 +54,23 @@ const StyledButton = styled('button', {
   },
 });
 
+const StyledBody = styled('div', {
+  position: 'relative',
+  padding: '$6',
+  variants: {
+    full: {
+      true: {
+        padding: 0,
+      },
+    },
+    compact: {
+      true: {
+        padding: '$4',
+      },
+    },
+  },
+});
+
 export function Modal({
   id,
   title,
@@ -71,16 +88,6 @@ export function Modal({
       ReactModal.setAppElement('#app');
     }
   }, []);
-
-  const paddingClass = () => {
-    if (compact) {
-      return 'p-4';
-    }
-    if (full) {
-      return 'p-0';
-    }
-    return 'p-8';
-  };
 
   const handleClose = React.useCallback(() => {
     close();
@@ -112,9 +119,9 @@ export function Modal({
           </Stack>
         </ModalHeader>
       )}
-      <div data-cy={id} className={`relative ${paddingClass()}`}>
+      <StyledBody compact={compact} full={full} data-cy={id}>
         {children}
-      </div>
+      </StyledBody>
       {(!!footer) && (
         <ModalFooter>
           {footer}

@@ -11,6 +11,13 @@ import { isEqual } from '@/utils/isEqual';
 import { StyledInspectBadge } from './StyledInspectBadge';
 import Text from './Text';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
+import { styled } from '@/stitches.config';
+
+const StyledCode = styled('code', {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '$2',
+});
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -38,15 +45,15 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
                 .filter(([key, value]) => !StyleIdBackupKeys.includes(key) && value !== 'delete')
                 .map(([property, value]) => (
                   <Stack key={property} direction="row" align="start" justify="between">
-                    <code className="flex flex-wrap space-x-2">
-                      <div className="font-bold">{property}</div>
+                    <StyledCode>
+                      <Text bold>{property}</Text>
                       :
                       {' '}
                       <StyledInspectBadge>
                         {typeof value === 'string' && value.split('.').join('-')}
                       </StyledInspectBadge>
                       <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</Text>
-                    </code>
+                    </StyledCode>
                   </Stack>
                 ))}
             </Stack>

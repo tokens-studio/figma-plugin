@@ -104,7 +104,6 @@ function ConfirmDialog() {
                 type={confirmState.input.type}
                 value={inputValue}
                 onChange={handleInputChange}
-                className="w-full"
                 inputRef={firstInput}
                 full
                 required
