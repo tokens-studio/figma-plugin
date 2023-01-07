@@ -26,6 +26,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 import { modifyColor } from '@/utils/modifyColor';
 import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
+import ColorPickerTrigger from './ColorPickerTrigger';
 
 const defaultValue = 0;
 
@@ -198,14 +199,7 @@ export default function ColorTokenForm({
         setInputValue={handleColorDownShiftInputChange}
         placeholder="#000000, hsla(), rgba() or {alias}"
         prefix={(
-          <button
-            type="button"
-            className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-            style={{ background: String(resolvedValue), fontSize: 0 }}
-            onClick={handleToggleInputHelper}
-          >
-            {internalEditToken.value}
-          </button>
+          <ColorPickerTrigger onClick={handleToggleInputHelper} background={String(resolvedValue)} />
         )}
         suffix
       />
@@ -291,14 +285,7 @@ export default function ColorTokenForm({
                     setInputValue={handleMixColorChange}
                     placeholder="#000000, hsla(), rgba() or {alias}"
                     prefix={(
-                      <button
-                        type="button"
-                        className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
-                        style={{ background: String(resolvedMixValue), fontSize: 0 }}
-                        onClick={handleToggleMixInputHelper}
-                      >
-                        {internalEditToken?.$extensions?.['studio.tokens']?.modify?.color}
-                      </button>
+                      <ColorPickerTrigger onClick={handleToggleMixInputHelper} background={String(resolvedMixValue)} />
                     )}
                     suffix
                   />
@@ -316,12 +303,15 @@ export default function ColorTokenForm({
         )
       }
       {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['studio.tokens']?.modify) && (
-      <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
-        {internalEditToken.type === 'color' ? (
-          <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(displayColor) }} />
-        ) : null}
-        {modifiedColor?.toString()}
-      </div>
+        <Box css={{
+          display: 'flex', gap: '$3', background: '$bgSubtle', color: '$fgSubtle', padding: '$3', borderRadius: '$2',
+        }}
+        >
+          {internalEditToken.type === 'color' ? (
+            <ColorPickerTrigger background={String(displayColor)} />
+          ) : null}
+          {modifiedColor?.toString()}
+        </Box>
       )}
     </>
   );
