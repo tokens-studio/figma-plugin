@@ -7,10 +7,11 @@ import Input from '../Input';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type Props = {
   isOpen: boolean;
-  type: string;
+  type?: TokenTypes;
   newName: string;
   oldName: string;
   onClose: () => void;

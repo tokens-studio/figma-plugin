@@ -1,7 +1,7 @@
 import set from 'set-value';
 import extend from 'just-extend';
 import tokenTypes from '../../config/tokenType.defs.json';
-import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
+import { DeepKeyTokenMap, SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 type CreateTokensObjectResult = Partial<Record<TokenTypes, {
@@ -82,12 +82,30 @@ export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?:
   return {};
 }
 
+// Creates a tokens object so that tokens are displayed in groups in the UI.
+export function createTokenGroups(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes; })[], tokenFilter = '') {
+  if (tokens.length > 0) {
+    const obj = tokens.reduce<CreateTokensObjectResult>((acc, cur) => {
+      if (tokenFilter === '' || cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0) {
+        // we can use ! here because in the previous block we are ensuring
+        // the values object exists
+        set(acc, cur.name, extend(true, {}, cur) as SingleToken);
+      }
+      return acc;
+    }, {});
+    return obj;
+  }
+  return {};
+}
+
 // Takes an array of tokens, transforms them into
 // an object and merges that with values we require for the UI
-export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
+export function groupTokensByType(tokens: SingleToken[], tokenFilter: string): Array<{
+  type: TokenTypes,
+  values: DeepKeyTokenMap
+}> {
   const tokenObj = extend(true, {}, tokenTypes) as Record<
-  TokenTypes,
-  TokenTypeSchema & { values: DeepKeyTokenMap }
+  TokenTypes, { values: DeepKeyTokenMap, type: TokenTypes }
   >;
   const tokenObjects = createTokensObject(tokens, tokenFilter);
 
@@ -95,8 +113,17 @@ export function mappedTokens(tokens: SingleToken[], tokenFilter: string) {
     tokenObj[key as TokenTypes] = {
       ...(tokenObj[key as TokenTypes] ?? {}),
       values: group.values,
+      type: key as TokenTypes,
     };
   });
 
-  return Object.entries(tokenObj);
+  return Object.values(tokenObj).sort((a, b) => {
+    if (b.values) {
+      return 1;
+    }
+    if (a.values) {
+      return -1;
+    }
+    return 0;
+  });
 }

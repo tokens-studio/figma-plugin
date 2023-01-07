@@ -1,7 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 
 interface StringSchemaType { type: 'string' }
-interface ObjectSchemaType {
+export interface ObjectSchemaType {
   type: 'object'
   properties: Record<string, StringSchemaType | ObjectSchemaType>
 }

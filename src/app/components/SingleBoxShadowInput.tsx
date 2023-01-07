@@ -198,7 +198,7 @@ export default function SingleBoxShadowInput({
           </Box>
         )}
         <Tooltip label="type"><StyledPrefix isText>Type</StyledPrefix></Tooltip>
-        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
+        <Select value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>

@@ -15,12 +15,13 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export type Props = {
   id: string
   label: string
   path: string
-  type: string
+  type?: TokenTypes
   showNewForm: (opts: ShowNewFormOptions) => void;
 };
 

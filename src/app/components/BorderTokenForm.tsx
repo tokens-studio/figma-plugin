@@ -14,6 +14,7 @@ import DownshiftInput from './DownshiftInput';
 import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { findReferences } from '@/utils/findReferences';
+import tokenTypes from '@/config/tokenType.defs.json';
 
 const propertyTypes = {
   color: TokenTypes.COLOR,
