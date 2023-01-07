@@ -15,6 +15,8 @@ import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
 import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 import { SingleBorderValueDisplay } from './SingleBorderValueDisplay';
+import { isSingleColorToken } from '@/utils/is/isSingleColorToken';
+import { SingleColorValueDisplay } from './SingleColorValueDisplay';
 
 type Props = {
   token: SingleToken;
@@ -102,6 +104,16 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
       <SingleBorderValueDisplay
         value={token.value as TokenBorderValue}
         resolvedValue={resolvedValue as TokenBorderValue}
+      />
+    );
+  }
+
+  if (isSingleColorToken(token)) {
+    return (
+      <SingleColorValueDisplay
+        value={token.value}
+        resolvedValue={resolvedValue as string}
+        modifier={token.$extensions?.['studio.tokens']?.modify}
       />
     );
   }
