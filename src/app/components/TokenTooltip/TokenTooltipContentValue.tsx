@@ -111,8 +111,8 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   if (isSingleColorToken(token)) {
     return (
       <SingleColorValueDisplay
-        value={token.value}
-        resolvedValue={resolvedValue as string}
+        value={String(token.value)}
+        resolvedValue={String(resolvedValue)}
         modifier={token.$extensions?.['studio.tokens']?.modify}
       />
     );
