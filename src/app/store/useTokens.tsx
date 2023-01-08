@@ -17,6 +17,7 @@ import {
   settingsStateSelector,
   tokensSelector,
   uiStateSelector,
+  updateModeSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -50,11 +51,13 @@ export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
+  const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -81,6 +84,30 @@ export default function useTokens() {
   const getStringTokens = useCallback(() => (
     stringifyTokens(tokens, activeTokenSet)
   ), [tokens, activeTokenSet]);
+
+  // handles updating JSON
+  const handleJSONUpdate = useCallback((newTokens: string) => {
+    track('Update JSON');
+    dispatch.tokenState.setJSONData(newTokens);
+  }, [dispatch.tokenState]);
+
+  // Handles the update operation
+  const handleUpdate = useCallback(() => {
+    track('Update Tokens');
+    if (shouldConfirm) {
+      confirm({
+        text: 'Are you sure?',
+        description:
+            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+      }).then((result) => {
+        if (result && result.result) {
+          dispatch.tokenState.updateDocument();
+        }
+      });
+    } else {
+      dispatch.tokenState.updateDocument();
+    }
+  }, [confirm, dispatch.tokenState, shouldConfirm]);
 
   // Calls Figma asking for all local text- and color styles
   const pullStyles = useCallback(async () => {
@@ -310,6 +337,8 @@ export default function useTokens() {
     removeStylesFromTokens,
     syncStyles,
     setNoneValuesOnNode,
+    handleUpdate,
+    handleJSONUpdate,
   }), [
     isAlias,
     getTokenValue,
@@ -326,5 +355,7 @@ export default function useTokens() {
     removeStylesFromTokens,
     syncStyles,
     setNoneValuesOnNode,
+    handleUpdate,
+    handleJSONUpdate,
   ]);
 }

@@ -7,29 +7,24 @@ import Box from './Box';
 import StylesDropdown from './StylesDropdown';
 import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
 import Button from './Button';
-import { useShortcut } from '@/hooks/useShortcut';
 import Stack from './Stack';
+import SettingsDropdown from './SettingsDropdown';
+import useTokens from '../store/useTokens';
+import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 
 type Props = {
-  handleUpdate: () => void;
-  handleSaveJSON: () => void;
   hasJSONError: boolean;
 };
 
-export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: Props) {
+export default function TokensBottomBar({ hasJSONError }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
+  const stringTokens = useSelector(stringTokensSelector);
+
+  const { handleJSONUpdate } = useTokens();
 
   const [exportModalVisible, showExportModal] = React.useState(false);
   const [presetModalVisible, showPresetModal] = React.useState(false);
-
-  const handleSaveShortcut = useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
-      handleSaveJSON();
-    }
-  }, [handleSaveJSON]);
-
-  useShortcut(['KeyS'], handleSaveShortcut);
 
   const handleShowPresetModal = useCallback(() => {
     showPresetModal(true);
@@ -42,6 +37,10 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
   const handleCloseExportModal = useCallback(() => {
     showExportModal(false);
   }, []);
+
+  const handleSaveJSON = useCallback(() => {
+    handleJSONUpdate(stringTokens);
+  }, [handleJSONUpdate, stringTokens]);
 
   return (
     <Box css={{
@@ -77,11 +76,14 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
           >
             <Stack direction="row" gap={1}>
               <Button variant="ghost" disabled={editProhibited} onClick={handleShowPresetModal}>
-                Load/Export
+                Tools
               </Button>
               <StylesDropdown />
             </Stack>
-            <ApplySelector handleUpdate={handleUpdate} />
+            <Stack direction="row" gap={1}>
+              <ApplySelector />
+              <SettingsDropdown />
+            </Stack>
           </Stack>
         )}
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
