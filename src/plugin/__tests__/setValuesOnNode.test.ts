@@ -56,6 +56,7 @@ describe('Can set values on node', () => {
       effectStyleId: '',
       fillStyleId: '',
       strokeStyleId: '',
+      dashPattern: [],
       getSharedPluginData: () => '',
       setSharedPluginData: () => undefined,
     } as unknown) as RectangleNode;
