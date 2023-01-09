@@ -703,16 +703,7 @@ describe('Can set values on node', () => {
     };
     const data = { border: 'border.regular' };
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
-    expect(solidNodeMock.strokes).toEqual([
-      {
-        color: {
-          b: 1,
-          g: 1,
-          r: 1,
-        },
-        opacity: 1,
-        type: 'SOLID',
-      },
-    ]);
+    expect(solidNodeMock.strokeWeight).toEqual(12);
+    expect(solidNodeMock.dashPattern).toEqual([0, 0]);
   });
 });
