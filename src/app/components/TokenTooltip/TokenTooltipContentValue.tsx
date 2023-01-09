@@ -31,8 +31,6 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     tokensContext.resolvedTokens,
   ]);
 
-  console.log('resolved', resolvedValue);
-  console.log('resolved', tokensContext.resolvedTokens);
   if (isSingleTypographyToken(token)) {
     return (
       <SingleTypographyValueDisplay
