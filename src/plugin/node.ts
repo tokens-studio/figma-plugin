@@ -141,11 +141,14 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
-export function destructureCompositionToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
+export function destructureToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
   const tokensInCompositionToken: Partial<
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
+  if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
+  }
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -156,7 +159,18 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   return values;
 }
 
-export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
+export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  if (values && values.border) {
+    const resolvedToken = tokens.get(values.border);
+    if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'color' in resolvedToken.rawValue && resolvedToken.rawValue.color) {
+      const { color } = resolvedToken.rawValue;
+      const { borderColor } = values;
+      let colorTokenName = color;
+      if (String(color).startsWith('$')) colorTokenName = String(color).slice(1, String(color).length);
+      if (String(color).startsWith('{')) colorTokenName = String(color).slice(1, String(color).length - 1);
+      values = { ...values, ...(borderColor ? { } : { borderColor: String(colorTokenName) }) };
+    }
+  }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -216,9 +230,9 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
+            const mappedTokens = destructureTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = destructureCompositionToken(mappedValues);
+            mappedValues = destructureToken(mappedValues);
             await migrateTokens(entry, mappedValues, mappedTokens);
             setValuesOnNode(
               entry.node,

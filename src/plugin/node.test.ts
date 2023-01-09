@@ -1,7 +1,7 @@
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
+  destructureToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 
@@ -183,10 +183,10 @@ describe('mapValuesToTokens', () => {
   });
 });
 
-describe('destructureCompositionToken', () => {
+describe('destructureToken', () => {
   it('return properties in compositionToken', () => {
     mappedTokens.forEach((token, index) => {
-      expect(destructureCompositionToken(token)).toEqual(applyProperties[index]);
+      expect(destructureToken(token)).toEqual(applyProperties[index]);
     });
   });
 });
