@@ -2,11 +2,11 @@
 import { SingleBorderToken } from '@/types/tokens';
 import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
-import setColorValuesOnTarget from './setColorValuesOnTarget';
 
 export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>, side?: 'top' | 'right' | 'bottom' | 'left') {
+  // we don't apply borderColor here. we extract borderColor and apply as a normal borderColor token
   const { value } = token;
-  const { color, width, style } = value;
+  const { width, style } = value;
   try {
     if ('strokeWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && !side) {
       target.strokeWeight = transformValue(String(width), 'borderWidth');
@@ -24,9 +24,6 @@ export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<Si
       target.strokeLeftWeight = transformValue(String(width), 'borderWidth');
     }
 
-    if (typeof color !== 'undefined' && typeof color === 'string') {
-      setColorValuesOnTarget(target, { value: color }, 'strokes');
-    }
     if (typeof style !== 'undefined' && typeof style === 'string' && 'dashPattern' in target) {
       let newDashPattern = [0, 0];
       switch (style) {
