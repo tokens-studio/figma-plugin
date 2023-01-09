@@ -123,7 +123,7 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
   }
 
   if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
-    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />;
+    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(resolvedValue, null, 2)} />;
   }
 
   return <TooltipProperty value={token.value} resolvedValue={resolvedValue} />;
