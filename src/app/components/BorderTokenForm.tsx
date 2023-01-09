@@ -42,6 +42,7 @@ export default function BorderTokenForm({
   const [alias, setAlias] = useState('');
   const [inputHelperOpen, setInputHelperOpen] = useState<boolean>(false);
 
+  console.log('resilve', resolvedTokens);
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
