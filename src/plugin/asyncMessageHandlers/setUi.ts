@@ -20,6 +20,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     inspectDeep: msg.inspectDeep,
     baseFontSize: msg.baseFontSize,
     aliasBaseFontSize: msg.aliasBaseFontSize,
+    shouldSwapStyles: msg.shouldSwapStyles,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

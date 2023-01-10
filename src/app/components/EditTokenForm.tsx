@@ -71,7 +71,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return false;
     }
     if (internalEditToken.type === TokenTypes.DIMENSION) {
-      return isValidDimensionToken;
+      return true;
     }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
@@ -138,11 +138,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(() => {
-    if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-      setError('Value must include either px or rem');
-    }
-  }, [internalEditToken]);
+
+  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    () => {
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+      }
+    },
+    [internalEditToken, isValidDimensionToken],
+  );
 
   const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
@@ -369,6 +373,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+        return;
+      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);

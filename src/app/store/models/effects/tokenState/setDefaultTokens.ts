@@ -22,7 +22,7 @@ export function setDefaultTokens(dispatch: RematchDispatch<RootModel>) {
       values: defaultTokens.values,
       themes: defaultTokens.themes,
       activeTheme: defaultTokens.activeTheme,
-      usedTokenSet: { global: TokenSetStatus.SOURCE, light: TokenSetStatus.ENABLED, theme: TokenSetStatus.ENABLED },
+      usedTokenSet: { core: TokenSetStatus.SOURCE, light: TokenSetStatus.ENABLED, theme: TokenSetStatus.ENABLED },
     });
   };
 }
