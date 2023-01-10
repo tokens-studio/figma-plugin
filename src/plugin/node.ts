@@ -25,7 +25,7 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
-import { extractColorInBorderTokenAlias } from './extractColorInBorderTokenAlias';
+import { extractColorInBorderTokenForAlias } from './extractColorInBorderTokenForAlias';
 
 // @TODO fix typings
 
@@ -174,19 +174,19 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.border) {
-    values = extractColorInBorderTokenAlias(tokens, values, values.border);
+    values = extractColorInBorderTokenForAlias(tokens, values, values.border);
   }
   if (values && values.borderTop) {
-    values = extractColorInBorderTokenAlias(tokens, values, values.borderTop);
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderTop);
   }
   if (values && values.borderRight) {
-    values = extractColorInBorderTokenAlias(tokens, values, values.borderRight);
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderRight);
   }
   if (values && values.borderLeft) {
-    values = extractColorInBorderTokenAlias(tokens, values, values.borderLeft);
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderLeft);
   }
   if (values && values.borderBottom) {
-    values = extractColorInBorderTokenAlias(tokens, values, values.borderBottom);
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderBottom);
   }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);

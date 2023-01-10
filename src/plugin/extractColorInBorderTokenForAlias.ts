@@ -2,7 +2,7 @@ import { MapValuesToTokensResult } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { AnyTokenList } from '@/types/tokens';
 
-export function extractColorInBorderTokenAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap, borderToken: string): MapValuesToTokensResult {
+export function extractColorInBorderTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap, borderToken: string): MapValuesToTokensResult {
   const resolvedToken = tokens.get(borderToken);
   if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'color' in resolvedToken.rawValue && resolvedToken.rawValue.color) {
     const { color } = resolvedToken.rawValue;
