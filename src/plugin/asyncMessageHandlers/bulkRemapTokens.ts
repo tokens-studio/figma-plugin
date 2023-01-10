@@ -1,5 +1,4 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
-import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
@@ -8,7 +7,7 @@ import { sendSelectionChange } from '../sendSelectionChange';
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   try {
     const { oldName, newName } = msg;
-    const allWithData = await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION });
+    const allWithData = await defaultNodeManager.findNodesWithData({ updateMode: msg.updateMode });
     const updatedNodes: NodeManagerNode[] = [];
 
     allWithData.forEach((node) => {
