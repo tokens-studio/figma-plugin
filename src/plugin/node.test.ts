@@ -4,6 +4,7 @@ import {
   destructureToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -47,6 +48,15 @@ const multipleShadowToken = {
       spread: 4,
     },
   ],
+};
+
+const borderToken = {
+  type: TokenTypes.BORDER,
+  value: {
+    color: '#ff0000',
+    width: '12px',
+    type: 'solid',
+  },
 };
 
 const tokens = new Map([
@@ -163,6 +173,21 @@ const mappedTokens = [
   {
     boxShadow: multipleShadowToken.value,
   },
+  {
+    border: borderToken.value,
+  },
+  {
+    borderTop: borderToken.value,
+  },
+  {
+    borderRight: borderToken.value,
+  },
+  {
+    borderLeft: borderToken.value,
+  },
+  {
+    borderBottom: borderToken.value,
+  },
 ];
 
 const applyProperties = [
@@ -173,6 +198,11 @@ const applyProperties = [
   { boxShadow: multipleShadowToken.value },
   { boxShadow: singleShadowToken.value },
   { boxShadow: multipleShadowToken.value },
+  { border: borderToken.value, borderColor: '#ff0000' },
+  { borderTop: borderToken.value, borderColor: '#ff0000' },
+  { borderRight: borderToken.value, borderColor: '#ff0000' },
+  { borderLeft: borderToken.value, borderColor: '#ff0000' },
+  { borderBottom: borderToken.value, borderColor: '#ff0000' },
 ];
 
 describe('mapValuesToTokens', () => {
