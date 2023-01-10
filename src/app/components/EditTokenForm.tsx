@@ -68,7 +68,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return false;
     }
     if (internalEditToken.type === TokenTypes.DIMENSION) {
-      return isValidDimensionToken;
+      return true;
     }
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
@@ -360,6 +360,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+        return;
+      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);

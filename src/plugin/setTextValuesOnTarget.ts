@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
-import { notifyException, notifyUI } from './notifiers';
+import { trackFromPlugin, notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
@@ -54,6 +54,8 @@ export default async function setTextValuesOnTarget(
           }
         });
 
+        let hasErrored = false;
+
         for (let i = 0; i < candidateFonts.length; i += 1) {
           let isApplied = false; // if font is applied then skip other font families
           await figma
@@ -67,11 +69,18 @@ export default async function setTextValuesOnTarget(
                 isApplied = true;
               }
             })
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             .catch(() => {
-              notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
-              notifyException('Font not found', { family, style });
+              hasErrored = true;
             });
-          if (isApplied) break;
+          if (isApplied) {
+            hasErrored = false;
+            break;
+          }
+        }
+        if (hasErrored) {
+          notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+          trackFromPlugin('Font not found', { family, style });
         }
       }
       if (typeof fontSize !== 'undefined') {

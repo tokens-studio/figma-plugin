@@ -111,7 +111,6 @@ export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseN
         removeValuesFromNode(node, prop);
       });
     }
-    node.setPluginData('values', 'none');
     store.successfulNodes.add(node);
   }));
 }
