@@ -402,7 +402,30 @@ describe('getAliasValue', () => {
       value: 'false',
       input: '{other.false}',
     },
-
+    {
+      name: 'border-token',
+      input: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      value: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      type: TokenTypes.BORDER,
+    },
+    {
+      name: 'border-alias',
+      input: '{border-token}',
+      value: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      type: TokenTypes.BORDER,
+    },
   ];
 
   allTokens.forEach((token) => {
