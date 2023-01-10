@@ -49,6 +49,8 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      console.log('values', values);
+      console.log('data', data);
       // set border token
       if (values.border && isCompositeBorderValue(values.border)) {
         setBorderValuesOnTarget(node, { value: values.border });

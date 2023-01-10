@@ -25,6 +25,7 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
+import { extractColorInBorderTokenAlias } from './extractColorInBorderTokenAlias';
 
 // @TODO fix typings
 
@@ -149,6 +150,18 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
   if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
   }
+  if (values && values.borderTop && typeof values.borderTop === 'object' && 'color' in values.borderTop && values.borderTop.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop.color }) };
+  }
+  if (values && values.borderRight && typeof values.borderRight === 'object' && 'color' in values.borderRight && values.borderRight.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight.color }) };
+  }
+  if (values && values.borderLeft && typeof values.borderLeft === 'object' && 'color' in values.borderLeft && values.borderLeft.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft.color }) };
+  }
+  if (values && values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom && values.borderBottom.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom.color }) };
+  }
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -161,15 +174,19 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.border) {
-    const resolvedToken = tokens.get(values.border);
-    if (resolvedToken?.rawValue && typeof resolvedToken.rawValue === 'object' && 'color' in resolvedToken.rawValue && resolvedToken.rawValue.color) {
-      const { color } = resolvedToken.rawValue;
-      const { borderColor } = values;
-      let colorTokenName = color;
-      if (String(color).startsWith('$')) colorTokenName = String(color).slice(1, String(color).length);
-      if (String(color).startsWith('{')) colorTokenName = String(color).slice(1, String(color).length - 1);
-      values = { ...values, ...(borderColor ? { } : { borderColor: String(colorTokenName) }) };
-    }
+    values = extractColorInBorderTokenAlias(tokens, values, values.border);
+  }
+  if (values && values.borderTop) {
+    values = extractColorInBorderTokenAlias(tokens, values, values.borderTop);
+  }
+  if (values && values.borderRight) {
+    values = extractColorInBorderTokenAlias(tokens, values, values.borderRight);
+  }
+  if (values && values.borderLeft) {
+    values = extractColorInBorderTokenAlias(tokens, values, values.borderLeft);
+  }
+  if (values && values.borderBottom) {
+    values = extractColorInBorderTokenAlias(tokens, values, values.borderBottom);
   }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
