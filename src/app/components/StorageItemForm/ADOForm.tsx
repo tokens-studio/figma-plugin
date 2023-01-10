@@ -6,9 +6,12 @@ import Box from '../Box';
 import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
+import Text from '../Text';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import Heading from '../Heading';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
 type Props = {
@@ -51,6 +54,16 @@ export default function ADOForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={1}>
+          <Heading>
+            Add new Azure DevOps credentials
+          </Heading>
+          <Text muted>
+            Access tokens stored on your repository, push and pull tokens in a two-way sync.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
         <Input
           autofocus
           full
