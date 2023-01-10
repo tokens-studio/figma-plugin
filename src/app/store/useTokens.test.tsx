@@ -328,6 +328,7 @@ describe('useToken test', () => {
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old.',
       newName: 'new.',
+      updateMode: UpdateMode.SELECTION,
     });
   });
 
@@ -467,6 +468,7 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.BULK_REMAP_TOKENS,
         oldName: 'oldName',
         newName: 'newName',
+        updateMode: UpdateMode.SELECTION,
       });
     });
 
