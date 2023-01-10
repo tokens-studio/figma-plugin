@@ -12,7 +12,11 @@ export function updateTokenPayloadToSingleToken(
       description: payload.description,
     } : {}),
     ...(payload.$extensions ? {
-      $extensions: payload.$extensions,
+      $extensions: {
+        'studio.tokens': {
+          modify: { ...payload.$extensions['studio.tokens']?.modify, value: Number(payload.$extensions['studio.tokens']?.modify.value) },
+        },
+      },
     } : {}),
   } as SingleToken;
 }

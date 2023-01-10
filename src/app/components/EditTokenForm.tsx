@@ -369,7 +369,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         dispatch.uiState.setShowEditForm(false);
       }
     },
-    [dispatch, isValid, internalEditToken, submitTokenValue],
+    [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken],
   );
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
@@ -379,7 +379,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         dispatch.uiState.setShowEditForm(false);
       }
     }
-  }, [handleSubmit, submitTokenValue, dispatch, internalEditToken, isValid]);
+  }, [submitTokenValue, dispatch, internalEditToken, isValid]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 

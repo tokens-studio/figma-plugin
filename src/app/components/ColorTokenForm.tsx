@@ -26,9 +26,9 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 import { modifyColor } from '@/utils/modifyColor';
 import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
-import ColorPickerTrigger from './ColorPickerTrigger';
+import { ColorPickerTrigger } from './ColorPickerTrigger';
 
-const defaultValue = 0;
+const defaultValue = '0';
 
 export default function ColorTokenForm({
   internalEditToken,
@@ -162,7 +162,7 @@ export default function ColorTokenForm({
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        value: e.target.valueAsNumber, // accept only number
+        value: e.target.value.replace(',', '.'),
       });
     }
   }, [internalEditToken, handleModifyChange]);
@@ -297,7 +297,7 @@ export default function ColorTokenForm({
             }
             <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
               <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput type="number" onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
+              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
             </Box>
           </>
         )

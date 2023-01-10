@@ -7,15 +7,20 @@ const TriggerButton = styled('button', {
   borderRadius: '$2',
   border: '1px solid $borderMuted',
   cursor: 'pointer',
+  fontSize: 0,
 });
 
-export default function ColorPickerTrigger({
+type Props = {
+  onClick?: () => void;
+  background: string | undefined;
+};
+
+export const ColorPickerTrigger: React.FC<Props> = ({
   onClick, background,
-}: { onClick?: () => void, background: string | undefined }) {
-  return (
-    <TriggerButton
-      css={{ background }}
-      onClick={onClick}
-    />
-  );
-}
+}) => (
+  <TriggerButton
+    type="button"
+    css={{ background }}
+    onClick={onClick}
+  />
+);
