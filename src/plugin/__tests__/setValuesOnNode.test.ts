@@ -727,10 +727,7 @@ describe('Can set values on node', () => {
         borderColor: 'border-color.none',
         borderRadius: 'border-radius.none',
       },
-      {
-        ...emptyStylesMap,
-        paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
-      },
+      emptyStylesMap,
       emptyThemeInfo,
     );
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: NaN });
