@@ -99,7 +99,7 @@ export default function InspectorTokenSingle({
         {
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
-        {(!!mappedToken) && (
+        {(!!mappedToken && token.value !== 'none') && (
           <InspectorResolvedToken token={mappedToken} />
         )}
         <Box
