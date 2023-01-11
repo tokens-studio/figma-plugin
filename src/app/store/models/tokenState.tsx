@@ -266,9 +266,12 @@ export const tokenState = createModel<RootModel>()({
       const nameToFind = data.oldName ? data.oldName : data.name;
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
+      const oldToken = { ...omit(newArray[index], 'description') };
+      const updateToken = updateTokenPayloadToSingleToken(data);
       newArray[index] = {
-        ...omit(newArray[index], 'description', '$extensions'),
-        ...updateTokenPayloadToSingleToken(data),
+        ...oldToken,
+        ...updateToken,
+        ...(oldToken?.$extensions || updateToken?.$extensions ? ({ $extensions: { ...oldToken?.$extensions, ...updateToken?.$extensions } }) : { }),
       } as SingleToken;
       return {
         ...state,
