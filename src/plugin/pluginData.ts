@@ -46,6 +46,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         type: style.type,
         category: style.type,
         nodes: [{ id, name, type }],
+        resolvedValue: style.value,
       });
     });
 

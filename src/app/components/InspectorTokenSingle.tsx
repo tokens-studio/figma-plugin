@@ -35,10 +35,15 @@ export default function InspectorTokenSingle({
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
 
   const mappedToken = React.useMemo(() => getTokenValue(token.value, resolvedTokens), [token, resolvedTokens, getTokenValue]);
+  const tokenToDisplay = React.useMemo(() => {
+    if (mappedToken) return { type: mappedToken.type, value: mappedToken.value };
+    if (token.resolvedValue) return { type: property, value: token.resolvedValue };
+    return null;
+  }, [mappedToken, token, property]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
-    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value)) setIsBrokenLink(true);
+    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue) setIsBrokenLink(true);
   }, [inspectState.selectedTokens, token]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
@@ -93,8 +98,8 @@ export default function InspectorTokenSingle({
           onCheckedChange={onCheckedChanged}
         />
         {isBrokenLink && <IconBrokenLink />}
-        {(!!mappedToken) && (
-          <InspectorResolvedToken token={mappedToken} />
+        {(tokenToDisplay) && (
+          <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
           css={{
@@ -121,7 +126,7 @@ export default function InspectorTokenSingle({
                 <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
                   <DownshiftInput
                     value={newTokenName}
-                    type={property === 'fill' ? 'color' : property}
+                    type={property}
                     resolvedTokens={resolvedTokens}
                     handleChange={handleChange}
                     setInputValue={handleDownShiftInputChange}

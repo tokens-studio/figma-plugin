@@ -2,13 +2,18 @@ import React from 'react';
 import Box from './Box';
 import Tooltip from './Tooltip';
 import IconBrokenLink from '@/icons/brokenlink.svg';
-import { SingleToken } from '@/types/tokens';
 import IconShadow from '@/icons/shadow.svg';
 import IconComposition from '@/icons/composition.svg';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { IconBorder, IconImage } from '@/icons';
+import { SingleToken } from '@/types/tokens';
 
-export default function InspectorResolvedToken({ token }: { token: SingleToken }) {
+type Props = {
+  value: SingleToken['value']
+  type: string;
+};
+
+export default function InspectorResolvedToken({ token }: { token: Props }) {
   // TODO: Introduce shared component for token tooltips
   if (!token) {
     return (
@@ -35,11 +40,12 @@ export default function InspectorResolvedToken({ token }: { token: SingleToken }
       return (
         <Box
           css={{
-            background: token.value,
+            background: String(token.value),
             width: '24px',
             height: '24px',
             borderRadius: '100%',
             border: '1px solid $borderMuted',
+            fontSize: 0,
           }}
         />
       );

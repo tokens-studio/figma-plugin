@@ -108,12 +108,12 @@ export default function SingleCompositionTokenForm({
         </DropdownMenu>
         <DownshiftInput
           value={propertyValue}
-          type={propertyType === 'fill' ? 'color' : propertyType}
+          type={propertyType}
           resolvedTokens={resolvedTokens}
           handleChange={onPropertyValueChanged}
           setInputValue={handleDownShiftInputChange}
           placeholder={
-            propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+            propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
           }
           suffix
         />
