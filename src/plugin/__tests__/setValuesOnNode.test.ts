@@ -715,4 +715,24 @@ describe('Can set values on node', () => {
       },
     ]);
   });
+
+  it('apply token with none value', async () => {
+    await setValuesOnNode(
+      solidNodeMock,
+      {
+        borderColor: 'none',
+        borderRadius: 'none',
+      },
+      {
+        borderColor: 'border-color.none',
+        borderRadius: 'border-radius.none',
+      },
+      {
+        ...emptyStylesMap,
+        paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
+      },
+      emptyThemeInfo,
+    );
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: NaN });
+  });
 });
