@@ -153,17 +153,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBoxShadowAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setError(null);
-      e.persist();
-      if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
-      }
-    },
-    [internalEditToken],
-  );
-
   const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       e.persist();
@@ -175,17 +164,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
             [e.target.name]: e.target.value,
           },
         });
-      }
-    },
-    [internalEditToken],
-  );
-
-  const handleTypographyAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setError(null);
-      e.persist();
-      if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
@@ -404,7 +382,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <BoxShadowInput
             handleBoxShadowValueChange={handleBoxShadowValueChange}
-            handleBoxShadowAliasValueChange={handleBoxShadowAliasValueChange}
+            handleBoxShadowAliasValueChange={handleChange}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
@@ -416,7 +394,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <TypographyInput
             internalEditToken={internalEditToken}
             handleTypographyValueChange={handleTypographyValueChange}
-            handleTypographyAliasValueChange={handleTypographyAliasValueChange}
+            handleTypographyAliasValueChange={handleChange}
             resolvedTokens={resolvedTokens}
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
@@ -439,6 +417,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             handleBorderValueChange={handleBorderValueChange}
             handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
+            handleBorderAliasValueChange={handleChange}
+            handleDownShiftInputChange={handleDownShiftInputChange}
           />
         );
       }
