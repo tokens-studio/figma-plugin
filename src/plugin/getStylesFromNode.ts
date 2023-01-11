@@ -1,21 +1,28 @@
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { SingleColorToken, SingleToken } from '@/types/tokens';
-import { TokenTypes } from '@/constants/TokenTypes';
-import { getNonLocalStyle } from './figmaUtils/styleUtils';
+import { getLocalStyle } from './figmaUtils/styleUtils';
 import { TokenBoxshadowValue } from '@/types/values';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
 import { convertFigmaGradientToString } from './figmaTransforms/gradients';
 import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
 import { convertFigmaToTextCase } from './figmaTransforms/textCase';
 import { convertFigmaToTextDecoration } from './figmaTransforms/textDecoration';
+import { Properties } from '@/constants/Properties';
+import { convertFigmaToLineHeight } from './figmaTransforms/lineHeight';
 
-export default async function getStylesFromNode(node) {
-  let styles = []
+export type SelectionStyle = {
+  name: string;
+  value: SingleToken['value'];
+  type: Properties
+};
+
+export default function getStylesFromNode(node: BaseNode): SelectionStyle[] {
+  const localStyles: SelectionStyle[] = [];
   if ('effects' in node) {
     const styleIdBackupKey = 'effectStyleId_original';
-    const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
-    if (nonLocalStyle) {
-      const effects = nonLocalStyle.effects as DropShadowEffect[];
+    const localStyle = getLocalStyle(node, styleIdBackupKey, 'effects');
+    if (localStyle) {
+      const effects = localStyle.effects as DropShadowEffect[];
       // convert paint to object containg x, y, spread, color
       const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
         const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
@@ -30,28 +37,28 @@ export default async function getStylesFromNode(node) {
         return effectObject;
       });
 
-      if (!shadows) return null;
+      if (shadows.length > 0) {
+        const normalizedName = localStyle.name
+          .split('/')
+          .map((section) => section.trim())
+          .join('.');
 
-      const normalizedName = nonLocalStyle.name
-        .split('/')
-        .map((section) => section.trim())
-        .join('.');
+        const styleObject: SelectionStyle = {
+          value: shadows.length > 1 ? shadows : shadows[0],
+          type: Properties.boxShadow,
+          name: normalizedName,
+        };
 
-      const styleObject: SingleToken = {
-        value: shadows.length > 1 ? shadows : shadows[0],
-        type: TokenTypes.BOX_SHADOW,
-        name: normalizedName,
-      };
-
-      return styleObject;
+        localStyles.push(styleObject);
+      }
     }
   }
 
   if ('fills' in node) {
     const styleIdBackupKey = 'fillStyleId_original';
-    const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
-    if (nonLocalStyle) {
-      const paint = nonLocalStyle.paints[0];
+    const localStyle = getLocalStyle(node, styleIdBackupKey, 'fills');
+    if (localStyle) {
+      const paint = localStyle.paints[0];
       let styleObject: SingleColorToken | null = {} as SingleColorToken;
       if (paint.type === 'SOLID') {
         const { r, g, b } = paint.color;
@@ -67,35 +74,34 @@ export default async function getStylesFromNode(node) {
       } else {
         styleObject = null;
       }
-      const normalizedName = nonLocalStyle.name
+      const normalizedName = localStyle.name
         .split('/')
         .map((section) => section.trim())
         .join('.');
-
-      return styleObject
-        ? {
+      if (styleObject) {
+        localStyles.push({
           ...styleObject,
           name: normalizedName,
-          type: TokenTypes.COLOR,
-        }
-        : null;
+          type: Properties.fill,
+        });
+      }
     }
   }
 
   if (node.type === 'TEXT') {
     const styleIdBackupKey = 'textStyleId_original';
-    const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
+    const localStyle = getLocalStyle(node, styleIdBackupKey, 'typography');
 
-    if (nonLocalStyle) {
-      const fontFamily = nonLocalStyle.fontName.family;
-      const fontWeight = nonLocalStyle.fontName?.style,;
-      const lineHeight = nonLocalStyle.lineHeight,;
-      const fontSize = nonLocalStyle.fontSize.toString());
-      const letterSpacing = convertFigmaToLetterSpacing(nonLocalStyle.letterSpacing).toString(),
-      const paragraphSpacing = nonLocalStyle.paragraphSpacing.toString(),
-      const paragraphIndent = nonLocalStyle.paragraphIndent.toString(),
-      const textCase = convertFigmaToTextCase(nonLocalStyle.textCase.toString()),
-      const textDecoration = convertFigmaToTextDecoration(nonLocalStyle.textDecoration.toString()),
+    if (localStyle) {
+      const fontFamily = localStyle.fontName.family;
+      const fontWeight = localStyle.fontName?.style;
+      const lineHeight = convertFigmaToLineHeight(localStyle.lineHeight).toString();
+      const fontSize = localStyle.fontSize.toString();
+      const letterSpacing = convertFigmaToLetterSpacing(localStyle.letterSpacing).toString();
+      const paragraphSpacing = localStyle.paragraphSpacing.toString();
+      const paragraphIndent = localStyle.paragraphIndent.toString();
+      const textCase = convertFigmaToTextCase(localStyle.textCase.toString());
+      const textDecoration = convertFigmaToTextDecoration(localStyle.textDecoration.toString());
 
       const obj = {
         fontFamily,
@@ -109,14 +115,15 @@ export default async function getStylesFromNode(node) {
         textDecoration,
       };
 
-      const normalizedName = nonLocalStyle.name
+      const normalizedName = localStyle.name
         .split('/')
         .map((section) => section.trim())
         .join('.');
 
-      const styleObject = { name: normalizedName, value: obj, type: TokenTypes.TYPOGRAPHY };
-
-      return styleObject;
+      const styleObject = { name: normalizedName, value: obj, type: Properties.typography };
+      localStyles.push(styleObject);
     }
   }
+
+  return localStyles;
 }
