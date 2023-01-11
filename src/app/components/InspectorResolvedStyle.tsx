@@ -13,9 +13,9 @@ type Props = {
   type: string;
 };
 
-export default function InspectorResolvedToken({ token }: { token: Props }) {
+export default function InspectorResolvedStyle({ style }: { style: Props }) {
   // TODO: Introduce shared component for token tooltips
-  if (!token) {
+  if (!style) {
     return (
       <Tooltip label="Token not found" side="bottom">
         <Box
@@ -35,12 +35,12 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
       </Tooltip>
     );
   }
-  switch (token?.type) {
+  switch (style?.type) {
     case TokenTypes.COLOR: {
       return (
         <Box
           css={{
-            background: String(token.value),
+            background: String(style.value),
             width: '24px',
             height: '24px',
             borderRadius: '100%',
@@ -142,7 +142,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             overflow: 'hidden',
           }}
         >
-          {token.value}
+          {style.value}
         </Box>
       );
     }

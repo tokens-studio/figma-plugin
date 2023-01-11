@@ -5,7 +5,7 @@ import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
-import InspectorResolvedToken from './InspectorResolvedToken';
+import InspectorResolvedStyle from './InspectorResolvedStyle';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -99,7 +99,7 @@ export default function InspectorTokenSingle({
         />
         {isBrokenLink && <IconBrokenLink />}
         {(tokenToDisplay) && (
-          <InspectorResolvedToken token={tokenToDisplay} />
+          <InspectorResolvedStyle style={tokenToDisplay} />
         )}
         <Box
           css={{
@@ -109,6 +109,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
+          {token.resolvedValue && <IconBrokenLink />}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
             tooltip="Change to another token"

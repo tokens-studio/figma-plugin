@@ -56,6 +56,23 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
   return selectionValues;
 }
 
+export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
+  const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
+    acc.push(curr.tokens);
+
+    const localStyles = getStylesFromNode(curr.node);
+    localStyles.forEach((style) => {
+      acc.push({
+        [style.type]: style.name,
+      });
+    });
+
+    return acc;
+  }, []);
+
+  return mainNodeSelectionValues;
+}
+
 export type SelectionContent = {
   selectionValues?: SelectionGroup[]
   mainNodeSelectionValues: SelectionValue[]
@@ -72,7 +89,7 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
-    mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
+    mainNodeSelectionValues = transformPluginDataToMainNodeSelectionValues(pluginValues);
   }
   const selectedNodes = figma.currentPage.selection.length;
   console.log('selection', selectionValues);
