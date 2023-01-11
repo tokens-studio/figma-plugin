@@ -1,10 +1,14 @@
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
+import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
+// eslint-disable-next-line import/no-cycle
+import { checkIfAlias } from './checkIfAlias';
 
 type TokenNameNodeType = string | undefined;
 
@@ -108,7 +112,14 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-        return convertToRgb(couldBeNumberValue);
+        const rgbColor = convertToRgb(couldBeNumberValue);
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor) {
+          if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
+          }
+          return convertModifiedColorToHex(rgbColor, token.$extensions?.['studio.tokens']?.modify);
+        }
+        return rgbColor;
       }
     }
   } catch (err) {
