@@ -10,6 +10,6 @@ export const singleFileSchema = z.object({
   $metadata: z.object({
     tokenSetOrder: z.array(z.string()).optional(),
     version: z.string().optional(),
-    updatedAt: z.string().optional().optional(),
+    updatedAt: z.string().optional(),
   }).optional(),
 });

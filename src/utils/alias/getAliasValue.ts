@@ -1,15 +1,19 @@
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
+import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
+// eslint-disable-next-line import/no-cycle
+import { checkIfAlias } from './checkIfAlias';
 
 type TokenNameNodeType = string | undefined;
 
 function getReturnedValue(token: SingleToken | string | number) {
-  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY)) {
+  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY || token?.type === TokenTypes.BORDER)) {
     return token.value;
   }
   if (isSingleTokenValueObject(token)) {
@@ -19,7 +23,7 @@ function getReturnedValue(token: SingleToken | string | number) {
 }
 
 function replaceAliasWithResolvedReference(
-  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
+  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenBorderValue | null,
   reference: string,
   resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
 ) {
@@ -35,7 +39,7 @@ function replaceAliasWithResolvedReference(
 }
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
+export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
@@ -108,7 +112,14 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-        return convertToRgb(couldBeNumberValue);
+        const rgbColor = convertToRgb(couldBeNumberValue);
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor) {
+          if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
+          }
+          return convertModifiedColorToHex(rgbColor, token.$extensions?.['studio.tokens']?.modify);
+        }
+        return rgbColor;
       }
     }
   } catch (err) {

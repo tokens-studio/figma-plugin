@@ -1,3 +1,7 @@
+## v0.0.29 (2023-01-05)
+
+Introduced support to programmatically use token-transformer by importing the transformTokens function. Added guide to Readme.
+
 ## v0.0.28 (2022-12-01)
 
 Fixed expanded composition token types using the wrong key, those are now using the token types we use in the plugin (fontFamilies, fontWeights). Thanks thomasmattheussen!

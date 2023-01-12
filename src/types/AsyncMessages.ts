@@ -46,6 +46,7 @@ export enum AsyncMessageTypes {
   SET_LICENSE_KEY = 'async/set-license-key',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
+  SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -84,6 +85,12 @@ export type RemoveTokensByValueAsyncMessage = AsyncMessage<AsyncMessageTypes.REM
 }>;
 export type RemoveTokensByValueAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE>;
 
+export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, {
+  tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
+  tokens: AnyTokenList
+}>;
+export type SetNoneValuesOnNodeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE>;
+
 export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS, {
   oldName: string;
   newName: string;
@@ -97,6 +104,7 @@ export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP
 export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
   oldName: string;
   newName: string;
+  updateMode: UpdateMode;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
@@ -140,7 +148,7 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
-  settings: Partial<SettingsState>;
+  settings: SettingsState;
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
@@ -166,7 +174,8 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   tokens: Record<string, AnyTokenList>;
-  settings: Record<SyncOption, boolean>
+  options: Record<SyncOption, boolean>;
+  settings: SettingsState;
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   styleIdsToRemove: string[];
@@ -252,7 +261,8 @@ export type AsyncMessages =
   | SetLicenseKeyMessage
   | StartupMessage
   | AttachLocalStylesToTheme
-  | ResolveStyleInfo;
+  | ResolveStyleInfo
+  | SetNoneValuesOnNodeAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -284,7 +294,8 @@ export type AsyncMessageResults =
   | SetLicenseKeyMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
-  | ResolveStyleInfoResult;
+  | ResolveStyleInfoResult
+  | SetNoneValuesOnNodeAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

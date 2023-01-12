@@ -514,6 +514,99 @@ describe('editToken', () => {
     ]);
   });
 
+  it('can create token', () => {
+    store.dispatch.tokenState.createToken({
+      name: 'test',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+      value: '#000000',
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            type: 'lighten',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+      {
+        name: 'test',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              type: 'lighten',
+              value: 0.5,
+              space: 'sRGB',
+            },
+          },
+        },
+      },
+    ]);
+  });
+
   it('should save tokens from json data', () => {
     store.dispatch.tokenState.setJSONData(JSON.stringify(
       {
@@ -564,6 +657,100 @@ describe('editToken', () => {
   });
 
   it('can duplicate token', () => {
+    store.dispatch.tokenState.duplicateToken({
+      newName: 'primary-copy',
+      oldName: 'primary',
+      parent: 'global',
+      value: '1',
+      type: 'sizing',
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            type: 'lighten',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        name: 'primary',
+        value: '1',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              type: 'lighten',
+              value: '0.5',
+              space: 'sRGB',
+            },
+          },
+        },
+      },
+      {
+        name: 'alias',
+        value: '$primary',
+      },
+      {
+        name: 'primary50',
+        value: '0.50',
+      },
+      {
+        name: 'alias50',
+        value: '$primary50',
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'header 1',
+        type: 'typography',
+        value: {
+          fontWeight: '400',
+          fontSize: '16',
+        },
+      },
+      {
+        name: 'shadow.mixed',
+        type: 'boxShadow',
+        description: 'the one with mixed shadows',
+        value: shadowArray,
+      },
+      {
+        name: 'font.big',
+        type: 'sizing',
+        value: '24px',
+      },
+      {
+        name: 'font.small',
+        type: 'sizing',
+        value: '12px',
+      },
+      {
+        name: 'font.medium',
+        type: 'fontSizes',
+        value: '18px',
+      },
+      {
+        name: 'font.alias',
+        type: 'sizing',
+        value: '$font.small',
+      },
+    ]);
+  });
+
+  it('can duplicate token without extension', () => {
     store.dispatch.tokenState.duplicateToken({
       newName: 'primary-copy',
       oldName: 'primary',
@@ -964,5 +1151,45 @@ describe('editToken', () => {
     });
     const { activeTokenSet } = store.getState().tokenState;
     expect(activeTokenSet).toBe('global');
+  });
+
+  it('can set tokens', () => {
+    store.dispatch.tokenState.setTokens({
+      global: [
+        {
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+          name: 'red',
+        },
+        {
+          type: TokenTypes.COLOR,
+          value: '#000000',
+          name: 'black',
+        },
+        {
+          type: TokenTypes.BORDER_RADIUS,
+          value: '12px',
+          name: 'rounded.md',
+        },
+      ],
+    });
+    const { tokens } = store.getState().tokenState;
+    expect(tokens.global).toEqual([
+      {
+        type: TokenTypes.COLOR,
+        value: '#ff0000',
+        name: 'red',
+      },
+      {
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        name: 'black',
+      },
+      {
+        type: TokenTypes.BORDER_RADIUS,
+        value: '12px',
+        name: 'rounded.md',
+      },
+    ]);
   });
 });

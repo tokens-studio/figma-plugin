@@ -55,6 +55,8 @@ describe('update', () => {
       updateRemote: true,
       updateStyles: true,
       shouldSwapStyles: true,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     },
     usedTokenSet: {
       global: TokenSetStatus.ENABLED,
@@ -84,7 +86,7 @@ describe('update', () => {
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
     expect(CheckForChangesPropertyWriteSpy).toBeCalledWith(false);
-    expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes);
+    expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
 
     runAfter.forEach((fn) => fn());
   });

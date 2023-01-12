@@ -61,6 +61,8 @@ export type SavedSettings = {
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  baseFontSize: string;
+  aliasBaseFontSize: string;
 };
 
 export function notifyUISettings(
@@ -76,6 +78,8 @@ export function notifyUISettings(
     updateRemote = true,
     inspectDeep,
     shouldSwapStyles,
+    baseFontSize,
+    aliasBaseFontSize,
   }: SavedSettings,
 ) {
   postToUI({
@@ -94,6 +98,8 @@ export function notifyUISettings(
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,
+      baseFontSize,
+      aliasBaseFontSize,
     },
   });
   postToUI({
@@ -118,6 +124,14 @@ export function notifyException(error: string, opts = {}) {
   postToUI({
     type: MessageFromPluginTypes.NOTIFY_EXCEPTION,
     error,
+    opts,
+  });
+}
+
+export function trackFromPlugin(title: string, opts = {}) {
+  postToUI({
+    type: MessageFromPluginTypes.TRACK_FROM_PLUGIN,
+    title,
     opts,
   });
 }

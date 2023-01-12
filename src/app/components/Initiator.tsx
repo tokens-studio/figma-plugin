@@ -79,6 +79,10 @@ export function Initiator() {
             Sentry.captureException({ error: pluginMessage.error, ...pluginMessage.opts });
             break;
           }
+          case MessageFromPluginTypes.TRACK_FROM_PLUGIN: {
+            track(pluginMessage.title, pluginMessage.opts);
+            break;
+          }
           case MessageFromPluginTypes.API_PROVIDERS: {
             dispatch.uiState.setAPIProviders(pluginMessage.providers);
             break;

@@ -4,6 +4,7 @@ import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
   isOpen: boolean
@@ -34,7 +35,7 @@ export default function CreateStorageItemModal({
     }
   }, [addNewProviderItem, onSuccess]);
 
-  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = React.useCallback((e: Eventlike) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 

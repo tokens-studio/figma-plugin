@@ -125,6 +125,29 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
   }));
 }
 
+export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties }) {
+  return Promise.all(nodes.map(async (node) => {
+    if (key) {
+      node.setPluginData(key, 'none');
+      tokensSharedDataHandler.set(node, key, 'none');
+      await defaultNodeManager.updateNode(node, (tokens) => (
+        omit(tokens, key)
+      ));
+      removeValuesFromNode(node, key);
+    } else {
+      await defaultNodeManager.updateNode(node, (tokens) => (
+        omit(tokens, Object.values(Properties))
+      ));
+      Object.values(Properties).forEach((prop) => {
+        node.setPluginData(prop, 'none');
+        tokensSharedDataHandler.set(node, prop, 'none');
+        removeValuesFromNode(node, prop);
+      });
+    }
+    store.successfulNodes.add(node);
+  }));
+}
+
 export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true, tokensMap,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
@@ -145,7 +168,7 @@ export async function updatePluginData({
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
-      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      if (values.composition === 'delete' || values.composition === 'none') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
@@ -173,6 +196,9 @@ export async function updatePluginData({
           case 'delete':
             delete newValuesOnNode[key as CompositionTokenProperty];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
+            break;
+          case 'none':
+            await setNonePluginData({ nodes: [node], key: key as Properties });
             break;
           // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':

@@ -6,11 +6,15 @@ import Input from '../Input';
 import Stack from '../Stack';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
+import Heading from '../Heading';
+import Link from '../Link';
+import Text from '../Text';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN; }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.JSONBIN; }>
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   isNew?: boolean;
@@ -45,6 +49,14 @@ export default function JSONBinForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={1}>
+          <Heading>Add new JSONBin.io credentials</Heading>
+          <Text muted>
+            Access tokens stored on JSONBin.io, a free JSON storage service for two-way sync.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
         <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input
           full
