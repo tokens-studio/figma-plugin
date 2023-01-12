@@ -16,7 +16,7 @@ export type SelectionStyle = {
   type: Properties
 };
 
-export default function getStylesFromNode(node: BaseNode): SelectionStyle[] {
+export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle[] {
   const localStyles: SelectionStyle[] = [];
   if ('effects' in node) {
     const styleIdBackupKey = 'effectStyleId_original';

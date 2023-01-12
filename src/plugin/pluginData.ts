@@ -17,17 +17,16 @@ import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
-import getStylesFromNode from './getStylesFromNode';
+import getAppliedStylesFromNode from './getAppliedStylesFromNode';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
 export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
   const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
-
+    // First we add applied tokens
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
-
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
@@ -39,8 +38,10 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
       }
     });
 
-    const localStyles = getStylesFromNode(curr.node);
+    // Second we add applied styles
+    const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
+      // Check if the token has been applied
       const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
@@ -53,26 +54,24 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         });
       }
     });
-
     return acc;
   }, []);
-
   return selectionValues;
 }
 
 export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
   const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
-    const localStyles = getStylesFromNode(curr.node);
+    // Fist we add styles and then tokens. This way in mainNodeSelectionValue, tokens will be override the styles
+    const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
       acc.push({
         [style.type]: style.name,
       });
     });
-    acc.push(curr.tokens);
 
+    acc.push(curr.tokens);
     return acc;
   }, []);
-
   return mainNodeSelectionValues;
 }
 
