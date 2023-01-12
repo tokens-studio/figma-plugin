@@ -24,7 +24,7 @@ import getAppliedStylesFromNode from './getAppliedStylesFromNode';
 export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
   const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
-    // First we add applied tokens
+    // First we add plugin tokens
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
       if (existing) {
@@ -38,10 +38,10 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
       }
     });
 
-    // Second we add applied styles
+    // Second we add styles
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
-      // Check if the token has been applied
+      // Check if the token has been applied. If the token has been applied then we don't add style.
       const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
@@ -61,7 +61,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
 
 export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
   const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
-    // Fist we add styles and then tokens. This way in mainNodeSelectionValue, tokens will be override the styles
+    // Fist we add styles. And then tokens. This way, styles will be override by the tokens
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
       acc.push({

@@ -5,7 +5,7 @@ import Box from './Box';
 import Checkbox from './Checkbox';
 import IconButton from './IconButton';
 import useTokens from '../store/useTokens';
-import InspectorResolvedStyle from './InspectorResolvedStyle';
+import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
 import { SelectionGroup } from '@/types';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -25,6 +25,7 @@ export default function InspectorTokenSingle({
   token: SelectionGroup;
   resolvedTokens: SingleToken[];
 }) {
+  // If token has the resolvedValue property, that means it is the style not a token
   const { handleRemap, getTokenValue } = useTokens();
   const property = useTypeForProperty(token.category);
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
@@ -34,12 +35,12 @@ export default function InspectorTokenSingle({
   const [isChecked, setChecked] = React.useState<boolean>(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
 
-  const mappedToken = React.useMemo(() => getTokenValue(token.value, resolvedTokens), [token, resolvedTokens, getTokenValue]);
   const tokenToDisplay = React.useMemo(() => {
-    if (mappedToken) return { type: mappedToken.type, value: mappedToken.value };
-    if (token.resolvedValue) return { type: property, value: token.resolvedValue };
+    const resolvedToken = getTokenValue(token.value, resolvedTokens);
+    if (resolvedToken) return { name: resolvedToken.name, value: resolvedToken.value, type: resolvedToken.type };
+    if (token.resolvedValue) return { name: token.value, value: token.resolvedValue, type: property };
     return null;
-  }, [mappedToken, token, property]);
+  }, [token, property, getTokenValue, resolvedTokens]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
@@ -99,7 +100,7 @@ export default function InspectorTokenSingle({
         />
         {isBrokenLink && <IconBrokenLink />}
         {(tokenToDisplay) && (
-          <InspectorResolvedStyle style={tokenToDisplay} />
+          <InspectorResolvedToken style={tokenToDisplay} />
         )}
         <Box
           css={{
@@ -109,6 +110,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
+          {/* TODO Should update the Icon to show this is style not a token */}
           {token.resolvedValue && <IconBrokenLink />}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
@@ -120,7 +122,7 @@ export default function InspectorTokenSingle({
         </Box>
         {
           showDialog && (
-            <Modal title={`Choose a new token for ${mappedToken?.name || token.value}`} large isOpen close={onCancel}>
+            <Modal title={`Choose a new token for ${tokenToDisplay?.name || token.value}`} large isOpen close={onCancel}>
               <form
                 onSubmit={onConfirm}
               >

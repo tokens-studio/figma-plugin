@@ -8,5 +8,5 @@ export interface SelectionGroup {
   type: string;
   value: string;
   nodes: NodeInfo[];
-  resolvedValue?: SingleToken['value']
+  resolvedValue?: SingleToken['value'] // We save the value of the style
 }

@@ -9,11 +9,12 @@ import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
 
 type Props = {
+  name: string;
   value: SingleToken['value']
   type: string;
 };
 
-export default function InspectorResolvedStyle({ style }: { style: Props }) {
+export default function InspectorResolvedToken({ style }: { style: Props }) {
   // TODO: Introduce shared component for token tooltips
   if (!style) {
     return (
