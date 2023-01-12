@@ -1,5 +1,6 @@
 import omit from 'just-omit';
 import get from 'just-safe-get';
+import { isEqual } from '@/utils/isEqual';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
@@ -39,15 +40,18 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     });
 
     const localStyles = getStylesFromNode(curr.node);
-    console.log('local', localStyles);
     localStyles.forEach((style) => {
-      acc.push({
-        value: style.name,
-        type: style.type,
-        category: style.type,
-        nodes: [{ id, name, type }],
-        resolvedValue: style.value,
-      });
+      const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      if (!isTokenApplied) {
+        const category = get(Properties, style.type) as Properties | TokenTypes;
+        acc.push({
+          value: style.name,
+          type: style.type,
+          category,
+          nodes: [{ id, name, type }],
+          resolvedValue: style.value,
+        });
+      }
     });
 
     return acc;
@@ -58,14 +62,13 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
 
 export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
   const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
-    acc.push(curr.tokens);
-
     const localStyles = getStylesFromNode(curr.node);
     localStyles.forEach((style) => {
       acc.push({
         [style.type]: style.name,
       });
     });
+    acc.push(curr.tokens);
 
     return acc;
   }, []);
