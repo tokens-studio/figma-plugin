@@ -231,6 +231,26 @@ const tokens: SingleToken[] = [
     },
     description: 'border token',
   },
+  {
+    name: 'other.object',
+    type: 'object' as TokenTypes,
+    value: {
+      other: 'test-value-object-value',
+    },
+    rawValue: {
+      other: 'test-value-object-value',
+    },
+    description: 'value is object',
+  } as SingleToken,
+  {
+    name: 'other.object-alias',
+    type: 'object' as TokenTypes,
+    value: {
+      other: 'test-value-object-value',
+    },
+    rawValue: '{other.object}',
+    description: 'object value alias',
+  } as SingleToken,
 ];
 
 const shadowTokens = [

@@ -171,16 +171,16 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
 }, ref) => {
   // if isMasked is true, then we need to handle toggle visibility
   const [show, setShow] = React.useState(false);
+  const htmlInputRef = React.useRef<HTMLInputElement>(null);
+  const reifiedRef = inputRef || htmlInputRef;
 
   const handleVisibility = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setShow(!show);
-    if (inputRef?.current?.type) {
-      inputRef.current.type = inputRef?.current?.type === 'password' ? 'text' : 'password';
+    if (reifiedRef?.current?.type) {
+      reifiedRef.current.type = reifiedRef?.current?.type === 'password' ? 'text' : 'password';
     }
-  }, [show, inputRef]);
-
-  const htmlInputRef = React.useRef<HTMLInputElement>(null);
+  }, [show, reifiedRef]);
 
   React.useEffect(() => {
     if (autofocus && htmlInputRef && htmlInputRef.current) {

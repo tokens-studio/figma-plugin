@@ -18,6 +18,7 @@ import { ChangeEventHandler } from './types';
 import Heading from '../Heading';
 import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -121,6 +122,14 @@ export default function GenericVersionedForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={1}>
+          <Heading>Add a new generic storage provider</Heading>
+          <Text muted>
+            Access tokens stored on your own storage provider, allowing two-way sync, create and read-only operations.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
         <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input
           full
@@ -178,8 +187,9 @@ export default function GenericVersionedForm({
                 label="Value"
                 value={x.value}
                 disabled={!x.name}
+                isMasked
                 onChange={onHeaderChange}
-                type="text"
+                type="password"
                 name="value"
                 data-index={i}
               />
