@@ -25,6 +25,7 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
+import { extractColorInBorderTokenForAlias } from './extractColorInBorderTokenForAlias';
 
 // @TODO fix typings
 
@@ -141,11 +142,26 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
-export function destructureCompositionToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
+export function destructureToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
   const tokensInCompositionToken: Partial<
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
+  if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
+  }
+  if (values && values.borderTop && typeof values.borderTop === 'object' && 'color' in values.borderTop && values.borderTop.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop.color }) };
+  }
+  if (values && values.borderRight && typeof values.borderRight === 'object' && 'color' in values.borderRight && values.borderRight.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight.color }) };
+  }
+  if (values && values.borderLeft && typeof values.borderLeft === 'object' && 'color' in values.borderLeft && values.borderLeft.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft.color }) };
+  }
+  if (values && values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom && values.borderBottom.color) {
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom.color }) };
+  }
   if (values && values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
@@ -156,7 +172,22 @@ export function destructureCompositionToken(values: MapValuesToTokensResult): Ma
   return values;
 }
 
-export function destructureCompositionTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): NodeTokenRefMap {
+export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  if (values && values.border) {
+    values = extractColorInBorderTokenForAlias(tokens, values, values.border);
+  }
+  if (values && values.borderTop) {
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderTop);
+  }
+  if (values && values.borderRight) {
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderRight);
+  }
+  if (values && values.borderLeft) {
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderLeft);
+  }
+  if (values && values.borderBottom) {
+    values = extractColorInBorderTokenForAlias(tokens, values, values.borderBottom);
+  }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -192,7 +223,7 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: UpdateNodesSettings,
 ) {
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -216,9 +247,9 @@ export async function updateNodes(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
-            const mappedTokens = destructureCompositionTokenForAlias(tokens, entry.tokens);
+            const mappedTokens = destructureTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = destructureCompositionToken(mappedValues);
+            mappedValues = destructureToken(mappedValues);
             await migrateTokens(entry, mappedValues, mappedTokens);
             setValuesOnNode(
               entry.node,
@@ -228,6 +259,7 @@ export async function updateNodes(
               themeInfo,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
+              baseFontSize,
             );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);

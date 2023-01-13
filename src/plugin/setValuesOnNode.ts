@@ -21,6 +21,7 @@ import setTextValuesOnTarget from './setTextValuesOnTarget';
 import setBorderValuesOnTarget from './setBorderValuesOnTarget';
 import setBackgroundBlurOnTarget from './setBackgroundBlurOnTarget';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 import { isCompositeBorderValue } from '@/utils/is/isCompositeBorderValue';
 import { setBorderColorValuesOnTarget } from './setBorderColorValuesOnTarget';
 
@@ -34,6 +35,7 @@ export default async function setValuesOnNode(
   themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
+  baseFontSize = defaultBaseFontSize,
 ) {
   const activeThemeObject = themeInfo.activeTheme
     ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
@@ -51,19 +53,19 @@ export default async function setValuesOnNode(
     ) {
       // set border token
       if (values.border && isCompositeBorderValue(values.border)) {
-        setBorderValuesOnTarget(node, { value: values.border });
+        setBorderValuesOnTarget(node, { value: values.border }, baseFontSize);
       }
       if (values.borderTop && isCompositeBorderValue(values.borderTop)) {
-        setBorderValuesOnTarget(node, { value: values.borderTop }, 'top');
+        setBorderValuesOnTarget(node, { value: values.borderTop }, baseFontSize, 'top');
       }
       if (values.borderRight && isCompositeBorderValue(values.borderRight)) {
-        setBorderValuesOnTarget(node, { value: values.borderRight }, 'right');
+        setBorderValuesOnTarget(node, { value: values.borderRight }, baseFontSize, 'right');
       }
       if (values.borderBottom && isCompositeBorderValue(values.borderBottom)) {
-        setBorderValuesOnTarget(node, { value: values.borderBottom }, 'bottom');
+        setBorderValuesOnTarget(node, { value: values.borderBottom }, baseFontSize, 'bottom');
       }
       if (values.borderLeft && isCompositeBorderValue(values.borderLeft)) {
-        setBorderValuesOnTarget(node, { value: values.borderLeft }, 'left');
+        setBorderValuesOnTarget(node, { value: values.borderLeft }, baseFontSize, 'left');
       }
 
       // if applied border is just a string, it's the older version where border was just a color. apply color then.
@@ -78,31 +80,31 @@ export default async function setValuesOnNode(
         switch (individualBorderRadius.length) {
           case 1:
             if ('cornerRadius' in node) {
-              node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius');
+              node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
             }
             break;
           case 2:
             if ('topLeftRadius' in node) {
-              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
-              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
-              node.bottomRightRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
-              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius', baseFontSize);
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius', baseFontSize);
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius', baseFontSize);
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius', baseFontSize);
             }
             break;
           case 3:
             if ('topLeftRadius' in node) {
-              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
-              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
-              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
-              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius', baseFontSize);
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius', baseFontSize);
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius', baseFontSize);
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius', baseFontSize);
             }
             break;
           case 4:
             if ('topLeftRadius' in node) {
-              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius');
-              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius');
-              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius');
-              node.bottomLeftRadius = transformValue(String(individualBorderRadius[3]), 'borderRadius');
+              node.topLeftRadius = transformValue(String(individualBorderRadius[0]), 'borderRadius', baseFontSize);
+              node.topRightRadius = transformValue(String(individualBorderRadius[1]), 'borderRadius', baseFontSize);
+              node.bottomRightRadius = transformValue(String(individualBorderRadius[2]), 'borderRadius', baseFontSize);
+              node.bottomLeftRadius = transformValue(String(individualBorderRadius[3]), 'borderRadius', baseFontSize);
             }
             break;
           default:
@@ -114,28 +116,28 @@ export default async function setValuesOnNode(
         && typeof values.borderRadiusTopLeft !== 'undefined'
         && isPrimitiveValue(values.borderRadiusTopLeft)
       ) {
-        node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius');
+        node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius', baseFontSize);
       }
       if (
         'topRightRadius' in node
         && typeof values.borderRadiusTopRight !== 'undefined'
         && isPrimitiveValue(values.borderRadiusTopRight)
       ) {
-        node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius');
+        node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius', baseFontSize);
       }
       if (
         'bottomRightRadius' in node
         && typeof values.borderRadiusBottomRight !== 'undefined'
         && isPrimitiveValue(values.borderRadiusBottomRight)
       ) {
-        node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius');
+        node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius', baseFontSize);
       }
       if (
         'bottomLeftRadius' in node
         && typeof values.borderRadiusBottomLeft !== 'undefined'
         && isPrimitiveValue(values.borderRadiusBottomLeft)
       ) {
-        node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius');
+        node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius', baseFontSize);
       }
 
       // BOX SHADOW
@@ -154,7 +156,7 @@ export default async function setValuesOnNode(
             const styleIdBackupKey = 'effectStyleId_original';
             const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
             if (nonLocalStyle) {
-              if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow)) {
+              if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow, baseFontSize)) {
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
@@ -171,56 +173,56 @@ export default async function setValuesOnNode(
 
         if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'effect', matchingStyleId)))) {
           if (isSingleBoxShadowValue(values.boxShadow)) {
-            setEffectValuesOnTarget(node, { value: values.boxShadow });
+            setEffectValuesOnTarget(node, { value: values.boxShadow }, baseFontSize);
           }
         }
       }
 
       // BACKGROUND BLUR
       if ('effects' in node && typeof values.backgroundBlur !== 'undefined' && isPrimitiveValue(values.backgroundBlur)) {
-        setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) });
+        setBackgroundBlurOnTarget(node, { value: String(values.backgroundBlur) }, baseFontSize);
       }
 
       // BORDER WIDTH
       if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined' && isPrimitiveValue(values.borderWidth)) {
-        node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth');
+        node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth', baseFontSize);
       }
 
       if ('strokeTopWeight' in node && typeof values.borderWidthTop !== 'undefined') {
-        node.strokeTopWeight = transformValue(String(values.borderWidthTop), 'borderWidthTop');
+        node.strokeTopWeight = transformValue(String(values.borderWidthTop), 'borderWidthTop', baseFontSize);
       }
 
       if ('strokeRightWeight' in node && typeof values.borderWidthRight !== 'undefined') {
-        node.strokeRightWeight = transformValue(String(values.borderWidthRight), 'borderWidthRight');
+        node.strokeRightWeight = transformValue(String(values.borderWidthRight), 'borderWidthRight', baseFontSize);
       }
 
       if ('strokeBottomWeight' in node && typeof values.borderWidthBottom !== 'undefined') {
-        node.strokeBottomWeight = transformValue(String(values.borderWidthBottom), 'borderWidthBottom');
+        node.strokeBottomWeight = transformValue(String(values.borderWidthBottom), 'borderWidthBottom', baseFontSize);
       }
 
       if ('strokeLeftWeight' in node && typeof values.borderWidthLeft !== 'undefined') {
-        node.strokeLeftWeight = transformValue(String(values.borderWidthLeft), 'borderWidthLeft');
+        node.strokeLeftWeight = transformValue(String(values.borderWidthLeft), 'borderWidthLeft', baseFontSize);
       }
 
       // OPACITY
       if ('opacity' in node && typeof values.opacity !== 'undefined' && isPrimitiveValue(values.opacity)) {
-        node.opacity = transformValue(String(values.opacity), 'opacity');
+        node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
       }
 
       // SIZING: BOTH
       if ('resize' in node && typeof values.sizing !== 'undefined' && isPrimitiveValue(values.sizing)) {
-        const size = transformValue(String(values.sizing), 'sizing');
+        const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
         node.resize(size, size);
       }
 
       // SIZING: WIDTH
       if ('resize' in node && typeof values.width !== 'undefined' && isPrimitiveValue(values.width)) {
-        node.resize(transformValue(String(values.width), 'sizing'), node.height);
+        node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
       }
 
       // SIZING: HEIGHT
       if ('resize' in node && typeof values.height !== 'undefined' && isPrimitiveValue(values.height)) {
-        node.resize(node.width, transformValue(String(values.height), 'sizing'));
+        node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
       }
 
       // FILL
@@ -276,7 +278,7 @@ export default async function setValuesOnNode(
             const styleIdBackupKey = 'textStyleId_original';
             const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
             if (nonLocalStyle) {
-              if (textStyleMatchesTypographyToken(nonLocalStyle, values.typography)) {
+              if (textStyleMatchesTypographyToken(nonLocalStyle, values.typography, baseFontSize)) {
                 // Non-local style matches - use this and clear style id backup:
                 matchingStyleId = nonLocalStyle.id;
                 clearStyleIdBackup(node, styleIdBackupKey);
@@ -292,7 +294,7 @@ export default async function setValuesOnNode(
 
           if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId)))) {
             if (isSingleTypographyValue(values.typography)) {
-              setTextValuesOnTarget(node, { value: values.typography });
+              setTextValuesOnTarget(node, { value: values.typography }, baseFontSize);
             }
           }
         }
@@ -319,7 +321,7 @@ export default async function setValuesOnNode(
               textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
               textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
             },
-          });
+          }, baseFontSize);
         }
       }
 
@@ -335,7 +337,7 @@ export default async function setValuesOnNode(
       // SPACING
       if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
         const individualSpacing = String(values.spacing).split(' ');
-        const spacing = transformValue(String(values.spacing), 'spacing');
+        const spacing = transformValue(String(values.spacing), 'spacing', baseFontSize);
         switch (individualSpacing.length) {
           case 1:
             node.paddingLeft = spacing;
@@ -344,22 +346,22 @@ export default async function setValuesOnNode(
             node.paddingBottom = spacing;
             break;
           case 2:
-            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-            node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing');
-            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing', baseFontSize);
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing', baseFontSize);
+            node.paddingBottom = transformValue(String(individualSpacing[0]), 'spacing', baseFontSize);
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing', baseFontSize);
             break;
           case 3:
-            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
-            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing', baseFontSize);
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing', baseFontSize);
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing', baseFontSize);
+            node.paddingLeft = transformValue(String(individualSpacing[1]), 'spacing', baseFontSize);
             break;
           case 4:
-            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing');
-            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing');
-            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing');
-            node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing');
+            node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing', baseFontSize);
+            node.paddingRight = transformValue(String(individualSpacing[1]), 'spacing', baseFontSize);
+            node.paddingBottom = transformValue(String(individualSpacing[2]), 'spacing', baseFontSize);
+            node.paddingLeft = transformValue(String(individualSpacing[3]), 'spacing', baseFontSize);
             break;
           default:
             break;
@@ -370,7 +372,7 @@ export default async function setValuesOnNode(
         && typeof values.horizontalPadding !== 'undefined'
         && isPrimitiveValue(values.horizontalPadding)
       ) {
-        const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing');
+        const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing', baseFontSize);
         node.paddingLeft = horizontalPadding;
         node.paddingRight = horizontalPadding;
       }
@@ -379,7 +381,7 @@ export default async function setValuesOnNode(
         && typeof values.verticalPadding !== 'undefined'
         && isPrimitiveValue(values.verticalPadding)
       ) {
-        const verticalPadding = transformValue(String(values.verticalPadding), 'spacing');
+        const verticalPadding = transformValue(String(values.verticalPadding), 'spacing', baseFontSize);
         node.paddingTop = verticalPadding;
         node.paddingBottom = verticalPadding;
       }
@@ -388,18 +390,18 @@ export default async function setValuesOnNode(
         if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
           node.primaryAxisAlignItems = 'MIN';
         }
-        node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing');
+        node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing', baseFontSize);
       }
 
       if ('paddingTop' in node && typeof values.paddingTop !== 'undefined' && isPrimitiveValue(values.paddingTop)) {
-        node.paddingTop = transformValue(String(values.paddingTop), 'spacing');
+        node.paddingTop = transformValue(String(values.paddingTop), 'spacing', baseFontSize);
       }
       if (
         'paddingRight' in node
         && typeof values.paddingRight !== 'undefined'
         && isPrimitiveValue(values.paddingRight)
       ) {
-        node.paddingRight = transformValue(String(values.paddingRight), 'spacing');
+        node.paddingRight = transformValue(String(values.paddingRight), 'spacing', baseFontSize);
       }
 
       if (
@@ -407,11 +409,11 @@ export default async function setValuesOnNode(
         && typeof values.paddingBottom !== 'undefined'
         && isPrimitiveValue(values.paddingBottom)
       ) {
-        node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing');
+        node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing', baseFontSize);
       }
 
       if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
-        node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing');
+        node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing', baseFontSize);
       }
 
       if (values.asset && typeof values.asset === 'string') {
@@ -439,9 +441,9 @@ export default async function setValuesOnNode(
           if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
             node.primaryAxisAlignItems = 'MIN';
           }
-          node.itemSpacing = transformValue(String(values.dimension), 'spacing');
+          node.itemSpacing = transformValue(String(values.dimension), 'spacing', baseFontSize);
         } else if ('resize' in node) {
-          const size = transformValue(String(values.dimension), 'sizing');
+          const size = transformValue(String(values.dimension), 'sizing', baseFontSize);
           node.resize(size, size);
         }
       }

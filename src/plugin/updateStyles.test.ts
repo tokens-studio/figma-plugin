@@ -1,3 +1,4 @@
+import { SettingsState } from '@/app/store/models/settings';
 import updateStyles from './updateStyles';
 import * as updateColorStyles from './updateColorStyles';
 import * as updateTextStyles from './updateTextStyles';
@@ -41,7 +42,7 @@ describe('updateStyles', () => {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: [{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }],
-      settings: {},
+      settings: {} as SettingsState,
     });
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
@@ -88,17 +89,49 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens]);
+    await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens], {
+      prefixStylesWithThemeName: true,
+      ignoreFirstPartForStyles: true,
+    } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
-      colorTokens,
+      [{
+        name: 'primary.500',
+        path: '500',
+        value: '#ff0000',
+        type: 'color',
+      }],
       false,
     );
     expect(textSpy).toHaveBeenCalledWith(
-      typographyTokens,
+      [{
+        name: 'heading.h1',
+        path: 'h1',
+        value: {
+          fontFamily: 'Inter',
+          fontWeight: 'Regular',
+          fontSize: '24',
+        },
+        type: 'typography',
+      }],
+      undefined,
       false,
     );
     expect(effectSpy).toHaveBeenCalledWith(
-      effectTokens,
+      [{
+        name: 'shadow.large',
+        path: 'large',
+        type: 'boxShadow',
+        description: 'the one with one shadow',
+        value: {
+          type: 'dropShadow',
+          color: '#00000080',
+          x: 0,
+          y: 0,
+          blur: 10,
+          spread: 0,
+        },
+      }],
+      undefined,
       false,
     );
   });
@@ -113,7 +146,9 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(colorTokens);
+    await updateStyles(colorTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
@@ -136,9 +171,12 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(typographyTokens);
+    await updateStyles(typographyTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
+      undefined,
       false,
     );
     expect(colorSpy).not.toHaveBeenCalled();
@@ -163,9 +201,12 @@ describe('updateStyles', () => {
       },
     ] as ExtendedSingleToken[];
 
-    await updateStyles(effectTokens);
+    await updateStyles(effectTokens, {
+      prefixStylesWithThemeName: true,
+    } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
       effectTokens,
+      undefined,
       false,
     );
     expect(colorSpy).not.toHaveBeenCalled();
@@ -194,9 +235,9 @@ describe('updateStyles', () => {
       })
     ));
 
-    await updateStyles([...colorTokens], false, {
+    await updateStyles([...colorTokens], {
       prefixStylesWithThemeName: true,
-    });
+    } as SettingsState, false);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,

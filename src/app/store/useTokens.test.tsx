@@ -328,6 +328,7 @@ describe('useToken test', () => {
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old.',
       newName: 'new.',
+      updateMode: UpdateMode.SELECTION,
     });
   });
 
@@ -467,6 +468,7 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.BULK_REMAP_TOKENS,
         oldName: 'oldName',
         newName: 'newName',
+        updateMode: UpdateMode.SELECTION,
       });
     });
 
@@ -497,10 +499,11 @@ describe('useToken test', () => {
           global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
-        settings: {
+        options: {
           renameStyle: true,
           removeStyle: true,
         },
+        settings: store.getState().settings,
       });
     });
   });

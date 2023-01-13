@@ -102,7 +102,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }
     const returnObject = {
-      ...omit(t, 'failedToResolve'),
+      ...omit(t, 'failedToResolve', '$extensions'),
       value: returnValue,
       rawValue: t.rawValue || t.value,
       ...(failedToResolve ? { failedToResolve } : {}),

@@ -55,6 +55,8 @@ describe('update', () => {
       updateRemote: true,
       updateStyles: true,
       shouldSwapStyles: true,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     },
     usedTokenSet: {
       global: TokenSetStatus.ENABLED,

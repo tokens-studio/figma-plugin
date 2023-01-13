@@ -6,6 +6,7 @@ import { trackFromPlugin, notifyUI } from './notifiers';
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
   token: Pick<SingleTypographyToken, 'value' | 'description'>,
+  baseFontSize: string,
 ) {
   try {
     const { value, description } = token;
@@ -34,7 +35,7 @@ export default async function setTextValuesOnTarget(
         }
       } catch (e) {
         const splitFontFamily = family.split(',');
-        const candidateStyles = transformValue(style, 'fontWeights');
+        const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
         const candidateFonts: { family: string; style: string }[] = [];
         splitFontFamily?.forEach((candidateFontFamily) => {
           const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
@@ -78,36 +79,36 @@ export default async function setTextValuesOnTarget(
           }
         }
         if (hasErrored) {
-          notifyUI(`Error setting font family/weight combination for ${family}/${style}`, { error: true });
+          notifyUI(`Error setting font family/weight combination for ${family}/${style}`);
           trackFromPlugin('Font not found', { family, style });
         }
       }
       if (typeof fontSize !== 'undefined') {
-        target.fontSize = transformValue(fontSize, 'fontSizes');
+        target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
       }
       if (typeof lineHeight !== 'undefined') {
-        const transformedValue = transformValue(String(lineHeight), 'lineHeights');
+        const transformedValue = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
         if (transformedValue !== null) {
           target.lineHeight = transformedValue;
         }
       }
       if (typeof letterSpacing !== 'undefined') {
-        const transformedValue = transformValue(letterSpacing, 'letterSpacing');
+        const transformedValue = transformValue(letterSpacing, 'letterSpacing', baseFontSize);
         if (transformedValue !== null) {
           target.letterSpacing = transformedValue;
         }
       }
       if (typeof paragraphSpacing !== 'undefined') {
-        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
+        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
       }
       if (typeof paragraphIndent !== 'undefined') {
-        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent');
+        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
       }
       if (textCase) {
-        target.textCase = transformValue(textCase, 'textCase');
+        target.textCase = transformValue(textCase, 'textCase', baseFontSize);
       }
       if (textDecoration) {
-        target.textDecoration = transformValue(textDecoration, 'textDecoration');
+        target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
       }
       if (description && 'description' in target) {
         target.description = description;

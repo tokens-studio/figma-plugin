@@ -104,6 +104,7 @@ export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP
 export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
   oldName: string;
   newName: string;
+  updateMode: UpdateMode;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
@@ -147,7 +148,7 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
-  settings: Partial<SettingsState>;
+  settings: SettingsState;
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
@@ -173,7 +174,8 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   tokens: Record<string, AnyTokenList>;
-  settings: Record<SyncOption, boolean>
+  options: Record<SyncOption, boolean>;
+  settings: SettingsState;
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   styleIdsToRemove: string[];

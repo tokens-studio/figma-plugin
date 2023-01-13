@@ -75,14 +75,14 @@ export default function BoxShadowInput({
         <Box css={{ display: 'flex' }}>
           {mode === 'input' ? (
             <IconButton
-              tooltip="Reference"
+              tooltip="Reference mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
-              tooltip="input mode"
+              tooltip="Input mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}

@@ -9,6 +9,7 @@ import {
 export default function compareStyleValueWithTokenValue(
   style: PaintStyle | EffectStyle | TextStyle,
   token: SingleToken<true, { path: string }>,
+  baseFontSize: string,
 ): boolean {
   try {
     if (style.type === 'PAINT' && token?.type === TokenTypes.COLOR) {
@@ -17,11 +18,11 @@ export default function compareStyleValueWithTokenValue(
     }
     if (style.type === 'TEXT' && token?.type === TokenTypes.TYPOGRAPHY) {
       const { value } = token;
-      return textStyleMatchesTypographyToken(style, value);
+      return textStyleMatchesTypographyToken(style, value, baseFontSize);
     }
     if (style.type === 'EFFECT' && token?.type === TokenTypes.BOX_SHADOW) {
       const { value } = token;
-      return effectStyleMatchesBoxShadowToken(style, value);
+      return effectStyleMatchesBoxShadowToken(style, value, baseFontSize);
     }
   } catch (e) {
     console.log('error in compare styles', e);

@@ -136,12 +136,13 @@ export default function useTokens() {
     });
   }, [confirm]);
 
-  const handleBulkRemap = useCallback(async (newName: string, oldName: string) => {
+  const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName,
       newName,
+      updateMode,
     });
   }, []);
 
@@ -174,7 +175,7 @@ export default function useTokens() {
       ],
     });
     if (shouldRemap) {
-      await handleBulkRemap(newGroupName, oldGroupName);
+      await handleBulkRemap(newGroupName, oldGroupName, shouldRemap.data[0]);
       dispatch.settings.setUpdateMode(shouldRemap.data[0] as UpdateMode);
     }
   }, [settings.updateMode, confirm, handleBulkRemap, dispatch.settings]);
@@ -241,14 +242,15 @@ export default function useTokens() {
       const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
-        settings: {
+        options: {
           renameStyle: userConfirmation.data.includes('renameStyles'),
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
+        settings,
       });
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
-  }, [confirm, tokens, dispatch.tokenState]);
+  }, [confirm, tokens, dispatch.tokenState, settings]);
 
   const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
     track('renameStyles', { oldName, newName, parent });

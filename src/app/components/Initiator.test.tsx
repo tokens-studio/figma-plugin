@@ -630,6 +630,8 @@ describe('Initiator', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     });
   });
 });
