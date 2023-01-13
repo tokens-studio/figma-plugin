@@ -18,6 +18,7 @@ import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
 import { IconBrokenLink } from '@/icons';
+import StyleIcon from '@/icons/style.svg';
 
 export default function InspectorTokenSingle({
   token,
@@ -118,7 +119,7 @@ export default function InspectorTokenSingle({
           }}
         >
           {/* TODO Should update the Icon to show this is style not a token */}
-          {token.resolvedValue && <IconBrokenLink />}
+          {token.resolvedValue && <StyleIcon />}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           <IconButton
             tooltip="Change to another token"
