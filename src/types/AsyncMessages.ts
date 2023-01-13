@@ -104,6 +104,7 @@ export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP
 export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
   oldName: string;
   newName: string;
+  updateMode: UpdateMode;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 

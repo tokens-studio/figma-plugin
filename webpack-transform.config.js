@@ -19,6 +19,16 @@ module.exports = (env, argv) => ({
         ],
         exclude: /node_modules/,
       },
+      // Fixing colorjs imports, see https://github.com/tokens-studio/figma-plugin/pull/1498#issuecomment-1372082627
+      {
+        test: /\.c?js$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
+        exclude:  /node_modules\/(?!(colorjs.io)\/)/,
+      }
     ],
   },
 

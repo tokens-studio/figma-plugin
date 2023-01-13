@@ -163,12 +163,13 @@ export default function useTokens() {
     });
   }, [confirm]);
 
-  const handleBulkRemap = useCallback(async (newName: string, oldName: string) => {
+  const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName,
       newName,
+      updateMode,
     });
   }, []);
 
@@ -201,7 +202,7 @@ export default function useTokens() {
       ],
     });
     if (shouldRemap) {
-      await handleBulkRemap(newGroupName, oldGroupName);
+      await handleBulkRemap(newGroupName, oldGroupName, shouldRemap.data[0]);
       dispatch.settings.setUpdateMode(shouldRemap.data[0] as UpdateMode);
     }
   }, [settings.updateMode, confirm, handleBulkRemap, dispatch.settings]);
