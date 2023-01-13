@@ -467,7 +467,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
               }}
               >
                 {internalEditToken.type === 'color' ? (
-                  <div className="w-4 h-4 mr-1 border border-gray-200 rounded" style={{ background: String(resolvedValue) }} />
+                  <Box
+                    css={{
+                      width: '1.5rem', height: '1.5rem', marginRight: '$1', border: '1px solid $borderMuted', borderRadius: '$default',
+                    }}
+                    style={{ background: String(resolvedValue) }}
+                  />
                 ) : null}
                 {resolvedValue?.toString()}
               </Box>
