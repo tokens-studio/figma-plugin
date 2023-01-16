@@ -106,7 +106,7 @@ export default function InspectorTokenSingle({
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
         {(tokenToDisplay) && (
-          <InspectorResolvedToken style={tokenToDisplay} />
+          <InspectorResolvedToken token={tokenToDisplay} />
 
         )}
         <Box
@@ -120,12 +120,16 @@ export default function InspectorTokenSingle({
           {/* TODO Should update the Icon to show this is style not a token */}
           {token.resolvedValue && <IconBrokenLink />}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
-          <IconButton
-            tooltip="Change to another token"
-            dataCy="button-token-remap"
-            onClick={handleClick}
-            icon={<IconToggleableDisclosure />}
-          />
+          {
+            !token.resolvedValue && (
+            <IconButton
+              tooltip="Change to another token"
+              dataCy="button-token-remap"
+              onClick={handleClick}
+              icon={<IconToggleableDisclosure />}
+            />
+            )
+          }
         </Box>
         {
           showDialog && (
