@@ -220,7 +220,7 @@ describe('MoreButton', () => {
     expect(getByText('Border width')).toBeInTheDocument();
   });
 
-  it('should ctrl + click leads to editForm', async () => {
+  it('cmd + click should lead to editForm', async () => {
     const { getByText } = render(
       <MoreButton
         type={TokenTypes.SPACING}
