@@ -141,6 +141,9 @@ export async function updatePluginData({
             delete newValuesOnNode[key as CompositionTokenProperty];
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
+          case 'none':
+            await removeValuesFromNode(node, key as Properties);
+            break;
           // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
             newValuesOnNode.paddingLeft = jsonValue;

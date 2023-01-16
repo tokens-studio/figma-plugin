@@ -51,6 +51,7 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      console.log('values', values, 'data', data);
       Object.entries(values).forEach(([key, value]) => {
         if (value === 'none') {
           removeValuesFromNode(node, key as Properties);
