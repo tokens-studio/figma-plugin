@@ -54,7 +54,10 @@ export default async function setValuesOnNode(
       && node.type !== 'CODE_BLOCK'
     ) {
       Object.entries(values).forEach(([key, value]) => {
-        if (value === 'none') removeValuesFromNode(node, key as Properties);
+        if (value === 'none') {
+          removeValuesFromNode(node, key as Properties);
+          delete values[key];
+        }
       });
 
       // set border token
