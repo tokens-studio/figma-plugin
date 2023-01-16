@@ -730,6 +730,6 @@ describe('Can set values on node', () => {
       emptyStylesMap,
       emptyThemeInfo,
     );
-    expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: NaN });
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
 });
