@@ -707,4 +707,21 @@ describe('Can set values on node', () => {
     expect(solidNodeMock.strokeWeight).toEqual(12);
     expect(solidNodeMock.dashPattern).toEqual([0, 0]);
   });
+
+  it('apply token with none value', async () => {
+    await setValuesOnNode(
+      solidNodeMock,
+      {
+        borderColor: 'none',
+        borderRadius: 'none',
+      },
+      {
+        borderColor: 'border-color.none',
+        borderRadius: 'border-radius.none',
+      },
+      emptyStylesMap,
+      emptyThemeInfo,
+    );
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
+  });
 });
