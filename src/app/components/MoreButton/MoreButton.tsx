@@ -111,9 +111,12 @@ export const MoreButton: React.FC<Props> = ({
     setPluginValue(newProps);
   }, [active, token.name, setPluginValue]);
 
-  const handleTokenClick = React.useCallback(() => {
+  const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    if (event.metaKey) {
+      handleEditClick();
+    }
     handleClick(properties[0]);
-  }, [properties, handleClick]);
+  }, [properties, handleClick, handleEditClick]);
 
   return (
     <ContextMenu>
