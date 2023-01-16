@@ -112,7 +112,7 @@ export const MoreButton: React.FC<Props> = ({
   }, [active, token.name, setPluginValue]);
 
   const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (event.ctrlKey) {
+    if (event.metaKey) {
       handleEditClick();
     }
     handleClick(properties[0]);

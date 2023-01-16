@@ -230,7 +230,7 @@ describe('MoreButton', () => {
     );
     expect(getByText(token.name)).toBeInTheDocument();
     await fireEvent.click(getByText(token.name), {
-      ctrlKey: true,
+      metaKey: true,
     });
     expect(mockShowForm).toHaveBeenCalled();
   });
