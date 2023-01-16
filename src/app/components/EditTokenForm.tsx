@@ -466,14 +466,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 alignItems: 'center',
               }}
               >
-                {internalEditToken.type === 'color' ? (
-                  <Box
-                    css={{
-                      width: '1.5rem', height: '1.5rem', marginRight: '$1', border: '1px solid $borderMuted', borderRadius: '$default',
-                    }}
-                    style={{ background: String(resolvedValue) }}
-                  />
-                ) : null}
                 {resolvedValue?.toString()}
               </Box>
             )}
