@@ -1,7 +1,11 @@
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable no-console */
+
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import copy from 'copy-to-clipboard';
+
 import { styled } from '@/stitches.config';
 import {
   ContextMenu,
@@ -54,10 +58,10 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
 
-  const resolvedValue = useMemo(
-    () => getAliasValue(token, tokensContext.resolvedTokens),
-    [token, tokensContext.resolvedTokens],
-  );
+  const resolvedValue = useMemo(() => getAliasValue(token, tokensContext.resolvedTokens), [
+    token,
+    tokensContext.resolvedTokens,
+  ]);
 
   const properties = usePropertiesForTokenType(type, resolvedValue?.toString());
 
@@ -67,6 +71,10 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const handleEditClick = React.useCallback(() => {
     showForm({ name: token.name, token, status: EditTokenFormStatus.EDIT });
   }, [token, showForm]);
+
+  const handleCopyTokenName = (props: unknown, text: string) => {
+    copy(text, {});
+  };
 
   const handleDeleteClick = React.useCallback(() => {
     deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
@@ -165,17 +173,14 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
           </ContextMenuContent>
         </ContextMenu>
         <ContextMenuSeparator />
-
         <ContextMenuItem onSelect={handleEditClick} disabled={editProhibited}>
           Edit Token
         </ContextMenuItem>
         <ContextMenuItem onSelect={handleDuplicateClick} disabled={editProhibited}>
           Duplicate Token
         </ContextMenuItem>
-        <ContextMenuItem disabled={editProhibited}>
-          <CopyToClipboard text={token.name}>
-            <span>Copy token path</span>
-          </CopyToClipboard>
+        <ContextMenuItem onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
+          Copy Token Path
         </ContextMenuItem>
         <ContextMenuItem onSelect={handleDeleteClick} disabled={editProhibited}>
           Delete Token
