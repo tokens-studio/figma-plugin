@@ -92,6 +92,17 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
   }));
 }
 
+export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key: Properties }) {
+  return Promise.all(nodes.map(async (node) => {
+    node.setPluginData(key, 'none');
+    await defaultNodeManager.updateNode(node, (tokens) => (
+      omit(tokens, key)
+    ));
+    removeValuesFromNode(node, key);
+    store.successfulNodes.add(node);
+  }));
+}
+
 export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true, tokensMap,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
@@ -142,7 +153,7 @@ export async function updatePluginData({
             await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: shouldRemove });
             break;
           case 'none':
-            await removeValuesFromNode(node, key as Properties);
+            await setNonePluginData({ nodes: [node], key: key as Properties });
             break;
           // Pre-Version 53 had horizontalPadding and verticalPadding.
           case 'horizontalPadding':
