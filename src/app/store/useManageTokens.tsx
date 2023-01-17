@@ -7,7 +7,7 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
+  DeleteTokenPayload, DuplicateTokenGroupPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
 import useTokens from './useTokens';
 import { StyleOptions } from '@/constants/StyleOptions';
@@ -156,14 +156,12 @@ export default function useManageTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
 
-  const duplicateGroup = useCallback(async (path: string, type: string) => {
+  const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length - oldName.length);
 
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
     await duplicateTokenGroup({
-      parent: activeTokenSet, path: newPath, oldName, type,
+      parent: activeTokenSet, oldName: data.oldName, newName: data.newName, tokenSets: data.tokenSets, type: data.type,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
   }, [store, duplicateTokenGroup, dispatch.uiState]);
