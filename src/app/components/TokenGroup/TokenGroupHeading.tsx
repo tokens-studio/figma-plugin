@@ -10,7 +10,7 @@ import Text from '../Text';
 import Input from '../Input';
 import Modal from '../Modal';
 import useManageTokens from '../../store/useManageTokens';
-import { editProhibitedSelector, tokensSelector } from '@/selectors';
+import { activeTokenSetSelector, editProhibitedSelector, tokensSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -31,9 +31,10 @@ export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
   const tokens = useSelector(tokensSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
-  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([]);
+  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
@@ -179,7 +180,7 @@ export function TokenGroupHeading({
             autofocus
             required
           />
-          <MultiSelectDownshiftInput menuItems={Object.keys(tokens)} setSelectedMenuItems={handleSelectedItemChange} />
+          <MultiSelectDownshiftInput menuItems={Object.keys(tokens)} initialSelectedItems={[activeTokenSet]} setSelectedMenuItems={handleSelectedItemChange} />
         </Stack>
       </Modal>
 

@@ -27,15 +27,17 @@ const SelectedItem: React.FC<{
 
 type Props = {
   menuItems: string[];
+  initialSelectedItems?: string[]
   setSelectedMenuItems: (selectedItems: string[]) => void
 };
 
 export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
   menuItems,
+  initialSelectedItems,
   setSelectedMenuItems,
 }) => {
   const [inputValue, setInputValue] = React.useState('');
-  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = React.useState<string[]>(initialSelectedItems ?? []);
   const seed = useUIDSeed();
 
   React.useEffect(() => {
