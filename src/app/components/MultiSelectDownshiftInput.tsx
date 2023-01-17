@@ -6,21 +6,22 @@ import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import { StyledDropdown, StyledItem, StyledItemName } from './DownshiftInput/DownshiftInput';
 import Box from './Box';
 import { StyledInput } from './Input';
-import Button from './Button';
+import { StyledButton } from './Button/StyledButton';
 
 const SelectedItem: React.FC<{
   children: React.ReactNode;
   onClick: (selectedItem: string) => void;
   selectedItem: string
 }> = ({ children, onClick, selectedItem }) => {
-  const handleClick = React.useCallback(() => {
+  const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     onClick(selectedItem);
   }, [onClick, selectedItem]);
 
   return (
-    <Button variant="secondary" onClick={handleClick}>
+    <StyledButton variant="secondary" onClick={handleClick}>
       {children}
-    </Button>
+    </StyledButton>
   );
 };
 
@@ -145,22 +146,12 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
             })}
           >
             {selectedItemForRender}
-            {/* <SelectedItem
+            <SelectedItem
               onClick={handleRemoveSelectedItem}
               selectedItem={selectedItemForRender}
             >
               <XIcon />
-            </SelectedItem> */}
-            <span
-              className="px-1 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                removeSelectedItem(selectedItemForRender);
-              }}
-            >
-              &#10005;
-            </span>
-            {' '}
+            </SelectedItem>
           </Box>
         ))}
         <Box
