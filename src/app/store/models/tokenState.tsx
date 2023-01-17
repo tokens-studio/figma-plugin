@@ -327,31 +327,24 @@ export const tokenState = createModel<RootModel>()({
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const {
-        parent, oldName, newName, tokenSets, type,
+        parent, path, oldName, type,
       } = data;
-      console.log('data', data);
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
-        const duplicatedTokenGroupName = token.name.replace(oldName, newName);
+        const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
         return {
           name: duplicatedTokenGroupName,
           ...rest,
         };
       });
 
-      const newTokens = Object.keys(state.tokens).reduce<Record<string, AnyTokenList>>((acc, key) => {
-        if (tokenSets.includes(key)) {
-          acc[key] = [...state.tokens[key], ...newTokenGroup];
-        } else {
-          acc[key] = state.tokens[key];
-        }
-        return acc;
-      }, {});
-
       return {
         ...state,
-        tokens: newTokens,
+        tokens: {
+          ...state.tokens,
+          [parent]: [...state.tokens[parent], ...newTokenGroup],
+        },
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
