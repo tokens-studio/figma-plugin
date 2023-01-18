@@ -16,7 +16,7 @@ class SharedDataHandler {
     if (value) {
       return (transformer ? transformer(value) : value) as Result;
     }
-    return undefined;
+    return value;
   }
 
   set(node: BaseNode, key: string, value: string) {
