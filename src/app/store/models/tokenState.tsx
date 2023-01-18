@@ -335,7 +335,6 @@ export const tokenState = createModel<RootModel>()({
       const {
         parent, oldName, newName, tokenSets, type,
       } = data;
-      console.log('data', data);
       const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
