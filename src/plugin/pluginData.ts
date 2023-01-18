@@ -95,6 +95,7 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
 export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key: Properties }) {
   return Promise.all(nodes.map(async (node) => {
     node.setPluginData(key, 'none');
+    tokensSharedDataHandler.set(node, key, 'none');
     await defaultNodeManager.updateNode(node, (tokens) => (
       omit(tokens, key)
     ));
