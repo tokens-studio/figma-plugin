@@ -156,6 +156,7 @@ export function TokenGroupHeading({
         title="Duplicate Group"
         isOpen={showDuplicateTokenGroupModal}
         close={handleDuplicateTokenGroupModalClose}
+        large
         footer={(
           <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
             <Stack direction="row" justify="end" gap={4}>
@@ -169,7 +170,7 @@ export function TokenGroupHeading({
           </form>
         )}
       >
-        <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
           <Input
             form="duplicateTokenGroup"
             full

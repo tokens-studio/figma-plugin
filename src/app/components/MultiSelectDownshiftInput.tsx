@@ -2,6 +2,7 @@ import React from 'react';
 import { useCombobox, useMultipleSelection } from 'downshift';
 import { useUIDSeed } from 'react-uid';
 import { XIcon } from '@primer/octicons-react';
+import compact from 'just-compact';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import { StyledDropdown, StyledItem, StyledItemName } from './DownshiftInput/DownshiftInput';
 import Box from './Box';
@@ -38,13 +39,14 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
 }) => {
   const [inputValue, setInputValue] = React.useState('');
   const [selectedItems, setSelectedItems] = React.useState<string[]>(initialSelectedItems ?? []);
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const seed = useUIDSeed();
 
   React.useEffect(() => {
     setSelectedMenuItems(selectedItems);
-  }, [selectedItems]);
+  }, [selectedItems, setSelectedMenuItems]);
 
-  const getFilteredBooks = React.useCallback((selectedItems: string[], inputValue: string) => {
+  const getFilteredItems = React.useCallback((selectedItems: string[], inputValue: string) => {
     const lowerCasedInputValue = inputValue.toLowerCase();
 
     return menuItems.filter((menuItem) => (
@@ -54,8 +56,8 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
   }, [menuItems]);
 
   const filteredItems = React.useMemo(
-    () => getFilteredBooks(selectedItems, inputValue),
-    [selectedItems, inputValue, getFilteredBooks],
+    () => getFilteredItems(selectedItems, inputValue),
+    [selectedItems, inputValue, getFilteredItems],
   );
 
   const {
@@ -71,7 +73,7 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
         case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownDelete:
         case useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace:
         case useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem:
-          if (newSelectedItems) setSelectedItems(newSelectedItems);
+          setSelectedItems(newSelectedItems ?? []);
           break;
         default:
           break;
@@ -112,11 +114,11 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
       switch (type) {
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
-          if (newSelectedItem) setSelectedItems([...selectedItems, newSelectedItem]);
+          setSelectedItems(compact([...selectedItems, newSelectedItem]));
           break;
 
         case useCombobox.stateChangeTypes.InputChange:
-          if (newInputValue) setInputValue(newInputValue);
+          setInputValue(newInputValue ?? '');
           break;
         default:
           break;
@@ -128,10 +130,18 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
     removeSelectedItem(selectedItemForRender);
   }, [removeSelectedItem]);
 
+  const handleOnFocus = React.useCallback(() => {
+    setShowAutoSuggest(true);
+  }, []);
+
+  const handleBlur = React.useCallback(() => {
+    setShowAutoSuggest(false);
+  }, []);
+
   return (
     <Box css={{ position: 'relative' }}>
       <Box css={{
-        background: '$bgDefault', display: 'inline-flex', flexWrap: 'wrap', gap: '$3', padding: '$3', border: '1px solid $borderMuted',
+        width: '100%', background: '$bgDefault', display: 'inline-flex', flexWrap: 'wrap', gap: '$3', padding: '$3', border: '1px solid $borderMuted',
       }}
       >
         {selectedItems.map((
@@ -163,8 +173,10 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
           className="input"
         >
           <StyledInput
-            placeholder="Best book ever"
+            placeholder="Select token sets"
             {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+            onFocus={handleOnFocus}
+            onBlur={handleBlur}
           />
           <StyledInputSuffix
             type="button"
@@ -180,7 +192,7 @@ export const MultiSelectDownshiftInput: React.FunctionComponent<Props> = ({
         className="content scroll-container"
         {...getMenuProps()}
       >
-        {isOpen
+        {(isOpen || showAutoSuggest)
           && filteredItems.map((filteredItem, index) => (
             <StyledItem
               key={seed(index)}
