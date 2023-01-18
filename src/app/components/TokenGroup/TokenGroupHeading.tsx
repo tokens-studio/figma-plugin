@@ -4,20 +4,17 @@ import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from '../ContextMenu';
 import Stack from '../Stack';
-import Button from '../Button';
 import Heading from '../Heading';
-import Text from '../Text';
-import Input from '../Input';
-import Modal from '../Modal';
 import useManageTokens from '../../store/useManageTokens';
-import { activeTokenSetSelector, editProhibitedSelector, tokensSelector } from '@/selectors';
+import { activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
-import { MultiSelectDownshiftInput } from '../MultiSelectDownshiftInput';
+import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
+import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
 
 export type Props = {
   id: string
@@ -30,7 +27,6 @@ export type Props = {
 export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
-  const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
@@ -52,9 +48,10 @@ export function TokenGroupHeading({
 
   const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowRenameTokenGroupModal(false);
     renameGroup(path, newTokenGroupName, type);
     remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.` });
+    setShowRenameTokenGroupModal(false);
+    setNewTokenGroupName(path);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,6 +60,7 @@ export function TokenGroupHeading({
       oldName: path, newName: newTokenGroupName, tokenSets: selectedTokenSets, type,
     });
     setShowDuplicateTokenGroupModal(false);
+    setNewTokenGroupName(path);
   }, [duplicateGroup, path, type, selectedTokenSets, newTokenGroupName]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,10 +69,12 @@ export function TokenGroupHeading({
 
   const handleRenameTokenGroupModalClose = React.useCallback(() => {
     setShowRenameTokenGroupModal(false);
+    setNewTokenGroupName(path);
   }, []);
 
   const handleDuplicateTokenGroupModalClose = React.useCallback(() => {
     setShowDuplicateTokenGroupModal(false);
+    setNewTokenGroupName(path);
   }, []);
 
   const handleDuplicate = React.useCallback(() => {
@@ -120,70 +120,24 @@ export function TokenGroupHeading({
           </ContextMenuContent>
         </ContextMenu>
       </StyledTokenGroupHeadingCollapsable>
-      <Modal
-        title={`Rename ${path}`}
-        isOpen={showRenameTokenGroupModal}
-        close={handleRenameTokenGroupModalClose}
-        footer={(
-          <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
-            <Stack direction="row" justify="end" gap={4}>
-              <Button variant="secondary" onClick={handleRenameTokenGroupModalClose}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary" disabled={path === newTokenGroupName}>
-                Change
-              </Button>
-            </Stack>
-          </form>
-        )}
-      >
-        <Stack direction="column" gap={4}>
-          <Input
-            form="renameTokenGroup"
-            full
-            onChange={handleNewTokenGroupNameChange}
-            type="text"
-            name="tokengroupname"
-            value={newTokenGroupName}
-            autofocus
-            required
-          />
-          <Text muted>Renaming only affects tokens of the same type</Text>
-        </Stack>
-      </Modal>
 
-      <Modal
-        title="Duplicate Group"
+      <RenameTokenGroupModal
+        isOpen={showRenameTokenGroupModal}
+        newName={newTokenGroupName}
+        oldName={path}
+        onClose={handleRenameTokenGroupModalClose}
+        handleRenameTokenGroupSubmit={handleRenameTokenGroupSubmit}
+        handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+      />
+
+      <DuplicateTokenGroupModal
         isOpen={showDuplicateTokenGroupModal}
-        close={handleDuplicateTokenGroupModalClose}
-        large
-        footer={(
-          <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
-            <Stack direction="row" justify="end" gap={4}>
-              <Button variant="secondary" onClick={handleDuplicateTokenGroupModalClose}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary">
-                Duplicate
-              </Button>
-            </Stack>
-          </form>
-        )}
-      >
-        <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
-          <Input
-            form="duplicateTokenGroup"
-            full
-            onChange={handleNewTokenGroupNameChange}
-            type="text"
-            name="tokengroupname"
-            value={newTokenGroupName}
-            autofocus
-            required
-          />
-          <MultiSelectDownshiftInput menuItems={Object.keys(tokens)} initialSelectedItems={[activeTokenSet]} setSelectedMenuItems={handleSelectedItemChange} />
-        </Stack>
-      </Modal>
+        newName={newTokenGroupName}
+        onClose={handleDuplicateTokenGroupModalClose}
+        handleDuplicateTokenGroupSubmit={handleDuplicateTokenGroupSubmit}
+        handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+        handleSelectedItemChange={handleSelectedItemChange}
+      />
 
       <StyledTokenGroupAddIcon
         icon={<IconAdd />}
