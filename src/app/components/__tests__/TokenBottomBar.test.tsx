@@ -14,11 +14,7 @@ describe('TokenBottomBar', () => {
 
     render(
       <Provider store={mockStore}>
-        <TokensBottomBar
-          handleSaveJSON={mockHandleSaveJSON}
-          handleUpdate={mockHandleUpdate}
-          hasJSONError={false}
-        />
+        <TokensBottomBar hasJSONError={false} />
       </Provider>,
     );
   });
@@ -28,14 +24,14 @@ describe('TokenBottomBar', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <TokensBottomBar
-          handleSaveJSON={mockHandleSaveJSON}
-          handleUpdate={mockHandleUpdate}
-          hasJSONError={false}
-        />
+        <TokensBottomBar hasJSONError={false} />
       </Provider>,
     );
 
+    const toolsButton = await result.findByText('Tools');
+    act(() => {
+      toolsButton.click();
+    });
     const loadButton = await result.findByText('Load');
     act(() => {
       loadButton.click();
@@ -54,17 +50,17 @@ describe('TokenBottomBar', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <TokensBottomBar
-          handleSaveJSON={mockHandleSaveJSON}
-          handleUpdate={mockHandleUpdate}
-          hasJSONError={false}
-        />
+        <TokensBottomBar hasJSONError={false} />
       </Provider>,
     );
 
-    const epxortButton = await result.findByText('Export');
+    const toolsButton = await result.findByText('Tools');
     act(() => {
-      epxortButton.click();
+      toolsButton.click();
+    });
+    const exportButton = await result.findByText('Export');
+    act(() => {
+      exportButton.click();
     });
     expect(result.queryAllByText('Export')).toHaveLength(3);
 
@@ -80,15 +76,11 @@ describe('TokenBottomBar', () => {
 
     const result = render(
       <Provider store={mockStore}>
-        <TokensBottomBar
-          handleSaveJSON={mockHandleSaveJSON}
-          handleUpdate={mockHandleUpdate}
-          hasJSONError={false}
-        />
+        <TokensBottomBar hasJSONError={false} />
       </Provider>,
     );
 
-    const updateButton = await result.findByText('Update');
+    const updateButton = await result.findByTestId('update-button');
     act(() => {
       updateButton.click();
     });
@@ -101,11 +93,7 @@ describe('TokenBottomBar', () => {
 
     render(
       <Provider store={mockStore}>
-        <TokensBottomBar
-          handleSaveJSON={mockHandleSaveJSON}
-          handleUpdate={mockHandleUpdate}
-          hasJSONError={false}
-        />
+        <TokensBottomBar hasJSONError={false} />
       </Provider>,
     );
 

@@ -44,7 +44,7 @@ export default function ApplySelector() {
 
   return (
     <Stack direction="row">
-      <Button variant="primary" css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={handleUpdate}>
+      <Button id="update-button" variant="primary" css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={handleUpdate}>
         Apply to
         {' '}
         {updateMode}
