@@ -24,7 +24,17 @@ function getStyleId(node: BaseNode, key: StyleTypeName) {
 }
 
 function getStyleIdFromBackup(node: BaseNode, backupKey: string) {
-  return tokensSharedDataHandler.get(node, backupKey, (val) => (val ? (JSON.parse(val) as string) : val));
+  return tokensSharedDataHandler.get(node, backupKey, (val) => {
+    if (val) {
+      try {
+        const parsedValue = JSON.parse(val) as string;
+        return parsedValue;
+      } catch (e) {
+        return val;
+      }
+    }
+    return val;
+  });
 }
 
 export function getNonLocalStyle<T extends StyleTypeName>(

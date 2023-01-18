@@ -178,7 +178,7 @@ describe('GitlabTokenStorage', () => {
       })
     ));
     expect(await storageProvider.canWrite()).toBe(true);
-    expect(mockGetGroupMembers).toBeCalledWith(51634506, 11289475);
+    expect(mockGetGroupMembers).toBeCalledWith(51634506, 11289475, { includeInherited: true });
   });
 
   it('canWrite should return true if user is a collaborator by projectMember', async () => {
@@ -197,7 +197,7 @@ describe('GitlabTokenStorage', () => {
       })
     ));
     expect(await storageProvider.canWrite()).toBe(true);
-    expect(mockGetProjectMembers).toBeCalledWith(35102363, 11289475);
+    expect(mockGetProjectMembers).toBeCalledWith(35102363, 11289475, { includeInherited: true });
   });
 
   it('canWrite should return false if user is not a collaborator', async () => {
