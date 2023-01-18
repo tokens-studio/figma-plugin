@@ -188,4 +188,9 @@ describe('removeTokensByValue', () => {
     removeValuesFromNode(mockNode, Properties.asset);
     expect(mockNode.fills).toEqual([]);
   });
+
+  it('should set cornerRadius as 0', () => {
+    removeValuesFromNode(mockNode, Properties.borderColor);
+    expect(mockNode.strokes).toEqual([]);
+  });
 });

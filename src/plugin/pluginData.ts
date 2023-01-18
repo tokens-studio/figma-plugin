@@ -92,25 +92,14 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
   }));
 }
 
-export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties }) {
+export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key: Properties }) {
   return Promise.all(nodes.map(async (node) => {
-    if (key) {
-      node.setPluginData(key, 'none');
-      tokensSharedDataHandler.set(node, key, 'none');
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, key)
-      ));
-      removeValuesFromNode(node, key);
-    } else {
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, Object.values(Properties))
-      ));
-      Object.values(Properties).forEach((prop) => {
-        node.setPluginData(prop, 'none');
-        tokensSharedDataHandler.set(node, prop, 'none');
-        removeValuesFromNode(node, prop);
-      });
-    }
+    node.setPluginData(key, 'none');
+    tokensSharedDataHandler.set(node, key, 'none');
+    await defaultNodeManager.updateNode(node, (tokens) => (
+      omit(tokens, key)
+    ));
+    removeValuesFromNode(node, key);
     store.successfulNodes.add(node);
   }));
 }
@@ -135,7 +124,7 @@ export async function updatePluginData({
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
-      if (values.composition === 'delete' || values.composition === 'none') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token

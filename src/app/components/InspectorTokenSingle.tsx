@@ -94,12 +94,12 @@ export default function InspectorTokenSingle({
           onCheckedChange={onCheckedChanged}
         />
         {
-          token.value === 'none' && <ValueNoneIcon />
+           (token.value === 'none' || mappedToken?.value === 'none') && <ValueNoneIcon />
         }
         {
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
-        {(!!mappedToken) && (
+        {(!!mappedToken && token.value !== 'none' && mappedToken?.value !== 'none') && (
           <InspectorResolvedToken token={mappedToken} />
         )}
         <Box
