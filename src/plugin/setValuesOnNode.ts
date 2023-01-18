@@ -23,6 +23,8 @@ import setBackgroundBlurOnTarget from './setBackgroundBlurOnTarget';
 import setImageValuesOnTarget from './setImageValuesOnTarget';
 import { isCompositeBorderValue } from '@/utils/is/isCompositeBorderValue';
 import { setBorderColorValuesOnTarget } from './setBorderColorValuesOnTarget';
+import removeValuesFromNode from './removeValuesFromNode';
+import { Properties } from '@/constants/Properties';
 
 // @README values typing is wrong
 
@@ -49,6 +51,12 @@ export default async function setValuesOnNode(
       && node.type !== 'STICKY'
       && node.type !== 'CODE_BLOCK'
     ) {
+      Object.entries(values).forEach(([key, value]) => {
+        if (value === 'none') {
+          removeValuesFromNode(node, key as Properties);
+          delete values[key];
+        }
+      });
       // set border token
       if (values.border && isCompositeBorderValue(values.border)) {
         setBorderValuesOnTarget(node, { value: values.border });
