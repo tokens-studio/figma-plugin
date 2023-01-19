@@ -32,5 +32,5 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
       }
     }),
   );
-  sendSelectionChange();
+  await sendSelectionChange();
 };

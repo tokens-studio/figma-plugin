@@ -113,7 +113,7 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
+  const removeTokensByValue = useCallback(async (data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 
     AsyncMessageChannel.ReactInstance.message({
@@ -275,7 +275,7 @@ export default function useTokens() {
     dispatch.tokenState.removeStyleIdsFromThemes(removeStylesResult.styleIds);
   }, [settings, dispatch.tokenState]);
 
-  const setNoneValuesOnNode = useCallback((resolvedTokens: SingleToken[]) => {
+  const setNoneValuesOnNode = useCallback(async (resolvedTokens: SingleToken[]) => {
     const uiState = uiStateSelector(store.getState());
     const inspectState = inspectStateSelector(store.getState());
     const tokensToSet = uiState.selectionValues

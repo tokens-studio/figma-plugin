@@ -26,5 +26,5 @@ export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.
       }
     }),
   );
-  sendSelectionChange();
+  await sendSelectionChange();
 };
