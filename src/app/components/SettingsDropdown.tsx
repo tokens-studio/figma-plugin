@@ -43,7 +43,7 @@ export default function SettingsDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger data-testid="bottom-bar-settings">
         <GearIcon />
       </DropdownMenuTrigger>
 

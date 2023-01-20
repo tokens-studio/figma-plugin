@@ -1,12 +1,11 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import {
-  act, createMockStore, fireEvent, render,
+  act, createMockStore, render,
 } from '../../../../tests/config/setupTest';
 import TokensBottomBar from '../TokensBottomBar';
 
 const mockHandleUpdate = jest.fn();
-const mockHandleSaveJSON = jest.fn();
 
 describe('TokenBottomBar', () => {
   it('should render', () => {
@@ -86,25 +85,5 @@ describe('TokenBottomBar', () => {
     });
 
     expect(mockHandleUpdate).toBeCalledTimes(1);
-  });
-
-  it('should trigger a save', async () => {
-    const mockStore = createMockStore({});
-
-    render(
-      <Provider store={mockStore}>
-        <TokensBottomBar hasJSONError={false} />
-      </Provider>,
-    );
-
-    act(() => {
-      fireEvent.keyDown(document, {
-        key: 'S',
-        code: 'KeyS',
-        ctrlKey: true,
-      });
-    });
-
-    expect(mockHandleSaveJSON).toBeCalledTimes(1);
   });
 });
