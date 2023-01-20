@@ -11,7 +11,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuItemIndicator,
   DropdownMenuSeparator,
-  DropdownSubmenu,
 } from '../DropdownMenu';
 import { Flex } from '../Flex';
 import Text from '../Text';
@@ -105,11 +104,6 @@ export const ThemeSelector: React.FC = () => {
             {availableThemeOptions}
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
-          <DropdownSubmenu>
-            <DropdownMenuTrigger>
-              Lock layer
-            </DropdownMenuTrigger>
-          </DropdownSubmenu>
           <DropdownMenuItem
             data-cy="themeselector-managethemes"
             css={{
