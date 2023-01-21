@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import Box from './Box';
 import Blankslate from './Blankslate';
@@ -15,6 +15,21 @@ import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
   const { getTokenValue } = useTokens();
+
+  const getResolvedValue = useCallback((property: string, value: string) => {
+    const resolvedToken = getTokenValue(value, resolvedTokens);
+    if (resolvedToken) return JSON.stringify(resolvedToken);
+    const resolvedValue = uiState.selectionValues.find((item) => item.category === property && item.value === value)?.resolvedValue;
+    if (resolvedValue) {
+      return JSON.stringify({
+        value: resolvedValue,
+        type: property,
+        name: value,
+        rawValue: resolvedValue,
+      });
+    }
+    return undefined;
+  }, [getTokenValue, resolvedTokens, uiState.selectionValues]);
 
   function renderBlankslate() {
     if (uiState.selectedLayers > 1) return <Blankslate title="More than 1 layer selected" text="Select a single layer to see applied tokens" />;
@@ -45,7 +60,7 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
                       <StyledInspectBadge>
                         {typeof value === 'string' && value.split('.').join('-')}
                       </StyledInspectBadge>
-                      <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${JSON.stringify(getTokenValue(value, resolvedTokens))} */`}</Text>
+                      <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${getResolvedValue(property, value)} */`}</Text>
                     </code>
                   </Stack>
                 ))}
