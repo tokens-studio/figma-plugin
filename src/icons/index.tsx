@@ -42,7 +42,6 @@ import IconRefresh from './refresh.svg';
 import IconResizeWindow from './resizewindow.svg';
 import IconShadow from './shadow.svg';
 import IconSpacing from './spacing.svg';
-import IconStyle from './style.svg';
 import Icon_Trash from './trash.svg';
 import IconUndo from './undo.svg';
 import IconVerticalPadding from './verticalpadding.svg';
@@ -110,7 +109,6 @@ export {
   IconResizeWindow,
   IconShadow,
   IconSpacing,
-  IconStyle,
   IconTrash,
   IconUndo,
   IconVerticalPadding,
