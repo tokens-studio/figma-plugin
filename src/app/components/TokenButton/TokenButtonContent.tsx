@@ -15,7 +15,7 @@ type Props = {
   active: boolean;
   type: TokenTypes;
   token: SingleToken;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export default function TokenButtonContent({
@@ -46,6 +46,11 @@ export default function TokenButtonContent({
     return (token.name ?? '').split('.').slice(-visibleDepth).join('.');
   }, [token.name]);
 
+  const handleButtonClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    onClick(event);
+  }, [onClick]);
+
   const cssOverrides = React.useMemo(() => {
     switch (type) {
       case TokenTypes.COLOR: {
@@ -67,7 +72,7 @@ export default function TokenButtonContent({
 
   return (
     <TokenTooltip token={token}>
-      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={onClick} css={cssOverrides}>
+      <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
         <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
       </StyledTokenButton>

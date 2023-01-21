@@ -101,14 +101,13 @@ export default function InspectorTokenSingle({
           onCheckedChange={onCheckedChanged}
         />
         {
-          token.value === 'none' && <ValueNoneIcon />
+           (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon />
         }
         {
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
-        {(tokenToDisplay) && (
-          <InspectorResolvedToken token={tokenToDisplay} />
-
+        {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
+        <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
           css={{
