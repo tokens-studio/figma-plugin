@@ -20,15 +20,11 @@ import useTokens from '../store/useTokens';
 import Box from './Box';
 
 export default function ApplySelector() {
-  const {
-    updateMode,
-  } = useSelector(settingsStateSelector, isEqual);
+  const { updateMode } = useSelector(settingsStateSelector, isEqual);
 
   const { handleUpdate } = useTokens();
 
-  const {
-    setUpdateMode,
-  } = useDispatch<Dispatch>().settings;
+  const { setUpdateMode } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
     setUpdateMode(UpdateMode.SELECTION);
@@ -44,7 +40,12 @@ export default function ApplySelector() {
 
   return (
     <Stack direction="row">
-      <Button id="update-button" variant="primary" css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }} onClick={handleUpdate}>
+      <Button
+        id="update-button"
+        variant="primary"
+        css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+        onClick={handleUpdate}
+      >
         Apply to
         {' '}
         {updateMode}
@@ -52,7 +53,13 @@ export default function ApplySelector() {
       <DropdownMenu>
         <DropdownMenuTrigger
           css={{
-            borderTopLeftRadius: 0, borderBottomLeftRadius: 0, backgroundColor: '$interaction', aspectRatio: '1 / 1', borderLeft: '1px solid $interactionSubtle', color: '$onInteraction',
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            backgroundColor: '$interaction',
+            aspectRatio: '1 / 1',
+            borderLeft: '1px solid $interactionSubtle',
+            color: '$onInteraction',
+            '&:hover': { backgroundColor: '$interaction' },
           }}
           data-testid="apply-selector"
         >
@@ -70,7 +77,11 @@ export default function ApplySelector() {
                 Applies current tokens to the current page
               </Box>
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem data-testid="apply-to-document" value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
+            <DropdownMenuRadioItem
+              data-testid="apply-to-document"
+              value={UpdateMode.DOCUMENT}
+              onSelect={handleApplyDocument}
+            >
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
@@ -79,7 +90,11 @@ export default function ApplySelector() {
                 Applies current tokens to the whole document (slow!)
               </Box>
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem data-testid="apply-to-selection" value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
+            <DropdownMenuRadioItem
+              data-testid="apply-to-selection"
+              value={UpdateMode.SELECTION}
+              onSelect={handleApplySelection}
+            >
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>

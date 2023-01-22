@@ -1,11 +1,10 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import userEvent from '@testing-library/user-event';
 import {
   act, createMockStore, render,
 } from '../../../../tests/config/setupTest';
 import TokensBottomBar from '../TokensBottomBar';
-
-const mockHandleUpdate = jest.fn();
 
 describe('TokenBottomBar', () => {
   it('should render', () => {
@@ -28,12 +27,10 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('Tools');
-    await act(() => {
-      toolsButton.click();
-    });
-    const loadButton = await result.findByText('Load');
-    act(() => {
-      loadButton.click();
+    await act(async () => {
+      await userEvent.click(toolsButton);
+      const loadButton = await result.findByText('Load from file/folder');
+      await userEvent.click(loadButton, { pointerEventsCheck: 0 });
     });
     expect(result.queryByText('Import')).toBeInTheDocument();
 
@@ -54,36 +51,11 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('Tools');
-    await act(() => {
-      toolsButton.click();
+    await act(async () => {
+      await userEvent.click(toolsButton);
+      const exportButton = await result.findByText('Export to file/folder');
+      await userEvent.click(exportButton, { pointerEventsCheck: 0 });
     });
-    const exportButton = await result.findByText('Export');
-    act(() => {
-      exportButton.click();
-    });
-    expect(result.queryAllByText('Export')).toHaveLength(3);
-
-    const closeButton = await result.findByTestId('close-button');
-    act(() => {
-      closeButton.click();
-    });
-    expect(result.queryAllByText('Export')).toHaveLength(1);
-  });
-
-  it('should trigger an update', async () => {
-    const mockStore = createMockStore({});
-
-    const result = render(
-      <Provider store={mockStore}>
-        <TokensBottomBar hasJSONError={false} />
-      </Provider>,
-    );
-
-    const updateButton = await result.findByTestId('update-button');
-    act(() => {
-      updateButton.click();
-    });
-
-    expect(mockHandleUpdate).toBeCalledTimes(1);
+    expect(result.queryByText('Export tokens')).toBeInTheDocument();
   });
 });

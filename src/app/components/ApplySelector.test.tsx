@@ -6,6 +6,8 @@ import {
 } from '../../../tests/config/setupTest';
 import ApplySelector from './ApplySelector';
 
+const mockHandleUpdate = jest.fn();
+
 const mockStore = createMockStore({});
 const renderStore = () => render(
   <Provider store={mockStore}>
@@ -30,6 +32,15 @@ describe('ApplySelector', () => {
       const applyToSelection = result.getByTestId('apply-to-selection');
       await userEvent.click(applyToSelection, { pointerEventsCheck: 0 });
       expect(updateModeSpy).toBeCalledTimes(3);
+    });
+
+    it('should trigger an update', async () => {
+      const updateButton = await result.findByTestId('update-button');
+      act(() => {
+        updateButton.click();
+      });
+
+      expect(mockHandleUpdate).toBeCalledTimes(1);
     });
   });
 });
