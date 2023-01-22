@@ -28,7 +28,7 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('Tools');
-    act(() => {
+    await act(() => {
       toolsButton.click();
     });
     const loadButton = await result.findByText('Load');
@@ -54,7 +54,7 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('Tools');
-    act(() => {
+    await act(() => {
       toolsButton.click();
     });
     const exportButton = await result.findByText('Export');
