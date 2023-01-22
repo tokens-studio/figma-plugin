@@ -56,10 +56,13 @@ export default function ApplySelector() {
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
             backgroundColor: '$interaction',
-            aspectRatio: '1 / 1',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
             borderLeft: '1px solid $interactionSubtle',
             color: '$onInteraction',
-            '&:hover': { backgroundColor: '$interaction' },
+            '&:hover, &:focus': { backgroundColor: '$interactionSubtle' },
           }}
           data-testid="apply-selector"
         >
@@ -68,6 +71,19 @@ export default function ApplySelector() {
 
         <DropdownMenuContent side="top">
           <DropdownMenuRadioGroup value={updateMode}>
+            <DropdownMenuRadioItem
+              data-testid="apply-to-selection"
+              value={UpdateMode.SELECTION}
+              onSelect={handleApplySelection}
+            >
+              <DropdownMenuItemIndicator>
+                <DotFilledIcon />
+              </DropdownMenuItemIndicator>
+              Apply to selection
+              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+                Applies current tokens to current selection (fast!)
+              </Box>
+            </DropdownMenuRadioItem>
             <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
@@ -88,19 +104,6 @@ export default function ApplySelector() {
               Apply to document
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
                 Applies current tokens to the whole document (slow!)
-              </Box>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              data-testid="apply-to-selection"
-              value={UpdateMode.SELECTION}
-              onSelect={handleApplySelection}
-            >
-              <DropdownMenuItemIndicator>
-                <DotFilledIcon />
-              </DropdownMenuItemIndicator>
-              Apply to selection
-              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                Applies current tokens to current selection (fast!)
               </Box>
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

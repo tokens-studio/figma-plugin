@@ -1,14 +1,21 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
-import {
-  act, createMockStore, render,
-} from '../../../tests/config/setupTest';
+import { act, createMockStore, render } from '../../../tests/config/setupTest';
 import SettingsDropdown from './SettingsDropdown';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const mockStore = createMockStore({});
-const renderStore = () => render(
-  <Provider store={mockStore}>
+const mockStoreJSONBin = createMockStore({
+  uiState: {
+    localApiState: {
+      provider: StorageProviderType.JSONBIN,
+    },
+  },
+});
+
+const renderStore = (store = mockStore) => render(
+  <Provider store={store}>
     <SettingsDropdown />
   </Provider>,
 );
@@ -21,14 +28,25 @@ describe('SettingsDropdown', () => {
     await act(async () => {
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('update-on-change');
-      const updateRemote = result.getByTestId('update-remote');
+      const updateRemote = result.queryByTestId('update-remote');
       const updateStyles = result.getByTestId('update-styles');
       const swapStylesAlpha = result.queryByTestId('swap-styles-alpha');
 
       expect(updateChanges).toBeInTheDocument();
-      expect(updateRemote).toBeInTheDocument();
       expect(updateStyles).toBeInTheDocument();
+      expect(updateRemote).toBeNull();
       expect(swapStylesAlpha).toBeNull();
+    });
+  });
+  it('should show Update remote when jsonbin', async () => {
+    const result = renderStore(mockStoreJSONBin);
+
+    const trigger = await result.getByTestId('bottom-bar-settings');
+    await act(async () => {
+      await userEvent.click(trigger);
+      const updateRemote = result.getByTestId('update-remote');
+
+      expect(updateRemote).toBeInTheDocument();
     });
   });
 
@@ -45,8 +63,8 @@ describe('SettingsDropdown', () => {
     });
   });
   it('should call updateRemote', async () => {
-    const updateRemoteSpy = jest.spyOn(mockStore.dispatch.settings, 'setUpdateRemote');
-    const result = renderStore();
+    const updateRemoteSpy = jest.spyOn(mockStoreJSONBin.dispatch.settings, 'setUpdateRemote');
+    const result = renderStore(mockStoreJSONBin);
 
     const trigger = await result.getByTestId('bottom-bar-settings');
     await act(async () => {

@@ -7,6 +7,12 @@ import {
 import ApplySelector from './ApplySelector';
 
 const mockHandleUpdate = jest.fn();
+jest.mock('../store/useTokens', () => ({
+  __esModule: true,
+  default: () => ({
+    handleUpdate: mockHandleUpdate,
+  }),
+}));
 
 const mockStore = createMockStore({});
 const renderStore = () => render(
@@ -33,14 +39,14 @@ describe('ApplySelector', () => {
       await userEvent.click(applyToSelection, { pointerEventsCheck: 0 });
       expect(updateModeSpy).toBeCalledTimes(3);
     });
-
-    it('should trigger an update', async () => {
-      const updateButton = await result.findByTestId('update-button');
-      act(() => {
-        updateButton.click();
-      });
-
-      expect(mockHandleUpdate).toBeCalledTimes(1);
+  });
+  it('should trigger an update', async () => {
+    const result = renderStore();
+    const updateButton = await result.findByTestId('update-button');
+    act(() => {
+      updateButton.click();
     });
+
+    expect(mockHandleUpdate).toBeCalledTimes(1);
   });
 });

@@ -9,12 +9,15 @@ import {
   DropdownMenuCheckboxItem,
 } from './DropdownMenu';
 import { Dispatch } from '../store';
-import { settingsStateSelector } from '@/selectors';
+import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { useFlags } from './LaunchDarkly';
 import Box from './Box';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function SettingsDropdown() {
+  const localApiState = useSelector(localApiStateSelector);
+
   const {
     updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
@@ -48,7 +51,11 @@ export default function SettingsDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top">
-        <DropdownMenuCheckboxItem data-testid="update-on-change" checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
+        <DropdownMenuCheckboxItem
+          data-testid="update-on-change"
+          checked={updateOnChange}
+          onCheckedChange={handleUpdateOnChange}
+        >
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
@@ -57,16 +64,26 @@ export default function SettingsDropdown() {
             Applies tokens whenever you make a change (slow!)
           </Box>
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem data-testid="update-remote" checked={updateRemote} onCheckedChange={handleUpdateRemote}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Update remote
-          <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Updates JSONBin whenever you make a change
-          </Box>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem data-testid="update-styles" checked={updateStyles} onCheckedChange={handleUpdateStyles}>
+        {localApiState?.provider === StorageProviderType.JSONBIN ? (
+          <DropdownMenuCheckboxItem
+            data-testid="update-remote"
+            checked={updateRemote}
+            onCheckedChange={handleUpdateRemote}
+          >
+            <DropdownMenuItemIndicator>
+              <CheckIcon />
+            </DropdownMenuItemIndicator>
+            Update remote
+            <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+              Updates JSONBin whenever you make a change
+            </Box>
+          </DropdownMenuCheckboxItem>
+        ) : null}
+        <DropdownMenuCheckboxItem
+          data-testid="update-styles"
+          checked={updateStyles}
+          onCheckedChange={handleUpdateStyles}
+        >
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
@@ -76,15 +93,19 @@ export default function SettingsDropdown() {
           </Box>
         </DropdownMenuCheckboxItem>
         {swapStylesAlpha && (
-        <DropdownMenuCheckboxItem data-testid="swap-styles-alpha" checked={shouldSwapStyles} onCheckedChange={handleShouldSwapStyles}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Swap styles (Alpha)
-          <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Swap themes by just changing styles, requires Themes
-          </Box>
-        </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            data-testid="swap-styles-alpha"
+            checked={shouldSwapStyles}
+            onCheckedChange={handleShouldSwapStyles}
+          >
+            <DropdownMenuItemIndicator>
+              <CheckIcon />
+            </DropdownMenuItemIndicator>
+            Swap styles (Alpha)
+            <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+              Swap themes by just changing styles, requires Themes
+            </Box>
+          </DropdownMenuCheckboxItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
