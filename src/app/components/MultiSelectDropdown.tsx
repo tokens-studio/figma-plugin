@@ -45,7 +45,7 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
           }}
           className="input"
         >
-          <StyledInput placeholder="Select token sets" value={selectedItemsString} />
+          <StyledInput placeholder="Select token sets" value={selectedItemsString} readOnly />
           <StyledInputSuffix type="button">
             <StyledIconDisclosure />
           </StyledInputSuffix>
