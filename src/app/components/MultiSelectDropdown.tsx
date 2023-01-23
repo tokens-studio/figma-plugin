@@ -22,7 +22,6 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
   selectedItems,
   handleSelectedItemChange,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
   const seed = useUIDSeed();
 
   const selectedItemsString = React.useMemo(() => selectedItems.join(','), [selectedItems]);
@@ -37,13 +36,9 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
     }
   }, [selectedItems, handleSelectedItemChange]);
 
-  const handleTrigger = React.useCallback(() => {
-    setIsOpen(!isOpen);
-  }, [isOpen]);
-
   return (
-    <DropdownMenu open={isOpen}>
-      <DropdownMenuTrigger css={{ width: '100%', padding: '0' }} onClick={handleTrigger}>
+    <DropdownMenu>
+      <DropdownMenuTrigger css={{ width: '100%', padding: '0' }}>
         <Box
           css={{
             display: 'flex', position: 'relative', width: '100%', flexGrow: 1,
