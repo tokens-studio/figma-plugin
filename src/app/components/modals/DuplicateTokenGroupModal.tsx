@@ -4,7 +4,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
-import { MultiSelectDownshiftInput } from '../MultiSelectDownshiftInput';
+import { MultiSelectDropdown } from '../MultiSelectDropdown';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
 
@@ -56,7 +56,7 @@ export default function DuplicateTokenGroupModal({
         </form>
     )}
     >
-      <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
+      <Stack direction="column" gap={4} css={{ justifyContent: 'center' }}>
         <Input
           form="duplicateTokenGroup"
           full
@@ -67,7 +67,7 @@ export default function DuplicateTokenGroupModal({
           autofocus
           required
         />
-        <MultiSelectDownshiftInput menuItems={Object.keys(tokens)} initialSelectedItems={[activeTokenSet]} setSelectedMenuItems={handleSelectedItemChange} />
+        <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
       </Stack>
     </Modal>
   );

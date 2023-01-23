@@ -14,7 +14,7 @@ import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 
-export const StyledDropdown = styled('div', {
+const StyledDropdown = styled('div', {
   position: 'absolute',
   zIndex: '10',
   width: '100%',
@@ -37,7 +37,7 @@ const StyledItemValue = styled('div', {
   textOverflow: 'ellipsis',
 });
 
-export const StyledItem = styled('div', {
+const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: '$2',
@@ -68,7 +68,7 @@ const StyledItemColor = styled('div', {
   borderColor: '$borderMuted',
 });
 
-export const StyledItemName = styled('div', {
+const StyledItemName = styled('div', {
   flexGrow: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
