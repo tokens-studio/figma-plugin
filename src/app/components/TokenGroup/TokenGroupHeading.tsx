@@ -6,7 +6,7 @@ import {
 import Stack from '../Stack';
 import Heading from '../Heading';
 import useManageTokens from '../../store/useManageTokens';
-import { activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
+import { editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -27,13 +27,11 @@ export type Props = {
 export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
-  const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
-  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
-  const { deleteGroup, renameGroup, duplicateGroup } = useManageTokens();
+  const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup } = useTokens();
@@ -43,25 +41,16 @@ export function TokenGroupHeading({
   }, [deleteGroup, path, type]);
 
   const handleRename = React.useCallback(() => {
+    setNewTokenGroupName(path);
     setShowRenameTokenGroupModal(true);
-  }, []);
+  }, [path]);
 
   const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     renameGroup(path, newTokenGroupName, type);
     remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.` });
     setShowRenameTokenGroupModal(false);
-    setNewTokenGroupName(path);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
-
-  const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    duplicateGroup({
-      oldName: path, newName: newTokenGroupName, tokenSets: selectedTokenSets, type,
-    });
-    setShowDuplicateTokenGroupModal(false);
-    setNewTokenGroupName(path);
-  }, [duplicateGroup, path, type, selectedTokenSets, newTokenGroupName]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
@@ -69,12 +58,10 @@ export function TokenGroupHeading({
 
   const handleRenameTokenGroupModalClose = React.useCallback(() => {
     setShowRenameTokenGroupModal(false);
-    setNewTokenGroupName(path);
   }, []);
 
   const handleDuplicateTokenGroupModalClose = React.useCallback(() => {
     setShowDuplicateTokenGroupModal(false);
-    setNewTokenGroupName(path);
   }, []);
 
   const handleDuplicate = React.useCallback(() => {
@@ -87,10 +74,6 @@ export function TokenGroupHeading({
   }, [collapsed, dispatch.tokenState, path]);
 
   const handleShowNewForm = useCallback(() => showNewForm({ name: `${path}.` }), [path, showNewForm]);
-
-  const handleSelectedItemChange = useCallback((selectedItems: string[]) => {
-    setSelectedTokenSets(selectedItems);
-  }, []);
 
   return (
     <StyledTokenGroupHeading>
@@ -132,11 +115,11 @@ export function TokenGroupHeading({
 
       <DuplicateTokenGroupModal
         isOpen={showDuplicateTokenGroupModal}
+        type={type}
         newName={newTokenGroupName}
+        oldName={path}
         onClose={handleDuplicateTokenGroupModalClose}
-        handleDuplicateTokenGroupSubmit={handleDuplicateTokenGroupSubmit}
         handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
-        handleSelectedItemChange={handleSelectedItemChange}
       />
 
       <StyledTokenGroupAddIcon

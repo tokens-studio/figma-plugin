@@ -6,21 +6,36 @@ import Stack from '../Stack';
 import Input from '../Input';
 import { MultiSelectDownshiftInput } from '../MultiSelectDownshiftInput';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
+import useManageTokens from '@/app/store/useManageTokens';
 
 type Props = {
-  isOpen: boolean
-  newName: string
+  isOpen: boolean;
+  type: string;
+  newName: string;
+  oldName: string;
   onClose: () => void;
-  handleDuplicateTokenGroupSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-  handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  handleSelectedItemChange: (selectedItems: string[]) => void
+  handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function DuplicateTokenGroupModal({
-  isOpen, newName, onClose, handleDuplicateTokenGroupSubmit, handleNewTokenGroupNameChange, handleSelectedItemChange,
+  isOpen, type, newName, oldName, onClose, handleNewTokenGroupNameChange,
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
+  const { duplicateGroup } = useManageTokens();
+
+  const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
+    setSelectedTokenSets(selectedItems);
+  }, []);
+
+  const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    duplicateGroup({
+      oldName, newName, tokenSets: selectedTokenSets, type,
+    });
+    onClose();
+  }, [duplicateGroup, oldName, newName, type, selectedTokenSets]);
 
   return (
     <Modal
