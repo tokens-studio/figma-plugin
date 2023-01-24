@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RealtimeChannel } from '@supabase/realtime-js';
-import { themesListSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
+import {
+  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+} from '@/selectors';
 import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import supabase from '@/supabase';
@@ -11,6 +13,7 @@ export default function SecondScreenSync() {
   const secondScreenOn = useSelector(secondScreenSelector);
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
+  const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
   const { user } = useAuth();
@@ -63,10 +66,15 @@ export default function SecondScreenSync() {
     }
 
     if (secondScreenOn && user) {
-      const data = JSON.stringify({ sets: tokens, themes, usedTokenSets });
+      const data = JSON.stringify({
+        sets: tokens,
+        themes,
+        usedTokenSets,
+        activeTheme,
+      });
       updateRemoteData(user.email, data);
     }
-  }, [tokens, themes, secondScreenOn, user, usedTokenSets]);
+  }, [tokens, themes, secondScreenOn, user, usedTokenSets, activeTheme]);
 
   useEffect(() => {
     let channel: RealtimeChannel | null = null;
