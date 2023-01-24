@@ -148,7 +148,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
           )
           .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-            a.name.localeCompare(b.name)
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
           ));
       }
       return resolvedTokens
@@ -156,7 +156,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
         )
         .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
         ));
     },
     [resolvedTokens, filteredValue, type, isDocumentationType],
