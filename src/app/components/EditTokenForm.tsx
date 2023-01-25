@@ -6,6 +6,7 @@ import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
 import Input from './Input';
+import Text from './Text';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import {
@@ -452,9 +453,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
             />
 
             {checkIfContainsAlias(internalEditToken.value) && (
-              <div className="flex p-2 mt-2 font-mono text-gray-700 bg-gray-100 border-gray-300 rounded text-xxs itms-center">
+              <Box css={{
+                display: 'flex',
+                padding: '$3',
+                marginTop: '$3',
+                fontFamily: '$mono',
+                color: '$textMuted',
+                backgroundColor: '$bgSubtle',
+                borderColor: '$borderSubtle',
+                borderRadius: '$card',
+                fontSize: '$xxs',
+                alignItems: 'center',
+              }}
+              >
                 {resolvedValue?.toString()}
-              </div>
+              </Box>
             )}
           </div>
         );
@@ -479,7 +492,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         />
         {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
+        {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
         <Box>
           <Heading size="xsmall">Description</Heading>
           <Textarea

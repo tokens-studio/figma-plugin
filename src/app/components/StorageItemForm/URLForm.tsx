@@ -7,6 +7,7 @@ import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
 import Heading from '../Heading';
 import Text from '../Text';
 import Link from '../Link';
@@ -69,9 +70,9 @@ export default function URLForm({
           </Button>
         </Stack>
         {hasErrored && (
-        <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+        <ErrorMessage data-cy="provider-modal-error">
           {errorMessage}
-        </div>
+        </ErrorMessage>
         )}
       </Stack>
     </form>

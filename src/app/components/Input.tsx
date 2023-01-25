@@ -5,6 +5,7 @@ import IconVisibilityOff from '@/icons/visibilityoff.svg';
 import type { StitchesCSS } from '@/types';
 import Box from './Box';
 import Stack from './Stack';
+import { ErrorValidation } from './ErrorValidation';
 
 type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   form?: string;
@@ -21,7 +22,6 @@ type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   type?: string;
   custom?: string;
   placeholder?: string;
-  capitalize?: boolean;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   step?: string;
@@ -140,6 +140,12 @@ const StyledPrefix = styled('div', {
   },
 });
 
+const StyledLabel = styled('label', {
+  display: 'block',
+  fontWeight: '$bold',
+  fontSize: '$small',
+});
+
 const Input = React.forwardRef<HTMLInputElement, Props>(({
   form,
   name,
@@ -159,7 +165,6 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   custom = '',
   inputRef,
   placeholder = '',
-  capitalize = false,
   isMasked = false,
   size = 'small',
   ...inputProps
@@ -186,12 +191,12 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   }, [autofocus, htmlInputRef]);
 
   return (
-    <label htmlFor={name} className="block font-medium text-xxs">
+    <StyledLabel htmlFor={name}>
       {(!!label || !!error) && (
         <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-          {label ? <div className={capitalize ? 'capitalize' : undefined}>{label}</div> : null}
+          {label || null}
           {error ? (
-            <div className="font-bold text-red-500">{error}</div>
+            <ErrorValidation>{error}</ErrorValidation>
           ) : null}
         </Stack>
       )}
@@ -224,7 +229,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
           </StyledSuffix>
         )}
       </Box>
-    </label>
+    </StyledLabel>
   );
 });
 
