@@ -59,7 +59,7 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <div className="fixed w-full z-20" data-testid="loadingBar" data-cy="loadingBar">
+    <div className={!windowSize?.isMinimized ? 'fixed w-full z-20' : 'fixed z-20'} data-testid="loadingBar" data-cy="loadingBar">
       <Stack
         direction="row"
         align="center"
