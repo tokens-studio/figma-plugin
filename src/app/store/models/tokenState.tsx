@@ -36,6 +36,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
@@ -58,6 +59,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    stringTokens: '',
     themes: [],
     lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
@@ -80,6 +82,10 @@ export const tokenState = createModel<RootModel>()({
     collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
+    setStringTokens: (state, payload: string) => ({
+      ...state,
+      stringTokens: payload,
+    }),
     setEditProhibited(state, payload: boolean) {
       return {
         ...state,
@@ -447,9 +453,6 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokenSetOrder() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    setJSONData() {
-      dispatch.tokenState.updateDocument();
     },
     setTokenData(payload: SetTokenDataPayload) {
       if (payload.shouldUpdate) {
