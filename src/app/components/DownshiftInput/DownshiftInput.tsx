@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
@@ -119,6 +120,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
+  const [inputX, setInputX] = React.useState(0);
+  const [inputY, setInputY] = React.useState(0);
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -187,6 +190,21 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     return returnValue;
   }, []);
 
+  const container = document.getElementById('app');
+  const [element] = React.useState(document.createElement('div'));
+  const inputRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (container) {
+      container.appendChild(element);
+    }
+    if (inputRef.current) {
+      const boundingRect = inputRef.current?.getBoundingClientRect();
+      setInputX(boundingRect.left);
+      setInputY(boundingRect.bottom);
+    }
+  }, []);
+
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
@@ -217,7 +235,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {label && !inlineLabel ? <div className="font-medium text-xxs">{label}</div> : null}
             {error ? <div className="font-bold text-red-500">{error}</div> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledDownshiftInput
@@ -241,28 +259,36 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
             && (showAutoSuggest || (!isFirstLoading && (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}')))) ? (
-              <StyledDropdown className="content scroll-container">
-                {filteredTokenItems.map((token: SingleToken, index: number) => (
-                  <StyledItem
-                    data-cy="downshift-input-item"
-                    data-testid="downshift-input-item"
-                    className="dropdown-item"
-                    {...getItemProps({ key: token.name, index, item: token })}
-                    css={{
-                      backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
-                    }}
-                    isFocused={highlightedIndex === index}
-                  >
-                    {type === 'color' && (
-                    <StyledItemColorDiv>
-                      <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                    </StyledItemColorDiv>
-                    )}
-                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                  </StyledItem>
-                ))}
-              </StyledDropdown>
+              ReactDOM.createPortal(
+                <Box css={{
+                  position: 'absolute', top: '0', width: '91%', zIndex: '10', transform: `translate(${inputX}px, ${inputY}px)`,
+                }}
+                >
+                  <StyledDropdown className="content scroll-container">
+                    {filteredTokenItems.map((token: SingleToken, index: number) => (
+                      <StyledItem
+                        data-cy="downshift-input-item"
+                        data-testid="downshift-input-item"
+                        className="dropdown-item"
+                        {...getItemProps({ key: token.name, index, item: token })}
+                        css={{
+                          backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                        }}
+                        isFocused={highlightedIndex === index}
+                      >
+                        {type === 'color' && (
+                        <StyledItemColorDiv>
+                          <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                        </StyledItemColorDiv>
+                        )}
+                        <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                        <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                      </StyledItem>
+                    ))}
+                  </StyledDropdown>
+                </Box>,
+                element,
+              )
             ) : null}
         </div>
       )}
