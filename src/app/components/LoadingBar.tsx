@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Button from './Button';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { backgroundJobsSelector } from '@/selectors';
+import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
 import Stack from './Stack';
 import Spinner from './Spinner';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -28,6 +28,8 @@ export const backgroundJobTitles = {
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
+  const windowSize = useSelector(windowSizeSelector);
+
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
@@ -63,19 +65,21 @@ export default function LoadingBar() {
         align="center"
         gap={2}
         css={{
-          backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
+          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$default', margin: '$2',
         }}
       >
         <Spinner />
-        <div className="flex flex-grow items-center justify-between">
-          <div className="font-medium text-xxs">
-            {message || 'Hold on, updating...'}
-            {expectedWaitTimeInSeconds >= 1 && (
-              `(${expectedWaitTimeInSeconds}s remaining)`
-            )}
+        {!windowSize?.isMinimized && (
+          <div className="flex flex-grow items-center justify-between">
+            <div className="font-medium text-xxs">
+              {message || 'Hold on, updating...'}
+              {expectedWaitTimeInSeconds >= 1 && (
+                `(${expectedWaitTimeInSeconds}s remaining)`
+              )}
+            </div>
+            <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
           </div>
-          <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
-        </div>
+        )}
       </Stack>
     </div>
   );
