@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
+import { Mention, MentionsInput as Input, SuggestionDataItem } from 'react-mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
@@ -14,12 +15,13 @@ import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
+import mentionInputStyles from './mentionInputStyle';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
   zIndex: '10',
   width: '100%',
-  maxHeight: '140px',
+  maxHeight: '300px',
   borderRadius: '$contextMenu',
   overflowY: 'scroll',
   backgroundColor: '$bgDefault',
@@ -119,9 +121,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   handleBlur,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
-  const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
-  const [inputX, setInputX] = React.useState(0);
-  const [inputY, setInputY] = React.useState(0);
+  const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
+  const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
+  const [inputContainerWith, setInputContainerWith] = React.useState(0);
+  const portalContainer = document.getElementById('app');
+  const [portalPlaceholder] = React.useState(document.createElement('div'));
+  const inputContainerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (portalContainer) {
+      portalContainer.appendChild(portalPlaceholder);
+    }
+    if (inputContainerRef.current) {
+      const boundingRect = inputContainerRef.current?.getBoundingClientRect();
+      setInputContainerPosX(boundingRect.left);
+      setInputContainerPosY(boundingRect.bottom);
+      setInputContainerWith(boundingRect.width);
+    }
+  }, []);
+
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -165,6 +183,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     [resolvedTokens, filteredValue, type, isDocumentationType],
   );
 
+  const mentionData = useMemo<SuggestionDataItem[]>(() => {
+    if (isDocumentationType(type as Properties)) {
+      return resolvedTokens
+        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name)
+        )).map((resolvedToken) => ({
+          id: resolvedToken.name,
+          display: resolvedToken.name,
+        }));
+    }
+    return resolvedTokens
+      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+        a.name.localeCompare(b.name)
+      )).map((resolvedToken) => ({
+        id: resolvedToken.name,
+        display: resolvedToken.name,
+      }));
+  }, [initialName, resolvedTokens, referenceTokenTypes, type]);
+
   const resolveValue = useCallback((token: SingleToken) => {
     let returnValue: string = '';
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
@@ -190,21 +227,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     return returnValue;
   }, []);
 
-  const container = document.getElementById('app');
-  const [element] = React.useState(document.createElement('div'));
-  const inputRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (container) {
-      container.appendChild(element);
-    }
-    if (inputRef.current) {
-      const boundingRect = inputRef.current?.getBoundingClientRect();
-      setInputX(boundingRect.left);
-      setInputY(boundingRect.bottom);
-    }
-  }, []);
-
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
@@ -215,15 +237,36 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [showAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsFirstLoading(false);
     handleChange(e);
   }, [handleChange]);
+
+  const [mentionValue, setMentionValue] = React.useState('');
 
   const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (handleBlur) {
       handleBlur(e);
     }
   }, [handleBlur]);
+
+  const handleMentionInputChange = React.useCallback((e, newValue) => {
+    console.log('eee', e);
+    setMentionValue(newValue);
+  }, [handleChange]);
+
+  const getContainer = React.useCallback((children: React.ReactNode) => {
+    console.log('chic', children);
+    return ReactDOM.createPortal(
+      <Box css={{
+        position: 'absolute', background: '$bgDefault', top: '0', width: `${inputContainerWith}px`, padding: '$2', zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
+      }}
+      >
+        <StyledDropdown className="content scroll-container">
+          {children}
+        </StyledDropdown>
+      </Box>,
+      portalPlaceholder,
+    );
+  }, [inputContainerWith, inputContainerPosX, inputContainerPosY]);
 
   return (
     <Downshift onSelect={handleSelect}>
@@ -235,10 +278,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {label && !inlineLabel ? <div className="font-medium text-xxs">{label}</div> : null}
             {error ? <div className="font-bold text-red-500">{error}</div> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputRef}>
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <StyledDownshiftInput
+            {/* <StyledDownshiftInput
               suffix={suffix}
               type={type}
               name={name}
@@ -247,7 +290,20 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               onChange={handleInputChange}
               getInputProps={getInputProps}
               onBlur={handleInputBlur}
-            />
+            /> */}
+            <Input
+              singleLine
+              style={{ ...mentionInputStyles }}
+              value={mentionValue}
+              onChange={handleMentionInputChange}
+              placeholder={placeholder}
+              autoComplete="off"
+              allowSpaceInQuery={false}
+              customSuggestionsContainer={getContainer}
+            >
+              <Mention trigger="{" data={mentionData} markup=" __id__ " />
+            </Input>
+
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
@@ -258,10 +314,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           {filteredTokenItems
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
-            && (showAutoSuggest || (!isFirstLoading && (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}')))) ? (
+            && showAutoSuggest ? (
               ReactDOM.createPortal(
                 <Box css={{
-                  position: 'absolute', top: '0', width: '91%', zIndex: '10', transform: `translate(${inputX}px, ${inputY}px)`,
+                  position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                 }}
                 >
                   <StyledDropdown className="content scroll-container">
@@ -287,7 +343,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     ))}
                   </StyledDropdown>
                 </Box>,
-                element,
+                portalPlaceholder,
               )
             ) : null}
         </div>
