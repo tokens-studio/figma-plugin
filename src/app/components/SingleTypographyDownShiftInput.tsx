@@ -10,6 +10,8 @@ export default function SingleTypographyDownShiftInput({
   resolvedTokens,
   handleChange,
   setInputValue,
+  dropDownStatus,
+  handleDropDownStatus,
 }: {
   name: string,
   value: string;
@@ -17,6 +19,8 @@ export default function SingleTypographyDownShiftInput({
   resolvedTokens: ResolveTokenValuesResult[];
   handleChange: React.ChangeEventHandler;
   setInputValue: (newInputValue: string, property: string) => void;
+  dropDownStatus: string;
+  handleDropDownStatus?: (name: string) => void;
 }) {
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
@@ -35,6 +39,8 @@ export default function SingleTypographyDownShiftInput({
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={`${name} value or {alias}`}
       suffix
+      handleDropDownStatus={handleDropDownStatus}
+      dropDownStatus={dropDownStatus}
     />
   );
 }

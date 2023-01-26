@@ -101,6 +101,8 @@ interface DownShiftProps {
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
+  handleDropDownStatus?: (name: string) => void;
+  dropDownStatus?: string;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -118,6 +120,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   resolvedTokens,
   handleChange,
   handleBlur,
+  handleDropDownStatus,
+  dropDownStatus,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
@@ -191,12 +195,18 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
-    setShowAutoSuggest(false);
-  }, [setInputValue, setShowAutoSuggest, value]);
+    if (handleDropDownStatus) handleDropDownStatus('');
+  }, [setInputValue, value, handleDropDownStatus]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    setShowAutoSuggest(!showAutoSuggest);
-  }, [showAutoSuggest]);
+    if (handleDropDownStatus && dropDownStatus !== name) handleDropDownStatus(name || '');
+    else if (handleDropDownStatus) handleDropDownStatus('');
+  }, [handleDropDownStatus, dropDownStatus, name]);
+
+  React.useEffect(() => {
+    if (dropDownStatus === name) setShowAutoSuggest(true);
+    else setShowAutoSuggest(false);
+  }, [dropDownStatus, name, setShowAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIsFirstLoading(false);
