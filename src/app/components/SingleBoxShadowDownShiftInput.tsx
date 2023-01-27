@@ -19,6 +19,8 @@ export default function SingleBoxShadowDownShiftInput({
   handleChange,
   setInputValue,
   handleToggleInputHelper,
+  dropDownStatus,
+  handleDropDownStatus,
 }: {
   name: string,
   value: string;
@@ -27,6 +29,8 @@ export default function SingleBoxShadowDownShiftInput({
   handleChange: React.ChangeEventHandler;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
+  dropDownStatus?: string;
+  handleDropDownStatus?: (name: string) => void;
 }) {
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
@@ -55,6 +59,8 @@ export default function SingleBoxShadowDownShiftInput({
         )
       }
       suffix
+      handleDropDownStatus={handleDropDownStatus}
+      dropDownStatus={dropDownStatus}
     />
   );
 }
