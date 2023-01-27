@@ -41,6 +41,7 @@ export default function BorderTokenForm({
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
   const [inputHelperOpen, setInputHelperOpen] = useState<boolean>(false);
+  const [dropDownStatus, setDropDownStatus] = useState('');
 
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
@@ -62,6 +63,10 @@ export default function BorderTokenForm({
     setMode(changeMode);
     setAlias('');
   }, [mode]);
+
+  const handleDropDownStatus = React.useCallback((name: string) => {
+    setDropDownStatus(name);
+  }, []);
 
   return (
     <Stack direction="column" gap={2}>
@@ -98,9 +103,11 @@ export default function BorderTokenForm({
                 handleChange={handleBorderValueChange}
                 setInputValue={handleBorderValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
+                dropDownStatus={dropDownStatus}
+                handleDropDownStatus={handleDropDownStatus}
               />
               {inputHelperOpen && key === 'color' && (
-              <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
+                <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
               )}
             </>
           ))}
@@ -121,10 +128,10 @@ export default function BorderTokenForm({
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedTokenDisplay
-            alias={alias}
-            selectedToken={selectedToken}
-          />
+            <ResolvedTokenDisplay
+              alias={alias}
+              selectedToken={selectedToken}
+            />
           )}
         </Stack>
       )}
