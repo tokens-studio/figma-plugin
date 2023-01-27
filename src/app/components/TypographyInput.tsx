@@ -118,7 +118,6 @@ export default function TypographyInput({
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"
             suffix
-            handleDropDownStatus={handleDropDownStatus}
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (

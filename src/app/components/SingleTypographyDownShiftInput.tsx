@@ -19,7 +19,7 @@ export default function SingleTypographyDownShiftInput({
   resolvedTokens: ResolveTokenValuesResult[];
   handleChange: React.ChangeEventHandler;
   setInputValue: (newInputValue: string, property: string) => void;
-  dropDownStatus: string;
+  dropDownStatus?: string;
   handleDropDownStatus?: (name: string) => void;
 }) {
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);

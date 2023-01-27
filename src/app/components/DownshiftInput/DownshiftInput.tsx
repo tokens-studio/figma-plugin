@@ -196,17 +196,23 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     if (handleDropDownStatus) handleDropDownStatus('');
+    setShowAutoSuggest(false);
   }, [setInputValue, value, handleDropDownStatus]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    if (handleDropDownStatus && dropDownStatus !== name) handleDropDownStatus(name || '');
-    else if (handleDropDownStatus) handleDropDownStatus('');
-  }, [handleDropDownStatus, dropDownStatus, name]);
+    if (handleDropDownStatus) {
+      if (showAutoSuggest) {
+        handleDropDownStatus('');
+      } else {
+        handleDropDownStatus(name || '');
+      }
+    }
+    setShowAutoSuggest(!showAutoSuggest);
+  }, [handleDropDownStatus, name, showAutoSuggest]);
 
   React.useEffect(() => {
-    if (dropDownStatus === name) setShowAutoSuggest(true);
-    else setShowAutoSuggest(false);
-  }, [dropDownStatus, name, setShowAutoSuggest]);
+    if (handleDropDownStatus && dropDownStatus !== name) { setShowAutoSuggest(false); }
+  }, [dropDownStatus, handleDropDownStatus, name, setShowAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIsFirstLoading(false);
