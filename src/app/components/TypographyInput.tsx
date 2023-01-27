@@ -45,7 +45,6 @@ export default function TypographyInput({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
-  const [dropDownStatus, setDropDownStatus] = useState('');
 
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
@@ -62,10 +61,6 @@ export default function TypographyInput({
     setMode(changeMode);
     setAlias('');
   }, [mode]);
-
-  const handleDropDownStatus = React.useCallback((name: string) => {
-    setDropDownStatus(name);
-  }, []);
 
   return (
     <Stack direction="column" gap={2}>
@@ -100,8 +95,6 @@ export default function TypographyInput({
               resolvedTokens={resolvedTokens}
               handleChange={handleTypographyValueChange}
               setInputValue={handleTypographyValueDownShiftInputChange}
-              dropDownStatus={dropDownStatus}
-              handleDropDownStatus={handleDropDownStatus}
             />
           ))}
         </Stack>

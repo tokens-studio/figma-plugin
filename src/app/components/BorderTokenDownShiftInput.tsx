@@ -26,8 +26,6 @@ export default function BorderTokenDownShiftInput({
   handleChange,
   setInputValue,
   handleToggleInputHelper,
-  dropDownStatus,
-  handleDropDownStatus,
 }: {
   name: string,
   value: string;
@@ -36,8 +34,6 @@ export default function BorderTokenDownShiftInput({
   handleChange: React.ChangeEventHandler;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
-  dropDownStatus?: string;
-  handleDropDownStatus?: (name: string) => void;
 }) {
   const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBorderDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
@@ -65,8 +61,6 @@ export default function BorderTokenDownShiftInput({
         )
       }
       suffix
-      handleDropDownStatus={handleDropDownStatus}
-      dropDownStatus={dropDownStatus}
     />
   );
 }

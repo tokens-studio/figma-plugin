@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import Downshift from 'downshift';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
@@ -101,8 +101,6 @@ interface DownShiftProps {
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
-  handleDropDownStatus?: (name: string) => void;
-  dropDownStatus?: string;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -120,11 +118,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   resolvedTokens,
   handleChange,
   handleBlur,
-  handleDropDownStatus,
-  dropDownStatus,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
+  const container = useRef<HTMLDivElement>(null);
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -195,24 +192,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
-    if (handleDropDownStatus) handleDropDownStatus('');
     setShowAutoSuggest(false);
-  }, [setInputValue, value, handleDropDownStatus]);
+  }, [setInputValue, setShowAutoSuggest, value]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    if (handleDropDownStatus) {
-      if (showAutoSuggest) {
-        handleDropDownStatus('');
-      } else {
-        handleDropDownStatus(name || '');
-      }
-    }
     setShowAutoSuggest(!showAutoSuggest);
-  }, [handleDropDownStatus, name, showAutoSuggest]);
-
-  React.useEffect(() => {
-    if (handleDropDownStatus && dropDownStatus !== name) { setShowAutoSuggest(false); }
-  }, [dropDownStatus, handleDropDownStatus, name, setShowAutoSuggest]);
+  }, [showAutoSuggest]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setIsFirstLoading(false);
@@ -225,6 +210,19 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, [handleBlur]);
 
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (container.current && event.target instanceof Node && !container.current.contains(event.target) && showAutoSuggest) {
+      setShowAutoSuggest(false);
+    }
+  }, [showAutoSuggest]);
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -235,7 +233,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={container}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledDownshiftInput

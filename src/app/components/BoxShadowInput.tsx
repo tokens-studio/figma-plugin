@@ -37,7 +37,6 @@ export default function BoxShadowInput({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
-  const [dropDownStatus, setDropDownStatus] = useState('');
 
   const handleMode = React.useCallback(() => {
     const changeMode = (mode === 'input') ? 'alias' : 'input';
@@ -68,10 +67,6 @@ export default function BoxShadowInput({
       handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
-
-  const handleDropDownStatus = React.useCallback((name: string) => {
-    setDropDownStatus(name);
-  }, []);
 
   return (
     <div>
@@ -117,8 +112,6 @@ export default function BoxShadowInput({
                     key={`single-shadow-${seed(index)}`}
                     onRemove={removeShadow}
                     resolvedTokens={resolvedTokens}
-                    dropDownStatus={dropDownStatus}
-                    handleDropDownStatus={handleDropDownStatus}
                   />
                 ))
               ) : (
@@ -130,8 +123,6 @@ export default function BoxShadowInput({
                     shadowItem={internalEditToken.value}
                     onRemove={removeShadow}
                     resolvedTokens={resolvedTokens}
-                    dropDownStatus={dropDownStatus}
-                    handleDropDownStatus={handleDropDownStatus}
                   />
                 )
               )}
