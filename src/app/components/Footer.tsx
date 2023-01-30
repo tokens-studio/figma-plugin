@@ -73,10 +73,10 @@ export default function Footer() {
         alignItems: 'center',
         justifyContent: 'space-between',
         flexShrink: 0,
-        padding: '$4',
+        padding: '$3',
       }}
     >
-      <Stack direction="row">
+      <Stack direction="row" align="center" gap={2}>
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />

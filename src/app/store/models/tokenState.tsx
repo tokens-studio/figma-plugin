@@ -36,6 +36,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
@@ -58,6 +59,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    stringTokens: '',
     themes: [],
     lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
@@ -80,6 +82,10 @@ export const tokenState = createModel<RootModel>()({
     collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
+    setStringTokens: (state, payload: string) => ({
+      ...state,
+      stringTokens: payload,
+    }),
     setEditProhibited(state, payload: boolean) {
       return {
         ...state,
@@ -333,24 +339,30 @@ export const tokenState = createModel<RootModel>()({
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const {
-        parent, path, oldName, type,
+        parent, oldName, newName, tokenSets, type,
       } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
-        const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
+        const duplicatedTokenGroupName = token.name.replace(oldName, newName);
         return {
           name: duplicatedTokenGroupName,
           ...rest,
         };
       });
 
+      const newTokens = Object.keys(state.tokens).reduce<Record<string, AnyTokenList>>((acc, key) => {
+        if (tokenSets.includes(key)) {
+          acc[key] = [...state.tokens[key], ...newTokenGroup];
+        } else {
+          acc[key] = state.tokens[key];
+        }
+        return acc;
+      }, {});
+
       return {
         ...state,
-        tokens: {
-          ...state.tokens,
-          [parent]: [...state.tokens[parent], ...newTokenGroup],
-        },
+        tokens: newTokens,
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
@@ -441,9 +453,6 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokenSetOrder() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    setJSONData() {
-      dispatch.tokenState.updateDocument();
     },
     setTokenData(payload: SetTokenDataPayload) {
       if (payload.shouldUpdate) {
