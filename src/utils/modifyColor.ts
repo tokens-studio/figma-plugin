@@ -11,7 +11,6 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
         return new Color(new Color(baseColor).darken(Number(modifier.value)).to(modifier.space)).toString({ inGamut: false, precision: 3 });
       case ColorModifierTypes.MIX:
         return new Color(new Color(new Color(baseColor).mix(modifier.color, Number(modifier.value)).toString()).to(modifier.space)).toString({ inGamut: false, precision: 3 });
-        // return new Color(new Color(new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' }).toString()).to(modifier.space)).toString({ inGamut: false, precision: 3 });
       case ColorModifierTypes.ALPHA:
         // eslint-disable-next-line no-case-declarations
         const newColor = new Color(baseColor);
