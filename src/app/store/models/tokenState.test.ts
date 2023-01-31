@@ -598,7 +598,7 @@ describe('editToken', () => {
           'studio.tokens': {
             modify: {
               type: 'lighten',
-              value: 0.5,
+              value: '0.5',
               space: 'sRGB',
             },
           },

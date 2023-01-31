@@ -115,9 +115,9 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         const rgbColor = convertToRgb(couldBeNumberValue);
         if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor) {
           if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
-            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)), color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
           }
-          return convertModifiedColorToHex(rgbColor, token.$extensions?.['studio.tokens']?.modify);
+          return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)) });
         }
         return rgbColor;
       }
