@@ -172,6 +172,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             a.name.localeCompare(b.name)
           ));
       }
+      console.log('filter', filteredValue);
       return resolvedTokens
         .filter(
           (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
@@ -182,25 +183,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     },
     [resolvedTokens, filteredValue, type, isDocumentationType],
   );
-
-  const mentionData = useMemo<SuggestionDataItem[]>(() => {
-    if (isDocumentationType(type as Properties)) {
-      return resolvedTokens
-        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
-        )).map((resolvedToken) => ({
-          id: resolvedToken.name,
-          display: resolvedToken.name,
-        }));
-    }
-    return resolvedTokens
-      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-        a.name.localeCompare(b.name)
-      )).map((resolvedToken) => ({
-        id: resolvedToken.name,
-        display: resolvedToken.name,
-      }));
-  }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
   const resolveValue = useCallback((token: SingleToken) => {
     let returnValue: string = '';
@@ -227,6 +209,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     return returnValue;
   }, []);
 
+  // React.useEffect(() => {
+  //   if (value?.endsWith('{')) setShowAutoSuggest(true);
+  // }, [value]);
+
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
@@ -240,13 +226,32 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     handleChange(e);
   }, [handleChange]);
 
-  const [mentionValue, setMentionValue] = React.useState('');
-
   const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (handleBlur) {
       handleBlur(e);
     }
   }, [handleBlur]);
+
+  const [mentionValue, setMentionValue] = React.useState('');
+
+  const mentionData = useMemo<SuggestionDataItem[]>(() => {
+    if (isDocumentationType(type as Properties)) {
+      return resolvedTokens
+        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name)
+        )).map((resolvedToken) => ({
+          id: resolvedToken.name,
+          display: resolvedToken.name,
+        }));
+    }
+    return resolvedTokens
+      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+        a.name.localeCompare(b.name)
+      )).map((resolvedToken) => ({
+        id: resolvedToken.name,
+        display: resolvedToken.name,
+      }));
+  }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
   const handleMentionInputChange = React.useCallback((e, newValue) => {
     console.log('eee', e);
@@ -266,7 +271,39 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       </Box>,
       portalPlaceholder,
     );
-  }, [inputContainerWith, inputContainerPosX, inputContainerPosY]);
+  }, [inputContainerWith, inputContainerPosX, inputContainerPosY, filteredTokenItems]);
+
+  const handleRenderSuggestion = React.useCallback((
+    suggestion: SuggestionDataItem,
+    search,
+    highlightedDisplay,
+    index,
+    focused,
+  ) => {
+    console.log('sugge', suggestion);
+    console.log('search', search);
+    console.log('highlightedDisplay', highlightedDisplay);
+    console.log('index', index);
+    console.log('focused', focused);
+    const resolvedToken = resolvedTokens.find((token) => token.type === type && token.name === suggestion.id);
+    console.log('resolve', resolvedToken);
+    return (
+      <StyledItem
+        css={{
+          backgroundColor: focused ? '$interaction' : '$bgDefault',
+        }}
+        isFocused={focused}
+      >
+        {type === 'color' && (
+          <StyledItemColorDiv>
+            <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
+          </StyledItemColorDiv>
+        )}
+        <StyledItemName>{getHighlightedText(resolvedToken?.name ?? '', search || '')}</StyledItemName>
+        <StyledItemValue>{resolvedToken?.value}</StyledItemValue>
+      </StyledItem>
+    );
+  }, []);
 
   return (
     <Downshift onSelect={handleSelect}>
@@ -301,7 +338,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               allowSpaceInQuery={false}
               customSuggestionsContainer={getContainer}
             >
-              <Mention trigger="{" data={mentionData} markup=" __id__ " />
+              <Mention
+                trigger="{"
+                data={mentionData}
+                markup=" __id__ "
+                renderSuggestion={handleRenderSuggestion}
+              />
             </Input>
 
             {suffix && (

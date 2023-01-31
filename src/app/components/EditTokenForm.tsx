@@ -125,7 +125,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
         setError('Value must include either px or rem');
