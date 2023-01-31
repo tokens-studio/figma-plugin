@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Button from './Button';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { backgroundJobsSelector } from '@/selectors';
+import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
 import Stack from './Stack';
 import Text from './Text';
 import Spinner from './Spinner';
@@ -30,6 +30,8 @@ export const backgroundJobTitles = {
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
+  const windowSize = useSelector(windowSizeSelector);
+
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
@@ -65,19 +67,21 @@ export default function LoadingBar() {
         align="center"
         gap={2}
         css={{
-          backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
+          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$default', margin: '$2',
         }}
       >
         <Spinner />
-        <Stack direction="row" align="center" justify="between" css={{ flexGrow: 1 }}>
-          <Text size="xsmall" bold>
-            {message || 'Hold on, updating...'}
-            {expectedWaitTimeInSeconds >= 1 && (
-              `(${expectedWaitTimeInSeconds}s remaining)`
-            )}
-          </Text>
-          <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
-        </Stack>
+        {!windowSize?.isMinimized && (
+          <Stack direction="row" align="center" justify="between" css={{ flexGrow: 1 }}>
+            <Text size="xsmall" bold>
+              {message || 'Hold on, updating...'}
+              {expectedWaitTimeInSeconds >= 1 && (
+                `(${expectedWaitTimeInSeconds}s remaining)`
+              )}
+            </Text>
+            <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+          </Stack>
+        )}
       </Stack>
     </Box>
   );
