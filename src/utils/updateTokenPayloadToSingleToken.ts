@@ -4,7 +4,6 @@ import { SingleToken } from '@/types/tokens';
 export function updateTokenPayloadToSingleToken(
   payload: UpdateTokenPayload,
 ): SingleToken {
-  console.log('payload', payload);
   return {
     name: payload.name,
     value: payload.value,
