@@ -44,10 +44,6 @@ export default function BoxShadowInput({
     setAlias('');
   }, [mode]);
 
-  React.useEffect(() => {
-    console.log('va', internalEditToken.value);
-  }, [internalEditToken.value]);
-
   const selectedToken = React.useMemo(() => {
     const search = findReferences(typeof internalEditToken.value === 'string' ? internalEditToken.value : '');
     if (search && search.length > 0) {
@@ -78,20 +74,12 @@ export default function BoxShadowInput({
         <Heading size="small">Shadow</Heading>
         <Box css={{ display: 'flex' }}>
           {mode === 'input' ? (
-            <>
-              <IconButton
-                tooltip="Reference mode"
-                dataCy="mode-change-button"
-                onClick={handleMode}
-                icon={<TokensIcon />}
-              />
-              <IconButton
-                tooltip="Add another shadow"
-                dataCy="button-shadow-add-multiple"
-                onClick={addShadow}
-                icon={<IconPlus />}
-              />
-            </>
+            <IconButton
+              tooltip="Reference mode"
+              dataCy="mode-change-button"
+              onClick={handleMode}
+              icon={<TokensIcon />}
+            />
           ) : (
             <IconButton
               tooltip="Input mode"
@@ -100,6 +88,12 @@ export default function BoxShadowInput({
               icon={<LinkBreak2Icon />}
             />
           )}
+          <IconButton
+            tooltip="Add another shadow"
+            dataCy="button-shadow-add-multiple"
+            onClick={addShadow}
+            icon={<IconPlus />}
+          />
         </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
