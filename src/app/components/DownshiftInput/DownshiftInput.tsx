@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import Downshift from 'downshift';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
@@ -121,6 +121,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
   const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
+  const container = useRef<HTMLDivElement>(null);
   const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
     showAutoSuggest,
     value,
@@ -209,6 +210,19 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, [handleBlur]);
 
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (container.current && event.target instanceof Node && !container.current.contains(event.target) && showAutoSuggest) {
+      setShowAutoSuggest(false);
+    }
+  }, [showAutoSuggest]);
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -219,7 +233,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={container}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <StyledDownshiftInput
