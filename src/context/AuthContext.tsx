@@ -4,10 +4,7 @@ import React, {
 import supabase from '@/supabase';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-
-export function sendMessageToBackground(type: any, data?: any) {
-  parent.postMessage({ pluginMessage: { ...(data || {}), type } }, '*');
-}
+import useInterval from '@/hooks/useInterval';
 
 interface UserData {
   email: string;
@@ -65,8 +62,8 @@ const AuthContextProvider = ({
 
   function handleLogin(data: AuthData) {
     setAuthData(data);
-    // Store user auth data in figma.clientStorage
 
+    // Store user auth data in figma.clientStorage
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_AUTH_DATA,
       auth: data,
@@ -108,9 +105,9 @@ const AuthContextProvider = ({
     setAuthInProgress(false);
   }, []);
 
-  useEffect(() => {
-    async function checkAuthData(data: AuthData) {
-      await supabase.verifyAuth(data, (result: AuthData | null) => {
+  const checkAuthData = useCallback(async () => {
+    if (authData) {
+      await supabase.verifyAuth(authData, (result: AuthData | null) => {
         if (result) {
           handleLogin(result);
         } else {
@@ -118,11 +115,21 @@ const AuthContextProvider = ({
         }
       });
     }
+  }, [authData]);
 
+  useEffect(() => {
+    if (authData) {
+      checkAuthData();
+    }
+  }, [authData, checkAuthData]);
+
+  useEffect(() => {
     if (savedAuthData) {
-      checkAuthData(savedAuthData);
+      setAuthData(savedAuthData);
     }
   }, [savedAuthData]);
+
+  useInterval(checkAuthData, 300000);
 
   const contextValue = useMemo(
     () => ({
