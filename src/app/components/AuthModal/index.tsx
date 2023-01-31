@@ -21,7 +21,6 @@ export default function AuthModal() {
   const [values, setValues] = React.useState({
     email: '',
     password: '',
-    repeatedPassword: '',
   });
 
   const handleChange = useCallback(
@@ -37,19 +36,17 @@ export default function AuthModal() {
 
   const onCtaClick = useCallback(() => {
     setMode(mode === 'login' ? 'signup' : 'login');
-    setValues({ email: '', password: '', repeatedPassword: '' });
+    setValues({ email: '', password: '' });
     setAuthError('');
   }, [mode, setAuthError]);
 
   const onSubmitButtonClick = useCallback(() => {
     if (mode === 'login') {
       logIn(values);
-    } else if (mode === 'signup' && values.password !== values.repeatedPassword) {
-      setAuthError('Passwords do not match');
     } else {
       signUp(values);
     }
-  }, [mode, logIn, signUp, values, setAuthError]);
+  }, [mode, logIn, signUp, values]);
 
   const getSubmitButtonContent = () => {
     if (authInProgress) {
@@ -81,15 +78,6 @@ export default function AuthModal() {
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$5' }}>
         <Input name="email" type="email" value={values.email} onChange={handleChange} label="Email" />
         <Input name="password" type="password" value={values.password} onChange={handleChange} label="Password" />
-        {mode === 'signup' && (
-          <Input
-            name="repeatedPassword"
-            type="password"
-            value={values.repeatedPassword}
-            onChange={handleChange}
-            label="Repeat password"
-          />
-        )}
         <Button variant="primary" onClick={onSubmitButtonClick}>
           {getSubmitButtonContent()}
         </Button>
