@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -38,6 +39,7 @@ const applicationInitStepLabels = {
 export const AppContainer = withLDProviderWrapper((params: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
+  const { secondScreen } = useFlags();
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -73,26 +75,30 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
   globalStyles();
 
-  return (
-    <AuthContextProvider authData={params.authData}>
-      <>
-        <FigmaLoading
-          isLoading={showLoadingScreen}
-          label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
-          onCancel={handleCancelLoadingScreen}
-        >
-          <App />
-        </FigmaLoading>
-        <Initiator />
-        <ConfirmDialog />
-        <ImportedTokensDialog />
-        <PushDialog />
-        <WindowResizer />
-        <OnboardingFlow />
-        <Changelog />
-        <SecondScreenSync />
-        <AuthModal />
-      </>
-    </AuthContextProvider>
+  const appContent = (
+    <>
+      <FigmaLoading
+        isLoading={showLoadingScreen}
+        label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
+        onCancel={handleCancelLoadingScreen}
+      >
+        <App />
+      </FigmaLoading>
+      <Initiator />
+      <ConfirmDialog />
+      <ImportedTokensDialog />
+      <PushDialog />
+      <WindowResizer />
+      <OnboardingFlow />
+      <Changelog />
+      {secondScreen && (
+        <>
+          <SecondScreenSync />
+          <AuthModal />
+        </>
+      )}
+    </>
   );
+
+  return secondScreen ? <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider> : appContent;
 });
