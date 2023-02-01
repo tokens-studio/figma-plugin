@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RealtimeChannel } from '@supabase/realtime-js';
+import { RealtimeChannel, RealtimePostgresUpdatePayload } from '@supabase/realtime-js';
 import {
   activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import supabase from '@/supabase';
 import { Dispatch } from '@/app/store';
+import { Clients, TokenData } from '@/types/SecondScreen';
 
 export default function SecondScreenSync() {
   const secondScreenOn = useSelector(secondScreenSelector);
@@ -18,33 +19,35 @@ export default function SecondScreenSync() {
   const usedTokenSets = useSelector(usedTokenSetSelector);
   const { user } = useAuth();
 
+  // Listen to data changes and update the state
   useEffect(() => {
     let dbUpdateChannel: RealtimeChannel | null = null;
-    // Supabase client setup
+
     if (user && secondScreenOn) {
       dbUpdateChannel = supabase
         .channel('value-db-changes')
         .on(
           'postgres_changes',
           {
-            event: '*',
+            event: 'UPDATE',
             schema: 'public',
             table: 'tokens',
             filter: `owner_email=eq.${user.email}`,
           },
-          // TODO: add some types
-          (payload: any) => {
-            if (payload.new.last_updated_by !== 'plugin' && payload.new.ftData) {
+          (payload: RealtimePostgresUpdatePayload<TokenData>) => {
+            if (payload.new.last_updated_by !== Clients.PLUGIN && payload.new.ftData) {
               const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.ftData;
 
-              dispatch.tokenState.setTokens(sets);
+              if (sets) {
+                dispatch.tokenState.setTokens(sets);
+              }
               dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
               dispatch.tokenState.setThemes(newThemes);
             }
           },
         )
         .subscribe((status: any, err: any) => {
-          console.log(err);
+          console.error(err);
         });
     }
     return () => {
@@ -54,12 +57,13 @@ export default function SecondScreenSync() {
     };
   }, [user, secondScreenOn, dispatch.tokenState]);
 
+  // Listen to state changes and update the db
   useEffect(() => {
     async function updateRemoteData(email: string, ftData: string) {
       await supabase.postgrest
         .from('tokens')
         .upsert(
-          { ftData, owner_email: email, last_updated_by: 'plugin' },
+          { ftData, owner_email: email, last_updated_by: Clients.PLUGIN },
           { onConflict: 'owner_email', ignoreDuplicates: false },
         )
         .eq('owner_email', email);
@@ -76,6 +80,7 @@ export default function SecondScreenSync() {
     }
   }, [tokens, themes, secondScreenOn, user, usedTokenSets, activeTheme]);
 
+  // this is used for tracking if the plugin is on
   const createChannel = useCallback(() => {
     let channel: RealtimeChannel | null = null;
 

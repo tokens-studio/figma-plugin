@@ -15,7 +15,7 @@ import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
 import { SyncOption } from '@/app/store/useTokens';
-import { AuthData } from '@/context/AuthContext';
+import { AuthData } from './Auth';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin

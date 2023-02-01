@@ -49,7 +49,7 @@ export default function SecondScreen() {
           height: '7px',
           width: '7px',
           borderRadius: '50%',
-          background: isEnabled && user ? '#93DD66' : '$fgDanger',
+          background: isEnabled && user ? '$fgSuccess' : '$fgDanger',
         }}
       />
     </Box>

@@ -1,4 +1,4 @@
-import { AuthData } from '@/context/AuthContext';
+import { AuthData } from '@/types/Auth';
 import { tryParseJson } from '@/utils/tryParseJson';
 import { FigmaStorageProperty, FigmaStorageType } from './FigmaStorageProperty';
 

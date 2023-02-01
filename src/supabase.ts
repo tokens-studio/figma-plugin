@@ -3,7 +3,7 @@ import { StorageClient } from '@supabase/storage-js';
 import {
   RealtimeChannel, RealtimeChannelOptions, RealtimeClient, RealtimeClientOptions,
 } from '@supabase/realtime-js';
-import { AuthData, AuthInfo } from './context/AuthContext';
+import { AuthData, AuthInfo } from './types/Auth';
 
 const authUri = '/auth/v1';
 
@@ -98,8 +98,9 @@ class SupabaseClient {
       const { data, error } = await this.signIn({
         refresh_token: auth.refresh_token,
       });
+
       if (error) {
-        console.error(data);
+        callback(null);
       } else {
         // Reset auth data
         this.initializeAuth(data);

@@ -1,44 +1,10 @@
 import React, {
-  useState, createContext, useContext, useEffect, useMemo, useCallback, SetStateAction,
+  useState, createContext, useContext, useEffect, useMemo, useCallback,
 } from 'react';
 import supabase from '@/supabase';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-
-export function sendMessageToBackground(type: any, data?: any) {
-  parent.postMessage({ pluginMessage: { ...(data || {}), type } }, '*');
-}
-
-interface UserData {
-  email: string;
-  id: string;
-}
-
-export interface AuthData {
-  access_token: string;
-  expires_at: number;
-  expires_in: number;
-  refresh_token: string;
-  token_type: string;
-  user: UserData;
-}
-
-export interface AuthInfo {
-  email?: string;
-  password?: string;
-  repeatedPassword?: string;
-  refresh_token?: string;
-}
-
-interface AuthContextType {
-  user: UserData | null;
-  logIn: (loginInfo: AuthInfo) => void;
-  signUp: (loginInfo: AuthInfo) => void;
-  handleLogout: () => void;
-  authInProgress: boolean;
-  authError: string;
-  setAuthError: React.Dispatch<SetStateAction<string>>;
-}
+import { AuthContextType, AuthData, AuthInfo } from '@/types/Auth';
 
 const defaultContextValue = {
   user: null,
@@ -86,7 +52,6 @@ const AuthContextProvider = ({
     setAuthInProgress(true);
     const { data, error } = await supabase.signIn(loginInfo);
     if (error) {
-      console.error(error);
       setAuthError(error.msg || error.error_description);
     } else {
       handleLogin(data);
@@ -99,7 +64,6 @@ const AuthContextProvider = ({
     setAuthInProgress(true);
     const { data, error } = await supabase.signUp(signUpInfo);
     if (error) {
-      console.error(error);
       setAuthError(error.msg || error.error_description);
     } else {
       handleLogin(data);

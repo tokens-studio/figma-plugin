@@ -10,12 +10,17 @@ import Button from '../Button';
 import Text from '../Text';
 import Spinner from '../Spinner';
 
+enum AuthModes {
+  LOGIN = 'login',
+  SIGNUP = 'signup',
+}
+
 export default function AuthModal() {
   const {
     user, authInProgress, logIn, signUp, authError, setAuthError,
   } = useAuth();
   const dispatch = useDispatch<Dispatch>();
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const secondScreenEnabled = useSelector(secondScreenSelector);
 
   const [values, setValues] = React.useState({
@@ -35,7 +40,7 @@ export default function AuthModal() {
   );
 
   const onCtaClick = useCallback(() => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+    setMode(mode === AuthModes.LOGIN ? AuthModes.SIGNUP : AuthModes.LOGIN);
     setValues({ email: '', password: '' });
     setAuthError('');
   }, [mode, setAuthError]);
@@ -56,12 +61,12 @@ export default function AuthModal() {
         </Box>
       );
     }
-    return mode === 'login' ? 'Log in' : 'Sign up';
+    return mode === AuthModes.LOGIN ? 'Log in' : 'Sign up';
   };
 
   const getInfo = () => {
-    const text = mode === 'login' ? 'Do not have an account ?' : 'Already have an account';
-    const cta = mode === 'login' ? 'Sign up here' : 'Log in here';
+    const text = mode === AuthModes.LOGIN ? 'Do not have an account ?' : 'Already have an account';
+    const cta = mode === AuthModes.LOGIN ? 'Sign up here' : 'Log in here';
 
     return (
       <>
