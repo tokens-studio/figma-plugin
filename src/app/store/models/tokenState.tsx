@@ -105,6 +105,14 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       activeTokenSet: data,
     }),
+    setUsedTokenSet: (state, data: UsedTokenSetsMap) => ({
+      ...state,
+      usedTokenSet: data,
+    }),
+    setThemes: (state, data: ThemeObjectsList) => ({
+      ...state,
+      themes: data,
+    }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
         notifyToUI('Token set already exists', { error: true });
