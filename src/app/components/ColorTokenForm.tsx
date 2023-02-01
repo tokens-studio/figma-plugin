@@ -19,7 +19,6 @@ import {
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
-import { StyledPrefix, StyledInput } from './Input';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { ColorModifier, MixModifier } from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -69,39 +68,43 @@ export default function ColorTokenForm({
     return null;
   }, [internalEditToken, resolvedTokens]);
 
+  const resolvedModifyAmountValue = React.useMemo(() => (internalEditToken?.$extensions?.['studio.tokens']?.modify?.value
+    ? getAliasValue(internalEditToken?.$extensions?.['studio.tokens']?.modify?.value, resolvedTokens)
+    : null), [internalEditToken, resolvedTokens]);
+
   const modifiedColor = useMemo(() => {
     if (resolvedValue) {
       if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
         const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
         if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return modifyColor(String(resolvedValue), internalEditToken?.$extensions?.['studio.tokens']?.modify);
+          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue) });
         }
         if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, color: String(resolvedMixValue) });
+          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue), color: String(resolvedMixValue) });
         }
         return resolvedValue;
       }
       return resolvedValue;
     }
     return null;
-  }, [internalEditToken, resolvedValue, resolvedMixValue]);
+  }, [internalEditToken, resolvedValue, resolvedMixValue, resolvedModifyAmountValue]);
 
   const displayColor = useMemo(() => {
     if (resolvedValue) {
       if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
         const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
         if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return convertModifiedColorToHex(String(resolvedValue), internalEditToken?.$extensions?.['studio.tokens']?.modify);
+          return convertModifiedColorToHex(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue) });
         }
         if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return convertModifiedColorToHex(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, color: String(resolvedMixValue) });
+          return convertModifiedColorToHex(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue), color: String(resolvedMixValue) });
         }
         return resolvedValue;
       }
       return resolvedValue;
     }
     return null;
-  }, [internalEditToken, resolvedValue, resolvedMixValue]);
+  }, [internalEditToken, resolvedValue, resolvedMixValue, resolvedModifyAmountValue]);
 
   const handleToggleInputHelper = useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -163,6 +166,15 @@ export default function ColorTokenForm({
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         value: e.target.value.replace(',', '.'),
+      });
+    }
+  }, [internalEditToken, handleModifyChange]);
+
+  const handleModifyValueDownShiftInputChange = useCallback((newModifyValue: string) => {
+    if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+      handleModifyChange({
+        ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
+        value: newModifyValue,
       });
     }
   }, [internalEditToken, handleModifyChange]);
@@ -295,10 +307,16 @@ export default function ColorTokenForm({
                 </>
               )
             }
-            <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
-              <StyledPrefix isText>{getIconComponent}</StyledPrefix>
-              <StyledInput onChange={handleModifyValueChange} value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value} required />
-            </Box>
+            <DownshiftInput
+              value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value}
+              type={TokenTypes.OTHER}
+              resolvedTokens={resolvedTokens}
+              handleChange={handleModifyValueChange}
+              setInputValue={handleModifyValueDownShiftInputChange}
+              placeholder="Value or {alias}"
+              suffix
+              prefix={getIconComponent}
+            />
           </>
         )
       }
