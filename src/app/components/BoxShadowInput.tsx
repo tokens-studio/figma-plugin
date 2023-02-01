@@ -74,12 +74,20 @@ export default function BoxShadowInput({
         <Heading size="small">Shadow</Heading>
         <Box css={{ display: 'flex' }}>
           {mode === 'input' ? (
-            <IconButton
-              tooltip="Reference mode"
-              dataCy="mode-change-button"
-              onClick={handleMode}
-              icon={<TokensIcon />}
-            />
+            <>
+              <IconButton
+                tooltip="Reference mode"
+                dataCy="mode-change-button"
+                onClick={handleMode}
+                icon={<TokensIcon />}
+              />
+              <IconButton
+                tooltip="Add another shadow"
+                dataCy="button-shadow-add-multiple"
+                onClick={addShadow}
+                icon={<IconPlus />}
+              />
+            </>
           ) : (
             <IconButton
               tooltip="Input mode"
@@ -88,12 +96,6 @@ export default function BoxShadowInput({
               icon={<LinkBreak2Icon />}
             />
           )}
-          <IconButton
-            tooltip="Add another shadow"
-            dataCy="button-shadow-add-multiple"
-            onClick={addShadow}
-            icon={<IconPlus />}
-          />
         </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
@@ -115,16 +117,14 @@ export default function BoxShadowInput({
                   />
                 ))
               ) : (
-                typeof internalEditToken.value !== 'string' && (
-                  <SingleBoxShadowInput
-                    handleBoxShadowValueChange={handleBoxShadowValueChange}
-                    index={0}
-                    value={internalEditToken.value}
-                    shadowItem={internalEditToken.value}
-                    onRemove={removeShadow}
-                    resolvedTokens={resolvedTokens}
-                  />
-                )
+                <SingleBoxShadowInput
+                  handleBoxShadowValueChange={handleBoxShadowValueChange}
+                  index={0}
+                  value={typeof internalEditToken.value === 'string' ? undefined : internalEditToken.value}
+                  shadowItem={typeof internalEditToken.value === 'string' ? undefined : internalEditToken.value}
+                  onRemove={removeShadow}
+                  resolvedTokens={resolvedTokens}
+                />
               )}
             </DndProvider>
           ) : (
