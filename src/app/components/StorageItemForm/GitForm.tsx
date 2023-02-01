@@ -7,11 +7,17 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
+import { transformProviderName } from '@/utils/transformProviderName';
+import Heading from '../Heading';
+import Text from '../Text';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
@@ -51,7 +57,21 @@ export default function GitForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
+        <Stack direction="column" gap={1}>
+          <Heading>
+            Add new
+            {' '}
+            {transformProviderName(values.provider)}
+            {' '}
+            credentials
+          </Heading>
+          <Text muted>
+            Access tokens stored on your repository, push and pull tokens in a two-way sync.
+            {' '}
+            <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}>Read more</Link>
+          </Text>
+        </Stack>
+        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Box css={{ position: 'relative' }}>
           <Input
             full
@@ -67,7 +87,7 @@ export default function GitForm({
         </Box>
         <Input
           full
-          label="Repository (username/repo)"
+          label="Repository (owner/repo)"
           value={values.id}
           onChange={onChange}
           type="text"
@@ -76,7 +96,7 @@ export default function GitForm({
         />
         <Input
           full
-          label="Default Branch"
+          label="Branch"
           value={values.branch}
           onChange={onChange}
           type="text"
@@ -85,7 +105,7 @@ export default function GitForm({
         />
         <Input
           full
-          label="File Path (e.g. data/tokens.json)"
+          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
           defaultValue=""
           value={values.filePath}
           onChange={onChange}
@@ -102,18 +122,18 @@ export default function GitForm({
           name="baseUrl"
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

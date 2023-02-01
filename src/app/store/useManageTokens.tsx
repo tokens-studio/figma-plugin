@@ -7,10 +7,11 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
+  DeleteTokenPayload, DuplicateTokenGroupPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
 import useTokens from './useTokens';
-
+import { StyleOptions } from '@/constants/StyleOptions';
+import { ColorModifier } from '@/types/Modifier';
 // @TODO this typing could be more strict in the future
 
 type EditSingleTokenData = {
@@ -21,6 +22,7 @@ type EditSingleTokenData = {
   description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };
 
 type CreateSingleTokenData = {
@@ -30,7 +32,10 @@ type CreateSingleTokenData = {
   value: SingleToken['value'];
   description?: string;
   shouldUpdateDocument?: boolean;
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };
+
+type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
 
 export default function useManageTokens() {
   const store = useStore<RootState>();
@@ -43,7 +48,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, type, name, value, description, oldName, shouldUpdateDocument = true,
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -61,6 +66,7 @@ export default function useManageTokens() {
         description,
         oldName,
         shouldUpdate: shouldUpdateDocument,
+        $extensions,
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
@@ -71,7 +77,7 @@ export default function useManageTokens() {
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, type, name, value, description, shouldUpdateDocument = true,
+      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -88,6 +94,7 @@ export default function useManageTokens() {
         value,
         description,
         shouldUpdate: shouldUpdateDocument,
+        $extensions,
       } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
@@ -103,14 +110,17 @@ export default function useManageTokens() {
   }, [duplicateToken, dispatch.uiState]);
 
   const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
+    const choices: Choice[] = [];
+    if (store.getState().tokenState.themes.length > 0 && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
+      choices.push({
+        key: StyleOptions.REMOVE, label: 'Delete associated style',
+      });
+    }
+
     const userConfirmation = await confirm({
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
-      choices: [
-        {
-          key: 'delete-style', label: 'Delete associated style',
-        },
-      ],
+      choices,
     });
     if (userConfirmation) {
       dispatch.uiState.startJob({
@@ -118,7 +128,7 @@ export default function useManageTokens() {
         isInfinite: true,
       });
       deleteToken(data);
-      if (Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
@@ -142,29 +152,25 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (path: string, newName: string, type: string) => {
+  const renameGroup = useCallback(async (oldName: string, newName: string, type: string) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length - oldName.length);
-
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
     await renameTokenGroup({
-      parent: activeTokenSet, path: newPath, oldName, newName, type,
+      parent: activeTokenSet, oldName, newName, type,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
 
-  const duplicateGroup = useCallback(async (path: string, type: string) => {
+  const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length - oldName.length);
 
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
     await duplicateTokenGroup({
-      parent: activeTokenSet, path: newPath, oldName, type,
+      parent: activeTokenSet, oldName: data.oldName, newName: data.newName, tokenSets: data.tokenSets, type: data.type,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
   }, [store, duplicateTokenGroup, dispatch.uiState]);
+
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup,
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);

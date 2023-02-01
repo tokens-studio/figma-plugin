@@ -29,6 +29,7 @@ import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { transformProviderName } from '@/utils/transformProviderName';
 import SecondScreen from './SecondScreen';
 
 export default function Footer() {
@@ -58,25 +59,6 @@ export default function Footer() {
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
-  const transformProviderName = React.useCallback((provider: StorageProviderType) => {
-    switch (provider) {
-      case StorageProviderType.JSONBIN:
-        return 'JSONBin.io';
-      case StorageProviderType.GITHUB:
-        return 'GitHub';
-      case StorageProviderType.GITLAB:
-        return 'GitLab';
-      case StorageProviderType.BITBUCKET:
-        return 'Bitbucket';
-      case StorageProviderType.ADO:
-        return 'ADO';
-      case StorageProviderType.URL:
-        return 'URL';
-      default:
-        return provider;
-    }
-  }, []);
-
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [
     pullTokens,
@@ -94,10 +76,10 @@ export default function Footer() {
         alignItems: 'center',
         justifyContent: 'space-between',
         flexShrink: 0,
-        padding: '$4',
+        padding: '$3',
       }}
     >
-      <Stack direction="row">
+      <Stack direction="row" align="center" gap={2}>
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />
@@ -141,11 +123,13 @@ export default function Footer() {
         )}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>{`V ${pjs.plugin_version}`}</Box>
+        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.plugin_version}`}</a>
+        </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
-          <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
+          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
         </Stack>
       </Stack>
     </Box>

@@ -32,6 +32,6 @@ export default function ProBadge({ compact }: Props) {
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
 
   return (
-    <StyledProBadge href="https://figmatokens.com" target="_blank">{(existingKey && !licenseKeyError) || compact ? 'Pro' : 'Get Pro'}</StyledProBadge>
+    <StyledProBadge href="https://tokens.studio" target="_blank">{(existingKey && !licenseKeyError) || compact ? 'Pro' : 'Get Pro'}</StyledProBadge>
   );
 }

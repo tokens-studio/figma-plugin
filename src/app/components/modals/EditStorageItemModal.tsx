@@ -1,10 +1,10 @@
 import React from 'react';
 import Modal from '../Modal';
-import Heading from '../Heading';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
 import { StorageTypeFormValues } from '@/types/StorageType';
+import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
   isOpen: boolean;
@@ -21,7 +21,7 @@ export default function EditStorageItemModal({
   const { addNewProviderItem } = useRemoteTokens();
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
-  const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = React.useCallback((e: Eventlike) => {
     setFormFields({ ...formFields, [e.target.name]: e.target.value });
   }, [formFields]);
 
@@ -36,9 +36,8 @@ export default function EditStorageItemModal({
   }, [addNewProviderItem, onSuccess]);
 
   return (
-    <Modal large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
+    <Modal title="Edit credentials" large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
-        <Heading>Edit storage item</Heading>
         <StorageItemForm
           onChange={handleChange}
           onSubmit={handleSubmit}

@@ -401,9 +401,8 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-
-      await result.findByText('Remote storage detected');
-      expect(result.queryByText('Remote storage detected')).toBeInTheDocument();
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
     });
   }));
 });

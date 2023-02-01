@@ -21,7 +21,6 @@ import IconFigmaLoading from './figma-loading.svg';
 import IconFigmaMark from './figma-mark.svg';
 import IconFolder from './folder.svg';
 import IconGap from './gap.svg';
-import IconGithub from './github.svg';
 import IconGrabber from './grabber.svg';
 import IconGrid from './grid.svg';
 import IconHelp from './help.svg';
@@ -43,7 +42,6 @@ import IconRefresh from './refresh.svg';
 import IconResizeWindow from './resizewindow.svg';
 import IconShadow from './shadow.svg';
 import IconSpacing from './spacing.svg';
-import IconStyle from './style.svg';
 import Icon_Trash from './trash.svg';
 import IconUndo from './undo.svg';
 import IconVerticalPadding from './verticalpadding.svg';
@@ -65,6 +63,7 @@ import IconCollapseArrow from './collapse-arrow.svg';
 import IconExpandArrow from './expand-arrow.svg';
 import IconBorder from './border.svg';
 import IconImage from './image.svg';
+import IconExclamationTriangle from './exclamation-triangle.svg';
 
 export {
   IconAdd,
@@ -90,7 +89,6 @@ export {
   IconFigmaMark,
   IconFolder,
   IconGap,
-  IconGithub,
   IconGrabber,
   IconGrid,
   IconHelp,
@@ -111,7 +109,6 @@ export {
   IconResizeWindow,
   IconShadow,
   IconSpacing,
-  IconStyle,
   IconTrash,
   IconUndo,
   IconVerticalPadding,
@@ -134,4 +131,5 @@ export {
   IconExpandArrow,
   IconBorder,
   IconImage,
+  IconExclamationTriangle,
 };

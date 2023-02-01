@@ -9,6 +9,7 @@ import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import Button from './Button';
 import Heading from './Heading';
 import Input from './Input';
+import Text from './Text';
 import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';
@@ -16,8 +17,9 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
+import Box from './Box';
 
-function ConfirmDialog() {
+function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
@@ -96,15 +98,17 @@ function ConfirmDialog() {
   switch (showPushDialog) {
     case 'initial': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal title="Push changes" showClose large isOpen close={onCancel}>
           <form onSubmit={handleSubmit}>
             <Stack direction="column" gap={4}>
-              <Stack direction="column" gap={2}>
-                <Heading>Push changes</Heading>
-                <p className="text-xs">Push your local changes to your repository.</p>
-                <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
+              <Stack direction="column" gap={3}>
+                <Text size="small">Push your local changes to your repository.</Text>
+                <Box css={{
+                  padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+                }}
+                >
                   {'id' in localApiState ? localApiState.id : null}
-                </div>
+                </Box>
                 <Heading size="small">Commit message</Heading>
                 <Textarea
                   id="push-dialog-commit-message"
@@ -156,21 +160,21 @@ function ConfirmDialog() {
     case 'success': {
       return (
         <Modal large isOpen close={onCancel}>
-          <div className="text-center">
-            <div className="mb-8 space-y-4">
+          <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
+            <Stack direction="column" gap={4}>
               <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
-              <div className="text-xs">
+              <Text size="small">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
-              </div>
-            </div>
+              </Text>
+            </Stack>
             <Button variant="primary" href={redirectHref}>
               Create Pull Request
             </Button>
-          </div>
+          </Stack>
         </Modal>
       );
     }
@@ -179,4 +183,4 @@ function ConfirmDialog() {
     }
   }
 }
-export default ConfirmDialog;
+export default PushDialog;

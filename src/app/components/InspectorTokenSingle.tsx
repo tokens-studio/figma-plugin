@@ -1,4 +1,5 @@
 import React from 'react';
+import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
@@ -13,11 +14,11 @@ import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
 import Button from './Button';
-import Heading from './Heading';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
 import { IconBrokenLink } from '@/icons';
+import StyleIcon from '@/icons/style.svg';
 
 export default function InspectorTokenSingle({
   token,
@@ -26,6 +27,7 @@ export default function InspectorTokenSingle({
   token: SelectionGroup;
   resolvedTokens: SingleToken[];
 }) {
+  // If token has the resolvedValue property, that means it is the style not a token
   const { handleRemap, getTokenValue } = useTokens();
   const property = useTypeForProperty(token.category);
   const inspectState = useSelector(inspectStateSelector, shallowEqual);
@@ -35,11 +37,16 @@ export default function InspectorTokenSingle({
   const [isChecked, setChecked] = React.useState<boolean>(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
 
-  const mappedToken = React.useMemo(() => getTokenValue(token.value, resolvedTokens), [token, resolvedTokens, getTokenValue]);
+  const tokenToDisplay = React.useMemo(() => {
+    const resolvedToken = getTokenValue(token.value, resolvedTokens);
+    if (resolvedToken) return { name: resolvedToken.name, value: resolvedToken.value, type: resolvedToken.type };
+    if (token.resolvedValue) return { name: token.value, value: token.resolvedValue, type: property };
+    return null;
+  }, [token, property, getTokenValue, resolvedTokens]);
 
   React.useEffect(() => {
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
-    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value)) setIsBrokenLink(true);
+    if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue) setIsBrokenLink(true);
   }, [inspectState.selectedTokens, token]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
@@ -54,7 +61,7 @@ export default function InspectorTokenSingle({
   const onConfirm = React.useCallback(() => {
     handleRemap(token.category, token.value, newTokenName, resolvedTokens);
     setShowDialog(false);
-  }, [token, handleRemap, newTokenName]);
+  }, [token, handleRemap, newTokenName, resolvedTokens]);
 
   const handleClick = React.useCallback(() => {
     setShowDialog(true);
@@ -93,9 +100,14 @@ export default function InspectorTokenSingle({
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
-        {isBrokenLink && <IconBrokenLink />}
-        {(!!mappedToken) && (
-          <InspectorResolvedToken token={mappedToken} />
+        {
+           (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon />
+        }
+        {
+          isBrokenLink && token.value !== 'none' && <IconBrokenLink />
+        }
+        {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
+        <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
           css={{
@@ -105,38 +117,37 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
+          {/* TODO Should update the Icon to show this is style not a token */}
+          {token.resolvedValue && <StyleIcon />}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
-          <IconButton
-            tooltip="Change to another token"
-            dataCy="button-token-remap"
-            onClick={handleClick}
-            icon={<IconToggleableDisclosure />}
-          />
+          {
+            !token.resolvedValue && (
+            <IconButton
+              tooltip="Change to another token"
+              dataCy="button-token-remap"
+              onClick={handleClick}
+              icon={<IconToggleableDisclosure />}
+            />
+            )
+          }
         </Box>
         {
           showDialog && (
-            <Modal large isOpen close={onCancel}>
+            <Modal title={`Choose a new token for ${tokenToDisplay?.name || token.value}`} large isOpen close={onCancel}>
               <form
                 onSubmit={onConfirm}
               >
                 <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
-                  <Stack direction="column" gap={2}>
-                    <Heading>
-                      Choose a new token for
-                      {' '}
-                      {mappedToken?.name || token.value}
-                    </Heading>
-                    <DownshiftInput
-                      value={newTokenName}
-                      type={property === 'fill' ? 'color' : property}
-                      resolvedTokens={resolvedTokens}
-                      handleChange={handleChange}
-                      setInputValue={handleDownShiftInputChange}
-                      placeholder="Choose a new token"
-                      suffix
-                    />
+                  <DownshiftInput
+                    value={newTokenName}
+                    type={property}
+                    resolvedTokens={resolvedTokens}
+                    handleChange={handleChange}
+                    setInputValue={handleDownShiftInputChange}
+                    placeholder="Choose a new token"
+                    suffix
+                  />
 
-                  </Stack>
                   <Stack direction="row" gap={4} justify="between">
                     <Button variant="secondary" onClick={onCancel}>
                       Cancel

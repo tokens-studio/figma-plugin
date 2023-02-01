@@ -8,6 +8,7 @@ import {
   UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty, CheckForChangesProperty,
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
+import * as swapStyles from '../swapStyles';
 
 describe('update', () => {
   const findNodesWithDataSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findNodesWithData');
@@ -17,6 +18,7 @@ describe('update', () => {
   const UpdatedAtPropertyWriteSpy = jest.spyOn(UpdatedAtProperty, 'write');
   const ActiveThemePropertyWriteSpy = jest.spyOn(ActiveThemeProperty, 'write');
   const CheckForChangesPropertyWriteSpy = jest.spyOn(CheckForChangesProperty, 'write');
+  const mockSwapStyles = jest.spyOn(swapStyles, 'swapStyles');
 
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
@@ -52,6 +54,9 @@ describe('update', () => {
       updateOnChange: false,
       updateRemote: true,
       updateStyles: true,
+      shouldSwapStyles: true,
+      baseFontSize: '16',
+      aliasBaseFontSize: '16',
     },
     usedTokenSet: {
       global: TokenSetStatus.ENABLED,
@@ -81,6 +86,7 @@ describe('update', () => {
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
     expect(CheckForChangesPropertyWriteSpy).toBeCalledWith(false);
+    expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
 
     runAfter.forEach((fn) => fn());
   });

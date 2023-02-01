@@ -31,6 +31,18 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.borderWidthBottom:
       type = Properties.borderWidth;
       break;
+    case 'fontFamily':
+      type = Properties.fontFamilies;
+      break;
+    case 'fontSize':
+      type = Properties.fontSizes;
+      break;
+    case 'fontWeight':
+      type = Properties.fontWeights;
+      break;
+    case 'lineHeights':
+      type = Properties.lineHeights;
+      break;
     default:
       type = property;
       break;

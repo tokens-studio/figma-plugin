@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as pjs from '../../../../package.json';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -9,7 +8,6 @@ import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { useStartupProcess } from './useStartupProcess';
 import { ProcessStepStatus } from '@/hooks';
-import { track } from '@/utils/analytics';
 import { withLDProviderWrapper } from '../LaunchDarkly';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import ConfirmDialog from '../ConfirmDialog';
@@ -60,7 +58,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       && startupProcess.currentStatus !== ProcessStepStatus.CANCELED
     ) {
       if (startupProcess.currentStep === null) {
-        track('Launched', { version: pjs.plugin_version });
         await startupProcess.start();
       } else if (startupProcess.currentStatus === ProcessStepStatus.DONE) {
         await startupProcess.next();

@@ -3,12 +3,10 @@
       "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
       "name": "themes-folder-light",
       "selectedTokenSets": {
-        "base/options": "enabled",
-        "base/sizing": "enabled",
-        "themes/light": "enabled",
-        "core/shadows": "enabled",
         "base/options": "source",
-        "base/sizing": "source"
+        "base/sizing": "source",
+        "themes/light": "enabled",
+        "core/shadows": "enabled"
       },
       "$figmaStyleReferences": {}
     },
@@ -16,12 +14,10 @@
       "id": "8f240f308c8cc4acb7106c1073dc37a682997059",
       "name": "themes-folder-dark",
       "selectedTokenSets": {
-        "base/options": "enabled",
-        "base/sizing": "enabled",
-        "themes/dark": "enabled",
-        "core/shadows": "enabled",
         "base/options": "source",
-        "base/sizing": "source"
+        "base/sizing": "source",
+        "themes/dark": "enabled",
+        "core/shadows": "enabled"
       },
       "$figmaStyleReferences": {}
     }

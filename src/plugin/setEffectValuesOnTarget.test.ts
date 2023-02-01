@@ -1,3 +1,4 @@
+import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
@@ -106,7 +107,7 @@ describe('setEffectValuesOnTarget', () => {
   });
 
   it('sets single shadow token', async () => {
-    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, singleShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMock,
       effects: [
@@ -130,10 +131,40 @@ describe('setEffectValuesOnTarget', () => {
   });
 
   it('sets multiple shadow tokens', async () => {
-    await setEffectValuesOnTarget(rectangleNodeMock, multipleShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, multipleShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMock,
       effects: [
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 1,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 8 },
+          radius: 16,
+          spread: 4,
+          showShadowBehindNode: false,
+        },
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 1,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 4 },
+          radius: 4,
+          spread: 4,
+          showShadowBehindNode: false,
+        },
         {
           type: 'DROP_SHADOW',
           blendMode: 'NORMAL',
@@ -149,21 +180,16 @@ describe('setEffectValuesOnTarget', () => {
           spread: 4,
           showShadowBehindNode: true,
         },
-        {
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          visible: true,
-          color: {
-            a: 1,
-            r: 0,
-            g: 0,
-            b: 0,
-          },
-          offset: { x: 0, y: 4 },
-          radius: 4,
-          spread: 4,
-          showShadowBehindNode: false,
-        },
+      ],
+    });
+  });
+
+  it('sets mixed shadow tokens', async () => {
+    const rectangleNodeMockOriginal = rectangleNodeMock;
+    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken, defaultBaseFontSize);
+    expect(rectangleNodeMock).toEqual({
+      ...rectangleNodeMockOriginal,
+      effects: [
         {
           type: 'DROP_SHADOW',
           blendMode: 'NORMAL',
@@ -179,16 +205,21 @@ describe('setEffectValuesOnTarget', () => {
           spread: 4,
           showShadowBehindNode: false,
         },
-      ],
-    });
-  });
-
-  it('sets mixed shadow tokens', async () => {
-    const rectangleNodeMockOriginal = rectangleNodeMock;
-    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
-    expect(rectangleNodeMock).toEqual({
-      ...rectangleNodeMockOriginal,
-      effects: [
+        {
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          visible: true,
+          color: {
+            a: 1,
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+          offset: { x: 0, y: 4 },
+          radius: 4,
+          spread: 4,
+          showShadowBehindNode: false,
+        },
         {
           type: 'INNER_SHADOW',
           blendMode: 'NORMAL',
@@ -202,36 +233,6 @@ describe('setEffectValuesOnTarget', () => {
           offset: { x: 0, y: 0 },
           radius: 2,
           spread: 4,
-        },
-        {
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          visible: true,
-          color: {
-            a: 1,
-            r: 0,
-            g: 0,
-            b: 0,
-          },
-          offset: { x: 0, y: 4 },
-          radius: 4,
-          spread: 4,
-          showShadowBehindNode: false,
-        },
-        {
-          type: 'DROP_SHADOW',
-          blendMode: 'NORMAL',
-          visible: true,
-          color: {
-            a: 1,
-            r: 0,
-            g: 0,
-            b: 0,
-          },
-          offset: { x: 0, y: 8 },
-          radius: 16,
-          spread: 4,
-          showShadowBehindNode: false,
         },
       ],
     });
@@ -239,23 +240,24 @@ describe('setEffectValuesOnTarget', () => {
 
   it('respects set show behind setting for mixed shadow tokens', async () => {
     const rectangleNodeMockOriginal = rectangleNodeMock;
-    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken);
+    await setEffectValuesOnTarget(rectangleNodeMock, mixedShadowToken, defaultBaseFontSize);
     expect(rectangleNodeMock).toEqual({
       ...rectangleNodeMockOriginal,
       effects: [
         {
-          type: 'INNER_SHADOW',
+          type: 'DROP_SHADOW',
           blendMode: 'NORMAL',
           visible: true,
           color: {
-            a: 0.5,
+            a: 1,
             r: 0,
             g: 0,
             b: 0,
           },
-          offset: { x: 0, y: 0 },
-          radius: 2,
+          offset: { x: 0, y: 8 },
+          radius: 16,
           spread: 4,
+          showShadowBehindNode: false,
         },
         {
           type: 'DROP_SHADOW',
@@ -273,19 +275,18 @@ describe('setEffectValuesOnTarget', () => {
           showShadowBehindNode: false,
         },
         {
-          type: 'DROP_SHADOW',
+          type: 'INNER_SHADOW',
           blendMode: 'NORMAL',
           visible: true,
           color: {
-            a: 1,
+            a: 0.5,
             r: 0,
             g: 0,
             b: 0,
           },
-          offset: { x: 0, y: 8 },
-          radius: 16,
+          offset: { x: 0, y: 0 },
+          radius: 2,
           spread: 4,
-          showShadowBehindNode: false,
         },
       ],
     });

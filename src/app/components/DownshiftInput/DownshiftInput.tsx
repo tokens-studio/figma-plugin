@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
+import Text from '../Text';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
 import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
@@ -13,6 +14,7 @@ import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
+import { ErrorValidation } from '../ErrorValidation';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -126,7 +128,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => (
@@ -148,7 +150,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
           )
           .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-            a.name.localeCompare(b.name)
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
           ));
       }
       return resolvedTokens
@@ -156,7 +158,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
         )
         .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
         ));
     },
     [resolvedTokens, filteredValue, type, isDocumentationType],
@@ -212,10 +214,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       {({
         selectedItem, highlightedIndex, getItemProps, getInputProps,
       }) => (
-        <div className="relative">
+        <div style={{ position: 'relative' }}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-            {label && !inlineLabel ? <div className="font-medium text-xxs">{label}</div> : null}
-            {error ? <div className="font-bold text-red-500">{error}</div> : null}
+            {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
+            {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
@@ -252,7 +254,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
                     }}
                     isFocused={highlightedIndex === index}
-
                   >
                     {type === 'color' && (
                     <StyledItemColorDiv>

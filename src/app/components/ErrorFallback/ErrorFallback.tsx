@@ -19,7 +19,7 @@ export function ErrorFallback({ error }: { error: Error }) {
         <Text size="xsmall" muted>
           If this keeps happening, you need to reset your tokens.
           {' '}
-          <StyledLink href="https://docs.figmatokens.com/reset-tokens" target="_blank" rel="noreferrer">Read how</StyledLink>
+          <StyledLink href="https://docs.tokens.studio/reset-tokens" target="_blank" rel="noreferrer">Read how</StyledLink>
         </Text>
 
       </Stack>

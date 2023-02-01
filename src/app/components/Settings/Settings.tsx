@@ -2,19 +2,22 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
-import { ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector } from '@/selectors';
+import {
+  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+} from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
-import { track } from '@/utils/analytics';
 import OnboardingExplainer from '../OnboardingExplainer';
+import RemConfiguration from '../RemConfiguration';
 
 function Settings() {
   const onboardingData = {
@@ -53,6 +56,7 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSets(true);
     dispatch.uiState.setOnboardingExplainerInspect(true);
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
+    dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
 
   return (
@@ -68,7 +72,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">Styles</Heading>
+          <Heading size="small">Settings</Heading>
           <Stack direction="row" gap={2} align="center">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -87,9 +91,11 @@ function Settings() {
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
-          <Stack direction="row" gap={3}>
-            <Button variant="primary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
-          </Stack>
+          <Heading size="small">Base font size token</Heading>
+          <RemConfiguration />
+          <Box>
+            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
+          </Box>
         </Stack>
       </Stack>
     </Box>

@@ -57,6 +57,7 @@ export interface UIState {
   displayType: DisplayType;
   disabled: boolean;
   activeTab: Tabs;
+  activeTokensTab: 'list' | 'json';
   projectURL: string;
   storageType: StorageType;
   api: StorageTypeCredentials;
@@ -99,6 +100,7 @@ export const uiState = createModel<RootModel>()({
     displayType: 'GRID',
     backgroundJobs: [],
     activeTab: Tabs.LOADING,
+    activeTokensTab: 'list',
     projectURL: '',
     storageType: {
       provider: StorageProviderType.LOCAL,
@@ -223,6 +225,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         activeTab: payload,
+      };
+    },
+    setActiveTokensTab(state, payload: 'list' | 'json') {
+      return {
+        ...state,
+        activeTokensTab: payload,
       };
     },
     setProjectURL(state, payload: string) {

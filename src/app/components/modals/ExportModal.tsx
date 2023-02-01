@@ -15,10 +15,10 @@ export default function ExportModal({ onClose }: Props) {
 
   const handleProviderClick = React.useCallback((provider: string) => {
     setExportProvider(provider);
-  }, [exportProvider]);
+  }, []);
 
   return (
-    <Modal large isOpen close={onClose} title="Export">
+    <Modal large isOpen close={onClose} title="Export tokens">
       <Stack gap={4} direction="column">
         <Stack direction="row" gap={1}>
           <LoadProviderItem

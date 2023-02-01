@@ -7,11 +7,13 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.BITBUCKET }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
@@ -77,7 +79,7 @@ export default function BitbucketForm({
         />
         <Input
           full
-          label="Default Branch"
+          label="Branch"
           value={values.branch}
           onChange={onChange}
           type="text"
@@ -86,7 +88,7 @@ export default function BitbucketForm({
         />
         <Input
           full
-          label="File Path (e.g. data/tokens.json)"
+          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
           value={values.filePath}
           onChange={onChange}
           type="text"
@@ -112,9 +114,9 @@ export default function BitbucketForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

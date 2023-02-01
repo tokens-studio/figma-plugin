@@ -31,6 +31,24 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           { label: 'Bottom Left', name: Properties.borderRadiusBottomLeft, disabled },
         );
         break;
+      case TokenTypes.BORDER:
+        properties.push(
+          {
+            label: 'All',
+            name: Properties.border,
+            clear: [
+              Properties.borderTop,
+              Properties.borderRight,
+              Properties.borderBottom,
+              Properties.borderLeft,
+            ],
+          },
+          { label: 'Top', name: Properties.borderTop, disabled },
+          { label: 'Right', name: Properties.borderRight, disabled },
+          { label: 'Bottom', name: Properties.borderBottom, disabled },
+          { label: 'Left', name: Properties.borderLeft, disabled },
+        );
+        break;
       case TokenTypes.BORDER_WIDTH:
         properties.push(
           {
@@ -205,6 +223,10 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
               { label: 'Bottom', name: Properties.borderWidthBottom },
               { label: 'Left', name: Properties.borderWidthLeft },
             ],
+          },
+          {
+            label: 'Background blur',
+            name: Properties.backgroundBlur,
           },
         );
         break;

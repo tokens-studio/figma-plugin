@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { DotFilledIcon } from '@radix-ui/react-icons';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -8,23 +8,23 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuItemIndicator,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
 } from './DropdownMenu';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { UpdateMode } from '@/constants/UpdateMode';
+import Stack from './Stack';
+import Button from './Button';
+import useTokens from '../store/useTokens';
+import Box from './Box';
 
 export default function ApplySelector() {
-  const {
-    updateMode, updateRemote, updateOnChange, updateStyles,
-  } = useSelector(settingsStateSelector, isEqual);
+  const { updateMode } = useSelector(settingsStateSelector, isEqual);
 
-  const {
-    setUpdateMode, setUpdateOnChange, setUpdateRemote, setUpdateStyles,
-  } = useDispatch<Dispatch>().settings;
+  const { handleUpdate } = useTokens();
+
+  const { setUpdateMode } = useDispatch<Dispatch>().settings;
 
   const handleApplySelection = React.useCallback(() => {
     setUpdateMode(UpdateMode.SELECTION);
@@ -38,72 +38,77 @@ export default function ApplySelector() {
     setUpdateMode(UpdateMode.DOCUMENT);
   }, [setUpdateMode]);
 
-  const handleUpdateOnChange = React.useCallback(() => {
-    setUpdateOnChange(!updateOnChange);
-  }, [updateOnChange, setUpdateOnChange]);
-
-  const handleUpdateRemote = React.useCallback(() => {
-    setUpdateRemote(!updateRemote);
-  }, [updateRemote, setUpdateRemote]);
-
-  const handleUpdateStyles = React.useCallback(() => {
-    setUpdateStyles(!updateStyles);
-  }, [updateStyles, setUpdateStyles]);
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger bordered>
-        <span>
-          Apply to
-          {' '}
-          {updateMode}
-        </span>
-        <IconChevronDown />
-      </DropdownMenuTrigger>
+    <Stack direction="row">
+      <Button
+        id="update-button"
+        variant="primary"
+        css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+        onClick={handleUpdate}
+      >
+        Apply to
+        {' '}
+        {updateMode}
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          css={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            backgroundColor: '$interaction',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '32px',
+            borderLeft: '1px solid $interactionSubtle',
+            color: '$onInteraction',
+            '&:hover, &:focus': { backgroundColor: '$interactionSubtle' },
+          }}
+          data-testid="apply-selector"
+        >
+          <IconChevronDown />
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="top">
-        <DropdownMenuRadioGroup value={updateMode}>
-          <DropdownMenuRadioItem value={UpdateMode.PAGE} onSelect={handleApplyPage}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to page
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.DOCUMENT} onSelect={handleApplyDocument}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to document
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={UpdateMode.SELECTION} onSelect={handleApplySelection}>
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Apply to selection
-          </DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuCheckboxItem checked={updateOnChange} onCheckedChange={handleUpdateOnChange}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Update on change
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateRemote} onCheckedChange={handleUpdateRemote}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Update remote
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem checked={updateStyles} onCheckedChange={handleUpdateStyles}>
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          Update styles
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent side="top">
+          <DropdownMenuRadioGroup value={updateMode}>
+            <DropdownMenuRadioItem
+              data-testid="apply-to-selection"
+              value={UpdateMode.SELECTION}
+              onSelect={handleApplySelection}
+            >
+              <DropdownMenuItemIndicator>
+                <DotFilledIcon />
+              </DropdownMenuItemIndicator>
+              Apply to selection
+              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+                Applies current tokens to current selection (fast!)
+              </Box>
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+              <DropdownMenuItemIndicator>
+                <DotFilledIcon />
+              </DropdownMenuItemIndicator>
+              Apply to page
+              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+                Applies current tokens to the current page
+              </Box>
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem
+              data-testid="apply-to-document"
+              value={UpdateMode.DOCUMENT}
+              onSelect={handleApplyDocument}
+            >
+              <DropdownMenuItemIndicator>
+                <DotFilledIcon />
+              </DropdownMenuItemIndicator>
+              Apply to document
+              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+                Applies current tokens to the whole document (slow!)
+              </Box>
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </Stack>
   );
 }

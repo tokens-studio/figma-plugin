@@ -1,0 +1,26 @@
+{
+  "default": {
+    "value": "#2B70E8",
+    "type": "color"
+  },
+  "gray": {
+    "value": "#2B70E8",
+    "type": "color"
+  },
+  "background": {
+    "value": "#E6EFFF",
+    "type": "color"
+  },
+  "color": {
+    "neutral": {
+      "10": {
+        "value": "#E6EFFF",
+        "type": "color"
+      },
+      "50": {
+        "value": "#2B70E8",
+        "type": "color"
+      }
+    }
+  }
+}

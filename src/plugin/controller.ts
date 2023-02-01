@@ -7,6 +7,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
 import { init } from '@/utils/plugin';
+import { sendDocumentChange } from './sendDocumentChange';
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -39,6 +40,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandler
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, asyncHandlers.attachLocalStylesToTheme);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, asyncHandlers.setNoneValuesOnNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 
 figma.on('close', () => {
@@ -47,6 +49,10 @@ figma.on('close', () => {
 
 figma.on('selectionchange', () => {
   sendSelectionChange();
+});
+
+figma.on('documentchange', (event: DocumentChangeEvent) => {
+  sendDocumentChange(event);
 });
 
 init();
