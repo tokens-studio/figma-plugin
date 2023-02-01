@@ -598,7 +598,7 @@ describe('editToken', () => {
           'studio.tokens': {
             modify: {
               type: 'lighten',
-              value: 0.5,
+              value: '0.5',
               space: 'sRGB',
             },
           },
@@ -964,8 +964,9 @@ describe('editToken', () => {
     store.dispatch.tokenState.duplicateTokenGroup({
       oldName: 'font',
       parent: 'global',
-      path: '',
+      newName: 'font-copy',
       type: 'sizing',
+      tokenSets: ['global'],
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([

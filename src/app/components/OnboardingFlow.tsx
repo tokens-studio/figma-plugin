@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Heading from './Heading';
+import Text from './Text';
 import Button from './Button';
 import Modal from './Modal';
 import { getLastopened } from '@/selectors';
@@ -12,6 +13,10 @@ const StyledLink = styled('a', {
   display: 'inline-flex',
   fontSize: '$1',
   color: '$fgAccent',
+});
+
+const StyledImage = styled('img', {
+  borderRadius: '$card',
 });
 
 function fetchOnboardingImage(idx: number) {
@@ -88,9 +93,9 @@ export default function OnboardingFlow() {
             align="start"
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
-            <img src={fetchOnboardingImage(index)} alt="" className="rounded" />
+            <StyledImage src={fetchOnboardingImage(index)} alt="" />
             <Heading size="medium">{item.title}</Heading>
-            <p className="text-xs">{item.excerpt}</p>
+            <Text size="small">{item.excerpt}</Text>
             {item.read_more_link && (
               <StyledLink
                 target="_blank"

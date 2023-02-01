@@ -4,18 +4,19 @@ import Downshift from 'downshift';
 import { Mention, MentionsInput as Input, SuggestionDataItem } from 'react-mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
+import Text from '../Text';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
 import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
 import { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
-import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 import mentionInputStyles from './mentionInputStyle';
+import { ErrorValidation } from '../ErrorValidation';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -101,7 +102,7 @@ interface DownShiftProps {
   resolvedTokens: ResolveTokenValuesResult[];
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
-  handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
+  handleBlur?: () => void;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -127,6 +128,17 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const portalContainer = document.getElementById('app');
   const [portalPlaceholder] = React.useState(document.createElement('div'));
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
+  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
+  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
+    showAutoSuggest,
+    value,
+  ]); // removing non-alphanumberic except . from the input value
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target) && showAutoSuggest) {
+      setShowAutoSuggest(false);
+    }
+  }, [showAutoSuggest]);
 
   React.useEffect(() => {
     if (portalContainer) {
@@ -140,11 +152,54 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, []);
 
-  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
-    showAutoSuggest,
-    value,
-  ]); // removing non-alphanumberic except . from the input value
-  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+  const filteredTokenItems = useMemo(
+    () => {
+      if (isDocumentationType(type as Properties)) {
+        return resolvedTokens
+          .filter(
+            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+          )
+          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+          ));
+      }
+      return resolvedTokens
+        .filter(
+          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+        )
+        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        ));
+    },
+    [resolvedTokens, filteredValue, type, initialName, referenceTokenTypes],
+  );
+
+  const mentionData = useMemo<SuggestionDataItem[]>(() => {
+    if (isDocumentationType(type as Properties)) {
+      return resolvedTokens
+        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        )).map((resolvedToken) => ({
+          id: resolvedToken.name,
+          display: resolvedToken.name,
+        }));
+    }
+    return resolvedTokens
+      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+      )).map((resolvedToken) => ({
+        id: resolvedToken.name,
+        display: resolvedToken.name,
+      }));
+  }, [initialName, resolvedTokens, referenceTokenTypes, type]);
+
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
@@ -161,30 +216,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
-  const filteredTokenItems = useMemo(
-    () => {
-      if (isDocumentationType(type as Properties)) {
-        return resolvedTokens
-          .filter(
-            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-          )
-          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-            a.name.localeCompare(b.name)
-          ));
-      }
-      console.log('filter', filteredValue);
-      return resolvedTokens
-        .filter(
-          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-        )
-        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
-        ));
-    },
-    [resolvedTokens, filteredValue, type, isDocumentationType],
-  );
-
-  const resolveValue = useCallback((token: SingleToken) => {
+  const getResolveValue = useCallback((token: SingleToken) => {
     let returnValue: string = '';
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(token.value)) {
@@ -209,10 +241,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     return returnValue;
   }, []);
 
-  // React.useEffect(() => {
-  //   if (value?.endsWith('{')) setShowAutoSuggest(true);
-  // }, [value]);
-
   const handleSelect = useCallback((selectedItem: any) => {
     setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
     setShowAutoSuggest(false);
@@ -222,75 +250,42 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
-  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(e);
-  }, [handleChange]);
-
-  const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputBlur = React.useCallback(() => {
     if (handleBlur) {
-      handleBlur(e);
+      handleBlur();
     }
   }, [handleBlur]);
 
-  const [mentionValue, setMentionValue] = React.useState('');
+  const handleMentionInputChange = React.useCallback((e) => {
+    e.target.name = name ?? 'value';
+    handleChange(e);
+  }, [handleChange, name]);
 
-  const mentionData = useMemo<SuggestionDataItem[]>(() => {
-    if (isDocumentationType(type as Properties)) {
-      return resolvedTokens
-        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
-        )).map((resolvedToken) => ({
-          id: resolvedToken.name,
-          display: resolvedToken.name,
-        }));
-    }
-    return resolvedTokens
-      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-        a.name.localeCompare(b.name)
-      )).map((resolvedToken) => ({
-        id: resolvedToken.name,
-        display: resolvedToken.name,
-      }));
-  }, [initialName, resolvedTokens, referenceTokenTypes, type]);
+  const renderMentionList = React.useCallback((children: React.ReactNode) => ReactDOM.createPortal(
+    <Box css={{
+      position: 'absolute', background: '$bgDefault', top: '0', width: `${inputContainerWith}px`, padding: '$2', zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
+    }}
+    >
+      <StyledDropdown className="content scroll-container">
+        {children}
+      </StyledDropdown>
+    </Box>,
+    portalPlaceholder,
+  ), [inputContainerWith, inputContainerPosX, inputContainerPosY, portalPlaceholder]);
 
-  const handleMentionInputChange = React.useCallback((e, newValue) => {
-    console.log('eee', e);
-    setMentionValue(newValue);
-  }, [handleChange]);
-
-  const getContainer = React.useCallback((children: React.ReactNode) => {
-    console.log('chic', children);
-    return ReactDOM.createPortal(
-      <Box css={{
-        position: 'absolute', background: '$bgDefault', top: '0', width: `${inputContainerWith}px`, padding: '$2', zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
-      }}
-      >
-        <StyledDropdown className="content scroll-container">
-          {children}
-        </StyledDropdown>
-      </Box>,
-      portalPlaceholder,
-    );
-  }, [inputContainerWith, inputContainerPosX, inputContainerPosY, filteredTokenItems]);
-
-  const handleRenderSuggestion = React.useCallback((
+  const renderMentionListItem = React.useCallback((
     suggestion: SuggestionDataItem,
     search,
-    highlightedDisplay,
-    index,
     focused,
   ) => {
-    console.log('sugge', suggestion);
-    console.log('search', search);
-    console.log('highlightedDisplay', highlightedDisplay);
-    console.log('index', index);
-    console.log('focused', focused);
     const resolvedToken = resolvedTokens.find((token) => token.type === type && token.name === suggestion.id);
-    console.log('resolve', resolvedToken);
     return (
       <StyledItem
+        data-cy="downshift-input-item"
+        data-testid="downshift-input-item"
+        className="dropdown-item"
         css={{
-          backgroundColor: focused ? '$interaction' : '$bgDefault',
+          backgroundColor: focused ? '$interaction' : '$bgDefault', width: '100%', padding: '0',
         }}
         isFocused={focused}
       >
@@ -299,60 +294,52 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
           </StyledItemColorDiv>
         )}
-        <StyledItemName>{getHighlightedText(resolvedToken?.name ?? '', search || '')}</StyledItemName>
+        <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', search || '')}</StyledItemName>
         <StyledItemValue>{resolvedToken?.value}</StyledItemValue>
       </StyledItem>
     );
-  }, []);
+  }, [resolvedTokens, type]);
 
+  const handleDisplayTransform = React.useCallback((id: string, display: string) => `{${display}}`, []);
   return (
     <Downshift onSelect={handleSelect}>
       {({
-        selectedItem, highlightedIndex, getItemProps, getInputProps,
+        selectedItem, highlightedIndex, getItemProps,
       }) => (
-        <div className="relative">
+        <div style={{ position: 'relative' }}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-            {label && !inlineLabel ? <div className="font-medium text-xxs">{label}</div> : null}
-            {error ? <div className="font-bold text-red-500">{error}</div> : null}
+            {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
+            {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            {/* <StyledDownshiftInput
-              suffix={suffix}
-              type={type}
-              name={name}
-              placeholder={placeholder}
-              value={value}
-              onChange={handleInputChange}
-              getInputProps={getInputProps}
-              onBlur={handleInputBlur}
-            /> */}
             <Input
               singleLine
               style={{ ...mentionInputStyles }}
-              value={mentionValue}
+              value={value}
               onChange={handleMentionInputChange}
               placeholder={placeholder}
               autoComplete="off"
               allowSpaceInQuery={false}
-              customSuggestionsContainer={getContainer}
+              customSuggestionsContainer={renderMentionList}
+              onBlur={handleInputBlur}
+              name={name}
             >
               <Mention
                 trigger="{"
                 data={mentionData}
                 markup=" __id__ "
-                renderSuggestion={handleRenderSuggestion}
+                renderSuggestion={renderMentionListItem}
+                displayTransform={handleDisplayTransform}
               />
             </Input>
-
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
               </StyledInputSuffix>
             )}
           </Box>
-
           {filteredTokenItems
             && filteredTokenItems.length > 0
             && selectedItem?.name !== filteredValue
@@ -380,7 +367,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                         </StyledItemColorDiv>
                         )}
                         <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                        <StyledItemValue>{resolveValue(token)}</StyledItemValue>
+                        <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
                       </StyledItem>
                     ))}
                   </StyledDropdown>

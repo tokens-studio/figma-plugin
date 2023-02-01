@@ -17,6 +17,7 @@ import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import Heading from '../Heading';
 import Label from '../Label';
+import { ErrorMessage } from '../ErrorMessage';
 import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
@@ -213,9 +214,9 @@ export default function GenericVersionedForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

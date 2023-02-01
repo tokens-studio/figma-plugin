@@ -24,7 +24,7 @@ export default {
       display: 'flex',
       alignItems: 'center',
       gap: 'var(--space-2)',
-      padding: 'var(--space-3) var(--space-3)',
+      padding: 'var(--space-2) var(--space-3)',
       color: 'var(--colors-fgDefault)',
       fontSize: 'var(--fontSizes-xsmall)',
       '&focused': {

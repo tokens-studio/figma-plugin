@@ -129,7 +129,7 @@ function StartScreen() {
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
-          <a href="https://github.com/tokens-studio/figma-plugin" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
+          <a href="https://github.com/tokens-studio/figma-plugin" style={{ textDecoration: 'underline', color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer">
             Found an issue? We&#39;re on GitHub!
           </a>
         </Stack>

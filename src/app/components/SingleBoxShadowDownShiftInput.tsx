@@ -1,6 +1,15 @@
 import React from 'react';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
+import { styled } from '@/stitches.config';
+
+const StyledButton = styled('button', {
+  display: 'block',
+  width: '1.5rem',
+  height: '1.5rem',
+  borderRadius: '$default',
+  cursor: 'pointer',
+});
 
 export default function SingleBoxShadowDownShiftInput({
   name,
@@ -36,14 +45,13 @@ export default function SingleBoxShadowDownShiftInput({
       }
       prefix={
         name === 'color' && value && (
-          <button
+          <StyledButton
             type="button"
-            className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
             style={{ background: value, fontSize: 0 }}
             onClick={handleToggleInputHelper}
           >
             {value}
-          </button>
+          </StyledButton>
         )
       }
       suffix
