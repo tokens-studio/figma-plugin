@@ -24,6 +24,10 @@ class SupabaseClient {
 
   realtimeUrl: string;
 
+  refreshTokenInterval: any;
+
+  intervalInSeconds = 5 * 60;
+
   /**
    * @param apiUrl  supabase api url.
    * @param apikey  supabase key.
@@ -75,6 +79,20 @@ class SupabaseClient {
     this.storage = this.initStorage();
     this.realtime = this.initRealtimeClient({});
     this.realtime.setAuth(auth.access_token);
+
+    // auto refresh token
+    clearInterval(this.refreshTokenInterval);
+    this.refreshTokenInterval = setInterval(async () => {
+      const tokenState = this.checkToken(auth);
+      if (tokenState === 'expired') {
+        const { data, error } = await this.signIn({
+          refresh_token: auth.refresh_token,
+        });
+        if (!error) {
+          this.initializeAuth(data);
+        }
+      }
+    }, this.intervalInSeconds * 1000);
   }
 
   private checkToken(auth: AuthData) {
