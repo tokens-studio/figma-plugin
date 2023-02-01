@@ -55,7 +55,7 @@ export interface TokenState {
 }
 
 export const tokenState = createModel<RootModel>()({
-  state: ({
+  state: {
     tokens: {
       global: [],
     },
@@ -80,7 +80,7 @@ export const tokenState = createModel<RootModel>()({
     }, {}),
     checkForChanges: false,
     collapsedTokens: [],
-  } as unknown) as TokenState,
+  } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
       ...state,
@@ -92,26 +92,18 @@ export const tokenState = createModel<RootModel>()({
         editProhibited: payload,
       };
     },
-
     toggleTreatAsSource: (state, tokenSet: string) => ({
       ...state,
       usedTokenSet: {
         ...state.usedTokenSet,
-        [tokenSet]:
-          state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE ? TokenSetStatus.DISABLED : TokenSetStatus.SOURCE,
+        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
+          ? TokenSetStatus.DISABLED
+          : TokenSetStatus.SOURCE,
       },
     }),
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
-    }),
-    setUsedTokenSet: (state, data: UsedTokenSetsMap) => ({
-      ...state,
-      usedTokenSet: data,
-    }),
-    setThemes: (state, data: ThemeObjectsList) => ({
-      ...state,
-      themes: data,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -137,7 +129,12 @@ export const tokenState = createModel<RootModel>()({
         )), indexOf + 1],
       );
     },
-    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(
+      state,
+      (setName, tokenSet) => (
+        setName === name ? null : [setName, tokenSet]
+      ),
+    ),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -186,7 +183,10 @@ export const tokenState = createModel<RootModel>()({
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
-          [data.parent]: [...state.tokens[data.parent], updateTokenPayloadToSingleToken(data)],
+          [data.parent]: [
+            ...state.tokens[data.parent],
+            updateTokenPayloadToSingleToken(data),
+          ],
         };
       }
       return {
@@ -303,9 +303,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter(
-            (token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type),
-          ),
+          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
         },
       };
 
@@ -368,36 +366,39 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
-      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>((acc, [key, values]) => {
-        const newValues = values.map<SingleToken>((token) => {
-          if (Array.isArray(token.value)) {
+      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
+        (acc, [key, values]) => {
+          const newValues = values.map<SingleToken>((token) => {
+            if (Array.isArray(token.value)) {
+              return {
+                ...token,
+                value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                  return a;
+                }, {})),
+              } as SingleToken;
+            }
+            if (typeof token.value === 'object') {
+              return {
+                ...token,
+                value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
+                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                  return a;
+                }, {}),
+              } as SingleToken;
+            }
+
             return {
               ...token,
-              value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                return a;
-              }, {})),
+              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
             } as SingleToken;
-          }
-          if (typeof token.value === 'object') {
-            return {
-              ...token,
-              value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
-                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                return a;
-              }, {}),
-            } as SingleToken;
-          }
+          });
 
-          return {
-            ...token,
-            value: replaceReferences(token.value.toString(), data.oldName, data.newName),
-          } as SingleToken;
-        });
-
-        acc[key] = newValues;
-        return acc;
-      }, {});
+          acc[key] = newValues;
+          return acc;
+        },
+        {},
+      );
 
       return {
         ...state,
@@ -515,6 +516,10 @@ export const tokenState = createModel<RootModel>()({
         console.error('Error updating document', e);
       }
     },
-    ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
+    ...Object.fromEntries(
+      (Object.entries(tokenStateEffects).map(([key, factory]) => (
+        [key, factory(dispatch)]
+      ))),
+    ),
   }),
 });
