@@ -1,14 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
-import { Mention, MentionsInput as Input, SuggestionDataItem } from 'react-mentions';
+import { Mention, MentionsInput, SuggestionDataItem } from 'react-mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
 import Text from '../Text';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
 import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
-import { StyledPrefix } from '../Input';
+import Input, { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { styled } from '@/stitches.config';
 import Tooltip from '../Tooltip';
@@ -17,6 +17,8 @@ import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 import mentionInputStyles from './mentionInputStyle';
 import { ErrorValidation } from '../ErrorValidation';
+
+type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
 const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -88,6 +90,19 @@ const StyledPart = styled('span', {
   },
 });
 
+const StyledButton = styled('button', {
+  padding: '$2 $3',
+  fontSize: '$xsmall',
+
+  variants: {
+    isFocused: {
+      false: {
+        color: '$textDisabled',
+      },
+    },
+  },
+});
+
 interface DownShiftProps {
   name?: string;
   type: string;
@@ -129,16 +144,18 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [portalPlaceholder] = React.useState(document.createElement('div'));
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
-  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
-    showAutoSuggest,
-    value,
-  ]); // removing non-alphanumberic except . from the input value
-
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target) && showAutoSuggest) {
-      setShowAutoSuggest(false);
-    }
-  }, [showAutoSuggest]);
+  const [searchInput, setSearchInput] = React.useState('');
+  const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
+  const externalSearchField = useMemo<SearchField | undefined>(() => {
+    if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
+    if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
+    return undefined;
+  }, [type]);
+  // const handleClickOutside = useCallback((event: MouseEvent) => {
+  //   if (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target) && showAutoSuggest) {
+  //     setShowAutoSuggest(false);
+  //   }
+  // }, [showAutoSuggest]);
 
   React.useEffect(() => {
     if (portalContainer) {
@@ -152,19 +169,19 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, []);
 
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
+  // React.useEffect(() => {
+  //   document.addEventListener('click', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('click', handleClickOutside);
+  //   };
+  // }, [handleClickOutside]);
 
   const filteredTokenItems = useMemo(
     () => {
       if (isDocumentationType(type as Properties)) {
         return resolvedTokens
           .filter(
-            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+            (token: SingleToken) => !searchInput || token.name.toLowerCase().includes(searchInput.toLowerCase()),
           )
           .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
             a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
@@ -172,13 +189,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       }
       return resolvedTokens
         .filter(
-          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
+          (token: SingleToken) => !searchInput || token.name.toLowerCase().includes(searchInput.toLowerCase()),
         )
         .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
         ));
     },
-    [resolvedTokens, filteredValue, type, initialName, referenceTokenTypes],
+    [resolvedTokens, searchInput, type, initialName, referenceTokenTypes],
   );
 
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
@@ -261,6 +278,15 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     handleChange(e);
   }, [handleChange, name]);
 
+  const handleSearchInputChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    setSearchInput(e.target.value);
+  }, []);
+
+  const handleChangeSearchField = React.useCallback(() => {
+    if (currentSearchField === 'Tokens' && externalSearchField) setCurrentSearchField(externalSearchField);
+    else setCurrentSearchField('Tokens');
+  }, [currentSearchField, externalSearchField]);
+
   const renderMentionList = React.useCallback((children: React.ReactNode) => ReactDOM.createPortal(
     <Box css={{
       position: 'absolute', background: '$bgDefault', top: '0', width: `${inputContainerWith}px`, padding: '$2', zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
@@ -276,6 +302,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const renderMentionListItem = React.useCallback((
     suggestion: SuggestionDataItem,
     search,
+    highlightedDisplay,
     focused,
   ) => {
     const resolvedToken = resolvedTokens.find((token) => token.type === type && token.name === suggestion.id);
@@ -300,7 +327,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, [resolvedTokens, type]);
 
-  const handleDisplayTransform = React.useCallback((id: string, display: string) => `{${display}}`, []);
+  const renderDisplayTransform = React.useCallback((id: string, display: string) => `{${display}}`, []);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -314,7 +342,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <Input
+            <MentionsInput
               singleLine
               style={{ ...mentionInputStyles }}
               value={value}
@@ -331,9 +359,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                 data={mentionData}
                 markup=" __id__ "
                 renderSuggestion={renderMentionListItem}
-                displayTransform={handleDisplayTransform}
+                displayTransform={renderDisplayTransform}
               />
-            </Input>
+            </MentionsInput>
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
                 <StyledIconDisclosure />
@@ -342,13 +370,38 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           </Box>
           {filteredTokenItems
             && filteredTokenItems.length > 0
-            && selectedItem?.name !== filteredValue
+            && selectedItem?.name !== searchInput
             && showAutoSuggest ? (
               ReactDOM.createPortal(
                 <Box css={{
                   position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                 }}
                 >
+                  <Box css={{
+                    display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
+                  }}
+                  >
+                    <Box css={{ display: 'flex', gap: '$3' }}>
+                      <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
+                        Tokens
+                      </StyledButton>
+                      {
+                        externalSearchField && (
+                          <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
+                            {externalSearchField}
+                          </StyledButton>
+                        )
+                      }
+                    </Box>
+                    <Input
+                      full
+                      value={searchInput}
+                      onChange={handleSearchInputChange}
+                      type="text"
+                      autofocus
+                      placeholder="Search"
+                    />
+                  </Box>
                   <StyledDropdown className="content scroll-container">
                     {filteredTokenItems.map((token: SingleToken, index: number) => (
                       <StyledItem
@@ -366,7 +419,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                           <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                         </StyledItemColorDiv>
                         )}
-                        <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
+                        <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
                         <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
                       </StyledItem>
                     ))}
