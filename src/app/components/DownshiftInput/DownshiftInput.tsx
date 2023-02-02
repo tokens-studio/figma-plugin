@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { Mention, MentionsInput, SuggestionDataItem } from 'react-mentions';
+import { useSelector } from 'react-redux';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
 import Text from '../Text';
@@ -17,6 +18,8 @@ import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 import mentionInputStyles from './mentionInputStyle';
 import { ErrorValidation } from '../ErrorValidation';
+import useFigmaFonts from '@/hooks/useFigmaFonts';
+import { figmaFontsSelector } from '@/selectors';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -115,6 +118,7 @@ interface DownShiftProps {
   prefix?: React.ReactNode;
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
+  externalFontFamily?: string;
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: () => void;
@@ -133,6 +137,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   placeholder,
   setInputValue,
   resolvedTokens,
+  externalFontFamily,
   handleChange,
   handleBlur,
 }) => {
@@ -146,11 +151,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const [searchInput, setSearchInput] = React.useState('');
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
+  const figmaFonts = useSelector(figmaFontsSelector);
   const externalSearchField = useMemo<SearchField | undefined>(() => {
     if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
     if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
     return undefined;
   }, [type]);
+  const { getFigmaFonts } = useFigmaFonts();
   // const handleClickOutside = useCallback((event: MouseEvent) => {
   //   if (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target) && showAutoSuggest) {
   //     setShowAutoSuggest(false);
@@ -168,6 +175,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       setInputContainerWith(boundingRect.width);
     }
   }, []);
+
+  React.useEffect(() => {
+    if (externalSearchField === 'Fonts') {
+      getFigmaFonts();
+    }
+  }, [externalSearchField, getFigmaFonts]);
 
   // React.useEffect(() => {
   //   document.addEventListener('click', handleClickOutside);
@@ -197,6 +210,16 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     },
     [resolvedTokens, searchInput, type, initialName, referenceTokenTypes],
   );
+
+  const filteredValues = useMemo(() => {
+    if (currentSearchField === 'Fonts') {
+      return [...new Set(figmaFonts.map((font) => font.fontName.family))].filter((fontName) => !searchInput || fontName.toLowerCase().includes(searchInput.toLowerCase()));
+    }
+    if (currentSearchField === 'Weights' && externalFontFamily) {
+      return figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
+    }
+    return [];
+  }, [figmaFonts, currentSearchField, searchInput, externalFontFamily]);
 
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
     if (isDocumentationType(type as Properties)) {
@@ -259,9 +282,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const handleSelect = useCallback((selectedItem: any) => {
-    setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
+    if (currentSearchField === 'Tokens') {
+      setInputValue(value?.includes('$') ? `$${selectedItem}` : `{${selectedItem}}`);
+    } else {
+      setInputValue(selectedItem);
+    }
     setShowAutoSuggest(false);
-  }, [setInputValue, setShowAutoSuggest, value]);
+  }, [setInputValue, setShowAutoSuggest, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
     setShowAutoSuggest(!showAutoSuggest);
@@ -368,9 +395,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               </StyledInputSuffix>
             )}
           </Box>
-          {filteredTokenItems
-            && filteredTokenItems.length > 0
-            && selectedItem?.name !== searchInput
+          {selectedItem?.name !== searchInput
             && showAutoSuggest ? (
               ReactDOM.createPortal(
                 <Box css={{
@@ -403,26 +428,45 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     />
                   </Box>
                   <StyledDropdown className="content scroll-container">
-                    {filteredTokenItems.map((token: SingleToken, index: number) => (
-                      <StyledItem
-                        data-cy="downshift-input-item"
-                        data-testid="downshift-input-item"
-                        className="dropdown-item"
-                        {...getItemProps({ key: token.name, index, item: token })}
-                        css={{
-                          backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
-                        }}
-                        isFocused={highlightedIndex === index}
-                      >
-                        {type === 'color' && (
-                        <StyledItemColorDiv>
-                          <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                        </StyledItemColorDiv>
-                        )}
-                        <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                        <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
-                      </StyledItem>
-                    ))}
+                    {
+                      currentSearchField === 'Tokens' ? (
+                        filteredTokenItems.map((token: SingleToken, index: number) => (
+                          <StyledItem
+                            data-cy="downshift-input-item"
+                            data-testid="downshift-input-item"
+                            className="dropdown-item"
+                            {...getItemProps({ key: token.name, index, item: token.name })}
+                            css={{
+                              backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                            }}
+                            isFocused={highlightedIndex === index}
+                          >
+                            {type === 'color' && (
+                            <StyledItemColorDiv>
+                              <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                            </StyledItemColorDiv>
+                            )}
+                            <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
+                            <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
+                          </StyledItem>
+                        ))
+                      ) : (
+                        filteredValues?.map((value, index) => (
+                          <StyledItem
+                            data-cy="downshift-input-item"
+                            data-testid="downshift-input-item"
+                            className="dropdown-item"
+                            {...getItemProps({ key: value, index, item: value })}
+                            css={{
+                              backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                            }}
+                            isFocused={highlightedIndex === index}
+                          >
+                            <StyledItemName>{getHighlightedText(value, searchInput || '')}</StyledItemName>
+                          </StyledItem>
+                        ))
+                      )
+                    }
                   </StyledDropdown>
                 </Box>,
                 portalPlaceholder,

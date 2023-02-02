@@ -50,6 +50,7 @@ export enum AsyncMessageTypes {
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
+  GET_FIGMA_FONTS = 'async/get-figma-fonts',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -231,6 +232,11 @@ export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
 )>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
+export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
+export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
+  fonts: Array<Font>
+}>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -262,7 +268,8 @@ export type AsyncMessages =
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
-  | SetNoneValuesOnNodeAsyncMessage;
+  | SetNoneValuesOnNodeAsyncMessage
+  | GetFigmaFontsMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -295,7 +302,8 @@ export type AsyncMessageResults =
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult
-  | SetNoneValuesOnNodeAsyncMessageResult;
+  | SetNoneValuesOnNodeAsyncMessageResult
+  | GetFigmaFontsMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

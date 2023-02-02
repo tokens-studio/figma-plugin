@@ -27,3 +27,4 @@ export * from './renameStyles';
 export * from './bulkRemapTokens';
 export * from './removeStyles';
 export * from './setNoneValuesOnNode';
+export * from './getFigmaFonts';

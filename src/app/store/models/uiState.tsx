@@ -79,6 +79,7 @@ export interface UIState {
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  figmaFonts: Font[]
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -130,6 +131,7 @@ export const uiState = createModel<RootModel>()({
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
+    figmaFonts: [],
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -356,6 +358,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         scrollPositionSet: payload,
+      };
+    },
+    setFigmaFonts(state, payload: Font[]) {
+      return {
+        ...state,
+        figmaFonts: payload,
       };
     },
   },
