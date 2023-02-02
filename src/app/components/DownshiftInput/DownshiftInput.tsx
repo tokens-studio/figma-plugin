@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector } from 'react-redux';
+import Fuse from 'fuse.js';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
 import Text from '../Text';
@@ -22,7 +23,6 @@ import {
   StyledButton,
   StyledDropdown, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
-import fuzzySearch from '@/utils/fuzzySearch';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -113,35 +113,41 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
   const filteredTokenItems = useMemo(
     () => {
+      let initialFilteredValues:ResolveTokenValuesResult[] = [];
       if (isDocumentationType(type as Properties)) {
-        return resolvedTokens
-          .filter(
-            (token: SingleToken) => !searchInput || fuzzySearch(token.name, searchInput),
-          )
+        initialFilteredValues = resolvedTokens
           .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
             a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
           ));
+      } else {
+        initialFilteredValues = resolvedTokens
+          .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+          ));
       }
-      return resolvedTokens
-        .filter(
-          (token: SingleToken) => !searchInput || fuzzySearch(token.name, searchInput),
-        )
-        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
-        ));
+      if (searchInput) {
+        const searchResult = new Fuse(initialFilteredValues, { keys: ['name'] }).search(searchInput);
+        return searchResult.map((searchItem) => searchItem.item);
+      }
+      return initialFilteredValues;
     },
-    [resolvedTokens, searchInput, type, initialName, referenceTokenTypes],
+    [resolvedTokens, type, initialName, referenceTokenTypes, searchInput],
   );
 
   const filteredValues = useMemo(() => {
+    let initialFilteredValues: Array<string> = [];
     if (currentSearchField === 'Fonts') {
-      return [...new Set(figmaFonts.map((font) => font.fontName.family))].filter((fontName) => !searchInput || fuzzySearch(fontName, searchInput));
+      initialFilteredValues = [...new Set(figmaFonts.map((font) => font.fontName.family))];
     }
     if (currentSearchField === 'Weights' && externalFontFamily) {
-      return figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
+      initialFilteredValues = figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
     }
-    return [];
-  }, [figmaFonts, currentSearchField, searchInput, externalFontFamily]);
+    if (searchInput) {
+      const searchResult = new Fuse(initialFilteredValues).search(searchInput);
+      return searchResult.map((searchItem) => searchItem.item);
+    }
+    return initialFilteredValues;
+  }, [figmaFonts, currentSearchField, externalFontFamily, searchInput]);
 
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
