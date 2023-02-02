@@ -64,24 +64,26 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
   const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
   const [inputContainerWith, setInputContainerWith] = React.useState(0);
-  const portalContainer = document.getElementById('app');
-  const [portalPlaceholder] = React.useState(document.createElement('div'));
-  const inputContainerRef = React.useRef<HTMLDivElement>(null);
-  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const [searchInput, setSearchInput] = React.useState('');
+  const [portalPlaceholder] = React.useState(document.createElement('div'));
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
   const figmaFonts = useSelector(figmaFontsSelector);
+  const inputContainerRef = React.useRef<HTMLDivElement>(null);
+  const downShiftContainerRef = React.useRef<HTMLDivElement>(null);
+  const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
+  const { getFigmaFonts } = useFigmaFonts();
+  const portalContainer = document.getElementById('app');
+  // eslint-disable-next-line consistent-return
   const externalSearchField = useMemo<SearchField | undefined>(() => {
     if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
     if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
-    return undefined;
   }, [type]);
-  const { getFigmaFonts } = useFigmaFonts();
-  // const handleClickOutside = useCallback((event: MouseEvent) => {
-  //   if (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target) && showAutoSuggest) {
-  //     setShowAutoSuggest(false);
-  //   }
-  // }, [showAutoSuggest]);
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (downShiftContainerRef.current && event.target instanceof Node && !downShiftContainerRef.current.contains(event.target) && showAutoSuggest) {
+      setShowAutoSuggest(false);
+    }
+  }, [showAutoSuggest]);
 
   React.useEffect(() => {
     if (portalContainer) {
@@ -101,12 +103,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, [externalSearchField, getFigmaFonts]);
 
-  // React.useEffect(() => {
-  //   document.addEventListener('click', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   };
-  // }, [handleClickOutside]);
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [handleClickOutside]);
 
   const filteredTokenItems = useMemo(
     () => {
@@ -208,7 +210,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       {({
         selectedItem, highlightedIndex, getItemProps,
       }) => (
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative' }} ref={downShiftContainerRef}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
