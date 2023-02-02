@@ -182,7 +182,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       <Mention
         trigger="{"
         data={mentionData}
-        markup=" __id__ "
+        markup="{__id__}"
         renderSuggestion={renderMentionListItem}
         displayTransform={renderDisplayTransform}
       />
