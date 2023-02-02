@@ -22,6 +22,7 @@ import {
   StyledButton,
   StyledDropdown, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
+import fuzzySearch from '@/utils/fuzzySearch';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -73,10 +74,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
   const portalContainer = document.getElementById('app');
-  // eslint-disable-next-line consistent-return
   const externalSearchField = useMemo<SearchField | undefined>(() => {
     if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
     if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
+    return undefined;
   }, [type]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -115,7 +116,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       if (isDocumentationType(type as Properties)) {
         return resolvedTokens
           .filter(
-            (token: SingleToken) => !searchInput || token.name.toLowerCase().includes(searchInput.toLowerCase()),
+            (token: SingleToken) => !searchInput || fuzzySearch(token.name, searchInput),
           )
           .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
             a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
@@ -123,7 +124,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       }
       return resolvedTokens
         .filter(
-          (token: SingleToken) => !searchInput || token.name.toLowerCase().includes(searchInput.toLowerCase()),
+          (token: SingleToken) => !searchInput || fuzzySearch(token.name, searchInput),
         )
         .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
@@ -134,7 +135,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
   const filteredValues = useMemo(() => {
     if (currentSearchField === 'Fonts') {
-      return [...new Set(figmaFonts.map((font) => font.fontName.family))].filter((fontName) => !searchInput || fontName.toLowerCase().includes(searchInput.toLowerCase()));
+      return [...new Set(figmaFonts.map((font) => font.fontName.family))].filter((fontName) => !searchInput || fuzzySearch(fontName, searchInput));
     }
     if (currentSearchField === 'Weights' && externalFontFamily) {
       return figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
@@ -149,7 +150,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       <span>
         {parts.map((part, i) => (
           // eslint-disable-next-line react/no-array-index-key
-          <StyledPart key={i} matches={part.toLowerCase() === highlight.toLowerCase()}>
+          <StyledPart key={i} matches={part === highlight}>
             {part}
           </StyledPart>
         ))}
