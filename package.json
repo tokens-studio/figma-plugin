@@ -49,7 +49,7 @@
     "chroma-js": "^2.4.2",
     "classnames": "^2.3.1",
     "color2k": "^2.0.1",
-    "colorjs.io": "^0.4.2",
+    "colorjs.io": "^0.4.3",
     "copy-to-clipboard": "^3.3.3",
     "core-js": "^3.9.1",
     "cypress-react-selector": "^2.3.6",

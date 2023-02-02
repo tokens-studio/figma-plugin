@@ -1,24 +1,35 @@
 import Color from 'colorjs.io';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+import { darken, lighten } from './modifyColor';
 
 export function convertModifiedColorToHex(baseColor: string, modifier: ColorModifier) {
+  const color = new Color(baseColor);
+  let returnedColor = color;
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        return new Color(baseColor).lighten(Number(modifier.value)).toString({ inGamut: false, format: 'hex' });
+        returnedColor = lighten(color, modifier.space, Number(modifier.value));
+        break;
       case ColorModifierTypes.DARKEN:
-        return new Color(baseColor).darken(Number(modifier.value)).toString({ inGamut: false, format: 'hex' });
+        returnedColor = darken(color, modifier.space, Number(modifier.value));
+        break;
       case ColorModifierTypes.MIX:
-        return new Color(new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' }).toString()).toString({ inGamut: false, format: 'hex' });
+        returnedColor = new Color(color.mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' }).toString());
+        break;
       case ColorModifierTypes.ALPHA: {
-        const newColor = new Color(baseColor);
+        const newColor = color;
         newColor.alpha = Number(modifier.value);
-        return newColor.toString({ inGamut: false, format: 'hex' });
+        returnedColor = newColor;
+        break;
       }
       default:
-        return new Color(baseColor).toString({ inGamut: false, format: 'hex' });
+        returnedColor = color;
+        break;
     }
+    console.log('convertModifiedColorToHex', returnedColor, returnedColor.toString({ inGamut: false, format: 'hex' }));
+
+    return returnedColor.toString({ inGamut: false, format: 'hex' });
   } catch (e) {
     return baseColor;
   }

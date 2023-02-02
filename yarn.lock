@@ -7796,10 +7796,10 @@ colorette@^1.2.1, colorette@^1.2.2:
   resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.2.2.tgz#cbcc79d5e99caea2dbf10eb3a26fd8b3e6acfa94"
   integrity sha512-MKGMzyfeuutC/ZJ1cba9NqcNpfeqMUcYmyF1ZFY6/Cn7CNSAKx6a+s48sqLqyAiZuaP2TcqMhoo+dlwFnVxT9w==
 
-colorjs.io@^0.4.2:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/colorjs.io/-/colorjs.io-0.4.2.tgz#5338fc185a8be3b46674420cd2be88389a18145b"
-  integrity sha512-vtpiH+BTzZtzs4Yno0GyoC05Z20fTeLwNJ7lQzjxi8GJJb1SZO2o5yUBAUXzgvrO2JNuyIqur4gb1Z6HBjpd9A==
+colorjs.io@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/colorjs.io/-/colorjs.io-0.4.3.tgz#0f12aca97508d7db8f53ed304d28f079b3b3fff5"
+  integrity sha512-Jr6NiWFZCuSECl23Bhe4jvDldQsE0ErnWrdl3xIUFy+Bkp0l8r5qt/iZlNH47/xxGP5izcyC8InjoUoI4Po+Pg==
 
 colors@^1.1.2:
   version "1.4.0"
