@@ -328,7 +328,7 @@ export default function ColorTokenForm({
           {internalEditToken.type === 'color' ? (
             <ColorPickerTrigger background={String(displayColor)} />
           ) : null}
-          {modifiedColor?.toString()}
+          {modifiedColor}
         </Box>
       )}
     </>
