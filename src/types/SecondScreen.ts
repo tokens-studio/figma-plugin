@@ -2,9 +2,7 @@ import { ThemeObject } from './ThemeObject';
 import { SingleToken } from './tokens';
 import { UsedTokenSetsMap } from './UsedTokenSetsMap';
 
-export type Token = SingleToken;
-
-export type TokenSets = Record<string, Token[]>;
+export type TokenSets = Record<string, SingleToken[]>;
 
 export enum Clients {
   PLUGIN = 'plugin',
@@ -15,7 +13,7 @@ export interface TokenData {
   id: string | number | null;
   owner_email?: string;
   created_at?: string;
-  ftData: {
+  synced_data: {
     sets: TokenSets | null;
     themes: ThemeObject[];
     usedTokenSets: UsedTokenSetsMap;

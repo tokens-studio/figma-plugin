@@ -6,6 +6,7 @@ import supabase from '@/supabase';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AuthContextType, AuthData, AuthInfo } from '@/types/Auth';
+import { track } from '@/utils/analytics';
 
 const defaultContextValue = {
   user: null,
@@ -33,7 +34,6 @@ const AuthContextProvider = ({
   function handleLogin(data: AuthData) {
     setAuthData(data);
     // Store user auth data in figma.clientStorage
-
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_AUTH_DATA,
       auth: data,
@@ -42,6 +42,7 @@ const AuthContextProvider = ({
 
   function handleLogout() {
     setAuthData(null);
+    track('Logout second screen');
     // Clear auth data in figma.clientStorage
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_AUTH_DATA,
@@ -55,6 +56,7 @@ const AuthContextProvider = ({
     if (error) {
       setAuthError(error.msg || error.error_description);
     } else {
+      track('Log in second screen');
       handleLogin(data);
     }
 
@@ -67,6 +69,7 @@ const AuthContextProvider = ({
     if (error) {
       setAuthError(error.msg || error.error_description);
     } else {
+      track('Sign up second screen');
       handleLogin(data);
     }
 

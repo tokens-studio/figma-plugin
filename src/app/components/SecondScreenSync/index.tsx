@@ -35,14 +35,18 @@ export default function SecondScreenSync() {
             filter: `owner_email=eq.${user.email}`,
           },
           (payload: RealtimePostgresUpdatePayload<TokenData>) => {
-            if (payload.new.last_updated_by !== Clients.PLUGIN && payload.new.ftData) {
-              const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.ftData;
+            if (payload.new.last_updated_by !== Clients.PLUGIN && payload.new.synced_data) {
+              const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.synced_data;
 
               if (sets) {
                 dispatch.tokenState.setTokens(sets);
               }
-              dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
-              dispatch.tokenState.setThemes(newThemes);
+              if (newUsedTokenSets) {
+                dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
+              }
+              if (newThemes) {
+                dispatch.tokenState.setThemes(newThemes);
+              }
             }
           },
         )
@@ -59,11 +63,11 @@ export default function SecondScreenSync() {
 
   // Listen to state changes and update the db
   useEffect(() => {
-    async function updateRemoteData(email: string, ftData: string) {
+    async function updateRemoteData(email: string, data: string) {
       await supabase.postgrest
         .from('tokens')
         .upsert(
-          { ftData, owner_email: email, last_updated_by: Clients.PLUGIN },
+          { synced_data: data, owner_email: email, last_updated_by: Clients.PLUGIN },
           { onConflict: 'owner_email', ignoreDuplicates: false },
         )
         .eq('owner_email', email);

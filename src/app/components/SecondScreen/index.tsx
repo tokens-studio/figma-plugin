@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import { track } from 'mixpanel-figma';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
@@ -20,6 +21,7 @@ export default function SecondScreen() {
   }, [dispatch.uiState]);
 
   const handleOpenSecondScreen = useCallback(() => {
+    track('Open second screen');
     window.open(process.env.SECOND_SCREEN_APP_URL);
   }, []);
 
@@ -35,8 +37,8 @@ export default function SecondScreen() {
         justifyContent: 'space-between',
         gap: '$3',
         padding: '$2 $4',
-        background: isEnabled ? 'rgba(65, 63, 63, 1)' : 'transparent',
-        borderRadius: '6px',
+        background: isEnabled ? '$bgSubtle' : 'transparent',
+        borderRadius: '$button',
         cursor: 'pointer',
         marginLeft: '$4',
       }}
