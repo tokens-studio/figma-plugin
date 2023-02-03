@@ -18,7 +18,7 @@ export interface AuthInfo {
   email?: string;
   password?: string;
   repeatedPassword?: string;
-  refresh_token?: string;
+  refreshToken?: string;
 }
 
 export interface AuthContextType {

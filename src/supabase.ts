@@ -86,7 +86,7 @@ class SupabaseClient {
       const tokenState = this.checkToken(auth);
       if (tokenState === 'expired') {
         const { data, error } = await this.signIn({
-          refresh_token: auth.refresh_token,
+          refreshToken: auth.refresh_token,
         });
         if (!error) {
           this.initializeAuth(data);
@@ -114,7 +114,7 @@ class SupabaseClient {
     if (tokenState === 'near') {
       // Refresh token automatically if token is almost expired
       const { data, error } = await this.signIn({
-        refresh_token: auth.refresh_token,
+        refreshToken: auth.refresh_token,
       });
 
       if (error) {
