@@ -3,18 +3,6 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
-// write the same function for darken
-function darkenL(l: number, amount: number) {
-  console.log('darkenL', l, amount, l * (1 - amount));
-
-  // do not go below 0
-  if (l * (1 - amount) < 0) {
-    return 0;
-  }
-
-  return l * (1 - amount);
-}
-
 export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
   // return new Color(color.mix('white', amount, { outputSpace: 'sRGB' }).toString());
   console.log('Trying to lighten in', colorSpace, amount, color);
@@ -56,9 +44,37 @@ export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: numbe
 }
 
 export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
-  // return new Color(color.mix(new Color('black'), amount, { outputSpace: 'sRGB' }).toString());
+  // write the same function as above, but for darken
+  switch (colorSpace) {
+    case ColorSpaceTypes.LCH: {
+      const lightness = color.lch.l;
+      const difference = lightness;
+      const newChroma = Math.max(0, color.lch.c - amount * color.lch.c);
+      const newLightness = Math.max(0, lightness - difference * amount);
+      color.set('lch.l', newLightness);
+      color.set('lch.c', newChroma);
+      return color;
+    }
+    case ColorSpaceTypes.HSL: {
+      const lightness = color.hsl.l;
+      const difference = lightness;
+      const newLightness = Math.max(0, lightness - difference * amount);
+      color.set('hsl.l', newLightness);
+      return color;
+    }
+    case ColorSpaceTypes.P3: {
+      const colorInP3 = color.to('p3');
+      const lightness = colorInP3.p3[0];
+      const difference = lightness;
+      const newLightness = Math.max(0, lightness - difference * amount);
+      colorInP3.p3[0] = newLightness;
+      return colorInP3;
+    }
 
-  return color.set('lch.l', (l) => darkenL(l, amount));
+    default: {
+      return color.darken(amount);
+    }
+  }
 }
 
 export function modifyColor(baseColor: string, modifier: ColorModifier) {
