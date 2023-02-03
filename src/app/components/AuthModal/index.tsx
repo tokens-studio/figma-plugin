@@ -9,6 +9,7 @@ import Box from '../Box';
 import Button from '../Button';
 import Text from '../Text';
 import Spinner from '../Spinner';
+import Link from '../Link';
 
 enum AuthModes {
   LOGIN = 'login',
@@ -87,6 +88,10 @@ export default function AuthModal() {
           {getSubmitButtonContent()}
         </Button>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>{getInfo()}</Box>
+        <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Link href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`}>Forgot password ?</Link>
+        </Box>
+
         <Box
           css={{
             display: 'flex',
