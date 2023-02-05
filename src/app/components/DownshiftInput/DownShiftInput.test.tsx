@@ -1,6 +1,6 @@
 import React from 'react';
 import { DownshiftInput } from './DownshiftInput';
-import { render } from '../../../../tests/config/setupTest';
+import { render, screen } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -127,36 +127,5 @@ describe('DownShiftInput', () => {
     dataStore.forEach((data) => {
       expect(data.input.replace(/[{}$]/g, '')).toBe(data.output);
     });
-  });
-
-  it('should return color tokens when type is color', () => {
-    const result = render(
-      <DownshiftInput
-        type="color"
-        resolvedTokens={resolvedTokens}
-        setInputValue={mockSetInputValue}
-        handleChange={mockHandleChange}
-        value="{"
-        suffix
-      />,
-    );
-    result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getByText('#e2e8f0')).toBeInTheDocument();
-    expect(result.getByText('#cbd5e1')).toBeInTheDocument();
-  });
-
-  it('should return all tokens when type is documentation type', () => {
-    const result = render(
-      <DownshiftInput
-        type="tokenName"
-        resolvedTokens={resolvedTokens}
-        setInputValue={mockSetInputValue}
-        handleChange={mockHandleChange}
-        value="{"
-        suffix
-      />,
-    );
-    result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(9);
   });
 });

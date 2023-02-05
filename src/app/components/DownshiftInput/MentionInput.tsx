@@ -64,7 +64,7 @@ const mentionInputStyles = {
 };
 
 export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
-  name,
+  name = 'value',
   type,
   value,
   initialName,
