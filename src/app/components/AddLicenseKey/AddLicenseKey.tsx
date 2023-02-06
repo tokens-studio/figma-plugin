@@ -79,7 +79,6 @@ export default function AddLicenseKey() {
     setLicenseKey(ev.target.value.trim());
   }, []);
 
-  console.log({ existingKey });
   const removeLicenseKeyButton = existingKey && (
     <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
       Remove key
