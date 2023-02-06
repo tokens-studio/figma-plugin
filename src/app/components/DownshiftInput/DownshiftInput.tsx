@@ -71,6 +71,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const figmaFonts = useSelector(figmaFontsSelector);
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const downShiftContainerRef = React.useRef<HTMLDivElement>(null);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
   const portalContainer = document.body;
@@ -96,7 +97,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       setInputContainerPosY(boundingRect.bottom);
       setInputContainerWith(boundingRect.width);
     }
-  }, []);
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [inputContainerRef.current?.getBoundingClientRect()]);
 
   React.useEffect(() => {
     if (externalSearchField === 'Fonts') {
@@ -212,6 +216,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     else setCurrentSearchField('Tokens');
   }, [currentSearchField, externalSearchField]);
 
+  const handleOnFocus = React.useCallback(() => {
+    setShowAutoSuggest(false);
+  }, []);
+
   return (
     <Downshift onSelect={handleSelect}>
       {({
@@ -238,6 +246,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               handleChange={handleChange}
               handleBlur={handleBlur}
               portalPlaceholder={portalPlaceholder}
+              handleOnFocus={handleOnFocus}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
@@ -270,10 +279,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     </Box>
                     <Input
                       full
+                      ref={searchInputRef}
                       value={searchInput}
                       onChange={handleSearchInputChange}
                       type="text"
-                      autofocus
                       placeholder="Search"
                       data-testid="downshift-search-input"
                     />

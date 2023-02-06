@@ -25,6 +25,7 @@ interface MentionInputProps {
   inputContainerPosY: number,
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: () => void;
+  handleOnFocus: React.FocusEventHandler<HTMLTextAreaElement>
 }
 
 const mentionInputStyles = {
@@ -37,6 +38,9 @@ const mentionInputStyles = {
     border: '1px solid var(--colors-borderMuted)',
     borderRadius: 'var(--radii-input)',
     fontSize: 'var(--fontSizes-small)',
+    '&:focus-within': {
+      boxShadow: 'var(--shadows-focus)',
+    },
   },
   suggestions: {
     borderRadius: 'var(--radii-contextMenu)',
@@ -76,6 +80,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
   inputContainerPosY,
   handleChange,
   handleBlur,
+  handleOnFocus,
 }) => {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
 
@@ -178,6 +183,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       customSuggestionsContainer={renderMentionList}
       onBlur={handleInputBlur}
       name={name}
+      onFocus={handleOnFocus}
     >
       <Mention
         trigger="{"
