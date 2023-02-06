@@ -275,6 +275,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       type="text"
                       autofocus
                       placeholder="Search"
+                      data-testid="downshift-search-input"
                     />
                   </Box>
                   <StyledDropdown className="content scroll-container">

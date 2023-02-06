@@ -41,6 +41,7 @@ export default function TypographyInput({
   handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
+  console.log('inter', internalEditToken);
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');

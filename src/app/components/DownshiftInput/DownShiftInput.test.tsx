@@ -1,6 +1,6 @@
 import React from 'react';
 import { DownshiftInput } from './DownshiftInput';
-import { render, screen } from '../../../../tests/config/setupTest';
+import { render } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -127,5 +127,19 @@ describe('DownShiftInput', () => {
     dataStore.forEach((data) => {
       expect(data.input.replace(/[{}$]/g, '')).toBe(data.output);
     });
+  });
+
+  it('should return color tokens when type is color', async () => {
+    const result = render(
+      <DownshiftInput
+        type="color"
+        resolvedTokens={resolvedTokens}
+        setInputValue={mockSetInputValue}
+        handleChange={mockHandleChange}
+        value=""
+        suffix
+      />,
+    );
+    expect(result).toMatchSnapshot();
   });
 });

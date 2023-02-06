@@ -25,12 +25,10 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   }, [handleBulkRemap, onClose, newName, oldName]);
 
   const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
     setOldName(e.target.value);
   }, []);
 
   const handleNewNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
     setNewName(e.target.value);
   }, []);
 

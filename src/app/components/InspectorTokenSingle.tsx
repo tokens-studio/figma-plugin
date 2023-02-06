@@ -54,7 +54,6 @@ export default function InspectorTokenSingle({
   }, []);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
     setNewTokenName(e.target.value);
   }, []);
 
