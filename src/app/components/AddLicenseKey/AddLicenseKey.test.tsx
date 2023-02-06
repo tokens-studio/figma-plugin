@@ -8,62 +8,8 @@ import {
 import AddLicenseKey from './AddLicenseKey';
 import { LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE } from '@/mocks/handlers';
 import { AddLicenseSource } from '@/app/store/models/userState';
-import { AppContainer } from '../AppContainer';
-import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
-import { StorageProviderType } from '@/constants/StorageProviderType';
-import { UpdateMode } from '@/constants/UpdateMode';
-import { TokenTypes } from '@/constants/TokenTypes';
 import ConfirmDialog from '../ConfirmDialog';
-
-const mockStartupParams: StartupMessage = {
-  type: AsyncMessageTypes.STARTUP,
-  activeTheme: null,
-  lastOpened: Date.now(),
-  onboardingExplainer: {
-    sets: true,
-    inspect: true,
-    syncProviders: true,
-  },
-  localApiProviders: [],
-  licenseKey: null,
-  settings: {
-    width: 800,
-    height: 500,
-    ignoreFirstPartForStyles: false,
-    inspectDeep: false,
-    prefixStylesWithThemeName: false,
-    showEmptyGroups: true,
-    updateMode: UpdateMode.PAGE,
-    updateOnChange: false,
-    updateRemote: true,
-    updateStyles: true,
-  },
-  storageType: {
-    provider: StorageProviderType.LOCAL,
-  },
-  user: {
-    figmaId: 'figma:1234',
-    userId: 'uid:1234',
-    name: 'Jan Six',
-  },
-  localTokenData: {
-    activeTheme: null,
-    checkForChanges: false,
-    themes: [],
-    usedTokenSet: {},
-    updatedAt: new Date().toISOString(),
-    values: {
-      global: [
-        {
-          type: TokenTypes.COLOR,
-          name: 'colors.red',
-          value: '#ff0000',
-        },
-      ],
-    },
-    version: '91',
-  },
-};
+import * as notifiers from '@/plugin/notifiers';
 
 jest.mock('launchdarkly-react-client-sdk', () => ({
   LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
@@ -121,7 +67,7 @@ describe('Add license key', () => {
     expect(input.value).toBe(licenseKey);
   });
 
-  it('Shows the backend error when added license is not valid and the add key button', async () => {
+  it('Shows the backend error when added license is not valid', async () => {
     const mockStore = createMockStore({});
     const user = userEvent.setup();
     render(
@@ -140,7 +86,6 @@ describe('Add license key', () => {
     const errorMessage = await screen.findByText(regExError);
 
     expect(errorMessage).toBeInTheDocument();
-    expect(addLicenseKeyButton).toBeInTheDocument();
   });
 
   it('Adds the license key and hides the previous error message if the license is valid', async () => {
@@ -288,15 +233,16 @@ describe('Add license key', () => {
     });
   });
 
-  it('Should show an error message if the license removal failed', async () => {
+  it('Should notify the ui if the license removal failed', async () => {
     const mockStore = createMockStore({});
-
+    const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
     let result: ReturnType<typeof render>;
 
     await act(async () => {
       result = render(
         <Provider store={mockStore}>
-          <AppContainer {...mockStartupParams} />
+          <ConfirmDialog />
+          <AddLicenseKey />
         </Provider>,
       );
     });
@@ -306,14 +252,25 @@ describe('Add license key', () => {
         key: LICENSE_FOR_ERROR_RESPONSE,
         source: AddLicenseSource.UI,
       });
-      const settingsTab = await result.findByTestId('navitem-settings');
-      settingsTab.click();
     });
 
     await act(async () => {
-      const addLicenseKeyButton = await result.findByText('Add license key');
+      const removeKeyButton = await result.findByRole('button', {
+        name: /remove key/i,
+      });
+      removeKeyButton.click();
+    });
 
-      expect(addLicenseKeyButton).toBeDisabled();
+    await act(async () => {
+      const confirmButton = await result.findByRole('button', {
+        name: /remove license key/i,
+      });
+      confirmButton.click();
+    });
+
+    await waitFor(() => {
+      notifyToUISpy.mockReturnValueOnce();
+      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support', { error: true });
     });
   });
 });
