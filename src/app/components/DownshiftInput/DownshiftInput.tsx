@@ -73,7 +73,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const downShiftContainerRef = React.useRef<HTMLDivElement>(null);
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
-  const portalContainer = document.getElementById('app');
+  const portalContainer = document.body;
   const externalSearchField = useMemo<SearchField | undefined>(() => {
     if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
     if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';

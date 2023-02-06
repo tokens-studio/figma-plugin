@@ -32,7 +32,6 @@ describe('uiState', () => {
           style: 'Regular',
         },
       },
-
     ];
     store.dispatch.uiState.setFigmaFonts(fonts);
     expect(store.getState().uiState.figmaFonts).toBe(fonts);
