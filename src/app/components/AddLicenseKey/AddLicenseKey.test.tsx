@@ -3,14 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import { Provider } from 'react-redux';
 import {
-  createMockStore,
-  fireEvent,
-  render, resetStore, screen, waitFor,
+  createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AddLicenseKey from './AddLicenseKey';
-import {
-  LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE,
-} from '@/mocks/handlers';
+import { LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE } from '@/mocks/handlers';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import { AppContainer } from '../AppContainer';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -161,7 +157,7 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const licenseKeyInput = await result.findByTestId('settings-license-key-input') as HTMLInputElement;
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
       fireEvent.change(licenseKeyInput, {
         target: { value: LICENSE_FOR_ERROR_RESPONSE },
       });
@@ -175,11 +171,43 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const licenseKeyInput = await result.findByTestId('settings-license-key-input') as HTMLInputElement;
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
       fireEvent.change(licenseKeyInput, {
         target: { value: LICENSE_FOR_VALID_RESPONSE },
       });
       expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
+    });
+  });
+
+  it('User should be able to remove a key if its not valid', async () => {
+    const mockStore = createMockStore({});
+
+    let result: ReturnType<typeof render>;
+
+    await act(async () => {
+      result = render(
+        <Provider store={mockStore}>
+          <AddLicenseKey />
+        </Provider>,
+      );
+    });
+
+    await act(async () => {
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
+      fireEvent.change(licenseKeyInput, {
+        target: { value: LICENSE_FOR_ERROR_RESPONSE },
+      });
+      expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
+
+      const addLicenseKeyButton = await result.findByText('Add license key');
+      addLicenseKeyButton.click();
+
+      const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
+      expect(errorMessage).toBeInTheDocument();
+
+      const removeKeyButton = await result.findByText('Remove key');
+      expect(removeKeyButton).toBeInTheDocument();
+      expect(removeKeyButton).not.toBeDisabled();
     });
   });
 
@@ -198,7 +226,10 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
     });
 
     await act(async () => {
@@ -225,7 +256,10 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
     });
 
     await act(async () => {
@@ -241,7 +275,7 @@ describe('Add license key', () => {
       });
       confirmButton.click();
 
-      const input = await result.getByTestId('settings-license-key-input') as HTMLInputElement;
+      const input = (await result.getByTestId('settings-license-key-input')) as HTMLInputElement;
 
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
@@ -268,7 +302,10 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_ERROR_RESPONSE, source: AddLicenseSource.UI });
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
       const settingsTab = await result.findByTestId('navitem-settings');
       settingsTab.click();
     });
