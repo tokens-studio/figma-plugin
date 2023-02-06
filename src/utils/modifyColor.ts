@@ -1,11 +1,10 @@
 import Color from 'colorjs.io';
+import * as Sentry from '@sentry/react';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
-export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
-  // return new Color(color.mix('white', amount, { outputSpace: 'sRGB' }).toString());
-  console.log('Trying to lighten in', colorSpace, amount, color);
+export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: number): Color {
   switch (colorSpace) {
     case ColorSpaceTypes.LCH: {
       const lightness = color.lch.l;
@@ -26,13 +25,10 @@ export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: numbe
     case ColorSpaceTypes.P3: {
       const colorInP3 = color.to('p3');
       const lightness = colorInP3.p3[0];
-      console.log('lightness is', lightness);
 
       const difference = 1 - lightness;
-      console.log('difference is', difference);
 
       const newLightness = Math.min(1, lightness + difference * amount);
-      console.log('newLightness is', newLightness);
 
       colorInP3.p3[0] = newLightness;
       return colorInP3;
@@ -43,8 +39,7 @@ export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: numbe
   }
 }
 
-export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
-  // write the same function as above, but for darken
+export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number): Color {
   switch (colorSpace) {
     case ColorSpaceTypes.LCH: {
       const lightness = color.lch.l;
@@ -93,11 +88,11 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
       case ColorModifierTypes.MIX:
         returnedColor = new Color(color.mix(modifier.color, Number(modifier.value)).toString()).to(modifier.space);
         break;
-      case ColorModifierTypes.ALPHA:
-        // eslint-disable-next-line no-case-declarations
+      case ColorModifierTypes.ALPHA: {
         const newColor = color;
         newColor.alpha = Number(modifier.value);
         break;
+      }
       default:
         returnedColor = color;
         break;
@@ -106,6 +101,7 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
 
     return returnedColor.toString({ inGamut: true, precision: 5 });
   } catch (e) {
+    Sentry.captureException(e);
     return baseColor;
   }
 }
