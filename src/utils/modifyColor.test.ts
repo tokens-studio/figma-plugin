@@ -14,7 +14,7 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(76.5 92.9 29.5)',
+        output: 'lch(68.151 66.851 31.669)',
       },
       {
         space: ColorSpaceTypes.P3,
@@ -40,7 +40,7 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(32.4 103 37.5)',
+        output: 'lch(38.151 66.851 31.669)',
       },
       {
         space: ColorSpaceTypes.P3,
@@ -67,7 +67,7 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(46.5 64.1 29.3)',
+        output: 'lch(46.53 64.095 29.27)',
       },
       {
         space: ColorSpaceTypes.P3,
@@ -93,7 +93,7 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(54.5 95.5 31.7 / 0.3)',
+        output: 'lch(54.501 95.502 31.669 / 0.3)',
       },
       {
         space: ColorSpaceTypes.P3,
