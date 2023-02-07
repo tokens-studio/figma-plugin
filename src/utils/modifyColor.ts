@@ -91,6 +91,18 @@ export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number
     }
   }
 }
+
+export function mixColor(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
+  const mixValue = Math.max(1, Math.min(0, Number(amount)));
+
+  return new Color(color.mix(color, mixValue).toString()).to(colorSpace);
+}
+
+export function transparentize(color: Color, amount: number) {
+  color.alpha = Math.max(0, Math.min(1, Number(amount)));
+  return color;
+}
+
 export function modifyColor(baseColor: string, modifier: ColorModifier) {
   const color = new Color(baseColor);
   let returnedColor = color;
@@ -103,11 +115,10 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
         returnedColor = darken(color, modifier.space, Number(modifier.value));
         break;
       case ColorModifierTypes.MIX:
-        returnedColor = new Color(color.mix(modifier.color, Number(modifier.value)).toString()).to(modifier.space);
+        returnedColor = mixColor(color, modifier.space, Number(modifier.value));
         break;
       case ColorModifierTypes.ALPHA: {
-        const newColor = color;
-        newColor.alpha = Number(modifier.value);
+        returnedColor = transparentize(color, Number(modifier.value));
         break;
       }
       default:
