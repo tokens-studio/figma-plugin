@@ -19,7 +19,7 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
         returnedColor = darken(color, modifier.space, Number(modifier.value));
         break;
       case ColorModifierTypes.MIX:
-        returnedColor = mix(color, modifier.space, Number(modifier.value));
+        returnedColor = mix(color, modifier.space, Number(modifier.value), new Color(modifier.color));
         break;
       case ColorModifierTypes.ALPHA: {
         returnedColor = transparentize(color, Number(modifier.value));
