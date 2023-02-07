@@ -85,7 +85,6 @@ export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number
       color.set('srgb.b', newBlue);
       return color;
     }
-
     default: {
       return color.darken(amount);
     }
