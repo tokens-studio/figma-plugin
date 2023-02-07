@@ -6,7 +6,9 @@ import {
   createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AddLicenseKey from './AddLicenseKey';
-import { LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE } from '@/mocks/handlers';
+import {
+  LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE, LICENSE_FOR_DETACH_ERROR_RESPONSE,
+} from '@/mocks/handlers';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ConfirmDialog from '../ConfirmDialog';
 import * as notifiers from '@/plugin/notifiers';
@@ -249,7 +251,7 @@ describe('Add license key', () => {
 
     await act(async () => {
       await mockStore.dispatch.userState.addLicenseKey({
-        key: LICENSE_FOR_ERROR_RESPONSE,
+        key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
         source: AddLicenseSource.UI,
       });
     });
@@ -271,6 +273,46 @@ describe('Add license key', () => {
     await waitFor(() => {
       notifyToUISpy.mockReturnValueOnce();
       expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support', { error: true });
+    });
+  });
+
+  it('If the key is invalid, The license key should be removed without confirmation and remove key should not be visible anymore', async () => {
+    const mockStore = createMockStore({});
+    let result: ReturnType<typeof render>;
+
+    await act(async () => {
+      result = render(
+        <Provider store={mockStore}>
+          <ConfirmDialog />
+          <AddLicenseKey />
+        </Provider>,
+      );
+    });
+
+    await act(async () => {
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
+    });
+
+    await act(async () => {
+      const removeKeyButton = await result.findByRole('button', {
+        name: /remove key/i,
+      });
+      removeKeyButton.click();
+    });
+
+    await act(async () => {
+      const confirmaModal = result.queryByText(/are you sure you want to remove your license key\?/i);
+      expect(confirmaModal).toBeNull();
+      const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
+      expect(input.value).toBe('');
+
+      const removeKeyButton = result.queryByRole('button', {
+        name: /remove key/i,
+      });
+      expect(removeKeyButton).toBeNull();
     });
   });
 });

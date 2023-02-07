@@ -46,17 +46,21 @@ export default function AddLicenseKey() {
   }, [userId, ldClient]);
 
   const removeKey = useCallback(async () => {
-    const confirmation = await confirm({
-      text: 'Are you sure you want to remove your license key?',
-      description: `Make sure you saved a copy of the license key somewhere,                    
-        as it won’t be stored on this device after you deleted it.`,
-      confirmAction: 'Remove license key',
-    });
-    if (confirmation) {
+    if (licenseKeyError) {
       dispatch.userState.removeLicenseKey('');
-      removeAccessToFeatures();
+    } else {
+      const confirmation = await confirm({
+        text: 'Are you sure you want to remove your license key?',
+        description: `Make sure you saved a copy of the license key somewhere,                    
+          as it won’t be stored on this device after you deleted it.`,
+        confirmAction: 'Remove license key',
+      });
+      if (confirmation) {
+        dispatch.userState.removeLicenseKey('');
+        removeAccessToFeatures();
+      }
     }
-  }, [dispatch, confirm, removeAccessToFeatures]);
+  }, [dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
     color: '$fgAccent',
