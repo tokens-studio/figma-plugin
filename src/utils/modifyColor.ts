@@ -4,7 +4,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 
-export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: number): Color {
+export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
   switch (colorSpace) {
     case ColorSpaceTypes.LCH: {
       const lightness = color.lch.l;
@@ -24,14 +24,22 @@ export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: numbe
     }
     case ColorSpaceTypes.P3: {
       const colorInP3 = color.to('p3');
-      const lightness = colorInP3.p3[0];
-
-      const difference = 1 - lightness;
-
-      const newLightness = Math.min(1, lightness + difference * amount);
-
-      colorInP3.p3[0] = newLightness;
+      const newRed = Math.min(1, colorInP3.p3.r + amount * (1 - colorInP3.p3.r));
+      const newGreen = Math.min(1, colorInP3.p3.g + amount * (1 - colorInP3.p3.g));
+      const newBlue = Math.min(1, colorInP3.p3.b + amount * (1 - colorInP3.p3.b));
+      colorInP3.set('p3.r', newRed);
+      colorInP3.set('p3.g', newGreen);
+      colorInP3.set('p3.b', newBlue);
       return colorInP3;
+    }
+    case ColorSpaceTypes.SRGB: {
+      const newRed = Math.min(1, color.srgb.r + amount * (1 - color.srgb.r));
+      const newGreen = Math.min(1, color.srgb.g + amount * (1 - color.srgb.g));
+      const newBlue = Math.min(1, color.srgb.b + amount * (1 - color.srgb.b));
+      color.set('srgb.r', newRed);
+      color.set('srgb.g', newGreen);
+      color.set('srgb.b', newBlue);
+      return color;
     }
     default: {
       return color.lighten(amount);
@@ -39,7 +47,7 @@ export function lighten(color: Color, colorSpace: ColorSpaceTypes, amount: numbe
   }
 }
 
-export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number): Color {
+export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number) {
   switch (colorSpace) {
     case ColorSpaceTypes.LCH: {
       const lightness = color.lch.l;
@@ -59,11 +67,23 @@ export function darken(color: Color, colorSpace: ColorSpaceTypes, amount: number
     }
     case ColorSpaceTypes.P3: {
       const colorInP3 = color.to('p3');
-      const lightness = colorInP3.p3[0];
-      const difference = lightness;
-      const newLightness = Math.max(0, lightness - difference * amount);
-      colorInP3.p3[0] = newLightness;
+      const newRed = Math.max(0, colorInP3.p3.r - amount * colorInP3.p3.r);
+      const newGreen = Math.max(0, colorInP3.p3.g - amount * colorInP3.p3.g);
+      const newBlue = Math.max(0, colorInP3.p3.b - amount * colorInP3.p3.b);
+      colorInP3.set('p3.r', newRed);
+      colorInP3.set('p3.g', newGreen);
+      colorInP3.set('p3.b', newBlue);
       return colorInP3;
+    }
+
+    case ColorSpaceTypes.SRGB: {
+      const newRed = Math.max(0, color.srgb.r - amount * color.srgb.r);
+      const newGreen = Math.max(0, color.srgb.g - amount * color.srgb.g);
+      const newBlue = Math.max(0, color.srgb.b - amount * color.srgb.b);
+      color.set('srgb.r', newRed);
+      color.set('srgb.g', newGreen);
+      color.set('srgb.b', newBlue);
+      return color;
     }
 
     default: {
