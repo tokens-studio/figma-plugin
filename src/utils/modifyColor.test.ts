@@ -22,7 +22,7 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(100% 61.6% 58.1%)',
+        output: 'rgb(100% 30% 44%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {
@@ -48,7 +48,7 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(63% 0% 1.28%)',
+        output: 'rgb(70% 0% 14%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {
