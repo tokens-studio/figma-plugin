@@ -67,15 +67,15 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(54.5 95.5 31.7)',
+        output: 'lch(46.5 64.1 29.3)',
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.92 0.2 0.24)',
+        output: 'color(display-p3 0.71 0.27 0.26)',
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(100% 0% 20%)',
+        output: 'rgb(77.2% 22.5% 24.3%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {
