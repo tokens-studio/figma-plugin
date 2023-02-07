@@ -18,7 +18,7 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.94 0.2 0.24)',
+        output: 'color(display-p3 0.94 0.44 0.47)',
       },
       {
         space: ColorSpaceTypes.SRGB,
@@ -44,7 +44,7 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.64 0.2 0.24)',
+        output: 'color(display-p3 0.64 0.14 0.17)',
       },
       {
         space: ColorSpaceTypes.SRGB,
