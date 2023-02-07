@@ -18,11 +18,11 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.94 0.2 0.24)',
+        output: 'color(display-p3 0.94 0.44 0.47)',
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(100% 61.6% 58.1%)',
+        output: 'rgb(100% 30% 44%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {
@@ -44,11 +44,11 @@ describe('modifyColor', () => {
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.64 0.2 0.24)',
+        output: 'color(display-p3 0.64 0.14 0.17)',
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(63% 0% 1.28%)',
+        output: 'rgb(70% 0% 14%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {

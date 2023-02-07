@@ -38,7 +38,7 @@ describe('convertModifiedColorToHex', () => {
     const baseColor = '#ff0033';
     const lightenModifier = {
       type: ColorModifierTypes.MIX,
-      space: ColorSpaceTypes.LCH,
+      space: ColorSpaceTypes.SRGB,
       value: '0.3',
       color: '#334455',
     } as ColorModifier;
