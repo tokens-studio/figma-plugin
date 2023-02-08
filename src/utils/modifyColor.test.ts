@@ -14,15 +14,15 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(76.5 92.9 29.5)',
+        output: 'lch(68.2 66.9 31.7)',
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 1.19 0.48 0.47)',
+        output: 'color(display-p3 0.94 0.44 0.47)',
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(128% 41.6% 43.5%)',
+        output: 'rgb(100% 30% 44%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {
@@ -40,15 +40,15 @@ describe('modifyColor', () => {
     const spaceValues = [
       {
         space: ColorSpaceTypes.LCH,
-        output: 'lch(32.4 103 37.5)',
+        output: 'lch(38.2 66.9 31.7)',
       },
       {
         space: ColorSpaceTypes.P3,
-        output: 'color(display-p3 0.65 -0.2 0)',
+        output: 'color(display-p3 0.64 0.14 0.17)',
       },
       {
         space: ColorSpaceTypes.SRGB,
-        output: 'rgb(72.1% -24% -8.8%)',
+        output: 'rgb(70% 0% 14%)',
       },
     ];
     spaceValues.forEach((spaceValue) => {

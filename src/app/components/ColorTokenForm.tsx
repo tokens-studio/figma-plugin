@@ -73,20 +73,25 @@ export default function ColorTokenForm({
     : null), [internalEditToken, resolvedTokens]);
 
   const modifiedColor = useMemo(() => {
-    if (resolvedValue) {
-      if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
-        const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
-        if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
-          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue) });
-        }
-        if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
-          return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue), color: String(resolvedMixValue) });
+    try {
+      if (resolvedValue) {
+        if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
+          const modifierType = internalEditToken?.$extensions?.['studio.tokens']?.modify?.type;
+          if (modifierType === ColorModifierTypes.LIGHTEN || modifierType === ColorModifierTypes.DARKEN || modifierType === ColorModifierTypes.ALPHA) {
+            return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue) });
+          }
+          if (modifierType === ColorModifierTypes.MIX && resolvedMixValue) {
+            return modifyColor(String(resolvedValue), { ...internalEditToken?.$extensions?.['studio.tokens']?.modify, value: String(resolvedModifyAmountValue), color: String(resolvedMixValue) });
+          }
+          return resolvedValue;
         }
         return resolvedValue;
       }
-      return resolvedValue;
+      return null;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    return null;
   }, [internalEditToken, resolvedValue, resolvedMixValue, resolvedModifyAmountValue]);
 
   const displayColor = useMemo(() => {
@@ -328,7 +333,7 @@ export default function ColorTokenForm({
           {internalEditToken.type === 'color' ? (
             <ColorPickerTrigger background={String(displayColor)} />
           ) : null}
-          {modifiedColor?.toString()}
+          {modifiedColor}
         </Box>
       )}
     </>
