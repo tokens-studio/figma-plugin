@@ -1,8 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import {
-  isSingleBorderToken,
-  isSingleBoxShadowToken, isSingleCompositionToken, isSingleTokenValueObject, isSingleTypographyToken,
+  isSingleBorderToken, isSingleBoxShadowToken, isSingleCompositionToken, isSingleTokenValueObject, isSingleTypographyToken,
 } from './is';
 import { isTokenGroupWithType } from './is/isTokenGroupWithType';
 
