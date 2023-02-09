@@ -74,12 +74,12 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           if (
             !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastExcluded
-            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplittedLast)
+            && foundToken.value?.hasOwnProperty(tokenAliasSplittedLast)
           ) {
-            const { rawValue } = foundToken;
-            if (typeof rawValue === 'object' && !Array.isArray(rawValue)) {
-              const value = rawValue[tokenAliasSplittedLast as keyof typeof rawValue] as string | number;
-              return getAliasValue(value, tokens);
+            const { value } = foundToken;
+            if (typeof value === 'object' && !Array.isArray(value)) {
+              const resolvedValue = value[tokenAliasSplittedLast as keyof typeof value] as string | number;
+              return getAliasValue(resolvedValue, tokens);
             }
           }
 
