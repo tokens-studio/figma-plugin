@@ -25,6 +25,7 @@ type GetFormattedTokensOptions = {
   expandTypography: boolean;
   expandShadow: boolean;
   expandComposition: boolean;
+  expandBorder: boolean;
 };
 
 const resolvedTokens: AnyTokenList = [
@@ -252,6 +253,7 @@ describe('useToken test', () => {
       expandTypography: false,
       expandShadow: false,
       expandComposition: false,
+      expandBorder: false,
     };
     expect(result.current.getFormattedTokens(opts)).toBeTruthy();
   });
