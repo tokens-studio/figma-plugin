@@ -10,13 +10,14 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { TokenSetListOrTree, TokenSetListOrTreeDragItem } from './TokenSetListOrTree';
+import { TokenSetListOrTree } from './TokenSetListOrTree';
 import {
   tokenSetListToTree, TreeItem, findOrderableTargetIndexesInTokenSetTreeList, ensureFolderIsTogether,
 } from '@/utils/tokenset';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { DragControlsContext, ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
+import { DragItem } from './StyledDragger/DragItem';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -218,7 +219,7 @@ export default function TokenSetTree({
       <TokenSetListOrTree<ExtendedTreeItem>
         displayType="tree"
         items={mappedItems}
-        renderItem={TokenSetListOrTreeDragItem}
+        renderItem={DragItem}
         renderItemContent={TokenSetTreeItemContent}
       />
     </ReorderGroup>

@@ -7,6 +7,6 @@ export const themeOptionsSelector = createSelector(
     Object.values(state.themes).map(({ id, name }) => ({
       value: id,
       label: name,
-    })).sort((a, b) => a.label.localeCompare(b.label))
+    }))
   ),
 );

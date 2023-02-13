@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckIcon } from '@radix-ui/react-icons';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -9,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { Flex } from '../Flex';
@@ -20,16 +20,25 @@ import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
+import { ReorderGroup } from '@/motion/ReorderGroup';
+import { DragItem } from '../StyledDragger/DragItem';
+import { ThemeListItemContent } from './ThemeListItemContent';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
+
+type AvailableThemeItem = {
+  value: string;
+  label: string;
+};
 
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
+  const [mappedItems, setMappedItems] = useState(availableThemes);
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
@@ -51,35 +60,16 @@ export const ThemeSelector: React.FC = () => {
 
   const activeThemeLabel = useMemo(() => {
     if (activeTheme) {
-      const themeOption = availableThemes.find(({ value }) => value === activeTheme);
+      const themeOption = mappedItems.find(({ value }) => value === activeTheme);
       return themeOption ? themeOption.label : 'Unknown';
     }
     return 'None';
-  }, [activeTheme, availableThemes]);
+  }, [activeTheme, mappedItems]);
 
-  const availableThemeOptions = useMemo(() => (
-    availableThemes.map(({ label, value }) => {
-      const handleSelect = () => handleSelectTheme(value);
-
-      return (
-        <DropdownMenuRadioItem
-          key={value}
-          value={value}
-          data-cy={`themeselector--themeoptions--${value}`}
-          data-testid={`themeselector--themeoptions--${value}`}
-          // @README we can disable this because we are using Memo for the whole list anyways
-          // eslint-disable-next-line react/jsx-no-bind
-          onSelect={handleSelect}
-        >
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          {label}
-        </DropdownMenuRadioItem>
-      );
-    })
-  ), [availableThemes, handleSelectTheme]);
-
+  const handleReorder = React.useCallback((reorderedItems: AvailableThemeItem[]) => {
+    console.log('resoodddd', reorderedItems);
+    setMappedItems(reorderedItems);
+  }, []);
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
       <DropdownMenu>
@@ -96,12 +86,22 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           <DropdownMenuRadioGroup value={activeTheme ?? ''}>
-            {availableThemes.length === 0 && (
+            {mappedItems.length === 0 && (
               <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
                 <Text>No themes</Text>
               </DropdownMenuRadioItem>
             )}
-            {availableThemeOptions}
+            <ReorderGroup
+              layoutScroll
+              values={mappedItems}
+              onReorder={handleReorder}
+            >
+              {mappedItems.map((item) => (
+                <DragItem<AvailableThemeItem> key={item.value} item={item}>
+                  <ThemeListItemContent item={item} isActive={item.value === activeTheme} onClick={handleSelectTheme} />
+                </DragItem>
+              ))}
+            </ReorderGroup>
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem

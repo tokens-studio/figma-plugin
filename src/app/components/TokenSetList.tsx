@@ -15,8 +15,8 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenSetListOrTree } from './TokenSetListOrTree';
 import { DragControlsContext } from '@/context';
 import { tokenSetListToList, TreeItem } from '@/utils/tokenset';
-import { TokenSetListOrTreeDragItem } from './TokenSetListOrTree/TokenSetListOrTreeDragItem';
 import { ReorderGroup } from '@/motion/ReorderGroup';
+import { DragItem } from './StyledDragger/DragItem';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -136,7 +136,7 @@ export default function TokenSetList({
         <TokenSetListOrTree<ExtendedTreeItem>
           displayType="list"
           items={mappedItems}
-          renderItem={TokenSetListOrTreeDragItem}
+          renderItem={DragItem}
           renderItemContent={TokenSetListItemContent}
         />
       </ReorderGroup>
