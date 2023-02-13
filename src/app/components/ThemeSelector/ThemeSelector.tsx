@@ -1,8 +1,9 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useMemo,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
+import compact from 'just-compact';
+import { activeThemeSelector, themeOptionsSelector, themesListSelector } from '@/selectors';
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -37,8 +38,8 @@ export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
+  const themes = useSelector(themesListSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-  const [mappedItems, setMappedItems] = useState(availableThemes);
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
@@ -60,16 +61,17 @@ export const ThemeSelector: React.FC = () => {
 
   const activeThemeLabel = useMemo(() => {
     if (activeTheme) {
-      const themeOption = mappedItems.find(({ value }) => value === activeTheme);
+      const themeOption = availableThemes.find(({ value }) => value === activeTheme);
       return themeOption ? themeOption.label : 'Unknown';
     }
     return 'None';
-  }, [activeTheme, mappedItems]);
+  }, [activeTheme, availableThemes]);
 
   const handleReorder = React.useCallback((reorderedItems: AvailableThemeItem[]) => {
-    console.log('resoodddd', reorderedItems);
-    setMappedItems(reorderedItems);
-  }, []);
+    const reorderedThemeList = compact(reorderedItems.map((item) => themes.find((theme) => theme.id === item.value)));
+    dispatch.tokenState.setThemes(reorderedThemeList);
+  }, [dispatch.tokenState, themes]);
+
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
       <DropdownMenu>
@@ -86,17 +88,17 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           <DropdownMenuRadioGroup value={activeTheme ?? ''}>
-            {mappedItems.length === 0 && (
+            {availableThemes.length === 0 && (
               <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
                 <Text>No themes</Text>
               </DropdownMenuRadioItem>
             )}
             <ReorderGroup
               layoutScroll
-              values={mappedItems}
+              values={availableThemes}
               onReorder={handleReorder}
             >
-              {mappedItems.map((item) => (
+              {availableThemes.map((item) => (
                 <DragItem<AvailableThemeItem> key={item.value} item={item}>
                   <ThemeListItemContent item={item} isActive={item.value === activeTheme} onClick={handleSelectTheme} />
                 </DragItem>

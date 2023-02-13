@@ -54,7 +54,6 @@ export function ReorderGroup<V>(
       if (isReordering.current) return;
 
       const newOrder = (checkReorderOverride ?? checkReorder)(order, id, offset, velocity);
-      console.log('newOrder', newOrder);
 
       if (order !== newOrder) {
         isReordering.current = true;
