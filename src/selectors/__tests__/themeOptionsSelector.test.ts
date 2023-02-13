@@ -29,15 +29,19 @@ describe('themeOptionsSelector', () => {
       tokenState: { themes: [lightTheme, darkTheme, backgroundTheme] },
     } as unknown as RootState;
 
-    expect(themeOptionsSelector(mockState)).toEqual([{
-      value: 'background',
-      label: 'Background',
-    }, {
-      value: 'dark',
-      label: 'Dark',
-    }, {
-      value: 'light',
-      label: 'Light',
-    }]);
+    expect(themeOptionsSelector(mockState)).toEqual([
+      {
+        value: 'light',
+        label: 'Light',
+      },
+      {
+        value: 'dark',
+        label: 'Dark',
+      },
+      {
+        value: 'background',
+        label: 'Background',
+      },
+    ]);
   });
 });

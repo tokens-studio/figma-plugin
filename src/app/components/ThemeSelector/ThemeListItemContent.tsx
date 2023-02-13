@@ -57,6 +57,8 @@ export function ThemeListItemContent({
           textOverflow: 'ellipsis',
           userSelect: 'none',
         }}
+        data-cy={`themeselector--themeoptions--${item.value}`}
+        data-testid={`themeselector--themeoptions--${item.value}`}
         onClick={handleClick}
       >
         {item.label}

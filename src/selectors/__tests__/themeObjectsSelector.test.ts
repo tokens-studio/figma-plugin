@@ -29,6 +29,6 @@ describe('themeObjectsSelector', () => {
       tokenState: { themes: [lightTheme, darkTheme, backgroundTheme] },
     } as unknown as RootState;
 
-    expect(themeObjectsSelector(mockState)).toEqual([backgroundTheme, darkTheme, lightTheme]);
+    expect(themeObjectsSelector(mockState)).toEqual([lightTheme, darkTheme, backgroundTheme]);
   });
 });

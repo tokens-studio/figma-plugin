@@ -71,8 +71,7 @@ describe('ThemeSelector', () => {
 
     await act(async () => {
       const lightTheme = await component.findByTestId('themeselector--themeoptions--light');
-      lightTheme.focus();
-      await userEvent.keyboard('[Enter]');
+      await lightTheme.click();
     });
 
     expect(mockStore.getState().tokenState.activeTheme).toEqual('light');
