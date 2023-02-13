@@ -108,6 +108,7 @@ export const ThemeSelector: React.FC = () => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             data-cy="themeselector-managethemes"
+            data-testid="themeselector-managethemes"
             css={{
               paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
             }}
