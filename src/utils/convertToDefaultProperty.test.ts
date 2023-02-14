@@ -80,10 +80,6 @@ describe('convertToDefaultProperty', () => {
       output: Properties.borderWidth,
     },
     {
-      input: Properties.sizing,
-      output: Properties.sizing,
-    },
-    {
       input: Properties.fill,
       output: Properties.fill,
     },

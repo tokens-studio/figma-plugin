@@ -429,7 +429,7 @@ describe('SingleFileExport', () => {
             },
             width: {
               value: '5px',
-              type: 'sizing',
+              type: 'dimension',
             },
           },
         },
