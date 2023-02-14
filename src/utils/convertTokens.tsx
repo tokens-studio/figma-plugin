@@ -1,7 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import {
-  isSingleBoxShadowToken, isSingleCompositionToken, isSingleTokenValueObject, isSingleTypographyToken,
+  isSingleBorderToken, isSingleBoxShadowToken, isSingleCompositionToken, isSingleTokenValueObject, isSingleTypographyToken,
 } from './is';
 import { isTokenGroupWithType } from './is/isTokenGroupWithType';
 
@@ -16,6 +16,7 @@ function checkForTokens({
   expandTypography = false,
   expandShadow = false,
   expandComposition = false,
+  expandBorder = false,
   inheritType,
   groupLevel = 0,
   currentTypeLevel = 0,
@@ -27,6 +28,7 @@ function checkForTokens({
   expandTypography?: boolean
   expandShadow?: boolean
   expandComposition?: boolean
+  expandBorder?: boolean
   inheritType?: string
   groupLevel?: number;
   currentTypeLevel?: number;
@@ -40,7 +42,8 @@ function checkForTokens({
   const shouldExpandTypography = (expandTypography && typeof token === 'object' && 'value' in token) ? isSingleTypographyToken(token.value) : false;
   const shouldExpandShadow = (expandShadow && typeof token === 'object' && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
   const shouldExpandComposition = (expandComposition && typeof token === 'object' && 'value' in token) ? isSingleCompositionToken(token.value) : false;
-  if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition) {
+  const shouldExpandBorder = (expandBorder && typeof token === 'object' && 'value' in token) ? isSingleBorderToken(token.value) : false;
+  if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition && !shouldExpandBorder) {
     returnValue = {
       ...token,
       ...((!('type' in token) && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
@@ -49,6 +52,7 @@ function checkForTokens({
     (isSingleTypographyToken(token) && !expandTypography)
     || (isSingleBoxShadowToken(token) && !expandShadow)
     || (isSingleCompositionToken(token) && !expandComposition)
+    || (isSingleBorderToken(token) && !expandBorder)
   ) {
     returnValue = {
       type: token.type,
@@ -85,6 +89,7 @@ function checkForTokens({
         expandTypography,
         expandShadow,
         expandComposition,
+        expandBorder,
         inheritType,
         groupLevel,
         currentTypeLevel,
@@ -109,16 +114,17 @@ function checkForTokens({
 }
 
 export default function convertToTokenArray({
-  tokens, returnValuesOnly = false, expandTypography = false, expandShadow = false, expandComposition = false,
+  tokens, returnValuesOnly = false, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
 }: {
   tokens: Tokens
   returnValuesOnly?: boolean
   expandTypography?: boolean
   expandShadow?: boolean
   expandComposition?: boolean
+  expandBorder?: boolean
 }) {
   const [result] = checkForTokens({
-    obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow, expandComposition,
+    obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow, expandComposition, expandBorder,
   });
   return Object.values(result);
 }

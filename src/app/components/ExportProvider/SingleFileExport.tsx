@@ -26,6 +26,7 @@ export default function SingleFileExport({ onClose }: Props) {
   const [expandTypography, setExpandTypography] = React.useState(false);
   const [expandShadow, setExpandShadow] = React.useState(false);
   const [expandComposition, setExpandComposition] = React.useState(false);
+  const [expandBorder, setExpandBorder] = React.useState(false);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
 
@@ -49,15 +50,19 @@ export default function SingleFileExport({ onClose }: Props) {
     setExpandComposition(!expandComposition);
   }, [expandComposition]);
 
+  const handleToggleExpandBorder = React.useCallback(() => {
+    setExpandBorder(!expandBorder);
+  }, [expandBorder]);
+
   const handleClickExport = React.useCallback(() => {
     track('Export file', {
-      includeParent, includeAllTokens, expandComposition, expandShadow, expandTypography,
+      includeParent, includeAllTokens, expandComposition, expandShadow, expandTypography, expandBorder,
     });
-  }, [expandComposition, expandShadow, expandTypography, includeAllTokens, includeParent]);
+  }, [expandComposition, expandShadow, expandTypography, expandBorder, includeAllTokens, includeParent]);
 
   const formattedTokens = React.useMemo(() => getFormattedTokens({
-    includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
-  }), [includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, getFormattedTokens]);
+    includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
+  }), [includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, getFormattedTokens]);
 
   const exportData = React.useMemo(() => {
     const returnValue = JSON.parse(formattedTokens);
@@ -121,6 +126,15 @@ export default function SingleFileExport({ onClose }: Props) {
             onCheckedChange={handleToggleExpandComposition}
           />
           <Label htmlFor="expandComposition">Expand Composition</Label>
+        </Box>
+        <Box css={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Checkbox
+            id="expandBorder"
+            checked={expandBorder}
+            defaultChecked={expandBorder}
+            onCheckedChange={handleToggleExpandBorder}
+          />
+          <Label htmlFor="expandBorder">Expand Border</Label>
         </Box>
       </Box>
       <Heading size="medium">Preview</Heading>
