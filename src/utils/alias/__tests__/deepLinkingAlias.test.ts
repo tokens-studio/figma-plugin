@@ -23,6 +23,11 @@ describe('deepLinkingAlias', () => {
       input: '$typography.tokensize.fontWeight',
       value: 'bold',
     },
+    {
+      name: 'font-weight-alias.bold',
+      input: '$typography.alias.fontWeight',
+      value: 'bold',
+    },
   ];
 
   const allTokens = [
@@ -32,6 +37,14 @@ describe('deepLinkingAlias', () => {
         fontSize: '$16',
         fontWeight: 'bold',
       },
+      value: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+      },
+    },
+    {
+      name: 'typography.alias',
+      rawValue: '$typography.tokensize',
       value: {
         fontSize: '16px',
         fontWeight: 'bold',
