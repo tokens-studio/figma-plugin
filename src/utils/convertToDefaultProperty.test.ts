@@ -5,11 +5,15 @@ describe('convertToDefaultProperty', () => {
   const properties = [
     {
       input: Properties.width,
-      output: Properties.sizing,
+      output: Properties.dimension,
     },
     {
       input: Properties.height,
-      output: Properties.sizing,
+      output: Properties.dimension,
+    },
+    {
+      input: Properties.sizing,
+      output: Properties.dimension,
     },
     {
       input: Properties.itemSpacing,
@@ -76,10 +80,6 @@ describe('convertToDefaultProperty', () => {
       output: Properties.borderWidth,
     },
     {
-      input: Properties.sizing,
-      output: Properties.sizing,
-    },
-    {
       input: Properties.fill,
       output: Properties.fill,
     },
@@ -131,6 +131,10 @@ describe('convertToDefaultProperty', () => {
     {
       input: Properties.textDecoration,
       output: Properties.textDecoration,
+    },
+    {
+      input: 'style',
+      output: 'strokeStyle',
     },
   ];
   it('should convert property to default property', () => {
