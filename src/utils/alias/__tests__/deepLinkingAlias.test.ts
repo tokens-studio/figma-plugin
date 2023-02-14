@@ -23,6 +23,11 @@ describe('deepLinkingAlias', () => {
       input: '$typography.tokensize.fontWeight',
       value: 'bold',
     },
+    {
+      name: 'font-weight-alias.bold',
+      input: '$typography.alias.fontWeight',
+      value: 'bold',
+    },
   ];
 
   const allTokens = [
@@ -32,7 +37,18 @@ describe('deepLinkingAlias', () => {
         fontSize: '$16',
         fontWeight: 'bold',
       },
-      value: '4px',
+      value: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+      },
+    },
+    {
+      name: 'typography.alias',
+      rawValue: '$typography.tokensize',
+      value: {
+        fontSize: '16px',
+        fontWeight: 'bold',
+      },
     },
     {
       name: 'typography.pixelsize',
@@ -40,7 +56,10 @@ describe('deepLinkingAlias', () => {
         fontSize: '5px',
         fontWeight: 'bold',
       },
-      value: '5px',
+      value: {
+        fontSize: '5px',
+        fontWeight: 'bold',
+      },
     },
     {
       name: 'typography.numbersize',
@@ -48,7 +67,10 @@ describe('deepLinkingAlias', () => {
         fontSize: 10,
         fontWeight: 'bold',
       },
-      value: 10,
+      value: {
+        fontSize: 10,
+        fontWeight: 'bold',
+      },
     },
     {
       name: '16',
