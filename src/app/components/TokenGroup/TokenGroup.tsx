@@ -56,6 +56,7 @@ const TokenGroup: React.FC<Props> = ({
   if (mappedItems.length === 0) {
     return null;
   }
+  console.log(mappedItems);
 
   return (
     <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
