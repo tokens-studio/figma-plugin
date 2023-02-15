@@ -54,16 +54,23 @@ export default function BoxShadowInput({
     return null;
   }, [internalEditToken, resolvedTokens]);
 
+  const mappedItems = React.useMemo(() => {
+    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value;
+    return internalEditToken.value;
+  }, [internalEditToken.value, selectedToken]);
+
   const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       handleBoxShadowValueChange([...internalEditToken.value, newTokenValue]);
+    } else if (typeof internalEditToken.value === 'undefined') {
+      handleBoxShadowValueChange(compact([newTokenValue, newTokenValue]));
     } else if (typeof internalEditToken.value !== 'string') {
       handleBoxShadowValueChange(compact([internalEditToken.value, newTokenValue]));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
 
   const removeShadow = React.useCallback((index: number) => {
-    if (Array.isArray(internalEditToken.value)) {
+    if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 0) {
       handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
@@ -102,11 +109,11 @@ export default function BoxShadowInput({
         {
           mode === 'input' ? (
             <DndProvider backend={HTML5Backend}>
-              {Array.isArray(internalEditToken.value) ? (
-                internalEditToken.value.map((token, index) => (
+              {Array.isArray(mappedItems) ? (
+                mappedItems.map((token, index) => (
                   <SingleBoxShadowInput
                     isMultiple
-                    value={internalEditToken.value as TokenBoxshadowValue[]}
+                    value={mappedItems as TokenBoxshadowValue[]}
                     handleBoxShadowValueChange={handleBoxShadowValueChange}
                     shadowItem={token}
                     index={index}
@@ -120,8 +127,8 @@ export default function BoxShadowInput({
                 <SingleBoxShadowInput
                   handleBoxShadowValueChange={handleBoxShadowValueChange}
                   index={0}
-                  value={typeof internalEditToken.value === 'string' ? undefined : internalEditToken.value}
-                  shadowItem={typeof internalEditToken.value === 'string' ? undefined : internalEditToken.value}
+                  value={mappedItems as TokenBoxshadowValue | TokenBoxshadowValue[]}
+                  shadowItem={mappedItems as TokenBoxshadowValue}
                   onRemove={removeShadow}
                   resolvedTokens={resolvedTokens}
                 />
