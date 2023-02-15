@@ -1,5 +1,6 @@
 export enum ColorSpaceTypes {
   LCH = 'lch',
-  SRGB = 'sRGB',
-  P3 = 'P3',
+  SRGB = 'srgb',
+  P3 = 'p3',
+  HSL = 'hsl',
 }

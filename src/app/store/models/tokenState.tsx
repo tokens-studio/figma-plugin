@@ -105,6 +105,14 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       activeTokenSet: data,
     }),
+    setUsedTokenSet: (state, data: UsedTokenSetsMap) => ({
+      ...state,
+      usedTokenSet: data,
+    }),
+    setThemes: (state, data: ThemeObjectsList) => ({
+      ...state,
+      themes: data,
+    }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
         notifyToUI('Token set already exists', { error: true });
@@ -272,12 +280,9 @@ export const tokenState = createModel<RootModel>()({
       const nameToFind = data.oldName ? data.oldName : data.name;
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
-      const oldToken = { ...omit(newArray[index], 'description') };
-      const updateToken = updateTokenPayloadToSingleToken(data);
       newArray[index] = {
-        ...oldToken,
-        ...updateToken,
-        ...(oldToken?.$extensions || updateToken?.$extensions ? ({ $extensions: { ...oldToken?.$extensions, ...updateToken?.$extensions } }) : { }),
+        ...omit(newArray[index], 'description', '$extensions'),
+        ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
       return {
         ...state,

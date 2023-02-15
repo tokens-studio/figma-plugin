@@ -1,26 +1,38 @@
 import Color from 'colorjs.io';
+import * as Sentry from '@sentry/react';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+import { transparentize } from './color/transparentize';
+import { mix } from './color/mix';
+import { darken } from './color/darken';
+import { lighten } from './color/lighten';
 
 export function modifyColor(baseColor: string, modifier: ColorModifier) {
+  const color = new Color(baseColor);
+  let returnedColor = color;
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        return new Color(new Color(baseColor).lighten(Number(modifier.value)).to(modifier.space)).toString({ inGamut: false, precision: 3 });
+        returnedColor = lighten(color, modifier.space, Number(modifier.value));
+        break;
       case ColorModifierTypes.DARKEN:
-        return new Color(new Color(baseColor).darken(Number(modifier.value)).to(modifier.space)).toString({ inGamut: false, precision: 3 });
+        returnedColor = darken(color, modifier.space, Number(modifier.value));
+        break;
       case ColorModifierTypes.MIX:
-        return new Color(new Color(new Color(baseColor).mix(modifier.color, Number(modifier.value)).toString()).to(modifier.space)).toString({ inGamut: false, precision: 3 });
-        // return new Color(new Color(new Color(baseColor).mix(new Color(modifier.color), Number(modifier.value), { outputSpace: 'sRGB' }).toString()).to(modifier.space)).toString({ inGamut: false, precision: 3 });
-      case ColorModifierTypes.ALPHA:
-        // eslint-disable-next-line no-case-declarations
-        const newColor = new Color(baseColor);
-        newColor.alpha = Number(modifier.value);
-        return new Color(newColor.to(modifier.space)).toString({ inGamut: false, precision: 3 });
+        returnedColor = mix(color, modifier.space, Number(modifier.value), new Color(modifier.color));
+        break;
+      case ColorModifierTypes.ALPHA: {
+        returnedColor = transparentize(color, Number(modifier.value));
+        break;
+      }
       default:
-        return new Color(baseColor).toString({ inGamut: false, precision: 3 });
+        returnedColor = color;
+        break;
     }
+    returnedColor = returnedColor.to(modifier.space);
+    return returnedColor.toString({ inGamut: true, precision: 3 });
   } catch (e) {
+    Sentry.captureException(e);
     return baseColor;
   }
 }

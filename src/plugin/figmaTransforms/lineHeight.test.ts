@@ -17,6 +17,10 @@ describe('convertLineHeightToFigma', () => {
     expect(lineHeightPx).toStrictEqual({ unit: 'PIXELS', value: 13 });
     const lineHeightPerc = convertLineHeightToFigma('160%');
     expect(lineHeightPerc).toStrictEqual({ unit: 'PERCENT', value: 160 });
+    const lineHeightRem = convertLineHeightToFigma('2rem');
+    expect(lineHeightRem).toStrictEqual({ unit: 'PIXELS', value: 32 });
+    const lineHeightUnitLess = convertLineHeightToFigma('15');
+    expect(lineHeightUnitLess).toStrictEqual({ unit: 'PIXELS', value: 15 });
     const lineHeightAuto = convertLineHeightToFigma('AUTO');
     expect(lineHeightAuto).toStrictEqual({ unit: 'AUTO' });
   });

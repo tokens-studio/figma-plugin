@@ -66,4 +66,27 @@ describe('LoadingBar', () => {
 
     result.unmount();
   });
+
+  it('should not display the job messages with minimized version', async () => {
+    Object.values(BackgroundJobs).reduce<Promise<void>>(async (prev, jobType) => {
+      await prev;
+
+      store.dispatch.uiState.startJob({
+        name: jobType,
+        isInfinite: true,
+      });
+
+      store.dispatch.settings.setMinimizePluginWindow({
+        width: 100,
+        height: 100,
+        isMinimized: true,
+      });
+
+      const result = render(<LoadingBar />);
+      const jobTitle = get(backgroundJobTitles, jobType) as string | undefined;
+      expect(result.queryByText(jobTitle || 'Hold on, updating...')).toBeNull();
+      expect(result.queryByTestId('loadingBar')).not.toBeNull();
+      result.unmount();
+    }, Promise.resolve());
+  });
 });

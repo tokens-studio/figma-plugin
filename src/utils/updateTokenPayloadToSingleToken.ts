@@ -14,7 +14,7 @@ export function updateTokenPayloadToSingleToken(
     ...(payload.$extensions ? {
       $extensions: {
         'studio.tokens': {
-          modify: { ...payload.$extensions['studio.tokens']?.modify, value: Number(payload.$extensions['studio.tokens']?.modify.value) },
+          modify: payload.$extensions['studio.tokens']?.modify,
         },
       },
     } : {}),

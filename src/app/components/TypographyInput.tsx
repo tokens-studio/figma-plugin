@@ -114,10 +114,10 @@ export default function TypographyInput({
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedTokenDisplay
-            alias={alias}
-            selectedToken={selectedToken}
-          />
+            <ResolvedTokenDisplay
+              alias={alias}
+              selectedToken={selectedToken}
+            />
           )}
         </Stack>
       )}

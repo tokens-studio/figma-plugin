@@ -25,6 +25,7 @@ type GetFormattedTokensOptions = {
   expandTypography: boolean;
   expandShadow: boolean;
   expandComposition: boolean;
+  expandBorder: boolean;
 };
 
 const resolvedTokens: AnyTokenList = [
@@ -252,6 +253,7 @@ describe('useToken test', () => {
       expandTypography: false,
       expandShadow: false,
       expandComposition: false,
+      expandBorder: false,
     };
     expect(result.current.getFormattedTokens(opts)).toBeTruthy();
   });
@@ -266,6 +268,24 @@ describe('useToken test', () => {
       await result.current.pullStyles();
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
+  });
+
+  it('should send message to pull styles from figma', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    mockConfirm.mockImplementation(() => Promise.resolve({
+      data: ['textStyles', 'colorStyles', 'effectStyles'],
+    }));
+    await act(async () => {
+      await result.current.pullStyles();
+    });
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.PULL_STYLES,
+      styleTypes: {
+        textStyles: true,
+        colorStyles: true,
+        effectStyles: true,
+      },
+    });
   });
 
   it('removeTokensByValue test', async () => {
