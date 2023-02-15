@@ -62,7 +62,7 @@ export default function BoxShadowInput({
   const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       handleBoxShadowValueChange([...internalEditToken.value, newTokenValue]);
-    } else if (typeof internalEditToken.value === 'undefined') {
+    } else if (typeof internalEditToken.value === 'undefined' || typeof internalEditToken.value === 'string') {
       handleBoxShadowValueChange(compact([newTokenValue, newTokenValue]));
     } else if (typeof internalEditToken.value !== 'string') {
       handleBoxShadowValueChange(compact([internalEditToken.value, newTokenValue]));
