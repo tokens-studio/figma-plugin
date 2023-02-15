@@ -2,29 +2,24 @@ import React, {
   useCallback, useContext,
 } from 'react';
 import { useSelector } from 'react-redux';
-import { CheckIcon } from '@radix-ui/react-icons';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
-import Box from '../Box';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
+import { SingleThemeEntry } from '../ManageThemesModal/SingleThemeEntry';
+import { ThemeObject } from '@/types';
 
-type AvailableThemeItem = {
-  value: string;
-  label: string;
-};
-
-type ThemeListItemContentProps = React.PropsWithChildren<{
-  item: AvailableThemeItem
+type Props = React.PropsWithChildren<{
+  item: ThemeObject
   isActive: boolean
-  onClick: (themeId: string) => void;
+  onOpen: (theme?: ThemeObject) => void;
 }>;
 
 export function ThemeListItemContent({
   item,
   isActive,
-  onClick,
-}: ThemeListItemContentProps) {
+  onOpen,
+}: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
 
@@ -32,37 +27,22 @@ export function ThemeListItemContent({
     dragContext.controls?.start(event);
   }, [dragContext.controls]);
 
-  const handleClick = useCallback(() => {
-    onClick(item.value);
-  }, [item, onClick]);
-
   return (
     <StyledDragButton
       type="button"
       isActive={isActive}
     >
-      <DragGrabber<AvailableThemeItem>
+      <DragGrabber<ThemeObject>
         item={item}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
       />
-      <Box css={{ width: '$5', marginRight: '$2' }}>
-        {
-        isActive && <CheckIcon />
-      }
-      </Box>
-      <Box
-        css={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          userSelect: 'none',
-        }}
-        data-cy={`themeselector--themeoptions--${item.value}`}
-        data-testid={`themeselector--themeoptions--${item.value}`}
-        onClick={handleClick}
-      >
-        {item.label}
-      </Box>
+      <SingleThemeEntry
+        key={item.id}
+        theme={item}
+        isActive={isActive}
+        onOpen={onOpen}
+      />
     </StyledDragButton>
   );
 }

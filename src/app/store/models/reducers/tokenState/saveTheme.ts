@@ -12,24 +12,24 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
   const isNewTheme = !data.id;
   const themeId = data.id || hash([Date.now(), data]);
   const isActiveTheme = state.activeTheme === themeId;
-  const themeObject = state.themes.find((theme) => theme.id === themeId);
   const selectedTokenSets = Object.fromEntries(
     Object.entries(data.selectedTokenSets)
       .filter(([, status]) => (status !== TokenSetStatus.DISABLED)),
   );
+  const themeObjectIndex = state.themes.findIndex(({ id }) => state.activeTheme === id);
+
+  const updatedThemes = [...state.themes];
+  updatedThemes.splice(themeObjectIndex, 1, {
+    ...state.themes[themeObjectIndex],
+    ...data,
+    id: themeId,
+    $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
+    selectedTokenSets,
+  });
 
   const nextState: TokenState = {
     ...state,
-    themes: [
-      ...state.themes.filter((theme) => theme.id !== themeId),
-      {
-        ...themeObject,
-        ...data,
-        id: themeId,
-        $figmaStyleReferences: themeObject?.$figmaStyleReferences ?? {},
-        selectedTokenSets,
-      },
-    ],
+    themes: updatedThemes,
   };
 
   if (isActiveTheme || isNewTheme) {

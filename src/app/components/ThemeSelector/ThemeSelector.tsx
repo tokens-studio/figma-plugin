@@ -1,9 +1,7 @@
-import React, {
-  useCallback, useMemo,
-} from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import compact from 'just-compact';
-import { activeThemeSelector, themeOptionsSelector, themesListSelector } from '@/selectors';
+import { CheckIcon } from '@radix-ui/react-icons';
+import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -11,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { Flex } from '../Flex';
@@ -21,24 +20,15 @@ import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
-import { ReorderGroup } from '@/motion/ReorderGroup';
-import { DragItem } from '../StyledDragger/DragItem';
-import { ThemeListItemContent } from './ThemeListItemContent';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
 
-type AvailableThemeItem = {
-  value: string;
-  label: string;
-};
-
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
-  const themes = useSelector(themesListSelector);
   const availableThemes = useSelector(themeOptionsSelector);
 
   const handleClearTheme = useCallback(() => {
@@ -67,10 +57,28 @@ export const ThemeSelector: React.FC = () => {
     return 'None';
   }, [activeTheme, availableThemes]);
 
-  const handleReorder = React.useCallback((reorderedItems: AvailableThemeItem[]) => {
-    const reorderedThemeList = compact(reorderedItems.map((item) => themes.find((theme) => theme.id === item.value)));
-    dispatch.tokenState.setThemes(reorderedThemeList);
-  }, [dispatch.tokenState, themes]);
+  const availableThemeOptions = useMemo(() => (
+    availableThemes.map(({ label, value }) => {
+      const handleSelect = () => handleSelectTheme(value);
+
+      return (
+        <DropdownMenuRadioItem
+          key={value}
+          value={value}
+          data-cy={`themeselector--themeoptions--${value}`}
+          data-testid={`themeselector--themeoptions--${value}`}
+          // @README we can disable this because we are using Memo for the whole list anyways
+          // eslint-disable-next-line react/jsx-no-bind
+          onSelect={handleSelect}
+        >
+          <DropdownMenuItemIndicator>
+            <CheckIcon />
+          </DropdownMenuItemIndicator>
+          {label}
+        </DropdownMenuRadioItem>
+      );
+    })
+  ), [availableThemes, handleSelectTheme]);
 
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
@@ -93,22 +101,11 @@ export const ThemeSelector: React.FC = () => {
                 <Text>No themes</Text>
               </DropdownMenuRadioItem>
             )}
-            <ReorderGroup
-              layoutScroll
-              values={availableThemes}
-              onReorder={handleReorder}
-            >
-              {availableThemes.map((item) => (
-                <DragItem<AvailableThemeItem> key={item.value} item={item}>
-                  <ThemeListItemContent item={item} isActive={item.value === activeTheme} onClick={handleSelectTheme} />
-                </DragItem>
-              ))}
-            </ReorderGroup>
+            {availableThemeOptions}
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             data-cy="themeselector-managethemes"
-            data-testid="themeselector-managethemes"
             css={{
               paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
             }}
