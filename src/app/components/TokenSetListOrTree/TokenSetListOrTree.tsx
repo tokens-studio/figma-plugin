@@ -17,7 +17,6 @@ type TreeOrListItem<ItemType = unknown> = {
 } & ItemType;
 
 type SharedProps<T extends TreeOrListItem> = {
-  displayType: 'tree' | 'list'
   items: T[]
   renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
   renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
@@ -26,7 +25,6 @@ type SharedProps<T extends TreeOrListItem> = {
 type Props<T extends TreeOrListItem> = SharedProps<T>;
 
 export function TokenSetListOrTree<T extends TreeOrListItem>({
-  displayType,
   items,
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
@@ -55,7 +53,7 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
         <RenderItem key={item.key} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf && displayType === 'tree') && (
+              {(!item.isLeaf) && (
                 <StyledFolderButton
                   type="button"
                   onClick={onToggleCollapsed}

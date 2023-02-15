@@ -102,7 +102,6 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
       {activeTab === ThemeFormTabs.SETS && (
         <Box css={{ paddingTop: '$4' }}>
           <TokenSetListOrTree
-            displayType={githubMfsEnabled ? 'tree' : 'list'}
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
           />
