@@ -7,7 +7,10 @@ import {
 } from '../../../../tests/config/setupTest';
 import AddLicenseKey from './AddLicenseKey';
 import {
-  LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE, LICENSE_FOR_DETACH_ERROR_RESPONSE,
+  LICENSE_ERROR_MESSAGE,
+  LICENSE_FOR_ERROR_RESPONSE,
+  LICENSE_FOR_VALID_RESPONSE,
+  LICENSE_FOR_DETACH_ERROR_RESPONSE,
 } from '@/mocks/handlers';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ConfirmDialog from '../ConfirmDialog';
@@ -183,6 +186,7 @@ describe('Add license key', () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
       expect(screen.getByText(/Are you sure you want to remove your license key?/i)).toBeInTheDocument();
     });
@@ -213,6 +217,7 @@ describe('Add license key', () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
     });
 
@@ -260,6 +265,7 @@ describe('Add license key', () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
     });
 
@@ -300,6 +306,7 @@ describe('Add license key', () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
     });
 
