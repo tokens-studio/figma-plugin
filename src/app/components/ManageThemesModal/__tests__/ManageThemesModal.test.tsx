@@ -36,4 +36,40 @@ describe('ManageThemesModal', () => {
 
     expect(result.queryByText('You don\'t have any themes yet')).not.toBeNull();
   });
+
+  it('should render create new theme form', async () => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <ManageThemesModal />
+      </Provider>,
+    );
+
+    await result.getByText('New theme').click();
+    expect(result.getByText('Save theme')).toBeInTheDocument();
+  });
+
+  it('should render edit theme form', async () => {
+    const mockStore = createMockStore({
+      tokenState: {
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <ManageThemesModal />
+      </Provider>,
+    );
+    await result.getByTestId('singlethemeentry-light').click();
+    expect(result.getByText('Delete')).toBeInTheDocument();
+  });
 });
