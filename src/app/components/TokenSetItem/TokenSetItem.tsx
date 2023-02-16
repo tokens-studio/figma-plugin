@@ -111,33 +111,35 @@ export function TokenSetItem({
 
   return (
     <StyledWrapper>
-      {!item.isLeaf ? (
-        <StyledButton
-          itemType="folder"
-          type="button"
-          data-testid={`tokensetitem-${item.path}`}
-          css={{
-            paddingLeft: `${5 * item.level}px`,
-          }}
-          isActive={isActive}
-          onClick={handleClick}
-        >
-          {tokenSetItemBefore}
-          <Box
-            css={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              color: '$textMuted',
-              fontWeight: '$normal',
-              userSelect: 'none',
-            }}
-          >
-            {item.label}
-          </Box>
-          {extraBefore}
-        </StyledButton>
-      ) : (
-        <ContextMenu>
+      <ContextMenu>
+        {!item.isLeaf ? (
+          <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+            <StyledButton
+              itemType="folder"
+              type="button"
+              data-testid={`tokensetitem-${item.path}`}
+              css={{
+                paddingLeft: `${5 * item.level}px`,
+              }}
+              isActive={isActive}
+              onClick={handleClick}
+            >
+              {tokenSetItemBefore}
+              <Box
+                css={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: '$textMuted',
+                  fontWeight: '$normal',
+                  userSelect: 'none',
+                }}
+              >
+                {item.label}
+              </Box>
+              {extraBefore}
+            </StyledButton>
+          </ContextMenuTrigger>
+        ) : (
           <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
             <StyledButton
               type="button"
@@ -160,25 +162,24 @@ export function TokenSetItem({
               </Box>
             </StyledButton>
           </ContextMenuTrigger>
-          {canEdit ? (
-            <ContextMenuContent>
-              <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
-              <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
-              <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
-                Delete
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
-                <ContextMenuItemIndicator>
-                  <CheckIcon />
-                </ContextMenuItemIndicator>
-                Treat as source
-              </ContextMenuCheckboxItem>
-            </ContextMenuContent>
-          ) : null}
-        </ContextMenu>
-      )}
-
+        )}
+        {canEdit ? (
+          <ContextMenuContent>
+            <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
+            <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
+            <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
+              Delete
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
+              <ContextMenuItemIndicator>
+                <CheckIcon />
+              </ContextMenuItemIndicator>
+              Treat as source
+            </ContextMenuCheckboxItem>
+          </ContextMenuContent>
+        ) : null}
+      </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         <Checkbox
           id={item.path}
