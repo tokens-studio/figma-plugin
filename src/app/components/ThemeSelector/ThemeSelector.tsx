@@ -36,7 +36,9 @@ export const ThemeSelector: React.FC = () => {
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
+    console.log('handlese');
     const nextTheme = (activeTheme === themeId) ? null : themeId;
+    console.log('next', nextTheme);
     if (nextTheme) {
       track('Apply theme', { id: nextTheme });
     } else {
