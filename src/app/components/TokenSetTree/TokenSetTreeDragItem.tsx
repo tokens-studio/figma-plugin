@@ -11,7 +11,7 @@ type Props = React.PropsWithChildren<{
   item: TreeItem
 }>;
 
-export function TokenSetListOrTreeDragItem({ item, children }: Props) {
+export function TokenSetTreeDragItem({ item, children }: Props) {
   const y = useMotionValue(0);
   const boxShadow = useRaisedShadow(y);
   const controls = useDragControls();

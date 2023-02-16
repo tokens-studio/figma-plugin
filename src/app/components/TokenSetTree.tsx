@@ -9,7 +9,6 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { TokenSetListOrTree, TokenSetListOrTreeDragItem } from './TokenSetListOrTree';
 import {
   tokenSetListToTree, TreeItem, findOrderableTargetIndexesInTokenSetTreeList, ensureFolderIsTogether,
 } from '@/utils/tokenset';
@@ -17,6 +16,8 @@ import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { TokenSetTreeItemContent } from './TokenSetTreeItemContent';
+import { TokenSetTreeContent } from './TokenSetTree/TokenSetTreeContent';
+import { TokenSetTreeDragItem } from './TokenSetTree/TokenSetTreeDragItem';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -153,9 +154,9 @@ export default function TokenSetTree({
       checkReorder={handleCheckReorder}
       onReorder={handleReorder}
     >
-      <TokenSetListOrTree<ExtendedTreeItem>
+      <TokenSetTreeContent<ExtendedTreeItem>
         items={mappedItems}
-        renderItem={TokenSetListOrTreeDragItem}
+        renderItem={TokenSetTreeDragItem}
         renderItemContent={TokenSetTreeItemContent}
       />
     </ReorderGroup>

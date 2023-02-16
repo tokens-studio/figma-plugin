@@ -9,22 +9,22 @@ import {
   collapsedTokenSetsSelector,
 } from '@/selectors';
 
-type TreeOrListItem<ItemType = unknown> = {
+type TreeItem<ItemType = unknown> = {
   key: string
   level: number
   parent: string | null
   isLeaf: boolean
 } & ItemType;
 
-type SharedProps<T extends TreeOrListItem> = {
+type SharedProps<T extends TreeItem> = {
   items: T[]
   renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
   renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
 };
 
-type Props<T extends TreeOrListItem> = SharedProps<T>;
+type Props<T extends TreeItem> = SharedProps<T>;
 
-export function TokenSetListOrTree<T extends TreeOrListItem>({
+export function TokenSetTreeContent<T extends TreeItem>({
   items,
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
