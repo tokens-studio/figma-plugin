@@ -71,7 +71,7 @@ describe('ThemeSelector', () => {
 
     await act(async () => {
       const lightTheme = await component.findByTestId('themeselector--themeoptions--light');
-      await lightTheme.focus();
+      lightTheme.focus();
       await userEvent.keyboard('[Enter]');
     });
 
