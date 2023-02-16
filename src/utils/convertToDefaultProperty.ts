@@ -6,8 +6,6 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.width:
     case Properties.height:
     case Properties.sizing:
-      type = Properties.dimension;
-      break;
     case Properties.itemSpacing:
     case Properties.verticalPadding:
     case Properties.horizontalPadding:
@@ -15,7 +13,7 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.paddingLeft:
     case Properties.paddingBottom:
     case Properties.paddingRight:
-      type = Properties.spacing;
+      type = Properties.dimension;
       break;
     case Properties.borderRadiusTopLeft:
     case Properties.borderRadiusTopRight:
