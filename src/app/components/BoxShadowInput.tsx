@@ -55,8 +55,9 @@ export default function BoxShadowInput({
   }, [internalEditToken, resolvedTokens]);
 
   const mappedItems = React.useMemo(() => {
-    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value;
-    return internalEditToken.value;
+    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value as TokenBoxshadowValue | TokenBoxshadowValue[];
+    if (typeof internalEditToken.value !== 'string') return internalEditToken.value;
+    return undefined;
   }, [internalEditToken.value, selectedToken]);
 
   const addShadow = React.useCallback(() => {
@@ -70,7 +71,7 @@ export default function BoxShadowInput({
   }, [internalEditToken, handleBoxShadowValueChange]);
 
   const removeShadow = React.useCallback((index: number) => {
-    if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 0) {
+    if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 1) {
       handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
@@ -113,7 +114,7 @@ export default function BoxShadowInput({
                 mappedItems.map((token, index) => (
                   <SingleBoxShadowInput
                     isMultiple
-                    value={mappedItems as TokenBoxshadowValue[]}
+                    value={mappedItems}
                     handleBoxShadowValueChange={handleBoxShadowValueChange}
                     shadowItem={token}
                     index={index}
@@ -127,8 +128,8 @@ export default function BoxShadowInput({
                 <SingleBoxShadowInput
                   handleBoxShadowValueChange={handleBoxShadowValueChange}
                   index={0}
-                  value={mappedItems as TokenBoxshadowValue | TokenBoxshadowValue[]}
-                  shadowItem={mappedItems as TokenBoxshadowValue}
+                  value={mappedItems}
+                  shadowItem={mappedItems}
                   onRemove={removeShadow}
                   resolvedTokens={resolvedTokens}
                 />
