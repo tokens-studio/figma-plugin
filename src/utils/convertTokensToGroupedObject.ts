@@ -26,6 +26,8 @@ export default function convertTokensToGroupedObject(
     delete tokenWithType.name;
     if (options.resolveReferences !== true) {
       tokenWithType.value = getValueWithReferences(tokenWithType as SingleToken, options);
+    } else {
+      delete tokenWithType.$extensions;
     }
 
     if (!options.preserveRawValue) {

@@ -79,14 +79,14 @@
     "backgroundDark": {
       "value": "{colors.gray.500}",
       "description": "Darkened color value",
+      "type": "color",
       "$extensions": {
         "modify": {
           "type": "darken",
           "amount": 0.5,
           "space": "hsl"
         }
-      },
-      "type": "color"
+      }
     },
     "size": {
       "default": {
