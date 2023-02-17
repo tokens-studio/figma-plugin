@@ -106,7 +106,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    Object.keys(tokens).forEach((key) => {
+      if (!key.indexOf(tokenSetMarkedForChange)) {
+        dispatch.tokenState.renameTokenSet({ oldName: key, newName: key.replace(tokenSetMarkedForChange, newTokenSetName.trim()) });
+      }
+    });
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
   }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
