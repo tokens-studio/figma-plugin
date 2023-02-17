@@ -33,6 +33,26 @@ describe('convertTokensToGroupedObject', () => {
       throwErrorWhenNotResolved: true,
       resolveReferences: true,
     };
-    expect(convertTokensToGroupedObject(resolvedTokens, [], options)).toEqual();
+    expect(convertTokensToGroupedObject(resolvedTokens, [], options)).toEqual({
+      color: {
+        first: {
+          type: 'color',
+          value: '#ffffff',
+        },
+        modify: {
+          $extensions: {
+            'studio.tokens': {
+              modify: {
+                space: 'lch',
+                type: 'darken',
+                value: '0.4',
+              },
+            },
+          },
+          type: 'color',
+          value: '#ffffff',
+        },
+      },
+    });
   });
 });
