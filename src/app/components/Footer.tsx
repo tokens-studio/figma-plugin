@@ -30,6 +30,8 @@ import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
+import SecondScreen from './SecondScreen';
+import { useFlags } from './LaunchDarkly';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -43,6 +45,7 @@ export default function Footer() {
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens } = useRemoteTokens();
+  const { secondScreen } = useFlags();
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -84,6 +87,7 @@ export default function Footer() {
             <IconButton dataCy="footer-push-button" badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
+        {secondScreen && <SecondScreen />}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB
           && storageType.provider !== StorageProviderType.GITLAB

@@ -33,7 +33,7 @@ Most information can be found in the [docs](https://docs.tokens.studio) or [our 
 
 # Contribute
 * Run `yarn` to install dependencies.
-* Run `yarn build:watch` to start webpack in watch mode.
+* Run `yarn start` to start webpack in watch mode or `yarn build` to build once.
 * Open `Figma` -> `Plugins` -> `Development` -> `New Plugin...` and choose `manifest.json` file from this repo.
 * Create a Pull request for your branch
 

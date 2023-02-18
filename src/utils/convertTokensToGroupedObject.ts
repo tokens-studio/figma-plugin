@@ -36,6 +36,7 @@ export default function convertTokensToGroupedObject(
       (!!options.expandTypography && tokenWithType.type === TokenTypes.TYPOGRAPHY)
       || (!!options.expandShadow && tokenWithType.type === TokenTypes.BOX_SHADOW)
       || (!!options.expandComposition && tokenWithType.type === TokenTypes.COMPOSITION)
+      || (!!options.expandBorder && tokenWithType.type === TokenTypes.BORDER)
     ) {
       const expanded = expand(tokenWithType.value);
       set(obj, token.name, { ...expanded });

@@ -653,7 +653,7 @@ Object {
   "composition": Object {
     "body": Object {
       "sizing": Object {
-        "type": "sizing",
+        "type": "dimension",
         "value": 12,
       },
       "spacing": Object {

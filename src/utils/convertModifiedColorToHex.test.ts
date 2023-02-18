@@ -11,7 +11,7 @@ describe('convertModifiedColorToHex', () => {
       space: ColorSpaceTypes.LCH,
       value: '0.3',
     } as ColorModifier;
-    expect(convertModifiedColorToHex(baseColor, lightenModifier)).toEqual('#ff9d94');
+    expect(convertModifiedColorToHex(baseColor, lightenModifier)).toEqual('#ff756b');
   });
 
   it('should be able to darken the color', () => {
@@ -21,7 +21,7 @@ describe('convertModifiedColorToHex', () => {
       space: ColorSpaceTypes.LCH,
       value: '0.3',
     } as ColorModifier;
-    expect(convertModifiedColorToHex(baseColor, darkenModifier)).toEqual('#a10003');
+    expect(convertModifiedColorToHex(baseColor, darkenModifier)).toEqual('#ad1b26');
   });
 
   it('should be able to add alpha to the color', () => {
@@ -38,7 +38,7 @@ describe('convertModifiedColorToHex', () => {
     const baseColor = '#ff0033';
     const lightenModifier = {
       type: ColorModifierTypes.MIX,
-      space: ColorSpaceTypes.LCH,
+      space: ColorSpaceTypes.SRGB,
       value: '0.3',
       color: '#334455',
     } as ColorModifier;

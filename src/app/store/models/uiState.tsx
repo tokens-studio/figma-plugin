@@ -80,6 +80,7 @@ export interface UIState {
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
   figmaFonts: Font[]
+  secondScreenEnabled: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -132,6 +133,7 @@ export const uiState = createModel<RootModel>()({
     manageThemesModalOpen: false,
     scrollPositionSet: {},
     figmaFonts: [],
+    secondScreenEnabled: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -364,6 +366,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         figmaFonts: payload,
+      };
+    },
+    toggleSecondScreen(state) {
+      return {
+        ...state,
+        secondScreenEnabled: !state.secondScreenEnabled,
       };
     },
   },
