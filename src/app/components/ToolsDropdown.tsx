@@ -40,7 +40,7 @@ export default function ToolsDropdown() {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="top">
-          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowPresetModal}>Load from file/folder</DropdownMenuItem>
+          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowPresetModal}>Load from file/folder or preset</DropdownMenuItem>
           <DropdownMenuItem disabled={editProhibited} onSelect={handleShowExportModal}>Export to file/folder</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
