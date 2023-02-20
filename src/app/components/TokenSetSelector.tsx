@@ -206,6 +206,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               name="tokensetname"
               required
               data-cy="token-set-input"
+              data-testId="create-set-input"
               autofocus
             />
             <Stack direction="row" gap={4}>
@@ -219,7 +220,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" data-testId="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>

@@ -20,4 +20,21 @@ describe('TokenSetSelector Component', () => {
 
     expect(result.queryByText('Sets')).toBeNull();
   });
+
+  it('create new token set', async () => {
+    const result = render(<TokenSetSelector />);
+    const newTokenSetButton = await result.findByTestId('new-set-button');
+    fireEvent.click(newTokenSetButton);
+    const newTokenSetInput = await result.findByTestId('create-set-input');
+    fireEvent.change(newTokenSetInput, { target: { value: 'newSet' } });
+    const createButton = await result.getByRole('button', {
+      name: /create/i,
+    });
+
+    fireEvent.click(createButton);
+    expect(store.getState().tokenState.tokens).toEqual({
+      newSet: [],
+      global: [],
+    });
+  });
 });
