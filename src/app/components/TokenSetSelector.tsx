@@ -178,6 +178,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               onChange={handleChangeName}
               type="text"
               name="tokensetname"
+              data-testId="rename-set-input"
               required
             />
             <Stack direction="row" gap={4}>

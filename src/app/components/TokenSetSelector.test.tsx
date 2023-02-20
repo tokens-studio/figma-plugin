@@ -21,8 +21,9 @@ describe('TokenSetSelector Component', () => {
     expect(result.queryByText('Sets')).toBeNull();
   });
 
-  it('create new token set', async () => {
+  it('create rename duplicate token set', async () => {
     const result = render(<TokenSetSelector />);
+    // create new token set
     const newTokenSetButton = await result.findByTestId('new-set-button');
     fireEvent.click(newTokenSetButton);
     const newTokenSetInput = await result.findByTestId('create-set-input');
@@ -34,6 +35,33 @@ describe('TokenSetSelector Component', () => {
     fireEvent.click(createButton);
     expect(store.getState().tokenState.tokens).toEqual({
       newSet: [],
+      global: [],
+    });
+
+    // rename token set
+    const createdTokenSet = result.getByText('newSet');
+    await fireEvent.contextMenu(createdTokenSet);
+    const renameButton = await result.findByText('Rename');
+    fireEvent.click(renameButton);
+    const renameTokenSetInput = await result.findByTestId('rename-set-input');
+    fireEvent.change(renameTokenSetInput, { target: { value: 'renameSet' } });
+    const changeButton = await result.getByRole('button', {
+      name: /change/i,
+    });
+    fireEvent.click(changeButton);
+    expect(store.getState().tokenState.tokens).toEqual({
+      renameSet: [],
+      global: [],
+    });
+
+    // duplicate token set
+    const renamedTokenSet = result.getByText('renameSet');
+    await fireEvent.contextMenu(renamedTokenSet);
+    const duplicateButton = await result.findByText('Duplicate');
+    fireEvent.click(duplicateButton);
+    expect(store.getState().tokenState.tokens).toEqual({
+      renameSet: [],
+      renameSet_Copy: [],
       global: [],
     });
   });
