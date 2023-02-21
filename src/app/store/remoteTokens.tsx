@@ -86,7 +86,9 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(
-    async ({ context = api, featureFlags, usedTokenSet, activeTheme }: PullTokensOptions) => {
+    async ({
+      context = api, featureFlags, usedTokenSet, activeTheme,
+    }: PullTokensOptions) => {
       track('pullTokens', { provider: context.provider });
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_PULLTOKENS,
@@ -159,8 +161,7 @@ export default function useRemoteTokens() {
       pullTokensFromJSONBin,
       pullTokensFromURL,
       pullTokensFromADO,
-      pullFromSupernova,
-    ]
+    ],
   );
 
   const restoreStoredProvider = useCallback(
@@ -220,7 +221,7 @@ export default function useRemoteTokens() {
       syncTokensWithBitbucket,
       syncTokensWithADO,
       syncTokensWithSupernova,
-    ]
+    ],
   );
 
   const pushTokens = useCallback(
@@ -349,7 +350,7 @@ export default function useRemoteTokens() {
       createNewGenericVersionedStorage,
       pullTokensFromURL,
       setStorageType,
-    ]
+    ],
   );
 
   const addNewBranch = useCallback(
@@ -423,7 +424,7 @@ export default function useRemoteTokens() {
         if (remoteData?.status === 'success') {
           const sortedTokens = applyTokenSetOrder(
             remoteData.tokens,
-            remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens)
+            remoteData.metadata?.tokenSetOrder ?? Object.keys(remoteData.tokens),
           );
           dispatch.tokenState.setTokenData({
             values: sortedTokens,

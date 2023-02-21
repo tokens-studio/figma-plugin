@@ -28,32 +28,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    console.log('+++ READ');
-    const accessor = await this.readWriteInstance();
-    // Use JSON token builder from Supernova SDK to create token representation.
-    // For now, we will represent it as single-file representation
-    const tool = new TokenJSONBuilder(this.sdkInstance, accessor.version);
-    const representation = (await tool.figmaTokensRepresentation(true)) as GitSingleFileObject;
-    const baseRepresentation = {
-      Supernova: { ...representation },
-    } as GitSingleFileObject;
-    console.log(representation);
-    return [
-      {
-        type: 'themes',
-        path: 'themes/$themes.json', // TODO: Theming support
-        data: [],
-      },
-      ...(Object.entries(baseRepresentation).filter(([key]) => key !== '$themes') as [
-        string,
-        AnyTokenSet<false>
-      ][]).map<RemoteTokenStorageFile<SupernovaMetadata>>(([name, tokenSet]) => ({
-        name,
-        type: 'tokenSet',
-        path: 'base/tokenset.json', // TODO: Theming support
-        data: tokenSet,
-      })),
-    ];
+    throw new Error('Not supported for reading');
   }
 
   public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {

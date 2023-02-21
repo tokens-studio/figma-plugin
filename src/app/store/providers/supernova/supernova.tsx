@@ -3,7 +3,11 @@ import { useCallback, useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  activeThemeSelector, localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector,
+  localApiStateSelector,
+  themesListSelector,
+  tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { RemoteTokenStorageData, RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
@@ -34,144 +38,145 @@ export function useSupernova() {
     return storageClient;
   }, []);
 
-  const pushTokensToSupernova = useCallback(async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
-    const storage = await storageClientFactory(context);
+  const pushTokensToSupernova = useCallback(
+    async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
+      const storage = await storageClientFactory(context);
 
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        tokens,
-        themes,
-        metadata: {},
-      };
-    }
-
-    dispatch.uiState.setLocalApiState({ ...context });
-
-    const pushSettings = await pushDialog();
-    if (pushSettings) {
-      const { commitMessage } = pushSettings;
-      try {
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
+      const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content?.errorMessage,
         };
-        await storage.save({
-          themes,
-          tokens,
-          metadata,
-        }, {
-          commitMessage,
-        });
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
-        dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
-        dispatch.uiState.setApiData({ ...context });
-        dispatch.tokenState.setTokenData({
-          values: tokens,
-          themes,
-          usedTokenSet,
-          activeTheme,
-        });
+      }
 
-        pushDialog('success');
+      if (
+        content
+        && isEqual(content.tokens, tokens)
+        && isEqual(content.themes, themes)
+        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+      ) {
+        notifyToUI('Nothing to commit');
         return {
           status: 'success',
           tokens,
           themes,
           metadata: {},
         };
-      } catch (e) {
-        closeDialog();
-        console.log('Error pushing to Supernova', e);
-        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+      }
+
+      dispatch.uiState.setLocalApiState({ ...context });
+
+      const pushSettings = await pushDialog();
+      if (pushSettings) {
+        const { commitMessage } = pushSettings;
+        try {
+          const metadata = {
+            tokenSetOrder: Object.keys(tokens),
+          };
+          await storage.save(
+            {
+              themes,
+              tokens,
+              metadata,
+            },
+            {
+              commitMessage,
+            }
+          );
+          saveLastSyncedState(dispatch, tokens, themes, metadata);
+          dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
+          dispatch.uiState.setApiData({ ...context });
+          dispatch.tokenState.setTokenData({
+            values: tokens,
+            themes,
+            usedTokenSet,
+            activeTheme,
+          });
+
+          pushDialog('success');
+          return {
+            status: 'success',
+            tokens,
+            themes,
+            metadata: {},
+          };
+        } catch (e) {
+          closeDialog();
+          console.log('Error pushing to Supernova', e);
+          if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+            return {
+              status: 'failure',
+              errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            };
+          }
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
           };
         }
-        return {
-          status: 'failure',
-          errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
-        };
       }
-    }
-    return {
-      status: 'success',
-      tokens,
-      themes,
-      metadata: {},
-    };
-  }, [
-    dispatch,
-    storageClientFactory,
-    pushDialog,
-    closeDialog,
-    tokens,
-    themes,
-    localApiState,
-    usedTokenSet,
-    activeTheme,
-  ]);
+      return {
+        status: 'success',
+        tokens,
+        themes,
+        metadata: {},
+      };
+    },
+    [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme]
+  );
 
   // Function to initially check auth and sync tokens with Supernova
   const syncTokensWithSupernova = useCallback(
-    async (context: SupernovaCredentials): Promise<RemoteTokenStorageData<RemoteTokenStorageMetadata> | null> => {
+    async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
       console.log('SYNC TOKENS');
       try {
         console.log(context);
-        return await pushTokensToSupernova(context) as any;
+        return (await pushTokensToSupernova(context)) as any;
       } catch (e) {
         notifyToUI('Error syncing with Supernova, check credentials', { error: true });
         console.log('Error', e);
-        return null;
+        return {
+          status: 'failure',
+          errorMessage: 'Beta error message',
+        };
       }
     },
     [pushTokensToSupernova],
   );
 
-  const addNewSupernovaCredentials = useCallback(async (context: SupernovaFormValues): Promise<RemoteResponseData> => {
-    const data = await syncTokensWithSupernova(context);
-    if (data.status === 'success') {
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: context,
-      });
-      if (!data.tokens) {
-        notifyToUI('No tokens stored on remote');
+  const addNewSupernovaCredentials = useCallback(
+    async (context: SupernovaFormValues): Promise<RemoteResponseData> => {
+      const data = await syncTokensWithSupernova(context);
+      if (!data) {
+        return {
+          status: 'failure',
+          errorMessage: 'Error syncing tokens',
+        };
       }
-    } else {
+      if (data.status === 'success') {
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREDENTIALS,
+          credential: context,
+        });
+        if (!data.tokens) {
+          notifyToUI('No tokens stored on remote');
+        }
+      } else {
+        return {
+          status: 'failure',
+          errorMessage: data.errorMessage,
+        };
+      }
       return {
-        status: 'failure',
-        errorMessage: data.errorMessage,
+        status: 'success',
+        tokens: data.tokens ?? tokens,
+        themes: data.themes ?? themes,
+        metadata: {},
       };
-    }
-    return {
-      status: 'success',
-      tokens: data.tokens ?? tokens,
-      themes: data.themes ?? themes,
-      metadata: {},
-    };
-  }, [
-    syncTokensWithSupernova,
-    tokens,
-    themes,
-    dispatch.tokenState,
-    usedTokenSet,
-    activeTheme,
-  ]);
+    },
+    [syncTokensWithSupernova, tokens, themes, dispatch.tokenState, usedTokenSet, activeTheme],
+  );
 
   return useMemo(
     () => ({
