@@ -41,6 +41,7 @@ export function pullTokensFactory(
       StorageProviderType.BITBUCKET,
       StorageProviderType.JSONBIN,
       StorageProviderType.URL,
+      StorageProviderType.SUPERNOVA,
     ].includes(storageType.provider);
 
     if (isRemoteStorage) {

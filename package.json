@@ -178,10 +178,5 @@
     "webpack": "5",
     "webpack-cli": "^3.3.6",
     "whatwg-fetch": "^3.6.2"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

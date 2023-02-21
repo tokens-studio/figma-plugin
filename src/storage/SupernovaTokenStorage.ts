@@ -1,19 +1,19 @@
-import { DesignSystem, DesignSystemVersion, Supernova, SupernovaToolsDesignTokensPlugin, TokenJSONBuilder } from '@supernovaio/supernova-sdk';
-import * as pjs from '../../package.json';
+import {
+  DesignSystem,
+  DesignSystemVersion,
+  Supernova,
+  TokenJSONBuilder,
+} from '@supernovaio/supernova-sdk';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { notifyUI } from '../plugin/notifiers';
-import { GitSingleFileObject, GitStorageMetadata } from './GitTokenStorage'
+import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { GitSingleFileObject } from './GitTokenStorage';
 
-export type SupernovaMetadata = {};
-
-type SupernovaData = SupernovaMetadata & {
-  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
-  $themes?: ThemeObjectsList,
+export type SupernovaStorageSaveOptions = {
+  commitMessage?: string;
 };
 
-export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata> {
+export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSaveOptions> {
   private designSystemId: string;
 
   private secret: string;
@@ -27,13 +27,13 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
     this.sdkInstance = new Supernova(this.secret, null, null);
   }
 
-  public async read(): Promise<RemoteTokenStorageFile<SupernovaMetadata>[]> {
-    console.log("+++ READ");
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+    console.log('+++ READ');
     const accessor = await this.readWriteInstance();
     // Use JSON token builder from Supernova SDK to create token representation.
     // For now, we will represent it as single-file representation
     const tool = new TokenJSONBuilder(this.sdkInstance, accessor.version);
-    const representation = await tool.figmaTokensRepresentation(true) as GitSingleFileObject;
+    const representation = (await tool.figmaTokensRepresentation(true)) as GitSingleFileObject;
     const baseRepresentation = {
       Supernova: { ...representation },
     } as GitSingleFileObject;
@@ -44,7 +44,10 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
         path: 'themes/$themes.json', // TODO: Theming support
         data: [],
       },
-      ...(Object.entries(baseRepresentation).filter(([key]) => key !== '$themes') as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile<SupernovaMetadata>>(([name, tokenSet]) => ({
+      ...(Object.entries(baseRepresentation).filter(([key]) => key !== '$themes') as [
+        string,
+        AnyTokenSet<false>
+      ][]).map<RemoteTokenStorageFile<SupernovaMetadata>>(([name, tokenSet]) => ({
         name,
         type: 'tokenSet',
         path: 'base/tokenset.json', // TODO: Theming support
@@ -53,15 +56,21 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
     ];
   }
 
-  public async write(files: RemoteTokenStorageFile<SupernovaMetadata>[]): Promise<boolean> {
+  public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {
     // Create Supernova instance, fetch design system and version
     const accessor = await this.readWriteInstance();
     // Use jSON token tool to synchronize tokens back to Supernova
     // For now, they should be synchronized to the first brand, but that will be configurable later on
     const brands = await accessor.version.brands();
-    const brand = brands[0];
-    const tool = new SupernovaToolsDesignTokensPlugin(this.sdkInstance, accessor.version, brand);
+    // const brand = brands[0];
+    // const tool = new SupernovaToolsDesignTokensPlugin(this.sdkInstance, accessor.version, brand);
+
+    console.log(brands);
+    console.log(files);
+    return false;
+
     // Create definition as JSON, single file mode
+    /*
     const jsonDefinition = JSON.stringify({
       ...files.reduce<GitSingleFileObject>((acc, file) => {
         if (file.type === 'tokenSet') {
@@ -77,11 +86,12 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
     const incomingTokenPack = tool.loadTokensFromDefinition(jsonDefinition);
     await tool.mergeWithRemoteSource(incomingTokenPack.processedNodes, true);
     return true;
+    */
   }
 
   private async readWriteInstance(): Promise<{
-    version: DesignSystemVersion,
-    ds: DesignSystem,
+    version: DesignSystemVersion;
+    ds: DesignSystem;
   }> {
     // Create Supernova instance, fetch design system and version
     try {
@@ -97,6 +107,8 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaMetadata>
       // Will throw always when something goes wrong
       console.log(error);
     }
-    throw new Error('Unable to connect to your design system. Provide valid access token and design systen ID and try again.');
+    throw new Error(
+      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.'
+    );
   }
 }
