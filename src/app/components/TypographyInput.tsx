@@ -20,6 +20,7 @@ const properties = {
   fontWeight: 'fontWeights',
   letterSpacing: 'letterSpacing',
   paragraphSpacing: 'paragraphSpacing',
+  paragraphIndent: 'paragraphIndent',
   textDecoration: 'textDecoration',
   lineHeight: 'lineHeights',
   textCase: 'textCase',
@@ -68,14 +69,14 @@ export default function TypographyInput({
         {
           mode === 'input' ? (
             <IconButton
-              tooltip="Reference"
+              tooltip="Reference mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
-              tooltip="input mode"
+              tooltip="Input mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}

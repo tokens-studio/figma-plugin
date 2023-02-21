@@ -5,6 +5,7 @@ export type TokenTypographyValue = {
   lineHeight?: string | number;
   letterSpacing?: string;
   paragraphSpacing?: string;
+  paragraphIndent?: string;
   textCase?: string;
   textDecoration?: string;
 };

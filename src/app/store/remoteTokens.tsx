@@ -19,6 +19,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
@@ -39,6 +40,7 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
+  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
   const {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
@@ -80,6 +82,10 @@ export default function useRemoteTokens() {
         remoteData = await pullTokensFromJSONBin(context);
         break;
       }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        remoteData = await pullTokensFromGenericVersionedStorage(context);
+        break;
+      }
       case StorageProviderType.GITHUB: {
         remoteData = await pullTokensFromGitHub(context, featureFlags);
         break;
@@ -109,6 +115,7 @@ export default function useRemoteTokens() {
     }
     if (remoteData?.status === 'success') {
       saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
@@ -127,6 +134,7 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     api,
+    pullTokensFromGenericVersionedStorage,
     pullTokensFromGitHub,
     pullTokensFromGitLab,
     pullTokensFromBitbucket,
@@ -142,21 +150,22 @@ export default function useRemoteTokens() {
     dispatch.uiState.setApiData(context);
     dispatch.tokenState.setEditProhibited(false);
     setStorageType({ provider: context, shouldSetInDocument: true });
+    let content: RemoteResponseData | null = null;
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
-        await syncTokensWithGitHub(context);
+        content = await syncTokensWithGitHub(context);
         break;
       }
       case StorageProviderType.GITLAB: {
-        await syncTokensWithGitLab(context);
+        content = await syncTokensWithGitLab(context);
         break;
       }
       case StorageProviderType.BITBUCKET: {
-        await syncTokensWithBitbucket(context);
+        content = await syncTokensWithBitbucket(context);
         break;
       }
       case StorageProviderType.ADO: {
-        await syncTokensWithADO(context);
+        content = await syncTokensWithADO(context);
         break;
       }
       case StorageProviderType.SUPERNOVA: {
@@ -164,9 +173,23 @@ export default function useRemoteTokens() {
         break;
       }
       default:
-        await pullTokens({ context });
+        content = await pullTokens({ context });
     }
-    return null;
+    if (content?.status === 'failure') {
+      return {
+        status: 'failure',
+        errorMessage: content?.errorMessage,
+      };
+    }
+    if (content) {
+      return {
+        status: 'success',
+      };
+    }
+    return {
+      status: 'failure',
+      errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+    };
   }, [
     dispatch,
     setStorageType,
@@ -234,6 +257,20 @@ export default function useRemoteTokens() {
         }
         break;
       }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        if (credentials.id) {
+          content = await addGenericVersionedCredentials(credentials);
+        } else {
+          const id = await createNewGenericVersionedStorage(credentials);
+          if (id) {
+            credentials.id = id;
+            return {
+              status: 'success',
+            };
+          }
+        }
+        break;
+      }
       case StorageProviderType.GITHUB: {
         content = await addNewGitHubCredentials(credentials);
         break;
@@ -282,12 +319,14 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     addJSONBinCredentials,
+    addGenericVersionedCredentials,
     addNewGitLabCredentials,
     addNewGitHubCredentials,
     addNewBitbucketCredentials,
     addNewADOCredentials,
     addNewSupernovaCredentials,
     createNewJSONBin,
+    createNewGenericVersionedStorage,
     pullTokensFromURL,
     setStorageType,
   ]);
@@ -315,7 +354,7 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     return newBranchCreated;
-  }, [createGithubBranch, createADOBranch, createBitbucketBranch]);
+  }, [createGithubBranch, createGitLabBranch, createBitbucketBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {

@@ -18,7 +18,7 @@ import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernova
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 
-function ConfirmDialog() {
+function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
@@ -91,10 +91,10 @@ function ConfirmDialog() {
   }, [showPushDialog, localApiState]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
+    if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
       handleSubmit();
     }
-  }, [handleSubmit]);
+  }, [handleSubmit, showPushDialog]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 
@@ -110,7 +110,7 @@ function ConfirmDialog() {
                 <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
                   {'id' in localApiState ? localApiState.id : null}
                 </div>
-                <Heading size="medium">Commit message</Heading>
+                <Heading size="small">Commit message</Heading>
                 <Textarea
                   id="push-dialog-commit-message"
                   border
@@ -190,4 +190,4 @@ function ConfirmDialog() {
     }
   }
 }
-export default ConfirmDialog;
+export default PushDialog;

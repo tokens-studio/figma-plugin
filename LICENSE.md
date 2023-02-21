@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 Jan Six and [Contributors](https://github.com/six7/figma-tokens/graphs/contributors)
+Copyright (c) 2022 Jan Six and [Contributors](https://github.com/tokens-studio/figma-plugin/graphs/contributors)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

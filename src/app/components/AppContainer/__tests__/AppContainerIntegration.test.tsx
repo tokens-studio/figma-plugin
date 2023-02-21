@@ -114,6 +114,11 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
   activeTheme: null,
   lastOpened: Date.now(),
+  onboardingExplainer: {
+    sets: true,
+    inspect: true,
+    syncProviders: true,
+  },
   localApiProviders: [],
   settings: mockSettings,
   storageType: {
@@ -199,6 +204,7 @@ describe('AppContainer (integration)', () => {
       withOrWithoutLicense({
         ...mockStartupParams,
         localTokenData: null,
+        lastOpened: 1,
       }, async (params) => {
         await act(async () => {
           const mockStore = createMockStore({});
@@ -207,7 +213,28 @@ describe('AppContainer (integration)', () => {
               <AppContainer {...params} />
             </Provider>,
           );
-          expect(await result.findByText('Get started')).not.toBeUndefined();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
+          result.unmount();
+        });
+      })
+    ),
+  );
+
+  it(
+    'shows the onboarding flow modal', (
+      withOrWithoutLicense({
+        ...mockStartupParams,
+        localTokenData: null,
+        lastOpened: 0,
+      }, async (params) => {
+        await act(async () => {
+          const mockStore = createMockStore({});
+          const result = render(
+            <Provider store={mockStore}>
+              <AppContainer {...params} />
+            </Provider>,
+          );
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
       })
@@ -374,9 +401,8 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-
-      await result.findByText('Remote storage detected');
-      expect(result.queryByText('Remote storage detected')).toBeInTheDocument();
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
     });
   }));
 });

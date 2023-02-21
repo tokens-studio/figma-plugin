@@ -3,7 +3,7 @@ import { textStyleMatchesTypographyToken } from './textStyleMatchesTypographyTok
 
 describe('textStyleMatchesTypographyToken', () => {
   // tslint:disable-next-line: no-empty
-  const noop: () => void = () => {};
+  const noop: () => void = () => { };
   const dummyFunc: <T>() => T = <T>() => (undefined as unknown) as T;
   const dummyFigmaTextStyle: TextStyle = {
     description: '',
@@ -55,6 +55,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const lineHeight = 'AUTO';
       const letterSpacing = 1;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'UNDERLINE';
       const typographyToken: TokenTypographyValue = {
@@ -64,6 +65,7 @@ describe('textStyleMatchesTypographyToken', () => {
         lineHeight,
         letterSpacing: `${letterSpacing}%`,
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
         textCase: 'none',
         textDecoration,
       };
@@ -80,12 +82,96 @@ describe('textStyleMatchesTypographyToken', () => {
           unit: 'PERCENT',
         },
         lineHeight: { unit: lineHeight },
-        paragraphIndent: 0,
+        paragraphIndent,
         paragraphSpacing,
         textCase,
       };
 
       expect(textStyleMatchesTypographyToken(figmaTextStyle, typographyToken)).toBe(true);
+    });
+
+    it('should return false when textCase if different', () => {
+      const fontFamily = 'Inter';
+      const fontWeight = 'Regular';
+      const fontSize = 9;
+      const lineHeight = 'AUTO';
+      const letterSpacing = 1;
+      const paragraphSpacing = 2;
+      const paragraphIndent = 2;
+      const textCase = 'UPPER';
+      const textDecoration = 'UNDERLINE';
+      const typographyToken: TokenTypographyValue = {
+        fontFamily,
+        fontWeight,
+        fontSize: fontSize.toString(),
+        lineHeight,
+        letterSpacing: `${letterSpacing}%`,
+        paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
+        textCase: 'none',
+        textDecoration,
+      };
+      const figmaTextStyle: TextStyle = {
+        ...dummyFigmaTextStyle,
+        fontSize,
+        textDecoration,
+        fontName: {
+          family: fontFamily,
+          style: fontWeight,
+        },
+        letterSpacing: {
+          value: letterSpacing,
+          unit: 'PERCENT',
+        },
+        lineHeight: { unit: lineHeight },
+        paragraphIndent,
+        paragraphSpacing,
+        textCase,
+      };
+
+      expect(textStyleMatchesTypographyToken(figmaTextStyle, typographyToken)).toBe(false);
+    });
+
+    it('should return false when textDecoration if different', () => {
+      const fontFamily = 'Inter';
+      const fontWeight = 'Regular';
+      const fontSize = 9;
+      const lineHeight = 'AUTO';
+      const letterSpacing = 1;
+      const paragraphSpacing = 2;
+      const paragraphIndent = 2;
+      const textCase = 'ORIGINAL';
+      const textDecoration = 'UNDERLINE';
+      const typographyToken: TokenTypographyValue = {
+        fontFamily,
+        fontWeight,
+        fontSize: fontSize.toString(),
+        lineHeight,
+        letterSpacing: `${letterSpacing}%`,
+        paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
+        textCase: 'none',
+        textDecoration,
+      };
+      const figmaTextStyle: TextStyle = {
+        ...dummyFigmaTextStyle,
+        fontSize,
+        textDecoration: 'STRIKETHROUGH',
+        fontName: {
+          family: fontFamily,
+          style: fontWeight,
+        },
+        letterSpacing: {
+          value: letterSpacing,
+          unit: 'PERCENT',
+        },
+        lineHeight: { unit: lineHeight },
+        paragraphIndent,
+        paragraphSpacing,
+        textCase,
+      };
+
+      expect(textStyleMatchesTypographyToken(figmaTextStyle, typographyToken)).toBe(false);
     });
 
     it('should match typography token with omitted defaults against same text style', () => {
@@ -94,6 +180,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const fontSize = 9;
       const letterSpacing = 0;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'NONE';
       const typographyToken: TokenTypographyValue = {
@@ -101,6 +188,7 @@ describe('textStyleMatchesTypographyToken', () => {
         fontWeight,
         fontSize: fontSize.toString(),
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
       };
       const figmaTextStyle: TextStyle = {
         ...dummyFigmaTextStyle,
@@ -115,7 +203,7 @@ describe('textStyleMatchesTypographyToken', () => {
           unit: 'PERCENT',
         },
         lineHeight: { unit: 'AUTO' },
-        paragraphIndent: 0,
+        paragraphIndent,
         paragraphSpacing,
         textCase,
       };
@@ -130,6 +218,7 @@ describe('textStyleMatchesTypographyToken', () => {
       const lineHeight = '0px';
       const letterSpacing = 0;
       const paragraphSpacing = 2;
+      const paragraphIndent = 2;
       const textCase = 'ORIGINAL';
       const textDecoration = 'NONE';
       const typographyToken: TokenTypographyValue = {
@@ -138,6 +227,7 @@ describe('textStyleMatchesTypographyToken', () => {
         fontSize: fontSize.toString(),
         lineHeight,
         paragraphSpacing: paragraphSpacing.toString(),
+        paragraphIndent: paragraphIndent.toString(),
       };
       const figmaTextStyle: TextStyle = {
         ...dummyFigmaTextStyle,
@@ -154,6 +244,7 @@ describe('textStyleMatchesTypographyToken', () => {
         lineHeight: { unit: 'PERCENT', value: 0 },
         paragraphIndent: 0,
         paragraphSpacing,
+        paragraphIndent,
         textCase,
       };
 

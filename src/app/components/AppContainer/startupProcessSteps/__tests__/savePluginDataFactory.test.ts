@@ -12,11 +12,16 @@ describe('savePluginDataFactory', () => {
 
     const mockParams = {
       user: {
-        userId: 'uid:1234',
+        userId: 'figma:1234',
         figmaId: 'figma:1234',
         name: 'Jan Six',
       },
       lastOpened: Date.now(),
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       settings: {
         width: 500,
         height: 500,

@@ -26,7 +26,7 @@ Then, to create the necessary bundle, run `yarn build`.
 Once that is done, launch the plugin in Figma once. Check if the version number is correct and that the plugin is running smooth.
 
 Then you'll need to go to `Manage plugins in development`.
-Click on Figma Tokens and choose `Publish a new release`
+Click on Tokens Studio and choose `Publish a new release`
 
 ## Creating a Sentry release
 

@@ -22,6 +22,10 @@ describe('ThemeStyleManagementCategory', () => {
               id: 'S:1235',
               name: 'body/bold',
             },
+            'typography/body/light': {
+              id: 'S:1235',
+              failedToResolve: false,
+            },
           }}
           icon={(
             <Box data-testid="icon" />
@@ -48,8 +52,8 @@ describe('ThemeStyleManagementCategory', () => {
     attachLocalStyles.click();
     expect(mockAttachLocalStyles).toBeCalledTimes(1);
 
-    const unlinkButton = await result.findByTestId('themestylemanagementcategorystyleentry-unlink');
-    unlinkButton.click();
+    const unlinkButton = await result.findAllByTestId('themestylemanagementcategorystyleentry-unlink');
+    unlinkButton[0].click();
     expect(mockDisconnectStyle).toBeCalledTimes(1);
   });
 });

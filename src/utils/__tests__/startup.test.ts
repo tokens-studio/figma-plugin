@@ -8,7 +8,12 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: null,
-      lastOpened: 1616241985291,
+      lastOpened: 0,
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,
@@ -38,7 +43,12 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: null,
-      lastOpened: 1616241985291,
+      lastOpened: 0,
+      onboardingExplainer: {
+        sets: true,
+        inspect: true,
+        syncProviders: true,
+      },
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,

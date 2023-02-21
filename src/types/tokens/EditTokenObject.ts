@@ -1,9 +1,11 @@
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { SingleBorderRadiusToken } from './SingleBorderRadiusToken';
+import { SingleBorderToken } from './SingleBorderToken';
 import { SingleBorderWidthToken } from './SingleBorderWidthToken';
 import { SingleBoxShadowToken } from './SingleBoxShadowToken';
 import { SingleColorToken } from './SingleColorToken';
 import { SingleCompositionToken } from './SingleCompositionToken';
+import { SingleDimensionToken } from './SingleDimensionToken';
 import { SingleFontFamiliesToken } from './SingleFontFamiliesToken';
 import { SingleFontSizesToken } from './SingleFontSizesToken';
 import { SingleFontWeightsToken } from './SingleFontWeightsToken';
@@ -46,4 +48,6 @@ PartialExceptTypeAndSchema<Named, SingleColorToken<Named, EditTokenObjectPropert
 | PartialExceptTypeAndSchema<Named, SingleTextCaseToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleSpacingToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleOtherToken<Named, EditTokenObjectProperties>>
-| PartialExceptTypeAndSchema<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>;
+| PartialExceptTypeAndSchema<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleDimensionToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleBorderToken<Named, EditTokenObjectProperties>>;

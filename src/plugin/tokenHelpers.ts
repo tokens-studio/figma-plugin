@@ -30,7 +30,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
 
     let failedToResolve = false;
     // Iterate over Typography and boxShadow Object to get resolved values
-    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW) {
+    if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW || t.type === TokenTypes.BORDER) {
       // If value is alias
       if (typeof t.value === 'string') {
         returnValue = getAliasValue(t.value, tokensInProgress);
@@ -125,8 +125,13 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     .filter(([, status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
     .map(([tokenSet]) => tokenSet);
 
+  const tokenSetOrder = tokens?.$metadata?.map(({ value }) => value);
+
+  const tokenEntries = tokenSetOrder ? Object.entries(tokens)
+    .sort((a, b) => tokenSetOrder.indexOf(a[0]) - tokenSetOrder.indexOf(b[0])) : Object.entries(tokens);
+
   // Reverse token set order (right-most win) and check for duplicates
-  Object.entries(tokens)
+  tokenEntries
     .reverse()
     .forEach((tokenGroup: [string, SingleToken[]]) => {
       if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {

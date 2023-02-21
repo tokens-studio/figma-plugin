@@ -17,7 +17,7 @@ describe('pullStyles', () => {
         name: 'blue/500',
         id: '567',
         description: 'the blue one',
-        paints: [{ type: 'SOLID', color: { r: 0, g: 0, b: 1 }, opacity: 0.5 }],
+        paints: [{ type: 'other', color: { r: 0, g: 0, b: 1 }, opacity: 0.5 }],
       },
     ]);
     await pullStyles({ colorStyles: true });
@@ -29,12 +29,6 @@ describe('pullStyles', () => {
           type: 'color',
           value: '#ff0000',
           description: 'the red one',
-        },
-        {
-          name: 'blue.500',
-          type: 'color',
-          value: '#0000ff80',
-          description: 'the blue one',
         },
       ],
     });
@@ -55,6 +49,7 @@ describe('pullStyles', () => {
           unit: 'AUTO',
         },
         paragraphSpacing: 0,
+        paragraphIndent: 0,
         letterSpacing: {
           unit: 'PERCENT',
           value: 0,
@@ -74,7 +69,8 @@ describe('pullStyles', () => {
         lineHeight: {
           unit: 'AUTO',
         },
-        paragraphSpacing: 0,
+        paragraphSpacing: 3,
+        paragraphIndent: 3,
         letterSpacing: {
           unit: 'PERCENT',
           value: 0,
@@ -94,7 +90,8 @@ describe('pullStyles', () => {
         lineHeight: {
           unit: 'AUTO',
         },
-        paragraphSpacing: 0,
+        paragraphSpacing: 7,
+        paragraphIndent: 7,
         letterSpacing: {
           unit: 'PERCENT',
           value: 0,
@@ -117,6 +114,7 @@ describe('pullStyles', () => {
             letterSpacing: '{letterSpacing.0}',
             lineHeight: '{lineHeights.0}',
             paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
           },
@@ -131,7 +129,8 @@ describe('pullStyles', () => {
             fontSize: '{fontSize.0}',
             letterSpacing: '{letterSpacing.0}',
             lineHeight: '{lineHeights.0}',
-            paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.1}',
+            paragraphIndent: '{paragraphIndent.1}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
           },
@@ -146,7 +145,8 @@ describe('pullStyles', () => {
             fontSize: '{fontSize.0}',
             letterSpacing: '{letterSpacing.0}',
             lineHeight: '{lineHeights.0}',
-            paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.2}',
+            paragraphIndent: '{paragraphIndent.2}',
             textCase: '{textCase.none}',
             textDecoration: '{textDecoration.none}',
           },
@@ -167,9 +167,28 @@ describe('pullStyles', () => {
         { name: 'fontSize.1', type: 'fontSizes', value: '24' },
       ],
       letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' }],
-      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' }],
+      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },
+        { name: 'paragraphSpacing.1', type: 'paragraphSpacing', value: '3' },
+        { name: 'paragraphSpacing.2', type: 'paragraphSpacing', value: '7' }],
       textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
       textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
+      paragraphIndent: [
+        {
+          name: 'paragraphIndent.0',
+          type: 'dimension',
+          value: '0px',
+        },
+        {
+          name: 'paragraphIndent.1',
+          type: 'dimension',
+          value: '3px',
+        },
+        {
+          name: 'paragraphIndent.2',
+          type: 'dimension',
+          value: '7px',
+        },
+      ],
     });
   });
 
@@ -184,7 +203,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 0.5,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 0.5,
             },
             offset: { x: 0, y: 0 },
             radius: 10,
@@ -202,7 +224,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 0.5,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 0.5,
             },
             offset: { x: 0, y: 0 },
             radius: 2,
@@ -213,7 +238,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 1,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
             },
             offset: { x: 0, y: 4 },
             radius: 4,
@@ -224,7 +252,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 1,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
             },
             offset: { x: 0, y: 8 },
             radius: 16,
@@ -242,7 +273,10 @@ describe('pullStyles', () => {
             type: 'INNER_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 0.5,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 0.5,
             },
             offset: { x: 0, y: 0 },
             radius: 2,
@@ -253,7 +287,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 1,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
             },
             offset: { x: 0, y: 4 },
             radius: 4,
@@ -264,7 +301,10 @@ describe('pullStyles', () => {
             type: 'DROP_SHADOW',
             visible: true,
             color: {
-              r: 0, g: 0, b: 0, a: 1,
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 1,
             },
             offset: { x: 0, y: 8 },
             radius: 16,

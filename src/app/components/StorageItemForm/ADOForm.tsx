@@ -6,12 +6,16 @@ import Box from '../Box';
 import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
+import Text from '../Text';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
+import Heading from '../Heading';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.ADO; }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
@@ -49,7 +53,18 @@ export default function ADOForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={1}>
+          <Heading>
+            Add new Azure DevOps credentials
+          </Heading>
+          <Text muted>
+            Access tokens stored on your repository, push and pull tokens in a two-way sync.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
         <Input
+          autofocus
           full
           label="Organization Url"
           value={values.baseUrl}
@@ -83,7 +98,7 @@ export default function ADOForm({
         />
         <Input
           full
-          label="Default Branch"
+          label="Branch"
           value={values.branch}
           onChange={onChange}
           type="text"
@@ -92,7 +107,7 @@ export default function ADOForm({
         />
         <Input
           full
-          label="File Path (e.g. data/tokens.json)"
+          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
           defaultValue=""
           value={values.filePath}
           onChange={onChange}
@@ -108,12 +123,12 @@ export default function ADOForm({
           name="name"
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (

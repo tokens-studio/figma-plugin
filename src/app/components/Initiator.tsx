@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
@@ -72,6 +73,14 @@ export function Initiator() {
               if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
               else dispatch.uiState.setActiveTab(Tabs.START);
             }
+            break;
+          }
+          case MessageFromPluginTypes.NOTIFY_EXCEPTION: {
+            Sentry.captureException({ error: pluginMessage.error, ...pluginMessage.opts });
+            break;
+          }
+          case MessageFromPluginTypes.TRACK_FROM_PLUGIN: {
+            track(pluginMessage.title, pluginMessage.opts);
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {

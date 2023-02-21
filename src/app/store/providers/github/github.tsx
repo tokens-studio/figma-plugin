@@ -61,23 +61,21 @@ export function useGitHub() {
         errorMessage: content?.errorMessage,
       };
     }
-    if (content) {
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          themes,
-          tokens,
-          metadata: {
-            tokenSetOrder: Object.keys(tokens),
-          },
-        };
-      }
+    if (
+      content
+      && isEqual(content.tokens, tokens)
+      && isEqual(content.themes, themes)
+      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+    ) {
+      notifyToUI('Nothing to commit');
+      return {
+        status: 'success',
+        themes,
+        tokens,
+        metadata: {
+          tokenSetOrder: Object.keys(tokens),
+        },
+      };
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
@@ -115,10 +113,10 @@ export function useGitHub() {
       } catch (e) {
         closeDialog();
         console.log('Error pushing to GitHub', e);
-        if (e instanceof Error) {
+        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
-            errorMessage: e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR ? ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR : ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
         return {

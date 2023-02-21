@@ -21,7 +21,7 @@ describe('bulkRemapTokens', () => {
           borderRadius: 'old.border-radius',
           fill: 'old.slate.400',
           sizing: 'old-size.450',
-        }
+        },
       },
       {
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
@@ -31,8 +31,8 @@ describe('bulkRemapTokens', () => {
         } as RectangleNode,
         tokens: {
           fill: 'old.red.500',
-          sizing: 'old-size.1600'
-        }
+          sizing: 'old-size.1600',
+        },
       },
       {
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
@@ -41,14 +41,14 @@ describe('bulkRemapTokens', () => {
           id: '295:5',
         } as TextNode,
         tokens: {
-          fill: 'old-color.gray.300'
-        }
-      }
+          fill: 'old-color.gray.300',
+        },
+      },
     ]));
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old',
-      newName: 'new'
+      newName: 'new',
     });
 
     expect(updatePluginData).toBeCalledWith({
@@ -62,7 +62,7 @@ describe('bulkRemapTokens', () => {
           borderRadius: 'new.border-radius',
           fill: 'new.slate.400',
           sizing: 'new-size.450',
-        }
+        },
       },
       {
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
@@ -72,8 +72,8 @@ describe('bulkRemapTokens', () => {
         } as RectangleNode,
         tokens: {
           fill: 'new.red.500',
-          sizing: 'new-size.1600'
-        }
+          sizing: 'new-size.1600',
+        },
       },
       {
         hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
@@ -82,11 +82,11 @@ describe('bulkRemapTokens', () => {
           id: '295:5',
         } as TextNode,
         tokens: {
-          fill: 'new-color.gray.300'
-        }
+          fill: 'new-color.gray.300',
+        },
       }],
       values: {},
-      shouldOverride: true
-    })
+      shouldOverride: true,
+    });
   });
 });

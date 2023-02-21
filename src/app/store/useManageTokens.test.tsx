@@ -2,13 +2,16 @@ import React from 'react';
 import { init, RematchStore } from '@rematch/core';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { Provider } from 'react-redux';
-import { RootModel } from '@/types/RootModel';
-import { models } from './models';
 import { AllTheProviders } from '../../../tests/config/setupTest';
 import useManageTokens from './useManageTokens';
+import { RootModel } from '@/types/RootModel';
+import { models } from './models';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { StyleOptions } from '@/constants/StyleOptions';
 
 const mockConfirm = jest.fn();
+const mockRemoveStylesFromTokens = jest.fn();
+type Store = RematchStore<RootModel, Record<string, never>>;
 
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
@@ -17,9 +20,14 @@ jest.mock('../hooks/useConfirm', () => ({
   }),
 }));
 
-type Store = RematchStore<RootModel, Record<string, never>>;
+jest.mock('./useTokens', () => ({
+  __esModule: true,
+  default: () => ({
+    removeStylesFromTokens: mockRemoveStylesFromTokens,
+  }),
+}));
 
-describe('useManageToken test', () => {
+describe('useManageTokens', () => {
   let store: Store;
   let { result } = renderHook(() => useManageTokens(), {
     wrapper: AllTheProviders,
@@ -45,6 +53,24 @@ describe('useManageToken test', () => {
               ],
             },
             activeTokenSet: 'global',
+            themes: [{
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:1234',
+                'colors.red': 'S:1235',
+                'colors.blue': 'S:1236',
+              },
+            }, {
+              id: 'dark',
+              name: 'Dark',
+              selectedTokenSets: {},
+              $figmaStyleReferences: {
+                'colors.brand.primary': 'S:2345',
+                'colors.red': 'S:2346',
+              },
+            }],
           },
         },
       },
@@ -173,5 +199,40 @@ describe('useManageToken test', () => {
         value: '16px',
       },
     ]);
+  });
+
+  it('Should be able to remove styles from any theme if the user deleted one', async () => {
+    const tokenToDelete = {
+      path: 'color.red',
+      parent: 'global',
+      type: TokenTypes.COLOR,
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [StyleOptions.REMOVE] }));
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(1);
+  });
+
+  it('doesn\'t remove styles from any theme when the user doesn\'t select option', async () => {
+    const tokenToDelete = {
+      path: 'color.red',
+      parent: 'global',
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [] }));
+    const { result } = renderHook(() => useManageTokens(), {
+      wrapper: AllTheProviders,
+    });
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
+  });
+
+  it('doesn\'t remove styles from themes when the token is not style token', async () => {
+    const tokenToDelete = {
+      path: 'size.regular',
+      parent: 'global',
+      type: TokenTypes.SIZING,
+    };
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: [] }));
+    await act(async () => result.current.deleteSingleToken(tokenToDelete));
+    expect(mockRemoveStylesFromTokens).toBeCalledTimes(0);
   });
 });

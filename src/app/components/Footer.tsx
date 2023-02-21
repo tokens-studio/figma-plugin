@@ -29,6 +29,7 @@ import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
+import { transformProviderName } from '@/utils/transformProviderName';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -58,27 +59,6 @@ export default function Footer() {
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
-
-  const transformProviderName = React.useCallback((provider: StorageProviderType) => {
-    switch (provider) {
-      case StorageProviderType.JSONBIN:
-        return 'JSONBin.io';
-      case StorageProviderType.GITHUB:
-        return 'GitHub';
-      case StorageProviderType.GITLAB:
-        return 'GitLab';
-      case StorageProviderType.BITBUCKET:
-        return 'Bitbucket';
-      case StorageProviderType.ADO:
-        return 'ADO';
-      case StorageProviderType.URL:
-        return 'URL';
-      case StorageProviderType.SUPERNOVA:
-        return 'Supernova.io';
-      default:
-        return provider;
-    }
-  }, []);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
@@ -115,7 +95,7 @@ export default function Footer() {
           && storageType.provider !== StorageProviderType.GITLAB
           && storageType.provider !== StorageProviderType.ADO
           && storageType.provider !== StorageProviderType.BITBUCKET
-          && storageType.provider !== StorageProviderType.SUPERNOVA (
+          && storageType.provider !== StorageProviderType.SUPERNOVA} (
             <Stack align="center" direction="row" gap={2}>
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
@@ -133,12 +113,12 @@ export default function Footer() {
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          {`V ${pjs.plugin_version}`}
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.plugin_version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
-          <IconButton href="https://github.com/six7/figma-tokens" icon={<FeedbackIcon />} tooltip="Feedback" />
+          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
         </Stack>
       </Stack>
     </Box>

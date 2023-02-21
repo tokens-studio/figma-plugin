@@ -1,5 +1,6 @@
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { OptionalPartial } from './OptionalPartial';
+import { GenericVersionedAdditionalHeaders } from '../storage/GenericVersionedStorage';
 
 /**
  * StorageTypes are meant to define the parameters of a storage provider
@@ -73,11 +74,24 @@ export type SupernovaStorageType = GenericStorageType<StorageProviderType.SUPERN
   id: string; // this is the id of workspace in Supernova
 }>;
 
+export enum GenericVersionedStorageFlow {
+  READ_WRITE_CREATE = 'Read/Write/Create',
+  READ_WRITE = 'Read/Write',
+  READ_ONLY = 'ReadOnly ',
+}
+export type GenericVersionedStorageType = GenericStorageType<StorageProviderType.GENERIC_VERSIONED_STORAGE, {
+  name?: string; // this is only for refrence
+  id: string // this would be the URL
+  flow: GenericVersionedStorageFlow,
+  additionalHeaders: GenericVersionedAdditionalHeaders ;
+}>;
+
 export type StorageType =
   | LocalStorageType
   | URLStorageType
   | JSONBinStorageType
   | GitStorageType
+  | GenericVersionedStorageType
   | ADOStorageType
   | BitbucketStorageType
   | SupernovaStorageType;
@@ -86,6 +100,7 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
   | StorageTypeCredential<JSONBinStorageType>
   | StorageTypeCredential<GitStorageType>
+  | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
   | StorageTypeCredential<SupernovaStorageType>;
@@ -107,12 +122,16 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<BitbucketStorageType>, 'provider'>
   >)
+  | ({ new?: boolean; provider: StorageProviderType.SUPERNOVA } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<SupernovaStorageType>, 'provider'>
+  >)
   | ({ new?: boolean; provider: StorageProviderType.ADO } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<ADOStorageType>, 'provider'>
   >)
-  | ({ new?: boolean; provider: StorageProviderType.SUPERNOVA } & OptionalPartial<
+  | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<
   Incomplete,
-  Omit<StorageTypeCredential<ADOStorageType>, 'provider'>
+  Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>
   >)
   | { new?: boolean; provider: StorageProviderType.LOCAL };

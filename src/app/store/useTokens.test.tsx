@@ -9,11 +9,15 @@ import {
 } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles } from '@/plugin/asyncMessageHandlers';
+import {
+  createStyles, renameStyles, removeStyles, syncStyles,
+} from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { NodeInfo } from '@/types/NodeInfo';
+import { Properties } from '@/constants/Properties';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -197,10 +201,9 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 const mockConfirm = jest.fn();
-const mockPullStylesHandler = jest.fn(async () => {});
-const mockRemapTokensHandler = jest.fn(async () => {});
-const mockRemoveTokensByValueHandler = jest.fn(async () => {});
-
+const mockPullStylesHandler = jest.fn(async () => { });
+const mockRemapTokensHandler = jest.fn(async () => { });
+const mockRemoveTokensByValueHandler = jest.fn(async () => { });
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -265,6 +268,25 @@ describe('useToken test', () => {
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
 
+  it('removeTokensByValue test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    const data = [{
+      property: Properties.fill,
+      nodes: [{
+        id: '12',
+        type: 'RECTANGLE',
+      } as NodeInfo],
+    }];
+    await act(async () => {
+      await result.current.removeTokensByValue(data);
+    });
+
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
+      tokensToRemove: data,
+    });
+  });
+
   it('handleRemap test', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     await act(async () => {
@@ -282,6 +304,20 @@ describe('useToken test', () => {
     });
   });
 
+  it('remapToken test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    await act(async () => {
+      await result.current.remapToken('oldName', 'newName', UpdateMode.SELECTION);
+    });
+
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.REMAP_TOKENS,
+      oldName: 'oldName',
+      newName: 'newName',
+      updateMode: UpdateMode.SELECTION,
+    });
+  });
+
   it('remapTokensInGroup', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection', 'page', 'document'] }));
@@ -292,6 +328,7 @@ describe('useToken test', () => {
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old.',
       newName: 'new.',
+      updateMode: UpdateMode.SELECTION,
     });
   });
 
@@ -328,6 +365,9 @@ describe('useToken test', () => {
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
+    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, syncStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -378,6 +418,7 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
+
     it('respects decision to only create text styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
 
@@ -404,6 +445,19 @@ describe('useToken test', () => {
         settings: store.getState().settings,
       });
     });
+    it('rename styles from current theme', async () => {
+      await act(async () => {
+        await result.current.renameStylesFromTokens({ oldName: 'old', newName: 'new', parent: 'global' });
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.RENAME_STYLES,
+        oldName: 'old',
+        newName: 'new',
+        parent: 'global',
+        settings: store.getState().settings,
+      });
+    });
 
     it('should remap all tokens', async () => {
       await act(async () => {
@@ -414,6 +468,100 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.BULK_REMAP_TOKENS,
         oldName: 'oldName',
         newName: 'newName',
+        updateMode: UpdateMode.SELECTION,
+      });
+    });
+
+    it('removeStylesFromTokens', async () => {
+      const tokenToDelete = {
+        path: 'color.red',
+        parent: 'global',
+      };
+      await act(async () => {
+        await result.current.removeStylesFromTokens(tokenToDelete);
+      });
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.REMOVE_STYLES,
+        token: tokenToDelete,
+        settings: store.getState().settings,
+      });
+    });
+
+    it('syncStyles', async () => {
+      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['renameStyles', 'removeStyles'] }));
+      await act(async () => {
+        await result.current.syncStyles();
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.SYNC_STYLES,
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
+        },
+        settings: {
+          renameStyle: true,
+          removeStyle: true,
+        },
+      });
+    });
+  });
+
+  describe('setNoneValuesOnNode', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        selectionValues: [{
+          category: Properties.fill,
+          type: 'fill',
+          value: 'color.slate.800',
+          nodes: [{
+            id: '12',
+            type: 'RECTANGLE',
+          } as NodeInfo],
+        }, {
+          category: Properties.borderRadius,
+          type: 'borderRadius',
+          value: 'border-radius.8',
+          nodes: [{
+            id: '12',
+            type: 'RECTANGLE',
+          } as NodeInfo],
+        }],
+      },
+      inspectState: {
+        selectedTokens: ['fill-color.slate.800', 'borderRadius-border-radius.8'],
+      },
+    });
+    beforeEach(() => {
+      resetStore();
+      result = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={mockStore}>{children}</Provider>,
+      }).result;
+    });
+
+    it('setNoneValuesOnNode test', async () => {
+      const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+      await act(async () => {
+        await result.current.setNoneValuesOnNode(resolvedTokens);
+      });
+
+      expect(messageSpy).toBeCalledWith({
+        type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
+        tokensToSet: [{
+          nodes: [{
+            id: '12',
+            type: 'RECTANGLE',
+          }],
+          property: 'fill',
+        },
+        {
+          nodes: [{
+            id: '12',
+            type: 'RECTANGLE',
+          }],
+          property: 'borderRadius',
+        }],
+        tokens: resolvedTokens,
       });
     });
   });

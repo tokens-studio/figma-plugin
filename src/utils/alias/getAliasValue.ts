@@ -1,6 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
 import { findReferences } from '../findReferences';
 import { isSingleTokenValueObject } from '../is';
@@ -9,7 +9,7 @@ import { checkAndEvaluateMath } from '../math';
 type TokenNameNodeType = string | undefined;
 
 function getReturnedValue(token: SingleToken | string | number) {
-  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY)) {
+  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY || token?.type === TokenTypes.BORDER)) {
     return token.value;
   }
   if (isSingleTokenValueObject(token)) {
@@ -19,7 +19,7 @@ function getReturnedValue(token: SingleToken | string | number) {
 }
 
 function replaceAliasWithResolvedReference(
-  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
+  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenBorderValue | null,
   reference: string,
   resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
 ) {
@@ -35,7 +35,7 @@ function replaceAliasWithResolvedReference(
 }
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
+export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
@@ -58,37 +58,37 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             return isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
           }
 
-          const tokenAliasSplited = nameToLookFor.split('.');
-          const tokenAliasSplitedLast: TokenNameNodeType = tokenAliasSplited.pop();
-          const tokenAliasLastExcluded = tokenAliasSplited.join('.');
-          const tokenAliasSplitedLastPrevious: number = Number(tokenAliasSplited.pop());
-          const tokenAliasLastPreviousExcluded = tokenAliasSplited.join('.');
+          const tokenAliasSplitted = nameToLookFor.split('.');
+          const tokenAliasSplittedLast: TokenNameNodeType = tokenAliasSplitted.pop();
+          const tokenAliasLastExcluded = tokenAliasSplitted.join('.');
+          const tokenAliasSplittedLastPrevious: number = Number(tokenAliasSplitted.pop());
+          const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
           if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
 
           if (
-            !!tokenAliasSplitedLast
+            !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastExcluded
-            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplitedLast)
+            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const { rawValue } = foundToken;
             if (typeof rawValue === 'object' && !Array.isArray(rawValue)) {
-              const value = rawValue[tokenAliasSplitedLast as keyof typeof rawValue] as string | number;
+              const value = rawValue[tokenAliasSplittedLast as keyof typeof rawValue] as string | number;
               return getAliasValue(value, tokens);
             }
           }
 
           if (
-            tokenAliasSplitedLastPrevious !== undefined
-            && !!tokenAliasSplitedLast
+            tokenAliasSplittedLastPrevious !== undefined
+            && !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastPreviousExcluded
             && Array.isArray(foundToken?.rawValue)
-            && !!foundToken?.rawValue[tokenAliasSplitedLastPrevious]
-            && foundToken?.rawValue[tokenAliasSplitedLastPrevious].hasOwnProperty(tokenAliasSplitedLast)
+            && !!foundToken?.rawValue[tokenAliasSplittedLastPrevious]
+            && foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
           ) {
-            const rawValueEntry = foundToken?.rawValue[tokenAliasSplitedLastPrevious];
-            return getAliasValue(rawValueEntry[tokenAliasSplitedLast as keyof typeof rawValueEntry] || tokenAliasSplitedLastPrevious, tokens);
+            const rawValueEntry = foundToken?.rawValue[tokenAliasSplittedLastPrevious];
+            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens);
           }
         }
         return ref;

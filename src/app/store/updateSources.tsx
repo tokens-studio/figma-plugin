@@ -1,6 +1,8 @@
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
+import { updateGenericVersionedTokens } from './providers/generic/versionedStorage';
 import { track } from '@/utils/analytics';
 import type { AnyTokenList } from '@/types/tokens';
 import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
@@ -17,6 +19,7 @@ type UpdateRemoteTokensPayload = {
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
+  dispatch: Dispatch
 };
 
 type UpdateTokensOnSourcesPayload = {
@@ -34,6 +37,8 @@ type UpdateTokensOnSourcesPayload = {
   lastUpdatedAt: string;
   api: StorageTypeCredentials;
   checkForChanges: boolean;
+  shouldSwapStyles?: boolean;
+  dispatch: Dispatch
 };
 
 async function updateRemoteTokens({
@@ -43,6 +48,7 @@ async function updateRemoteTokens({
   context,
   updatedAt,
   oldUpdatedAt,
+  dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
   switch (provider) {
@@ -56,10 +62,24 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        dispatch,
       });
       break;
     }
+    case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+      track('pushTokens', { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE });
+      notifyToUI('Updating Generic Remote...');
+      await updateGenericVersionedTokens({
+        themes,
+        tokens,
+        context,
+        updatedAt,
+        oldUpdatedAt,
+        dispatch,
+      });
 
+      break;
+    }
     case StorageProviderType.GITHUB: {
       break;
     }
@@ -95,6 +115,8 @@ export default async function updateTokensOnSources({
   api,
   lastUpdatedAt,
   checkForChanges,
+  shouldSwapStyles,
+  dispatch,
 }: UpdateTokensOnSourcesPayload) {
   if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -104,6 +126,7 @@ export default async function updateTokensOnSources({
       context: api,
       updatedAt,
       oldUpdatedAt: lastUpdatedAt,
+      dispatch,
     });
   }
 
@@ -120,5 +143,6 @@ export default async function updateTokensOnSources({
     usedTokenSet,
     checkForChanges,
     activeTheme,
+    shouldSwapStyles,
   });
 }

@@ -5,5 +5,8 @@ declare module 'launchdarkly-js-sdk-common' {
     multiFileSync?: boolean;
     compositionTokens?: boolean;
     bitbucketSync?: boolean;
+    tokenFlowButton?: boolean;
+    swapStylesAlpha?: boolean;
+    genericVersionedAlpha?: boolean;
   }
 }

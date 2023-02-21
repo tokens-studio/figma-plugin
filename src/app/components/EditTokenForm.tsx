@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { track } from '@/utils/analytics';
+import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
@@ -8,10 +9,14 @@ import Input from './Input';
 import ColorPicker from './ColorPicker';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
-import { EditTokenObject, SingleBoxShadowToken, SingleToken } from '@/types/tokens';
-import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
+import {
+  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken,
+} from '@/types/tokens';
+import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { activeTokenSetSelector, updateModeSelector, editTokenSelector } from '@/selectors';
+import {
+  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector,
+} from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
@@ -22,31 +27,41 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { StyleOptions } from '@/constants/StyleOptions';
 import Textarea from './Textarea';
 import Heading from './Heading';
+import BorderTokenForm from './BorderTokenForm';
+import Box from './Box';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
+type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
+
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
-  const firstInput = React.useRef<HTMLInputElement | null>(null);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editToken = useSelector(editTokenSelector);
+  const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
-  const { remapToken } = useTokens();
+  const { remapToken, renameStylesFromTokens } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
 
+  const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
+
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
       return false;
+    }
+    if (internalEditToken.type === TokenTypes.DIMENSION) {
+      return true;
     }
     return internalEditToken?.value && !error;
   }, [internalEditToken, error]);
@@ -61,6 +76,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasAnotherTokenThatStartsWithName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
+      .filter((t) => t.name !== internalEditToken?.initialName)
       .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
@@ -86,7 +102,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError('Tokens can\'t share name with a group');
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
   const handleToggleInputHelper = React.useCallback(() => {
     setInputHelperOpen(!inputHelperOpen);
@@ -103,6 +119,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    () => {
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+      }
+    },
+    [internalEditToken, isValidDimensionToken],
+  );
+
   const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
       setError(null);
@@ -117,17 +142,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     (newTokenValue: NodeTokenRefMap) => {
       if (internalEditToken?.type === TokenTypes.COMPOSITION) {
         setInternalEditToken((prev) => ({ ...prev, value: newTokenValue } as EditTokenObject));
-      }
-    },
-    [internalEditToken],
-  );
-
-  const handleBoxShadowAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setError(null);
-      e.persist();
-      if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
     [internalEditToken],
@@ -159,19 +173,33 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyAliasValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: { ...internalEditToken.value, [property]: newInputValue },
+      });
+    }
+  }, [internalEditToken]);
+
+  const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      setError(null);
       e.persist();
-      if (internalEditToken) {
-        setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
+      if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: {
+            ...internalEditToken.value,
+            [e.target.name]: e.target.value,
+          },
+        });
       }
     },
     [internalEditToken],
   );
 
-  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+  const handleBorderValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
+    if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
       setInternalEditToken({
         ...internalEditToken,
         value: { ...internalEditToken.value, [property]: newInputValue },
@@ -238,26 +266,34 @@ function EditTokenForm({ resolvedTokens }: Props) {
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
+          const choices: Choice[] = [
+            {
+              key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
+            },
+            {
+              key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+            },
+            {
+              key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+            },
+          ];
+          if (themes.length > 0 && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)) {
+            choices.push({
+              key: StyleOptions.RENAME, label: 'Rename styles',
+            });
+          }
 
           const shouldRemap = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
-            choices: [
-              {
-                key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
-              },
-              {
-                key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
-              },
-              {
-                key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
-              },
-            ],
+            choices,
           });
-
           if (shouldRemap) {
             remapToken(oldName, newName, shouldRemap.data[0]);
             dispatch.settings.setUpdateMode(shouldRemap.data[0]);
+            if (shouldRemap.data.includes(StyleOptions.RENAME)) {
+              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+            }
           }
         } else {
           track('Edit token', { renamed: false });
@@ -282,23 +318,32 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+        setError('Value must include either px or rem');
+        return;
+      }
       if (isValid && internalEditToken) {
         submitTokenValue(internalEditToken);
         dispatch.uiState.setShowEditForm(false);
       }
     },
-    [dispatch, isValid, internalEditToken],
+    [dispatch, isValid, internalEditToken, submitTokenValue],
   );
+
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      if (isValid && internalEditToken) {
+        submitTokenValue(internalEditToken);
+        dispatch.uiState.setShowEditForm(false);
+      }
+    }
+  }, [handleSubmit, submitTokenValue, dispatch, internalEditToken, isValid]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
   }, [dispatch]);
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      firstInput.current?.focus();
-    }, 50);
-  }, []);
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
@@ -317,7 +362,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         return (
           <BoxShadowInput
             handleBoxShadowValueChange={handleBoxShadowValueChange}
-            handleBoxShadowAliasValueChange={handleBoxShadowAliasValueChange}
+            handleBoxShadowAliasValueChange={handleChange}
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
@@ -329,7 +374,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <TypographyInput
             internalEditToken={internalEditToken}
             handleTypographyValueChange={handleTypographyValueChange}
-            handleTypographyAliasValueChange={handleTypographyAliasValueChange}
+            handleTypographyAliasValueChange={handleChange}
             resolvedTokens={resolvedTokens}
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
@@ -345,6 +390,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
           />
         );
       }
+      case TokenTypes.BORDER: {
+        return (
+          <BorderTokenForm
+            internalEditToken={internalEditToken}
+            resolvedTokens={resolvedTokens}
+            handleBorderValueChange={handleBorderValueChange}
+            handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
+            handleBorderAliasValueChange={handleChange}
+            handleDownShiftInputChange={handleDownShiftInputChange}
+          />
+        );
+      }
       default: {
         return (
           <div>
@@ -355,6 +412,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               resolvedTokens={resolvedTokens}
               initialName={internalEditToken.initialName}
               handleChange={handleChange}
+              handleBlur={handleBlur}
               setInputValue={handleDownShiftInputChange}
               placeholder={
                 internalEditToken.type === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
@@ -401,30 +459,32 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value={internalEditToken?.name}
           onChange={handleChange}
           type="text"
+          autofocus
           name="name"
-          inputRef={firstInput}
           error={error}
           placeholder="Unique name"
         />
         {renderTokenForm()}
 
         {internalEditToken?.schema?.explainer && <div className="mt-1 text-gray-600 text-xxs">{internalEditToken.schema.explainer}</div>}
-        <Heading size="small">Description</Heading>
-
-        <Textarea
-          key="description"
-          value={internalEditToken?.description || ''}
-          onChange={handleDescriptionChange}
-          rows={3}
-          border
-        />
+        <Box>
+          <Heading size="xsmall">Description</Heading>
+          <Textarea
+            key="description"
+            value={internalEditToken?.description || ''}
+            placeholder="Optional description"
+            onChange={handleDescriptionChange}
+            rows={3}
+            border
+          />
+        </Box>
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
-            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Update'}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Save'}
             {(
               internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT

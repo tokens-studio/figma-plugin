@@ -6,11 +6,15 @@ import Button from '../Button';
 import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
+import { ChangeEventHandler } from './types';
+import Heading from '../Heading';
+import Text from '../Text';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.URL; }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange:ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
   hasErrored?: boolean;
@@ -44,16 +48,24 @@ export default function URLForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
+        <Stack direction="column" gap={1}>
+          <Heading>Add a new URL provider</Heading>
+          <Text muted>
+            Tokens stored on a server allow you to add them as a read-only provider.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
+        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input full label="Headers (optional)" value={values.secret} onChange={onChange} type="text" name="secret" />
         <Input full label="URL" value={values.id} onChange={onChange} type="text" name="id" required />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            Save credentials
           </Button>
         </Stack>
         {hasErrored && (

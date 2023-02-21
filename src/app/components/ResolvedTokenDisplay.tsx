@@ -1,11 +1,12 @@
 import React from 'react';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import { isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
-import { SingleTypographyToken } from '@/types/tokens';
+import { isSingleBorderToken, isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
+import { SingleBorderToken, SingleTypographyToken } from '@/types/tokens';
 import Box from './Box';
 import { ResolvedShadowValueDisplay } from './ResolvedShadowValueDisplay';
-import { ResolvedTypograhpyValueDisplay } from './ResolvedTypograhpyValueDisplay';
+import { ResolvedTypographyValueDisplay } from './ResolvedTypographyValueDisplay';
 import { TokenBoxshadowValue } from '@/types/values';
+import { ResolvedBorderValueDisplay } from './ResolvedBorderValueDisplay';
 
 export default function ResolvedTokenDisplay({
   alias,
@@ -20,7 +21,7 @@ export default function ResolvedTokenDisplay({
 
   if (selectedToken && isSingleTypographyToken(selectedToken)) {
     return (
-      <ResolvedTypograhpyValueDisplay
+      <ResolvedTypographyValueDisplay
         value={valueToCheck as SingleTypographyToken['value']}
       />
     );
@@ -29,6 +30,14 @@ export default function ResolvedTokenDisplay({
   if (selectedToken && isSingleBoxShadowToken(selectedToken)) {
     if (Array.isArray(valueToCheck)) return <ResolvedShadowValueDisplay shadows={valueToCheck as TokenBoxshadowValue[]} />;
     return <ResolvedShadowValueDisplay shadows={[valueToCheck as TokenBoxshadowValue]} />;
+  }
+
+  if (selectedToken && isSingleBorderToken(selectedToken)) {
+    return (
+      <ResolvedBorderValueDisplay
+        value={valueToCheck as SingleBorderToken['value']}
+      />
+    );
   }
 
   if (typeof valueToCheck !== 'string' && typeof valueToCheck !== 'number') {

@@ -38,6 +38,7 @@ import ProBadge from './ProBadge';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { track } from '@/utils/analytics';
 
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
@@ -121,6 +122,7 @@ export default function BranchSelector() {
   }, [confirm]);
 
   const createBranchByChange = React.useCallback(() => {
+    track('Create new branch from current changes');
     setMenuOpened(false);
     setIsCurrentChanges(true);
     setStartBranch(currentBranch ?? null);
@@ -128,6 +130,7 @@ export default function BranchSelector() {
   }, [currentBranch]);
 
   const createNewBranchFrom = React.useCallback(async (branch: string) => {
+    track('Create new branch from specific branch');
     setMenuOpened(false);
 
     if (hasChanges && await askUserIfPushChanges()) {
@@ -154,6 +157,7 @@ export default function BranchSelector() {
   }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
 
   const onBranchSelected = React.useCallback(async (branch: string) => {
+    track('Branch changed');
     if (hasChanges) {
       if (await askUserIfPushChanges()) {
         await changeAndPull(branch);
@@ -216,7 +220,7 @@ export default function BranchSelector() {
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="left">
+              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="right" align="end">
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>

@@ -163,12 +163,60 @@ describe('MoreButton', () => {
     expect(mockSetNodeData).toHaveBeenCalledWith({
       horizontalPadding: 'delete',
       verticalPadding: 'delete',
-      itemSpacing: 'delete',
       spacing: token.name,
       paddingLeft: 'delete',
       paddingTop: 'delete',
       paddingRight: 'delete',
       paddingBottom: 'delete',
     }, []);
+  });
+
+  it('gap property should not be applied when spacing token has multi value', async () => {
+    const multiSpacingToken: SingleToken = {
+      value: '16 20',
+      name: 'two-value-token',
+      type: TokenTypes.SPACING,
+    };
+    const mockStore = createMockStore({
+      uiState: {
+        mainNodeSelectionValues: {
+          paddingLeft: multiSpacingToken.name,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <MoreButton
+          type={TokenTypes.SPACING}
+          showForm={mockShowForm}
+          token={multiSpacingToken}
+        />
+      </Provider>,
+    );
+    await fireEvent.contextMenu(result.getByText(multiSpacingToken.name));
+    await fireEvent.click(result.getByText('Gap'));
+    expect(mockSetNodeData).toBeCalledTimes(0);
+  });
+
+  it('show all properties about dimension token', async () => {
+    const dimensionToken: SingleToken = {
+      value: '16px',
+      name: 'dimension-regular',
+      type: TokenTypes.DIMENSION,
+    };
+    const { getByText } = render(
+      <MoreButton
+        type={TokenTypes.DIMENSION}
+        showForm={mockShowForm}
+        token={dimensionToken}
+      />,
+    );
+    expect(getByText(dimensionToken.name)).toBeInTheDocument();
+    await fireEvent.contextMenu(getByText(dimensionToken.name));
+    expect(getByText('Spacing')).toBeInTheDocument();
+    expect(getByText('Sizing')).toBeInTheDocument();
+    expect(getByText('Border radius')).toBeInTheDocument();
+    expect(getByText('Border width')).toBeInTheDocument();
   });
 });

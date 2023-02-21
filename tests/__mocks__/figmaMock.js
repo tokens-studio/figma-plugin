@@ -61,6 +61,7 @@ module.exports.mockParentPostMessage = jest.fn((data) => {
 });
 module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
+module.exports.mockCreateImage = jest.fn();
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -94,6 +95,7 @@ module.exports.figma = {
   createEffectStyle: module.exports.mockCreateEffectStyle,
   importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
   getNodeById: module.exports.mockGetNodeById,
+  createImage: module.exports.mockCreateImage
 };
 
 parent.postMessage = module.exports.mockParentPostMessage;
