@@ -205,7 +205,7 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
+  const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
 
   return (
     <>
@@ -228,7 +228,7 @@ export default function ColorTokenForm({
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
-          <Heading size="xsmall">Modify</Heading>
+          <Heading size="small">Modify</Heading>
           <ProBadge compact />
         </Box>
         {
@@ -326,9 +326,10 @@ export default function ColorTokenForm({
               resolvedTokens={resolvedTokens}
               handleChange={handleModifyValueChange}
               setInputValue={handleModifyValueDownShiftInputChange}
-              placeholder="Value or {alias}"
+              placeholder="Value (0 to 1) or {alias}"
               suffix
-              prefix={getIconComponent}
+              label={getLabel}
+              inlineLabel
             />
           </>
         )
