@@ -103,7 +103,7 @@ describe('convertToTokenArray', () => {
     ]);
 
     expect(convertToTokenArray({
-      tokens: basicTokens, expandTypography: true, expandShadow: true, expandComposition: true,
+      tokens: basicTokens, expandTypography: true, expandShadow: true, expandComposition: true, expandBorder: true,
     })).toEqual([
       { name: 'global.withValue', value: 'bar', type: 'other' },
       { name: 'global.basic', value: '#ff0000' },

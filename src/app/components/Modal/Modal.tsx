@@ -5,6 +5,8 @@ import Stack from '../Stack';
 import XIcon from '@/icons/x.svg';
 import { ModalFooter } from './ModalFooter';
 import { ModalHeader } from './ModalHeader';
+import Box from '../Box';
+import { styled } from '@/stitches.config';
 
 const customStyles = (large = false): ReactModalStyles => ({
   overlay: {
@@ -42,6 +44,33 @@ export type ModalProps = {
   close: () => void;
 };
 
+const StyledButton = styled('button', {
+  padding: '$4',
+  '&:hover': {
+    backgroundColor: '$bgSubtle',
+  },
+  '&:focus': {
+    outline: 'none',
+  },
+});
+
+const StyledBody = styled('div', {
+  position: 'relative',
+  padding: '$6',
+  variants: {
+    full: {
+      true: {
+        padding: 0,
+      },
+    },
+    compact: {
+      true: {
+        padding: '$4',
+      },
+    },
+  },
+});
+
 export function Modal({
   id,
   title,
@@ -60,16 +89,6 @@ export function Modal({
     }
   }, []);
 
-  const paddingClass = () => {
-    if (compact) {
-      return 'p-4';
-    }
-    if (full) {
-      return 'p-0';
-    }
-    return 'p-8';
-  };
-
   const handleClose = React.useCallback(() => {
     close();
   }, [close]);
@@ -85,25 +104,24 @@ export function Modal({
         <ModalHeader>
           <Stack direction="row" justify="between" align="center">
             {title && (
-              <div className="pl-4">
+              <Box css={{ paddingLeft: '$4' }}>
                 <Heading size="small">{title}</Heading>
-              </div>
+              </Box>
             )}
-            <button
+            <StyledButton
               type="button"
               onClick={handleClose}
-              className="p-4 hover:bg-gray-100 rounded focus:outline-none"
               data-cy="close-button"
               data-testid="close-button"
             >
               <XIcon />
-            </button>
+            </StyledButton>
           </Stack>
         </ModalHeader>
       )}
-      <div data-cy={id} className={`relative ${paddingClass()}`}>
+      <StyledBody compact={compact} full={full} data-cy={id}>
         {children}
-      </div>
+      </StyledBody>
       {(!!footer) && (
         <ModalFooter>
           {footer}

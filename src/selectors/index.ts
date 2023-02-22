@@ -52,3 +52,5 @@ export * from './themeByIdSelector';
 export * from './isWaitingForBackgroundJobSelector';
 export * from './licenseDetailsSelector';
 export * from './getLastopened';
+export * from './baseFontSizeSelector';
+export * from './aliasBaseFontSizeSelector';

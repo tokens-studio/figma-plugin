@@ -178,16 +178,16 @@ const SyncSettings = () => {
               side="bottom"
             >
               {
-                  providers.map((provider) => {
-                    if (provider.type === StorageProviderType.GENERIC_VERSIONED_STORAGE && !genericVersionedAlpha) { return null; }
-                    return (
-                      <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
-                        <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
-                        {provider.text}
-                      </DropdownMenuItem>
-                    );
-                  })
-                }
+                providers.map((provider) => {
+                  if (provider.type === StorageProviderType.GENERIC_VERSIONED_STORAGE && !genericVersionedAlpha) { return null; }
+                  return (
+                    <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                      <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
+                      {provider.text}
+                    </DropdownMenuItem>
+                  );
+                })
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </Stack>

@@ -14,6 +14,7 @@ export default function convertTokensObjectToResolved(
     expandTypography: false,
     expandShadow: false,
     expandComposition: false,
+    expandBorder: false,
     preserveRawValue: false,
     resolveReferences: true,
   },

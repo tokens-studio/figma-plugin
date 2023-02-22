@@ -4,7 +4,7 @@ import syncStylesFn from '../syncStyles';
 
 export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYLES] = async (msg) => {
   try {
-    const styleIds = await syncStylesFn(msg.tokens, msg.settings);
+    const styleIds = await syncStylesFn(msg.tokens, msg.options, msg.settings);
     return {
       styleIdsToRemove: styleIds.styleIdsToRemove,
     };

@@ -2,19 +2,22 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
-import { ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector } from '@/selectors';
+import {
+  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+} from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
-import { track } from '@/utils/analytics';
 import OnboardingExplainer from '../OnboardingExplainer';
+import RemConfiguration from '../RemConfiguration';
 
 function Settings() {
   const onboardingData = {
@@ -88,6 +91,8 @@ function Settings() {
             />
             <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
           </Stack>
+          <Heading size="small">Base font size token</Heading>
+          <RemConfiguration />
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
           </Box>

@@ -17,6 +17,7 @@ import {
   settingsStateSelector,
   tokensSelector,
   uiStateSelector,
+  updateModeSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -40,6 +41,7 @@ type GetFormattedTokensOptions = {
   expandTypography: boolean;
   expandShadow: boolean;
   expandComposition: boolean;
+  expandBorder: boolean;
 };
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
@@ -50,11 +52,13 @@ export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
+  const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -69,11 +73,11 @@ export default function useTokens() {
   // Returns formatted tokens for style dictionary
   const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
     const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false,
+      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
     });
   }, [tokens, activeTokenSet]);
 
@@ -81,6 +85,30 @@ export default function useTokens() {
   const getStringTokens = useCallback(() => (
     stringifyTokens(tokens, activeTokenSet)
   ), [tokens, activeTokenSet]);
+
+  // handles updating JSON
+  const handleJSONUpdate = useCallback((newTokens: string) => {
+    track('Update JSON');
+    dispatch.tokenState.setJSONData(newTokens);
+  }, [dispatch.tokenState]);
+
+  // Handles the update operation
+  const handleUpdate = useCallback(() => {
+    track('Update Tokens');
+    if (shouldConfirm) {
+      confirm({
+        text: 'Are you sure?',
+        description:
+            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+      }).then((result) => {
+        if (result && result.result) {
+          dispatch.tokenState.updateDocument();
+        }
+      });
+    } else {
+      dispatch.tokenState.updateDocument();
+    }
+  }, [confirm, dispatch.tokenState, shouldConfirm]);
 
   // Calls Figma asking for all local text- and color styles
   const pullStyles = useCallback(async () => {
@@ -242,14 +270,15 @@ export default function useTokens() {
       const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
-        settings: {
+        options: {
           renameStyle: userConfirmation.data.includes('renameStyles'),
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
+        settings,
       });
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
-  }, [confirm, tokens, dispatch.tokenState]);
+  }, [confirm, tokens, dispatch.tokenState, settings]);
 
   const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
     track('renameStyles', { oldName, newName, parent });
@@ -310,6 +339,8 @@ export default function useTokens() {
     removeStylesFromTokens,
     syncStyles,
     setNoneValuesOnNode,
+    handleUpdate,
+    handleJSONUpdate,
   }), [
     isAlias,
     getTokenValue,
@@ -326,5 +357,7 @@ export default function useTokens() {
     removeStylesFromTokens,
     syncStyles,
     setNoneValuesOnNode,
+    handleUpdate,
+    handleJSONUpdate,
   ]);
 }

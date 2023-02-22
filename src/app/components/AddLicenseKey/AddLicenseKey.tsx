@@ -46,17 +46,21 @@ export default function AddLicenseKey() {
   }, [userId, ldClient]);
 
   const removeKey = useCallback(async () => {
-    const confirmation = await confirm({
-      text: 'Are you sure you want to remove your license key?',
-      description: `Make sure you saved a copy of the license key somewhere,                    
-        as it won’t be stored on this device after you deleted it.`,
-      confirmAction: 'Remove license key',
-    });
-    if (confirmation) {
+    if (licenseKeyError) {
       dispatch.userState.removeLicenseKey('');
-      removeAccessToFeatures();
+    } else {
+      const confirmation = await confirm({
+        text: 'Are you sure you want to remove your license key?',
+        description: `Make sure you saved a copy of the license key somewhere,                    
+          as it won’t be stored on this device after you deleted it.`,
+        confirmAction: 'Remove license key',
+      });
+      if (confirmation) {
+        dispatch.userState.removeLicenseKey('');
+        removeAccessToFeatures();
+      }
     }
-  }, [dispatch, confirm, removeAccessToFeatures]);
+  }, [dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
     color: '$fgAccent',
@@ -79,15 +83,15 @@ export default function AddLicenseKey() {
     setLicenseKey(ev.target.value.trim());
   }, []);
 
-  const removeLicenseKeyButton = existingKey && !licenseKeyError && (
-    <Button variant="primary" onClick={removeKey} disabled={existingKey !== newKey}>
-      Remove key
+  const addLicenseKeyButton = !existingKey && (
+    <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
+      Add license key
     </Button>
   );
 
-  const addLicenseKeyButton = (!existingKey || licenseKeyError) && (
-    <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-      Add license key
+  const removeLicenseKeyButton = existingKey && (
+    <Button variant="primary" onClick={removeKey}>
+      Remove key
     </Button>
   );
 
