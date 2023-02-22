@@ -25,7 +25,7 @@ interface MentionInputProps {
   inputContainerPosY: number,
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: () => void;
-  handleOnFocus: React.FocusEventHandler<HTMLTextAreaElement>
+  handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
 }
 
 const mentionInputStyles = {

@@ -220,10 +220,25 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(false);
   }, []);
 
+  const stateReducer = (state: any, changes: any) => {
+    switch (changes.type) {
+      case Downshift.stateChangeTypes.keyDownEnter:
+      case Downshift.stateChangeTypes.clickItem:
+        return {
+          ...changes,
+          highlightedIndex: state.highlightedIndex,
+          isOpen: true,
+          inputValue: '',
+        };
+      default:
+        return changes;
+    }
+  };
+
   return (
-    <Downshift onSelect={handleSelect}>
+    <Downshift onSelect={handleSelect} isOpen={showAutoSuggest} stateReducer={stateReducer}>
       {({
-        selectedItem, highlightedIndex, getItemProps,
+        selectedItem, highlightedIndex, getItemProps, isOpen,
       }) => (
         <div style={{ position: 'relative' }} ref={downShiftContainerRef}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
@@ -255,7 +270,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             )}
           </Box>
           {selectedItem?.name !== searchInput
-            && showAutoSuggest ? (
+            && isOpen ? (
               ReactDOM.createPortal(
                 <Box css={{
                   position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
@@ -265,18 +280,18 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
                   }}
                   >
-                    <Box css={{ display: 'flex', gap: '$3' }}>
-                      <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
-                        Tokens
-                      </StyledButton>
-                      {
-                        externalSearchField && (
+                    {
+                      externalSearchField && (
+                        <Box css={{ display: 'flex', gap: '$3' }}>
+                          <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
+                            Tokens
+                          </StyledButton>
                           <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
                             {externalSearchField}
                           </StyledButton>
-                        )
-                      }
-                    </Box>
+                        </Box>
+                      )
+                    }
                     <Input
                       full
                       ref={searchInputRef}
@@ -289,27 +304,34 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   </Box>
                   <StyledDropdown className="content scroll-container">
                     {
+                      // eslint-disable-next-line no-nested-ternary
                       currentSearchField === 'Tokens' ? (
-                        filteredTokenItems.map((token: SingleToken, index: number) => (
-                          <StyledItem
-                            data-cy="downshift-input-item"
-                            data-testid="downshift-input-item"
-                            className="dropdown-item"
-                            {...getItemProps({ key: token.name, index, item: token.name })}
-                            css={{
-                              backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
-                            }}
-                            isFocused={highlightedIndex === index}
-                          >
-                            {type === 'color' && (
-                            <StyledItemColorDiv>
-                              <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                            </StyledItemColorDiv>
-                            )}
-                            <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                            <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
-                          </StyledItem>
-                        ))
+                        filteredTokenItems.length > 0 ? (
+                          filteredTokenItems.map((token: SingleToken, index: number) => (
+                            <StyledItem
+                              data-cy="downshift-input-item"
+                              data-testid="downshift-input-item"
+                              className="dropdown-item"
+                              {...getItemProps({ key: token.name, index, item: token.name })}
+                              css={{
+                                backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                              }}
+                              isFocused={highlightedIndex === index}
+                            >
+                              {type === 'color' && (
+                              <StyledItemColorDiv>
+                                <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                              </StyledItemColorDiv>
+                              )}
+                              <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
+                              <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
+                            </StyledItem>
+                          ))
+                        ) : (
+                          <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                            No suggestions found
+                          </Box>
+                        )
                       ) : (
                         filteredValues?.map((value, index) => (
                           <StyledItem
