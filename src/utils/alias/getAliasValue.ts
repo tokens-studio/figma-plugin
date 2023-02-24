@@ -39,7 +39,7 @@ function replaceAliasWithResolvedReference(
 }
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
+export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = [], isResolved: boolean = true, previousCount: number = 0): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
@@ -69,7 +69,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
-          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens, isResolved, previousCount); }
 
           if (
             !!tokenAliasSplittedLast
@@ -79,7 +79,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             const { value } = foundToken;
             if (typeof value === 'object' && !Array.isArray(value)) {
               const resolvedValue = value[tokenAliasSplittedLast as keyof typeof value] as string | number;
-              return getAliasValue(resolvedValue, tokens);
+              return getAliasValue(resolvedValue, tokens, isResolved, previousCount);
             }
           }
 
@@ -92,7 +92,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             && foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const rawValueEntry = foundToken?.rawValue[tokenAliasSplittedLastPrevious];
-            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens);
+            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens, isResolved, previousCount);
           }
         }
         return ref;
@@ -113,11 +113,11 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
         const rgbColor = convertToRgb(couldBeNumberValue);
-        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor) {
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor && !isResolved && previousCount === 0) {
           if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
-            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)), color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens)) ?? '' });
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)), color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens, isResolved, previousCount)) ?? '' });
           }
-          return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)) });
+          return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens, isResolved, previousCount)) });
         }
         return rgbColor;
       }
