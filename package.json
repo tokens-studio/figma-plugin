@@ -33,7 +33,7 @@
     "@radix-ui/react-toolbar": "^0.1.5",
     "@radix-ui/react-tooltip": "^0.0.19",
     "@rematch/core": "^2.2.0",
-    "@sentry/react": "^6.2.5",
+    "@sentry/react": "^6.19.7",
     "@stitches/react": "^1.2.8",
     "@storybook/addon-postcss": "^2.0.0",
     "@types/chroma-js": "^2.1.4",
