@@ -19,6 +19,7 @@ import Modal from './Modal';
 import Stack from './Stack';
 import { IconBrokenLink } from '@/icons';
 import StyleIcon from '@/icons/style.svg';
+import Tooltip from './Tooltip';
 
 export default function InspectorTokenSingle({
   token,
@@ -117,8 +118,7 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          {/* TODO Should update the Icon to show this is style not a token */}
-          {token.resolvedValue && <StyleIcon />}
+          {token.resolvedValue && <Tooltip label="Applied style"><StyleIcon /></Tooltip>}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           {
             !token.resolvedValue && (
