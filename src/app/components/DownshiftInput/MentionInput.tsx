@@ -1,6 +1,11 @@
-import React, { useCallback, useMemo } from 'react';
+import React, {
+  useCallback, useMemo,
+} from 'react';
 import ReactDOM from 'react-dom';
-import { Mention, MentionsInput, SuggestionDataItem } from 'react-mentions';
+import {
+  Mention, MentionsInput, SuggestionDataItem,
+} from 'react-mentions';
+import { GetInputPropsOptions } from 'downshift';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import Box from '../Box';
 import { SingleToken } from '@/types/tokens';
@@ -23,9 +28,11 @@ interface MentionInputProps {
   inputContainerWith: number,
   inputContainerPosX: number,
   inputContainerPosY: number,
+  inputRef: React.RefObject<HTMLInputElement>;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
   handleBlur?: () => void;
-  handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
+  handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
+  getInputProps: <T>(options?: T) => T & GetInputPropsOptions;
 }
 
 const mentionInputStyles = {
@@ -78,12 +85,13 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
   inputContainerWith,
   inputContainerPosX,
   inputContainerPosY,
+  inputRef,
   handleChange,
   handleBlur,
   handleOnFocus,
+  getInputProps,
 }) => {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
-
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
     if (isDocumentationType(type as Properties)) {
       return resolvedTokens
@@ -184,6 +192,8 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       onBlur={handleInputBlur}
       name={name}
       onFocus={handleOnFocus}
+      inputRef={inputRef}
+      {...getInputProps()}
     >
       <Mention
         trigger="{"
@@ -193,6 +203,5 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
         displayTransform={renderDisplayTransform}
       />
     </MentionsInput>
-
   );
 };

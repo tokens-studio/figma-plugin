@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector } from 'react-redux';
@@ -72,6 +72,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const downShiftContainerRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const mentionInputRef = useRef<HTMLInputElement>(null);
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
   const portalContainer = document.body;
@@ -96,9 +97,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       setInputContainerPosX(boundingRect.left);
       setInputContainerPosY(boundingRect.bottom);
       setInputContainerWith(boundingRect.width);
-    }
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
     }
   }, [inputContainerRef.current?.getBoundingClientRect()]);
 
@@ -204,6 +202,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [setInputValue, setShowAutoSuggest, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
+    mentionInputRef?.current?.focus();
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
@@ -220,25 +219,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(false);
   }, []);
 
-  const stateReducer = (state: any, changes: any) => {
-    switch (changes.type) {
-      case Downshift.stateChangeTypes.keyDownEnter:
-      case Downshift.stateChangeTypes.clickItem:
-        return {
-          ...changes,
-          highlightedIndex: state.highlightedIndex,
-          isOpen: true,
-          inputValue: '',
-        };
-      default:
-        return changes;
-    }
-  };
-
   return (
-    <Downshift onSelect={handleSelect} isOpen={showAutoSuggest} stateReducer={stateReducer}>
+    <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
       {({
-        selectedItem, highlightedIndex, getItemProps, isOpen,
+        selectedItem, highlightedIndex, getItemProps, isOpen, getInputProps,
       }) => (
         <div style={{ position: 'relative' }} ref={downShiftContainerRef}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
@@ -258,10 +242,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               inputContainerWith={inputContainerWith}
               inputContainerPosX={inputContainerPosX}
               inputContainerPosY={inputContainerPosY}
+              inputRef={mentionInputRef}
               handleChange={handleChange}
               handleBlur={handleBlur}
               portalPlaceholder={portalPlaceholder}
               handleOnFocus={handleOnFocus}
+              getInputProps={getInputProps}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
