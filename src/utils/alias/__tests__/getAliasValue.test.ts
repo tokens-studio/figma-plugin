@@ -468,7 +468,7 @@ describe('getAliasValue', () => {
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
       // @TODO check this test typing
-      expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
+      expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[], false)).toEqual(token.value);
     });
   });
 });
