@@ -95,8 +95,14 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger data-cy="composition-token-dropdown" bordered css={{ flex: 1, height: '$10' }}>
-            <span>{property || 'Choose a property'}</span>
+          <DropdownMenuTrigger
+            data-cy="composition-token-dropdown"
+            bordered
+            css={{
+              width: '130px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', height: '$10',
+            }}
+          >
+            {property || 'Choose a property'}
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
             {' '}
@@ -106,17 +112,19 @@ export default function SingleCompositionTokenForm({
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DownshiftInput
-          value={propertyValue}
-          type={propertyType}
-          resolvedTokens={resolvedTokens}
-          handleChange={onPropertyValueChanged}
-          setInputValue={handleDownShiftInputChange}
-          placeholder={
+        <Box css={{ flexGrow: 1 }}>
+          <DownshiftInput
+            value={propertyValue}
+            type={propertyType}
+            resolvedTokens={resolvedTokens}
+            handleChange={onPropertyValueChanged}
+            setInputValue={handleDownShiftInputChange}
+            placeholder={
             propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
           }
-          suffix
-        />
+            suffix
+          />
+        </Box>
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
             tooltip="Remove this style"
