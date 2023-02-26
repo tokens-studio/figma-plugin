@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector } from 'react-redux';
@@ -9,7 +9,7 @@ import Text from '../Text';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
 import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
-import Input, { StyledPrefix } from '../Input';
+import { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
 import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
@@ -21,6 +21,7 @@ import { figmaFontsSelector } from '@/selectors';
 import { MentionInput } from './MentionInput';
 import {
   StyledButton,
+  StyledDownshiftInput,
   StyledDropdown, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
 
@@ -70,9 +71,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
   const figmaFonts = useSelector(figmaFontsSelector);
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
-  const downShiftContainerRef = React.useRef<HTMLDivElement>(null);
+  const downShiftSearchRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const mentionInputRef = useRef<HTMLInputElement>(null);
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
   const portalContainer = document.body;
@@ -83,10 +83,11 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [type]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (downShiftContainerRef.current && event.target instanceof Node && !downShiftContainerRef.current.contains(event.target) && showAutoSuggest) {
+    if ((downShiftSearchRef.current && event.target instanceof Node && !downShiftSearchRef.current.contains(event.target))
+     && (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target))) {
       setShowAutoSuggest(false);
     }
-  }, [showAutoSuggest]);
+  }, []);
 
   React.useEffect(() => {
     if (portalContainer) {
@@ -97,6 +98,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       setInputContainerPosX(boundingRect.left);
       setInputContainerPosY(boundingRect.bottom);
       setInputContainerWith(boundingRect.width);
+    }
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   }, [inputContainerRef.current?.getBoundingClientRect()]);
 
@@ -202,7 +206,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [setInputValue, setShowAutoSuggest, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    mentionInputRef?.current?.focus();
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
@@ -224,7 +227,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       {({
         selectedItem, highlightedIndex, getItemProps, isOpen, getInputProps,
       }) => (
-        <div style={{ position: 'relative' }} ref={downShiftContainerRef}>
+        <div style={{ position: 'relative' }}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
@@ -242,12 +245,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               inputContainerWith={inputContainerWith}
               inputContainerPosX={inputContainerPosX}
               inputContainerPosY={inputContainerPosY}
-              inputRef={mentionInputRef}
               handleChange={handleChange}
               handleBlur={handleBlur}
               portalPlaceholder={portalPlaceholder}
               handleOnFocus={handleOnFocus}
-              getInputProps={getInputProps}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
@@ -258,13 +259,16 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           {selectedItem?.name !== searchInput
             && isOpen ? (
               ReactDOM.createPortal(
-                <Box css={{
-                  position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
-                }}
-                >
-                  <Box css={{
-                    display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
+                <Box
+                  css={{
+                    position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                   }}
+                >
+                  <Box
+                    css={{
+                      display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
+                    }}
+                    ref={downShiftSearchRef}
                   >
                     {
                       externalSearchField && (
@@ -278,14 +282,11 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                         </Box>
                       )
                     }
-                    <Input
-                      full
-                      ref={searchInputRef}
+                    <StyledDownshiftInput
+                      inputRef={searchInputRef}
                       value={searchInput}
                       onChange={handleSearchInputChange}
-                      type="text"
-                      placeholder="Search"
-                      data-testid="downshift-search-input"
+                      getInputProps={getInputProps}
                     />
                   </Box>
                   <StyledDropdown className="content scroll-container">

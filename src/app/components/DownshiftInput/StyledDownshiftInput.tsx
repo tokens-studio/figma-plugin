@@ -1,4 +1,16 @@
+import React from 'react';
+import type { GetInputPropsOptions } from 'downshift';
 import { styled } from '@/stitches.config';
+import { StyledInput } from '../Input';
+
+type Props = {
+  name?: string;
+  value?: string;
+  placeholder?: string;
+  searchInputRef: React.RefObject<HTMLInputElement>;
+  getInputProps: <T>(options?: T) => T & GetInputPropsOptions;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+};
 
 export const StyledDropdown = styled('div', {
   position: 'absolute',
@@ -82,3 +94,28 @@ export const StyledButton = styled('button', {
     },
   },
 });
+
+export const StyledDownshiftInput: React.FC<Props> = ({
+  name,
+  value,
+  placeholder,
+  searchInputRef,
+  onChange,
+  getInputProps,
+}) => {
+  const { ref, size, ...inputProps } = getInputProps({
+    ref: searchInputRef,
+    name,
+    placeholder,
+    value: value || '',
+    onChange,
+  });
+
+  return (
+    <StyledInput
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
+      autoFocus
+      {...inputProps}
+    />
+  );
+};
