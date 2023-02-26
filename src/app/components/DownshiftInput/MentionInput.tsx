@@ -20,6 +20,7 @@ interface MentionInputProps {
   placeholder?: string;
   resolvedTokens: ResolveTokenValuesResult[];
   portalPlaceholder: HTMLDivElement
+  inputRef: React.RefObject<HTMLInputElement>;
   inputContainerWith: number,
   inputContainerPosX: number,
   inputContainerPosY: number,
@@ -78,6 +79,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
   inputContainerWith,
   inputContainerPosX,
   inputContainerPosY,
+  inputRef,
   handleChange,
   handleBlur,
   handleOnFocus,
@@ -183,6 +185,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       customSuggestionsContainer={renderMentionList}
       onBlur={handleInputBlur}
       name={name}
+      inputRef={inputRef}
       onFocus={handleOnFocus}
     >
       <Mention

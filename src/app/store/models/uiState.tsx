@@ -81,6 +81,7 @@ export interface UIState {
   scrollPositionSet: Record<string, number>;
   figmaFonts: Font[]
   secondScreenEnabled: boolean;
+  showAutoSuggest: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -134,6 +135,7 @@ export const uiState = createModel<RootModel>()({
     scrollPositionSet: {},
     figmaFonts: [],
     secondScreenEnabled: false,
+    showAutoSuggest: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -374,6 +376,10 @@ export const uiState = createModel<RootModel>()({
         secondScreenEnabled: !state.secondScreenEnabled,
       };
     },
+    setShowAutoSuggest: (state, data: boolean) => ({
+      ...state,
+      showAutoSuggest: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {

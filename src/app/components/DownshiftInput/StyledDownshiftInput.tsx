@@ -4,12 +4,15 @@ import { styled } from '@/stitches.config';
 import { StyledInput } from '../Input';
 
 type Props = {
+  type?: string;
   name?: string;
   value?: string;
   placeholder?: string;
-  searchInputRef: React.RefObject<HTMLInputElement>;
+  suffix?: React.ReactNode;
+  inputRef: React.RefObject<HTMLInputElement>;
   getInputProps: <T>(options?: T) => T & GetInputPropsOptions;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
 export const StyledDropdown = styled('div', {
@@ -96,25 +99,32 @@ export const StyledButton = styled('button', {
 });
 
 export const StyledDownshiftInput: React.FC<Props> = ({
+  type,
   name,
   value,
   placeholder,
-  searchInputRef,
+  suffix,
+  inputRef,
   onChange,
+  onBlur,
   getInputProps,
 }) => {
   const { ref, size, ...inputProps } = getInputProps({
-    ref: searchInputRef,
+    ref: inputRef,
     name,
-    placeholder,
+    label: type || null,
     value: value || '',
+    placeholder,
     onChange,
+    onBlur,
   });
 
   return (
     <StyledInput
       ref={ref as React.MutableRefObject<HTMLInputElement>}
-      autoFocus
+      hasSuffix={!!suffix}
+      size="small"
+      className="input"
       {...inputProps}
     />
   );
