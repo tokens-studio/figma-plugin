@@ -208,10 +208,12 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const handleSelect = useCallback((selectedItem: any) => {
-    if (currentSearchField === 'Tokens') {
-      setInputValue(value?.includes('$') ? `$${selectedItem}` : `{${selectedItem}}`);
-    } else {
-      setInputValue(selectedItem);
+    if (selectedItem) {
+      if (currentSearchField === 'Tokens') {
+        setInputValue(value?.includes('$') ? `$${selectedItem}` : `{${selectedItem}}`);
+      } else {
+        setInputValue(selectedItem);
+      }
     }
     dispatch.uiState.setShowAutoSuggest(false);
   }, [setInputValue, value, currentSearchField, dispatch.uiState]);

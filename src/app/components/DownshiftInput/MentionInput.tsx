@@ -189,7 +189,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       onFocus={handleOnFocus}
     >
       <Mention
-        trigger="{"
+        trigger={/({([^{]*))$/}
         data={mentionData}
         markup="{__id__}"
         renderSuggestion={renderMentionListItem}
