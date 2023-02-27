@@ -25,7 +25,6 @@ import {
   StyledDownshiftInput,
   StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
 } from './StyledDownshiftInput';
-import { showAutoSuggestSelector } from '@/selectors/showAutoSuggestSelector';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -64,21 +63,21 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   handleChange,
   handleBlur,
 }) => {
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
   const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
   const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
   const [inputContainerWith, setInputContainerWith] = React.useState(0);
   const [searchInput, setSearchInput] = React.useState('');
   const [portalPlaceholder] = React.useState(document.createElement('div'));
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
-  const windowHeight = React.useRef(window.innerHeight);
-  const downShiftContainerHeight = (windowHeight.current / 10) * 3;
   const dispatch = useDispatch<Dispatch>();
   const figmaFonts = useSelector(figmaFontsSelector);
-  const showAutoSuggest = useSelector(showAutoSuggestSelector);
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const downShiftSearchContainerRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
   const mentionInputRef = React.useRef<HTMLInputElement>(null);
+  const windowHeight = React.useRef(window.innerHeight);
+  const downShiftContainerHeight = (windowHeight.current / 10) * 3;
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
   const portalContainer = document.body;
@@ -91,9 +90,9 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if ((downShiftSearchContainerRef.current && event.target instanceof Node && !downShiftSearchContainerRef.current.contains(event.target))
      && (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target))) {
-      dispatch.uiState.setShowAutoSuggest(false);
+      setShowAutoSuggest(false);
     }
-  }, [dispatch.uiState]);
+  }, []);
 
   React.useEffect(() => {
     if (portalContainer) {
@@ -125,10 +124,10 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
 
   React.useEffect(() => {
     if (!showAutoSuggest) {
-      mentionInputRef.current?.focus();
       setSearchInput('');
     }
-  }, [showAutoSuggest]);
+    dispatch.uiState.setShowAutoSuggest(showAutoSuggest);
+  }, [showAutoSuggest, dispatch.uiState]);
 
   const filteredTokenItems = useMemo(
     () => {
@@ -210,6 +209,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const handleSelect = useCallback((selectedItem: any) => {
+    console.log('select', selectedItem);
     if (selectedItem) {
       if (currentSearchField === 'Tokens') {
         setInputValue(value?.includes('$') ? `$${selectedItem}` : `{${selectedItem}}`);
@@ -217,12 +217,13 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
         setInputValue(selectedItem);
       }
     }
-    dispatch.uiState.setShowAutoSuggest(false);
-  }, [setInputValue, value, currentSearchField, dispatch.uiState]);
+    setShowAutoSuggest(false);
+    mentionInputRef.current?.focus();
+  }, [setInputValue, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
-    dispatch.uiState.setShowAutoSuggest(!showAutoSuggest);
-  }, [dispatch.uiState, showAutoSuggest]);
+    setShowAutoSuggest(!showAutoSuggest);
+  }, [showAutoSuggest]);
 
   const handleSearchInputChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setSearchInput(e.target.value);
@@ -234,8 +235,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, [currentSearchField, externalSearchField]);
 
   const handleOnFocus = React.useCallback(() => {
-    dispatch.uiState.setShowAutoSuggest(false);
-  }, [dispatch.uiState]);
+    setShowAutoSuggest(false);
+  }, []);
 
   return (
     <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
@@ -323,6 +324,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                                   }}
                                   isFocused={highlightedIndex === index}
                                   style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                  onMouseDown={() => handleSelect(token.name)}
                                 >
                                   {type === 'color' && (
                                   <StyledItemColorDiv>
@@ -359,6 +362,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                                   }}
                                   isFocused={highlightedIndex === index}
                                   style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                  onMouseDown={() => handleSelect(value)}
                                 >
                                   <StyledItemName>{getHighlightedText(value, searchInput || '')}</StyledItemName>
                                 </StyledItem>
@@ -371,7 +376,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                               No suggestions found
                             </Box>
                           </StyledDropdown>
-
                         )
                       )
                     }
