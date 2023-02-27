@@ -87,7 +87,6 @@ export default function SecondScreenSync() {
   // this is used for tracking if the plugin is on
   const createChannel = useCallback(() => {
     let channel: RealtimeChannel | null = null;
-
     if (user && secondScreenOn) {
       channel = supabase.channel(`${user.id}`, {
         config: {
@@ -99,9 +98,11 @@ export default function SecondScreenSync() {
 
       channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED' && channel) {
-          await channel.track({ online_at: new Date().toISOString() });
-        } else if (status === 'CLOSED') {
-          createChannel();
+          try {
+            await channel.track({ online_at: new Date().toISOString() });
+          } catch (error) {
+            console.log('channel error', error);
+          }
         }
       });
     }
