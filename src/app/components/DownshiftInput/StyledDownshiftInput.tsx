@@ -1,5 +1,6 @@
 import React from 'react';
 import type { GetInputPropsOptions } from 'downshift';
+import { FixedSizeList as List } from 'react-window';
 import { styled } from '@/stitches.config';
 import { StyledInput } from '../Input';
 
@@ -16,6 +17,19 @@ type Props = {
 };
 
 export const StyledDropdown = styled('div', {
+  position: 'absolute',
+  zIndex: '10',
+  width: '100%',
+  maxHeight: '30vh',
+  borderRadius: '$contextMenu',
+  overflowY: 'scroll',
+  backgroundColor: '$bgDefault',
+  marginTop: '1px',
+  cursor: 'pointer',
+  boxShadow: '$contextMenu',
+});
+
+export const StyledList = styled(List, {
   position: 'absolute',
   zIndex: '10',
   width: '100%',
