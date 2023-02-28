@@ -19,9 +19,11 @@ Install (either globally or local)
 
 `node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --expandBorder=false`
 
-`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --preserveRawValue=true resolveReferences=false`
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false --expandBorder=false --preserveRawValue=true`
+
+`node token-transformer input.json output.json --expandTypography=false --expandShadow=false --expandComposition=false  --expandBorder=false --preserveRawValue=true resolveReferences=false`
 
 You can also set a directory as an input instead of providing just one file.
 
@@ -78,6 +80,7 @@ const transformerOptions = {
   expandTypography: true,
   expandShadow: true,
   expandComposition: true,
+  expandBorder: true,
   preserveRawValue: false,
   throwErrorWhenNotResolved:  true,
   resolveReferences:true

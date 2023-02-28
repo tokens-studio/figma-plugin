@@ -4,7 +4,7 @@ export function convertLineHeightToFigma(inputValue: string, baseFontSize: strin
   let lineHeight: LineHeight | null = null;
   const value = inputValue.toString();
   const numbers = /^\d+(\.\d+)?$/;
-  if (value.match(numbers) || value.endsWith('px')) {
+  if (value.match(numbers) || value.endsWith('px') || value.endsWith('rem')) {
     lineHeight = {
       unit: 'PIXELS',
       value: convertTypographyNumberToFigma(value, baseFontSize),

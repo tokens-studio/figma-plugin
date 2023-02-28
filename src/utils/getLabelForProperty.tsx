@@ -40,16 +40,16 @@ export function getLabelForProperty(key: string): React.ReactElement | string {
       return 'Style';
     }
     case 'lighten': {
-      return 'Amount';
+      return 'Amount (0-1)';
     }
     case 'darken': {
-      return 'Amount';
+      return 'Amount (0-1)';
     }
     case 'mix': {
-      return 'Ratio';
+      return 'Ratio (0-1)';
     }
     case 'alpha': {
-      return 'Opacity';
+      return 'Opacity (0-1)';
     }
     default: {
       return key;

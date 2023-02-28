@@ -26,6 +26,8 @@ import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 import { modifyColor } from '@/utils/modifyColor';
 import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
+import ProBadge from './ProBadge';
+import { useFlags } from './LaunchDarkly';
 
 const defaultValue = '0';
 
@@ -52,6 +54,7 @@ export default function ColorTokenForm({
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
   const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
+  const { colorModifier } = useFlags();
 
   React.useEffect(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
@@ -202,7 +205,7 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const getIconComponent = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
+  const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
 
   return (
     <>
@@ -224,13 +227,17 @@ export default function ColorTokenForm({
         <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Heading size="xsmall">Modify</Heading>
+        <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
+          <Heading size="small">Modify</Heading>
+          <ProBadge compact />
+        </Box>
         {
           !modifyVisible ? (
             <IconButton
               tooltip="Add new modifier"
               dataCy="button-add-new-modify"
               onClick={addModify}
+              disabled={!colorModifier}
               icon={<IconPlus />}
             />
           ) : (
@@ -238,13 +245,14 @@ export default function ColorTokenForm({
               tooltip="Remove modifier"
               dataCy="button-remove=modify"
               onClick={removeModify}
+              disabled={!colorModifier}
               icon={<IconMinus />}
             />
           )
         }
       </Box>
       {
-        modifyVisible && (
+        modifyVisible && colorModifier && (
           <>
             <Box css={{
               display: 'flex',
@@ -318,9 +326,10 @@ export default function ColorTokenForm({
               resolvedTokens={resolvedTokens}
               handleChange={handleModifyValueChange}
               setInputValue={handleModifyValueDownShiftInputChange}
-              placeholder="Value or {alias}"
+              placeholder="Value (0 to 1) or {alias}"
               suffix
-              prefix={getIconComponent}
+              label={getLabel}
+              inlineLabel
             />
           </>
         )

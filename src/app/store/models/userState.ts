@@ -117,27 +117,27 @@ export const userState = createModel<RootModel>()({
       dispatch.userState.setLicenseKey(key);
     },
     removeLicenseKey: async (payload, rootState) => {
-      const { licenseKey, userId } = rootState.userState;
+      const { licenseKey, userId, licenseError } = rootState.userState;
 
-      if (licenseKey) {
+      if (licenseKey && !licenseError) {
         const { error } = await removeLicense(licenseKey, userId);
         if (error) {
           notifyToUI('Error removing license, please contact support', { error: true });
-        } else {
-          AsyncMessageChannel.ReactInstance.message({
-            type: AsyncMessageTypes.SET_LICENSE_KEY,
-            licenseKey: null,
-          });
-
-          dispatch.userState.setLicenseKey(undefined);
-          dispatch.userState.setLicenseError(undefined);
-          dispatch.userState.setLicenseDetails({
-            plan: '',
-            entitlements: [],
-            clientEmail: '',
-          });
         }
       }
+      // clear license key related state
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_LICENSE_KEY,
+        licenseKey: null,
+      });
+
+      dispatch.userState.setLicenseKey(undefined);
+      dispatch.userState.setLicenseError(undefined);
+      dispatch.userState.setLicenseDetails({
+        plan: '',
+        entitlements: [],
+        clientEmail: '',
+      });
     },
   }),
 });

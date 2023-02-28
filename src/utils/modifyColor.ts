@@ -1,5 +1,4 @@
 import Color from 'colorjs.io';
-import * as Sentry from '@sentry/react';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { transparentize } from './color/transparentize';
@@ -32,7 +31,6 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
     returnedColor = returnedColor.to(modifier.space);
     return returnedColor.toString({ inGamut: true, precision: 3 });
   } catch (e) {
-    Sentry.captureException(e);
     return baseColor;
   }
 }

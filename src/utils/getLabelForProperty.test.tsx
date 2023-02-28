@@ -20,9 +20,9 @@ describe('getLabelForProperty', () => {
     expect(getLabelForProperty('width')).toEqual('Width');
     expect(getLabelForProperty('style')).toEqual('Style');
     expect(getLabelForProperty('blur')).toEqual('blur');
-    expect(getLabelForProperty('lighten')).toEqual('Amount');
-    expect(getLabelForProperty('darken')).toEqual('Amount');
-    expect(getLabelForProperty('mix')).toEqual('Ratio');
-    expect(getLabelForProperty('alpha')).toEqual('Opacity');
+    expect(getLabelForProperty('lighten')).toEqual('Amount (0-1)');
+    expect(getLabelForProperty('darken')).toEqual('Amount (0-1)');
+    expect(getLabelForProperty('mix')).toEqual('Ratio (0-1)');
+    expect(getLabelForProperty('alpha')).toEqual('Opacity (0-1)');
   });
 });

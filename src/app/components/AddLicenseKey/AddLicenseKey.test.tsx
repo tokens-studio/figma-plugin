@@ -3,71 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import { Provider } from 'react-redux';
 import {
-  createMockStore,
-  fireEvent,
-  render, resetStore, screen, waitFor,
+  createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AddLicenseKey from './AddLicenseKey';
 import {
-  LICENSE_ERROR_MESSAGE, LICENSE_FOR_ERROR_RESPONSE, LICENSE_FOR_VALID_RESPONSE,
+  LICENSE_ERROR_MESSAGE,
+  LICENSE_FOR_ERROR_RESPONSE,
+  LICENSE_FOR_VALID_RESPONSE,
+  LICENSE_FOR_DETACH_ERROR_RESPONSE,
 } from '@/mocks/handlers';
 import { AddLicenseSource } from '@/app/store/models/userState';
-import { AppContainer } from '../AppContainer';
-import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
-import { StorageProviderType } from '@/constants/StorageProviderType';
-import { UpdateMode } from '@/constants/UpdateMode';
-import { TokenTypes } from '@/constants/TokenTypes';
 import ConfirmDialog from '../ConfirmDialog';
-
-const mockStartupParams: StartupMessage = {
-  type: AsyncMessageTypes.STARTUP,
-  activeTheme: null,
-  lastOpened: Date.now(),
-  onboardingExplainer: {
-    sets: true,
-    inspect: true,
-    syncProviders: true,
-  },
-  localApiProviders: [],
-  licenseKey: null,
-  settings: {
-    width: 800,
-    height: 500,
-    ignoreFirstPartForStyles: false,
-    inspectDeep: false,
-    prefixStylesWithThemeName: false,
-    showEmptyGroups: true,
-    updateMode: UpdateMode.PAGE,
-    updateOnChange: false,
-    updateRemote: true,
-    updateStyles: true,
-  },
-  storageType: {
-    provider: StorageProviderType.LOCAL,
-  },
-  user: {
-    figmaId: 'figma:1234',
-    userId: 'uid:1234',
-    name: 'Jan Six',
-  },
-  localTokenData: {
-    activeTheme: null,
-    checkForChanges: false,
-    themes: [],
-    usedTokenSet: {},
-    updatedAt: new Date().toISOString(),
-    values: {
-      global: [
-        {
-          type: TokenTypes.COLOR,
-          name: 'colors.red',
-          value: '#ff0000',
-        },
-      ],
-    },
-    version: '91',
-  },
-};
+import * as notifiers from '@/plugin/notifiers';
 
 jest.mock('launchdarkly-react-client-sdk', () => ({
   LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
@@ -125,7 +72,7 @@ describe('Add license key', () => {
     expect(input.value).toBe(licenseKey);
   });
 
-  it('Shows the backend error when added license is not valid and the add key button', async () => {
+  it('Shows the backend error when added license is not valid', async () => {
     const mockStore = createMockStore({});
     const user = userEvent.setup();
     render(
@@ -144,7 +91,6 @@ describe('Add license key', () => {
     const errorMessage = await screen.findByText(regExError);
 
     expect(errorMessage).toBeInTheDocument();
-    expect(addLicenseKeyButton).toBeInTheDocument();
   });
 
   it('Adds the license key and hides the previous error message if the license is valid', async () => {
@@ -161,7 +107,7 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const licenseKeyInput = await result.findByTestId('settings-license-key-input') as HTMLInputElement;
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
       fireEvent.change(licenseKeyInput, {
         target: { value: LICENSE_FOR_ERROR_RESPONSE },
       });
@@ -175,11 +121,43 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const licenseKeyInput = await result.findByTestId('settings-license-key-input') as HTMLInputElement;
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
       fireEvent.change(licenseKeyInput, {
         target: { value: LICENSE_FOR_VALID_RESPONSE },
       });
       expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
+    });
+  });
+
+  it('User should be able to remove a key if its not valid', async () => {
+    const mockStore = createMockStore({});
+
+    let result: ReturnType<typeof render>;
+
+    await act(async () => {
+      result = render(
+        <Provider store={mockStore}>
+          <AddLicenseKey />
+        </Provider>,
+      );
+    });
+
+    await act(async () => {
+      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
+      fireEvent.change(licenseKeyInput, {
+        target: { value: LICENSE_FOR_ERROR_RESPONSE },
+      });
+      expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
+
+      const addLicenseKeyButton = await result.findByText('Add license key');
+      addLicenseKeyButton.click();
+
+      const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
+      expect(errorMessage).toBeInTheDocument();
+
+      const removeKeyButton = await result.findByText('Remove key');
+      expect(removeKeyButton).toBeInTheDocument();
+      expect(removeKeyButton).not.toBeDisabled();
     });
   });
 
@@ -198,13 +176,17 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
     });
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
       expect(screen.getByText(/Are you sure you want to remove your license key?/i)).toBeInTheDocument();
     });
@@ -225,13 +207,17 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_VALID_RESPONSE, source: AddLicenseSource.UI });
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_VALID_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
     });
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
       });
+      expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
     });
 
@@ -241,7 +227,7 @@ describe('Add license key', () => {
       });
       confirmButton.click();
 
-      const input = await result.getByTestId('settings-license-key-input') as HTMLInputElement;
+      const input = (await result.getByTestId('settings-license-key-input')) as HTMLInputElement;
 
       const removeKeyButton = await result.findByRole('button', {
         name: /remove key/i,
@@ -254,29 +240,86 @@ describe('Add license key', () => {
     });
   });
 
-  it('Should show an error message if the license removal failed', async () => {
+  it('Should notify the ui if the license removal failed', async () => {
     const mockStore = createMockStore({});
-
+    const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
     let result: ReturnType<typeof render>;
 
     await act(async () => {
       result = render(
         <Provider store={mockStore}>
-          <AppContainer {...mockStartupParams} />
+          <ConfirmDialog />
+          <AddLicenseKey />
         </Provider>,
       );
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({ key: LICENSE_FOR_ERROR_RESPONSE, source: AddLicenseSource.UI });
-      const settingsTab = await result.findByTestId('navitem-settings');
-      settingsTab.click();
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
     });
 
     await act(async () => {
-      const addLicenseKeyButton = await result.findByText('Add license key');
+      const removeKeyButton = await result.findByRole('button', {
+        name: /remove key/i,
+      });
+      expect(removeKeyButton).not.toBeDisabled();
+      removeKeyButton.click();
+    });
 
-      expect(addLicenseKeyButton).toBeDisabled();
+    await act(async () => {
+      const confirmButton = await result.findByRole('button', {
+        name: /remove license key/i,
+      });
+      confirmButton.click();
+    });
+
+    await waitFor(() => {
+      notifyToUISpy.mockReturnValueOnce();
+      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support', { error: true });
+    });
+  });
+
+  it('If the key is invalid, The license key should be removed without confirmation and remove key should not be visible anymore', async () => {
+    const mockStore = createMockStore({});
+    let result: ReturnType<typeof render>;
+
+    await act(async () => {
+      result = render(
+        <Provider store={mockStore}>
+          <ConfirmDialog />
+          <AddLicenseKey />
+        </Provider>,
+      );
+    });
+
+    await act(async () => {
+      await mockStore.dispatch.userState.addLicenseKey({
+        key: LICENSE_FOR_ERROR_RESPONSE,
+        source: AddLicenseSource.UI,
+      });
+    });
+
+    await act(async () => {
+      const removeKeyButton = await result.findByRole('button', {
+        name: /remove key/i,
+      });
+      expect(removeKeyButton).not.toBeDisabled();
+      removeKeyButton.click();
+    });
+
+    await act(async () => {
+      const confirmaModal = result.queryByText(/are you sure you want to remove your license key\?/i);
+      expect(confirmaModal).toBeNull();
+      const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
+      expect(input.value).toBe('');
+
+      const removeKeyButton = result.queryByRole('button', {
+        name: /remove key/i,
+      });
+      expect(removeKeyButton).toBeNull();
     });
   });
 });
