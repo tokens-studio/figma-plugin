@@ -49,6 +49,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
   const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
+  const [isDuplicate, setIsDuplicate] = React.useState(false);
   const allTokenSets = React.useMemo(() => Object.keys(tokens), [tokens]);
 
   React.useEffect(() => {
@@ -86,6 +87,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
     setTokenSetMarkedForChange(tokenSet);
+    setIsDuplicate(false);
     setShowRenameTokenSetFields(true);
   }, []);
 
@@ -96,6 +98,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
     handleNewTokenSetNameChange(newTokenSetName);
     setTokenSetMarkedForChange(newTokenSetName);
+    setIsDuplicate(true);
     setShowRenameTokenSetFields(true);
   }, [dispatch]);
 
@@ -156,7 +159,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`Rename ${tokenSetMarkedForChange}`}
+        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${tokenSetMarkedForChange}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
