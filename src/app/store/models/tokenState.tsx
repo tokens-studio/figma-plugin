@@ -206,27 +206,47 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
-      let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
-      if (existingTokenIndex > -1) {
-        const existingTokens = [...state.tokens[data.parent]];
-        existingTokens.splice(existingTokenIndex + 1, 0, {
-          ...state.tokens[data.parent][existingTokenIndex],
-          name: data.newName,
-          value: data.value,
-          type: data.type,
-          ...(data.description ? {
-            description: data.description,
-          } : {}),
-          ...(data.$extensions ? {
-            $extensions: data.$extensions,
-          } : {}),
-        } as SingleToken);
+      const newTokens: TokenStore['values'] = {};
+      Object.keys(state.tokens).forEach((tokenSet) => {
+        if (tokenSet === data.parent) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.oldName);
+          if (existingTokenIndex > -1) {
+            const existingTokens = [...state.tokens[tokenSet]];
+            existingTokens.splice(existingTokenIndex + 1, 0, {
+              ...state.tokens[tokenSet][existingTokenIndex],
+              name: data.newName,
+              value: data.value,
+              type: data.type,
+              ...(data.description ? {
+                description: data.description,
+              } : {}),
+              ...(data.$extensions ? {
+                $extensions: data.$extensions,
+              } : {}),
+            } as SingleToken);
+            newTokens[tokenSet] = existingTokens;
+          }
+        } else if (data.tokenSets.includes(tokenSet)) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
+          if (existingTokenIndex < 0) {
+            const newToken = {
+              name: data.newName,
+              value: data.value,
+              type: data.type,
+              ...(data.description ? {
+                description: data.description,
+              } : {}),
+              ...(data.$extensions ? {
+                $extensions: data.$extensions,
+              } : {}),
+            };
+            newTokens[tokenSet] = [
+              ...state.tokens[tokenSet], newToken as SingleToken,
+            ];
+          }
+        }
+      });
 
-        newTokens = {
-          [data.parent]: existingTokens,
-        };
-      }
       return {
         ...state,
         tokens: {

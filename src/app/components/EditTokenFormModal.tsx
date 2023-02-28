@@ -29,7 +29,9 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
       large
       isOpen
       close={handleReset}
-      title={editToken.status === EditTokenFormStatus.CREATE ? 'New Token' : editToken.initialName}
+      // eslint-disable-next-line no-nested-ternary
+      title={editToken.status === EditTokenFormStatus.CREATE ? 'New Token'
+        : editToken.status === EditTokenFormStatus.DUPLICATE ? 'Duplicate Token' : editToken.initialName}
     >
       <EditTokenForm resolvedTokens={resolvedTokens} />
     </Modal>
