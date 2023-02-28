@@ -11,6 +11,7 @@ type Props = {
   placeholder?: string;
   suffix?: React.ReactNode;
   inputRef: React.RefObject<HTMLInputElement>;
+  dataCy?: string;
   getInputProps: <T>(options?: T) => T & GetInputPropsOptions;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   onBlur?: React.ChangeEventHandler<HTMLInputElement>;
@@ -119,6 +120,7 @@ export const StyledDownshiftInput: React.FC<Props> = ({
   placeholder,
   suffix,
   inputRef,
+  dataCy,
   onChange,
   onBlur,
   getInputProps,
@@ -136,6 +138,7 @@ export const StyledDownshiftInput: React.FC<Props> = ({
   return (
     <StyledInput
       ref={ref as React.MutableRefObject<HTMLInputElement>}
+      data-testid={dataCy}
       hasSuffix={!!suffix}
       size="small"
       className="input"

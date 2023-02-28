@@ -303,6 +303,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                       value={searchInput}
                       onChange={handleSearchInputChange}
                       getInputProps={getInputProps}
+                      dataCy="downshift-search-input"
                     />
                   </Box>
                   {
