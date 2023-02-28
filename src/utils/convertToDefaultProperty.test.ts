@@ -17,31 +17,31 @@ describe('convertToDefaultProperty', () => {
     },
     {
       input: Properties.itemSpacing,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.verticalPadding,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.horizontalPadding,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingTop,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingLeft,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingBottom,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingRight,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.borderRadiusTopLeft,
