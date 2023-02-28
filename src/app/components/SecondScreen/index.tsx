@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { track } from 'mixpanel-figma';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
@@ -10,6 +9,7 @@ import { Dispatch } from '@/app/store';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from '../DropdownMenu';
+import { track } from '@/utils/analytics';
 
 export default function SecondScreen() {
   const isEnabled = useSelector(secondScreenSelector);
@@ -62,7 +62,7 @@ export default function SecondScreen() {
       <DropdownMenu>
         <DropdownMenuPrimitive.Trigger>{secondScreenButton}</DropdownMenuPrimitive.Trigger>
         <DropdownMenuContent>
-          <Box css={{ padding: '$3', color: '$textMuted' }}>{`Logged in as ${user.email}`}</Box>
+          <DropdownMenuItem disabled>{`Logged in as ${user.email}`}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={handleTurnOffSync}>Turn off sync</DropdownMenuItem>
           <DropdownMenuItem onSelect={handleOpenSecondScreen}>Open second screen</DropdownMenuItem>

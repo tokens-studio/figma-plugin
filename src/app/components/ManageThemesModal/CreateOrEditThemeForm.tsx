@@ -7,7 +7,6 @@ import { StyledNameInputBox } from './StyledNameInputBox';
 import { StyledCreateOrEditThemeFormHeaderFlex } from './StyledCreateOrEditThemeFormHeaderFlex';
 import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
 import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
-import { TokenSetListOrTree } from '../TokenSetListOrTree';
 import { TokenSetThemeItem } from './TokenSetThemeItem';
 import { StyledForm } from './StyledForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -18,6 +17,7 @@ import { IconBack } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagentForm';
+import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 
 export type FormValues = {
   name: string
@@ -101,8 +101,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
       </StyledNameInputBox>
       {activeTab === ThemeFormTabs.SETS && (
         <Box css={{ paddingTop: '$4' }}>
-          <TokenSetListOrTree
-            displayType={githubMfsEnabled ? 'tree' : 'list'}
+          <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
           />

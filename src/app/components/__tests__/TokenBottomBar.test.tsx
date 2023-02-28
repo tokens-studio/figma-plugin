@@ -29,7 +29,7 @@ describe('TokenBottomBar', () => {
     const toolsButton = await result.findByText('Tools');
     await act(async () => {
       await userEvent.click(toolsButton);
-      const loadButton = await result.findByText('Load from file/folder');
+      const loadButton = await result.findByText('Load from file/folder or preset');
       await userEvent.click(loadButton, { pointerEventsCheck: 0 });
     });
     expect(result.queryByText('Import')).toBeInTheDocument();

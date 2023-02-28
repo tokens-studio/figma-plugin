@@ -9,5 +9,6 @@ declare module 'launchdarkly-js-sdk-common' {
     swapStylesAlpha?: boolean;
     genericVersionedAlpha?: boolean;
     secondScreen?: boolean;
+    colorModifier?: boolean;
   }
 }
