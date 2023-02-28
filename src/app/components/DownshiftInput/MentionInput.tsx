@@ -151,7 +151,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
     index,
     focused,
   ) => {
-    const resolvedToken = resolvedTokens.find((token) => token.type === type && token.name === suggestion.id);
+    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.id);
     return (
       <StyledItem
         className="dropdown-item"
