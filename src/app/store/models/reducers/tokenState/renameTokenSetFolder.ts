@@ -12,14 +12,14 @@ export function renameTokenSetFolder(state: TokenState, data: Payload): TokenSta
     Object.keys(state.tokens).includes(data.newName)
     && data.oldName !== data.newName
   ) {
-    notifyToUI('Floder name already exists', { error: true });
+    notifyToUI('Folder name already exists', { error: true });
     return state;
   }
 
   return updateTokenSetsInState(
     state,
     (setName, tokenSet) => (
-      setName.includes(data.oldName)
+      setName.includes(data.oldName) && setName[data.oldName.length] === '/'
         ? [setName.replace(data.oldName, data.newName), tokenSet]
         : [setName, tokenSet]
     ),
