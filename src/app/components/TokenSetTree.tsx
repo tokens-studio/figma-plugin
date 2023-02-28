@@ -15,9 +15,9 @@ import {
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
+import { DragItem } from './StyledDragger/DragItem';
 import { TokenSetTreeItemContent } from './TokenSetTreeItemContent';
 import { TokenSetTreeContent } from './TokenSetTree/TokenSetTreeContent';
-import { TokenSetTreeDragItem } from './TokenSetTree/TokenSetTreeDragItem';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -156,7 +156,7 @@ export default function TokenSetTree({
     >
       <TokenSetTreeContent<ExtendedTreeItem>
         items={mappedItems}
-        renderItem={TokenSetTreeDragItem}
+        renderItem={DragItem}
         renderItemContent={TokenSetTreeItemContent}
       />
     </ReorderGroup>

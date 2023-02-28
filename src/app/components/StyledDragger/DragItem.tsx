@@ -1,17 +1,16 @@
 import React, { useMemo } from 'react';
 import { useDragControls, useMotionValue } from 'framer-motion';
 import { useSelector } from 'react-redux';
-import { TreeItem } from '@/utils/tokenset';
-import { useRaisedShadow } from '../use-raised-shadow';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { ReorderItem } from '@/motion/ReorderItem';
+import { useRaisedShadow } from '../use-raised-shadow';
 
-type Props = React.PropsWithChildren<{
-  item: TreeItem
+type Props<T> = React.PropsWithChildren<{
+  item: T;
 }>;
 
-export function TokenSetTreeDragItem({ item, children }: Props) {
+export function DragItem<T>({ item, children }: Props<T>) {
   const y = useMotionValue(0);
   const boxShadow = useRaisedShadow(y);
   const controls = useDragControls();

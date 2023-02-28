@@ -1,5 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import compact from 'just-compact';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -8,11 +11,13 @@ import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import Button from '../Button';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
-import { SingleThemeEntry } from './SingleThemeEntry';
-import { ThemeObject } from '@/types';
+import { ThemeObject, ThemeObjectsList } from '@/types';
 import Box from '../Box';
 import { track } from '@/utils/analytics';
 import useConfirm from '@/app/hooks/useConfirm';
+import { ReorderGroup } from '@/motion/ReorderGroup';
+import { DragItem } from '../StyledDragger/DragItem';
+import { ThemeListItemContent } from '../ThemeSelector/ThemeListItemContent';
 
 type Props = unknown;
 
@@ -22,6 +27,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
+
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
     if (themeObject) {
@@ -75,6 +81,11 @@ export const ManageThemesModal: React.FC<Props> = () => {
     });
     setThemeEditorOpen(false);
   }, [themeEditorOpen, dispatch]);
+
+  const handleReorder = React.useCallback((reorderedItems: ThemeObjectsList) => {
+    const reorderedThemeList = compact(reorderedItems.map((item) => themes.find((theme) => theme.id === item.id)));
+    dispatch.tokenState.setThemes(reorderedThemeList);
+  }, [dispatch.tokenState, themes]);
 
   return (
     <Modal
@@ -137,14 +148,17 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        themes.map((theme) => (
-          <SingleThemeEntry
-            key={theme.id}
-            theme={theme}
-            isActive={activeTheme === theme.id}
-            onOpen={handleToggleThemeEditor}
-          />
-        ))
+      <ReorderGroup
+        layoutScroll
+        values={themes}
+        onReorder={handleReorder}
+      >
+        {themes.map((theme) => (
+          <DragItem<ThemeObject> key={theme.id} item={theme}>
+            <ThemeListItemContent item={theme} isActive={activeTheme === theme.id} onOpen={handleToggleThemeEditor} />
+          </DragItem>
+        ))}
+      </ReorderGroup>
       )}
       {themeEditorOpen && (
         <CreateOrEditThemeForm
