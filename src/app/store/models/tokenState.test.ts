@@ -663,6 +663,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global'],
       $extensions: {
         'studio.tokens': {
           modify: {
@@ -757,6 +758,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global'],
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
