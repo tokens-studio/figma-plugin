@@ -113,6 +113,9 @@ describe('editToken', () => {
             activeTokenSet: 'global',
             collapsedTokens: [],
           },
+          settings: {
+            updateOnChange: true,
+          },
         },
       },
       models,
@@ -663,7 +666,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
-      tokenSets: ['global'],
+      tokenSets: ['global', 'options'],
       $extensions: {
         'studio.tokens': {
           modify: {
@@ -673,6 +676,7 @@ describe('editToken', () => {
           },
         },
       },
+      shouldUpdate: true,
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
@@ -747,6 +751,26 @@ describe('editToken', () => {
         name: 'font.alias',
         type: 'sizing',
         value: '$font.small',
+      },
+    ]);
+    expect(tokens.options).toEqual([
+      {
+        name: 'background',
+        value: '$primary',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              type: 'lighten',
+              value: '0.5',
+              space: 'sRGB',
+            },
+          },
+        },
       },
     ]);
   });
@@ -1151,6 +1175,7 @@ describe('editToken', () => {
           },
         },
       ],
+      shouldUpdate: true,
     });
     const { activeTokenSet } = store.getState().tokenState;
     expect(activeTokenSet).toBe('global');
@@ -1192,6 +1217,42 @@ describe('editToken', () => {
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',
         name: 'rounded.md',
+      },
+    ]);
+  });
+
+  it('can set usedTokenSets', async () => {
+    await store.dispatch.tokenState.setUsedTokenSet({
+      global: TokenSetStatus.DISABLED,
+    });
+
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: 'disabled',
+    });
+  });
+
+  it('can set themes', async () => {
+    await store.dispatch.tokenState.setThemes([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
+      },
+    ]);
+
+    const { themes } = store.getState().tokenState;
+    expect(themes).toEqual([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
       },
     ]);
   });
