@@ -22,4 +22,35 @@ describe('checkAndEvaluateMath', () => {
     expect(checkAndEvaluateMath('2px * 2px')).toEqual('2px * 2px');
     expect(checkAndEvaluateMath('2px + 10%')).toEqual('2px + 10%');
   });
+
+  it('older clamp continues to work correctly', () => {
+    expect(checkAndEvaluateMath('clamp(5,2,4)')).toEqual('clamp(5,2,4)');
+    expect(checkAndEvaluateMath('clamp(0,2,4)')).toEqual('clamp(0,2,4)');
+    expect(checkAndEvaluateMath('clamp(3,2,4)')).toEqual('clamp(3,2,4)');
+  });
+
+  it('clamps expressions correctly', () => {
+    expect(checkAndEvaluateMath('clamped(5,2,4)')).toEqual(4);
+    expect(checkAndEvaluateMath('clamped(0,2,4)')).toEqual(2);
+    expect(checkAndEvaluateMath('clamped(3,2,4)')).toEqual(3);
+  });
+
+  it('normalized values as expected', () => {
+    expect(checkAndEvaluateMath('norm(10,5,15)')).toEqual(0.5);
+    expect(checkAndEvaluateMath('norm(1,1,88)')).toEqual(0);
+    expect(checkAndEvaluateMath('norm(3,0,10)')).toEqual(0.3);
+  });
+
+  it('lerps values as expected', () => {
+    expect(checkAndEvaluateMath('lerp(0.5,5,15)')).toEqual(10);
+    expect(checkAndEvaluateMath('lerp(0,1,88)')).toEqual(1);
+    expect(checkAndEvaluateMath('lerp(1,47,94)')).toEqual(94);
+  });
+
+  it('samples the curve correctly', () => {
+    expect(checkAndEvaluateMath('sample(cubicBezier1D(1,0),0.5)')).toEqual(0.5);
+    expect(checkAndEvaluateMath('sample(cubicBezier1D(0.33, 0.66),0.8)')).toEqual(0.797);
+    expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
+    expect(checkAndEvaluateMath('sample(cubicBezier1D(0.45,0.34),0.2)')).toEqual(0.213);
+  });
 });

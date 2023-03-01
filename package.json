@@ -16,6 +16,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
+    "lint":"eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
