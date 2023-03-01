@@ -33,23 +33,6 @@ parser.functions.norm = (x: number, start: number, end: number): number => (x - 
 
 /**
  * Creates a one dimensional cubicBezier
- * @remarks We have to do a significant overhaul to the system to support multidimensional functions
- * @param x1
- * @param x2
- * @returns
- */
-parser.functions.cubicBezier1D = (x1: number, x2: number) => {
-  const xx = [0, x1, x2, 1];
-
-  return (t: number) => {
-    const coeffs = [(1 - t) ** 3, 3 * (1 - t) ** 2 * t, 3 * (1 - t) * t ** 2, t ** 3];
-    const x = coeffs.reduce((acc, c, i) => acc + c * xx[i], 0);
-    return x;
-  };
-};
-
-/**
- * Creates a one dimensional cubicBezier
  * @remarks We have to do a significant overhaul to the system to support multidimensional functions. Seems like expr-eval can support neither array or property accessors
  * @param x1
  * @param x2
