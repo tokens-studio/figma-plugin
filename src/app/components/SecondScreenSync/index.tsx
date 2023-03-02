@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RealtimeChannel, RealtimePostgresUpdatePayload } from '@supabase/realtime-js';
 import {
@@ -51,7 +52,10 @@ export default function SecondScreenSync() {
           },
         )
         .subscribe((status: any, err: any) => {
-          console.error(err);
+          if (err) {
+            console.error(err);
+            Sentry.captureException(err);
+          }
         });
     }
     return () => {
@@ -101,7 +105,10 @@ export default function SecondScreenSync() {
           try {
             await channel.track({ online_at: new Date().toISOString() });
           } catch (error) {
-            console.log('channel error', error);
+            if (error) {
+              console.log('channel error', error);
+              Sentry.captureException(error);
+            }
           }
         }
       });
