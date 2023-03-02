@@ -246,7 +246,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   // @TODO update to useCallback
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const submitTokenValue = async ({
     type, value, name, $extensions,
   }: EditTokenObject) => {
