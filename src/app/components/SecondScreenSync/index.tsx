@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RealtimeChannel, RealtimePostgresUpdatePayload } from '@supabase/realtime-js';
 import {
@@ -51,7 +52,10 @@ export default function SecondScreenSync() {
           },
         )
         .subscribe((status: any, err: any) => {
-          console.error(err);
+          if (err) {
+            console.error(err);
+            Sentry.captureException(err);
+          }
         });
     }
     return () => {
@@ -87,7 +91,6 @@ export default function SecondScreenSync() {
   // this is used for tracking if the plugin is on
   const createChannel = useCallback(() => {
     let channel: RealtimeChannel | null = null;
-
     if (user && secondScreenOn) {
       channel = supabase.channel(`${user.id}`, {
         config: {
@@ -99,9 +102,14 @@ export default function SecondScreenSync() {
 
       channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED' && channel) {
-          await channel.track({ online_at: new Date().toISOString() });
-        } else if (status === 'CLOSED') {
-          createChannel();
+          try {
+            await channel.track({ online_at: new Date().toISOString() });
+          } catch (error) {
+            if (error) {
+              console.log('channel error', error);
+              Sentry.captureException(error);
+            }
+          }
         }
       });
     }
