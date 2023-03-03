@@ -68,6 +68,7 @@
     "figma-plugin-ds": "^0.1.8",
     "file-loader": "^6.2.0",
     "file-saver": "^2.0.5",
+    "fuzzysearch-ts": "^1.0.3",
     "framer-motion": "^6.3.11",
     "ignore-styles": "^5.0.1",
     "json5": "^2.2.2",
