@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
-import fuzzysearch from 'fuzzysearch-ts';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import Box from '../Box';
@@ -25,6 +24,7 @@ import {
   StyledDownshiftInput,
   StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
 } from './StyledDownshiftInput';
+import fuzzySearch from '@/utils/fuzzySearch';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -144,7 +144,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           ));
       }
       if (searchInput) {
-        return initialFilteredValues.filter((token: SingleToken) => fuzzysearch(searchInput, token.name));
+        return initialFilteredValues.filter((token: SingleToken) => fuzzySearch(searchInput, token.name));
       }
       return initialFilteredValues;
     },
@@ -160,7 +160,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       initialFilteredValues = figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
     }
     if (searchInput) {
-      return initialFilteredValues.filter((value: string) => fuzzysearch(searchInput, value));
+      return initialFilteredValues.filter((value: string) => fuzzySearch(searchInput, value));
     }
     return initialFilteredValues;
   }, [figmaFonts, currentSearchField, externalFontFamily, searchInput]);
