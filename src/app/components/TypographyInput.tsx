@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
-import { checkIfContainsAlias } from '@/utils/alias';
+import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { findReferences } from '@/utils/findReferences';
@@ -45,6 +45,13 @@ export default function TypographyInput({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
+  const selectedFontFamily = useMemo(() => {
+    if (typeof internalEditToken.value === 'object') {
+      const resolvedFontFamily = getAliasValue(internalEditToken.value?.fontFamily ?? '', resolvedTokens);
+      return String(resolvedFontFamily);
+    }
+    return '';
+  }, [internalEditToken, resolvedTokens]);
 
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
@@ -95,6 +102,7 @@ export default function TypographyInput({
               resolvedTokens={resolvedTokens}
               handleChange={handleTypographyValueChange}
               setInputValue={handleTypographyValueDownShiftInputChange}
+              externalFontFamily={selectedFontFamily}
             />
           ))}
         </Stack>

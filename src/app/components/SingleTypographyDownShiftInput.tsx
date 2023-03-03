@@ -8,6 +8,7 @@ export default function SingleTypographyDownShiftInput({
   value,
   type,
   resolvedTokens,
+  externalFontFamily,
   handleChange,
   setInputValue,
 }: {
@@ -15,6 +16,7 @@ export default function SingleTypographyDownShiftInput({
   value: string;
   type: string;
   resolvedTokens: ResolveTokenValuesResult[];
+  externalFontFamily?: string;
   handleChange: React.ChangeEventHandler;
   setInputValue: (newInputValue: string, property: string) => void;
 }) {
@@ -31,6 +33,7 @@ export default function SingleTypographyDownShiftInput({
       label={getIconComponent}
       inlineLabel
       resolvedTokens={resolvedTokens}
+      externalFontFamily={externalFontFamily}
       handleChange={onChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={`${name} value or {alias}`}

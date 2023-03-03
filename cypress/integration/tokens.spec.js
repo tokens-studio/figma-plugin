@@ -234,72 +234,6 @@ describe('TokenListing', () => {
     cy.get('@postMessage').should('be.calledTwice');
   });
 
-  it('can add shadow tokens by alias using auto complete', () => {
-    cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
-    cy.receiveSetTokens({
-      version: '5',
-      values: {
-        options: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        },
-        {
-          name: 'boxshadow.single',
-          value: {
-            blur: "3",
-            color: "red",
-            spread: "3",
-            type: "innerShadow",
-            x: "3",
-            y: "3",
-          },
-          type: 'boxShadow'
-        },
-        {
-          name: 'boxshadow.multi',
-          value: [{
-            blur: "3",
-            color: "red",
-            spread: "3",
-            type: "innerShadow",
-            x: "3",
-            y: "3",
-          },
-          {
-            blur: "1",
-            color: "blue",
-            spread: "1",
-            type: "dropShadow",
-            x: "1",
-            y: "1",
-          }
-          ],
-          type: 'boxShadow'
-        }
-        ],
-        global: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-      },
-    });
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
-      timeout: 1000
-    });
-    cy.get('[data-cy=mode-change-button]').click();
-    fillInput({
-      input: 'name',
-      value: 'boxshadow.alias',
-    });
-    cy.get(`input[name=value]`).type('$boxshadow.sin');
-    cy.get('[data-cy=downshift-input-item]').click();
-    cy.get(`input[name=value]`).type('{enter}');
-    cy.get('@postMessage').should('be.calledTwice');
-  });
-
   it('can add a new typography token', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-cy="button-configure"]').should('be.visible')
@@ -353,65 +287,6 @@ describe('TokenListing', () => {
     cy.get('@postMessage').should('be.calledTwice');
   });
 
-  it('can add a new typography token by alias using auto complete', () => {
-    cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
-    cy.receiveSetTokens({
-      version: '5',
-      values: {
-        options: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }, {
-          name: 'typography.heading',
-          value: {
-            fontFamily: "Arial",
-            fontSize: "12px",
-            fontWeight: "bold",
-            letterSpacing: "1",
-            lineHeight: "1",
-            paragraphSpacing: "1",
-            textCase: "none",
-            textDecoration: "underline",
-          },
-          type: 'typography'
-        },
-        {
-          name: 'typography.label',
-          value: {
-            fontFamily: "Helvetica",
-            fontSize: "24px",
-            fontWeight: "light",
-            letterSpacing: "2",
-            lineHeight: "2",
-            paragraphSpacing: "2",
-            textCase: "none",
-            textDecoration: "none",
-          },
-          type: 'typography'
-        }
-        ],
-        global: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-      },
-    });
-    cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({
-      timeout: 1000
-    });
-    cy.get('[data-cy=mode-change-button]').click();
-    fillInput({
-      input: 'name',
-      value: 'typography.alias',
-    });
-    cy.get(`input[name=value]`).type('$typography.hea');
-    cy.get('[data-cy=downshift-input-item]').click();
-    cy.get(`input[name=value]`).type('{enter}');
-    cy.get('@postMessage').should('be.calledTwice');
-  });
 
   it('can add a new token in group', () => {
     cy.startup(mockStartupParams);

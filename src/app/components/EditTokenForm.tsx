@@ -121,7 +121,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
-      e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
@@ -129,7 +128,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
         setError('Value must include either px or rem');
@@ -159,7 +158,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      e.persist();
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,
@@ -184,7 +182,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      e.persist();
       if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,

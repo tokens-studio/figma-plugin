@@ -51,6 +51,7 @@ export enum AsyncMessageTypes {
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
+  GET_FIGMA_FONTS = 'async/get-figma-fonts',
   SET_AUTH_DATA = 'async/set-auth-data',
 }
 
@@ -233,6 +234,10 @@ export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
 )>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
+export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
+export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
+  fonts: Array<Font>
+}>;
 export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
   auth: AuthData | null
 }>;
@@ -270,6 +275,7 @@ export type AsyncMessages =
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
   | SetNoneValuesOnNodeAsyncMessage
+  | GetFigmaFontsMessage
   | SetAuthDataMessage;
 
 export type AsyncMessageResults =
@@ -304,6 +310,7 @@ export type AsyncMessageResults =
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult
   | SetNoneValuesOnNodeAsyncMessageResult
+  | GetFigmaFontsMessageResult
   | SetAuthDataMessageResult;
 
 export type AsyncMessagesMap = {

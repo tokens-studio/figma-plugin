@@ -55,7 +55,6 @@ export default function InspectorTokenSingle({
   }, []);
 
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
     setNewTokenName(e.target.value);
   }, []);
 
@@ -137,7 +136,7 @@ export default function InspectorTokenSingle({
               <form
                 onSubmit={onConfirm}
               >
-                <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
+                <Stack direction="column" gap={4}>
                   <DownshiftInput
                     value={newTokenName}
                     type={property}
