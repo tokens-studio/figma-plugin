@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
-import Fuse from 'fuse.js';
+import fuzzysearch from 'fuzzysearch-ts';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import Box from '../Box';
@@ -144,8 +144,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           ));
       }
       if (searchInput) {
-        const searchResult = new Fuse(initialFilteredValues, { keys: ['name'] }).search(searchInput);
-        return searchResult.map((searchItem) => searchItem.item);
+        return initialFilteredValues.filter((token: SingleToken) => fuzzysearch(searchInput, token.name));
       }
       return initialFilteredValues;
     },
@@ -161,8 +160,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       initialFilteredValues = figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
     }
     if (searchInput) {
-      const searchResult = new Fuse(initialFilteredValues).search(searchInput);
-      return searchResult.map((searchItem) => searchItem.item);
+      return initialFilteredValues.filter((value: string) => fuzzysearch(searchInput, value));
     }
     return initialFilteredValues;
   }, [figmaFonts, currentSearchField, externalFontFamily, searchInput]);

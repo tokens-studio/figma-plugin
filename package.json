@@ -69,7 +69,6 @@
     "file-loader": "^6.2.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^6.3.11",
-    "fuse.js": "^6.6.2",
     "ignore-styles": "^5.0.1",
     "json5": "^2.2.2",
     "jszip": "^3.10.0",
