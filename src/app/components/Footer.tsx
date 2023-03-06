@@ -61,6 +61,14 @@ export default function Footer() {
     return hasChanged;
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
 
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('This will run every second!');
+      checkForChanges();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);

@@ -160,9 +160,11 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
         headers: octokitClientDefaultHeaders,
       });
+      console.log('response', response);
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
+        console.log('directorySha', directorySha);
         const treeResponse = await this.octokitClient.rest.git.getTree({
           owner: this.owner,
           repo: this.repository,
@@ -170,6 +172,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           recursive: 'true',
           headers: octokitClientDefaultHeaders,
         });
+        console.log('treeResponse', treeResponse);
         if (treeResponse && treeResponse.data.tree.length > 0) {
           const jsonFiles = treeResponse.data.tree.filter((file) => (
             file.path?.endsWith('.json')
