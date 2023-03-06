@@ -75,7 +75,6 @@ export default function SecondScreenSync() {
         activeTheme,
       });
 
-      console.log('update remote databro');
       updateRemoteData(user.email, data);
     }
   }, [tokens, themes, secondScreenOn, user, usedTokenSets, activeTheme]);
