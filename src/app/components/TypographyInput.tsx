@@ -49,8 +49,7 @@ export default function TypographyInput({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0];
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;
