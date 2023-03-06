@@ -37,17 +37,7 @@ export default function SecondScreenSync() {
           },
           (payload: RealtimePostgresUpdatePayload<TokenData>) => {
             if (payload.new.last_updated_by !== Clients.PLUGIN && payload.new.synced_data) {
-              const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.synced_data;
-
-              if (sets) {
-                dispatch.tokenState.setTokens(sets);
-              }
-              if (newUsedTokenSets) {
-                dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
-              }
-              if (newThemes) {
-                dispatch.tokenState.setThemes(newThemes);
-              }
+              dispatch.tokenState.setNewTokenData(payload.new.synced_data);
             }
           },
         )
@@ -84,6 +74,8 @@ export default function SecondScreenSync() {
         usedTokenSets,
         activeTheme,
       });
+
+      console.log('update remote databro');
       updateRemoteData(user.email, data);
     }
   }, [tokens, themes, secondScreenOn, user, usedTokenSets, activeTheme]);
