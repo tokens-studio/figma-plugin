@@ -53,13 +53,8 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
         if (ref.length > 1) {
           let nameToLookFor: string;
           if (ref.startsWith('{')) {
-            if (ref.endsWith('}')) {
-              nameToLookFor = ref.slice(1, ref.length - 1);
-            } else {
-              nameToLookFor = ref.slice(1, ref.length);
-            }
+            nameToLookFor = ref.slice(1, ref.length - 1);
           } else { nameToLookFor = ref.substring(1); }
-
           if (
             (typeof token === 'object' && nameToLookFor === token.name)
             || nameToLookFor === token

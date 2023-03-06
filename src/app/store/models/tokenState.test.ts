@@ -131,7 +131,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{brand.primary}');
+    expect(tokens.global[1].value).toEqual('$brand.primary');
   });
 
   it('doesnt interfere with tokens that have a similar name', async () => {
@@ -146,7 +146,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{secondary}');
+    expect(tokens.global[1].value).toEqual('$secondary');
     expect(tokens.global[3].value).toEqual('$primary50');
     expect(tokens.global[3].value).toEqual('$primary50');
   });
@@ -178,7 +178,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.options[0].value).toEqual('{secondary}');
+    expect(tokens.options[0].value).toEqual('$secondary');
   });
 
   it('does a deep equality check on object values', async () => {
@@ -955,7 +955,7 @@ describe('editToken', () => {
       {
         name: 'text.alias',
         type: 'sizing',
-        value: '{text.small}',
+        value: '$text.small',
       },
     ]);
   });

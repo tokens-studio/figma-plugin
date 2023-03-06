@@ -45,7 +45,7 @@ export default function BorderTokenForm({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
+      const nameToLookFor = search[0];
       const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
       if (foundToken) return foundToken;
     }
