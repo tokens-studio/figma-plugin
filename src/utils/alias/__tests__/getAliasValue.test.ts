@@ -463,6 +463,55 @@ describe('getAliasValue', () => {
       },
       type: TokenTypes.BORDER,
     },
+    {
+      name: 'color.light-10',
+      input: '#ffffff',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.light-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-10',
+      input: '#000000',
+      value: '#000000',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'mode',
+      input: 'light',
+      value: 'light',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'mode',
+      input: 'dark',
+      value: 'dark',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'foreground.default',
+      input: '{color.{mode}-10}',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'foreground.subtle',
+      input: '{color.{mode}-20}',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+
   ];
 
   allTokens.forEach((token) => {
