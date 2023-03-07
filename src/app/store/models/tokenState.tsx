@@ -515,6 +515,10 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
+    setCollapsedTokenSets() {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
@@ -535,6 +539,7 @@ export const tokenState = createModel<RootModel>()({
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
+          collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
           dispatch,
         });
       } catch (e) {

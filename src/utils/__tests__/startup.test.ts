@@ -57,6 +57,7 @@ describe('startup', () => {
       localTokenData: {
         activeTheme: null,
         checkForChanges: null,
+        collapsedTokenSets: null,
         themes: [],
         updatedAt: '',
         usedTokenSet: null,

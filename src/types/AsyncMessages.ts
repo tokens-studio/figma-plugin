@@ -194,6 +194,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   activeTheme: string | null;
   checkForChanges?: boolean
   shouldSwapStyles?: boolean;
+  collapsedTokenSets: string[];
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
