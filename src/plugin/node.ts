@@ -1,5 +1,6 @@
 import compact from 'just-compact';
 import omit from 'just-omit';
+import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
@@ -67,6 +68,7 @@ export async function getTokenData(): Promise<{
   updatedAt: string;
   version: string;
   checkForChanges: boolean | null
+  collapsedTokenSets: string[] | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
@@ -75,6 +77,7 @@ export async function getTokenData(): Promise<{
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);
+    const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
@@ -87,6 +90,7 @@ export async function getTokenData(): Promise<{
         updatedAt: updatedAt || '',
         version: version || '',
         checkForChanges,
+        collapsedTokenSets,
       };
     }
   } catch (e) {

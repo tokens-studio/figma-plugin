@@ -18,3 +18,4 @@ export * from './CheckForChangesProperty';
 export * from './UiSettingsProperty';
 export * from './LicenseKeyProperty';
 export * from './AuthDataProperty';
+export * from './CollapsedTokenSetsProperty';
