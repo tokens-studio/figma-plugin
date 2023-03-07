@@ -1,7 +1,7 @@
 import React from 'react';
-import TokenSetSelector from './TokenSetSelector';
-import { render, fireEvent } from '../../../tests/config/setupTest';
+import { fireEvent, render } from '../../../tests/config/setupTest';
 import { store } from '../store';
+import TokenSetSelector from './TokenSetSelector';
 
 describe('TokenSetSelector Component', () => {
   it('show onboarding explainer sets', () => {
@@ -27,30 +27,46 @@ describe('TokenSetSelector Component', () => {
     const newTokenSetButton = await result.findByTestId('new-set-button');
     fireEvent.click(newTokenSetButton);
     const newTokenSetInput = await result.findByTestId('create-set-input');
-    fireEvent.change(newTokenSetInput, { target: { value: 'newSet' } });
+    fireEvent.change(newTokenSetInput, { target: { value: 'Folder/newSet' } });
     const createButton = await result.getByRole('button', {
       name: /create/i,
     });
 
     fireEvent.click(createButton);
     expect(store.getState().tokenState.tokens).toEqual({
-      newSet: [],
+      'Folder/newSet': [],
       global: [],
     });
 
     // rename token set
     const createdTokenSet = result.getByText('newSet');
     await fireEvent.contextMenu(createdTokenSet);
-    const renameButton = await result.findByText('Rename');
+    let renameButton = await result.findByText('Rename');
     fireEvent.click(renameButton);
     const renameTokenSetInput = await result.findByTestId('rename-set-input');
-    fireEvent.change(renameTokenSetInput, { target: { value: 'renameSet' } });
-    const changeButton = await result.getByRole('button', {
+    fireEvent.change(renameTokenSetInput, { target: { value: 'Folder/renameSet' } });
+    let changeButton = await result.getByRole('button', {
       name: /change/i,
     });
     fireEvent.click(changeButton);
     expect(store.getState().tokenState.tokens).toEqual({
-      renameSet: [],
+      'Folder/renameSet': [],
+      global: [],
+    });
+
+    // rename sublevel
+    const createdSublevel = result.getByText('Folder');
+    await fireEvent.contextMenu(createdSublevel);
+    renameButton = await result.findByText('Rename');
+    fireEvent.click(renameButton);
+    const renameSublevelInput = await result.findByTestId('rename-set-input');
+    fireEvent.change(renameSublevelInput, { target: { value: 'renameFolder' } });
+    changeButton = await result.getByRole('button', {
+      name: /change/i,
+    });
+    fireEvent.click(changeButton);
+    expect(store.getState().tokenState.tokens).toEqual({
+      'renameFolder/renameSet': [],
       global: [],
     });
 
@@ -60,8 +76,8 @@ describe('TokenSetSelector Component', () => {
     const duplicateButton = await result.findByText('Duplicate');
     fireEvent.click(duplicateButton);
     expect(store.getState().tokenState.tokens).toEqual({
-      renameSet: [],
-      renameSet_Copy: [],
+      'renameFolder/renameSet': [],
+      'renameFolder/renameSet_Copy': [],
       global: [],
     });
   });
