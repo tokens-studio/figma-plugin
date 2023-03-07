@@ -19,8 +19,8 @@ export function renameTokenSetFolder(state: TokenState, data: Payload): TokenSta
   return updateTokenSetsInState(
     state,
     (setName, tokenSet) => (
-      setName.includes(data.oldName) && setName[data.oldName.length] === '/'
-        ? [setName.replace(data.oldName, data.newName), tokenSet]
+      setName.indexOf(data.oldName) === 0 && setName[data.oldName.length] === '/'
+        ? [data.newName + setName.slice(data.oldName.length, setName.length), tokenSet]
         : [setName, tokenSet]
     ),
   );
