@@ -66,7 +66,5 @@ export const getRootReferences = (tokenValue: string) => {
     }
   }
 
-  const tokenDollarReferences = findDollarReferences(tokenValue) ?? [];
-  array.push(...tokenDollarReferences);
-  return array;
+  return array.concat(findDollarReferences(tokenValue) || []);
 };
