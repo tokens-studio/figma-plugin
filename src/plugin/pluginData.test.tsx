@@ -1,5 +1,5 @@
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
-import { updatePluginData } from './pluginData';
+import { transformPluginDataToSelectionValues, updatePluginData } from './pluginData';
 
 describe('pluginData', () => {
   const mockSetPluginData = jest.fn();
@@ -51,5 +51,52 @@ describe('pluginData', () => {
       borderRadius: 'none',
       fill: 'none',
     });
+  });
+
+  it('transformPluginDataToSelectionValues', () => {
+    const pluginData = [{
+      id: '5989:3',
+      node: {
+        name: 'Rectangle 1',
+        type: 'RECTANGLE',
+      } as unknown as BaseNode,
+      tokens: {
+        borderRadius: 'border-radius.8',
+        fill: 'color.red.700',
+        opacity: 'opacity.60',
+      },
+    } as NodeManagerNode];
+    const selectionValues = transformPluginDataToSelectionValues(pluginData);
+
+    expect(selectionValues).toEqual([
+      {
+        category: 'borderRadius',
+        nodes: [{
+          id: '5989:3',
+          name: 'Rectangle 1',
+          type: 'RECTANGLE',
+        }],
+        type: 'borderRadius',
+        value: 'border-radius.8',
+      }, {
+        category: 'fill',
+        nodes: [{
+          id: '5989:3',
+          name: 'Rectangle 1',
+          type: 'RECTANGLE',
+        }],
+        type: 'fill',
+        value: 'color.red.700',
+      }, {
+        category: 'opacity',
+        nodes: [{
+          id: '5989:3',
+          name: 'Rectangle 1',
+          type: 'RECTANGLE',
+        }],
+        type: 'opacity',
+        value: 'opacity.60',
+      },
+    ]);
   });
 });

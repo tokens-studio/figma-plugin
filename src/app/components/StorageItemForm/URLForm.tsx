@@ -7,6 +7,10 @@ import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
+import Heading from '../Heading';
+import Text from '../Text';
+import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
 type Props = {
@@ -45,6 +49,14 @@ export default function URLForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
+        <Stack direction="column" gap={1}>
+          <Heading>Add a new URL provider</Heading>
+          <Text muted>
+            Tokens stored on a server allow you to add them as a read-only provider.
+            {' '}
+            <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">Read more</Link>
+          </Text>
+        </Stack>
         <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input full label="Headers (optional)" value={values.secret} onChange={onChange} type="text" name="secret" />
         <Input full label="URL" value={values.id} onChange={onChange} type="text" name="id" required />
@@ -58,9 +70,9 @@ export default function URLForm({
           </Button>
         </Stack>
         {hasErrored && (
-        <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+        <ErrorMessage data-cy="provider-modal-error">
           {errorMessage}
-        </div>
+        </ErrorMessage>
         )}
       </Stack>
     </form>

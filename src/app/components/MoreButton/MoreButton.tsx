@@ -1,6 +1,11 @@
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable no-console */
+
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
+import copy from 'copy-to-clipboard';
+
 import { styled } from '@/stitches.config';
 import {
   ContextMenu,
@@ -41,15 +46,11 @@ const RightSlot = styled('div', {
 
 type Props = {
   token: SingleToken;
-  type: TokenTypes,
+  type: TokenTypes;
   showForm: (options: ShowFormOptions) => void;
 };
 
-export const MoreButton: React.FC<Props> = ({
-  token,
-  type,
-  showForm,
-}) => {
+export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const tokensContext = React.useContext(TokensContext);
   const setNodeData = useSetNodeData();
   const dispatch = useDispatch<Dispatch>();
@@ -57,20 +58,23 @@ export const MoreButton: React.FC<Props> = ({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
 
-  const resolvedValue = useMemo(() => (
-    getAliasValue(token, tokensContext.resolvedTokens)
-  ), [token, tokensContext.resolvedTokens]);
+  const resolvedValue = useMemo(() => getAliasValue(token, tokensContext.resolvedTokens), [
+    token,
+    tokensContext.resolvedTokens,
+  ]);
 
   const properties = usePropertiesForTokenType(type, resolvedValue?.toString());
 
   // @TODO check type property typing
-  const visibleProperties = React.useMemo(() => (
-    properties.filter((p) => p.label)
-  ), [properties]);
+  const visibleProperties = React.useMemo(() => properties.filter((p) => p.label), [properties]);
 
   const handleEditClick = React.useCallback(() => {
     showForm({ name: token.name, token, status: EditTokenFormStatus.EDIT });
   }, [token, showForm]);
+
+  const handleCopyTokenName = (props: unknown, text: string) => {
+    copy(text, {});
+  };
 
   const handleDeleteClick = React.useCallback(() => {
     deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
@@ -81,11 +85,14 @@ export const MoreButton: React.FC<Props> = ({
   }, [showForm, token]);
 
   // TODO: This should probably move to state or a hook
-  const setPluginValue = React.useCallback(async (value: SelectionValue) => {
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
-    await setNodeData(value, tokensContext.resolvedTokens);
-    dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
-  }, [dispatch, tokensContext.resolvedTokens, setNodeData]);
+  const setPluginValue = React.useCallback(
+    async (value: SelectionValue) => {
+      dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
+      await setNodeData(value, tokensContext.resolvedTokens);
+      dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
+    },
+    [dispatch, tokensContext.resolvedTokens, setNodeData],
+  );
 
   const activeStateProperties = React.useMemo(() => {
     const childProperties: PropertyObject[] = [];
@@ -99,21 +106,28 @@ export const MoreButton: React.FC<Props> = ({
 
   const active = useGetActiveState(activeStateProperties, type, token.name);
 
-  const handleClick = React.useCallback((givenProperties: PropertyObject, isActive = active) => {
-    track('Apply Token', { givenProperties });
-    const newProps: SelectionValue = {
-      [givenProperties.name]: isActive ? 'delete' : token.name,
-    };
-    if (givenProperties.clear) {
-      givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+  const handleClick = React.useCallback(
+    (givenProperties: PropertyObject, isActive = active) => {
+      track('Apply Token', { givenProperties });
+      const newProps: SelectionValue = {
+        [givenProperties.name]: isActive ? 'delete' : token.name,
+      };
+      if (givenProperties.clear) {
+        givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
+      }
+
+      setPluginValue(newProps);
+    },
+    [active, token.name, setPluginValue],
+  );
+
+  const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    if (event.metaKey) {
+      handleEditClick();
+    } else {
+      handleClick(properties[0]);
     }
-
-    setPluginValue(newProps);
-  }, [active, token.name, setPluginValue]);
-
-  const handleTokenClick = React.useCallback(() => {
-    handleClick(properties[0]);
-  }, [properties, handleClick]);
+  }, [properties, handleClick, handleEditClick]);
 
   return (
     <ContextMenu>
@@ -158,22 +172,19 @@ export const MoreButton: React.FC<Props> = ({
           </ContextMenuTriggerItem>
           <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
             {DocumentationProperties.map((property) => (
-              <MoreButtonProperty
-                key={property.name}
-                value={token.name}
-                property={property}
-                onClick={handleClick}
-              />
+              <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
             ))}
           </ContextMenuContent>
         </ContextMenu>
         <ContextMenuSeparator />
-
         <ContextMenuItem onSelect={handleEditClick} disabled={editProhibited}>
           Edit Token
         </ContextMenuItem>
         <ContextMenuItem onSelect={handleDuplicateClick} disabled={editProhibited}>
           Duplicate Token
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
+          Copy Token Path
         </ContextMenuItem>
         <ContextMenuItem onSelect={handleDeleteClick} disabled={editProhibited}>
           Delete Token

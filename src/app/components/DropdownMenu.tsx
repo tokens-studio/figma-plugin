@@ -50,7 +50,7 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   color: '$text',
   fontSize: '$xsmall',
 
-  '&:focus, &:hover': {
+  '&:focus-visible, &:hover': {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',

@@ -49,20 +49,16 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
   const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
   const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
-  const [allTokenSets, setAllTokenSets] = React.useState(Object.keys(tokens));
-  const tokenKeys = Object.keys(tokens).join(',');
+  const [isDuplicate, setIsDuplicate] = React.useState(false);
+  const allTokenSets = React.useMemo(() => Object.keys(tokens), [tokens]);
 
   React.useEffect(() => {
-    const scollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
+    const scrollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
       acc[crr] = 0;
       return acc;
     }, {});
-    dispatch.uiState.setScrollPositionSet(scollPositionSet);
+    dispatch.uiState.setScrollPositionSet(scrollPositionSet);
   }, [allTokenSets, dispatch]);
-
-  React.useEffect(() => {
-    setAllTokenSets(Object.keys(tokens));
-  }, [tokenKeys]);
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
@@ -91,6 +87,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
     setTokenSetMarkedForChange(tokenSet);
+    setIsDuplicate(false);
     setShowRenameTokenSetFields(true);
   }, []);
 
@@ -101,6 +98,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
     handleNewTokenSetNameChange(newTokenSetName);
     setTokenSetMarkedForChange(newTokenSetName);
+    setIsDuplicate(true);
     setShowRenameTokenSetFields(true);
   }, [dispatch]);
 
@@ -161,7 +159,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`Rename ${tokenSetMarkedForChange}`}
+        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${tokenSetMarkedForChange}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >

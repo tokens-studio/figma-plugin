@@ -36,6 +36,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
@@ -58,6 +59,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    stringTokens: '',
     themes: [],
     lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
     importedTokens: {
@@ -80,6 +82,10 @@ export const tokenState = createModel<RootModel>()({
     collapsedTokens: [],
   } as unknown as TokenState,
   reducers: {
+    setStringTokens: (state, payload: string) => ({
+      ...state,
+      stringTokens: payload,
+    }),
     setEditProhibited(state, payload: boolean) {
       return {
         ...state,
@@ -98,6 +104,14 @@ export const tokenState = createModel<RootModel>()({
     setActiveTokenSet: (state, data: string) => ({
       ...state,
       activeTokenSet: data,
+    }),
+    setUsedTokenSet: (state, data: UsedTokenSetsMap) => ({
+      ...state,
+      usedTokenSet: data,
+    }),
+    setThemes: (state, data: ThemeObjectsList) => ({
+      ...state,
+      themes: data,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -192,24 +206,47 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
-      let newTokens: TokenStore['values'] = {};
-      const existingTokenIndex = state.tokens[data.parent].findIndex((n) => n.name === data?.oldName);
-      if (existingTokenIndex > -1) {
-        const existingTokens = [...state.tokens[data.parent]];
-        existingTokens.splice(existingTokenIndex + 1, 0, {
-          ...state.tokens[data.parent][existingTokenIndex],
-          name: data.newName,
-          value: data.value,
-          type: data.type,
-          ...(data.description ? {
-            description: data.description,
-          } : {}),
-        } as SingleToken);
+      const newTokens: TokenStore['values'] = {};
+      Object.keys(state.tokens).forEach((tokenSet) => {
+        if (tokenSet === data.parent) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.oldName);
+          if (existingTokenIndex > -1) {
+            const existingTokens = [...state.tokens[tokenSet]];
+            existingTokens.splice(existingTokenIndex + 1, 0, {
+              ...state.tokens[tokenSet][existingTokenIndex],
+              name: data.newName,
+              value: data.value,
+              type: data.type,
+              ...(data.description ? {
+                description: data.description,
+              } : {}),
+              ...(data.$extensions ? {
+                $extensions: data.$extensions,
+              } : {}),
+            } as SingleToken);
+            newTokens[tokenSet] = existingTokens;
+          }
+        } else if (data.tokenSets.includes(tokenSet)) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
+          if (existingTokenIndex < 0) {
+            const newToken = {
+              name: data.newName,
+              value: data.value,
+              type: data.type,
+              ...(data.description ? {
+                description: data.description,
+              } : {}),
+              ...(data.$extensions ? {
+                $extensions: data.$extensions,
+              } : {}),
+            };
+            newTokens[tokenSet] = [
+              ...state.tokens[tokenSet], newToken as SingleToken,
+            ];
+          }
+        }
+      });
 
-        newTokens = {
-          [data.parent]: existingTokens,
-        };
-      }
       return {
         ...state,
         tokens: {
@@ -264,7 +301,7 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...omit(newArray[index], 'description'),
+        ...omit(newArray[index], 'description', '$extensions'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
       return {
@@ -327,24 +364,30 @@ export const tokenState = createModel<RootModel>()({
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
       const {
-        parent, path, oldName, type,
+        parent, oldName, newName, tokenSets, type,
       } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${path}${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
-        const duplicatedTokenGroupName = token.name.replace(`${path}${oldName}`, `${path}${oldName}-copy`);
+        const duplicatedTokenGroupName = token.name.replace(oldName, newName);
         return {
           name: duplicatedTokenGroupName,
           ...rest,
         };
       });
 
+      const newTokens = Object.keys(state.tokens).reduce<Record<string, AnyTokenList>>((acc, key) => {
+        if (tokenSets.includes(key)) {
+          acc[key] = [...state.tokens[key], ...newTokenGroup];
+        } else {
+          acc[key] = state.tokens[key];
+        }
+        return acc;
+      }, {});
+
       return {
         ...state,
-        tokens: {
-          ...state.tokens,
-          [parent]: [...state.tokens[parent], ...newTokenGroup],
-        },
+        tokens: newTokens,
       };
     },
     updateAliases: (state, data: { oldName: string; newName: string }) => {
@@ -436,9 +479,6 @@ export const tokenState = createModel<RootModel>()({
     setTokenSetOrder() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    setJSONData() {
-      dispatch.tokenState.updateDocument();
-    },
     setTokenData(payload: SetTokenDataPayload) {
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
@@ -475,6 +515,10 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
+    setCollapsedTokenSets() {
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
@@ -495,6 +539,7 @@ export const tokenState = createModel<RootModel>()({
           shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
+          collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
           dispatch,
         });
       } catch (e) {

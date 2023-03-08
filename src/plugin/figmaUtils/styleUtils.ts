@@ -7,7 +7,7 @@ type StyleType<T> =
       T extends 'typography' ? TextStyle :
         never;
 
-function getStyleId(node: BaseNode, key: StyleTypeName) {
+export function getStyleId(node: BaseNode, key: StyleTypeName) {
   if (key === 'effects' && key in node && typeof node.effectStyleId === 'string') {
     return node.effectStyleId;
   }
@@ -24,7 +24,17 @@ function getStyleId(node: BaseNode, key: StyleTypeName) {
 }
 
 function getStyleIdFromBackup(node: BaseNode, backupKey: string) {
-  return tokensSharedDataHandler.get(node, backupKey, (val) => (val ? (JSON.parse(val) as string) : val));
+  return tokensSharedDataHandler.get(node, backupKey, (val) => {
+    if (val) {
+      try {
+        const parsedValue = JSON.parse(val) as string;
+        return parsedValue;
+      } catch (e) {
+        return val;
+      }
+    }
+    return val;
+  });
 }
 
 export function getNonLocalStyle<T extends StyleTypeName>(
@@ -41,6 +51,15 @@ export function getNonLocalStyle<T extends StyleTypeName>(
     }
   }
   return nonLocalStyle as StyleType<T>;
+}
+
+export function getLocalStyle<T extends StyleTypeName>(
+  node: BaseNode,
+  backupKey: string,
+  key: T,
+): StyleType<T> | undefined {
+  const styleId = getStyleId(node, key) || getStyleIdFromBackup(node, backupKey);
+  return figma.getStyleById(styleId) as StyleType<T>;
 }
 
 export function setStyleIdBackup(node: BaseNode, backupKey: string, styleId: string) {

@@ -1,6 +1,7 @@
 import React from 'react';
+import { Provider } from 'react-redux';
 import { DownshiftInput } from './DownshiftInput';
-import { render } from '../../../../tests/config/setupTest';
+import { createMockStore, fireEvent, render } from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -40,6 +41,13 @@ const resolvedTokens = [
     rawValue: '#cbd5e1',
     type: 'color',
     value: '#cbd5e1',
+  },
+  {
+    internal__Parent: 'core',
+    name: 'color.red.200',
+    rawValue: '#b91c1c',
+    type: 'color',
+    value: '#b91c1c',
   },
   {
     internal__Parent: 'core',
@@ -142,7 +150,26 @@ describe('DownShiftInput', () => {
     );
     result.getByTestId('downshift-input-suffix-button').click();
     expect(result.getByText('#e2e8f0')).toBeInTheDocument();
-    expect(result.getByText('#cbd5e1')).toBeInTheDocument();
+    expect(result.getByText('#b91c1c')).toBeInTheDocument();
+  });
+
+  it('should return filtered color tokens', async () => {
+    const result = render(
+      <DownshiftInput
+        type="color"
+        resolvedTokens={resolvedTokens}
+        setInputValue={mockSetInputValue}
+        handleChange={mockHandleChange}
+        value="{"
+        suffix
+      />,
+    );
+    result.getByTestId('downshift-input-suffix-button').click();
+    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+    fireEvent.change(searchInput, {
+      target: { value: 'slate' },
+    });
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
   });
 
   it('should return all tokens when type is documentation type', () => {
@@ -157,6 +184,81 @@ describe('DownShiftInput', () => {
       />,
     );
     result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(9);
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(10);
+  });
+
+  it('should return fontValues when type is fontFamily', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        figmaFonts: [
+          {
+            fontName: {
+              family: 'ABeeZee',
+              style: 'Italic',
+            },
+          },
+          {
+            fontName: {
+              family: 'Abril Fatface',
+              style: 'Regular',
+            },
+          },
+        ],
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <DownshiftInput
+          type="fontFamilies"
+          resolvedTokens={resolvedTokens}
+          setInputValue={mockSetInputValue}
+          handleChange={mockHandleChange}
+          value="{"
+          suffix
+        />
+      </Provider>,
+    );
+
+    result.getByTestId('downshift-input-suffix-button').click();
+    result.getByText('Fonts').click();
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
+  });
+
+  it('should return fontWeights when type is fontWeight', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        figmaFonts: [
+          {
+            fontName: {
+              family: 'ABeeZee',
+              style: 'Italic',
+            },
+          },
+          {
+            fontName: {
+              family: 'Abril Fatface',
+              style: 'Regular',
+            },
+          },
+        ],
+      },
+    });
+    const result = render(
+      <Provider store={mockStore}>
+        <DownshiftInput
+          type="fontWeights"
+          resolvedTokens={resolvedTokens}
+          setInputValue={mockSetInputValue}
+          handleChange={mockHandleChange}
+          value="{"
+          externalFontFamily="ABeeZee"
+          suffix
+        />
+      </Provider>,
+    );
+
+    result.getByTestId('downshift-input-suffix-button').click();
+    result.getByText('Weights').click();
+    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
   });
 });

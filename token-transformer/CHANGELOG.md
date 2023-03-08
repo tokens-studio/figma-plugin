@@ -1,3 +1,14 @@
+## v0.0.30 (2023-02-16)
+
+Added support for expandBorder=true - this will expand the recently introduced `border` tokens to their individual parts
+Added support for color modifiers that we introduced with plugin version 1.35
+Changed how dimension-related properties are transformed when `expandComposition` is true: Instead of `spacing` or `sizing` we now use `dimension` for these.
+
+
+## v0.0.29 (2023-01-05)
+
+Introduced support to programmatically use token-transformer by importing the transformTokens function. Added guide to Readme.
+
 ## v0.0.28 (2022-12-01)
 
 Fixed expanded composition token types using the wrong key, those are now using the token types we use in the plugin (fontFamilies, fontWeights). Thanks thomasmattheussen!

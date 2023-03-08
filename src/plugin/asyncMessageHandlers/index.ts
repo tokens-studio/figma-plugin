@@ -26,4 +26,6 @@ export * from './resolveStyleInfo';
 export * from './renameStyles';
 export * from './bulkRemapTokens';
 export * from './removeStyles';
+export * from './setAuthData';
 export * from './setNoneValuesOnNode';
+export * from './getFigmaFonts';

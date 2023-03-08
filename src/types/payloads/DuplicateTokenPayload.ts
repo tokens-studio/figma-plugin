@@ -1,4 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
+import { ColorModifier } from '../Modifier';
 import { SingleToken } from '../tokens';
 
 export type DuplicateTokenPayload = {
@@ -9,4 +10,6 @@ export type DuplicateTokenPayload = {
   description?: string;
   oldName?: string;
   shouldUpdate?: boolean;
+  tokenSets: string[];
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };

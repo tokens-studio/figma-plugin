@@ -11,5 +11,12 @@ export function updateTokenPayloadToSingleToken(
     ...(payload.description ? {
       description: payload.description,
     } : {}),
+    ...(payload.$extensions ? {
+      $extensions: {
+        'studio.tokens': {
+          modify: payload.$extensions['studio.tokens']?.modify,
+        },
+      },
+    } : {}),
   } as SingleToken;
 }

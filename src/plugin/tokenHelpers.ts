@@ -33,13 +33,13 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
     if (t.type === TokenTypes.TYPOGRAPHY || t.type === TokenTypes.BOX_SHADOW || t.type === TokenTypes.BORDER) {
       // If value is alias
       if (typeof t.value === 'string') {
-        returnValue = getAliasValue(t.value, tokensInProgress);
+        returnValue = getAliasValue(t.value, tokensInProgress, false, previousCount);
         failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
       } else if (Array.isArray(t.value)) {
         // If we're dealing with an array, iterate over each item and then key
         returnValue = t.value.map((item) => (
           Object.entries(item).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
-            acc[key] = getAliasValue(value, tokensInProgress);
+            acc[key] = getAliasValue(value, tokensInProgress, false, previousCount);
             const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(typeof acc[key] === 'string' ? acc[key] as string : '');
             if (itemFailedToResolve) {
               failedToResolve = true;
@@ -50,7 +50,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         // If not, iterate over each key
       } else {
         returnValue = Object.entries(t.value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
-          acc[key] = getAliasValue(value, tokensInProgress);
+          acc[key] = getAliasValue(value, tokensInProgress, false, previousCount);
           const itemFailedToResolve = acc[key] === null || checkIfContainsAlias(typeof acc[key] === 'string' ? acc[key] as string : '');
           if (itemFailedToResolve) {
             failedToResolve = true;
@@ -65,7 +65,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
         if (Array.isArray(value)) {
           const resolvedValue = value.map((item) => (
             Object.entries(item as TokenBoxshadowValue).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
-              acc[key] = getAliasValue(value, tokensInProgress);
+              acc[key] = getAliasValue(value, tokensInProgress, false, previousCount);
               itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
               if (itemFailedToResolve) {
                 failedToResolve = true;
@@ -76,7 +76,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
         } else if (typeof value === 'object') {
           const resolvedValue = Object.entries(value).reduce<Record<string, ReturnType<typeof getAliasValue>>>((acc, [key, value]) => {
-            acc[key] = getAliasValue(value, tokensInProgress);
+            acc[key] = getAliasValue(value, tokensInProgress, false, previousCount);
             itemFailedToResolve = acc[key] === null || checkIfContainsAlias(acc[key]);
             if (itemFailedToResolve) {
               failedToResolve = true;
@@ -85,7 +85,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
           }, {});
           compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
         } else {
-          const resolvedValue = getAliasValue(value, tokensInProgress);
+          const resolvedValue = getAliasValue(value, tokensInProgress, false, previousCount);
           if (resolvedValue !== null) {
             compositionReturnValue[property as CompositionTokenProperty] = resolvedValue;
           }
@@ -98,7 +98,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
       returnValue = compositionReturnValue;
     } else {
       // If we're not dealing with special tokens, just return resolved value
-      returnValue = getAliasValue(t, tokensInProgress);
+      returnValue = getAliasValue(t, tokensInProgress, false, previousCount);
       failedToResolve = returnValue === null || checkIfContainsAlias(typeof returnValue === 'string' ? returnValue : '');
     }
     const returnObject = {
@@ -136,10 +136,21 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     .forEach((tokenGroup: [string, SingleToken[]]) => {
       if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
         tokenGroup[1].forEach((token) => {
-          if (!mergedTokens.some((t) => t.name === token.name)) {
+          const mergedTokenIndex = mergedTokens.findIndex((t) => t.name === token.name);
+          const mergedToken = mergedTokens[mergedTokenIndex];
+          if (mergedTokenIndex < 0) {
             mergedTokens.push({
               ...appendTypeToToken(token),
               internal__Parent: tokenGroup[0],
+            } as SingleToken);
+          }
+          if (mergedTokenIndex > -1 && typeof mergedToken.value === 'object' && typeof token.value === 'object') {
+            mergedTokens.splice(mergedTokenIndex, 1, {
+              ...mergedToken,
+              value: {
+                ...token.value,
+                ...mergedToken.value,
+              },
             } as SingleToken);
           }
         });

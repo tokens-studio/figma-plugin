@@ -1,5 +1,6 @@
 import omit from 'just-omit';
 import get from 'just-safe-get';
+import { isEqual } from '@/utils/isEqual';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 import { Properties } from '@/constants/Properties';
@@ -16,16 +17,16 @@ import { ProgressTracker } from './ProgressTracker';
 import { SelectionGroup, SelectionValue } from '@/types';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
+import getAppliedStylesFromNode from './getAppliedStylesFromNode';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
 export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
   const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
     const { tokens, id, node: { name, type } } = curr;
-
+    // First we add plugin tokens
     Object.entries(tokens).forEach(([key, value]) => {
       const existing = acc.find((item) => item.type === key && item.value === value);
-
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
@@ -36,10 +37,42 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         });
       }
     });
+
+    // Second we add styles
+    const localStyles = getAppliedStylesFromNode(curr.node);
+    localStyles.forEach((style) => {
+      // Check if the token has been applied. If the token has been applied then we don't add style.
+      const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      if (!isTokenApplied) {
+        const category = get(Properties, style.type) as Properties | TokenTypes;
+        acc.push({
+          value: style.name,
+          type: style.type,
+          category,
+          nodes: [{ id, name, type }],
+          resolvedValue: style.value,
+        });
+      }
+    });
     return acc;
   }, []);
-
   return selectionValues;
+}
+
+export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
+  const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
+    // Fist we add styles. And then tokens. This way, styles will be override by the tokens
+    const localStyles = getAppliedStylesFromNode(curr.node);
+    localStyles.forEach((style) => {
+      acc.push({
+        [style.type]: style.name,
+      });
+    });
+
+    acc.push(curr.tokens);
+    return acc;
+  }, []);
+  return mainNodeSelectionValues;
 }
 
 export type SelectionContent = {
@@ -56,7 +89,7 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
     if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
-    mainNodeSelectionValues = pluginValues.map((value) => value.tokens);
+    mainNodeSelectionValues = transformPluginDataToMainNodeSelectionValues(pluginValues);
   }
   const selectedNodes = figma.currentPage.selection.length;
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
@@ -92,25 +125,14 @@ export async function removePluginData({ nodes, key, shouldRemoveValues = true }
   }));
 }
 
-export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties }) {
+export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseNode | SceneNode)[], key: Properties }) {
   return Promise.all(nodes.map(async (node) => {
-    if (key) {
-      node.setPluginData(key, 'none');
-      tokensSharedDataHandler.set(node, key, 'none');
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, key)
-      ));
-      removeValuesFromNode(node, key);
-    } else {
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, Object.values(Properties))
-      ));
-      Object.values(Properties).forEach((prop) => {
-        node.setPluginData(prop, 'none');
-        tokensSharedDataHandler.set(node, prop, 'none');
-        removeValuesFromNode(node, prop);
-      });
-    }
+    node.setPluginData(key, 'none');
+    tokensSharedDataHandler.set(node, key, 'none');
+    await defaultNodeManager.updateNode(node, (tokens) => (
+      omit(tokens, key)
+    ));
+    removeValuesFromNode(node, key);
     store.successfulNodes.add(node);
   }));
 }
@@ -135,7 +157,7 @@ export async function updatePluginData({
     promises.add(defaultWorker.schedule(async () => {
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
-      if (values.composition === 'delete' || values.composition === 'none') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
+      if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };
       else newValuesOnNode = { ...currentValuesOnNode, ...values };
       if (currentValuesOnNode.composition && values.composition) {
         // when select another composition token, reset applied properties by current composition token
