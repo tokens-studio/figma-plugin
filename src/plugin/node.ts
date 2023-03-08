@@ -234,11 +234,9 @@ export async function updateNodes(
       nameToLookFor = aliasBaseFontSize.slice(1, aliasBaseFontSize.length - 1);
     } else if (aliasBaseFontSize.startsWith('$')) {
       nameToLookFor = aliasBaseFontSize.substring(1);
-    } else {
-      nameToLookFor = aliasBaseFontSize;
     }
   }
-  const resolvedBaseFontSize = nameToLookFor ? String(tokens.get(nameToLookFor)?.value) : undefined;
+  const resolvedBaseFontSize = nameToLookFor ? String(tokens.get(nameToLookFor)?.value) : aliasBaseFontSize;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {

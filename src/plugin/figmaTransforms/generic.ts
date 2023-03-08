@@ -9,13 +9,10 @@ export function fakeZeroForFigma(value: number) {
 }
 
 export function convertTypographyNumberToFigma(value: string, baseFontSize: string) {
-  console.log('baseFont', baseFontSize);
   if (typeof value === 'string' && (value.endsWith('em') || value.endsWith('rem'))) {
     if (!isNaN(parseFloat(baseFontSize))) {
-      console.log('parse success');
       return parseFloat(value) * parseFloat(baseFontSize);
     }
-    console.log('parse failure');
     return parseFloat(value) * parseFloat(defaultBaseFontSize);
   }
   return parseFloat(value);
