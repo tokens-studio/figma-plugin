@@ -62,7 +62,7 @@ export default function ApplySelector() {
             width: '32px',
             borderLeft: '1px solid $interactionSubtle',
             color: '$onInteraction',
-            '&:hover, &:focus': { backgroundColor: '$interactionSubtle' },
+            '&:hover, &:focus-visible': { backgroundColor: '$interactionSubtle' },
           }}
           data-testid="apply-selector"
         >

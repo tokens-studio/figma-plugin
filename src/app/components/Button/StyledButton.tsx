@@ -22,7 +22,7 @@ export const StyledButton = styled('button', {
     },
     variant: {
       primary: {
-        '&:focus': {
+        '&:focus-visible': {
           boxShadow: '$focus',
         },
       },
@@ -30,7 +30,7 @@ export const StyledButton = styled('button', {
         background: '$bgBtnSecondary',
         color: '$fgBtnSecondary',
         borderColor: '$border',
-        '&:focus': {
+        '&:focus-visible': {
           boxShadow: '$focus',
         },
       },
@@ -41,7 +41,7 @@ export const StyledButton = styled('button', {
         '&:hover': {
           background: '$bgHoverBtnGhost',
         },
-        '&:focus': {
+        '&:focus-visible': {
           boxShadow: '$focus',
         },
       },
@@ -49,7 +49,7 @@ export const StyledButton = styled('button', {
         background: '$bgBtnSecondary',
         color: '$fgDanger',
         borderColor: '$border',
-        '&:focus': {
+        '&:focus-visible': {
           boxShadow: '$focusDanger',
         },
       },

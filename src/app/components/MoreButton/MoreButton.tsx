@@ -124,8 +124,9 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.metaKey) {
       handleEditClick();
+    } else {
+      handleClick(properties[0]);
     }
-    handleClick(properties[0]);
   }, [properties, handleClick, handleEditClick]);
 
   return (
