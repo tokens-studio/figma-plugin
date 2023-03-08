@@ -5,7 +5,6 @@ import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
-import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -26,6 +25,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
 import { extractColorInBorderTokenForAlias } from './extractColorInBorderTokenForAlias';
+import { SettingsState } from '@/app/store/models/settings';
 
 // @TODO fix typings
 
@@ -221,14 +221,24 @@ async function migrateTokens(entry: NodeManagerNode, values: MapValuesToTokensRe
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
-  settings?: UpdateNodesSettings,
+  settings?: SettingsState,
 ) {
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, aliasBaseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-
+  let nameToLookFor = '';
+  if (aliasBaseFontSize) {
+    if (aliasBaseFontSize.startsWith('{')) {
+      nameToLookFor = aliasBaseFontSize.slice(1, aliasBaseFontSize.length - 1);
+    } else if (aliasBaseFontSize.startsWith('$')) {
+      nameToLookFor = aliasBaseFontSize.substring(1);
+    } else {
+      nameToLookFor = aliasBaseFontSize;
+    }
+  }
+  const resolvedBaseFontSize = nameToLookFor ? String(tokens.get(nameToLookFor)?.value) : undefined;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -259,7 +269,7 @@ export async function updateNodes(
               themeInfo,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
-              baseFontSize,
+              resolvedBaseFontSize,
             );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
