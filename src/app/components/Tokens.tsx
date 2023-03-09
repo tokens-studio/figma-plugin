@@ -22,7 +22,7 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -31,6 +31,7 @@ import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+import { getAliasValue } from '@/utils/alias';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -98,6 +99,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
+  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const dispatch = useDispatch<Dispatch>();
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
@@ -190,6 +192,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
   }, [dispatch, tokens, stringTokens, activeTokenSet]);
+
+  React.useEffect(() => {
+    const newBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+    dispatch.settings.setBaseFontSize(String(newBaseFontSize));
+  }, [resolvedTokens, aliasBaseFontSize]);
 
   const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
     if (tokenDiv.current) {

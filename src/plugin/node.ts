@@ -236,7 +236,8 @@ export async function updateNodes(
       nameToLookFor = aliasBaseFontSize.substring(1);
     }
   }
-  const resolvedBaseFontSize = nameToLookFor ? String(tokens.get(nameToLookFor)?.value) : aliasBaseFontSize;
+  const resolvedToken = tokens.get(nameToLookFor);
+  const resolvedBaseFontSize = resolvedToken ? String(resolvedToken.value) : aliasBaseFontSize;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
