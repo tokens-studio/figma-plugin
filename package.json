@@ -98,7 +98,7 @@
     "react-dnd-html5-backend": "^12.1.1",
     "react-dom": "17.0.0",
     "react-error-boundary": "^3.1.1",
-    "react-hook-form": "^7.29.0",
+    "react-hook-form": "^7.43.1",
     "react-modal": "^3.11.2",
     "react-redux": "^8",
     "react-svg-loader": "^3.0.3",
