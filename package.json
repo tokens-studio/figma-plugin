@@ -28,7 +28,7 @@
     "@radix-ui/react-context-menu": "^0.1.6",
     "@radix-ui/react-dropdown-menu": "0.0.19",
     "@radix-ui/react-icons": "^1.0.3",
-    "@radix-ui/react-label": "^0.0.14",
+    "@radix-ui/react-label": "^0.1.5",
     "@radix-ui/react-switch": "^0.1.5",
     "@radix-ui/react-toolbar": "^0.1.5",
     "@radix-ui/react-tooltip": "^0.0.19",

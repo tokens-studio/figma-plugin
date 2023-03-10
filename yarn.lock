@@ -3182,7 +3182,7 @@
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-use-layout-effect" "0.1.0"
 
-"@radix-ui/react-label@0.1.5":
+"@radix-ui/react-label@0.1.5", "@radix-ui/react-label@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-label/-/react-label-0.1.5.tgz#12cd965bfc983e0148121d4c99fb8e27a917c45c"
   integrity sha512-Au9+n4/DhvjR0IHhvZ1LPdx/OW+3CGDie30ZyCkbSHIuLp4/CV4oPPGBwJ1vY99Jog3zyQhsGww9MXj8O9Aj/A==
@@ -3192,17 +3192,6 @@
     "@radix-ui/react-context" "0.1.1"
     "@radix-ui/react-id" "0.1.5"
     "@radix-ui/react-primitive" "0.1.4"
-
-"@radix-ui/react-label@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/@radix-ui/react-label/-/react-label-0.0.14.tgz#32928a0f5d72e3a24b99021f5c6805e96f3d9395"
-  integrity sha512-gtrEpON6Ye8OBYtOEJBEuB/n/h6x07VPs7JR/1t34LaB74GJ+gACcafLcg5gMGWku3Gbc3eaDwfhOkxhTuJdYQ==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/react-compose-refs" "0.0.5"
-    "@radix-ui/react-id" "0.0.6"
-    "@radix-ui/react-polymorphic" "0.0.12"
-    "@radix-ui/react-primitive" "0.0.14"
 
 "@radix-ui/react-menu@0.0.18":
   version "0.0.18"
