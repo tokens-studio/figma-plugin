@@ -111,7 +111,7 @@
     "set-value": "^3.0.2",
     "storyblok-js-client": "^3.3.1",
     "use-debounce": "^6.0.1",
-    "zod": "^3.14.4"
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
