@@ -26,7 +26,6 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
-import { extractColorInBorderTokenForAlias } from './extractColorInBorderTokenForAlias';
 
 // @TODO fix typings
 
@@ -54,7 +53,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-
     acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
     return acc;
   }, {});
@@ -178,19 +176,19 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.border) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.border);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
   if (values && values.borderTop) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderTop);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderRight) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderRight);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderLeft) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderLeft);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderBottom) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderBottom);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
