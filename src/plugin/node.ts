@@ -223,21 +223,11 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: SettingsState,
 ) {
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, aliasBaseFontSize } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  let nameToLookFor = '';
-  if (aliasBaseFontSize) {
-    if (aliasBaseFontSize.startsWith('{')) {
-      nameToLookFor = aliasBaseFontSize.slice(1, aliasBaseFontSize.length - 1);
-    } else if (aliasBaseFontSize.startsWith('$')) {
-      nameToLookFor = aliasBaseFontSize.substring(1);
-    }
-  }
-  const resolvedToken = tokens.get(nameToLookFor);
-  const resolvedBaseFontSize = resolvedToken ? String(resolvedToken.value) : aliasBaseFontSize;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -268,7 +258,7 @@ export async function updateNodes(
               themeInfo,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
-              resolvedBaseFontSize,
+              baseFontSize,
             );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);
