@@ -23,13 +23,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.cache-name }}-
       # 3: Install dependencies
       - name: Install dependencies
-        run: yarn --frozen-lockfile
-
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
       # 5: Build package
       - name: Build Package
-        run: yarn build
+        run: npm run build
 
       # 6: Store artifact
       - name: Store Artifact
@@ -53,13 +64,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # 3: Install dependencies
+      # 3: Install dependencies.
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.cache-name }}-
+      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
 
       # 4: Run tests
       - name: Run test command
-        run: yarn test
+        run: npm run test
   coverage:
     name: Test coverage
     runs-on: ubuntu-latest
@@ -73,9 +97,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # 3: Install dependencies
+      # 3: Install dependencies.
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.cache-name }}-
+      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
 
       # 4: Run test coverage report
       - name: Run test coverage report
@@ -86,7 +123,7 @@ jobs:
           runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles'
           total_delta: 1
           delta: 1
-          afterSwitchCommand: yarn --frozen-lockfile
+          afterSwitchCommand: npm ci
           useSameComment: true
   test-transform:
     name: Transformer Tests
@@ -101,21 +138,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # 3: Install dependencies
+      # 3: Install dependencies.
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.cache-name }}-
+      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
 
       # 4: Build package
       - name: build:transform
-        run: yarn build-transform
+        run: npm run build-transform
 
       # 5: Install dependencies
       - name: Install dependencies - transformer
-        run: cd token-transformer && yarn --frozen-lockfile
+        run: cd token-transformer && npm ci
 
       # 6: Run tests
       - name: Run test command
-        run: cd token-transformer && yarn test
+        run: cd token-transformer && npm run test
   cypress-run:
     name: Cypress
     runs-on: ubuntu-latest
@@ -128,5 +178,5 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          build: yarn build:cy
-          start: yarn serve
+          build: npm run build:cy
+          start: npm run serve
