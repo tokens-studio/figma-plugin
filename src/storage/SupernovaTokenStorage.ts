@@ -28,7 +28,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    throw new Error('Not supported for reading');
+    return [];
   }
 
   public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {
@@ -56,7 +56,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         }
         return acc;
       }, {}),
-    }, null, 2); 
+    }, null, 2);
     // Merge remote with definition
     const incomingTokenPack = tool.loadTokensFromDefinition(jsonDefinition);
     await tool.mergeWithRemoteSource(incomingTokenPack.processedNodes, true);
@@ -70,6 +70,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }> {
     // Create Supernova instance, fetch design system and version
     try {
+      console.log('GOT INSTANCE');
       const designSystem = await this.sdkInstance.designSystem(this.designSystemId);
       const designSystemVersion = await designSystem!.activeVersion();
       if (designSystem && designSystemVersion) {
@@ -83,7 +84,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       console.log(error);
     }
     throw new Error(
-      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.'
+      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.',
     );
   }
 }

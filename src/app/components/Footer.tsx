@@ -86,7 +86,6 @@ export default function Footer() {
         )}
         {storageType.provider === StorageProviderType.SUPERNOVA && (
           <>
-            <IconButton icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
             <IconButton badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
@@ -95,7 +94,7 @@ export default function Footer() {
           && storageType.provider !== StorageProviderType.GITLAB
           && storageType.provider !== StorageProviderType.ADO
           && storageType.provider !== StorageProviderType.BITBUCKET
-          && storageType.provider !== StorageProviderType.SUPERNOVA} (
+          && storageType.provider !== StorageProviderType.SUPERNOVA ?  
             <Stack align="center" direction="row" gap={2}>
               <Text muted>Sync</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
@@ -108,8 +107,7 @@ export default function Footer() {
                 onClick={handlePullTokens}
                 icon={<RefreshIcon />}
               />
-            </Stack>
-        )}
+            </Stack> : null }
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
