@@ -9,6 +9,7 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
+import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
   AnyTokenList, ImportToken, SingleToken, TokenStore,
@@ -112,6 +113,13 @@ export const tokenState = createModel<RootModel>()({
     setThemes: (state, data: ThemeObjectsList) => ({
       ...state,
       themes: data,
+    }),
+    setNewTokenData: (state, data: TokenData['synced_data']) => ({
+      ...state,
+      usedTokenSet: data.usedTokenSets || state.usedTokenSet,
+      themes: data.themes || state.themes,
+      activeTheme: data.activeTheme || state.activeTheme,
+      tokens: data.sets || state.tokens,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
