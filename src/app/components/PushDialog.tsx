@@ -46,10 +46,6 @@ function PushDialog() {
           redirectHref = getGitlabCreatePullRequestUrl(localApiState.id, localApiState.baseUrl);
           break;
         }
-        case StorageProviderType.SUPERNOVA: {
-          redirectHref = getSupernovaOpenCloud(localApiState.id);
-          break;
-        }
         case StorageProviderType.ADO:
           redirectHref = getADOCreatePullRequestUrl({
             branch,
@@ -61,7 +57,17 @@ function PushDialog() {
         default:
           break;
       }
+    } else if (localApiState && 'designSystemUrl' in localApiState) {
+      switch (localApiState.provider) {
+        case StorageProviderType.SUPERNOVA: {
+          redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
+          break;
+        }
+        default:
+          break;
+      }
     }
+    console.log(redirectHref);
     return redirectHref;
   }, [branch, localApiState]);
 
@@ -176,7 +182,6 @@ function PushDialog() {
               </div>
             </div>
             <Button variant="primary" href={redirectHref}>
-
               {localApiState.provider === StorageProviderType.SUPERNOVA
                 ? <>Open Supernova Workspace</>
                 : <>Create Pull Request</>}

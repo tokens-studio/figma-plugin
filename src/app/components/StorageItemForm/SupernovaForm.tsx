@@ -10,6 +10,7 @@ import Text from '../Text';
 import { generateId } from '@/utils/generateId';
 import Heading from '../Heading';
 import Link from '../Link';
+import Textarea from '../Textarea';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
@@ -18,10 +19,11 @@ type Props = {
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
+  errorMessage?: string;
 };
 
 export default function SupernovaForm({
-  onChange, onSubmit, onCancel, values, hasErrored,
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
@@ -33,6 +35,7 @@ export default function SupernovaForm({
       name: zod.string(),
       designSystemUrl: zod.string(),
       secret: zod.string(),
+      mapping: zod.string(),
       internalId: zod.string().optional(),
     });
     const validationResult = zodSchema.safeParse(values);
@@ -44,6 +47,13 @@ export default function SupernovaForm({
       onSubmit(formFields);
     }
   }, [values, onSubmit]);
+
+  const handleMappingChange = React.useCallback(
+    (val: string, event: React.ChangeEvent<any>) => {
+      onChange(event);
+    },
+    [onChange],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -81,18 +91,31 @@ export default function SupernovaForm({
           name="designSystemUrl"
           required
         />
+        <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
+          <label htmlFor="mapping" className="block font-medium text-xxs">
+            Supernova &lt;&gt; Token Studio mapping
+          </label>
+        </Stack>
+        <Textarea
+          id="mapping"
+          name="mapping"
+          border
+          rows={8}
+          value={values.mapping ?? ''}
+          onChange={handleMappingChange}
+          placeholder=""
+        />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
             Cancel
           </Button>
-
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl}>
+          <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}>
             Save
           </Button>
         </Stack>
         {hasErrored && (
           <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
-            There was an error connecting to Supernova. Check your API key / Design System URL.
+            {errorMessage}
           </div>
         )}
       </Stack>

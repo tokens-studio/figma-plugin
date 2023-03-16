@@ -33,7 +33,7 @@ export function useSupernova() {
   const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: SupernovaCredentials) => {
-    const storageClient = new SupernovaTokenStorage(context.designSystemUrl, context.secret);
+    const storageClient = new SupernovaTokenStorage(context.designSystemUrl, context.mapping, context.secret);
     return storageClient;
   }, []);
 
@@ -65,40 +65,51 @@ export function useSupernova() {
       }
 
       dispatch.uiState.setLocalApiState({ ...context });
-      try {
-        const metadata = {
-          tokenSetOrder: Object.keys(tokens),
-        };
-        await storage.save(
-          {
+      const pushSettings = await pushDialog();
+      if (pushSettings) {
+        try {
+          const metadata = {
+            tokenSetOrder: Object.keys(tokens),
+          };
+          await storage.save(
+            {
+              themes,
+              tokens,
+              metadata,
+            },
+          );
+          saveLastSyncedState(dispatch, tokens, themes, metadata);
+          dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
+          dispatch.uiState.setApiData({ ...context });
+          dispatch.tokenState.setTokenData({
+            values: tokens,
             themes,
-            tokens,
-            metadata,
-          },
-        );
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
-        dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
-        dispatch.uiState.setApiData({ ...context });
-        dispatch.tokenState.setTokenData({
-          values: tokens,
-          themes,
-          usedTokenSet,
-          activeTheme,
-        });
+            usedTokenSet,
+            activeTheme,
+          });
 
-        pushDialog('success');
+          pushDialog('success');
+          return {
+            status: 'success',
+            tokens,
+            themes,
+            metadata: {},
+          };
+        } catch (e) {
+          closeDialog();
+          console.log('Error syncing tokens with Supernova', e);
+          console.log('sending error message');
+          return {
+            status: 'failure',
+            errorMessage: (e as Error).message,
+          };
+        }
+      } else {
         return {
           status: 'success',
           tokens,
           themes,
           metadata: {},
-        };
-      } catch (e) {
-        closeDialog();
-        console.log('Error syncing tokens with Supernova', e);
-        return {
-          status: 'failure',
-          errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
         };
       }
     },

@@ -22,11 +22,13 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
 
   private designSystemId: string;
 
+  private mapping: string;
+
   private secret: string;
 
   private sdkInstance: Supernova;
 
-  constructor(url: string, secret: string) {
+  constructor(url: string, mapping: string, secret: string) {
     super();
 
     // Deconstruct url to WS ID / DS ID
@@ -41,6 +43,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         console.log(this.workspaceHandle);
         console.log(this.designSystemId);
         this.secret = secret;
+        this.mapping = mapping;
         this.sdkInstance = new Supernova(this.secret, null, null);
       }
     } catch (error) {
@@ -61,13 +64,8 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }
 
   public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {
-    // Create Supernova instance, fetch design system and version
+    // Create writable Supernova instance
     const accessor = await this.readWriteInstance();
-    // Use jSON token tool to synchronize tokens back to Supernova
-    // For now, they should be synchronized to the first brand, but that will be configurable later on
-    const brands = await accessor.version.brands();
-    // const brand = brands[0];
-    // const tool = new SupernovaToolsDesignTokensPlugin(this.sdkInstance, accessor.version, brand);
 
     const dataObject = {
       $themes: [],
@@ -89,26 +87,26 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       preciseCopy: true,
       verbose: false,
     };
-    const rawMaps = [{
-      tokensTheme: null,
-      tokenSets: ['core', 'light'],
-      supernovaBrand: 'Default',
-      supernovaTheme: null,
-    }];
 
     const maps = new Array<DTPluginToSupernovaMap>();
-    for (const map of rawMaps) {
-      maps.push({
-        type: map.tokenSets ? DTPluginToSupernovaMapType.set : DTPluginToSupernovaMapType.theme,
-        pluginSets: map.tokenSets ?? null,
-        pluginTheme: map.tokensTheme ?? null,
-        bindToBrand: map.supernovaBrand,
-        bindToTheme: map.supernovaTheme ?? null,
-        nodes: null,
-        processedNodes: null,
-        processedGroups: null,
-      });
+    try {
+      const rawMaps = JSON.parse(this.mapping);
+      for (const map of rawMaps) {
+        maps.push({
+          type: map.tokenSets ? DTPluginToSupernovaMapType.set : DTPluginToSupernovaMapType.theme,
+          pluginSets: map.tokenSets ?? null,
+          pluginTheme: map.tokensTheme ?? null,
+          bindToBrand: map.supernovaBrand,
+          bindToTheme: map.supernovaTheme ?? null,
+          nodes: null,
+          processedNodes: null,
+          processedGroups: null,
+        });
+      }
+    } catch (e) {
+      throw new Error(`Provided mapping is incorrectly formatted: ${e}`);
     }
+
     const result = await syncTool.synchronizeTokensFromData(dataObject, maps, settings);
     return result;
   }
@@ -122,7 +120,6 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       const designSystem = await this.sdkInstance.designSystem(this.designSystemId);
       const designSystemVersion = await designSystem!.activeVersion();
       if (designSystem && designSystemVersion) {
-        console.log('Obtained design system');
         return {
           ds: designSystem,
           version: designSystemVersion,
@@ -130,7 +127,6 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       }
     } catch (error) {
       // Will throw always when something goes wrong
-      console.log('Could not obtain design system');
       console.log(error);
     }
     throw new Error(

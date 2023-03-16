@@ -73,6 +73,7 @@ export type SupernovaStorageType = GenericStorageType<StorageProviderType.SUPERN
   id: string; // Not used for now, but makes it easier to handle rest of code for other providers
   name: string; // this is only for refrence
   designSystemUrl: string; // URL of the design system
+  mapping: string; // Mapping configuration
 }>;
 
 export enum GenericVersionedStorageFlow {

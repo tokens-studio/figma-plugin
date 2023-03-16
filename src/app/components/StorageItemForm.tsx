@@ -111,6 +111,7 @@ export default function StorageItemForm({
           onCancel={onCancel}
           values={values}
           hasErrored={hasErrored}
+          errorMessage={errorMessage}
         />
       );
     }
