@@ -14,17 +14,35 @@ export type SupernovaStorageSaveOptions = {
 };
 
 export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSaveOptions> {
+
+  private workspaceHandle: string;
+
   private designSystemId: string;
 
   private secret: string;
 
   private sdkInstance: Supernova;
 
-  constructor(id: string, secret: string) {
+  constructor(url: string, secret: string) {
     super();
-    this.designSystemId = id;
-    this.secret = secret;
-    this.sdkInstance = new Supernova(this.secret, null, null);
+
+    // Deconstruct url to WS ID / DS ID
+    try {
+      let parsedURL = new URL(url);
+      let fragments = parsedURL.pathname.split('/');
+      if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
+        throw new Error('Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.');
+      } else {
+        this.workspaceHandle = fragments[2];
+        this.designSystemId = fragments[4].split('-')[0];
+        console.log(this.workspaceHandle);
+        console.log(this.designSystemId);
+        this.secret = secret;
+        this.sdkInstance = new Supernova(this.secret, null, null);
+      }
+    } catch (error) {
+      throw (error);
+    }
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {

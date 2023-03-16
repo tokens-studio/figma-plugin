@@ -34,7 +34,7 @@ export function useSupernova() {
   const { pushDialog, closeDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: SupernovaCredentials) => {
-    const storageClient = new SupernovaTokenStorage(context.id, context.secret);
+    const storageClient = new SupernovaTokenStorage(context.designSystemUrl, context.secret);
     return storageClient;
   }, []);
 

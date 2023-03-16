@@ -70,8 +70,9 @@ StorageProviderType.ADO,
 >;
 
 export type SupernovaStorageType = GenericStorageType<StorageProviderType.SUPERNOVA, {
+  id: string; // Not used for now, but makes it easier to handle rest of code for other providers
   name: string; // this is only for refrence
-  id: string; // this is the id of workspace in Supernova
+  designSystemUrl: string; // URL of the design system
 }>;
 
 export enum GenericVersionedStorageFlow {
