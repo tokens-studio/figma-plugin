@@ -1,8 +1,11 @@
 import {
   DesignSystem,
   DesignSystemVersion,
+  DTPluginToSupernovaMap,
+  DTPluginToSupernovaMapType,
+  DTPluginToSupernovaSettings,
   Supernova,
-  TokenJSONBuilder,
+  SupernovaToolsDesignTokensPlugin,
 } from '@supernovaio/supernova-sdk';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
@@ -66,28 +69,48 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     // const brand = brands[0];
     // const tool = new SupernovaToolsDesignTokensPlugin(this.sdkInstance, accessor.version, brand);
 
-    console.log(brands);
-    console.log(files);
-    return false;
+    const dataObject = {
+      $themes: [],
+    } as any;
+    files.forEach((file) => {
+      if (file.type === 'themes') {
+        dataObject.$themes = [
+          ...(dataObject.$themes ?? []),
+          ...file.data,
+        ];
+      } else if (file.type === 'tokenSet') {
+        dataObject[file.name] = file.data;
+      }
+    });
 
-    // Create definition as JSON, single file mode
-    /*
-    const jsonDefinition = JSON.stringify({
-      ...files.reduce<GitSingleFileObject>((acc, file) => {
-        if (file.type === 'tokenSet') {
-          acc[file.name] = file.data;
-        }
-        if (file.type === 'themes') {
-          acc.$themes = [...acc.$themes ?? [], ...file.data];
-        }
-        return acc;
-      }, {}),
-    }, null, 2);
-    // Merge remote with definition
-    const incomingTokenPack = tool.loadTokensFromDefinition(jsonDefinition);
-    await tool.mergeWithRemoteSource(incomingTokenPack.processedNodes, true);
-    return true;
-    */
+    const syncTool = new SupernovaToolsDesignTokensPlugin(accessor.version);
+    const settings: DTPluginToSupernovaSettings = {
+      dryRun: false,
+      preciseCopy: true,
+      verbose: false,
+    };
+    const rawMaps = [{
+      tokensTheme: null,
+      tokenSets: ['core', 'light'],
+      supernovaBrand: 'Default',
+      supernovaTheme: null,
+    }];
+
+    const maps = new Array<DTPluginToSupernovaMap>();
+    for (const map of rawMaps) {
+      maps.push({
+        type: map.tokenSets ? DTPluginToSupernovaMapType.set : DTPluginToSupernovaMapType.theme,
+        pluginSets: map.tokenSets ?? null,
+        pluginTheme: map.tokensTheme ?? null,
+        bindToBrand: map.supernovaBrand,
+        bindToTheme: map.supernovaTheme ?? null,
+        nodes: null,
+        processedNodes: null,
+        processedGroups: null,
+      });
+    }
+    const result = await syncTool.synchronizeTokensFromData(dataObject, maps, settings);
+    return result;
   }
 
   private async readWriteInstance(): Promise<{
@@ -96,10 +119,10 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }> {
     // Create Supernova instance, fetch design system and version
     try {
-      console.log('GOT INSTANCE');
       const designSystem = await this.sdkInstance.designSystem(this.designSystemId);
       const designSystemVersion = await designSystem!.activeVersion();
       if (designSystem && designSystemVersion) {
+        console.log('Obtained design system');
         return {
           ds: designSystem,
           version: designSystemVersion,
@@ -107,6 +130,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       }
     } catch (error) {
       // Will throw always when something goes wrong
+      console.log('Could not obtain design system');
       console.log(error);
     }
     throw new Error(
