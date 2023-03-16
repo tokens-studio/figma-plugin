@@ -46,7 +46,15 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    return [];
+    try {
+      // Create Supernova instance, fetch design system and version, checking if this is possible
+      const accessor = await this.readWriteInstance();
+
+      // Always retrieve current tokens defined in the plugin
+      return [];
+    } catch (error) {
+      throw new Error('There was an error connecting to Supernova. Check your API key / Design System URL.');
+    }
   }
 
   public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {
