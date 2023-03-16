@@ -86,6 +86,7 @@
     "mixpanel-figma": "^2.0.1",
     "ml-matrix": "^6.9.0",
     "monaco-editor": "^0.34.1",
+    "monaco-editor-webpack-plugin": "^7.0.1",
     "msw": "^0.42.1",
     "object-hash": "^2.2.0",
     "object-path": "^0.11.8",

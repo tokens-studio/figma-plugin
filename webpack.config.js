@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -70,6 +71,10 @@ module.exports = (env, argv) => ({
         test: /\.mjs$/,
         include: /node_modules/,
       },
+      {
+				test: /\.ttf$/,
+				use: ['file-loader']
+			}
     ],
   },
 
@@ -91,6 +96,7 @@ module.exports = (env, argv) => ({
     filename: '[name].js',
     sourceMapFilename: "[name].js.map",
     path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
+    publicPath: '/'
   },
 
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
@@ -117,5 +123,6 @@ module.exports = (env, argv) => ({
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     }),
+    new MonacoWebpackPlugin()
   ],
 });
