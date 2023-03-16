@@ -41,7 +41,7 @@
     "@sentry/react": "^6.2.5",
     "@stitches/react": "^1.2.8",
     "@storybook/addon-postcss": "^2.0.0",
-    "@supernovaio/supernova-sdk": "1.7.15",
+    "@supernovaio/supernova-sdk": "1.8.62",
     "@types/file-saver": "^2.0.5",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
