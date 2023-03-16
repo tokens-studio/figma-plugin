@@ -50,7 +50,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       // Create Supernova instance, fetch design system and version, checking if this is possible
       const accessor = await this.readWriteInstance();
 
-      // Always retrieve current tokens defined in the plugin
+      // Always retrieve current tokens defined in the plugin, as Supernova can't yet reconstruct the tokens properly
       return [];
     } catch (error) {
       throw new Error('There was an error connecting to Supernova. Check your API key / Design System URL.');

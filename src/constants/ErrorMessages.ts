@@ -6,6 +6,7 @@ export enum ErrorMessages {
   ADO_CREDENTIAL_ERROR = 'Error syncing with ADO, check credentials',
   URL_CREDENTIAL_ERROR = 'Error fetching from URL, check console (F12)',
   JSONBIN_CREDENTIAL_ERROR = 'Error fetching from JSONbin, check console (F12)',
+  SUPERNOVA_CREDENTIAL_ERROR = 'Error syncing with Supernova, check credentials',
   FILE_CREDENTIAL_ERROR = 'Error fetching from file, check console (F12)',
   EMPTY_BRANCH_ERROR = 'There is no branch',
   VALIDATION_ERROR = 'Contents don\'t pass schema validation',

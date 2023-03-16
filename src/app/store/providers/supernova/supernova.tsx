@@ -10,7 +10,6 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-import { RemoteTokenStorageData, RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
@@ -66,62 +65,42 @@ export function useSupernova() {
       }
 
       dispatch.uiState.setLocalApiState({ ...context });
-
-      const pushSettings = await pushDialog();
-      if (pushSettings) {
-        const { commitMessage } = pushSettings;
-        try {
-          const metadata = {
-            tokenSetOrder: Object.keys(tokens),
-          };
-          await storage.save(
-            {
-              themes,
-              tokens,
-              metadata,
-            },
-            {
-              commitMessage,
-            }
-          );
-          saveLastSyncedState(dispatch, tokens, themes, metadata);
-          dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
-          dispatch.uiState.setApiData({ ...context });
-          dispatch.tokenState.setTokenData({
-            values: tokens,
+      try {
+        const metadata = {
+          tokenSetOrder: Object.keys(tokens),
+        };
+        await storage.save(
+          {
             themes,
-            usedTokenSet,
-            activeTheme,
-          });
-
-          pushDialog('success');
-          return {
-            status: 'success',
             tokens,
-            themes,
-            metadata: {},
-          };
-        } catch (e) {
-          closeDialog();
-          console.log('Error pushing to Supernova', e);
-          if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
-            return {
-              status: 'failure',
-              errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
-            };
-          }
-          return {
-            status: 'failure',
-            errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,
-          };
-        }
+            metadata,
+          },
+        );
+        saveLastSyncedState(dispatch, tokens, themes, metadata);
+        dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
+        dispatch.uiState.setApiData({ ...context });
+        dispatch.tokenState.setTokenData({
+          values: tokens,
+          themes,
+          usedTokenSet,
+          activeTheme,
+        });
+
+        pushDialog('success');
+        return {
+          status: 'success',
+          tokens,
+          themes,
+          metadata: {},
+        };
+      } catch (e) {
+        closeDialog();
+        console.log('Error syncing tokens with Supernova', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
+        };
       }
-      return {
-        status: 'success',
-        tokens,
-        themes,
-        metadata: {},
-      };
     },
     [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme]
   );
