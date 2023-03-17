@@ -149,7 +149,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       break;
     case 'textDecoration':
       if ('textDecoration' in node && typeof node.textDecoration !== 'undefined') {
-        console.log('hehe');
         node.textDecoration = 'NONE';
       }
       break;
