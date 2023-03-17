@@ -40,6 +40,7 @@ export enum Properties {
   paragraphSpacing = 'paragraphSpacing',
   textCase = 'textCase',
   dimension = 'dimension',
+  boolean = 'boolean',
   textDecoration = 'textDecoration',
   asset = 'asset',
   tokenValue = 'tokenValue',

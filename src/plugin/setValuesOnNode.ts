@@ -456,6 +456,14 @@ export default async function setValuesOnNode(
         }
       }
 
+      if ('visible' in node && typeof values.boolean === 'string' && typeof data.boolean !== 'undefined') {
+        if (values.boolean.toLocaleLowerCase() === 'true') {
+          node.visible = true;
+        } else if (values.boolean.toLocaleLowerCase() === 'false') {
+          node.visible = false;
+        }
+      }
+
       // Real value for text layers
       if ('value' in values) {
         if ('characters' in node && node.fontName !== figma.mixed) {
