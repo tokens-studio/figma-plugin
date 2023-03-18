@@ -56,6 +56,7 @@ function JSONEditor({
         language="json"
         onChange={handleJsonEditChange}
         value={stringTokens}
+        theme="vs-dark"
       />
     </Box>
   );
