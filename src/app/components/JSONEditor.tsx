@@ -1,24 +1,39 @@
+/*
+  With monacco:
+  we can support:
+  - Syntax highlighting
+  - Search and highlight within code
+  - Collapsable lines / groups (like VSCode)
+  - Show errors inline
+  bundle size increase: 0.09kb
+
+  With react-ace:
+  we can support:
+    It seems like that react-ace doesn't work properly in node environments
+  bundle size increase: 0.04kb
+*/
+
 import React from 'react';
-import { useSelector } from 'react-redux';
-import Textarea from './Textarea';
+import Editor from '@monaco-editor/react';
 import Box from './Box';
-import { editProhibitedSelector } from '@/selectors';
 import { useShortcut } from '@/hooks/useShortcut';
 import useTokens from '../store/useTokens';
 
 type Props = {
   stringTokens: string;
   handleChange: (tokens: string) => void;
-  hasError: boolean;
 };
 
 function JSONEditor({
   stringTokens,
   handleChange,
-  hasError,
 }: Props) {
-  const editProhibited = useSelector(editProhibitedSelector);
   const { handleJSONUpdate } = useTokens();
+
+  const handleJsonEditChange = React.useCallback((value?: string) => {
+    if (value) handleChange(value);
+  }, [handleChange]);
+
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
     if (event.metaKey || event.ctrlKey) {
       handleJSONUpdate(stringTokens);
@@ -37,13 +52,10 @@ function JSONEditor({
         position: 'relative',
       }}
     >
-      <Textarea
-        isDisabled={editProhibited}
-        placeholder="Enter JSON"
-        rows={21}
-        onChange={handleChange}
+      <Editor
+        language="json"
+        onChange={handleJsonEditChange}
         value={stringTokens}
-        css={{ paddingBottom: hasError ? '$9' : '0' }}
       />
     </Box>
   );
