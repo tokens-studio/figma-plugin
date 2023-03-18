@@ -57,6 +57,7 @@ export interface UIState {
   displayType: DisplayType;
   disabled: boolean;
   activeTab: Tabs;
+  activeTokensTab: 'list' | 'json';
   projectURL: string;
   storageType: StorageType;
   api: StorageTypeCredentials;
@@ -78,6 +79,9 @@ export interface UIState {
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  figmaFonts: Font[]
+  secondScreenEnabled: boolean;
+  showAutoSuggest: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -98,6 +102,7 @@ export const uiState = createModel<RootModel>()({
     displayType: 'GRID',
     backgroundJobs: [],
     activeTab: Tabs.LOADING,
+    activeTokensTab: 'list',
     projectURL: '',
     storageType: {
       provider: StorageProviderType.LOCAL,
@@ -128,6 +133,9 @@ export const uiState = createModel<RootModel>()({
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
+    figmaFonts: [],
+    secondScreenEnabled: false,
+    showAutoSuggest: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -223,6 +231,12 @@ export const uiState = createModel<RootModel>()({
       return {
         ...state,
         activeTab: payload,
+      };
+    },
+    setActiveTokensTab(state, payload: 'list' | 'json') {
+      return {
+        ...state,
+        activeTokensTab: payload,
       };
     },
     setProjectURL(state, payload: string) {
@@ -350,6 +364,22 @@ export const uiState = createModel<RootModel>()({
         scrollPositionSet: payload,
       };
     },
+    setFigmaFonts(state, payload: Font[]) {
+      return {
+        ...state,
+        figmaFonts: payload,
+      };
+    },
+    toggleSecondScreen(state) {
+      return {
+        ...state,
+        secondScreenEnabled: !state.secondScreenEnabled,
+      };
+    },
+    setShowAutoSuggest: (state, data: boolean) => ({
+      ...state,
+      showAutoSuggest: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {

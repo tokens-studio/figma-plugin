@@ -13,6 +13,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { isGitProvider } from '@/utils/is';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -50,7 +51,8 @@ export function pullTokensFactory(
       if (matchingSet) {
         // found API credentials
         try {
-          track('Fetched from remote', { provider: matchingSet.provider });
+          const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
+          track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
           if (!matchingSet.internalId) {
             track('missingInternalId', { provider: matchingSet.provider });
           }
@@ -69,6 +71,7 @@ export function pullTokensFactory(
           dispatch.uiState.setLocalApiState(matchingSet);
           // we don't want to update nodes if we're pulling from remote
           dispatch.tokenState.setActiveTheme({ themeId: params.activeTheme || null, shouldUpdateNodes: false });
+          dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
           if (shouldPull) {
             const remoteData = await useRemoteTokensResult.pullTokens({
@@ -76,6 +79,7 @@ export function pullTokensFactory(
               featureFlags: flags,
               activeTheme: params.activeTheme,
               usedTokenSet: params.localTokenData?.usedTokenSet,
+              collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
             });
             // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
             if (!remoteData) {

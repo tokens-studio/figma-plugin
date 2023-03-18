@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
-import { checkIfContainsAlias } from '@/utils/alias';
+import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { findReferences } from '@/utils/findReferences';
@@ -45,12 +45,18 @@ export default function TypographyInput({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
+  const selectedFontFamily = useMemo(() => {
+    if (typeof internalEditToken.value === 'object') {
+      const resolvedFontFamily = getAliasValue(internalEditToken.value?.fontFamily ?? '', resolvedTokens);
+      return String(resolvedFontFamily);
+    }
+    return '';
+  }, [internalEditToken, resolvedTokens]);
 
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;
@@ -69,14 +75,14 @@ export default function TypographyInput({
         {
           mode === 'input' ? (
             <IconButton
-              tooltip="Reference"
+              tooltip="Reference mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
-              tooltip="input mode"
+              tooltip="Input mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
@@ -95,6 +101,7 @@ export default function TypographyInput({
               resolvedTokens={resolvedTokens}
               handleChange={handleTypographyValueChange}
               setInputValue={handleTypographyValueDownShiftInputChange}
+              externalFontFamily={selectedFontFamily}
             />
           ))}
         </Stack>
@@ -114,10 +121,10 @@ export default function TypographyInput({
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedTokenDisplay
-            alias={alias}
-            selectedToken={selectedToken}
-          />
+            <ResolvedTokenDisplay
+              alias={alias}
+              selectedToken={selectedToken}
+            />
           )}
         </Stack>
       )}

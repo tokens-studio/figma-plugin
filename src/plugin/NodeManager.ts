@@ -5,7 +5,6 @@ import { EventEmitter } from 'eventemitter3';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
-import { hasTokens } from '@/utils/hasTokens';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { parseIntOrDefault } from '@/utils/parseIntOrDefault';
@@ -100,29 +99,7 @@ export class NodeManager {
 
     const currentPluginVersion = parseInt(pkg.plugin_version, 10);
     const version = parseIntOrDefault(await VersionProperty.read(node), 0);
-    const migrationFlags = {
-      v72: version && version >= currentPluginVersion,
-    };
     let tokens: NodeTokenRefMap | null = null;
-
-    // only perform this action if the node has not been migrated yet
-    if (!migrationFlags.v72) {
-      // @deprecated - moved to separated token values
-      const deprecatedValuesProp = node.getPluginData('values');
-      if (deprecatedValuesProp) {
-        tokens = JSON.parse(deprecatedValuesProp) as NodeTokenRefMap;
-        // migrate values to new format
-        // there's no need to keep supporting deprecated data structures
-        // this will take more time on startup but only once
-        await Promise.all(
-          Object.keys(tokens).map(async (property) => {
-            const token = tokens?.[(property as Properties)];
-            tokensSharedDataHandler.set(node, property, token ?? '');
-          }),
-        );
-        node.setPluginData('values', '');
-      }
-    }
 
     if (!tokens) {
       // also consider the non-shared keys if the v72 migration has not been executed
@@ -138,34 +115,18 @@ export class NodeManager {
       const availableSharedKeys = tokensSharedDataHandler.keys(node).filter((key) => (
         !excludedKeys.includes(key)
       ));
-      const deprecatedAvailableKeys = (!migrationFlags.v72 ? node.getPluginDataKeys() : []).filter((key) => (
-        !excludedKeys.includes(key)
-      ));
 
       tokens = Object.fromEntries(
         compact(
           await Promise.all([
-            ...deprecatedAvailableKeys.map((property) => {
-              const value = node.getPluginData(property);
-              if (value) {
-                // migrate from private to shared data if the data is coming from private
-                node.setPluginData(property, '');
-                tokensSharedDataHandler.set(node, property, value);
-                try {
-                  // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
-                } catch (err) {
-                  console.warn(err);
-                }
-              }
-              return null;
-            }),
             ...availableSharedKeys.map((property) => {
               const value = tokensSharedDataHandler.get(node, property);
               if (value) {
                 try {
                   // make sure we catch JSON parse errors in case invalid property keys are set and found
-                  return [property, JSON.parse(value)] as [Properties, NodeTokenRefValue];
+                  // we're storing `none` as a string without quotes
+                  const parsedValue = value === 'none' ? 'none' : JSON.parse(value);
+                  return [property, parsedValue] as [Properties, NodeTokenRefValue];
                 } catch (err) {
                   console.warn(err);
                 }
@@ -302,7 +263,7 @@ export class NodeManager {
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
       const cache = this.nodes.get(nodeId);
-      if (cache && hasTokens(cache.tokens)) {
+      if (cache) {
         return cache;
       }
       return null;

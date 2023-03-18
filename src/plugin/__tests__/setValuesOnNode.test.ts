@@ -56,6 +56,7 @@ describe('Can set values on node', () => {
       effectStyleId: '',
       fillStyleId: '',
       strokeStyleId: '',
+      dashPattern: [],
       getSharedPluginData: () => '',
       setSharedPluginData: () => undefined,
     } as unknown) as RectangleNode;
@@ -703,16 +704,24 @@ describe('Can set values on node', () => {
     };
     const data = { border: 'border.regular' };
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
-    expect(solidNodeMock.strokes).toEqual([
+    expect(solidNodeMock.strokeWeight).toEqual(12);
+    expect(solidNodeMock.dashPattern).toEqual([0, 0]);
+  });
+
+  it('apply token with none value', async () => {
+    await setValuesOnNode(
+      solidNodeMock,
       {
-        color: {
-          b: 1,
-          g: 1,
-          r: 1,
-        },
-        opacity: 1,
-        type: 'SOLID',
+        borderColor: 'none',
+        borderRadius: 'none',
       },
-    ]);
+      {
+        borderColor: 'border-color.none',
+        borderRadius: 'border-radius.none',
+      },
+      emptyStylesMap,
+      emptyThemeInfo,
+    );
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
 });

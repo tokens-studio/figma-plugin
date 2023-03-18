@@ -1,8 +1,6 @@
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as pjs from '../../../../package.json';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -11,7 +9,6 @@ import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { useStartupProcess } from './useStartupProcess';
 import { ProcessStepStatus } from '@/hooks';
-import { track } from '@/utils/analytics';
 import { withLDProviderWrapper } from '../LaunchDarkly';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import ConfirmDialog from '../ConfirmDialog';
@@ -22,10 +19,13 @@ import Changelog from '../Changelog';
 import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
+import { AuthContextProvider } from '@/context/AuthContext';
+import SecondScreenSync from '../SecondScreenSync';
+import AuthModal from '../AuthModal';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
-  startupProcess?: ReturnType<typeof useStartupProcess>
+  startupProcess?: ReturnType<typeof useStartupProcess>;
 };
 
 const applicationInitStepLabels = {
@@ -39,6 +39,7 @@ const applicationInitStepLabels = {
 export const AppContainer = withLDProviderWrapper((params: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
+  const { secondScreen } = useFlags();
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -59,7 +60,6 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       && startupProcess.currentStatus !== ProcessStepStatus.CANCELED
     ) {
       if (startupProcess.currentStep === null) {
-        track('Launched', { version: pjs.plugin_version });
         await startupProcess.start();
       } else if (startupProcess.currentStatus === ProcessStepStatus.DONE) {
         await startupProcess.next();
@@ -75,15 +75,11 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
   globalStyles();
 
-  return (
+  const appContent = (
     <>
       <FigmaLoading
         isLoading={showLoadingScreen}
-        label={(
-          startupProcess.currentStep
-            ? applicationInitStepLabels[startupProcess.currentStep]
-            : undefined
-        )}
+        label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
         onCancel={handleCancelLoadingScreen}
       >
         <App />
@@ -95,6 +91,14 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />
+      {secondScreen && (
+        <>
+          <SecondScreenSync />
+          <AuthModal />
+        </>
+      )}
     </>
   );
+
+  return secondScreen ? <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider> : appContent;
 });

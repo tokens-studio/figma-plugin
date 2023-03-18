@@ -1,88 +1,32 @@
 import React, { useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
+import { useSelector, useDispatch } from 'react-redux';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { Dispatch } from '@/app/store';
 import Box from '../Box';
+import Text from '../Text';
 import { StyledIconDisclosure, StyledInputSuffix } from '../StyledInputSuffix';
 import Stack from '../Stack';
 import { SingleToken } from '@/types/tokens';
 import { StyledPrefix } from '../Input';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { styled } from '@/stitches.config';
-import { StyledDownshiftInput } from './StyledDownshiftInput';
 import Tooltip from '../Tooltip';
 import { Properties } from '@/constants/Properties';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
+import { ErrorValidation } from '../ErrorValidation';
+import useFigmaFonts from '@/hooks/useFigmaFonts';
+import { figmaFontsSelector } from '@/selectors';
+import { MentionInput } from './MentionInput';
+import {
+  StyledButton,
+  StyledDownshiftInput,
+  StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
+} from './StyledDownshiftInput';
+import fuzzySearch from '@/utils/fuzzySearch';
 
-const StyledDropdown = styled('div', {
-  position: 'absolute',
-  zIndex: '10',
-  width: '100%',
-  maxHeight: '140px',
-  borderRadius: '$contextMenu',
-  overflowY: 'scroll',
-  backgroundColor: '$bgDefault',
-  marginTop: '1px',
-  cursor: 'pointer',
-  boxShadow: '$contextMenu',
-});
-
-const StyledItemValue = styled('div', {
-  color: '$textMuted',
-  fontWeight: '$bold',
-  textAlign: 'right',
-  textTransform: 'uppercase',
-  maxWidth: '300px',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-const StyledItem = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '$2',
-  padding: '$2 $3',
-  fontSize: '$xsmall',
-  variants: {
-    isFocused: {
-      true: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
-        [`& ${StyledItemValue}`]: {
-          color: '$onInteraction',
-        },
-      },
-    },
-  },
-});
-
-const StyledItemColorDiv = styled('div', {
-  flexShrink: 0,
-});
-
-const StyledItemColor = styled('div', {
-  width: '16px',
-  height: '16px',
-  borderRadius: '$colorSwatch',
-  border: '1px solid',
-  borderColor: '$borderMuted',
-});
-
-const StyledItemName = styled('div', {
-  flexGrow: 1,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-});
-
-const StyledPart = styled('span', {
-  variants: {
-    matches: {
-      true: {
-        fontWeight: '$bold',
-      },
-    },
-  },
-});
+type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
 interface DownShiftProps {
   name?: string;
@@ -96,9 +40,10 @@ interface DownShiftProps {
   prefix?: React.ReactNode;
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
+  externalFontFamily?: string;
   setInputValue(value: string): void;
   handleChange: React.ChangeEventHandler<HTMLInputElement>;
-  handleBlur?: React.ChangeEventHandler<HTMLInputElement>;
+  handleBlur?: () => void;
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -114,16 +59,112 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   placeholder,
   setInputValue,
   resolvedTokens,
+  externalFontFamily,
   handleChange,
   handleBlur,
 }) => {
-  const [showAutoSuggest, setShowAutoSuggest] = React.useState<boolean>(false);
-  const [isFirstLoading, setIsFirstLoading] = React.useState<boolean>(true);
-  const filteredValue = useMemo(() => ((showAutoSuggest || typeof value !== 'string') ? '' : value?.replace(/[{}$]/g, '')), [
-    showAutoSuggest,
-    value,
-  ]); // removing non-alphanumberic except . from the input value
+  const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
+  const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
+  const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
+  const [inputContainerWith, setInputContainerWith] = React.useState(0);
+  const [searchInput, setSearchInput] = React.useState('');
+  const [portalPlaceholder] = React.useState(document.createElement('div'));
+  const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
+  const dispatch = useDispatch<Dispatch>();
+  const figmaFonts = useSelector(figmaFontsSelector);
+  const inputContainerRef = React.useRef<HTMLDivElement>(null);
+  const downShiftSearchContainerRef = React.useRef<HTMLDivElement>(null);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const mentionInputRef = React.useRef<HTMLInputElement>(null);
+  const windowHeight = React.useRef(window.innerHeight);
+  const downShiftContainerHeight = (windowHeight.current / 10) * 3;
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
+  const { getFigmaFonts } = useFigmaFonts();
+  const portalContainer = document.body;
+  const externalSearchField = useMemo<SearchField | undefined>(() => {
+    if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
+    if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
+    return undefined;
+  }, [type]);
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if ((downShiftSearchContainerRef.current && event.target instanceof Node && !downShiftSearchContainerRef.current.contains(event.target))
+     && (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target))) {
+      setShowAutoSuggest(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (portalContainer) {
+      portalContainer.appendChild(portalPlaceholder);
+    }
+    if (inputContainerRef.current) {
+      const boundingRect = inputContainerRef.current?.getBoundingClientRect();
+      setInputContainerPosX(boundingRect.left);
+      setInputContainerPosY(boundingRect.bottom);
+      setInputContainerWith(boundingRect.width);
+    }
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [inputContainerRef.current?.getBoundingClientRect()]);
+
+  React.useEffect(() => {
+    if (externalSearchField === 'Fonts') {
+      getFigmaFonts();
+    }
+  }, [externalSearchField, getFigmaFonts]);
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+  React.useEffect(() => {
+    if (!showAutoSuggest) {
+      setSearchInput('');
+    }
+    dispatch.uiState.setShowAutoSuggest(showAutoSuggest);
+  }, [showAutoSuggest, dispatch.uiState]);
+
+  const filteredTokenItems = useMemo(
+    () => {
+      let initialFilteredValues:ResolveTokenValuesResult[] = [];
+      if (isDocumentationType(type as Properties)) {
+        initialFilteredValues = resolvedTokens
+          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+          ));
+      } else {
+        initialFilteredValues = resolvedTokens
+          .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+          ));
+      }
+      if (searchInput) {
+        return initialFilteredValues.filter((token: SingleToken) => fuzzySearch(searchInput, token.name));
+      }
+      return initialFilteredValues;
+    },
+    [resolvedTokens, type, initialName, referenceTokenTypes, searchInput],
+  );
+
+  const filteredValues = useMemo(() => {
+    let initialFilteredValues: Array<string> = [];
+    if (currentSearchField === 'Fonts') {
+      initialFilteredValues = [...new Set(figmaFonts.map((font) => font.fontName.family))];
+    }
+    if (currentSearchField === 'Weights' && externalFontFamily) {
+      initialFilteredValues = figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
+    }
+    if (searchInput) {
+      return initialFilteredValues.filter((value: string) => fuzzySearch(searchInput, value));
+    }
+    return initialFilteredValues;
+  }, [figmaFonts, currentSearchField, externalFontFamily, searchInput]);
+
   const getHighlightedText = useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
@@ -131,7 +172,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       <span>
         {parts.map((part, i) => (
           // eslint-disable-next-line react/no-array-index-key
-          <StyledPart key={i} matches={part.toLowerCase() === highlight.toLowerCase()}>
+          <StyledPart key={i} matches={part === highlight}>
             {part}
           </StyledPart>
         ))}
@@ -140,29 +181,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
-  const filteredTokenItems = useMemo(
-    () => {
-      if (isDocumentationType(type as Properties)) {
-        return resolvedTokens
-          .filter(
-            (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-          )
-          .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-            a.name.localeCompare(b.name)
-          ));
-      }
-      return resolvedTokens
-        .filter(
-          (token: SingleToken) => !filteredValue || token.name.toLowerCase().includes(filteredValue.toLowerCase()),
-        )
-        .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name)
-        ));
-    },
-    [resolvedTokens, filteredValue, type, isDocumentationType],
-  );
-
-  const resolveValue = useCallback((token: SingleToken) => {
+  const getResolveValue = useCallback((token: SingleToken) => {
     let returnValue: string = '';
     if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
       if (Array.isArray(token.value)) {
@@ -188,47 +207,62 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   }, []);
 
   const handleSelect = useCallback((selectedItem: any) => {
-    setInputValue(value?.includes('$') ? `$${selectedItem.name}` : `{${selectedItem.name}}`);
+    if (selectedItem) {
+      if (currentSearchField === 'Tokens') {
+        setInputValue(value?.includes('$') ? `$${selectedItem}` : `{${selectedItem}}`);
+      } else {
+        setInputValue(selectedItem);
+      }
+    }
     setShowAutoSuggest(false);
-  }, [setInputValue, setShowAutoSuggest, value]);
+    mentionInputRef.current?.focus();
+  }, [setInputValue, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
     setShowAutoSuggest(!showAutoSuggest);
   }, [showAutoSuggest]);
 
-  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsFirstLoading(false);
-    handleChange(e);
-  }, [handleChange]);
+  const handleSearchInputChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
+    setSearchInput(e.target.value);
+  }, []);
 
-  const handleInputBlur = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (handleBlur) {
-      handleBlur(e);
-    }
-  }, [handleBlur]);
+  const handleChangeSearchField = React.useCallback(() => {
+    if (currentSearchField === 'Tokens' && externalSearchField) setCurrentSearchField(externalSearchField);
+    else setCurrentSearchField('Tokens');
+  }, [currentSearchField, externalSearchField]);
+
+  const handleOnFocus = React.useCallback(() => {
+    setShowAutoSuggest(false);
+  }, []);
 
   return (
-    <Downshift onSelect={handleSelect}>
+    <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
       {({
-        selectedItem, highlightedIndex, getItemProps, getInputProps,
+        selectedItem, highlightedIndex, getItemProps, isOpen, getInputProps,
       }) => (
-        <div className="relative">
+        <div style={{ position: 'relative' }}>
           <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-            {label && !inlineLabel ? <div className="font-medium text-xxs">{label}</div> : null}
-            {error ? <div className="font-bold text-red-500">{error}</div> : null}
+            {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
+            {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <StyledDownshiftInput
-              suffix={suffix}
-              type={type}
+            <MentionInput
               name={name}
-              placeholder={placeholder}
+              type={type}
               value={value}
-              onChange={handleInputChange}
-              getInputProps={getInputProps}
-              onBlur={handleInputBlur}
+              initialName={initialName}
+              placeholder={placeholder}
+              resolvedTokens={resolvedTokens}
+              inputContainerWith={inputContainerWith}
+              inputContainerPosX={inputContainerPosX}
+              inputContainerPosY={inputContainerPosY}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              portalPlaceholder={portalPlaceholder}
+              handleOnFocus={handleOnFocus}
+              inputRef={mentionInputRef}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>
@@ -236,33 +270,116 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               </StyledInputSuffix>
             )}
           </Box>
-
-          {filteredTokenItems
-            && filteredTokenItems.length > 0
-            && selectedItem?.name !== filteredValue
-            && (showAutoSuggest || (!isFirstLoading && (['{', '$'].some((c) => value?.includes(c)) && !value?.includes('}')))) ? (
-              <StyledDropdown className="content scroll-container">
-                {filteredTokenItems.map((token: SingleToken, index: number) => (
-                  <StyledItem
-                    data-cy="downshift-input-item"
-                    data-testid="downshift-input-item"
-                    className="dropdown-item"
-                    {...getItemProps({ key: token.name, index, item: token })}
+          {selectedItem?.name !== searchInput
+            && isOpen ? (
+              ReactDOM.createPortal(
+                <Box
+                  css={{
+                    position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
+                  }}
+                >
+                  <Box
                     css={{
-                      backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                      display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
                     }}
-                    isFocused={highlightedIndex === index}
+                    ref={downShiftSearchContainerRef}
                   >
-                    {type === 'color' && (
-                    <StyledItemColorDiv>
-                      <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                    </StyledItemColorDiv>
-                    )}
-                    <StyledItemName>{getHighlightedText(token.name, filteredValue || '')}</StyledItemName>
-                    <StyledItemValue>{resolveValue(token)}</StyledItemValue>
-                  </StyledItem>
-                ))}
-              </StyledDropdown>
+                    {
+                      externalSearchField && (
+                        <Box css={{ display: 'flex', gap: '$3' }}>
+                          <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
+                            Tokens
+                          </StyledButton>
+                          <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
+                            {externalSearchField}
+                          </StyledButton>
+                        </Box>
+                      )
+                    }
+                    <StyledDownshiftInput
+                      inputRef={searchInputRef}
+                      value={searchInput}
+                      onChange={handleSearchInputChange}
+                      getInputProps={getInputProps}
+                      dataCy="downshift-search-input"
+                    />
+                  </Box>
+                  {
+                      // eslint-disable-next-line no-nested-ternary
+                      currentSearchField === 'Tokens' ? (
+                        filteredTokenItems.length > 0 ? (
+                          <StyledList className="content content-dark scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith} itemCount={filteredTokenItems.length} itemSize={30}>
+                            {({ index, style }) => {
+                              const token = filteredTokenItems[index];
+                              return (
+                                <StyledItem
+                                  data-cy="downshift-input-item"
+                                  data-testid="downshift-input-item"
+                                  className="dropdown-item"
+                                  {...getItemProps({ key: token.name, index, item: token.name })}
+                                  css={{
+                                    backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                                  }}
+                                  isFocused={highlightedIndex === index}
+                                  style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                  onMouseDown={() => handleSelect(token.name)}
+                                >
+                                  {type === 'color' && (
+                                  <StyledItemColorDiv>
+                                    <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                                  </StyledItemColorDiv>
+                                  )}
+                                  <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
+                                  <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
+                                </StyledItem>
+
+                              );
+                            }}
+                          </StyledList>
+                        ) : (
+                          <StyledDropdown className="content scroll-container">
+                            <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                              No suggestions found
+                            </Box>
+                          </StyledDropdown>
+                        )
+                      ) : (
+                        filteredValues.length > 0 ? (
+                          <StyledList className="content content-dark scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith} itemCount={filteredValues.length} itemSize={30}>
+                            {({ index, style }) => {
+                              const value = filteredValues[index];
+                              return (
+                                <StyledItem
+                                  data-cy="downshift-input-item"
+                                  data-testid="downshift-input-item"
+                                  className="dropdown-item"
+                                  {...getItemProps({ key: value, index, item: value })}
+                                  css={{
+                                    backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                                  }}
+                                  isFocused={highlightedIndex === index}
+                                  style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                  onMouseDown={() => handleSelect(value)}
+                                >
+                                  <StyledItemName>{getHighlightedText(value, searchInput || '')}</StyledItemName>
+                                </StyledItem>
+                              );
+                            }}
+                          </StyledList>
+                        ) : (
+                          <StyledDropdown className="content scroll-container">
+                            <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                              No suggestions found
+                            </Box>
+                          </StyledDropdown>
+                        )
+                      )
+                    }
+                </Box>,
+                portalPlaceholder,
+              )
             ) : null}
         </div>
       )}

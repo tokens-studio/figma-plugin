@@ -15,7 +15,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
-import BulkRemapModal from './modals/BulkRemapModal';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
 import Stack from './Stack';
@@ -29,8 +28,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
-  const { removeTokensByValue } = useTokens();
-  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
+  const { removeTokensByValue, setNoneValuesOnNode } = useTokens();
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
@@ -70,14 +68,6 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     removeTokensByValue(valuesToRemove);
   }, [inspectState.selectedTokens, removeTokensByValue, uiState.selectionValues]);
 
-  const handleShowBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(true);
-  }, []);
-
-  const handleHideBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(false);
-  }, []);
-
   const handleSelectAll = React.useCallback(() => {
     dispatch.inspectState.setSelectedTokens(
       inspectState.selectedTokens.length === uiState.selectionValues.length
@@ -90,57 +80,59 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     dispatch.uiState.setOnboardingExplainerInspect(false);
   }, [dispatch]);
 
+  const setNoneValues = React.useCallback(() => {
+    setNoneValuesOnNode(resolvedTokens);
+  }, [setNoneValuesOnNode, resolvedTokens]);
+
   return (
-    <Box
-      css={{
-        display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+    <>
+      {uiState.selectionValues.length > 0 && (
+      <Box css={{
+        display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$4',
       }}
-      className="content scroll-container"
-    >
-      {uiState.selectionValues.length > 0 ? (
-        <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between',
-          }}
-          >
-            <Box css={{
-              display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
-            }}
-            >
-              <Checkbox
-                checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
-                id="selectAll"
-                onCheckedChange={handleSelectAll}
-              />
-              <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
-                Select all
-              </Label>
-            </Box>
-            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-              <Button onClick={handleShowBulkRemap} variant="secondary">
-                Bulk remap
-              </Button>
-              <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-                Remove selected
-              </Button>
-            </Box>
-          </Box>
-          {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
-          {bulkRemapModalVisible && (
-            <BulkRemapModal
-              isOpen={bulkRemapModalVisible}
-              onClose={handleHideBulkRemap}
-            />
-          )}
+      >
+        <Box css={{
+          display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+        }}
+        >
+          <Checkbox
+            checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
+            id="selectAll"
+            onCheckedChange={handleSelectAll}
+          />
+          <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+            Select all
+          </Label>
         </Box>
-      ) : (
-        <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
-          <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
-          {uiState.onboardingExplainerInspect && (
-            <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
-          )}
-        </Stack>
+        <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+          <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            Set to none
+          </Button>
+          <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            Remove selected
+          </Button>
+        </Box>
+      </Box>
       )}
-    </Box>
+      <Box
+        css={{
+          display: 'flex', flexDirection: 'column', flexGrow: 1, padding: '$4',
+        }}
+        className="content scroll-container"
+      >
+        {uiState.selectionValues.length > 0 ? (
+          <Box css={{ display: 'flex', flexDirection: 'column', gap: '$1' }}>
+            {Object.entries(groupedSelectionValues).map((group) => <InspectorTokenGroup key={`inspect-group-${group[0]}`} group={group as [Properties, SelectionGroup[]]} resolvedTokens={resolvedTokens} />)}
+          </Box>
+        ) : (
+          <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
+            <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+            {uiState.onboardingExplainerInspect && (
+              <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
+            )}
+          </Stack>
+        )}
+      </Box>
+    </>
   );
 }

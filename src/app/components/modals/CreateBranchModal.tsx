@@ -10,6 +10,7 @@ import { apiSelector, localApiStateSelector } from '@/selectors';
 import Stack from '../Stack';
 import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
+import { ErrorMessage } from '../ErrorMessage';
 
 type Props = {
   isOpen: boolean;
@@ -118,9 +119,9 @@ export default function CreateBranchModal({
           />
           {
             !isBranchNameValid && (
-              <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+              <ErrorMessage data-cy="provider-modal-error">
                 Branch name cannot contain spaces
-              </div>
+              </ErrorMessage>
             )
           }
           <Stack direction="row" gap={4}>
@@ -132,9 +133,9 @@ export default function CreateBranchModal({
             </Button>
           </Stack>
           {hasErrored && (
-            <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+            <ErrorMessage data-cy="provider-modal-error">
               There was an error connecting. Check your credentials.
-            </div>
+            </ErrorMessage>
           )}
         </Stack>
       </form>

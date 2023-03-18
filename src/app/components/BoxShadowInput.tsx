@@ -47,23 +47,30 @@ export default function BoxShadowInput({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(typeof internalEditToken.value === 'string' ? internalEditToken.value : '');
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;
   }, [internalEditToken, resolvedTokens]);
 
+  const mappedItems = React.useMemo(() => {
+    if (typeof internalEditToken.value === 'string' && selectedToken) return selectedToken.value as TokenBoxshadowValue | TokenBoxshadowValue[];
+    if (typeof internalEditToken.value !== 'string') return internalEditToken.value;
+    return undefined;
+  }, [internalEditToken.value, selectedToken]);
+
   const addShadow = React.useCallback(() => {
     if (Array.isArray(internalEditToken.value)) {
       handleBoxShadowValueChange([...internalEditToken.value, newTokenValue]);
+    } else if (typeof internalEditToken.value === 'undefined' || typeof internalEditToken.value === 'string') {
+      handleBoxShadowValueChange(compact([newTokenValue, newTokenValue]));
     } else if (typeof internalEditToken.value !== 'string') {
       handleBoxShadowValueChange(compact([internalEditToken.value, newTokenValue]));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
 
   const removeShadow = React.useCallback((index: number) => {
-    if (Array.isArray(internalEditToken.value)) {
+    if (Array.isArray(internalEditToken.value) && internalEditToken.value.length > 1) {
       handleBoxShadowValueChange(internalEditToken.value.filter((_, i) => i !== index));
     }
   }, [internalEditToken, handleBoxShadowValueChange]);
@@ -74,37 +81,39 @@ export default function BoxShadowInput({
         <Heading size="small">Shadow</Heading>
         <Box css={{ display: 'flex' }}>
           {mode === 'input' ? (
-            <IconButton
-              tooltip="Reference"
-              dataCy="mode-change-button"
-              onClick={handleMode}
-              icon={<TokensIcon />}
-            />
+            <>
+              <IconButton
+                tooltip="Reference mode"
+                dataCy="mode-change-button"
+                onClick={handleMode}
+                icon={<TokensIcon />}
+              />
+              <IconButton
+                tooltip="Add another shadow"
+                dataCy="button-shadow-add-multiple"
+                onClick={addShadow}
+                icon={<IconPlus />}
+              />
+            </>
           ) : (
             <IconButton
-              tooltip="input mode"
+              tooltip="Input mode"
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
             />
           )}
-          <IconButton
-            tooltip="Add another shadow"
-            dataCy="button-shadow-add-multiple"
-            onClick={addShadow}
-            icon={<IconPlus />}
-          />
         </Box>
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>
         {
           mode === 'input' ? (
             <DndProvider backend={HTML5Backend}>
-              {Array.isArray(internalEditToken.value) ? (
-                internalEditToken.value.map((token, index) => (
+              {Array.isArray(mappedItems) ? (
+                mappedItems.map((token, index) => (
                   <SingleBoxShadowInput
                     isMultiple
-                    value={internalEditToken.value as TokenBoxshadowValue[]}
+                    value={mappedItems}
                     handleBoxShadowValueChange={handleBoxShadowValueChange}
                     shadowItem={token}
                     index={index}
@@ -115,16 +124,14 @@ export default function BoxShadowInput({
                   />
                 ))
               ) : (
-                typeof internalEditToken.value !== 'string' && (
-                  <SingleBoxShadowInput
-                    handleBoxShadowValueChange={handleBoxShadowValueChange}
-                    index={0}
-                    value={internalEditToken.value}
-                    shadowItem={internalEditToken.value}
-                    onRemove={removeShadow}
-                    resolvedTokens={resolvedTokens}
-                  />
-                )
+                <SingleBoxShadowInput
+                  handleBoxShadowValueChange={handleBoxShadowValueChange}
+                  index={0}
+                  value={mappedItems}
+                  shadowItem={mappedItems}
+                  onRemove={removeShadow}
+                  resolvedTokens={resolvedTokens}
+                />
               )}
             </DndProvider>
           ) : (

@@ -5,8 +5,7 @@ export function convertToDefaultProperty(property: string): string {
   switch (property) {
     case Properties.width:
     case Properties.height:
-      type = Properties.sizing;
-      break;
+    case Properties.sizing:
     case Properties.itemSpacing:
     case Properties.verticalPadding:
     case Properties.horizontalPadding:
@@ -14,7 +13,7 @@ export function convertToDefaultProperty(property: string): string {
     case Properties.paddingLeft:
     case Properties.paddingBottom:
     case Properties.paddingRight:
-      type = Properties.spacing;
+      type = Properties.dimension;
       break;
     case Properties.borderRadiusTopLeft:
     case Properties.borderRadiusTopRight:
@@ -42,6 +41,9 @@ export function convertToDefaultProperty(property: string): string {
       break;
     case 'lineHeights':
       type = Properties.lineHeights;
+      break;
+    case 'style':
+      type = 'strokeStyle';
       break;
     default:
       type = property;

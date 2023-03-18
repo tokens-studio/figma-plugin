@@ -18,10 +18,11 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       usedTokenSets: msg.usedTokenSet,
       updatedAt: msg.updatedAt,
       checkForChanges: msg.checkForChanges ?? false,
+      collapsedTokenSets: msg.collapsedTokenSets,
     });
   }
   if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, false, msg.settings);
+    receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);
@@ -31,7 +32,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     await updateNodes(allWithData, tokensMap, msg.settings);
     await updatePluginData({ entries: allWithData, values: {} });
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
-      await swapStyles(msg.activeTheme, msg.themes);
+      await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
   }
 

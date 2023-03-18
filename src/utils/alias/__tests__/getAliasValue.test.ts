@@ -54,6 +54,37 @@ describe('getAliasValue', () => {
       type: TokenTypes.COLOR,
     },
     {
+      name: 'colors.light-extension',
+      input: '#ff0000',
+      value: '#ffdbd2',
+      type: TokenTypes.COLOR,
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            type: 'lighten',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    },
+    {
+      name: 'colors.mix-extension',
+      input: '#ff2277',
+      value: '#ff1445',
+      type: TokenTypes.COLOR,
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            color: '{colors.hex}',
+            type: 'mix',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    },
+    {
       name: 'alias.complex',
       input: '$base.scale * $base.ratio ^ round((200 + 400 - $base.index) / 100)',
       value: 8,
@@ -129,6 +160,12 @@ describe('getAliasValue', () => {
       name: 'colors.aliasdeep',
       input: '{colors.deep}',
       value: '#ff0000',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'colors.aliasdeep-without-endtag',
+      input: '{colors.deep',
+      value: '{colors.deep',
       type: TokenTypes.COLOR,
     },
     {
@@ -402,13 +439,85 @@ describe('getAliasValue', () => {
       value: 'false',
       input: '{other.false}',
     },
+    {
+      name: 'border-token',
+      input: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      value: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      type: TokenTypes.BORDER,
+    },
+    {
+      name: 'border-alias',
+      input: '{border-token}',
+      value: {
+        color: '#ffffff',
+        width: '10px',
+        style: 'solid',
+      },
+      type: TokenTypes.BORDER,
+    },
+    {
+      name: 'color.light-10',
+      input: '#ffffff',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.light-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-10',
+      input: '#000000',
+      value: '#000000',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'mode',
+      input: 'light',
+      value: 'light',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'mode',
+      input: 'dark',
+      value: 'dark',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'foreground.default',
+      input: '{color.{mode}-10}',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'foreground.subtle',
+      input: '{color.{mode}-20}',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
 
   ];
 
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
       // @TODO check this test typing
-      expect(getAliasValue({ value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
+      expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[], false)).toEqual(token.value);
     });
   });
 });

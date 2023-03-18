@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Heading from './Heading';
+import Text from './Text';
 import Button from './Button';
 import Modal from './Modal';
 import { getLastopened } from '@/selectors';
@@ -12,6 +13,10 @@ const StyledLink = styled('a', {
   display: 'inline-flex',
   fontSize: '$1',
   color: '$fgAccent',
+});
+
+const StyledImage = styled('img', {
+  borderRadius: '$card',
 });
 
 function fetchOnboardingImage(idx: number) {
@@ -34,28 +39,28 @@ function fetchOnboardingImage(idx: number) {
 export default function OnboardingFlow() {
   const onboardingflow = [
     {
-      title: 'Welcome to Figma Tokens',
-      excerpt: 'Hey there, awesome to have you with us. Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.',
+      title: 'Welcome!',
+      excerpt: 'Hey there, awesome to have you with us. Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.',
     },
     {
       title: 'Create tokens',
       excerpt: 'Start by creating your tokens, a good place to start is your colors. You can even import your existing styles!',
-      read_more_link: 'https://docs.figmatokens.com/tokens/creating-tokens',
+      read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
     },
     {
       title: 'Reference token values',
       excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {colors.red.500} — that way you are able to reuse your tokens.',
-      read_more_link: 'https://docs.figmatokens.com/tokens/aliases',
+      read_more_link: 'https://docs.tokens.studio/tokens/aliases',
     },
     {
       title: 'Apply tokens to a layer',
       excerpt: 'Select a layer in Figma and left-click any token to apply that token on it. Depending on the type of token you clicked on, a different action is performed. Right-click tokens for a context menu to choose what you want to apply.',
-      read_more_link: 'https://docs.figmatokens.com/tokens/applying-tokens',
+      read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
     },
     {
       title: 'Want to know more?',
       excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know on Slack!',
-      read_more_link: 'https://docs.figmatokens.com',
+      read_more_link: 'https://docs.tokens.studio',
     },
   ];
 
@@ -88,9 +93,9 @@ export default function OnboardingFlow() {
             align="start"
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
-            <img src={fetchOnboardingImage(index)} alt="" className="rounded" />
+            <StyledImage src={fetchOnboardingImage(index)} alt="" />
             <Heading size="medium">{item.title}</Heading>
-            <p className="text-xs">{item.excerpt}</p>
+            <Text size="small">{item.excerpt}</Text>
             {item.read_more_link && (
               <StyledLink
                 target="_blank"

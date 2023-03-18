@@ -21,7 +21,7 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import filterInternalProperty from '@/utils/filterInternalProperty';
 
 export async function updateJSONBinTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null,
+  tokens, themes, context, updatedAt, oldUpdatedAt = null, dispatch,
 }: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
   try {
@@ -52,6 +52,9 @@ export async function updateJSONBinTokens({
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
         if (await storage.save(payload)) {
+          saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
+            tokenSetOrder: Object.keys(tokens),
+          });
           return payload;
         }
       } else {
@@ -61,6 +64,9 @@ export async function updateJSONBinTokens({
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else if (await storage.save(payload)) {
+      saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
+        tokenSetOrder: Object.keys(tokens),
+      });
       return payload;
     }
   } catch (e) {
@@ -92,6 +98,7 @@ export function useJSONbin() {
         },
         themes,
         updatedAt,
+        dispatch,
       });
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,

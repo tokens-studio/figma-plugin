@@ -15,6 +15,7 @@ import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
 import { SyncOption } from '@/app/store/useTokens';
+import { AuthData } from './Auth';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -46,9 +47,12 @@ export enum AsyncMessageTypes {
   SET_LICENSE_KEY = 'async/set-license-key',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
+  SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
+  GET_FIGMA_FONTS = 'async/get-figma-fonts',
+  SET_AUTH_DATA = 'async/set-auth-data',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -84,6 +88,12 @@ export type RemoveTokensByValueAsyncMessage = AsyncMessage<AsyncMessageTypes.REM
 }>;
 export type RemoveTokensByValueAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE>;
 
+export type SetNoneValuesOnNodeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, {
+  tokensToSet: { nodes: NodeInfo[]; property: Properties }[];
+  tokens: AnyTokenList
+}>;
+export type SetNoneValuesOnNodeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NONE_VALUES_ON_NODE>;
+
 export type RemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.REMAP_TOKENS, {
   oldName: string;
   newName: string;
@@ -97,6 +107,7 @@ export type RemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.REMAP
 export type BulkRemapTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS, {
   oldName: string;
   newName: string;
+  updateMode: UpdateMode;
 }>;
 export type BulkRemapTokensMessageAsyncResult = AsyncMessage<AsyncMessageTypes.BULK_REMAP_TOKENS>;
 
@@ -140,7 +151,7 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
-  settings: Partial<SettingsState>;
+  settings: SettingsState;
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
@@ -166,7 +177,8 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
 
 export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   tokens: Record<string, AnyTokenList>;
-  settings: Record<SyncOption, boolean>
+  options: Record<SyncOption, boolean>;
+  settings: SettingsState;
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   styleIdsToRemove: string[];
@@ -182,6 +194,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   activeTheme: string | null;
   checkForChanges?: boolean
   shouldSwapStyles?: boolean;
+  collapsedTokenSets: string[];
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
@@ -222,6 +235,15 @@ export type StartupMessage = AsyncMessage<AsyncMessageTypes.STARTUP, (
 )>;
 export type StartupMessageResult = AsyncMessage<AsyncMessageTypes.STARTUP>;
 
+export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS>;
+export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
+  fonts: Array<Font>
+}>;
+export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
+  auth: AuthData | null
+}>;
+export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -252,7 +274,10 @@ export type AsyncMessages =
   | SetLicenseKeyMessage
   | StartupMessage
   | AttachLocalStylesToTheme
-  | ResolveStyleInfo;
+  | ResolveStyleInfo
+  | SetNoneValuesOnNodeAsyncMessage
+  | GetFigmaFontsMessage
+  | SetAuthDataMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -284,7 +309,10 @@ export type AsyncMessageResults =
   | SetLicenseKeyMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
-  | ResolveStyleInfoResult;
+  | ResolveStyleInfoResult
+  | SetNoneValuesOnNodeAsyncMessageResult
+  | GetFigmaFontsMessageResult
+  | SetAuthDataMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

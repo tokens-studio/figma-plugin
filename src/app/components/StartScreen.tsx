@@ -17,9 +17,10 @@ import { Tabs } from '@/constants/Tabs';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
+import { track } from '@/utils/analytics';
 
 const StyledFigmaTokensLogo = styled(FigmaLetter, {
-  width: '90px',
+  width: '130px',
   height: '55px',
 });
 
@@ -46,9 +47,16 @@ function StartScreen() {
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
 
-  const onSetDefaultTokens = React.useCallback(() => {
+  const onSetEmptyTokens = React.useCallback(() => {
+    track('Start with empty set');
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
     dispatch.tokenState.setEmptyTokens();
+  }, [dispatch]);
+
+  const onSetDefaultTokens = React.useCallback(() => {
+    track('Start with exmaple set');
+    dispatch.uiState.setActiveTab(Tabs.TOKENS);
+    dispatch.tokenState.setDefaultTokens();
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {
@@ -80,20 +88,20 @@ function StartScreen() {
           <StyledFigmaTokensLogo />
         </Stack>
         <Text muted>
-          Figma Tokens allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
+          Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
         </Text>
         <Stack direction="column" gap={4}>
           <Heading size="large">Guides</Heading>
           <Stack direction="column" gap={3}>
-            <HelpfulLink href="https://docs.figmatokens.com/getting-started" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/getting-started?ref=startscreen" target="_blank">
               <BookmarkIcon />
               Getting started
             </HelpfulLink>
-            <HelpfulLink href="https://docs.figmatokens.com/" target="_blank">
+            <HelpfulLink href="https://docs.tokens.studio/?ref=startscreen" target="_blank">
               <ReaderIcon />
               Documentation
             </HelpfulLink>
-            <HelpfulLink href="https://figmatokens.com/slack" target="_blank">
+            <HelpfulLink href="https://tokens.studio/slack" target="_blank">
               <ChatBubbleIcon />
               Join our Slack
             </HelpfulLink>
@@ -110,13 +118,18 @@ function StartScreen() {
             }}
           />
         ) : (
-          <Button id="button-configure" size="small" variant="primary" onClick={onSetDefaultTokens}>
-            Get started with a new file
-          </Button>
+          <Stack direction="row" gap={2}>
+            <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
+              New empty file
+            </Button>
+            <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
+              Load example
+            </Button>
+          </Stack>
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
-          <a href="https://github.com/six7/figma-tokens" style={{ color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer" className="underline">
+          <a href="https://github.com/tokens-studio/figma-plugin" style={{ textDecoration: 'underline', color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer">
             Found an issue? We&#39;re on GitHub!
           </a>
         </Stack>

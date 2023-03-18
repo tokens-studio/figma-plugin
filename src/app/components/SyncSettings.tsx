@@ -22,7 +22,6 @@ import {
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { Flex } from './Flex';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
@@ -47,6 +46,10 @@ const providers = [
   {
     text: 'Azure DevOps',
     type: StorageProviderType.ADO,
+  },
+  {
+    text: 'Generic Versioned',
+    type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
   },
 ];
 
@@ -112,7 +115,7 @@ const SyncSettings = () => {
     });
     dispatch.tokenState.setEditProhibited(false);
     showConfirmModal(false);
-  }, [dispatch.uiState, setStorageType, dispatch.tokenState]);
+  }, [dispatch.tokenState, dispatch.uiState, setStorageType]);
 
   const handleHideStorageModal = React.useCallback(() => {
     setShowEditStorageModalVisible(false);
@@ -157,7 +160,7 @@ const SyncSettings = () => {
               <LocalStorageItem onClick={handleSetLocalStorage} isActive={storageType.provider === StorageProviderType.LOCAL} />
               {apiProviders.map((item) => (
                 <StorageItem
-                  key={item?.internalId || `${item.provider}-${item.id}-${item.secret}`}
+                  key={item?.internalId || `${item.provider}-${item.id}`}
                   onEdit={handleEditClick(item)}
                   item={item}
                 />
@@ -166,28 +169,20 @@ const SyncSettings = () => {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
-              <Flex>
-                <Text size="small">Add new</Text>
-              </Flex>
+              <Text size="small">Add new</Text>
               <IconToggleableDisclosure />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               side="bottom"
-              css={{ minWidth: '180px' }}
             >
               {
-                  providers.map((provider) => (
-                    <DropdownMenuItem
-                      css={{ display: 'flex', gap: '$3', padding: '$5' }}
-                      key={provider.type}
-                      data-testid={`add-${provider.text}-credential`}
-                      onSelect={handleProviderClick(provider.type)}
-                    >
-                      {getProviderIcon(provider.type)}
-                      {provider.text}
-                    </DropdownMenuItem>
-                  ))
-                }
+                providers.map((provider) => (
+                  <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                    <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider.type)}</Box>
+                    {provider.text}
+                  </DropdownMenuItem>
+                ))
+              }
             </DropdownMenuContent>
           </DropdownMenu>
         </Stack>

@@ -8,6 +8,7 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: null,
+      authData: null,
       lastOpened: 0,
       onboardingExplainer: {
         sets: true,
@@ -43,6 +44,7 @@ describe('startup', () => {
     expect(result).toEqual({
       settings: {},
       activeTheme: null,
+      authData: null,
       lastOpened: 0,
       onboardingExplainer: {
         sets: true,
@@ -55,6 +57,7 @@ describe('startup', () => {
       localTokenData: {
         activeTheme: null,
         checkForChanges: null,
+        collapsedTokenSets: null,
         themes: [],
         updatedAt: '',
         usedTokenSet: null,

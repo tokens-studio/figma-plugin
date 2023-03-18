@@ -18,6 +18,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
+import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
@@ -28,6 +29,7 @@ type PullTokensOptions = {
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
   activeTheme?: string | null
+  collapsedTokenSets?: string[] | null
 };
 
 // @TODO typings and hooks
@@ -38,6 +40,7 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
+  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
   const {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
   } = useGitHub();
@@ -59,7 +62,7 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
     dispatch.uiState.startJob({
@@ -71,6 +74,10 @@ export default function useRemoteTokens() {
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
         remoteData = await pullTokensFromJSONBin(context);
+        break;
+      }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        remoteData = await pullTokensFromGenericVersionedStorage(context);
         break;
       }
       case StorageProviderType.GITHUB: {
@@ -105,7 +112,7 @@ export default function useRemoteTokens() {
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
-      dispatch.tokenState.setCollapsedTokenSets([]);
+      dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
       track('Launched with token sets', {
         count: Object.keys(remoteData.tokens).length,
         setNames: Object.keys(remoteData.tokens),
@@ -117,6 +124,7 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     api,
+    pullTokensFromGenericVersionedStorage,
     pullTokensFromGitHub,
     pullTokensFromGitLab,
     pullTokensFromBitbucket,
@@ -228,6 +236,20 @@ export default function useRemoteTokens() {
         }
         break;
       }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        if (credentials.id) {
+          content = await addGenericVersionedCredentials(credentials);
+        } else {
+          const id = await createNewGenericVersionedStorage(credentials);
+          if (id) {
+            credentials.id = id;
+            return {
+              status: 'success',
+            };
+          }
+        }
+        break;
+      }
       case StorageProviderType.GITHUB: {
         content = await addNewGitHubCredentials(credentials);
         break;
@@ -272,11 +294,13 @@ export default function useRemoteTokens() {
   }, [
     dispatch,
     addJSONBinCredentials,
+    addGenericVersionedCredentials,
     addNewGitLabCredentials,
     addNewGitHubCredentials,
     addNewBitbucketCredentials,
     addNewADOCredentials,
     createNewJSONBin,
+    createNewGenericVersionedStorage,
     pullTokensFromURL,
     setStorageType,
   ]);
@@ -304,7 +328,7 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     return newBranchCreated;
-  }, [createGithubBranch, createADOBranch, createBitbucketBranch]);
+  }, [createGithubBranch, createGitLabBranch, createBitbucketBranch, createADOBranch]);
 
   const fetchBranches = useCallback(async (context: StorageTypeCredentials) => {
     switch (context.provider) {

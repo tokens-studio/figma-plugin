@@ -1,12 +1,9 @@
 import React from 'react';
 import Button from './Button';
 import Box from './Box';
-import { IconFile, IconDotaVertical } from '@/icons';
+import { IconFile } from '@/icons';
 import { StyledStorageItem } from './StyledStorageItem';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from './DropdownMenu';
+import Badge from './Badge';
 
 type Props = {
   onClick: () => void;
@@ -24,16 +21,14 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => (
       </Box>
       <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>Local document</Box>
     </Box>
-    <Box css={{ marginRight: '$3' }}>
-      <Button id="button-storage-item-apply" variant={isActive ? 'primary' : 'secondary'} onClick={onClick}>
-        {isActive ? 'Active' : 'Apply'}
-      </Button>
+    <Box css={{ marginRight: '$2' }}>
+      {isActive ? <Badge text="Active" /> : (
+
+        <Button id="button-storage-item-apply" variant="secondary" onClick={onClick}>
+          Apply
+        </Button>
+      )}
     </Box>
-    <DropdownMenu>
-      <DropdownMenuTrigger css={{ padding: '$1', background: 'none' }}>
-        <IconDotaVertical />
-      </DropdownMenuTrigger>
-    </DropdownMenu>
   </StyledStorageItem>
 );
 

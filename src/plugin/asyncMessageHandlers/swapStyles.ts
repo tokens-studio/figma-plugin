@@ -1,9 +1,29 @@
+import { UpdateMode } from '@/constants/UpdateMode';
 import { ThemeObjectsList } from '@/types';
 import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 import { applySiblingStyleId } from './applySiblingStyle';
 
+function getRootNode(updateMode: UpdateMode) {
+  const rootNode = [];
+  switch (updateMode) {
+    case UpdateMode.PAGE:
+      if (figma.currentPage.children) rootNode.push(...figma.currentPage.children);
+      break;
+    case UpdateMode.SELECTION:
+      if (figma.currentPage.selection) rootNode.push(...figma.currentPage.selection);
+      break;
+    case UpdateMode.DOCUMENT:
+      figma.root.children.forEach((page) => rootNode.push(...page.children));
+      break;
+    default:
+      rootNode.push(...figma.currentPage.children);
+      break;
+  }
+  return rootNode;
+}
+
 // Go through layers to swap styles
-export function swapStyles(activeTheme: string, themes: ThemeObjectsList) {
+export async function swapStyles(activeTheme: string, themes: ThemeObjectsList, updateMode: UpdateMode) {
   const newTheme = themes.find((theme) => theme.id === activeTheme)?.name;
   // Creates an object that groups sibling styles by token name and theme name, e.g. { 'color.background': { 'dark': 'S:1234,4:16', 'light': 'S:1235,4:16' } }
   const mappedStyleReferences = themes.reduce((acc, theme) => {
@@ -26,7 +46,7 @@ export function swapStyles(activeTheme: string, themes: ThemeObjectsList) {
     return;
   }
 
-  figma.currentPage.selection.forEach((layer) => {
+  getRootNode(updateMode).forEach((layer) => {
     applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, newTheme);
   });
 }

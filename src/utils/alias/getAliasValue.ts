@@ -1,15 +1,20 @@
+import { getRootReferences, findReferences } from '../findReferences';
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-import { TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
+import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
-import { findReferences } from '../findReferences';
+import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
+
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
+// eslint-disable-next-line import/no-cycle
+import { checkIfAlias } from './checkIfAlias';
 
 type TokenNameNodeType = string | undefined;
 
 function getReturnedValue(token: SingleToken | string | number) {
-  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY)) {
+  if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY || token?.type === TokenTypes.BORDER)) {
     return token.value;
   }
   if (isSingleTokenValueObject(token)) {
@@ -19,7 +24,7 @@ function getReturnedValue(token: SingleToken | string | number) {
 }
 
 function replaceAliasWithResolvedReference(
-  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | null,
+  token: string | TokenTypographyValue | TokenBoxshadowValue | TokenBoxshadowValue[] | TokenBorderValue | null,
   reference: string,
   resolvedReference: string | number | TokenBoxshadowValue | TokenBoxshadowValue[] | Record<string, unknown> | null,
 ) {
@@ -35,27 +40,30 @@ function replaceAliasWithResolvedReference(
 }
 
 // @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = []): string | number | TokenTypographyValue | TokenBoxshadowValue | Array<TokenBoxshadowValue> | null {
+// when isResolved is true, we don't calculate the modifiers because it has been already resolved. previousCount prevents the multiple calculation of modifier
+export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = [], isResolved: boolean = true, previousCount: number = 0): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
   // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {
-    const tokenReferences = typeof returnedValue === 'string' ? findReferences(returnedValue) : null;
+    const tokenReferences = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
 
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {
           let nameToLookFor: string;
           if (ref.startsWith('{')) {
-            if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
-            else nameToLookFor = ref.slice(1, ref.length);
+            nameToLookFor = ref.slice(1, ref.length - 1);
           } else { nameToLookFor = ref.substring(1); }
-
           if (
             (typeof token === 'object' && nameToLookFor === token.name)
             || nameToLookFor === token
           ) {
             return isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
+          }
+          const nameToLookForReferences = getRootReferences(nameToLookFor);
+          if (nameToLookForReferences?.length) {
+            nameToLookFor = String(getAliasValue(nameToLookFor, tokens, isResolved, previousCount));
           }
 
           const tokenAliasSplitted = nameToLookFor.split('.');
@@ -65,17 +73,19 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
-          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens); }
+          if (foundToken?.name === nameToLookFor) {
+            return getAliasValue(foundToken, tokens, isResolved, previousCount);
+          }
 
           if (
             !!tokenAliasSplittedLast
             && foundToken?.name === tokenAliasLastExcluded
-            && foundToken.rawValue?.hasOwnProperty(tokenAliasSplittedLast)
+            && foundToken.value?.hasOwnProperty(tokenAliasSplittedLast)
           ) {
-            const { rawValue } = foundToken;
-            if (typeof rawValue === 'object' && !Array.isArray(rawValue)) {
-              const value = rawValue[tokenAliasSplittedLast as keyof typeof rawValue] as string | number;
-              return getAliasValue(value, tokens);
+            const { value } = foundToken;
+            if (typeof value === 'object' && !Array.isArray(value)) {
+              const resolvedValue = value[tokenAliasSplittedLast as keyof typeof value] as string | number;
+              return getAliasValue(resolvedValue, tokens, isResolved, previousCount);
             }
           }
 
@@ -88,7 +98,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
             && foundToken?.rawValue[tokenAliasSplittedLastPrevious].hasOwnProperty(tokenAliasSplittedLast)
           ) {
             const rawValueEntry = foundToken?.rawValue[tokenAliasSplittedLastPrevious];
-            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens);
+            return getAliasValue(rawValueEntry[tokenAliasSplittedLast as keyof typeof rawValueEntry] || tokenAliasSplittedLastPrevious, tokens, isResolved, previousCount);
           }
         }
         return ref;
@@ -108,7 +118,14 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
       if (!remainingReferences) {
         const couldBeNumberValue = checkAndEvaluateMath(returnedValue);
         if (typeof couldBeNumberValue === 'number') return couldBeNumberValue;
-        return convertToRgb(couldBeNumberValue);
+        const rgbColor = convertToRgb(couldBeNumberValue);
+        if (typeof token !== 'string' && typeof token !== 'number' && token?.$extensions?.['studio.tokens']?.modify && rgbColor && !isResolved && previousCount === 0) {
+          if (token?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && checkIfAlias(token?.$extensions?.['studio.tokens']?.modify?.color)) {
+            return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens)), color: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.color, tokens, isResolved, previousCount)) ?? '' });
+          }
+          return convertModifiedColorToHex(rgbColor, { ...token.$extensions?.['studio.tokens']?.modify, value: String(getAliasValue(token?.$extensions?.['studio.tokens']?.modify?.value, tokens, isResolved, previousCount)) });
+        }
+        return rgbColor;
       }
     }
   } catch (err) {

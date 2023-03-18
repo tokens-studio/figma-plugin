@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from '../Modal';
 import Heading from '../Heading';
+import Text from '../Text';
 import Button from '../Button';
 import Stack from '../Stack';
 
@@ -17,10 +18,10 @@ export default function ConfirmLocalStorageModal({ isOpen, onToggle, onSuccess }
 
   return (
     <Modal isOpen={isOpen} close={handleClose}>
-      <Stack direction="column" justify="center" gap={4} css={{ textAlign: 'center' }}>
+      <Stack direction="column" justify="center" gap={4}>
         <Stack direction="column" gap={2}>
           <Heading>Set to document storage?</Heading>
-          <p className="text-xs">You can always go back to remote storage.</p>
+          <Text size="small">You can always go back to remote storage.</Text>
         </Stack>
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={handleClose}>

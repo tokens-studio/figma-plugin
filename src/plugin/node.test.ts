@@ -1,9 +1,10 @@
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  destructureCompositionToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
+  destructureToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders, destructureTokenForAlias,
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 const singleShadowToken = {
   type: 'boxShadow',
@@ -47,6 +48,15 @@ const multipleShadowToken = {
       spread: 4,
     },
   ],
+};
+
+const borderToken = {
+  type: TokenTypes.BORDER,
+  value: {
+    color: '#ff0000',
+    width: '12px',
+    type: 'solid',
+  },
 };
 
 const tokens = new Map([
@@ -124,6 +134,14 @@ const tokens = new Map([
       value: multipleShadowToken.value,
     },
   ],
+  ['global.border.general',
+    {
+      ...borderToken,
+      name: 'border.general',
+      rawValue: borderToken.value,
+      value: borderToken.value,
+    },
+  ],
 ]);
 
 const values = [
@@ -134,6 +152,7 @@ const values = [
   { composition: 'global.composition.containMultiBoxshadow' },
   { boxShadow: 'global.shadow.single' },
   { boxShadow: 'global.shadow.multiple' },
+  { border: 'global.border.general' },
 ];
 
 const mappedTokens = [
@@ -163,6 +182,21 @@ const mappedTokens = [
   {
     boxShadow: multipleShadowToken.value,
   },
+  {
+    border: borderToken.value,
+  },
+  {
+    borderTop: borderToken.value,
+  },
+  {
+    borderRight: borderToken.value,
+  },
+  {
+    borderLeft: borderToken.value,
+  },
+  {
+    borderBottom: borderToken.value,
+  },
 ];
 
 const applyProperties = [
@@ -173,6 +207,25 @@ const applyProperties = [
   { boxShadow: multipleShadowToken.value },
   { boxShadow: singleShadowToken.value },
   { boxShadow: multipleShadowToken.value },
+  { border: borderToken.value, borderColor: '#ff0000' },
+  { borderTop: borderToken.value, borderColor: '#ff0000' },
+  { borderRight: borderToken.value, borderColor: '#ff0000' },
+  { borderLeft: borderToken.value, borderColor: '#ff0000' },
+  { borderBottom: borderToken.value, borderColor: '#ff0000' },
+];
+
+const applyTokens = [
+  { fill: 'global.colors.blue' },
+  { opacity: 'opacity.40' },
+  {
+    opacity: 'opacity.40',
+    borderRadius: 'border-radius.7',
+  },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { border: 'global.border.general', borderColor: 'global.border.general' },
 ];
 
 describe('mapValuesToTokens', () => {
@@ -183,10 +236,18 @@ describe('mapValuesToTokens', () => {
   });
 });
 
-describe('destructureCompositionToken', () => {
+describe('destructureToken', () => {
   it('return properties in compositionToken', () => {
     mappedTokens.forEach((token, index) => {
-      expect(destructureCompositionToken(token)).toEqual(applyProperties[index]);
+      expect(destructureToken(token)).toEqual(applyProperties[index]);
+    });
+  });
+});
+
+describe('destructureTokenForAliasa', () => {
+  it('return extract border color from border token', () => {
+    values.forEach((value, index) => {
+      expect(destructureTokenForAlias(tokens, value)).toEqual(applyTokens[index]);
     });
   });
 });
