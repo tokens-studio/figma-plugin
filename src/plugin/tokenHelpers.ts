@@ -113,7 +113,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   if (aliases.length > 0 && (previousCount > aliases.length || !previousCount)) {
     return resolveTokenValues(returnedTokens, aliases.length);
   }
-
   return returnedTokens;
 }
 

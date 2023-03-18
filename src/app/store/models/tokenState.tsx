@@ -33,10 +33,12 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
+import removeInheritType from '@/utils/removeInheritTypeTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
   stringTokens: string;
+  inheritTypeTokens: Record<string, AnyTokenList>;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
   importedTokens: {
@@ -57,6 +59,9 @@ export interface TokenState {
 export const tokenState = createModel<RootModel>()({
   state: {
     tokens: {
+      global: [],
+    },
+    inheritTypeTokens: {
       global: [],
     },
     stringTokens: '',
@@ -168,10 +173,15 @@ export const tokenState = createModel<RootModel>()({
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens });
+      const tokens = removeInheritType(values);
       return {
         ...state,
         tokens: {
           ...state.tokens,
+          ...tokens,
+        },
+        inheritTypeTokens: {
+          ...state.inheritTypeTokens,
           ...values,
         },
       };
@@ -185,6 +195,10 @@ export const tokenState = createModel<RootModel>()({
     setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
       tokens: newTokens,
+    }),
+    setInheritTypeTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
+      ...state,
+      inheritTypeTokens: newTokens,
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};

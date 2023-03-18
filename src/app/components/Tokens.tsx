@@ -22,7 +22,7 @@ import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, inheritTypeTokenSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
@@ -31,6 +31,7 @@ import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+import convertToInheritTypeTokens from '@/utils/convertToInheritToTypeTokens';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -90,6 +91,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
+  const inheritTypeTokens = useSelector(inheritTypeTokenSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTokensTab = useSelector(activeTokensTabSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -108,6 +110,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
       tokenDiv.current.addEventListener('scroll', () => {}, false);
     }
   }, []);
+
+  React.useEffect(() => {
+    const newInheritTypeTokens = convertToInheritTypeTokens(tokens, inheritTypeTokens);
+    dispatch.tokenState.setInheritTypeTokens(newInheritTypeTokens);
+  }, [tokens]);
 
   React.useEffect(() => {
     if (scrollPositionSet && tokenDiv.current && typeof tokenDiv.current.scrollTo === 'function') {

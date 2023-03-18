@@ -55,3 +55,4 @@ export * from './getLastopened';
 export * from './baseFontSizeSelector';
 export * from './aliasBaseFontSizeSelector';
 export * from './figmaFontsSelector';
+export * from './inheritTypeTokenSelector';
