@@ -147,7 +147,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.dashPattern = [0, 0];
       }
       break;
-
+    case 'boolean':
+      if ('visible' in node && typeof node.visible !== 'undefined') {
+        node.visible = true;
+      }
+      break;
     default:
       break;
   }
