@@ -155,7 +155,7 @@ export const settings = createModel<RootModel>()({
       };
     },
   },
-  effects: () => ({
+  effects: (dispatch) => ({
     setWindowSize: (payload) => {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,
@@ -196,6 +196,7 @@ export const settings = createModel<RootModel>()({
     },
     setBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
