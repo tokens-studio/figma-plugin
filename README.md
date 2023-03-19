@@ -32,8 +32,8 @@ Whenever you apply a token to a layer, the plugin will store hidden information 
 Most information can be found in the [docs](https://docs.tokens.studio) or [our website](https://tokens.studio).
 
 # Contribute
-* Run `npm ci` to install dependencies.
-* Run `npm run start` to start webpack in watch mode or `npm run build` to build once.
+* Run `yarn` to install dependencies.
+* Run `yarn start` to start webpack in watch mode or `yarn build` to build once.
 * Open `Figma` -> `Plugins` -> `Development` -> `New Plugin...` and choose `manifest.json` file from this repo.
 * Create a Pull request for your branch
 
