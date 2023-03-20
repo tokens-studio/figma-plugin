@@ -2,7 +2,7 @@ import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
 
-function getGroupTypeName(tokenName: string, groupLevel: number): string {
+export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
     const lastDotPosition = tokenName.split('.', groupLevel - 1).join('.').length;
     return `${tokenName.slice(0, lastDotPosition)}.type`;
