@@ -84,7 +84,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async canWrite(): Promise<boolean> {
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
-    if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
+    if (!this.projectId) throw new Error('Project ID not assigned');
 
     const currentUser = await this.gitlabClient.Users.current();
     try {
@@ -96,7 +96,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
     } catch (e) {
       console.error(e);
     }
-
     return false;
   }
 
