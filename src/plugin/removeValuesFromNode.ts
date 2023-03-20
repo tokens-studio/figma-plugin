@@ -147,7 +147,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.dashPattern = [0, 0];
       }
       break;
-
+    case 'textDecoration':
+      if ('textDecoration' in node && typeof node.textDecoration !== 'undefined') {
+        node.textDecoration = 'NONE';
+      }
+      break;
     default:
       break;
   }
