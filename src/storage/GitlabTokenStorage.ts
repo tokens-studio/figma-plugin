@@ -84,27 +84,18 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   public async canWrite(): Promise<boolean> {
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
-    if (!this.groupId || !this.projectId) throw new Error('Missing Project or Group ID');
+    if (!this.projectId) throw new Error('Project ID not assigned');
 
     const currentUser = await this.gitlabClient.Users.current();
     try {
       if (!currentUser || currentUser.state !== 'active') return false;
-
-      const groupPermission = await this.gitlabClient.GroupMembers.show(this.groupId, currentUser.id, {
+      const projectPermission = await this.gitlabClient.ProjectMembers.show(this.projectId, currentUser.id, {
         includeInherited: true,
       });
-      return groupPermission.access_level >= GitLabAccessLevel.Developer;
+      return projectPermission.access_level >= GitLabAccessLevel.Developer;
     } catch (e) {
-      try {
-        const projectPermission = await this.gitlabClient.ProjectMembers.show(this.projectId, currentUser.id, {
-          includeInherited: true,
-        });
-        return projectPermission.access_level >= GitLabAccessLevel.Developer;
-      } catch (e) {
-        console.error(e);
-      }
+      console.error(e);
     }
-
     return false;
   }
 
