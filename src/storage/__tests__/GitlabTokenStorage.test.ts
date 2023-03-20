@@ -165,22 +165,6 @@ describe('GitlabTokenStorage', () => {
     expect(mockCreateBranch).toBeCalledWith(35102363, 'development', 'heads/main');
   });
 
-  it('canWrite should return true if user is a collaborator by GroupMember', async () => {
-    mockGetCurrentUser.mockImplementationOnce(() => (
-      Promise.resolve({
-        id: 11289475,
-        state: 'active',
-      })
-    ));
-    mockGetGroupMembers.mockImplementationOnce(() => (
-      Promise.resolve({
-        access_level: 50,
-      })
-    ));
-    expect(await storageProvider.canWrite()).toBe(true);
-    expect(mockGetGroupMembers).toBeCalledWith(51634506, 11289475, { includeInherited: true });
-  });
-
   it('canWrite should return true if user is a collaborator by projectMember', async () => {
     mockGetCurrentUser.mockImplementationOnce(() => (
       Promise.resolve({
@@ -220,7 +204,7 @@ describe('GitlabTokenStorage', () => {
     provider.enableMultiFile();
     await expect(provider.canWrite())
       .rejects
-      .toThrow('Missing Project or Group ID');
+      .toThrow('Project ID not assigned');
   });
 
   it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
