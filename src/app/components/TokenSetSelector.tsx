@@ -104,7 +104,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    if (tokens.hasOwnProperty(tokenSetMarkedForChange)) {
+      dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    } else {
+      dispatch.tokenState.renameTokenSetFolder({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    }
     setTokenSetMarkedForChange('');
     setShowRenameTokenSetFields(false);
   }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
@@ -172,6 +176,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               onChange={handleChangeName}
               type="text"
               name="tokensetname"
+              data-testId="rename-set-input"
               required
             />
             <Stack direction="row" gap={4}>
@@ -200,6 +205,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               name="tokensetname"
               required
               data-cy="token-set-input"
+              data-testId="create-set-input"
               autofocus
             />
             <Stack direction="row" gap={4}>
@@ -213,7 +219,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" data-testId="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>
