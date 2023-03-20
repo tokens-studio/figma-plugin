@@ -55,6 +55,7 @@ describe('removeTokensByValue', () => {
       paddingBottom: 10,
       paddingLeft: 10,
       itemSpacing: 10,
+      textDecoration: 'underline',
     } as unknown) as BaseNode;
   });
 
@@ -192,5 +193,10 @@ describe('removeTokensByValue', () => {
   it('should set cornerRadius as 0', () => {
     removeValuesFromNode(mockNode, Properties.borderColor);
     expect(mockNode.strokes).toEqual([]);
+  });
+
+  it('should set textDecoration as none', () => {
+    removeValuesFromNode(mockNode, Properties.textDecoration);
+    expect(mockNode.textDecoration).toEqual('NONE');
   });
 });

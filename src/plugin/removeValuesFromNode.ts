@@ -152,6 +152,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.visible = true;
       }
       break;
+    case 'textDecoration':
+      if ('textDecoration' in node && typeof node.textDecoration !== 'undefined') {
+        node.textDecoration = 'NONE';
+      }
+      break;
     default:
       break;
   }
