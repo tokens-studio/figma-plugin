@@ -1,22 +1,9 @@
-/*
-  With monacco:
-  we can support:
-  - Syntax highlighting
-  - Search and highlight within code
-  - Collapsable lines / groups (like VSCode)
-  - Show errors inline
-  bundle size increase: 0.09kb
-
-  With react-ace:
-  we can support:
-    It seems like that react-ace doesn't work properly in node environments
-  bundle size increase: 0.04kb
-*/
-
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Editor from '@monaco-editor/react';
 import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
+import { editProhibitedSelector } from '@/selectors';
 import useTokens from '../store/useTokens';
 
 type Props = {
@@ -28,10 +15,11 @@ function JSONEditor({
   stringTokens,
   handleChange,
 }: Props) {
+  const editProhibited = useSelector(editProhibitedSelector);
   const { handleJSONUpdate } = useTokens();
 
-  const handleJsonEditChange = React.useCallback((value?: string) => {
-    if (value) handleChange(value);
+  const handleJsonEditChange = React.useCallback((value: string | undefined) => {
+    handleChange(value ?? '');
   }, [handleChange]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
@@ -57,6 +45,15 @@ function JSONEditor({
         onChange={handleJsonEditChange}
         value={stringTokens}
         theme="vs-dark"
+        options={{
+          minimap: {
+            enabled: false,
+          },
+          lineNumbers: 'off',
+          wordWrap: 'on',
+          contextmenu: false,
+          readOnly: editProhibited,
+        }}
       />
     </Box>
   );

@@ -63,7 +63,7 @@ export class AsyncMessageChannel {
 
   public connect() {
     return this.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
-      if (!msg?.id || !msg.message || !msg.message.type.startsWith('async/')) return;
+      if (!msg.id || !msg.message || !msg.message.type.startsWith('async/')) return;
       const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
       if (handler) {
         try {
