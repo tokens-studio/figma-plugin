@@ -41,7 +41,7 @@
     "@supabase/postgrest-js": "^1.1.0",
     "@supabase/realtime-js": "^2.1.0",
     "@supabase/storage-js": "^2.0.0",
-    "@supabase/supabase-js": "^2.0.5",
+    "@supabase/supabase-js": "^2.8.0",
     "@types/file-saver": "^2.0.5",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
