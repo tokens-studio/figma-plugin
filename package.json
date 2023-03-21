@@ -82,7 +82,7 @@
     "lodash.debounce": "^4.0.8",
     "mixpanel-figma": "^2.0.1",
     "ml-matrix": "^6.9.0",
-    "msw": "^0.42.1",
+    "msw": "^0.49.3",
     "object-hash": "^2.2.0",
     "object-path": "^0.11.8",
     "octokit-commit-multiple-files": "^3.2.1",
