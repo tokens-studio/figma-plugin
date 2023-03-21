@@ -55,7 +55,7 @@
     "color2k": "^2.0.1",
     "colorjs.io": "^0.4.3",
     "copy-to-clipboard": "^3.3.3",
-    "core-js": "^3.9.1",
+    "core-js": "^3.29.0",
     "cypress-react-selector": "^2.3.6",
     "dnd-core": "^12.0.1",
     "dot-object": "^2.1.3",
