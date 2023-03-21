@@ -44,7 +44,7 @@
     "@supabase/supabase-js": "^2.0.5",
     "@types/file-saver": "^2.0.5",
     "@welldone-software/why-did-you-render": "^6.2.3",
-    "autoprefixer": "^10.2.5",
+    "autoprefixer": "^10.4.13",
     "axios": "^0.21.2",
     "azure-devops-node-api": "^11.1.1",
     "bitbucket": "^2.7.0",
