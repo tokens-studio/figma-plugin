@@ -31,3 +31,4 @@ export * from './EditTokenObject';
 export * from './SingleDimensionToken';
 export * from './SingleBorderToken';
 export * from './SingleAssetToken';
+export * from './SingleBooleanToken';
