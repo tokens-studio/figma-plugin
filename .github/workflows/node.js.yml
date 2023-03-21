@@ -41,7 +41,6 @@ jobs:
       # 5: Build package
       - name: Build Package
         run: npm run build
-
       # 6: Store artifact
       - name: Store Artifact
         uses: actions/upload-artifact@v2

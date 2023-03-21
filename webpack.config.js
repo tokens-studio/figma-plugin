@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 module.exports = (env, argv) => ({
@@ -29,15 +30,14 @@ module.exports = (env, argv) => ({
         ],
         exclude: /node_modules/,
       },
-      // Fixing colorjs imports, see https://github.com/tokens-studio/figma-plugin/pull/1498#issuecomment-1372082627
       {
         test: /\.c?js$/,
         use: [
           {
             loader: 'babel-loader',
           },
+          //We don't add an exclude for node_modules as we need to aggressively optimize code deps
         ],
-        exclude: /node_modules\/(?!(colorjs.io)\/)/,
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
       { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
@@ -65,11 +65,6 @@ module.exports = (env, argv) => ({
           },
         ],
       },
-      {
-        type: 'javascript/auto',
-        test: /\.mjs$/,
-        include: /node_modules/,
-      },
     ],
   },
 
@@ -86,7 +81,12 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-
+  optimization:{
+    nodeEnv: 'production',
+    minimize: true,
+    usedExports: true,
+    concatenateModules:true
+  },
   output: {
     filename: '[name].js',
     sourceMapFilename: "[name].js.map",
@@ -115,6 +115,7 @@ module.exports = (env, argv) => ({
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    })
+    }),
+    new BundleAnalyzerPlugin()
   ],
 });

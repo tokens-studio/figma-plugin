@@ -37,7 +37,7 @@ export const stitchesInstance = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
-      mono: 'JetBrainsMono, monospace',
+      mono: '\'JetBrains Mono\', monospace',
     },
     fontSizes: {
       xxsmall: '10px',
