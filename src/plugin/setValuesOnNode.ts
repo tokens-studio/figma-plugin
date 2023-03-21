@@ -457,9 +457,9 @@ export default async function setValuesOnNode(
       }
 
       if ('visible' in node && typeof values.boolean === 'string' && typeof data.boolean !== 'undefined') {
-        if (values.boolean.toLocaleLowerCase() === 'true') {
+        if (values.boolean === 'true') {
           node.visible = true;
-        } else if (values.boolean.toLocaleLowerCase() === 'false') {
+        } else if (values.boolean === 'false') {
           node.visible = false;
         }
       }
