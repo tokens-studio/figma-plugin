@@ -54,7 +54,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       values: {
         options: {},
       },
-    }, null, 2);
+    }, null, '\t');
     let method: string;
     switch (flow) {
       case GenericVersionedStorageFlow.READ_ONLY:

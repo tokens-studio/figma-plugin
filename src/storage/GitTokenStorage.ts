@@ -99,15 +99,15 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
           }
           return acc;
         }, {}),
-      }, null, 2);
+      }, null, '\t');
     } else if (this.flags.multiFileEnabled) {
       files.forEach((file) => {
         if (file.type === 'tokenSet') {
-          filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${file.name}.json`)] = JSON.stringify(file.data, null, '\t');
         } else if (file.type === 'themes') {
-          filesChangeset[joinPath(this.path, `${SystemFilenames.THEMES}.json`)] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${SystemFilenames.THEMES}.json`)] = JSON.stringify(file.data, null, '\t');
         } else if (file.type === 'metadata') {
-          filesChangeset[joinPath(this.path, `${SystemFilenames.METADATA}.json`)] = JSON.stringify(file.data, null, 2);
+          filesChangeset[joinPath(this.path, `${SystemFilenames.METADATA}.json`)] = JSON.stringify(file.data, null, '\t');
         }
       });
     } else {

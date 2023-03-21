@@ -30,5 +30,5 @@ export default function stringifyTokens(
     }
   });
 
-  return JSON.stringify(tokenObj, null, 2);
+  return JSON.stringify(tokenObj, null, '\t');
 }

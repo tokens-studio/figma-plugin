@@ -16,6 +16,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  flexShrink: 0,
   width: 12,
   height: 12,
   '&:focus': { boxShadow: '$focus' },

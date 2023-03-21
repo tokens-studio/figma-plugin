@@ -24,13 +24,13 @@ export default function MultiFilesExport({ onClose }: Props) {
   const filesChangeset = React.useMemo(() => {
     const changeObj: Record<string, string> = {};
     Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
-      changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
+      changeObj[`${key}.json`] = JSON.stringify(value, null, '\t');
     });
-    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
+    changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, '\t');
     const metadata = {
       tokenSetOrder: Object.keys(tokens),
     };
-    changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, 2);
+    changeObj[`${SystemFilenames.METADATA}.json`] = JSON.stringify(metadata, null, '\t');
     return changeObj;
   }, [tokens, themes]);
 
