@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
 
@@ -14,7 +15,6 @@ module.exports = (env, argv) => ({
   entry: {
     ui: './src/app/index.tsx', // The entry point for your UI code
     code: './src/plugin/controller.ts', // The entry point for your plugin code
-    transform: './src/utils/transform.ts', // The entry point for your plugin code
   },
 
   module: {
@@ -37,7 +37,7 @@ module.exports = (env, argv) => ({
             loader: 'babel-loader',
           },
         ],
-        exclude:  /node_modules\/(?!(colorjs.io)\/)/,
+        exclude: /node_modules\/(?!(colorjs.io)\/)/,
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
       { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
@@ -92,7 +92,6 @@ module.exports = (env, argv) => ({
     sourceMapFilename: "[name].js.map",
     path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
   },
-
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
   plugins: [
     new Dotenv({
@@ -116,6 +115,6 @@ module.exports = (env, argv) => ({
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    }),
+    })
   ],
 });
