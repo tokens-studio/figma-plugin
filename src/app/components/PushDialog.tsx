@@ -112,34 +112,46 @@ function PushDialog() {
             <Stack direction="column" gap={4}>
               <Stack direction="column" gap={2}>
                 <Heading>Push changes</Heading>
-                <p className="text-xs">Push your local changes to your repository.</p>
-                <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
-                  {'id' in localApiState ? localApiState.id : null}
-                </div>
-                <Heading size="small">Commit message</Heading>
-                <Textarea
-                  id="push-dialog-commit-message"
-                  border
-                  rows={3}
-                  value={commitMessage}
-                  onChange={handleCommitMessageChange}
-                  placeholder="Enter commit message"
-                />
-                <Input
-                  full
-                  label="Branch"
-                  value={branch}
-                  onChange={handleBranchChange}
-                  type="text"
-                  name="branch"
-                  required
-                />
+                {localApiState.provider !== StorageProviderType.SUPERNOVA ? (
+                  <>
+                    <p className="text-xs">Push your local changes to your repository.</p>
+                    <Heading size="small">Commit message</Heading>
+                    <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
+                      {'id' in localApiState ? localApiState.id : null}
+                    </div>
+                    <Textarea
+                      id="push-dialog-commit-message"
+                      border
+                      rows={3}
+                      value={commitMessage}
+                      onChange={handleCommitMessageChange}
+                      placeholder="Enter commit message"
+                    />
+                    <Input
+                      full
+                      label="Branch"
+                      value={branch}
+                      onChange={handleBranchChange}
+                      type="text"
+                      name="branch"
+                      required
+                    />
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs">Push your local changes to your Supernova.io design system.</p>
+                    <Heading size="small">Design system</Heading>
+                    <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
+                      {'designSystemUrl' in localApiState ? localApiState.designSystemUrl : null}
+                    </div>
+                  </>
+                )}
               </Stack>
               <Stack direction="row" gap={4} justify="between">
                 <Button variant="secondary" onClick={onCancel}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={!commitMessage} variant="primary">
+                <Button type="submit" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && !commitMessage} variant="primary">
                   Push
                 </Button>
               </Stack>
