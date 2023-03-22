@@ -83,32 +83,60 @@ export default async function setTextValuesOnTarget(
           trackFromPlugin('Font not found', { family, style });
         }
       }
-      if (typeof fontSize !== 'undefined') {
-        target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
-      }
-      if (typeof lineHeight !== 'undefined') {
-        const transformedValue = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
-        if (transformedValue !== null) {
-          target.lineHeight = transformedValue;
+      try {
+        if (typeof fontSize !== 'undefined') {
+          target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
         }
+      } catch (e) {
+        console.log('Error setting fontSize on target', target, token, e);
       }
-      if (typeof letterSpacing !== 'undefined') {
-        const transformedValue = transformValue(letterSpacing, 'letterSpacing', baseFontSize);
-        if (transformedValue !== null) {
-          target.letterSpacing = transformedValue;
+      try {
+        if (typeof lineHeight !== 'undefined') {
+          const transformedValue = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
+          if (transformedValue !== null) {
+            target.lineHeight = transformedValue;
+          }
         }
+      } catch (e) {
+        console.log('Error setting lineHeight on target', target, token, e);
       }
-      if (typeof paragraphSpacing !== 'undefined') {
-        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
+      try {
+        if (typeof letterSpacing !== 'undefined') {
+          const transformedValue = transformValue(letterSpacing, 'letterSpacing', baseFontSize);
+          if (transformedValue !== null) {
+            target.letterSpacing = transformedValue;
+          }
+        }
+      } catch (e) {
+        console.log('Error setting letterSpacing on target', target, token, e);
       }
-      if (typeof paragraphIndent !== 'undefined') {
-        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
+      try {
+        if (typeof paragraphSpacing !== 'undefined') {
+          target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting paragraphSpacing on target', target, token, e);
       }
-      if (textCase) {
-        target.textCase = transformValue(textCase, 'textCase', baseFontSize);
+      try {
+        if (typeof paragraphIndent !== 'undefined') {
+          target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting paragraphIndent on target', target, token, e);
       }
-      if (textDecoration) {
-        target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
+      try {
+        if (textCase) {
+          target.textCase = transformValue(textCase, 'textCase', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting textCase on target', target, token, e);
+      }
+      try {
+        if (textDecoration) {
+          target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting textDecoration on target', target, token, e);
       }
       if (description && 'description' in target) {
         target.description = description;
