@@ -99,4 +99,76 @@ describe('convertTokensToGroupedObject', () => {
       },
     });
   });
+
+  it('should not resolve references', () => {
+    const resolvedTokens = [
+      {
+        value: '#1B1F24',
+        type: 'color',
+        name: 'colors.gray.900',
+        internal__Parent: 'base/options',
+        rawValue: '#1B1F24',
+      },
+      {
+        value: '#1B1F24',
+        type: 'color',
+        name: 'colors.gray.alias',
+        internal__Parent: 'base/options',
+        rawValue: '{colors.gray.900}',
+      },
+      {
+        value: { width: 4, color: '#1B1F24', style: 'solid' },
+        description: 'Font value',
+        type: 'border',
+        name: 'border.base',
+        internal__Parent: 'core/border',
+        rawValue: {
+          width: '{sizing.base}',
+          color: '{colors.gray.900}',
+          style: 'solid',
+        },
+      },
+    ] as ResolveTokenValuesResult[];
+    const options = {
+      expandTypography: false,
+      expandShadow: false,
+      expandComposition: false,
+      expandBorder: false,
+      preserveRawValue: true,
+      throwErrorWhenNotResolved: false,
+      resolveReferences: false,
+    };
+    expect(convertTokensToGroupedObject(resolvedTokens, [], options)).toEqual({
+      border: {
+        base: {
+          description: 'Font value',
+          rawValue: {
+            color: '{colors.gray.900}',
+            style: 'solid',
+            width: '{sizing.base}',
+          },
+          type: 'border',
+          value: {
+            color: '{colors.gray.900}',
+            style: 'solid',
+            width: '{sizing.base}',
+          },
+        },
+      },
+      colors: {
+        gray: {
+          900: {
+            rawValue: '#1B1F24',
+            type: 'color',
+            value: '#1B1F24',
+          },
+          alias: {
+            rawValue: '{colors.gray.900}',
+            type: 'color',
+            value: '{colors.gray.900}',
+          },
+        },
+      },
+    });
+  });
 });
