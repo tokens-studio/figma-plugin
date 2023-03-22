@@ -1,0 +1,14 @@
+{
+    "color": {
+      "button": {
+        "primary": {
+          "press": {
+            "bg-color": {
+              "value": "#00a2ba",
+              "type": "color"
+            }
+          }
+        }
+      }
+    }
+  }

@@ -167,6 +167,42 @@ const tokens = [
     description: 'the one with a nested shadow alias',
     type: TokenTypes.BOX_SHADOW,
   },
+  {
+    name: 'colors.modify',
+    value: '#00a2ba',
+    $extensions: {
+      'studio.tokens': {
+        modify: {
+          type: 'darken',
+          value: '0.3',
+          space: 'srgb',
+        },
+      },
+    },
+    description: 'color with modifier',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'colors.white',
+    value: '#00a2ba',
+    description: 'color with modifier',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'colors.alias-modify',
+    value: '$colors.white',
+    $extensions: {
+      'studio.tokens': {
+        modify: {
+          type: 'darken',
+          value: '0.3',
+          space: 'srgb',
+        },
+      },
+    },
+    description: 'color with alias modifier',
+    type: TokenTypes.COLOR,
+  },
 ];
 
 const output = [
