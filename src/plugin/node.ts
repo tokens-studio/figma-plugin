@@ -57,7 +57,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
     if (isSingleToken(resolvedToken)) {
       if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
         const modifier = resolvedToken.$extensions['studio.tokens'].modify;
-        acc[key] = modifier.type === ColorModifierTypes.MIX ? `mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${modifier.type}(${modifier.value}) / ${modifier.space}`;
+        acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
       } else {
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       }
