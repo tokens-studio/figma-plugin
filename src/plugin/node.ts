@@ -26,6 +26,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 
 // @TODO fix typings
 
@@ -53,7 +54,16 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
+    if (isSingleToken(resolvedToken)) {
+      if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
+        const modifier = resolvedToken.$extensions['studio.tokens'].modify;
+        acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
+      } else {
+        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
+      }
+    } else {
+      acc[key] = resolvedToken;
+    }
     return acc;
   }, {});
   return mappedValues;

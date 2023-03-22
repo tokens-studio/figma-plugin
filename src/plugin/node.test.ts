@@ -234,6 +234,59 @@ describe('mapValuesToTokens', () => {
       expect(mapValuesToTokens(tokens, value)).toEqual(mappedTokens[index]);
     });
   });
+
+  it('return rawValue with modifier', () => {
+    const tokens = new Map([
+      ['global.colors.mix',
+        {
+          name: 'global.colors.mix',
+          type: 'color' as const,
+          value: '#0000ff',
+          rawValue: '#0000ff',
+          $extensions: {
+            'studio.tokens': {
+              modify: {
+                type: 'mix',
+                value: 0.4,
+                space: 'lch',
+                color: '#0033ff',
+              },
+            },
+          },
+        },
+      ],
+      ['global.colors.lighten',
+        {
+          name: 'global.colors.lighten',
+          type: 'color' as const,
+          value: '#0000ff',
+          rawValue: '#0000ff',
+          $extensions: {
+            'studio.tokens': {
+              modify: {
+                type: 'lighten',
+                value: 0.4,
+                space: 'lch',
+              },
+            },
+          },
+        },
+      ],
+    ]);
+
+    const values = [
+      { tokenValue: 'global.colors.lighten' },
+      { tokenValue: 'global.colors.mix' },
+    ];
+
+    const output = [
+      { tokenValue: '#0000ff / lighten(0.4) / lch' }, { tokenValue: '#0000ff / mix(#0033ff, 0.4) / lch' },
+    ];
+
+    values.forEach((value, index) => {
+      expect(mapValuesToTokens(tokens, value)).toEqual(output[index]);
+    });
+  });
 });
 
 describe('destructureToken', () => {
