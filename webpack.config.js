@@ -14,7 +14,6 @@ module.exports = (env, argv) => ({
   entry: {
     ui: './src/app/index.tsx', // The entry point for your UI code
     code: './src/plugin/controller.ts', // The entry point for your plugin code
-    transform: './src/utils/transform.ts', // The entry point for your plugin code
   },
 
   module: {
@@ -29,15 +28,14 @@ module.exports = (env, argv) => ({
         ],
         exclude: /node_modules/,
       },
-      // Fixing colorjs imports, see https://github.com/tokens-studio/figma-plugin/pull/1498#issuecomment-1372082627
       {
         test: /\.c?js$/,
         use: [
           {
             loader: 'babel-loader',
           },
+          //We don't add an exclude for node_modules as we need to aggressively optimize code deps
         ],
-        exclude:  /node_modules\/(?!(colorjs.io)\/)/,
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
       { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
@@ -65,11 +63,6 @@ module.exports = (env, argv) => ({
           },
         ],
       },
-      {
-        type: 'javascript/auto',
-        test: /\.mjs$/,
-        include: /node_modules/,
-      },
     ],
   },
 
@@ -86,13 +79,17 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-
+  optimization:{
+    nodeEnv: 'production',
+    minimize: true,
+    usedExports: true,
+    concatenateModules:true
+  },
   output: {
     filename: '[name].js',
     sourceMapFilename: "[name].js.map",
     path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
   },
-
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
   plugins: [
     new Dotenv({
@@ -116,6 +113,6 @@ module.exports = (env, argv) => ({
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    }),
+    })
   ],
 });
