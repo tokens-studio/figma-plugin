@@ -398,6 +398,46 @@ const output = [
       color: '#ff0000',
     },
   },
+  {
+    $extensions: {
+      'studio.tokens': {
+        modify: {
+          space: 'srgb',
+          type: 'darken',
+          value: '0.3',
+        },
+      },
+    },
+    description: 'color with modifier',
+    name: 'colors.modify',
+    rawValue: '#00a2ba',
+    type: 'color',
+    value: '#007182',
+  },
+  {
+    description: 'color with modifier',
+    name: 'colors.white',
+    rawValue: '#00a2ba',
+    type: 'color',
+    value: '#00a2ba',
+  },
+  {
+    $extensions: {
+      'studio.tokens': {
+        modify: {
+          space: 'srgb',
+          type: 'darken',
+          value: '0.3',
+        },
+      },
+    },
+    description: 'color with alias modifier',
+    name: 'colors.alias-modify',
+    rawValue: '$colors.white',
+    type: 'color',
+    value: '#007182',
+  },
+
 ];
 describe('resolveTokenValues', () => {
   it('resolves all values it can resolve', () => {
