@@ -50,12 +50,14 @@ describe('GenericVersionedStorage', () => {
   });
 
   it('can read GenericVersioned data', async () => {
+    const unixTime = 1666785400000;
+    const date = new Date(unixTime);
     mockFetch.mockImplementationOnce(() => (
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
           version: '1',
-          updatedAt: 1666785400000,
+          updatedAt: unixTime,
           values: {
             global: {
               colors: {
@@ -96,7 +98,73 @@ describe('GenericVersionedStorage', () => {
       path: '$metadata.json',
       data: {
         version: '1',
-        updatedAt: 1666785400000,
+        updatedAt: date.toISOString(),
+      },
+    });
+    expect(result[2]).toEqual({
+      type: 'tokenSet',
+      path: 'global.json',
+      name: 'global',
+      data: {
+        colors: {
+          red: {
+            type: TokenTypes.COLOR,
+            value: '#ff0000',
+          },
+        },
+      },
+    });
+  });
+
+  it('can parse date as an iso string', async () => {
+    const date = new Date(1666785400000);
+    mockFetch.mockImplementationOnce(() => (
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          version: '1',
+          updatedAt: date.toISOString(),
+          values: {
+            global: {
+              colors: {
+                red: {
+                  type: TokenTypes.COLOR,
+                  value: '#ff0000',
+                },
+              },
+            },
+          },
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {},
+            },
+          ],
+        }),
+      })
+    ));
+
+    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
+    const result = await storage.read();
+
+    expect(result[0]).toEqual({
+      type: 'themes',
+      path: '$themes.json',
+      data: [
+        {
+          id: 'light',
+          name: 'Light',
+          selectedTokenSets: {},
+        },
+      ],
+    });
+    expect(result[1]).toEqual({
+      type: 'metadata',
+      path: '$metadata.json',
+      data: {
+        version: '1',
+        updatedAt: date.toISOString(),
       },
     });
     expect(result[2]).toEqual({
