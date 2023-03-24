@@ -93,10 +93,11 @@ export function updateTokenSetsInState(
     });
   }
 
+  const updatedTokens = Object.fromEntries(entries);
   const tokenSetItems = tokenSetListToTree(entries.map(([tokenSet]) => tokenSet));
   const newTokens = {};
   tokenSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path).forEach((set) => {
-    Object.assign(newTokens, { [set]: state.tokens[set] });
+    Object.assign(newTokens, { [set]: updatedTokens[set] });
   });
 
   return {
