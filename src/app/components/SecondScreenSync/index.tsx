@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import * as Sentry from '@sentry/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RealtimeChannel, RealtimePostgresUpdatePayload } from '@supabase/realtime-js';
 import {
@@ -36,22 +37,15 @@ export default function SecondScreenSync() {
           },
           (payload: RealtimePostgresUpdatePayload<TokenData>) => {
             if (payload.new.last_updated_by !== Clients.PLUGIN && payload.new.synced_data) {
-              const { sets, themes: newThemes, usedTokenSets: newUsedTokenSets } = payload.new.synced_data;
-
-              if (sets) {
-                dispatch.tokenState.setTokens(sets);
-              }
-              if (newUsedTokenSets) {
-                dispatch.tokenState.setUsedTokenSet(newUsedTokenSets);
-              }
-              if (newThemes) {
-                dispatch.tokenState.setThemes(newThemes);
-              }
+              dispatch.tokenState.setNewTokenData(payload.new.synced_data);
             }
           },
         )
         .subscribe((status: any, err: any) => {
-          console.error(err);
+          if (err) {
+            console.error(err);
+            Sentry.captureException(err);
+          }
         });
     }
     return () => {
@@ -80,6 +74,7 @@ export default function SecondScreenSync() {
         usedTokenSets,
         activeTheme,
       });
+
       updateRemoteData(user.email, data);
     }
   }, [tokens, themes, secondScreenOn, user, usedTokenSets, activeTheme]);
@@ -87,7 +82,6 @@ export default function SecondScreenSync() {
   // this is used for tracking if the plugin is on
   const createChannel = useCallback(() => {
     let channel: RealtimeChannel | null = null;
-
     if (user && secondScreenOn) {
       channel = supabase.channel(`${user.id}`, {
         config: {
@@ -99,9 +93,14 @@ export default function SecondScreenSync() {
 
       channel.subscribe(async (status) => {
         if (status === 'SUBSCRIBED' && channel) {
-          await channel.track({ online_at: new Date().toISOString() });
-        } else if (status === 'CLOSED') {
-          createChannel();
+          try {
+            await channel.track({ online_at: new Date().toISOString() });
+          } catch (error) {
+            if (error) {
+              console.log('channel error', error);
+              Sentry.captureException(error);
+            }
+          }
         }
       });
     }

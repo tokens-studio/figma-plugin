@@ -26,6 +26,11 @@ describe('token-transformer', () => {
     var testResult = fs.readFileSync('temp/typography.json');
     expect(testResult.toString()).toEqual(expectedResult.toString());
   });
+  it('generates border theme files correctly', async () => {
+    var expectedResult = fs.readFileSync('output/border.json');
+    var testResult = fs.readFileSync('temp/border.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
   it('generates light theme files correctly from folder', async () => {
     var expectedResult = fs.readFileSync('output/folder-light.json');
     var testResult = fs.readFileSync('temp/folder-light.json');
