@@ -1,3 +1,12 @@
+## v0.0.32 (2023-03-24)
+
+Fixed an issue with borders using references not resolving correctly
+Fixed an issue with color modifiers output values (darken, lighten)
+
+## v0.0.31 (2023-03-24)
+
+Fixed an issue with color modifiers where they'd sometimes lead to wrong results.
+
 ## v0.0.30 (2023-02-16)
 
 Added support for expandBorder=true - this will expand the recently introduced `border` tokens to their individual parts
