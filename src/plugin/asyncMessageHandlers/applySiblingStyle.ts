@@ -19,6 +19,21 @@ export async function applySiblingStyleId(node: BaseNode, styleIds: StyleIdMap, 
           }
 
           // A text layer can have mixed styles, we need to swap the segments.
+          if (node.textStyleId !== figma.mixed) {
+            const newTextStyleId = await getNewStyleId(node.textStyleId as string, styleIds, styleMap, newTheme);
+            if (newTextStyleId) {
+              node.textStyleId = newTextStyleId;
+            }
+          } else {
+            node.getStyledTextSegments(['textStyleId']).forEach(async (segment) => {
+              const newTextStyleId = await getNewStyleId(segment.textStyleId, styleIds, styleMap, newTheme);
+
+              if (newTextStyleId) {
+                node.setRangeTextStyleId(segment.start, segment.end, newTextStyleId);
+              }
+            });
+          }
+
           if (node.fillStyleId !== figma.mixed) {
             const newFillStyleId = await getNewStyleId(node.fillStyleId as string, styleIds, styleMap, newTheme);
             if (newFillStyleId) {

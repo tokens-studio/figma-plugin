@@ -19,12 +19,12 @@ export default async function renameStylesFromPlugin(
   });
 
   const themesToContainToken = themeInfo.themes.filter((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, value]) => tokenSet === parent && value === TokenSetStatus.ENABLED)).map((filteredTheme) => filteredTheme.name);
-  const pathNames = themesToContainToken.map((theme) => convertTokenNameToPath(oldName, theme)).concat(convertTokenNameToPath(oldName));
-  const allStyleIds = allStyles.filter((style) => pathNames.some((pathName) => {
-    if (isMatchingStyle(pathName, style)) {
-      const oldPath = oldName.split('.').map((part) => part.trim()).join('/');
-      const newPath = newName.split('.').map((part) => part.trim()).join('/');
-      style.name = pathName.replace(oldPath, newPath);
+  const oldPathNames = themesToContainToken.map((theme) => convertTokenNameToPath(oldName, theme)).concat(themesToContainToken.map(() => convertTokenNameToPath(oldName, null, 1))).concat(convertTokenNameToPath(oldName));
+  const newPathNames = themesToContainToken.map((theme) => convertTokenNameToPath(newName, theme)).concat(themesToContainToken.map(() => convertTokenNameToPath(newName, null, 1))).concat(convertTokenNameToPath(newName));
+  const allStyleIds = allStyles.filter((style) => oldPathNames.some((oldPathName) => {
+    if (isMatchingStyle(oldPathName, style)) {
+      const index = oldPathNames.findIndex((item) => item === oldPathName);
+      style.name = newPathNames[index];
       return true;
     }
     return false;
