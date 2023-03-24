@@ -19,7 +19,8 @@
     "build-folder-test": "node cli.js tokens temp/folder-light.json base/options,base/sizing,themes/light,core/shadows base/options,base/sizing",
     "build-folder-test-theme-config": "node cli.js tokens --theme --themeOutputPath temp",
     "build-resolve-false-test": "node cli.js tokens.json temp/resolve-false.json base/options,base/sizing,themes/dark,core/shadows base/options,base/sizing --resolveReferences=false",
-    "test": "npm run build-typography-test && npm run build-border-test && npm run build-light-test && npm run build-dark-test && npm run build-single-file-test-theme-config && npm run build-folder-test && npm run build-folder-test-theme-config && npm run build-resolve-false-test && npm run build-composition-test && npm run build-single-file-test-order-config && jest"
+    "build-color-modifier": "node cli.js modifier temp/tokens-modifier.json core,theme/01-light,theme/02-dark --expandTypography=true --expandShadow=true --preserveRawValue=true",
+    "test": "npm run build-typography-test && npm run build-border-test && npm run build-light-test && npm run build-dark-test && npm run build-single-file-test-theme-config && npm run build-folder-test && npm run build-folder-test-theme-config && npm run build-resolve-false-test && npm run build-composition-test && npm run build-single-file-test-order-config && npm run build-color-modifier && jest"
   },
   "author": "six7",
   "license": "MIT",
