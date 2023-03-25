@@ -14,6 +14,18 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Test current file",
+      "program": "${workspaceRoot}/node_modules/jest/bin/jest",
+      "args": [
+        "--config=./jest.config.ts",
+        "--json",
+        "--testPathPattern=${fileBasenameNoExtension}"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Debug tests",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
