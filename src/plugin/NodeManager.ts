@@ -54,6 +54,25 @@ export class NodeManager {
           this.persistentNodesCache = new Map(parsedCache);
         }
 
+        // Compare nodes in the document to what we have in the cache
+        const allNodes = figma.root.findAll();
+        const nodeIds = new Set(allNodes.map((node) => node.id));
+        const deletedNodeIds = new Set<string>();
+
+        // Remove any nodes from the cache that no longer exist
+        for (const [id] of this.persistentNodesCache) {
+          if (!nodeIds.has(id)) {
+            this.persistentNodesCache.delete(id);
+            deletedNodeIds.add(id);
+          }
+        }
+
+        // Emit a cache update if we removed any nodes
+        if (deletedNodeIds.size > 0) {
+          const remainingEntries = Array.from(this.persistentNodesCache.entries()).filter(([id]) => !deletedNodeIds.has(id));
+          await PersistentNodesCacheProperty.write(remainingEntries);
+        }
+
         this.emitter.on('cache-update', debounce(async () => {
           const entries = Array.from(this.persistentNodesCache.entries());
           await PersistentNodesCacheProperty.write(entries);
@@ -203,7 +222,11 @@ export class NodeManager {
         promises.add(defaultWorker.schedule(async () => {
           const node = nodes[nodeIndex];
 
-          await this.getNodePluginData(node);
+          try {
+            await this.getNodePluginData(node);
+          } catch (error) {
+            console.warn(`Node ${node.id} no longer exists`);
+          }
 
           tracker.next();
           tracker.reportIfNecessary();
