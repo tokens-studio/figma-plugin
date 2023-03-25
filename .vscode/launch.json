@@ -40,6 +40,20 @@
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}/token-transformer",
       "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Test current file",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/jest",
+      "args": [
+        "--testPathPattern=${fileBasenameNoExtension}",
+        "--no-cache",
+        "--coverage=false"
+      ],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "console": "integratedTerminal"
     }
   ]
 }
