@@ -48,6 +48,6 @@ describe('TokenGroupHeading', () => {
     await fireEvent.contextMenu(getByText('color'));
     await fireEvent.click(getByText('Duplicate'));
 
-    expect(getByText('Duplicate Group')).toBeInTheDocument();
+    expect(getByText('Duplicate group')).toBeInTheDocument();
   });
 });

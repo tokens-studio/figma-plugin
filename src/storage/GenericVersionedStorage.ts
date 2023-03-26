@@ -12,7 +12,7 @@ const genericVersionedSchema = singleFileSchema.extend({
   values: z.record(tokensMapSchema),
   version: z.string().optional(),
   $themes: z.array(themeObjectSchema).optional(),
-  updatedAt: z.number().optional(),
+  updatedAt: z.coerce.date().optional(),
 });
 
 type GenericVersionedMeta = {
@@ -139,9 +139,9 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
     if (response.ok) {
       const parsedJsonData = await response.json();
       const validationResult = await genericVersionedSchema.safeParseAsync(parsedJsonData);
-
       if (validationResult.success) {
         const GenericVersionedData = validationResult.data as unknown as GenericVersionedData;
+        GenericVersionedData.updatedAt = (GenericVersionedData.updatedAt as unknown as Date).toISOString();
         return this.convertGenericVersionedDataToFiles(GenericVersionedData);
       }
     }
