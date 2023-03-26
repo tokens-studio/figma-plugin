@@ -5,6 +5,7 @@ import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
 import { editProhibitedSelector } from '@/selectors';
 import useTokens from '../store/useTokens';
+import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 
 type Props = {
   stringTokens: string;
@@ -17,6 +18,7 @@ function JSONEditor({
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const { handleJSONUpdate } = useTokens();
+  const { isDarkTheme } = useFigmaTheme();
 
   const handleJsonEditChange = React.useCallback((value: string | undefined) => {
     handleChange(value ?? '');
@@ -44,12 +46,13 @@ function JSONEditor({
         language="json"
         onChange={handleJsonEditChange}
         value={stringTokens}
-        theme="vs-dark"
+        theme={isDarkTheme ? 'vs-dark' : 'vs-light'}
         options={{
           minimap: {
             enabled: false,
           },
           lineNumbers: 'off',
+          fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,
           readOnly: editProhibited,
