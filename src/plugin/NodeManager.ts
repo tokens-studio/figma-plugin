@@ -56,21 +56,23 @@ export class NodeManager {
 
         // Compare nodes in the document to what we have in the cache
         const allNodes = figma.root.findAll();
-        const nodeIds = new Set(allNodes.map((node) => node.id));
-        const deletedNodeIds = new Set<string>();
+        if (allNodes.length > 0) {
+          const nodeIds = new Set(allNodes.map((node) => node.id));
+          const deletedNodeIds = new Set<string>();
 
-        // Remove any nodes from the cache that no longer exist
-        for (const [id] of this.persistentNodesCache) {
-          if (!nodeIds.has(id)) {
-            this.persistentNodesCache.delete(id);
-            deletedNodeIds.add(id);
+          // Remove any nodes from the cache that no longer exist
+          for (const [id] of this.persistentNodesCache) {
+            if (!nodeIds.has(id)) {
+              this.persistentNodesCache.delete(id);
+              deletedNodeIds.add(id);
+            }
           }
-        }
 
-        // Emit a cache update if we removed any nodes
-        if (deletedNodeIds.size > 0) {
-          const remainingEntries = Array.from(this.persistentNodesCache.entries()).filter(([id]) => !deletedNodeIds.has(id));
-          await PersistentNodesCacheProperty.write(remainingEntries);
+          // Emit a cache update if we removed any nodes
+          if (deletedNodeIds.size > 0) {
+            const remainingEntries = Array.from(this.persistentNodesCache.entries()).filter(([id]) => !deletedNodeIds.has(id));
+            await PersistentNodesCacheProperty.write(remainingEntries);
+          }
         }
 
         this.emitter.on('cache-update', debounce(async () => {

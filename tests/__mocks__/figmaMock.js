@@ -54,7 +54,7 @@ module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
 });
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
-module.exports.mockRootFindAll = jest.fn(() => {});
+module.exports.mockRootFindAll = jest.fn(() => []);
 module.exports.mockParentPostMessage = jest.fn((data) => {
   figmaUiOnHandlers
     .filter(([eventName]) => eventName === 'message')
