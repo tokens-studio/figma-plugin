@@ -16,7 +16,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
-    "lint":"eslint . --quiet --fix",
+    "lint": "eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -171,7 +171,6 @@
     "prettier": "^2.0.5",
     "react-devtools": "^4.24.3",
     "react-svg-loader": "^3.0.3",
-    "react-test-renderer": "17.0.0",
     "serve": "^11.3.2",
     "style-loader": "^3.3.2",
     "svg-url-loader": "^7.1.1",
