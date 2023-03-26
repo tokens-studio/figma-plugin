@@ -36,6 +36,9 @@ module.exports.mockCreatePaintStyle = jest.fn(() => ({
 module.exports.mockCreateEffectStyle = jest.fn(() => ({
   id: 'effectstyle',
 }));
+module.exports.mockGetStyleById = jest.fn(() => ({
+  id: 'style',
+}));
 module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn((eventName, handler) => {
   figmaUiOnHandlers.push([eventName, handler]);
@@ -91,6 +94,7 @@ module.exports.figma = {
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
   getLocalEffectStyles: module.exports.mockGetLocalEffectStyles,
+  getStyleById: module.exports.mockGetStyleById,
   loadFontAsync: module.exports.mockLoadFontAsync,
   createTextStyle: module.exports.mockCreateTextStyle,
   createPaintStyle: module.exports.mockCreatePaintStyle,
