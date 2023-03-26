@@ -1,3 +1,4 @@
+import { mockGetNodeById } from '../../tests/__mocks__/figmaMock';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { transformPluginDataToSelectionValues, updatePluginData } from './pluginData';
 
@@ -13,6 +14,7 @@ describe('pluginData', () => {
 
   it('updatePluginData', async () => {
     updateNodeSpy.mockResolvedValue([]);
+    mockGetNodeById.mockResolvedValue({ id: '5989:3' });
     mockGetRelaunchData.mockResolvedValue({ edit: 'edit' });
 
     const entries = [{
