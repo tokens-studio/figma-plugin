@@ -58,19 +58,19 @@ export class NodeManager {
         const allNodes = figma.root.findAll();
         if (allNodes.length > 0) {
           const nodeIds = new Set(allNodes.map((node) => node.id));
-          const deletedNodeIds = new Set<string>();
+          let hasDeletedNodes = false;
 
           // Remove any nodes from the cache that no longer exist
           for (const [id] of this.persistentNodesCache) {
             if (!nodeIds.has(id)) {
               this.persistentNodesCache.delete(id);
-              deletedNodeIds.add(id);
+              hasDeletedNodes = true;
             }
           }
 
-          // Emit a cache update if we removed any nodes
-          if (deletedNodeIds.size > 0) {
-            const remainingEntries = Array.from(this.persistentNodesCache.entries()).filter(([id]) => !deletedNodeIds.has(id));
+          // Cache update if we removed any nodes
+          if (hasDeletedNodes) {
+            const remainingEntries = Array.from(this.persistentNodesCache.entries());
             await PersistentNodesCacheProperty.write(remainingEntries);
           }
         }
