@@ -36,8 +36,8 @@ module.exports.mockCreatePaintStyle = jest.fn(() => ({
 module.exports.mockCreateEffectStyle = jest.fn(() => ({
   id: 'effectstyle',
 }));
-module.exports.mockGetStyleById = jest.fn(() => ({
-  id: 'style',
+module.exports.mockGetStyleById = jest.fn((id) => ({
+  id,
 }));
 module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn((eventName, handler) => {
