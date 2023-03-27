@@ -321,7 +321,7 @@ export class ADOTokenStorage extends GitTokenStorage {
           })),
         ];
       }
-      if (/could not be found in the repository/i.test(singleItem.message)) {
+      if (singleItem.errorCode === 0) {
         return [];
       }
       return {
