@@ -16,10 +16,11 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
     Object.entries(data.selectedTokenSets)
       .filter(([, status]) => (status !== TokenSetStatus.DISABLED)),
   );
-  const themeObjectIndex = state.themes.findIndex(({ id }) => state.activeTheme === id);
+  const themeObjectIndex = state.themes.findIndex((theme) => theme.id === themeId);
+  const startIndex = themeObjectIndex > -1 ? themeObjectIndex : state.themes.length;
 
   const updatedThemes = [...state.themes];
-  updatedThemes.splice(themeObjectIndex, 1, {
+  updatedThemes.splice(startIndex, 1, {
     ...state.themes[themeObjectIndex],
     ...data,
     id: themeId,
