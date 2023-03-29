@@ -48,7 +48,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
   const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
   const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
-  const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
+  const [oldTokenSetName, setOldTokenSetName] = React.useState('');
   const [isDuplicate, setIsDuplicate] = React.useState(false);
   const allTokenSets = React.useMemo(() => Object.keys(tokens), [tokens]);
 
@@ -62,7 +62,6 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange(tokenSetMarkedForChange);
   }, [tokens]);
 
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
@@ -86,32 +85,32 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
-    setTokenSetMarkedForChange(tokenSet);
+    setOldTokenSetName(tokenSet);
     setIsDuplicate(false);
     setShowRenameTokenSetFields(true);
   }, []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
     const newTokenSetName = `${tokenSet}_Copy`;
-    track('Duplicate token set', { name: newTokenSetName });
-    dispatch.tokenState.duplicateTokenSet(tokenSet);
-
     handleNewTokenSetNameChange(newTokenSetName);
-    setTokenSetMarkedForChange(newTokenSetName);
+    setOldTokenSetName(tokenSet);
     setIsDuplicate(true);
     setShowRenameTokenSetFields(true);
-  }, [dispatch]);
+  }, []);
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (tokens.hasOwnProperty(tokenSetMarkedForChange)) {
-      dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+    if (isDuplicate) {
+      track('Duplicate token set', { name: newTokenSetName });
+      dispatch.tokenState.duplicateTokenSet(newTokenSetName, oldTokenSetName);
+    } else if (tokens.hasOwnProperty(oldTokenSetName)) {
+      dispatch.tokenState.renameTokenSet({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
     } else {
-      dispatch.tokenState.renameTokenSetFolder({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
+      dispatch.tokenState.renameTokenSetFolder({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
     }
-    setTokenSetMarkedForChange('');
+    setOldTokenSetName('');
     setShowRenameTokenSetFields(false);
-  }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
+  }, [dispatch, newTokenSetName, oldTokenSetName, isDuplicate, tokens]);
 
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
@@ -163,7 +162,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${tokenSetMarkedForChange}`}
+        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${oldTokenSetName}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
@@ -183,8 +182,10 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
-                Change
+              <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
+                {
+                  isDuplicate ? 'Save' : 'Change'
+                }
               </Button>
             </Stack>
           </Stack>
