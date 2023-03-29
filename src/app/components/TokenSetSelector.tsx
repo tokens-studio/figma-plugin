@@ -68,6 +68,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
     dispatch.tokenState.addTokenSet(newTokenSetName.trim());
+    handleNewTokenSetNameChange('');
   }, [dispatch, newTokenSetName]);
 
   const handleDeleteTokenSet = React.useCallback(async (tokenSet: string) => {
@@ -109,6 +110,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       dispatch.tokenState.renameTokenSetFolder({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
     }
     setOldTokenSetName('');
+    handleNewTokenSetNameChange('');
     setShowRenameTokenSetFields(false);
   }, [dispatch, newTokenSetName, oldTokenSetName, isDuplicate, tokens]);
 
@@ -126,6 +128,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleCloseRenameModal = useCallback(() => {
     setShowRenameTokenSetFields(false);
+    handleNewTokenSetNameChange('');
   }, []);
 
   const handleChangeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
