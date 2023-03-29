@@ -130,6 +130,10 @@ export const tokenState = createModel<RootModel>()({
       return updateTokenSetsInState(state, null, [name]);
     },
     duplicateTokenSet: (state, newName: string, oldName: string): TokenState => {
+      if (!(oldName in state.tokens)) {
+        notifyToUI('Token set does not exist', { error: true });
+        return state;
+      }
       const indexOf = Object.keys(state.tokens).indexOf(oldName);
       return updateTokenSetsInState(
         state,

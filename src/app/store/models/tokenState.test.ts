@@ -349,7 +349,7 @@ describe('editToken', () => {
   });
 
   it('can duplicate token set', () => {
-    store.dispatch.tokenState.duplicateTokenSet('global');
+    store.dispatch.tokenState.duplicateTokenSet('global_Copy', 'global');
     const { tokens, usedTokenSet } = store.getState().tokenState;
     expect(tokens.global_Copy).toEqual([
       {
@@ -420,7 +420,7 @@ describe('editToken', () => {
   it('will notify the UI if the token set to duplicate does not exist', () => {
     const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
     notifyToUISpy.mockReturnValueOnce();
-    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant_Copy', 'nonexistant');
     expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
   });
 
