@@ -220,6 +220,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
           hasPrefix={!!prefix}
           hasSuffix={!!isMasked}
           size={size}
+          data-testid={`input-${name}`}
           {...inputProps}
         />
         {!!suffix && <span>{suffix}</span>}

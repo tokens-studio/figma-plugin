@@ -187,6 +187,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       name={name}
       inputRef={inputRef}
       onFocus={handleOnFocus}
+      data-testid={`mention-input-${name}`}
     >
       <Mention
         trigger={/({([^{]*))$/}

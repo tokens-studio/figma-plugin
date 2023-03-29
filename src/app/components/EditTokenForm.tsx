@@ -159,13 +159,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: {
-            ...internalEditToken.value,
-            [e.target.name]: e.target.value,
-          },
-        });
+        if (e.target.value) {
+          setInternalEditToken({
+            ...internalEditToken,
+            value: {
+              ...internalEditToken.value,
+              [e.target.name]: e.target.value,
+            },
+          });
+        } else if (internalEditToken.value) {
+          delete internalEditToken.value[e.target.name as keyof typeof internalEditToken.value];
+          setInternalEditToken({
+            ...internalEditToken,
+          });
+        }
       }
     },
     [internalEditToken],
