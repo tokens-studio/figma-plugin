@@ -75,6 +75,10 @@ describe('TokenSetSelector Component', () => {
     await fireEvent.contextMenu(renamedTokenSet);
     const duplicateButton = await result.findByText('Duplicate');
     fireEvent.click(duplicateButton);
+    const saveButton = await result.getByRole('button', {
+      name: /Save/i,
+    });
+    fireEvent.click(saveButton);
     expect(store.getState().tokenState.tokens).toEqual({
       'renameFolder/renameSet': [],
       'renameFolder/renameSet_Copy': [],

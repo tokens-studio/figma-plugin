@@ -30,7 +30,7 @@ export function ThemeListItemContent({
   return (
     <StyledDragButton
       type="button"
-      isActive={isActive}
+      style={{ cursor: 'inherit' }}
     >
       <DragGrabber<ThemeObject>
         item={item}
