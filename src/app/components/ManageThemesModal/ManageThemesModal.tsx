@@ -90,7 +90,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
   return (
     <Modal
       isOpen
-      compact
+      compact={!!themeEditorOpen}
+      full={!themeEditorOpen}
       large
       title="Themes"
       footer={(
