@@ -53,6 +53,10 @@ export interface TokenState {
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
   checkForChanges: boolean;
   collapsedTokens: string[];
+  changedTokens: {
+    newTokens: ImportToken[];
+    updatedTokens: ImportToken[];
+  };
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -81,6 +85,10 @@ export const tokenState = createModel<RootModel>()({
     }, {}),
     checkForChanges: false,
     collapsedTokens: [],
+    changedTokens: {
+      newTokens: [],
+      updatedTokens: [],
+    },
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -452,6 +460,46 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
+    setChangedState: (state, receivedTokens: SetTokensFromStylesPayload): TokenState => {
+      const newTokens: SingleToken[] = [];
+      const existingTokens: SingleToken[] = [];
+      const updatedTokens: SingleToken[] = [];
+      // Iterate over received styles and check if they existed before or need updating
+      Object.entries(receivedTokens).forEach(([tokenSet, values]) => {
+        values.forEach((token) => {
+          const oldValue = state.tokens[tokenSet].find((t) => t.name === token.name);
+          if (oldValue) {
+            if (isEqual(oldValue.value, token.value)) {
+              if (
+                oldValue.description === token.description
+                || (typeof token.description === 'undefined' && oldValue.description === '')
+              ) {
+                existingTokens.push(token);
+              } else {
+                updatedTokens.push({
+                  ...token,
+                  oldDescription: oldValue.description,
+                });
+              }
+            } else {
+              const updatedToken = { ...token };
+              updatedToken.oldValue = oldValue.value;
+              updatedTokens.push(updatedToken);
+            }
+          } else {
+            newTokens.push(token);
+          }
+        });
+      });
+
+      return {
+        ...state,
+        importedTokens: {
+          newTokens,
+          updatedTokens,
+        },
+      } as TokenState;
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({

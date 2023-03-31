@@ -12,7 +12,7 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { apiSelector } from '@/selectors';
+import { apiSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -23,6 +23,8 @@ import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponse
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { isEqual } from '@/utils/isEqual';
+import usePullDialog from '../hooks/usePullDialog';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -37,6 +39,8 @@ type PullTokensOptions = {
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
+  const tokens = useSelector(tokensSelector);
+  const { pullDialog } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -104,19 +108,27 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+      const tokenSetOrder = Object.keys(tokens);
+      const defaultMetadata = { tokenSetOrder };
+      if (!isEqual(tokens, remoteData.tokens)) {
+        dispatch.tokenState.setChangedState(remoteData.tokens);
+        const shouldOverride = await pullDialog();
+        if (shouldOverride) {
+          saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
 
-      dispatch.tokenState.setTokenData({
-        values: remoteData.tokens,
-        themes: remoteData.themes,
-        activeTheme: activeTheme ?? null,
-        usedTokenSet: usedTokenSet ?? {},
-      });
-      dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
-      track('Launched with token sets', {
-        count: Object.keys(remoteData.tokens).length,
-        setNames: Object.keys(remoteData.tokens),
-      });
+          dispatch.tokenState.setTokenData({
+            values: remoteData.tokens,
+            themes: remoteData.themes,
+            activeTheme: activeTheme ?? null,
+            usedTokenSet: usedTokenSet ?? {},
+          });
+          dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+          track('Launched with token sets', {
+            count: Object.keys(remoteData.tokens).length,
+            setNames: Object.keys(remoteData.tokens),
+          });
+        }
+      }
     }
 
     dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
@@ -131,6 +143,8 @@ export default function useRemoteTokens() {
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
+    pullDialog,
+    tokens,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {
