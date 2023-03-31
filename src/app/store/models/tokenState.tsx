@@ -53,10 +53,7 @@ export interface TokenState {
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
   checkForChanges: boolean;
   collapsedTokens: string[];
-  changedTokens: {
-    newTokens: ImportToken[];
-    updatedTokens: ImportToken[];
-  };
+  changedTokens: Record<string, AnyTokenList>;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -85,10 +82,7 @@ export const tokenState = createModel<RootModel>()({
     }, {}),
     checkForChanges: false,
     collapsedTokens: [],
-    changedTokens: {
-      newTokens: [],
-      updatedTokens: [],
-    },
+    changedTokens: {},
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -460,12 +454,19 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
-    setChangedState: (state, receivedTokens: SetTokensFromStylesPayload): TokenState => {
-      const newTokens: SingleToken[] = [];
-      const existingTokens: SingleToken[] = [];
-      const updatedTokens: SingleToken[] = [];
+    setChangedState: (state, receivedTokens: Record<string, AnyTokenList>): TokenState => {
+      // const newTokens: SingleToken[] = [];
+      // const existingTokens: SingleToken[] = [];
+      // const updatedTokens: SingleToken[] = [];
+      // const removedTokens: SingleToken[] = [];
       // Iterate over received styles and check if they existed before or need updating
+      const entries: [string, SingleToken[]][] = [];
       Object.entries(receivedTokens).forEach(([tokenSet, values]) => {
+        const newTokens: SingleToken[] = [];
+        const existingTokens: SingleToken[] = [];
+        const updatedTokens: SingleToken[] = [];
+        const removedTokens: SingleToken[] = [];
+        // Find new created tokens and updated tokens
         values.forEach((token) => {
           const oldValue = state.tokens[tokenSet].find((t) => t.name === token.name);
           if (oldValue) {
@@ -490,14 +491,28 @@ export const tokenState = createModel<RootModel>()({
             newTokens.push(token);
           }
         });
+
+        // Find removed tokens
+        state.tokens[tokenSet].forEach((token) => {
+          const isTokenRemoved = !receivedTokens[tokenSet].find((t) => t.name === token.name);
+          if (isTokenRemoved) {
+            removedTokens.push(token);
+          }
+        });
+        const totalUpdatedTokens = [...newTokens, ...updatedTokens, ...removedTokens];
+        entries.push([tokenSet, totalUpdatedTokens]);
+      });
+
+      Object.entries(state.tokens).forEach(([tokenSet, values]) => {
+        const isTokenSetRemoved = typeof receivedTokens[tokenSet] === 'undefined';
+        if (isTokenSetRemoved) {
+          entries.push([tokenSet, values]);
+        }
       });
 
       return {
         ...state,
-        importedTokens: {
-          newTokens,
-          updatedTokens,
-        },
+        changedTokens: Object.fromEntries(entries),
       } as TokenState;
     },
     ...tokenStateReducers,
