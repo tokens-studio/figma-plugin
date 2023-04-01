@@ -11,13 +11,13 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
+import ChangeTokenListingHeading from './ChangeTokenListingHeading';
 
 function PullDialog() {
+  const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
   const { onConfirm, onCancel, showPullDialog } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
   const changedTokens = useSelector(changedTokensSelector);
-  const [newTokens, setNewTokens] = React.useState(changedTokens.newTokens);
-  const [updatedTokens, setUpdatedTokens] = React.useState(changedTokens.updatedTokens);
 
   const handleOverrideClick = React.useCallback(() => {
     onConfirm();
@@ -27,10 +27,16 @@ function PullDialog() {
     onCancel();
   }, [onCancel]);
 
-  React.useEffect(() => {
-    setNewTokens(changedTokens.newTokens);
-    setUpdatedTokens(changedTokens.updatedTokens);
-  }, [changedTokens.newTokens, changedTokens.updatedTokens]);
+  const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
+    e.stopPropagation();
+    if (e.altKey) {
+      setCollapsedTokenSets([]);
+    } else if (collapsedTokenSets.includes(tokenSet)) {
+      setCollapsedTokenSets(collapsedTokenSets.filter((item) => item !== tokenSet));
+    } else {
+      setCollapsedTokenSets([...collapsedTokenSets, tokenSet]);
+    }
+  }, [collapsedTokenSets]);
 
   switch (showPullDialog) {
     case 'initial': {
@@ -43,16 +49,7 @@ function PullDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
-            {newTokens.length > 0 && (
-            <div>
-              <Stack
-                direction="row"
-                justify="between"
-                align="center"
-                css={{ padding: '$2 $4' }}
-              >
-                <Heading>New Tokens</Heading>
-              </Stack>
+            {Object.entries(changedTokens).length > 0 && (
               <Stack
                 direction="column"
                 gap={1}
@@ -61,35 +58,15 @@ function PullDialog() {
                   borderColor: '$borderMuted',
                 }}
               >
-                {newTokens.map((token) => (
-                  <div />
+                {Object.entries(changedTokens).map(([tokenSet, tokenList]) => (
+                  <>
+                    <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
+                    {!collapsedTokenSets.includes(tokenSet) && tokenList && (
+                    <div>tokenlist</div>
+                    )}
+                  </>
                 ))}
               </Stack>
-            </div>
-            )}
-            {updatedTokens.length > 0 && (
-            <div>
-              <Stack
-                direction="row"
-                justify="between"
-                align="center"
-                css={{ padding: '$2 $4' }}
-              >
-                <Heading>Existing Tokens</Heading>
-              </Stack>
-              <Stack
-                direction="column"
-                gap={1}
-                css={{
-                  borderTop: '1px solid',
-                  borderColor: '$borderMuted',
-                }}
-              >
-                {updatedTokens.map((token) => (
-                  <div />
-                ))}
-              </Stack>
-            </div>
             )}
             <Box css={{
               display: 'flex',
@@ -99,7 +76,7 @@ function PullDialog() {
               borderColor: '$borderMuted',
             }}
             >
-              <Button variant="secondary" id="pullDaialog-button-close" onClick={handleClose}>
+              <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
                 Cancel
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
