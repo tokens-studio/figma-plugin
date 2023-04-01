@@ -53,7 +53,7 @@ export interface TokenState {
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
   checkForChanges: boolean;
   collapsedTokens: string[];
-  changedTokens: Record<string, AnyTokenList>;
+  changedTokens: Record<string, ImportToken[]>;
 }
 
 export const tokenState = createModel<RootModel>()({

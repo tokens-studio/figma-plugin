@@ -12,6 +12,57 @@ import Spinner from './Spinner';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangeTokenListingHeading from './ChangeTokenListingHeading';
+import Text from './Text';
+import { ImportToken } from '@/types/tokens';
+
+function ChangedToken({
+  token,
+}: {
+  token: ImportToken;
+}) {
+  return (
+    <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
+      <Stack direction="column" gap={1}>
+        <Text bold size="small">{token.name}</Text>
+        <Stack direction="row" align="center" gap={1}>
+          <Box css={{
+            padding: '$2',
+            wordBreak: 'break-all',
+            fontWeight: '$bold',
+            borderRadius: '$default',
+            fontSize: '$xsmall',
+            backgroundColor: '$bgSuccess',
+            color: '$fgSuccess',
+          }}
+          >
+            {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
+          </Box>
+          {token.oldValue ? (
+            <Box css={{
+              padding: '$2',
+              wordBreak: 'break-all',
+              fontWeight: '$bold',
+              borderRadius: '$default',
+              fontSize: '$xsmall',
+              backgroundColor: '$bgDanger',
+              color: '$fgDanger',
+            }}
+            >
+              {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
+            </Box>
+          ) : null}
+        </Stack>
+        {(token.description || token.oldDescription) && (
+        <Text size="small">
+          {token.description}
+          {' '}
+          {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
+        </Text>
+        )}
+      </Stack>
+    </Stack>
+  );
+}
 
 function PullDialog() {
   const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
@@ -62,7 +113,9 @@ function PullDialog() {
                   <>
                     <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
                     {!collapsedTokenSets.includes(tokenSet) && tokenList && (
-                    <div>tokenlist</div>
+                      tokenList.map((token) => (
+                        <ChangedToken token={token} />
+                      ))
                     )}
                   </>
                 ))}
