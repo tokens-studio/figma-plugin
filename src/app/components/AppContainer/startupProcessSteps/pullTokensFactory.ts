@@ -14,6 +14,9 @@ import type useRemoteTokens from '@/app/store/remoteTokens';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isGitProvider } from '@/utils/is';
+import { AnyTokenList } from '@/types/tokens';
+import parseTokenValues from '@/utils/parseTokenValues';
+import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export function pullTokensFactory(
   store: Store<RootState>,
@@ -31,7 +34,7 @@ export function pullTokensFactory(
     return shouldRecoverLocalChanges;
   };
 
-  const getApiCredentials = async (shouldPull: boolean) => {
+  const getApiCredentials = async ({ shouldPull, tokens }: { shouldPull: boolean, tokens?: Record<string, AnyTokenList> }) => {
     const state = store.getState();
     const storageType = storageTypeSelector(state);
     const isRemoteStorage = [
@@ -72,7 +75,7 @@ export function pullTokensFactory(
           // we don't want to update nodes if we're pulling from remote
           dispatch.tokenState.setActiveTheme({ themeId: params.activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
-
+          console.log('getapicredential', tokens);
           if (shouldPull) {
             const remoteData = await useRemoteTokensResult.pullTokens({
               context: matchingSet,
@@ -80,6 +83,8 @@ export function pullTokensFactory(
               activeTheme: params.activeTheme,
               usedTokenSet: params.localTokenData?.usedTokenSet,
               collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
+              localTokens: tokens,
+              isInitialLoading: true,
             });
             // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
             if (!remoteData) {
@@ -133,14 +138,15 @@ export function pullTokensFactory(
         )
       ) {
         // get API credentials
-        await getApiCredentials(true);
+        console.log('parseTokenValues(params.localTokenData.values)', parseTokenValues(params.localTokenData.values));
+        await getApiCredentials({ shouldPull: true, tokens: parseTokenValues(params.localTokenData.values) });
       } else {
         // no local changes and user did not confirm to pull tokens
         dispatch.tokenState.setTokenData(params.localTokenData);
         const hasTokens = Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
         if (hasTokens) {
           // local tokens found
-          await getApiCredentials(false);
+          await getApiCredentials({ shouldPull: false });
         } else {
           // no local tokens - go to start
           dispatch.uiState.setActiveTab(Tabs.START);

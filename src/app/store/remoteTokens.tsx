@@ -12,7 +12,7 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { apiSelector, themesListSelector, tokensSelector } from '@/selectors';
+import { apiSelector } from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -25,6 +25,7 @@ import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
 import usePullDialog from '../hooks/usePullDialog';
+import { AnyTokenList } from '@/types/tokens';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -32,6 +33,8 @@ type PullTokensOptions = {
   usedTokenSet?: UsedTokenSetsMap | null
   activeTheme?: string | null
   collapsedTokenSets?: string[] | null
+  localTokens?: Record<string, AnyTokenList>
+  isInitialLoading?: boolean
 };
 
 // @TODO typings and hooks
@@ -39,8 +42,7 @@ type PullTokensOptions = {
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
-  const tokens = useSelector(tokensSelector);
-  const { pullDialog } = usePullDialog();
+  const { pullDialog, closePullDialog } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -66,9 +68,10 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, localTokens, isInitialLoading = false,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
+    pullDialog('loading');
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_PULLTOKENS,
       isInfinite: true,
@@ -107,12 +110,16 @@ export default function useRemoteTokens() {
       default:
         throw new Error('Not implemented');
     }
+    dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
     if (remoteData?.status === 'success') {
-      const tokenSetOrder = Object.keys(tokens);
+      console.log('tokens', localTokens);
+      const tokenSetOrder = Object.keys(localTokens || {});
       const defaultMetadata = { tokenSetOrder };
-      if (!isEqual(tokens, remoteData.tokens)) {
+      console.log('remote', remoteData);
+      if ((!isEqual(localTokens, remoteData.tokens))) {
         dispatch.tokenState.setChangedState(remoteData.tokens);
         const shouldOverride = await pullDialog();
+        console.log('should', shouldOverride);
         if (shouldOverride) {
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
 
@@ -128,10 +135,23 @@ export default function useRemoteTokens() {
             setNames: Object.keys(remoteData.tokens),
           });
         }
+      } else if (isInitialLoading) {
+        saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+
+        dispatch.tokenState.setTokenData({
+          values: remoteData.tokens,
+          themes: remoteData.themes,
+          activeTheme: activeTheme ?? null,
+          usedTokenSet: usedTokenSet ?? {},
+        });
+        dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+        track('Launched with token sets', {
+          count: Object.keys(remoteData.tokens).length,
+          setNames: Object.keys(remoteData.tokens),
+        });
       }
     }
-
-    dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+    closePullDialog();
     return remoteData;
   }, [
     dispatch,
@@ -144,7 +164,7 @@ export default function useRemoteTokens() {
     pullTokensFromURL,
     pullTokensFromADO,
     pullDialog,
-    tokens,
+    closePullDialog,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {

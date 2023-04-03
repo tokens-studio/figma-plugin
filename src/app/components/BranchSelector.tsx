@@ -147,14 +147,16 @@ export default function BranchSelector() {
       setCurrentBranch(branch);
       dispatch.uiState.setApiData({ ...apiData, branch });
       dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-      await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+      await pullTokens({
+        context: { ...apiData, branch }, usedTokenSet, activeTheme, localTokens: tokens,
+      });
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
         credential: { ...apiData, branch },
       });
       setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
     }
-  }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
+  }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch, tokens]);
 
   const onBranchSelected = React.useCallback(async (branch: string) => {
     track('Branch changed');

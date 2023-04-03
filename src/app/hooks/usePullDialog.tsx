@@ -3,13 +3,11 @@ import { useCallback, useMemo } from 'react';
 import { showPullDialogSelector } from '@/selectors';
 import { Dispatch } from '../store';
 
-export type PullDialogPromiseResult = {
-  shouldOverride: boolean
-};
+export type PullDialogPromiseResult = boolean;
 
 export type UseDialogResult = {
   showPullDialog?: string | boolean
-  closeDialog: () => void
+  closePullDialog: () => void
   pullDialog: (givenState?: string) => Promise<PullDialogPromiseResult | null>
   onConfirm: () => void
   onCancel: () => void
@@ -21,9 +19,11 @@ function usePullDialog(): UseDialogResult {
   const dispatch = useDispatch<Dispatch>();
 
   const pullDialog: UseDialogResult['pullDialog'] = useCallback((givenState) => {
+    console.log('pullDialaog', givenState);
     if (givenState) {
       dispatch.uiState.setShowPullDialog(givenState);
     } else {
+      console.log('initial');
       dispatch.uiState.setShowPullDialog('initial');
     }
     return new Promise<PullDialogPromiseResult | null>((res) => {
@@ -31,23 +31,23 @@ function usePullDialog(): UseDialogResult {
     });
   }, [dispatch]);
 
-  const closeDialog = useCallback(() => {
+  const closePullDialog = useCallback(() => {
     dispatch.uiState.setShowPullDialog(false);
   }, [dispatch]);
 
   const onCancel = useCallback(() => {
-    closeDialog();
-    resolveCallback({ shouldOverride: false });
-  }, [closeDialog]);
+    closePullDialog();
+    resolveCallback(false);
+  }, [closePullDialog]);
 
   const onConfirm = useCallback(() => {
-    closeDialog();
-    resolveCallback({ shouldOverride: true });
-  }, [closeDialog]);
+    closePullDialog();
+    resolveCallback(true);
+  }, [closePullDialog]);
 
   return useMemo(() => ({
-    pullDialog, onConfirm, onCancel, showPullDialog, closeDialog,
-  }), [pullDialog, onConfirm, onCancel, closeDialog, showPullDialog]);
+    pullDialog, onConfirm, onCancel, showPullDialog, closePullDialog,
+  }), [pullDialog, onConfirm, onCancel, closePullDialog, showPullDialog]);
 }
 
 export default usePullDialog;

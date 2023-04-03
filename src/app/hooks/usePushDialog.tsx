@@ -12,7 +12,7 @@ export type PushDialogPromiseResult = {
 
 export type UseDialogResult = {
   showPushDialog?: string | boolean
-  closeDialog: () => void
+  closePushDialog: () => void
   pushDialog: (givenState?: string) => Promise<PushDialogPromiseResult | null>
   onConfirm: (commitMessage: string, customBranch: string) => void
   onCancel: () => void
@@ -34,14 +34,14 @@ function usePushDialog(): UseDialogResult {
     });
   }, [dispatch]);
 
-  const closeDialog = useCallback(() => {
+  const closePushDialog = useCallback(() => {
     dispatch.uiState.setShowPushDialog(false);
   }, [dispatch]);
 
   const onCancel = useCallback(() => {
-    closeDialog();
+    closePushDialog();
     resolveCallback(null);
-  }, [closeDialog]);
+  }, [closePushDialog]);
 
   const onConfirm = useCallback((commitMessage: string, customBranch: string) => {
     dispatch.uiState.setShowPushDialog('loading');
@@ -49,8 +49,8 @@ function usePushDialog(): UseDialogResult {
   }, [dispatch]);
 
   return useMemo(() => ({
-    pushDialog, onConfirm, onCancel, showPushDialog, closeDialog,
-  }), [pushDialog, onConfirm, onCancel, closeDialog, showPushDialog]);
+    pushDialog, onConfirm, onCancel, showPushDialog, closePushDialog,
+  }), [pushDialog, onConfirm, onCancel, closePushDialog, showPushDialog]);
 }
 
 export default usePushDialog;

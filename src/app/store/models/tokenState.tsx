@@ -455,61 +455,50 @@ export const tokenState = createModel<RootModel>()({
       collapsedTokens: data,
     }),
     setChangedState: (state, receivedTokens: Record<string, AnyTokenList>): TokenState => {
-      // const newTokens: SingleToken[] = [];
-      // const existingTokens: SingleToken[] = [];
-      // const updatedTokens: SingleToken[] = [];
-      // const removedTokens: SingleToken[] = [];
-      // Iterate over received styles and check if they existed before or need updating
-      const entries: [string, SingleToken[]][] = [];
+      const entries: [string, ImportToken[]][] = [];
       Object.entries(receivedTokens).forEach(([tokenSet, values]) => {
-        const newTokens: SingleToken[] = [];
-        const existingTokens: SingleToken[] = [];
-        const updatedTokens: SingleToken[] = [];
-        const removedTokens: SingleToken[] = [];
-        // Find new created tokens and updated tokens
+        const newTokens: ImportToken[] = [];
+        const updatedTokens: ImportToken[] = [];
+        const removedTokens: ImportToken[] = [];
+        // Find created tokens and updated tokens
         values.forEach((token) => {
           const oldValue = state.tokens[tokenSet].find((t) => t.name === token.name);
           if (oldValue) {
-            if (isEqual(oldValue.value, token.value)) {
-              if (
-                oldValue.description === token.description
-                || (typeof token.description === 'undefined' && oldValue.description === '')
-              ) {
-                existingTokens.push(token);
-              } else {
-                updatedTokens.push({
-                  ...token,
-                  oldDescription: oldValue.description,
-                });
-              }
-            } else {
-              const updatedToken = { ...token };
+            if (!isEqual(oldValue.value, token.value)) {
+              const updatedToken: ImportToken = { ...token };
               updatedToken.oldValue = oldValue.value;
+              updatedToken.importType = 'UPDATE';
               updatedTokens.push(updatedToken);
             }
+            if (!isEqual(oldValue.description, token.description)) {
+              updatedTokens.push({
+                ...token,
+                oldDescription: oldValue.description,
+                importType: 'UPDATE',
+              });
+            }
           } else {
-            newTokens.push(token);
+            newTokens.push({ ...token, importType: 'NEW' });
           }
         });
-
-        // Find removed tokens
+        // Find the removed tokens
         state.tokens[tokenSet].forEach((token) => {
-          const isTokenRemoved = !receivedTokens[tokenSet].find((t) => t.name === token.name);
-          if (isTokenRemoved) {
-            removedTokens.push(token);
+          const oldValue = receivedTokens[tokenSet].find((t) => t.name === token.name);
+          if (!oldValue) {
+            removedTokens.push({ ...token, importType: 'REMOVE' });
           }
         });
         const totalUpdatedTokens = [...newTokens, ...updatedTokens, ...removedTokens];
         entries.push([tokenSet, totalUpdatedTokens]);
       });
 
+      // Find the tokens in removed tokenSet
       Object.entries(state.tokens).forEach(([tokenSet, values]) => {
         const isTokenSetRemoved = typeof receivedTokens[tokenSet] === 'undefined';
         if (isTokenSetRemoved) {
-          entries.push([tokenSet, values]);
+          entries.push([tokenSet, values.map((token) => ({ ...token, importType: 'REMOVE' }))]);
         }
       });
-
       return {
         ...state,
         changedTokens: Object.fromEntries(entries),

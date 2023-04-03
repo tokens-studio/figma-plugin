@@ -31,7 +31,7 @@ const mockSetBranches = jest.fn();
 const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
-const mockCloseDialog = jest.fn();
+const mockClosePushDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
@@ -185,7 +185,7 @@ jest.mock('../hooks/usePushDialog', () => ({
   __esModule: true,
   default: () => ({
     pushDialog: mockPushDialog,
-    closeDialog: mockCloseDialog,
+    closePushDialog: mockClosePushDialog,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -667,7 +667,7 @@ describe('remoteTokens', () => {
           throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
         });
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
       });
     }
   });
@@ -734,7 +734,7 @@ describe('remoteTokens', () => {
         });
 
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
           errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
