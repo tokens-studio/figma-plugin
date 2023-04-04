@@ -191,10 +191,10 @@ function PushDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
-            <Stack direction="row" gap={2}>
+            <Stack direction="row" gap={2} align="center">
               This will push your local changes to the
               {' '}
-              <Text bold>
+              <Text bold css={{ background: '$bgSubtle', padding: '$2' }}>
                 {' '}
                 {branch}
               </Text>
@@ -202,8 +202,8 @@ function PushDialog() {
               branch
             </Stack>
             <div>
-              <TabButton<string> name="Diff" activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
-              <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+              <TabButton<string> name="Diff" activeTab={activeTab} label="Diff" onSwitch={handleSwitch} />
+              <TabButton<string> name="JSON" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
             </div>
             {
               activeTab === 'Diff' && <ChangedStateList changedState={changedState} />

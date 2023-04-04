@@ -25,10 +25,6 @@ function PushJSON() {
     <Stack
       direction="column"
       gap={1}
-      css={{
-        borderTop: '1px solid',
-        borderColor: '$borderMuted',
-      }}
     >
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (

@@ -22,10 +22,6 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
     <Stack
       direction="column"
       gap={1}
-      css={{
-        borderTop: '1px solid',
-        borderColor: '$borderMuted',
-      }}
     >
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
