@@ -4,7 +4,6 @@ import Stack from './Stack';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { themesListSelector, tokensSelector } from '@/selectors';
 import stringifyTokens from '@/utils/stringifyTokens';
-import Textarea from './Textarea';
 
 function PushJSON() {
   const tokens = useSelector(tokensSelector);
@@ -36,11 +35,9 @@ function PushJSON() {
         <>
           <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
           {!collapsedTokenSets.includes(tokenSet) && tokenList && (
-          <Textarea
-            isDisabled
-            rows={21}
-            value={stringifyTokens(tokens, tokenSet)}
-          />
+            <pre style={{ padding: '$2 $4' }}>
+              {stringifyTokens(tokens, tokenSet)}
+            </pre>
           )}
         </>
         )
@@ -50,11 +47,22 @@ function PushJSON() {
           <>
             <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
             {!collapsedTokenSets.includes('$themes') && (
-            <Textarea
-              isDisabled
-              rows={21}
-              value={JSON.stringify(themes, null, 2)}
-            />
+            <pre style={{ padding: '$2 $4' }}>
+              {JSON.stringify(themes, null, 2)}
+              {' '}
+            </pre>
+            )}
+          </>
+        )
+      }
+      {
+        Object.keys(tokens).length > 0 && (
+          <>
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
+            {!collapsedTokenSets.includes('$metadata') && (
+            <pre style={{ padding: '$2 $4' }}>
+              {JSON.stringify(Object.keys(tokens), null, 2)}
+            </pre>
             )}
           </>
         )

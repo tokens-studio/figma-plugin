@@ -95,6 +95,41 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
           </>
         )
       }
+      {
+        (changedState.metadata?.tokenSetOrder && Object.entries(changedState.metadata.tokenSetOrder).length > 0) && (
+          <>
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
+            {!collapsedTokenSets.includes('$metadata') && (
+              changedState.metadata.tokenSetOrder.map((theme) => (
+                <Stack
+                  direction="row"
+                  justify="between"
+                  align="center"
+                  gap={1}
+                  css={{ padding: '$2 $4' }}
+                >
+                  <Text bold size="small">{theme}</Text>
+                  <Text
+                    size="small"
+                    css={{
+                      padding: '$2',
+                      wordBreak: 'break-all',
+                      fontWeight: '$bold',
+                      borderRadius: '$default',
+                      fontSize: '$xsmall',
+                      backgroundColor: '$bgSuccess',
+                      color: '$fgSuccess',
+                    }}
+                  >
+                    Added
+                  </Text>
+                </Stack>
+              ))
+            )}
+          </>
+        )
+      }
+
     </Stack>
   );
 }

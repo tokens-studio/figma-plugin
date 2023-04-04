@@ -1,10 +1,12 @@
 import { ImportToken } from '@/types/tokens';
 import { isEqual } from './isEqual';
 import { ThemeObject } from '@/types';
+import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 
-export type CompareStateType = {
+export type CompareStateType<Metadata = null> = {
   tokens: Record<string, ImportToken[]>
   themes: ImportTheme[]
+  metadata?: RemoteTokenStorageMetadata | Metadata
 };
 
 export type ImportTheme = ThemeObject & {
@@ -80,5 +82,6 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
   return {
     tokens: Object.fromEntries(entries),
     themes: [...newThemes, ...changedThemes, ...removedThemes],
+    metadata: !isEqual(baseState.metadata, compareState.metadata) ? compareState.metadata : null,
   };
 }

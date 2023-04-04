@@ -98,16 +98,19 @@ function PushDialog() {
   const handleSubmit = React.useCallback(async () => {
     const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
     if (parsedState) {
+      const tokenSetOrder = Object.keys(tokens);
       setChangedState(findDifferentState({
         tokens: parsedState[0],
         themes: parsedState[1] || [],
+        metadata: parsedState[2],
       }, {
         tokens,
         themes,
+        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
       }));
     }
     dispatch.uiState.setShowPushDialog('difference');
-  }, [tokens, themes, lastSyncedState, dispatch.uiState]);
+  }, [tokens, themes, lastSyncedState, dispatch.uiState, storageType]);
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
