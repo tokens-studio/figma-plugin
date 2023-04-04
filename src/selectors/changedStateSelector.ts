@@ -2,9 +2,9 @@ import { createSelector } from 'reselect';
 import { isEqual } from '@/utils/isEqual';
 import { tokenStateSelector } from './tokenStateSelector';
 
-export const changedTokensSelector = createSelector(
+export const changedStateSelector = createSelector(
   tokenStateSelector,
-  (state) => state.changedTokens,
+  (state) => state.changedState,
   {
     memoizeOptions: {
       resultEqualityCheck: isEqual,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
-  changedTokensSelector, storageTypeSelector,
+  changedStateSelector, storageTypeSelector,
 } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Button from './Button';
@@ -16,7 +16,7 @@ import ChangedTokenList from './ChangedTokenList';
 function PullDialog() {
   const { onConfirm, onCancel, showPullDialog } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
-  const changedTokens = useSelector(changedTokensSelector);
+  const changedState = useSelector(changedStateSelector);
 
   const handleOverrideClick = React.useCallback(() => {
     onConfirm();
@@ -40,9 +40,7 @@ function PullDialog() {
             <Stack direction="row" gap={2}>
               This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
             </Stack>
-            {Object.entries(changedTokens).length > 0 && (
-              <ChangedTokenList changedTokens={changedTokens} />
-            )}
+            <ChangedTokenList changedState={changedState} />
             <Box css={{
               display: 'flex',
               justifyContent: 'space-between',

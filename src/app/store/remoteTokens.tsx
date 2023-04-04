@@ -12,7 +12,9 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { activeTabSelector, apiSelector, tokensSelector } from '@/selectors';
+import {
+  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -41,6 +43,7 @@ export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
   const { pullDialog, closePullDialog } = usePullDialog();
 
@@ -106,10 +109,13 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens)) {
+      if (activeTab === Tabs.LOADING || (!isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes))) {
         let shouldOverride = false;
         if (activeTab !== Tabs.LOADING) {
-          dispatch.tokenState.setChangedTokens(remoteData.tokens);
+          dispatch.tokenState.setChangedState({
+            tokens: remoteData.tokens,
+            themes: remoteData.themes,
+          });
           shouldOverride = !!await pullDialog();
         }
         if (shouldOverride || activeTab === Tabs.LOADING) {
@@ -128,11 +134,12 @@ export default function useRemoteTokens() {
         }
       }
     }
-    dispatch.tokenState.resetChangedTokens();
+    dispatch.tokenState.resetChangedState();
     closePullDialog();
     return remoteData;
   }, [
     tokens,
+    themes,
     activeTab,
     dispatch,
     api,

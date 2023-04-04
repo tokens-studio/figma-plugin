@@ -1,12 +1,12 @@
 import React from 'react';
 import Stack from './Stack';
-import { AnyTokenList } from '@/types/tokens';
 import ChangeTokenListingHeading from './ChangeTokenListingHeading';
 import ChangedTokenItem from './ChangedTokenItem';
+import { CompareStateType } from '@/utils/findDifferentState';
+import Text from './Text';
 
-function ChangedTokenList({ changedTokens }: { changedTokens: Record<string, AnyTokenList> }) {
+function ChangedTokenList({ changedState }: { changedState: CompareStateType }) {
   const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
-
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
     if (e.altKey) {
@@ -27,7 +27,7 @@ function ChangedTokenList({ changedTokens }: { changedTokens: Record<string, Any
         borderColor: '$borderMuted',
       }}
     >
-      {Object.entries(changedTokens).map(([tokenSet, tokenList]) => (
+      {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
         <>
           <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
@@ -39,6 +39,61 @@ function ChangedTokenList({ changedTokens }: { changedTokens: Record<string, Any
         </>
         )
       ))}
+      {
+        changedState.themes.length > 0 && (
+          <>
+            <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
+            {!collapsedTokenSets.includes('$themes') && (
+              changedState.themes.map((theme) => (
+                <Stack
+                  direction="row"
+                  justify="between"
+                  align="center"
+                  gap={1}
+                >
+                  <Text bold size="small">{theme.name}</Text>
+                  {
+                    theme.importType === 'REMOVE' && (
+                    <Text
+                      size="small"
+                      css={{
+                        padding: '$2',
+                        wordBreak: 'break-all',
+                        fontWeight: '$bold',
+                        borderRadius: '$default',
+                        fontSize: '$xsmall',
+                        backgroundColor: '$bgDanger',
+                        color: '$fgDanger',
+                      }}
+                    >
+                      Removed
+                    </Text>
+                    )
+                  }
+                  {
+                    (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
+                    <Text
+                      size="small"
+                      css={{
+                        padding: '$2',
+                        wordBreak: 'break-all',
+                        fontWeight: '$bold',
+                        borderRadius: '$default',
+                        fontSize: '$xsmall',
+                        backgroundColor: '$bgSuccess',
+                        color: '$fgSuccess',
+                      }}
+                    >
+                      {theme.importType === 'NEW' ? 'Added' : 'Changed' }
+                    </Text>
+                    )
+                  }
+                </Stack>
+              ))
+            )}
+          </>
+        )
+      }
     </Stack>
   );
 }

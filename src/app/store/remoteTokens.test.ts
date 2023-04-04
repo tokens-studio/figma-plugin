@@ -37,8 +37,8 @@ const mockClosePullDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
-const mockSetChangedTokens = jest.fn();
-const mockResetChangedTokens = jest.fn();
+const mocksetChangedState = jest.fn();
+const mockResetChangedState = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -83,8 +83,8 @@ jest.mock('react-redux', () => ({
       setTokenData: mockSetTokenData,
       setEditProhibited: mockSetEditProhibited,
       setCollapsedTokenSets: mockSetCollapsedTokenSets,
-      setChangedTokens: mockSetChangedTokens,
-      resetChangedTokens: mockResetChangedTokens,
+      setChangedState: mocksetChangedState,
+      resetChangedState: mockResetChangedState,
     },
     branchState: {
       setBranches: mockSetBranches,

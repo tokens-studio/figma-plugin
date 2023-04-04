@@ -34,7 +34,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
-import { findDifferentTokens } from '@/utils/findDifferentTokens';
+import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -54,7 +54,7 @@ export interface TokenState {
   collapsedTokenTypeObj: Record<TokenTypes, boolean>;
   checkForChanges: boolean;
   collapsedTokens: string[];
-  changedTokens: Record<string, ImportToken[]>;
+  changedState: CompareStateType;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -83,7 +83,7 @@ export const tokenState = createModel<RootModel>()({
     }, {}),
     checkForChanges: false,
     collapsedTokens: [],
-    changedTokens: {},
+    changedState: {},
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -455,13 +455,22 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
-    setChangedTokens: (state, receivedTokens: Record<string, AnyTokenList>): TokenState => ({
+    setChangedState: (state, receivedState: { tokens: Record<string, AnyTokenList>, themes: ThemeObjectsList }): TokenState => {
+      const localState = {
+        tokens: state.tokens,
+        themes: state.themes,
+      };
+      return {
+        ...state,
+        changedState: findDifferentState(localState, receivedState),
+      } as TokenState;
+    },
+    resetChangedState: (state) => ({
       ...state,
-      changedTokens: findDifferentTokens(state.tokens, receivedTokens),
-    } as TokenState),
-    resetChangedTokens: (state) => ({
-      ...state,
-      changedTokens: {},
+      changedState: {
+        tokens: {},
+        themes: [],
+      },
     }),
     ...tokenStateReducers,
   },

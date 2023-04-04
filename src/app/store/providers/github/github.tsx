@@ -79,6 +79,7 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
