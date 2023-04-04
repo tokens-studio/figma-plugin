@@ -37,6 +37,9 @@ function PullDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
+            <Stack direction="row" gap={2}>
+              This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
+            </Stack>
             {Object.entries(changedTokens).length > 0 && (
               <ChangedTokenList changedTokens={changedTokens} />
             )}
@@ -68,6 +71,9 @@ function PullDialog() {
           title={`Pull from ${transformProviderName(storageType.provider)}`}
         >
           <Stack direction="column" gap={4} justify="center" align="center">
+            <Stack direction="row" gap={2}>
+              This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
+            </Stack>
             <Spinner />
             <Heading size="medium">
               Fetching Tokens from
