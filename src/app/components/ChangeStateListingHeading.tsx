@@ -15,7 +15,7 @@ type Props = {
   onCollapse: (e: React.MouseEvent<HTMLButtonElement>, tokenKey: string) => void;
 };
 
-export default function ChangeTokenListingHeading({
+export default function ChangeStateListingHeading({
   isCollapsed,
   label,
   tokenKey,

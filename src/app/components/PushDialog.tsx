@@ -21,7 +21,7 @@ import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
-import ChangedTokenList from './ChangedTokenList';
+import ChangedStateList from './ChangedStateList';
 import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
 import { tryParseJson } from '@/utils/tryParseJson';
@@ -203,7 +203,7 @@ function PushDialog() {
               <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
             </div>
             {
-              activeTab === 'Diff' && <ChangedTokenList changedState={changedState} />
+              activeTab === 'Diff' && <ChangedStateList changedState={changedState} />
             }
             {
               activeTab === 'JSON' && <PushJSON />

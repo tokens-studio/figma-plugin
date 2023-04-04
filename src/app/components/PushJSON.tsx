@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Stack from './Stack';
-import ChangeTokenListingHeading from './ChangeTokenListingHeading';
+import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { themesListSelector, tokensSelector } from '@/selectors';
 import stringifyTokens from '@/utils/stringifyTokens';
 import Textarea from './Textarea';
@@ -34,7 +34,7 @@ function PushJSON() {
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
         <>
-          <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
+          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
           {!collapsedTokenSets.includes(tokenSet) && tokenList && (
           <Textarea
             isDisabled
@@ -48,7 +48,7 @@ function PushJSON() {
       {
         themes.length > 0 && (
           <>
-            <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
             {!collapsedTokenSets.includes('$themes') && (
             <Textarea
               isDisabled

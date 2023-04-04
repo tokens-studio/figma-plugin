@@ -1,11 +1,11 @@
 import React from 'react';
 import Stack from './Stack';
-import ChangeTokenListingHeading from './ChangeTokenListingHeading';
+import ChangeStateListingHeading from './ChangeStateListingHeading';
 import ChangedTokenItem from './ChangedTokenItem';
 import { CompareStateType } from '@/utils/findDifferentState';
 import Text from './Text';
 
-function ChangedTokenList({ changedState }: { changedState: CompareStateType }) {
+function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
@@ -30,7 +30,7 @@ function ChangedTokenList({ changedState }: { changedState: CompareStateType }) 
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
         <>
-          <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
+          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
           {!collapsedTokenSets.includes(tokenSet) && tokenList && (
             tokenList.map((token) => (
               <ChangedTokenItem token={token} />
@@ -42,7 +42,7 @@ function ChangedTokenList({ changedState }: { changedState: CompareStateType }) 
       {
         changedState.themes.length > 0 && (
           <>
-            <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
             {!collapsedTokenSets.includes('$themes') && (
               changedState.themes.map((theme) => (
                 <Stack
@@ -50,6 +50,7 @@ function ChangedTokenList({ changedState }: { changedState: CompareStateType }) 
                   justify="between"
                   align="center"
                   gap={1}
+                  css={{ padding: '$2 $4' }}
                 >
                   <Text bold size="small">{theme.name}</Text>
                   {
@@ -98,4 +99,4 @@ function ChangedTokenList({ changedState }: { changedState: CompareStateType }) 
   );
 }
 
-export default ChangedTokenList;
+export default ChangedStateList;

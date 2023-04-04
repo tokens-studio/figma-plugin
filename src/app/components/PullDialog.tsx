@@ -11,7 +11,7 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
-import ChangedTokenList from './ChangedTokenList';
+import ChangedStateList from './ChangedStateList';
 
 function PullDialog() {
   const { onConfirm, onCancel, showPullDialog } = usePullDialog();
@@ -40,7 +40,7 @@ function PullDialog() {
             <Stack direction="row" gap={2}>
               This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
             </Stack>
-            <ChangedTokenList changedState={changedState} />
+            <ChangedStateList changedState={changedState} />
             <Box css={{
               display: 'flex',
               justifyContent: 'space-between',
