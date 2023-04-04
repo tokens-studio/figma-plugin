@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 /* eslint-disable import/prefer-default-export */
 import omit from 'just-omit';
 import { createModel } from '@rematch/core';
@@ -437,72 +438,6 @@ export const tokenState = createModel<RootModel>()({
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
-    editToken(payload: UpdateTokenPayload, rootState) {
-      if (payload.oldName && payload.oldName !== payload.name) {
-        dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
-      }
-
-      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
-      }
-    },
-    deleteToken() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    deleteTokenGroup() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    addTokenSet() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    duplicateTokenSet() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    renameTokenSet() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    deleteTokenSet() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    setTokenSetOrder() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
-    setTokenData(payload: SetTokenDataPayload) {
-      if (payload.shouldUpdate) {
-        dispatch.tokenState.updateDocument();
-      }
-    },
-    toggleUsedTokenSet() {
-      dispatch.tokenState.updateDocument({ updateRemote: false });
-    },
-    toggleManyTokenSets() {
-      dispatch.tokenState.updateDocument({ updateRemote: false });
-    },
-    toggleTreatAsSource() {
-      dispatch.tokenState.updateDocument({ updateRemote: false });
-    },
-    duplicateToken(payload: DuplicateTokenPayload, rootState) {
-      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
-      }
-    },
-    createToken(payload: UpdateTokenPayload, rootState) {
-      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
-      }
-    },
-    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
-      const {
-        oldName, newName, type, parent,
-      } = data;
-      const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
-      });
-    },
-    updateCheckForChanges() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
-    },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
@@ -529,6 +464,88 @@ export const tokenState = createModel<RootModel>()({
         console.error('Error updating document', e);
       }
     },
+    editToken(payload: UpdateTokenPayload, rootState) {
+      if (payload.oldName && payload.oldName !== payload.name) {
+        dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
+      }
+
+      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+        //@ts-ignore
+        dispatch.tokenState.updateDocument();
+      }
+    },
+    deleteToken() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    deleteTokenGroup() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    addTokenSet() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    duplicateTokenSet() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    renameTokenSet() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    deleteTokenSet() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    setTokenSetOrder() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    setTokenData(payload: SetTokenDataPayload) {
+      if (payload.shouldUpdate) {
+        //@ts-ignore
+        dispatch.tokenState.updateDocument();
+      }
+    },
+    toggleUsedTokenSet() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleManyTokenSets() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    toggleTreatAsSource() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ updateRemote: false });
+    },
+    duplicateToken(payload: DuplicateTokenPayload, rootState) {
+      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+        //@ts-ignore
+        dispatch.tokenState.updateDocument();
+      }
+    },
+    createToken(payload: UpdateTokenPayload, rootState) {
+      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
+        //@ts-ignore
+        dispatch.tokenState.updateDocument();
+      }
+    },
+    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
+      const {
+        oldName, newName, type, parent,
+      } = data;
+      const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
+      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
+      });
+    },
+    updateCheckForChanges() {
+      //@ts-ignore
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+
     ...Object.fromEntries(
       (Object.entries(tokenStateEffects).map(([key, factory]) => (
         [key, factory(dispatch)]

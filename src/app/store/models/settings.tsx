@@ -196,6 +196,7 @@ export const settings = createModel<RootModel>()({
     },
     setBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
+      // @ts-ignore
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {

@@ -61,7 +61,7 @@ function NewOrExistingToken({
               color: '$fgDanger',
             }}
             >
-              {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
+              {typeof token.oldValue === 'object' ? JSON.stringify((token as ImportToken).oldValue) : token.oldValue}
             </Box>
           ) : null}
         </Stack>

@@ -5,6 +5,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
+const ANALYZE = process.env.ANALYZE;
+
+const plugins = [];
+
+if (ANALYZE){
+  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+  plugins.push(new BundleAnalyzerPlugin());
+}
+
+
+
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
 
@@ -25,6 +36,12 @@ module.exports = (env, argv) => ({
           {
             loader: 'babel-loader',
           },
+          {
+            loader: 'ts-loader',
+            options:{
+              transpileOnly: true,
+            }
+          }
         ],
         exclude: /node_modules/,
       },
@@ -79,11 +96,18 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-  optimization:{
+  optimization: argv.mode === 'production' ? {
     nodeEnv: 'production',
     minimize: true,
     usedExports: true,
-    concatenateModules:true
+    concatenateModules: true
+  } : {
+
+    nodeEnv: 'development',
+    minimize: false,
+    usedExports: false,
+    concatenateModules: false
+
   },
   output: {
     filename: '[name].js',
@@ -91,7 +115,7 @@ module.exports = (env, argv) => ({
     path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
   },
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
-  plugins: [
+  plugins: plugins.concat([
     new Dotenv({
       path: argv.mode === 'production' ? '.env.production' : '.env',
     }),
@@ -114,5 +138,5 @@ module.exports = (env, argv) => ({
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     })
-  ],
+  ]),
 });
