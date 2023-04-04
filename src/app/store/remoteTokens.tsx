@@ -25,6 +25,7 @@ import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
 import usePullDialog from '../hooks/usePullDialog';
+import { Tabs } from '@/constants/Tabs';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
@@ -105,15 +106,14 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      if (activeTab === 'loading' || !isEqual(tokens, remoteData.tokens)) {
+      if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens)) {
         let shouldOverride = false;
-        if (activeTab !== 'loading') {
-          dispatch.tokenState.setChangedState(remoteData.tokens);
+        if (activeTab !== Tabs.LOADING) {
+          dispatch.tokenState.setChangedTokens(remoteData.tokens);
           shouldOverride = !!await pullDialog();
         }
-        if (shouldOverride || activeTab === 'loading') {
+        if (shouldOverride || activeTab === Tabs.LOADING) {
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
-
           dispatch.tokenState.setTokenData({
             values: remoteData.tokens,
             themes: remoteData.themes,
@@ -128,6 +128,7 @@ export default function useRemoteTokens() {
         }
       }
     }
+    dispatch.tokenState.resetChangedTokens();
     closePullDialog();
     return remoteData;
   }, [

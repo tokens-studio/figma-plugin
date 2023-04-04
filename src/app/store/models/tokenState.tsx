@@ -34,6 +34,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
+import { findDifferentTokens } from '@/utils/findDifferentTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -454,56 +455,14 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
-    setChangedState: (state, receivedTokens: Record<string, AnyTokenList>): TokenState => {
-      const entries: [string, ImportToken[]][] = [];
-      Object.entries(receivedTokens).forEach(([tokenSet, values]) => {
-        const newTokens: ImportToken[] = [];
-        const updatedTokens: ImportToken[] = [];
-        const removedTokens: ImportToken[] = [];
-        // Find created tokens and updated tokens
-        values.forEach((token) => {
-          const oldValue = state.tokens[tokenSet].find((t) => t.name === token.name);
-          if (oldValue) {
-            if (!isEqual(oldValue.value, token.value)) {
-              const updatedToken: ImportToken = { ...token };
-              updatedToken.oldValue = oldValue.value;
-              updatedToken.importType = 'UPDATE';
-              updatedTokens.push(updatedToken);
-            }
-            if (!isEqual(oldValue.description, token.description)) {
-              updatedTokens.push({
-                ...token,
-                oldDescription: oldValue.description,
-                importType: 'UPDATE',
-              });
-            }
-          } else {
-            newTokens.push({ ...token, importType: 'NEW' });
-          }
-        });
-        // Find the removed tokens
-        state.tokens[tokenSet].forEach((token) => {
-          const oldValue = receivedTokens[tokenSet].find((t) => t.name === token.name);
-          if (!oldValue) {
-            removedTokens.push({ ...token, importType: 'REMOVE' });
-          }
-        });
-        const totalUpdatedTokens = [...newTokens, ...updatedTokens, ...removedTokens];
-        entries.push([tokenSet, totalUpdatedTokens]);
-      });
-
-      // Find the tokens in removed tokenSet
-      Object.entries(state.tokens).forEach(([tokenSet, values]) => {
-        const isTokenSetRemoved = typeof receivedTokens[tokenSet] === 'undefined';
-        if (isTokenSetRemoved) {
-          entries.push([tokenSet, values.map((token) => ({ ...token, importType: 'REMOVE' }))]);
-        }
-      });
-      return {
-        ...state,
-        changedTokens: Object.fromEntries(entries),
-      } as TokenState;
-    },
+    setChangedTokens: (state, receivedTokens: Record<string, AnyTokenList>): TokenState => ({
+      ...state,
+      changedTokens: findDifferentTokens(state.tokens, receivedTokens),
+    } as TokenState),
+    resetChangedTokens: (state) => ({
+      ...state,
+      changedTokens: {},
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({

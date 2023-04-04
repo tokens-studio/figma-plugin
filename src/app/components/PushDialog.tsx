@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { localApiStateSelector } from '@/selectors';
+import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
@@ -18,10 +18,15 @@ import { isGitProvider } from '@/utils/is';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
+import { transformProviderName } from '@/utils/transformProviderName';
+import PushInfoContainer from './PushInfoContainer';
 
 function PushDialog() {
-  const { onConfirm, onCancel, showPushDialog } = usePushDialog();
+  const {
+    onConfirm, onCancel, showPushDialog, pushDialog,
+  } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
+  const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
 
@@ -76,9 +81,9 @@ function PushDialog() {
     [setBranch],
   );
 
-  const handleSubmit = React.useCallback(() => {
-    onConfirm(commitMessage, branch);
-  }, [branch, commitMessage, onConfirm]);
+  const handleSubmit = React.useCallback(async () => {
+    await pushDialog('difference');
+  }, [pushDialog]);
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
@@ -94,6 +99,10 @@ function PushDialog() {
   }, [handleSubmit, showPushDialog]);
 
   useShortcut(['Enter'], handleSaveShortcut);
+
+  const handlePushChanges = React.useCallback(async () => {
+    onConfirm(commitMessage, branch);
+  }, [branch, commitMessage, onConfirm]);
 
   switch (showPushDialog) {
     case 'initial': {
@@ -138,6 +147,43 @@ function PushDialog() {
               </Stack>
             </Stack>
           </form>
+        </Modal>
+      );
+    }
+    case 'difference': {
+      return (
+        <Modal
+          title={`Push to ${transformProviderName(storageType.provider)}`}
+          showClose
+          large
+          isOpen
+          close={onCancel}
+        >
+          <Stack direction="column" gap={4}>
+            <Box css={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '$4',
+              borderTop: '1px solid',
+              borderColor: '$borderMuted',
+            }}
+            >
+              <Text>
+                This will push your local changes to the
+                {' '}
+                {branch}
+                {' '}
+                branch
+              </Text>
+              <PushInfoContainer />
+              <Button variant="secondary" id="pushDialog-button-close" onClick={onCancel}>
+                Cancel
+              </Button>
+              <Button variant="primary" id="pushDialog-button-pushChanges" onClick={handlePushChanges}>
+                Push Changes
+              </Button>
+            </Box>
+          </Stack>
         </Modal>
       );
     }
