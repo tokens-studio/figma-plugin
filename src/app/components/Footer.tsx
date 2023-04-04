@@ -64,10 +64,10 @@ export default function Footer() {
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme, localTokens: tokens }), [pullTokens, usedTokenSet, activeTheme, tokens]);
+  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
   const handlePullTokens = useCallback(() => {
-    pullTokens({ usedTokenSet, activeTheme, localTokens: tokens });
-  }, [pullTokens, usedTokenSet, activeTheme, tokens]);
+    pullTokens({ usedTokenSet, activeTheme });
+  }, [pullTokens, usedTokenSet, activeTheme]);
 
   return (
     <Box

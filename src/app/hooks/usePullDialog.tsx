@@ -19,11 +19,9 @@ function usePullDialog(): UseDialogResult {
   const dispatch = useDispatch<Dispatch>();
 
   const pullDialog: UseDialogResult['pullDialog'] = useCallback((givenState) => {
-    console.log('pullDialaog', givenState);
     if (givenState) {
       dispatch.uiState.setShowPullDialog(givenState);
     } else {
-      console.log('initial');
       dispatch.uiState.setShowPullDialog('initial');
     }
     return new Promise<PullDialogPromiseResult | null>((res) => {
