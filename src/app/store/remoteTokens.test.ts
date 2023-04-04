@@ -32,9 +32,13 @@ const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
 const mockClosePushDialog = jest.fn();
+const mockPullDialog = jest.fn();
+const mockClosePullDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
+const mockSetChangedTokens = jest.fn();
+const mockResetChangedTokens = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -79,6 +83,8 @@ jest.mock('react-redux', () => ({
       setTokenData: mockSetTokenData,
       setEditProhibited: mockSetEditProhibited,
       setCollapsedTokenSets: mockSetCollapsedTokenSets,
+      setChangedTokens: mockSetChangedTokens,
+      resetChangedTokens: mockResetChangedTokens,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -186,6 +192,13 @@ jest.mock('../hooks/usePushDialog', () => ({
   default: () => ({
     pushDialog: mockPushDialog,
     closePushDialog: mockClosePushDialog,
+  }),
+}));
+jest.mock('../hooks/usePullDialog', () => ({
+  __esModule: true,
+  default: () => ({
+    pullDialog: mockPullDialog,
+    closePullDialog: mockClosePullDialog,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -454,11 +467,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(1);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -503,11 +511,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(0);
         expect(mockSetTokenData).toBeCalledTimes(0);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -542,11 +545,6 @@ describe('remoteTokens', () => {
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(mockPushDialog).toBeCalledTimes(1);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });

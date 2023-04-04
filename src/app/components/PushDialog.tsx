@@ -208,10 +208,10 @@ function PushDialog() {
               borderColor: '$borderMuted',
             }}
             >
-              <Button variant="secondary" id="pushDialog-button-close" onClick={onCancel}>
+              <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button variant="primary" id="pushDialog-button-pushChanges" onClick={handlePushChanges}>
+              <Button variant="primary" id="push-dialog-button-push-changes" onClick={handlePushChanges}>
                 Push Changes
               </Button>
             </Box>
