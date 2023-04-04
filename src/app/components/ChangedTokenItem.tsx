@@ -4,7 +4,7 @@ import Box from './Box';
 import Text from './Text';
 import { ImportToken } from '@/types/tokens';
 
-export default function ChangedTokenInfo({
+export default function ChangedTokenItem({
   token,
 }: {
   token: ImportToken;

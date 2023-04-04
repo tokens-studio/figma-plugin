@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { localApiStateSelector, storageTypeSelector } from '@/selectors';
+import {
+  lastSyncedStateSelector, localApiStateSelector, storageTypeSelector, tokensSelector,
+} from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
@@ -19,7 +21,13 @@ import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
-import PushInfoContainer from './PushInfoContainer';
+import { AnyTokenList } from '@/types/tokens';
+import ChangedTokenList from './ChangedTokenList';
+import { TabButton } from './TabButton';
+import PushJSON from './PushJSON';
+import { tryParseJson } from '@/utils/tryParseJson';
+import { findDifferentTokens } from '@/utils/findDifferentTokens';
+import { LastSyncedState } from '@/utils/compareLastSyncedState';
 
 function PushDialog() {
   const {
@@ -28,7 +36,11 @@ function PushDialog() {
   const localApiState = useSelector(localApiStateSelector);
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
+  const [changedTokens, setChangedTokens] = React.useState<Record<string, AnyTokenList>>({});
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
+  const [activeTab, setActiveTab] = React.useState('Diff');
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const tokens = useSelector(tokensSelector);
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
@@ -82,8 +94,12 @@ function PushDialog() {
   );
 
   const handleSubmit = React.useCallback(async () => {
+    const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
+    if (parsedState) {
+      setChangedTokens(findDifferentTokens(tokens, parsedState[0]));
+    }
     await pushDialog('difference');
-  }, [pushDialog]);
+  }, [pushDialog, tokens, lastSyncedState]);
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
@@ -103,6 +119,10 @@ function PushDialog() {
   const handlePushChanges = React.useCallback(async () => {
     onConfirm(commitMessage, branch);
   }, [branch, commitMessage, onConfirm]);
+
+  const handleSwitch = React.useCallback((tab: string) => {
+    setActiveTab(tab);
+  }, []);
 
   switch (showPushDialog) {
     case 'initial': {
@@ -175,7 +195,16 @@ function PushDialog() {
                 {' '}
                 branch
               </Text>
-              <PushInfoContainer />
+              <div>
+                <TabButton<string> name="Diff" activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
+                <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+              </div>
+              {
+                (activeTab === 'Diff' && Object.entries(changedTokens).length > 0) && <ChangedTokenList changedTokens={changedTokens} />
+              }
+              {
+                activeTab === 'JSON' && <PushJSON />
+              }
               <Button variant="secondary" id="pushDialog-button-close" onClick={onCancel}>
                 Cancel
               </Button>

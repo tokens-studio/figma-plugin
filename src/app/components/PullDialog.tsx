@@ -11,11 +11,9 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
-import ChangeTokenListingHeading from './ChangeTokenListingHeading';
-import ChangedTokenInfo from './ChangedTokenInfo';
+import ChangedTokenList from './ChangedTokenList';
 
 function PullDialog() {
-  const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
   const { onConfirm, onCancel, showPullDialog } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
   const changedTokens = useSelector(changedTokensSelector);
@@ -27,17 +25,6 @@ function PullDialog() {
   const handleClose = React.useCallback(() => {
     onCancel();
   }, [onCancel]);
-
-  const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
-    e.stopPropagation();
-    if (e.altKey) {
-      setCollapsedTokenSets([]);
-    } else if (collapsedTokenSets.includes(tokenSet)) {
-      setCollapsedTokenSets(collapsedTokenSets.filter((item) => item !== tokenSet));
-    } else {
-      setCollapsedTokenSets([...collapsedTokenSets, tokenSet]);
-    }
-  }, [collapsedTokenSets]);
 
   switch (showPullDialog) {
     case 'initial': {
@@ -51,27 +38,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4}>
             {Object.entries(changedTokens).length > 0 && (
-              <Stack
-                direction="column"
-                gap={1}
-                css={{
-                  borderTop: '1px solid',
-                  borderColor: '$borderMuted',
-                }}
-              >
-                {Object.entries(changedTokens).map(([tokenSet, tokenList]) => (
-                  tokenList.length > 0 && (
-                    <>
-                      <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
-                      {!collapsedTokenSets.includes(tokenSet) && tokenList && (
-                        tokenList.map((token) => (
-                          <ChangedTokenInfo token={token} />
-                        ))
-                      )}
-                    </>
-                  )
-                ))}
-              </Stack>
+              <ChangedTokenList changedTokens={changedTokens} />
             )}
             <Box css={{
               display: 'flex',
