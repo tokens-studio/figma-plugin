@@ -212,42 +212,6 @@ function PullDialog() {
         </Modal>
       );
     }
-    // case 'success': {
-    //   return (
-    //     <Modal
-    //       large
-    //       isOpen
-    //       close={onCancel}
-    //       title={`Pull from ${transformProviderName(storageType.provider)}`}
-    //     >
-    //       <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
-    //         <Stack direction="column" gap={4}>
-    //           <Heading id="pull-dialog-success-heading" size="medium">All done!</Heading>
-    //           <Text size="small">
-    //             Changes pulled to
-    //             {' '}
-    //             {transformProviderName(storageType.provider)}
-    //           </Text>
-    //         </Stack>
-    //         <Box css={{
-    //           display: 'flex',
-    //           justifyContent: 'space-between',
-    //           padding: '$4',
-    //           borderTop: '1px solid',
-    //           borderColor: '$borderMuted',
-    //         }}
-    //         >
-    //           <Button variant="secondary" id="pullDaialog-button-close">
-    //             Cancel
-    //           </Button>
-    //           <Button variant="primary" id="pullDialog-button-override">
-    //             Override Tokens
-    //           </Button>
-    //         </Box>
-    //       </Stack>
-    //     </Modal>
-    //   );
-    // }
     default: {
       return null;
     }
