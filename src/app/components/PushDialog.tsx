@@ -96,7 +96,7 @@ function PushDialog() {
   const handleSubmit = React.useCallback(async () => {
     const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
     if (parsedState) {
-      setChangedTokens(findDifferentTokens(tokens, parsedState[0]));
+      setChangedTokens(findDifferentTokens(parsedState[0], tokens));
     }
     await pushDialog('difference');
   }, [pushDialog, tokens, lastSyncedState]);
@@ -180,13 +180,16 @@ function PushDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
-            <Text>
+            <Stack direction="row" gap={2}>
               This will push your local changes to the
               {' '}
-              {branch}
+              <Text bold>
+                {' '}
+                {branch}
+              </Text>
               {' '}
               branch
-            </Text>
+            </Stack>
             <div>
               <TabButton<string> name="Diff" activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
               <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
