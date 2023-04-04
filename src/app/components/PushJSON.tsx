@@ -2,8 +2,9 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import Stack from './Stack';
 import ChangeTokenListingHeading from './ChangeTokenListingHeading';
-import ChangedTokenItem from './ChangedTokenItem';
 import { tokensSelector } from '@/selectors';
+import stringifyTokens from '@/utils/stringifyTokens';
+import Textarea from './Textarea';
 
 function PushJSON() {
   const tokens = useSelector(tokensSelector);
@@ -34,9 +35,11 @@ function PushJSON() {
         <>
           <ChangeTokenListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
           {!collapsedTokenSets.includes(tokenSet) && tokenList && (
-            tokenList.map((token) => (
-              <ChangedTokenItem token={token} />
-            ))
+          <Textarea
+            isDisabled
+            rows={21}
+            value={stringifyTokens(tokens, tokenSet)}
+          />
           )}
         </>
         )

@@ -7,7 +7,7 @@ import Button from '../Button';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import {
-  activeThemeSelector, apiSelector, localApiStateSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector, apiSelector, localApiStateSelector, usedTokenSetSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import { isGitProvider } from '@/utils/is';
@@ -37,7 +37,6 @@ export default function CreateBranchModal({
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const tokens = useSelector(tokensSelector);
 
   const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
   const [hasErrored, setHasErrored] = React.useState<boolean>(false);
@@ -97,7 +96,6 @@ export default function CreateBranchModal({
     pushTokens,
     onSuccess,
     startBranch,
-    tokens,
   ]);
 
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);

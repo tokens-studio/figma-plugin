@@ -166,7 +166,6 @@ export function useGitLab() {
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-    console.log('pulltokensfromgithub', tokens);
     await checkAndSetAccess({
       context, receivedFeatureFlags,
     });

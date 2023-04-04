@@ -180,6 +180,23 @@ function PushDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
+            <Text>
+              This will push your local changes to the
+              {' '}
+              {branch}
+              {' '}
+              branch
+            </Text>
+            <div>
+              <TabButton<string> name="Diff" activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
+              <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+            </div>
+            {
+              (activeTab === 'Diff' && Object.entries(changedTokens).length > 0) && <ChangedTokenList changedTokens={changedTokens} />
+            }
+            {
+              activeTab === 'JSON' && <PushJSON />
+            }
             <Box css={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -188,23 +205,6 @@ function PushDialog() {
               borderColor: '$borderMuted',
             }}
             >
-              <Text>
-                This will push your local changes to the
-                {' '}
-                {branch}
-                {' '}
-                branch
-              </Text>
-              <div>
-                <TabButton<string> name="Diff" activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
-                <TabButton<string> name="JSON" activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
-              </div>
-              {
-                (activeTab === 'Diff' && Object.entries(changedTokens).length > 0) && <ChangedTokenList changedTokens={changedTokens} />
-              }
-              {
-                activeTab === 'JSON' && <PushJSON />
-              }
               <Button variant="secondary" id="pushDialog-button-close" onClick={onCancel}>
                 Cancel
               </Button>
