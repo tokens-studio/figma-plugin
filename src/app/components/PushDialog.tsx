@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   lastSyncedStateSelector, localApiStateSelector, storageTypeSelector, tokensSelector,
 } from '@/selectors';
@@ -28,10 +28,11 @@ import PushJSON from './PushJSON';
 import { tryParseJson } from '@/utils/tryParseJson';
 import { findDifferentTokens } from '@/utils/findDifferentTokens';
 import { LastSyncedState } from '@/utils/compareLastSyncedState';
+import { Dispatch } from '../store';
 
 function PushDialog() {
   const {
-    onConfirm, onCancel, showPushDialog, pushDialog,
+    onConfirm, onCancel, showPushDialog,
   } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
   const storageType = useSelector(storageTypeSelector);
@@ -41,6 +42,7 @@ function PushDialog() {
   const [activeTab, setActiveTab] = React.useState('Diff');
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const tokens = useSelector(tokensSelector);
+  const dispatch = useDispatch<Dispatch>();
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
@@ -98,8 +100,8 @@ function PushDialog() {
     if (parsedState) {
       setChangedTokens(findDifferentTokens(parsedState[0], tokens));
     }
-    await pushDialog('difference');
-  }, [pushDialog, tokens, lastSyncedState]);
+    dispatch.uiState.setShowPushDialog('difference');
+  }, [tokens, lastSyncedState, dispatch.uiState]);
 
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
@@ -116,7 +118,7 @@ function PushDialog() {
 
   useShortcut(['Enter'], handleSaveShortcut);
 
-  const handlePushChanges = React.useCallback(async () => {
+  const handlePushChanges = React.useCallback(() => {
     onConfirm(commitMessage, branch);
   }, [branch, commitMessage, onConfirm]);
 

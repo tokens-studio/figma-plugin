@@ -7,9 +7,9 @@ export function findDifferentTokens(baseTokens: Record<string, AnyTokenList>, co
     const newTokens: ImportToken[] = [];
     const updatedTokens: ImportToken[] = [];
     const removedTokens: ImportToken[] = [];
-    // Find created tokens and updated tokens
+    // Find different tokens and new tokens in compareTokens
     values.forEach((token) => {
-      const oldValue = baseTokens[tokenSet].find((t) => t.name === token.name);
+      const oldValue = baseTokens[tokenSet]?.find((t) => t.name === token.name);
       if (oldValue) {
         if (!isEqual(oldValue.value, token.value)) {
           const updatedToken: ImportToken = { ...token };
@@ -28,9 +28,9 @@ export function findDifferentTokens(baseTokens: Record<string, AnyTokenList>, co
         newTokens.push({ ...token, importType: 'NEW' });
       }
     });
-    // Find the removed tokens
-    baseTokens[tokenSet].forEach((token) => {
-      const oldValue = compareTokens[tokenSet].find((t) => t.name === token.name);
+    // Find the new tokens in baseTokens
+    baseTokens[tokenSet]?.forEach((token) => {
+      const oldValue = compareTokens[tokenSet]?.find((t) => t.name === token.name);
       if (!oldValue) {
         removedTokens.push({ ...token, importType: 'REMOVE' });
       }
@@ -39,7 +39,7 @@ export function findDifferentTokens(baseTokens: Record<string, AnyTokenList>, co
     entries.push([tokenSet, totalUpdatedTokens]);
   });
 
-  // Find the tokens in removed tokenSet
+  // Find the new tokenSet in baseTokens
   Object.entries(baseTokens).forEach(([tokenSet, values]) => {
     const isTokenSetRemoved = typeof compareTokens[tokenSet] === 'undefined';
     if (isTokenSetRemoved) {

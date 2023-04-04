@@ -79,7 +79,6 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
-
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
@@ -157,7 +156,6 @@ export function useGitHub() {
   const pullTokensFromGitHub = useCallback(async (context: GithubCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-    console.log('pulltokensfromgithub', tokens);
 
     const [owner, repo] = context.id.split('/');
 
