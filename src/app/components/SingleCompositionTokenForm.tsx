@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
 } from './DropdownMenu';
-import { PropertyDropdownMenuRadioElement } from './PropertyDropdownMenuRadioElement';
+import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -95,28 +95,36 @@ export default function SingleCompositionTokenForm({
       }}
       >
         <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <DropdownMenuTrigger data-cy="composition-token-dropdown" bordered css={{ flex: 1, height: '$10' }}>
-            <span>{property || 'Choose a property'}</span>
+          <DropdownMenuTrigger
+            data-cy="composition-token-dropdown"
+            bordered
+            css={{
+              width: '130px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', height: '$10',
+            }}
+          >
+            {property || 'Choose a property'}
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
             {' '}
             <DropdownMenuRadioGroup value={property}>
               {properties.length > 0
-                && properties.map((property, index) => <PropertyDropdownMenuRadioElement key={`property-${seed(index)}`} property={property} index={index} propertySelected={onPropertySelected} />)}
+                && properties.map((property, index) => <DropdownMenuRadioElement key={`property-${seed(index)}`} item={property} index={index} itemSelected={onPropertySelected} />)}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DownshiftInput
-          value={propertyValue}
-          type={propertyType === 'fill' ? 'color' : propertyType}
-          resolvedTokens={resolvedTokens}
-          handleChange={onPropertyValueChanged}
-          setInputValue={handleDownShiftInputChange}
-          placeholder={
-            propertyType === 'fill' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+        <Box css={{ flexGrow: 1 }}>
+          <DownshiftInput
+            value={propertyValue}
+            type={propertyType}
+            resolvedTokens={resolvedTokens}
+            handleChange={onPropertyValueChanged}
+            setInputValue={handleDownShiftInputChange}
+            placeholder={
+            propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
           }
-          suffix
-        />
+            suffix
+          />
+        </Box>
         <Box css={{ width: '$5', marginRight: '$3' }}>
           <IconButton
             tooltip="Remove this style"

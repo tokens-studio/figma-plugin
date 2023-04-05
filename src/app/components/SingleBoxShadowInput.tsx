@@ -15,6 +15,8 @@ import Select from './Select';
 import Box from './Box';
 import SingleBoxShadowDownShiftInput from './SingleBoxShadowDownShiftInput';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import Tooltip from './Tooltip';
+import { StyledPrefix } from './Input';
 
 interface DragItem {
   index: number;
@@ -195,6 +197,7 @@ export default function SingleBoxShadowInput({
             <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
           </Box>
         )}
+        <Tooltip label="type"><StyledPrefix isText>Type</StyledPrefix></Tooltip>
         <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>

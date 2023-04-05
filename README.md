@@ -8,7 +8,7 @@ Tokens Studio for Figma is a plugin for Figma allowing you to define and use des
 https://docs.tokens.studio/
 
 # Roadmap
-https://github.com/users/six7/projects/4
+https://github.com/orgs/tokens-studio/projects/34/views/6
 
 # Slack Channel
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. [Want to join](https://tokens.studio/slack).
@@ -32,8 +32,8 @@ Whenever you apply a token to a layer, the plugin will store hidden information 
 Most information can be found in the [docs](https://docs.tokens.studio) or [our website](https://tokens.studio).
 
 # Contribute
-* Run `yarn` to install dependencies.
-* Run `yarn build:watch` to start webpack in watch mode.
+* Run `npm ci` to install dependencies.
+* Run `npm run start` to start webpack in watch mode or `npm run build` to build once.
 * Open `Figma` -> `Plugins` -> `Development` -> `New Plugin...` and choose `manifest.json` file from this repo.
 * Create a Pull request for your branch
 

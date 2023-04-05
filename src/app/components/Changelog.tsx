@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Heading from './Heading';
+import Text from './Text';
 import Button from './Button';
 import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
@@ -10,6 +11,11 @@ import { styled } from '@/stitches.config';
 const StyledReadMoreLink = styled('a', {
   color: '$fgAccent',
   fontSize: '$xsmall',
+});
+
+const StyledImage = styled('img', {
+  marginBottom: '$4',
+  borderRadius: '$card',
 });
 
 export default function Changelog() {
@@ -43,9 +49,9 @@ export default function Changelog() {
               align="start"
               css={{ display: index === activeIndex ? 'flex' : 'none' }}
             >
-              {item.image && <img src={item.image.filename} alt={item.image.alt} className="mb-8 rounded" />}
+              {item.image && <StyledImage src={item.image.filename} alt={item.image.alt} />}
               <Heading>{item.title}</Heading>
-              <p className="text-xs">{item.excerpt}</p>
+              <Text size="small">{item.excerpt}</Text>
               {item.read_more_link && (
                 <StyledReadMoreLink
                   target="_blank"

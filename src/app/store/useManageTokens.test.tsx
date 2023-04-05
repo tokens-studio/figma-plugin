@@ -175,7 +175,12 @@ describe('useManageTokens', () => {
   it('duplicateGroup test', async () => {
     const path = 'size';
     const type = TokenTypes.SIZING;
-    await act(async () => result.current.duplicateGroup(path, type));
+    await act(async () => result.current.duplicateGroup({
+      oldName: path,
+      newName: 'size-copy',
+      tokenSets: ['global'],
+      type,
+    }));
 
     expect(store.getState().tokenState.tokens.global).toEqual([
       {

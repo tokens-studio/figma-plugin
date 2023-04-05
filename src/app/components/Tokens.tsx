@@ -16,22 +16,22 @@ import Box from './Box';
 import IconButton from './IconButton';
 import IconListing from '@/icons/listing.svg';
 import IconJSON from '@/icons/json.svg';
-import useConfirm from '../hooks/useConfirm';
-import { track } from '@/utils/analytics';
 import useTokens from '../store/useTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, updateModeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { UpdateMode } from '@/constants/UpdateMode';
+import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
+import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+import { getAliasValue } from '@/utils/alias';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -92,19 +92,18 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const activeTokensTab = useSelector(activeTokensTabSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const stringTokens = useSelector(stringTokensSelector);
   const showEditForm = useSelector(showEditFormSelector);
   const manageThemesModalOpen = useSelector(manageThemesModalOpenSelector);
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
+  const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
   const dispatch = useDispatch<Dispatch>();
-  const [activeTokensTab, setActiveTokensTab] = React.useState('list');
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
-  const updateMode = useSelector(updateModeSelector);
-  const { confirm } = useConfirm();
-  const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -125,9 +124,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
     })),
     [tokens, usedTokenSet, activeTokenSet],
   );
-  const [stringTokens, setStringTokens] = React.useState(
-    JSON.stringify(tokens[activeTokenSet], null, 2),
-  );
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
@@ -140,8 +136,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } catch (e) {
       setError(`Unable to read JSON: ${JSON.stringify(e)}`);
     }
-    setStringTokens(val);
-  }, []);
+    dispatch.tokenState.setStringTokens(val);
+  }, [dispatch.tokenState]);
 
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
@@ -164,44 +160,17 @@ function Tokens({ isActive }: { isActive: boolean }) {
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
 
-  const handleSaveJSON = React.useCallback(() => {
-    dispatch.tokenState.setJSONData(stringTokens);
-  }, [dispatch.tokenState, stringTokens]);
-
   const handleToggleTokenSetsVisibility = React.useCallback(() => {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
 
   const handleSetTokensTabToList = React.useCallback(() => {
-    setActiveTokensTab('list');
-  }, []);
+    dispatch.uiState.setActiveTokensTab('list');
+  }, [dispatch.uiState]);
 
   const handleSetTokensTabToJSON = React.useCallback(() => {
-    setActiveTokensTab('json');
-  }, []);
-
-  const handleUpdate = React.useCallback(async () => {
-    if (activeTokensTab === 'list') {
-      track('Update Tokens');
-      if (shouldConfirm) {
-        confirm({
-          text: 'Are you sure?',
-          description:
-            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
-        }).then((result) => {
-          if (result && result.result) {
-            dispatch.tokenState.updateDocument();
-          }
-        });
-      } else {
-        dispatch.tokenState.updateDocument();
-      }
-    } else {
-      track('Update JSON');
-
-      dispatch.tokenState.setJSONData(stringTokens);
-    }
-  }, [confirm, shouldConfirm, dispatch.tokenState, activeTokensTab, stringTokens]);
+    dispatch.uiState.setActiveTokensTab('json');
+  }, [dispatch.uiState]);
 
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
@@ -211,8 +180,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
     // @README these dependencies aren't exhaustive
     // because of specific logic requirements
     setError(null);
-    setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenType]);
+    dispatch.tokenState.setStringTokens(getStringTokens());
+  }, [tokens, activeTokenSet, tokenType, dispatch.tokenState, getStringTokens]);
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -223,6 +192,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
   }, [dispatch, tokens, stringTokens, activeTokenSet]);
+
+  React.useEffect(() => {
+    const newBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+    dispatch.settings.setBaseFontSize(String(newBaseFontSize));
+  }, [resolvedTokens, aliasBaseFontSize]);
 
   const saveScrollPositionSet = React.useCallback((tokenSet: string) => {
     if (tokenDiv.current) {
@@ -356,8 +330,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
           </Box>
         </Box>
         <TokensBottomBar
-          handleUpdate={handleUpdate}
-          handleSaveJSON={handleSaveJSON}
           hasJSONError={!!error}
         />
       </Box>

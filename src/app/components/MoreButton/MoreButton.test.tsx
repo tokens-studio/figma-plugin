@@ -219,4 +219,19 @@ describe('MoreButton', () => {
     expect(getByText('Border radius')).toBeInTheDocument();
     expect(getByText('Border width')).toBeInTheDocument();
   });
+
+  it('cmd + click should lead to editForm', async () => {
+    const { getByText } = render(
+      <MoreButton
+        type={TokenTypes.SPACING}
+        showForm={mockShowForm}
+        token={token}
+      />,
+    );
+    expect(getByText(token.name)).toBeInTheDocument();
+    await fireEvent.click(getByText(token.name), {
+      metaKey: true,
+    });
+    expect(mockShowForm).toHaveBeenCalled();
+  });
 });

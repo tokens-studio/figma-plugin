@@ -2,16 +2,22 @@ import { convertTypographyNumberToFigma, fakeZeroForFigma } from './generic';
 
 describe('convertTypographyNumberToFigma', () => {
   it('converts an input number-like string and returns a transformed value', () => {
-    const pxValue = convertTypographyNumberToFigma('13px');
+    const pxValue = convertTypographyNumberToFigma('13px', '16');
     expect(pxValue).toBe(13);
-    const remValue = convertTypographyNumberToFigma('2rem');
+    const remValue = convertTypographyNumberToFigma('2rem', '16');
     expect(remValue).toBe(32);
-    const emValue = convertTypographyNumberToFigma('1.5em');
+    const emValue = convertTypographyNumberToFigma('1.5em', '16');
     expect(emValue).toBe(24);
-    const numberStringValue = convertTypographyNumberToFigma('144');
+    const numberStringValue = convertTypographyNumberToFigma('144', '16');
     expect(numberStringValue).toBe(144);
-    const numberValue = convertTypographyNumberToFigma(72);
+    const numberValue = convertTypographyNumberToFigma(72, '16');
     expect(numberValue).toBe(72);
+    const cursomtPxValue = convertTypographyNumberToFigma('2rem', '14px');
+    expect(cursomtPxValue).toBe(28);
+    const nanValue = convertTypographyNumberToFigma('2rem', 'aaa');
+    expect(nanValue).toBe(32);
+    const cursomtRemValue = convertTypographyNumberToFigma('2rem', '14rem');
+    expect(cursomtRemValue).toBe(28);
   });
 });
 

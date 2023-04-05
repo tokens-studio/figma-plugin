@@ -15,6 +15,8 @@ import TooltipProperty from './TooltipProperty';
 import Stack from '../Stack';
 import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 import { SingleBorderValueDisplay } from './SingleBorderValueDisplay';
+import { isColorToken } from '@/utils/is/isColorToken';
+import { SingleColorValueDisplay } from './SingleColorValueDisplay';
 
 type Props = {
   token: SingleToken;
@@ -106,12 +108,22 @@ export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
     );
   }
 
+  if (isColorToken(token)) {
+    return (
+      <SingleColorValueDisplay
+        value={String(token.value)}
+        resolvedValue={String(resolvedValue)}
+        modifier={token.$extensions?.['studio.tokens']?.modify}
+      />
+    );
+  }
+
   if (typeof token.value !== 'string' && typeof token.value !== 'number') {
     return <TooltipProperty value={JSON.stringify(token.value, null, 2)} />;
   }
 
   if (resolvedValue && typeof resolvedValue !== 'string' && typeof resolvedValue !== 'number') {
-    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(token.value, null, 2)} />;
+    return <TooltipProperty value={token.value} resolvedValue={JSON.stringify(resolvedValue, null, 2)} />;
   }
 
   return <TooltipProperty value={token.value} resolvedValue={resolvedValue} />;

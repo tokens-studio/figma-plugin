@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import Textarea from './Textarea';
 import Box from './Box';
 import { editProhibitedSelector } from '@/selectors';
+import { useShortcut } from '@/hooks/useShortcut';
+import useTokens from '../store/useTokens';
 
 type Props = {
   stringTokens: string;
@@ -16,6 +18,14 @@ function JSONEditor({
   hasError,
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
+  const { handleJSONUpdate } = useTokens();
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey) {
+      handleJSONUpdate(stringTokens);
+    }
+  }, [handleJSONUpdate, stringTokens]);
+
+  useShortcut(['KeyS'], handleSaveShortcut);
 
   return (
     <Box

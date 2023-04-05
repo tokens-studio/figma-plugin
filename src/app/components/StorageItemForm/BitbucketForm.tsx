@@ -8,6 +8,7 @@ import Input from '../Input';
 import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
+import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
 type Props = {
@@ -113,9 +114,9 @@ export default function BitbucketForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

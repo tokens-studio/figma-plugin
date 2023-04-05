@@ -508,7 +508,7 @@ describe('TokenListing', () => {
       value: 'composition.regular',
     });
     cy.get('[data-cy=composition-token-dropdown]').click();
-    cy.get('[data-cy=property-dropdown-menu-element-sizing]').click();
+    cy.get('[data-cy=item-dropdown-menu-element-sizing]').click();
     fillInput({
       input: 'value',
       value: '$sizing.xs',
@@ -516,7 +516,7 @@ describe('TokenListing', () => {
     cy.get('[data-cy=button-style-add-multiple]').click();
 
     cy.get('[data-cy=composition-token-dropdown]').eq(1).click();
-    cy.get('[data-cy=property-dropdown-menu-element-opacity]').click();
+    cy.get('[data-cy=item-dropdown-menu-element-opacity]').click();
     fillInputNth({
       input: 'value',
       value: '$opacity.30',
@@ -525,7 +525,7 @@ describe('TokenListing', () => {
 
     cy.get('[data-cy=button-style-add-multiple]').click();
     cy.get('[data-cy=composition-token-dropdown]').eq(2).click();
-    cy.get('[data-cy=property-dropdown-menu-element-fontSizes]').click();
+    cy.get('[data-cy=item-dropdown-menu-element-fontSizes]').click();
     fillInputNth({
       input: 'value',
       value: '$font-size.4',

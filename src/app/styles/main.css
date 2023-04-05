@@ -1,0 +1,414 @@
+*,
+::before,
+::after {
+  --tw-translate-x: 0;
+
+  --tw-translate-y: 0;
+
+  --tw-rotate: 0;
+
+  --tw-skew-x: 0;
+
+  --tw-skew-y: 0;
+
+  --tw-scale-x: 1;
+
+  --tw-scale-y: 1;
+
+  --tw-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate))
+    skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+
+  border-color: var(--figma-color-border, #eeeeee);
+
+  --tw-ring-offset-shadow: 0 0 #0000;
+
+  --tw-ring-shadow: 0 0 #0000;
+
+  --tw-shadow: 0 0 #0000;
+
+  --tw-shadow-colored: 0 0 #0000;
+
+  --tw-blur: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-brightness: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-contrast: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-grayscale: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-hue-rotate: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-invert: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-saturate: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-sepia: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-drop-shadow: var(--tw-empty, /*!*/ /*!*/);
+
+  --tw-filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate)
+    var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.fixed {
+  position: fixed !important;
+}
+
+.absolute {
+  position: absolute !important;
+}
+
+.relative {
+  position: relative !important;
+}
+
+.sticky {
+  position: sticky !important;
+}
+
+.z-20 {
+  z-index: 20 !important;
+}
+
+.mb-8 {
+  margin-bottom: 2rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mr-1 {
+  margin-right: 0.25rem !important;
+}
+
+.mt-1 {
+  margin-top: 0.25rem !important;
+}
+
+.mt-4 {
+  margin-top: 1rem !important;
+}
+
+.mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.block {
+  display: block !important;
+}
+
+.inline-block {
+  display: inline-block !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
+
+.table {
+  display: table !important;
+}
+
+.grid {
+  display: grid !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.h-4 {
+  height: 1rem !important;
+}
+
+.w-4 {
+  width: 1rem !important;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.flex-grow {
+  flex-grow: 1 !important;
+}
+
+.transform {
+  transform: var(--tw-transform) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.resize {
+  resize: both !important;
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.justify-center {
+  justify-content: center !important;
+}
+
+.justify-between {
+  justify-content: space-between !important;
+}
+
+.gap-1 {
+  gap: 0.25rem !important;
+}
+
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0 !important;
+
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse)) !important;
+
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse))) !important;
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0 !important;
+
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse))) !important;
+
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse)) !important;
+}
+
+.break-all {
+  word-break: break-all !important;
+}
+
+.rounded-sm {
+  border-radius: 0.125rem !important;
+}
+
+.rounded {
+  border-radius: 0.25rem !important;
+}
+
+.border {
+  border-width: 1px !important;
+}
+
+.border-gray-300 {
+  border-color: var(--figma-color-border, #eeeeee) !important;
+}
+
+.border-gray-200 {
+  border-color: var(--figma-color-border, #eeeeee) !important;
+}
+
+.bg-gray-100 {
+  background-color: var(--figma-color-bg-tertiary, #f5f5f5) !important;
+}
+
+.bg-red-200 {
+  --tw-bg-opacity: 1 !important;
+
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity)) !important;
+}
+
+.p-2 {
+  padding: 0.5rem !important;
+}
+
+.p-4 {
+  padding: 1rem !important;
+}
+
+.p-0 {
+  padding: 0px !important;
+}
+
+.p-8 {
+  padding: 2rem !important;
+}
+
+.pl-4 {
+  padding-left: 1rem !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.text-xs {
+  font-size: 0.75rem !important;
+
+  line-height: 1rem !important;
+}
+
+.text-xxs {
+  font-size: 0.7rem !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.uppercase {
+  text-transform: uppercase !important;
+}
+
+.capitalize {
+  text-transform: capitalize !important;
+}
+
+.text-primary-500 {
+  color: var(--figma-color-bg-brand, #18a0fb) !important;
+}
+
+.text-gray-700 {
+  color: var(--figma-color-text-secondary, #9e9e9e) !important;
+}
+
+.text-gray-600 {
+  color: var(--figma-color-text-secondary, #9e9e9e) !important;
+}
+
+.text-red-500 {
+  --tw-text-opacity: 1 !important;
+
+  color: rgb(239 68 68 / var(--tw-text-opacity)) !important;
+}
+
+.text-red-600 {
+  --tw-text-opacity: 1 !important;
+
+  color: rgb(220 38 38 / var(--tw-text-opacity)) !important;
+}
+
+.text-red-700 {
+  --tw-text-opacity: 1 !important;
+
+  color: rgb(185 28 28 / var(--tw-text-opacity)) !important;
+}
+
+.underline {
+  -webkit-text-decoration-line: underline !important;
+
+  text-decoration-line: underline !important;
+}
+
+.shadow-border {
+  --tw-shadow: 0 0 0 1px !important;
+
+  --tw-shadow-colored: 0 0 0 1px var(--tw-shadow-color) !important;
+
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.shadow {
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color) !important;
+
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.shadow-gray-300 {
+  --tw-shadow-color: var(--figma-color-border, #eeeeee) !important;
+
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+.outline {
+  outline-style: solid !important;
+}
+
+.blur {
+  --tw-blur: blur(8px) !important;
+
+  filter: var(--tw-filter) !important;
+}
+
+.filter {
+  filter: var(--tw-filter) !important;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter,
+    -webkit-text-decoration-color, -webkit-backdrop-filter !important;
+
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow,
+    transform, filter, backdrop-filter !important;
+
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow,
+    transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter !important;
+
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  transition-duration: 150ms !important;
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1) !important;
+}
+
+.hover\:bg-gray-100:hover {
+  background-color: var(--figma-color-bg-tertiary, #f5f5f5) !important;
+}
+
+.focus\:shadow-focus:focus {
+  --tw-shadow: 0 0 0 2px var(--figma-color-border-selected) !important;
+
+  --tw-shadow-colored: 0 0 0 2px var(--tw-shadow-color) !important;
+
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.focus\:shadow-primary-400:focus {
+  --tw-shadow-color: var(--figma-color-bg-brand, #3cb1ff) !important;
+
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+.focus\:outline-none:focus {
+  outline: 2px solid transparent !important;
+
+  outline-offset: 2px !important;
+}

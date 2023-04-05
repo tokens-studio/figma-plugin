@@ -2,12 +2,21 @@ import React from 'react';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
+import { styled } from '@/stitches.config';
 
 const mapTypeToPlaceHolder = {
   color: 'Border color',
   width: 'Border width',
   style: 'solid | dashed',
 };
+
+const StyledButton = styled('button', {
+  display: 'block',
+  width: '1.5rem',
+  height: '1.5rem',
+  borderRadius: '$default',
+  cursor: 'pointer',
+});
 
 export default function BorderTokenDownShiftInput({
   name,
@@ -42,14 +51,13 @@ export default function BorderTokenDownShiftInput({
       placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder]}
       prefix={
         name === 'color' && (
-          <button
+          <StyledButton
             type="button"
-            className="block w-4 h-4 rounded-sm cursor-pointer shadow-border shadow-gray-300 focus:shadow-focus focus:shadow-primary-400"
             style={{ background: value ?? '#000000', fontSize: 0 }}
             onClick={handleToggleInputHelper}
           >
             {value}
-          </button>
+          </StyledButton>
         )
       }
       suffix

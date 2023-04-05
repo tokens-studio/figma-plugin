@@ -4,11 +4,13 @@ import { useSelector } from 'react-redux';
 import Button from './Button';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { backgroundJobsSelector } from '@/selectors';
+import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
 import Stack from './Stack';
+import Text from './Text';
 import Spinner from './Spinner';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import Box from './Box';
 
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
@@ -28,6 +30,8 @@ export const backgroundJobTitles = {
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
+  const windowSize = useSelector(windowSizeSelector);
+
   const hasInfiniteJobs = React.useMemo(() => backgroundJobs.some((job) => job.isInfinite), [backgroundJobs]);
   const expectedWaitTime = React.useMemo(() => backgroundJobs.reduce((time, job) => (
     time + (job.totalTasks ? (
@@ -57,26 +61,28 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <div className="fixed w-full z-20" data-testid="loadingBar" data-cy="loadingBar">
+    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar" data-cy="loadingBar">
       <Stack
         direction="row"
         align="center"
         gap={2}
         css={{
-          backgroundColor: '$bgSubtle', padding: '$2', borderRadius: '$default', margin: '$2',
+          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$default', margin: '$2',
         }}
       >
         <Spinner />
-        <div className="flex flex-grow items-center justify-between">
-          <div className="font-medium text-xxs">
-            {message || 'Hold on, updating...'}
-            {expectedWaitTimeInSeconds >= 1 && (
-              `(${expectedWaitTimeInSeconds}s remaining)`
-            )}
-          </div>
-          <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
-        </div>
+        {!windowSize?.isMinimized && (
+          <Stack direction="row" align="center" justify="between" css={{ flexGrow: 1 }}>
+            <Text size="xsmall" bold>
+              {message || 'Hold on, updating...'}
+              {expectedWaitTimeInSeconds >= 1 && (
+                `(${expectedWaitTimeInSeconds}s remaining)`
+              )}
+            </Text>
+            <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+          </Stack>
+        )}
       </Stack>
-    </div>
+    </Box>
   );
 }

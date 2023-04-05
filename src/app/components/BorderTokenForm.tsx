@@ -100,7 +100,7 @@ export default function BorderTokenForm({
                 handleToggleInputHelper={handleToggleInputHelper}
               />
               {inputHelperOpen && key === 'color' && (
-              <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
+                <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
               )}
             </>
           ))}
@@ -121,10 +121,10 @@ export default function BorderTokenForm({
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
-          <ResolvedTokenDisplay
-            alias={alias}
-            selectedToken={selectedToken}
-          />
+            <ResolvedTokenDisplay
+              alias={alias}
+              selectedToken={selectedToken}
+            />
           )}
         </Stack>
       )}

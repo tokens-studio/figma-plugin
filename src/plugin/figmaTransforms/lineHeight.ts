@@ -1,13 +1,13 @@
 import { convertTypographyNumberToFigma } from './generic';
 
-export function convertLineHeightToFigma(inputValue: string): LineHeight | null {
+export function convertLineHeightToFigma(inputValue: string, baseFontSize: string): LineHeight | null {
   let lineHeight: LineHeight | null = null;
   const value = inputValue.toString();
   const numbers = /^\d+(\.\d+)?$/;
-  if (value.match(numbers) || value.endsWith('px')) {
+  if (value.match(numbers) || value.endsWith('px') || value.endsWith('rem')) {
     lineHeight = {
       unit: 'PIXELS',
-      value: convertTypographyNumberToFigma(value),
+      value: convertTypographyNumberToFigma(value, baseFontSize),
     };
   } else if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
     lineHeight = {

@@ -52,6 +52,11 @@ const argv = yargs(hideBin(process.argv))
                 describe: 'Expands composition in the output tokens',
                 default: false,
             })
+            .option('expandBorder', {
+                type: 'boolean',
+                describe: 'Expands border in the output tokens',
+                default: false,
+            })
             .option('preserveRawValue', {
                 type: 'boolean',
                 describe: 'Preserve the raw, unprocessed value in the output tokens',
@@ -134,7 +139,7 @@ const transformTokensAndWriteFile = async (tokens, input, sets, excludes, option
     log(`using sets: ${sets.length > 0 ? sets : '[]'}`);
     log(`using excludes: ${excludes.length > 0 ? excludes : '[]'}`);
     log(
-        `using options: { expandTypography: ${options.expandTypography}, expandShadow: ${options.expandShadow}, expandComposition: ${options.expandComposition}, preserveRawValue: ${options.preserveRawValue}, resolveReferences: ${options.resolveReferences} }`
+        `using options: { expandTypography: ${options.expandTypography}, expandShadow: ${options.expandShadow}, expandComposition: ${options.expandComposition}, expandBorder: ${options.expandBorder}, preserveRawValue: ${options.preserveRawValue}, resolveReferences: ${options.resolveReferences} }`
     );
     const transformed = transformTokens(tokens, sets, excludes, options);
 
@@ -178,6 +183,7 @@ const transform = async () => {
         expandTypography,
         expandShadow,
         expandComposition,
+        expandBorder,
         preserveRawValue,
         throwErrorWhenNotResolved,
         resolveReferences: resolveReferencesArg,
@@ -196,6 +202,7 @@ const transform = async () => {
         expandTypography,
         expandShadow,
         expandComposition,
+        expandBorder,
         preserveRawValue,
         throwErrorWhenNotResolved,
         resolveReferences,

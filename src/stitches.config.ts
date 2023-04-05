@@ -37,7 +37,7 @@ export const stitchesInstance = createStitches({
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',
-      mono: 'JetBrainsMono, monospace',
+      mono: '\'JetBrains Mono\', monospace',
     },
     fontSizes: {
       xxsmall: '10px',
@@ -72,7 +72,7 @@ export const stitchesInstance = createStitches({
       bgAccent: 'var(--figma-color-bg-selected)',
       bgAccentHover: 'var(--figma-color-bg-selected-hover)',
       interaction: 'var(--figma-color-bg-brand)',
-      interactionSubtle: 'var(--figma-color-bg-brand-secondary)',
+      interactionSubtle: 'var(--figma-color-bg-brand-hover)',
       onInteraction: 'var(--figma-color-text-onbrand)',
       interactionDisabled: 'var(--figma-color-text-menu-disabled)',
       dangerFg: 'var(--figma-color-text-danger)',

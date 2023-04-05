@@ -9,6 +9,7 @@ import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import Button from './Button';
 import Heading from './Heading';
 import Input from './Input';
+import Text from './Text';
 import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';
@@ -17,6 +18,7 @@ import { isGitProvider } from '@/utils/is';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
+import Box from './Box';
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -106,18 +108,20 @@ function PushDialog() {
   switch (showPushDialog) {
     case 'initial': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal title="Push changes" showClose large isOpen close={onCancel}>
           <form onSubmit={handleSubmit}>
             <Stack direction="column" gap={4}>
-              <Stack direction="column" gap={2}>
-                <Heading>Push changes</Heading>
+                            <Stack direction="column" gap={3}>
                 {localApiState.provider !== StorageProviderType.SUPERNOVA ? (
-                  <>
-                    <p className="text-xs">Push your local changes to your repository.</p>
-                    <Heading size="small">Commit message</Heading>
-                    <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
-                      {'id' in localApiState ? localApiState.id : null}
-                    </div>
+                <>
+                  <Text size="small">Push your local changes to your repository.</Text>
+                  <Box css={{
+                    padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+                  }}
+                  >
+                    {'id' in localApiState ? localApiState.id : null}
+                  </Box>
+                  <Heading size="small">Commit message</Heading>
                     <Textarea
                       id="push-dialog-commit-message"
                       border
@@ -140,9 +144,11 @@ function PushDialog() {
                   <>
                     <p className="text-xs">Push your local changes to your Supernova.io design system.</p>
                     <Heading size="small">Design system</Heading>
-                    <div className="p-2 font-mono text-gray-600 bg-gray-100 rounded text-xxs">
+                    <Box css={{
+                      padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+                    }}>
                       {'designSystemUrl' in localApiState ? localApiState.designSystemUrl : null}
-                    </div>
+                    </Box>
                   </>
                 )}
               </Stack>
@@ -179,25 +185,24 @@ function PushDialog() {
     case 'success': {
       return (
         <Modal large isOpen close={onCancel}>
-          <div className="text-center">
-            <div className="mb-8 space-y-4">
+          <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
+            <Stack direction="column" gap={4}>
               <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
-              <div className="text-xs">
+              <Text size="small">
                 Changes pushed to
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
                 {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
-                .
-              </div>
-            </div>
+              </Text>
+            </Stack>
             <Button variant="primary" href={redirectHref}>
               {localApiState.provider === StorageProviderType.SUPERNOVA
                 ? <>Open Supernova Workspace</>
                 : <>Create Pull Request</>}
             </Button>
-          </div>
+          </Stack>
         </Modal>
       );
     }

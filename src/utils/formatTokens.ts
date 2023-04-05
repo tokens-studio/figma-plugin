@@ -12,6 +12,7 @@ type Options = {
   expandTypography?: boolean;
   expandShadow?: boolean;
   expandComposition?: boolean;
+  expandBorder?: boolean;
 };
 
 export default function formatTokens({
@@ -23,6 +24,7 @@ export default function formatTokens({
   expandTypography = false,
   expandShadow = false,
   expandComposition = false,
+  expandBorder = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
@@ -33,6 +35,7 @@ export default function formatTokens({
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
         || (token.type === TokenTypes.COMPOSITION && expandComposition)
+        || (token.type === TokenTypes.BORDER && expandBorder)
       ) {
         if (typeof token.value === 'string') {
           const resolvedToken = resolvedTokens.find((t) => t.name === name);

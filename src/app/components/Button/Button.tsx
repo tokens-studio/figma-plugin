@@ -2,6 +2,7 @@ import React from 'react';
 import { track } from '@/utils/analytics';
 import { StyledButtonIconContainer } from './StyledButtonIconContainer';
 import { StyledButton } from './StyledButton';
+import type { StitchesCSS } from '@/types';
 
 export interface ButtonProps {
   type?: 'button' | 'submit';
@@ -15,6 +16,7 @@ export interface ButtonProps {
   id?: string;
   icon?: React.ReactNode;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null>;
+  css?: StitchesCSS
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -30,6 +32,7 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   disabled = false,
   buttonRef = null,
+  css,
 }) => {
   const handleClick = React.useCallback(() => {
     if (id) {
@@ -57,6 +60,7 @@ const Button: React.FC<ButtonProps> = ({
           size={size}
           variant={variant}
           form={form}
+          css={css}
         >
           {(!!icon) && (
             <StyledButtonIconContainer>
@@ -81,6 +85,7 @@ const Button: React.FC<ButtonProps> = ({
       variant={variant}
       form={form}
       onClick={handleClick}
+      css={css}
     >
       {(!!icon) && (
         <StyledButtonIconContainer>

@@ -2,6 +2,7 @@ import { rest } from 'msw';
 
 export const LICENSE_FOR_VALID_RESPONSE = 'validate-c421c421-c421c421c-4c21c421-c421c42';
 export const LICENSE_FOR_ERROR_RESPONSE = 'validate-error-c421c421-c421c421c421421-41';
+export const LICENSE_FOR_DETACH_ERROR_RESPONSE = 'detach-error-c421c421-c421c421c421421-41';
 
 export const USER_ID_FOR_FOUND_LICENSE_KEY = 'pro-user-id';
 export const USER_ID_FOR_NOT_FOUND_LICENSE_KEY = 'free-user-id';
@@ -25,23 +26,19 @@ export const mockValidateLicenseHandler = jest.fn((req, res, ctx) => {
   if (licenseKey === LICENSE_FOR_ERROR_RESPONSE) {
     return res(ctx.status(500), ctx.json({ message: LICENSE_ERROR_MESSAGE }));
   }
-  if (licenseKey === LICENSE_FOR_VALID_RESPONSE) {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        plan: 'pro',
-        entitlements: 'pro',
-        email: 'test@email.com',
-      }),
-    );
-  }
-
-  return res();
+  return res(
+    ctx.status(200),
+    ctx.json({
+      plan: 'pro',
+      entitlements: 'pro',
+      email: 'test@email.com',
+    }),
+  );
 });
 
 export const mockDetachLicenseHandler = jest.fn((req, res, ctx) => {
   const { licenseKey } = req.body as { licenseKey: string };
-  if (licenseKey === LICENSE_FOR_ERROR_RESPONSE) {
+  if (licenseKey === LICENSE_FOR_DETACH_ERROR_RESPONSE) {
     return res(ctx.status(500), ctx.json({ message: DETACH_ERROR_MESSAGE }));
   }
   if (licenseKey === LICENSE_FOR_VALID_RESPONSE) {

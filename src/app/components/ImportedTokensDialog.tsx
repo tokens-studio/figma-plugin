@@ -12,6 +12,7 @@ import AddIcon from '@/icons/add.svg';
 import TrashIcon from '@/icons/trash.svg';
 import Box from './Box';
 import { ImportToken } from '@/types/tokens';
+import Text from './Text';
 
 function NewOrExistingToken({
   token,
@@ -35,7 +36,7 @@ function NewOrExistingToken({
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
       <Stack direction="column" gap={1}>
-        <div className="text-xs font-semibold">{token.name}</div>
+        <Text bold size="small">{token.name}</Text>
         <Stack direction="row" align="center" gap={1}>
           <Box css={{
             padding: '$2',
@@ -65,11 +66,11 @@ function NewOrExistingToken({
           ) : null}
         </Stack>
         {(token.description || token.oldDescription) && (
-        <div className="text-xxs">
+        <Text size="small">
           {token.description}
           {' '}
           {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
-        </div>
+        </Text>
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>

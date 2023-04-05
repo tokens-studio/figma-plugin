@@ -5,7 +5,6 @@ import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
-import { UpdateNodesSettings } from '@/types/UpdateNodesSettings';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -25,7 +24,7 @@ import {
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
-import { extractColorInBorderTokenForAlias } from './extractColorInBorderTokenForAlias';
+import { SettingsState } from '@/app/store/models/settings';
 
 // @TODO fix typings
 
@@ -53,7 +52,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-
     acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
     return acc;
   }, {});
@@ -174,19 +172,19 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.border) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.border);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
   if (values && values.borderTop) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderTop);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderRight) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderRight);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderLeft) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderLeft);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.borderBottom) {
-    values = extractColorInBorderTokenForAlias(tokens, values, values.borderBottom);
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
@@ -221,14 +219,13 @@ async function migrateTokens(entry: NodeManagerNode, values: MapValuesToTokensRe
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
-  settings?: UpdateNodesSettings,
+  settings?: SettingsState,
 ) {
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName } = settings ?? {};
+  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -259,6 +256,7 @@ export async function updateNodes(
               themeInfo,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
+              baseFontSize,
             );
             store.successfulNodes.add(entry.node);
             returnedValues.add(entry.tokens);

@@ -54,6 +54,37 @@ describe('getAliasValue', () => {
       type: TokenTypes.COLOR,
     },
     {
+      name: 'colors.light-extension',
+      input: '#ff0000',
+      value: '#ffdbd2',
+      type: TokenTypes.COLOR,
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            type: 'lighten',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    },
+    {
+      name: 'colors.mix-extension',
+      input: '#ff2277',
+      value: '#ff1445',
+      type: TokenTypes.COLOR,
+      $extensions: {
+        'studio.tokens': {
+          modify: {
+            color: '{colors.hex}',
+            type: 'mix',
+            value: '0.5',
+            space: 'sRGB',
+          },
+        },
+      },
+    },
+    {
       name: 'alias.complex',
       input: '$base.scale * $base.ratio ^ round((200 + 400 - $base.index) / 100)',
       value: 8,
@@ -129,6 +160,12 @@ describe('getAliasValue', () => {
       name: 'colors.aliasdeep',
       input: '{colors.deep}',
       value: '#ff0000',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'colors.aliasdeep-without-endtag',
+      input: '{colors.deep',
+      value: '{colors.deep',
       type: TokenTypes.COLOR,
     },
     {
@@ -426,12 +463,37 @@ describe('getAliasValue', () => {
       },
       type: TokenTypes.BORDER,
     },
+    {
+      name: 'clamped', input: 'clamped($xx,2,4)', value: 2, type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'clamp', input: 'clamp($xx,2,4)', value: 'clamp(1,2,4)', type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'xx',
+      input: '1',
+      value: 1,
+      type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'yy',
+      input: '0.2',
+      value: 0.2,
+      type: TokenTypes.DIMENSION,
+    },
+    {
+      // Note that we cannot do {sample(cubicBezier1D($yy,$yy),$yy)}px to inject px values, it must have a semantic intermediary as shown in the following
+      name: 'cubicSample', input: 'sample(cubicBezier1D($yy,$yy),$yy)', value: 0.104, type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'cubicSamplePx', input: '{cubicSample}px', value: '0.104px', type: TokenTypes.DIMENSION,
+    },
   ];
 
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
-      // @TODO check this test typing
-      expect(getAliasValue({ value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[])).toEqual(token.value);
+      // @TODO check this test typing,
+      expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[], false)).toEqual(token.value);
     });
   });
 });

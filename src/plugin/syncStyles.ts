@@ -1,3 +1,4 @@
+import { SettingsState } from '@/app/store/models/settings';
 import { SyncOption } from '@/app/store/useTokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -18,7 +19,7 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 import setTextValuesOnTarget from './setTextValuesOnTarget';
 
-export default async function syncStyles(tokens: Record<string, AnyTokenList>, settings: Record<SyncOption, boolean>) {
+export default async function syncStyles(tokens: Record<string, AnyTokenList>, options: Record<SyncOption, boolean>, settings: SettingsState) {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
@@ -40,13 +41,13 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
       styleSet[pathName] = {
         ...token,
         path: pathName,
-        value: typeof token.value === 'string' ? transformValue(token.value, token.type) : token.value,
+        value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings.baseFontSize) : token.value,
       } as SingleToken<true, { path: string }>;
     });
   });
 
   // rename styles
-  if (settings.renameStyle && activeThemeObject) {
+  if (options.renameStyle && activeThemeObject) {
     allStyles.filter((style) => style.name.startsWith(`${activeThemeObject.name}/`)).forEach((style) => {
       if (activeThemeObject.$figmaStyleReferences) {
         Object.entries(activeThemeObject.$figmaStyleReferences).forEach(([key, value]) => {
@@ -62,7 +63,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
 
   // Remove any styles that do not have a token that matches its name
   const styleIdsToRemove: string[] = [];
-  if (settings.removeStyle) {
+  if (options.removeStyle) {
     allStyles = allStyles.filter((style) => {
       if (!Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
         if (activeThemeObject && activeThemeObject.$figmaStyleReferences) {
@@ -83,15 +84,15 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, s
 
   // Update all different style values
   allStyles.forEach((style) => {
-    if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name])) {
+    if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name], settings.baseFontSize)) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
         setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
       }
       if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
-        setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken);
+        setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
-        setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken);
+        setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken, settings.baseFontSize);
       }
     }
   });

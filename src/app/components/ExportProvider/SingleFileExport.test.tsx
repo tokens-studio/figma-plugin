@@ -25,6 +25,7 @@ const defaultStore = {
           type: TokenTypes.BOX_SHADOW,
         },
         { name: 'composition', value: { fill: '$white' }, type: TokenTypes.COMPOSITION },
+        { name: 'border', value: { color: '$white', width: '5px' }, type: TokenTypes.BORDER },
       ],
       light: [
         { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
@@ -73,6 +74,13 @@ describe('SingleFileExport', () => {
             },
             type: 'composition',
           },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
+            },
+            type: 'border',
+          },
         },
       }, null, 2),
     );
@@ -118,6 +126,13 @@ describe('SingleFileExport', () => {
               fill: '$white',
             },
             type: 'composition',
+          },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
+            },
+            type: 'border',
           },
         },
         light: {
@@ -352,6 +367,69 @@ describe('SingleFileExport', () => {
             fill: {
               value: '$white',
               type: 'fill',
+            },
+          },
+          border: {
+            value: {
+              color: '$white',
+              width: '5px',
+            },
+            type: 'border',
+          },
+        },
+      }, null, 2),
+    );
+  });
+
+  it('should return expanded border token', () => {
+    const mockStore = createMockStore(defaultStore);
+    const result = render(
+      <Provider store={mockStore}>
+        <SingleFileExport onClose={mockClose} />
+      </Provider>,
+    );
+    const expandBorderCheckBox = result.getByTestId('expandBorder');
+    fireEvent.click(expandBorderCheckBox);
+    const textArea = result.getByRole('textbox');
+    expect(textArea).toHaveValue(
+      JSON.stringify({
+        global: {
+          white: {
+            value: '#ffffff',
+            type: 'color',
+          },
+          headline: {
+            value: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
+            type: 'typography',
+          },
+          shadow: {
+            value: {
+              blur: '2',
+              color: '#000000',
+              spread: '0',
+              type: 'innerShadow',
+              x: '2',
+              y: '2',
+            },
+            type: 'boxShadow',
+          },
+          composition: {
+            value: {
+              fill: '$white',
+            },
+            type: 'composition',
+          },
+          border: {
+            color: {
+              value: '$white',
+              type: 'color',
+            },
+            width: {
+              value: '5px',
+              type: 'dimension',
             },
           },
         },

@@ -6,6 +6,7 @@ import { trackFromPlugin, notifyUI } from './notifiers';
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
   token: Pick<SingleTypographyToken, 'value' | 'description'>,
+  baseFontSize: string,
 ) {
   try {
     const { value, description } = token;
@@ -34,7 +35,7 @@ export default async function setTextValuesOnTarget(
         }
       } catch (e) {
         const splitFontFamily = family.split(',');
-        const candidateStyles = transformValue(style, 'fontWeights');
+        const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
         const candidateFonts: { family: string; style: string }[] = [];
         splitFontFamily?.forEach((candidateFontFamily) => {
           const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
@@ -82,32 +83,60 @@ export default async function setTextValuesOnTarget(
           trackFromPlugin('Font not found', { family, style });
         }
       }
-      if (typeof fontSize !== 'undefined') {
-        target.fontSize = transformValue(fontSize, 'fontSizes');
-      }
-      if (typeof lineHeight !== 'undefined') {
-        const transformedValue = transformValue(String(lineHeight), 'lineHeights');
-        if (transformedValue !== null) {
-          target.lineHeight = transformedValue;
+      try {
+        if (typeof fontSize !== 'undefined') {
+          target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
         }
+      } catch (e) {
+        console.log('Error setting fontSize on target', target, token, e);
       }
-      if (typeof letterSpacing !== 'undefined') {
-        const transformedValue = transformValue(letterSpacing, 'letterSpacing');
-        if (transformedValue !== null) {
-          target.letterSpacing = transformedValue;
+      try {
+        if (typeof lineHeight !== 'undefined') {
+          const transformedValue = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
+          if (transformedValue !== null) {
+            target.lineHeight = transformedValue;
+          }
         }
+      } catch (e) {
+        console.log('Error setting lineHeight on target', target, token, e);
       }
-      if (typeof paragraphSpacing !== 'undefined') {
-        target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing');
+      try {
+        if (typeof letterSpacing !== 'undefined') {
+          const transformedValue = transformValue(letterSpacing, 'letterSpacing', baseFontSize);
+          if (transformedValue !== null) {
+            target.letterSpacing = transformedValue;
+          }
+        }
+      } catch (e) {
+        console.log('Error setting letterSpacing on target', target, token, e);
       }
-      if (typeof paragraphIndent !== 'undefined') {
-        target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent');
+      try {
+        if (typeof paragraphSpacing !== 'undefined') {
+          target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting paragraphSpacing on target', target, token, e);
       }
-      if (textCase) {
-        target.textCase = transformValue(textCase, 'textCase');
+      try {
+        if (typeof paragraphIndent !== 'undefined') {
+          target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting paragraphIndent on target', target, token, e);
       }
-      if (textDecoration) {
-        target.textDecoration = transformValue(textDecoration, 'textDecoration');
+      try {
+        if (textCase) {
+          target.textCase = transformValue(textCase, 'textCase', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting textCase on target', target, token, e);
+      }
+      try {
+        if (textDecoration) {
+          target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
+        }
+      } catch (e) {
+        console.log('Error setting textDecoration on target', target, token, e);
       }
       if (description && 'description' in target) {
         target.description = description;

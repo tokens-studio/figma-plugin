@@ -5,39 +5,43 @@ describe('convertToDefaultProperty', () => {
   const properties = [
     {
       input: Properties.width,
-      output: Properties.sizing,
+      output: Properties.dimension,
     },
     {
       input: Properties.height,
-      output: Properties.sizing,
+      output: Properties.dimension,
+    },
+    {
+      input: Properties.sizing,
+      output: Properties.dimension,
     },
     {
       input: Properties.itemSpacing,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.verticalPadding,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.horizontalPadding,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingTop,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingLeft,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingBottom,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.paddingRight,
-      output: Properties.spacing,
+      output: Properties.dimension,
     },
     {
       input: Properties.borderRadiusTopLeft,
@@ -74,10 +78,6 @@ describe('convertToDefaultProperty', () => {
     {
       input: Properties.borderWidthBottom,
       output: Properties.borderWidth,
-    },
-    {
-      input: Properties.sizing,
-      output: Properties.sizing,
     },
     {
       input: Properties.fill,
@@ -131,6 +131,10 @@ describe('convertToDefaultProperty', () => {
     {
       input: Properties.textDecoration,
       output: Properties.textDecoration,
+    },
+    {
+      input: 'style',
+      output: 'strokeStyle',
     },
   ];
   it('should convert property to default property', () => {

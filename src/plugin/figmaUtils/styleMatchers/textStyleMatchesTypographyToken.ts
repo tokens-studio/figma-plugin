@@ -4,6 +4,7 @@ import { TokenTypographyValue } from '@/types/values';
 export function textStyleMatchesTypographyToken(
   textStyle: TextStyle | undefined,
   typographyToken: string | TokenTypographyValue,
+  baseFontSize: string,
 ) {
   if (!textStyle || typeof typographyToken === 'string') {
     return false;
@@ -27,11 +28,11 @@ export function textStyleMatchesTypographyToken(
   if (textStyle.fontName.style !== fontWeight) {
     return false;
   }
-  if (fontSize === undefined || textStyle.fontSize !== transformValue(fontSize, 'fontSizes')) {
+  if (fontSize === undefined || textStyle.fontSize !== transformValue(fontSize, 'fontSizes', baseFontSize)) {
     return false;
   }
   // This will default to `{ unit: 'AUTO' }` if lineHeight token is not set:
-  const tokenLineHeight = transformValue(String(lineHeight), 'lineHeights');
+  const tokenLineHeight = transformValue(String(lineHeight), 'lineHeights', baseFontSize);
   if (tokenLineHeight?.unit !== textStyle.lineHeight.unit) {
     let hasMismatch = true;
     if (tokenLineHeight && tokenLineHeight.unit !== 'AUTO' && textStyle.lineHeight.unit !== 'AUTO') {
@@ -46,7 +47,7 @@ export function textStyleMatchesTypographyToken(
     }
   }
   // This will default to `null` if letterSpacing token is not set:
-  const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing');
+  const tokenLetterSpacing = transformValue(String(letterSpacing), 'letterSpacing', baseFontSize);
   if (
     tokenLetterSpacing?.unit !== textStyle.letterSpacing.unit
     || tokenLetterSpacing?.value !== textStyle.letterSpacing.value
@@ -57,23 +58,23 @@ export function textStyleMatchesTypographyToken(
   }
   if (
     paragraphSpacing === undefined
-    || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing')
+    || textStyle.paragraphSpacing !== transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize)
   ) {
     return false;
   }
   if (
     paragraphIndent === undefined
-    || textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent')
+    || textStyle.paragraphIndent !== transformValue(paragraphIndent, 'paragraphIndent', baseFontSize)
   ) {
     return false;
   }
   // This will default to `ORIGINAL` if textCase token is not set:
-  const tokenTextCase = transformValue(String(textCase), 'textCase');
+  const tokenTextCase = transformValue(String(textCase), 'textCase', baseFontSize);
   if (tokenTextCase !== textStyle.textCase) {
     return false;
   }
   // This will default to `NONE` if textDecoration token is not set:
-  const tokenTextDecoration = transformValue(String(textDecoration), 'textDecoration');
+  const tokenTextDecoration = transformValue(String(textDecoration), 'textDecoration', baseFontSize);
   if (tokenTextDecoration !== textStyle.textDecoration) {
     return false;
   }

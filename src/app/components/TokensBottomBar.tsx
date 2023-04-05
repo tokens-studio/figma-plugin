@@ -1,50 +1,29 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import ApplySelector from './ApplySelector';
-import ExportModal from './modals/ExportModal';
-import PresetModal from './modals/PresetModal';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
-import { editProhibitedSelector, hasUnsavedChangesSelector } from '@/selectors';
+import { hasUnsavedChangesSelector } from '@/selectors';
 import Button from './Button';
-import { useShortcut } from '@/hooks/useShortcut';
+import Stack from './Stack';
+import SettingsDropdown from './SettingsDropdown';
+import useTokens from '../store/useTokens';
+import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+import ToolsDropdown from './ToolsDropdown';
 
 type Props = {
-  handleUpdate: () => void;
-  handleSaveJSON: () => void;
   hasJSONError: boolean;
 };
 
-export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONError }: Props) {
-  const editProhibited = useSelector(editProhibitedSelector);
+export default function TokensBottomBar({ hasJSONError }: Props) {
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
+  const stringTokens = useSelector(stringTokensSelector);
 
-  const [exportModalVisible, showExportModal] = React.useState(false);
-  const [presetModalVisible, showPresetModal] = React.useState(false);
+  const { handleJSONUpdate } = useTokens();
 
-  const handleSaveShortcut = useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
-      handleSaveJSON();
-    }
-  }, [handleSaveJSON]);
-
-  useShortcut(['KeyS'], handleSaveShortcut);
-
-  const handleShowPresetModal = useCallback(() => {
-    showPresetModal(true);
-  }, []);
-
-  const handleClosePresetModal = useCallback(() => {
-    showPresetModal(false);
-  }, []);
-
-  const handleShowExportModal = useCallback(() => {
-    showExportModal(true);
-  }, []);
-
-  const handleCloseExportModal = useCallback(() => {
-    showExportModal(false);
-  }, []);
+  const handleSaveJSON = useCallback(() => {
+    handleJSONUpdate(stringTokens);
+  }, [handleJSONUpdate, stringTokens]);
 
   return (
     <Box css={{
@@ -69,27 +48,25 @@ export default function TokensBottomBar({ handleUpdate, handleSaveJSON, hasJSONE
         </Box>
       )
         : (
-          <Box css={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', gap: '$2', padding: '$3 $4',
-          }}
+          <Stack
+            direction="row"
+            gap={2}
+            justify="between"
+            align="center"
+            css={{
+              padding: '$3',
+            }}
           >
-            <ApplySelector />
-            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$2' }}>
-              <Button variant="ghost" disabled={editProhibited} onClick={handleShowPresetModal}>
-                Load
-              </Button>
-              <Button variant="ghost" onClick={handleShowExportModal}>
-                Export
-              </Button>
+            <Stack direction="row" gap={1}>
+              <ToolsDropdown />
               <StylesDropdown />
-              <Button variant="primary" onClick={handleUpdate}>
-                Update
-              </Button>
-            </Box>
-          </Box>
+            </Stack>
+            <Stack direction="row" gap={1}>
+              <ApplySelector />
+              <SettingsDropdown />
+            </Stack>
+          </Stack>
         )}
-      {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
-      {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}
     </Box>
   );
 }

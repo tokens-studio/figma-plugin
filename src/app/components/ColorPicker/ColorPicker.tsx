@@ -3,6 +3,7 @@ import { RgbaColorPicker, RgbaColor } from 'react-colorful';
 import { parseToRgb, parseToHsl, toColorString } from 'polished';
 import Input from '../Input';
 import Button from '../Button';
+import Stack from '../Stack';
 
 enum InputMode {
   RGBA = 'rgba',
@@ -173,13 +174,13 @@ const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
   }, [value, internalValue]);
 
   return (
-    <div className="mt-2">
-      <div className="color-picker mb-1">
+    <Stack direction="column" gap={1} css={{ marginTop: '$2' }}>
+      <div className="color-picker">
         <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
       </div>
-      <div className="flex">
+      <Stack direction="row" gap={1}>
         {inputMode === InputMode.RGBA && (
-        <div className="grid gap-1 grid-cols-4 mr-1">
+        <Stack direction="row" gap={1}>
           <Input {...PROPS} min={0} max={255} name="r" value={rgba.r} onChange={handleRedChange} />
           <Input {...PROPS} min={0} max={255} name="g" value={rgba.g} onChange={handleGreenChange} />
           <Input {...PROPS} min={0} max={255} name="b" value={rgba.b} onChange={handleBlueChange} />
@@ -192,10 +193,10 @@ const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
             value={rgba.a}
             onChange={handleAlphaChange}
           />
-        </div>
+        </Stack>
         )}
         {inputMode === InputMode.HSLA && (
-        <div className="grid gap-1 grid-cols-4 mr-1">
+        <Stack direction="row" gap={1}>
           <Input {...PROPS} min={0} max={360} name="h" value={hsla.h} onChange={handleHueChange} />
           <Input {...PROPS} min={0} max={100} name="s" value={hsla.s} onChange={handleSaturationChange} />
           <Input {...PROPS} min={0} max={100} name="l" value={hsla.l} onChange={handleLightnessChange} />
@@ -208,13 +209,13 @@ const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
             value={hsla.a}
             onChange={handleAlphaChange}
           />
-        </div>
+        </Stack>
         )}
         <Button variant="secondary" size="small" onClick={handleInputModeToggle}>
           {inputMode === InputMode.RGBA ? 'RGB(A)' : 'HSL(A)'}
         </Button>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 };
 

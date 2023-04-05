@@ -8,6 +8,7 @@ const StyledSelect = styled('select', {
   padding: '$3',
   fontSize: 12,
   lineHeight: 1,
+  backgroundColor: '$bgDefault',
   color: '$text',
   border: '1px solid $border',
   '&:focus': { boxShadow: '$focus' },

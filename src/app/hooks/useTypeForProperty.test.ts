@@ -49,11 +49,11 @@ describe('useTypeForProperty', () => {
     },
     {
       input: 'fill',
-      output: 'fill',
+      output: 'color',
     },
     {
       input: 'borderColor',
-      output: 'fill',
+      output: 'color',
     },
     {
       input: 'borderRadius',

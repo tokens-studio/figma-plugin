@@ -4,6 +4,7 @@ import { mockCreateEffectStyle, mockGetLocalEffectStyles } from '../../../tests/
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 describe('updateEffectStyles', () => {
+  const baseFontSize = '16';
   it('Can create styles', () => {
     const createdStyle = {
       id: '1234',
@@ -26,6 +27,7 @@ describe('updateEffectStyles', () => {
         type: TokenTypes.BOX_SHADOW,
         path: 'shadows/lg',
       }],
+      baseFontSize,
       true,
     );
 
@@ -82,6 +84,7 @@ describe('updateEffectStyles', () => {
         type: TokenTypes.BOX_SHADOW,
         path: 'shadows/lg',
       }],
+      baseFontSize,
       true,
     );
 

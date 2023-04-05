@@ -1,7 +1,6 @@
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useFlags } from 'launchdarkly-react-client-sdk';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -20,10 +19,13 @@ import Changelog from '../Changelog';
 import OnboardingFlow from '../OnboardingFlow';
 import { Initiator } from '../Initiator';
 import { globalStyles } from '../globalStyles';
+import { AuthContextProvider } from '@/context/AuthContext';
+import SecondScreenSync from '../SecondScreenSync';
+import AuthModal from '../AuthModal';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
-  startupProcess?: ReturnType<typeof useStartupProcess>
+  startupProcess?: ReturnType<typeof useStartupProcess>;
 };
 
 const applicationInitStepLabels = {
@@ -37,6 +39,7 @@ const applicationInitStepLabels = {
 export const AppContainer = withLDProviderWrapper((params: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
+  const { secondScreen } = useFlags();
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -72,15 +75,11 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
 
   globalStyles();
 
-  return (
+  const appContent = (
     <>
       <FigmaLoading
         isLoading={showLoadingScreen}
-        label={(
-          startupProcess.currentStep
-            ? applicationInitStepLabels[startupProcess.currentStep]
-            : undefined
-        )}
+        label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
         onCancel={handleCancelLoadingScreen}
       >
         <App />
@@ -92,6 +91,14 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />
+      {secondScreen && (
+        <>
+          <SecondScreenSync />
+          <AuthModal />
+        </>
+      )}
     </>
   );
+
+  return secondScreen ? <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider> : appContent;
 });

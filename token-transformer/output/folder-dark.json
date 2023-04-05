@@ -10,6 +10,11 @@
       "description": "Nested color value",
       "type": "color"
     },
+    "backgroundDark": {
+      "value": "#949DA7",
+      "description": "Darkened color value",
+      "type": "color"
+    },
     "size": {
       "default": {
         "value": 4,

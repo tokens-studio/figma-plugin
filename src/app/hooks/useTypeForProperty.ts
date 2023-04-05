@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import { Properties } from '@/constants/Properties';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export function useTypeForProperty(property: string): string {
   return useMemo(() => {
     switch (property) {
       case Properties.width:
       case Properties.height:
-        return Properties.sizing;
+        return TokenTypes.SIZING;
       case Properties.itemSpacing:
       case Properties.verticalPadding:
       case Properties.horizontalPadding:
@@ -14,19 +15,20 @@ export function useTypeForProperty(property: string): string {
       case Properties.paddingLeft:
       case Properties.paddingBottom:
       case Properties.paddingRight:
-        return Properties.spacing;
+        return TokenTypes.SPACING;
       case Properties.borderRadiusTopLeft:
       case Properties.borderRadiusTopRight:
       case Properties.borderRadiusBottomLeft:
       case Properties.borderRadiusBottomRight:
-        return Properties.borderRadius;
+        return TokenTypes.BORDER_RADIUS;
       case Properties.borderColor:
-        return Properties.fill;
+      case Properties.fill:
+        return TokenTypes.COLOR;
       case Properties.borderWidthTop:
       case Properties.borderWidthLeft:
       case Properties.borderWidthRight:
       case Properties.borderWidthBottom:
-        return Properties.borderWidth;
+        return TokenTypes.BORDER_WIDTH;
       default:
         return property;
     }

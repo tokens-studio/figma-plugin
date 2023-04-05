@@ -1,6 +1,7 @@
 export type DuplicateTokenGroupPayload = {
   parent: string;
-  path: string;
   oldName: string;
+  newName: string;
+  tokenSets: string[];
   type: string;
 };

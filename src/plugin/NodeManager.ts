@@ -5,7 +5,6 @@ import { EventEmitter } from 'eventemitter3';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeTokenRefValue } from '@/types/NodeTokenRefValue';
-import { hasTokens } from '@/utils/hasTokens';
 import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { parseIntOrDefault } from '@/utils/parseIntOrDefault';
@@ -264,7 +263,7 @@ export class NodeManager {
     const relevantNodeIds = relevantNodes.map((node) => node.id);
     const resultingNodes = compact(relevantNodeIds.map((nodeId) => {
       const cache = this.nodes.get(nodeId);
-      if (cache && hasTokens(cache.tokens)) {
+      if (cache) {
         return cache;
       }
       return null;

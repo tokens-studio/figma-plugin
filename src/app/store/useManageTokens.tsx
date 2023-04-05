@@ -7,10 +7,11 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { activeTokenSetSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  DeleteTokenPayload, DuplicateTokenPayload, UpdateTokenPayload,
+  DeleteTokenPayload, DuplicateTokenGroupPayload, DuplicateTokenPayload, UpdateTokenPayload,
 } from '@/types/payloads';
 import useTokens from './useTokens';
 import { StyleOptions } from '@/constants/StyleOptions';
+import { ColorModifier } from '@/types/Modifier';
 // @TODO this typing could be more strict in the future
 
 type EditSingleTokenData = {
@@ -21,6 +22,7 @@ type EditSingleTokenData = {
   description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };
 
 type CreateSingleTokenData = {
@@ -30,6 +32,7 @@ type CreateSingleTokenData = {
   value: SingleToken['value'];
   description?: string;
   shouldUpdateDocument?: boolean;
+  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
 };
 
 type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
@@ -45,7 +48,7 @@ export default function useManageTokens() {
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
     const {
-      parent, type, name, value, description, oldName, shouldUpdateDocument = true,
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
@@ -63,6 +66,7 @@ export default function useManageTokens() {
         description,
         oldName,
         shouldUpdate: shouldUpdateDocument,
+        $extensions,
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
@@ -73,7 +77,7 @@ export default function useManageTokens() {
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
-      parent, type, name, value, description, shouldUpdateDocument = true,
+      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
     } = data;
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATESINGLETOKEN,
@@ -90,6 +94,7 @@ export default function useManageTokens() {
         value,
         description,
         shouldUpdate: shouldUpdateDocument,
+        $extensions,
       } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
@@ -156,17 +161,16 @@ export default function useManageTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);
 
-  const duplicateGroup = useCallback(async (path: string, type: string) => {
+  const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    const oldName = path.split('.').pop() || '';
-    const newPath = path.slice(0, path.length - oldName.length);
 
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
     await duplicateTokenGroup({
-      parent: activeTokenSet, path: newPath, oldName, type,
+      parent: activeTokenSet, oldName: data.oldName, newName: data.newName, tokenSets: data.tokenSets, type: data.type,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
   }, [store, duplicateTokenGroup, dispatch.uiState]);
+
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup,
   }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);
