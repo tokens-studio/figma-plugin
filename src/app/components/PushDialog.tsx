@@ -14,7 +14,7 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
-import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud'
+import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 
@@ -67,7 +67,6 @@ function PushDialog() {
           break;
       }
     }
-    console.log(redirectHref);
     return redirectHref;
   }, [branch, localApiState]);
 

@@ -99,7 +99,7 @@ export default function SupernovaForm({
         <Textarea
           id="mapping"
           name="mapping"
-          border
+          border={true}
           rows={8}
           value={values.mapping ?? ''}
           onChange={handleMappingChange}

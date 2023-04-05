@@ -17,7 +17,6 @@ export type SupernovaStorageSaveOptions = {
 };
 
 export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSaveOptions> {
-
   private workspaceHandle: string;
 
   private designSystemId: string;
@@ -36,7 +35,9 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       let parsedURL = new URL(url);
       let fragments = parsedURL.pathname.split('/');
       if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
-        throw new Error('Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.');
+        throw new Error(
+          'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.'
+        );
       } else {
         this.workspaceHandle = fragments[2];
         this.designSystemId = fragments[4].split('-')[0];
@@ -47,7 +48,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         this.sdkInstance = new Supernova(this.secret, null, null);
       }
     } catch (error) {
-      throw (error);
+      throw error;
     }
   }
 
@@ -57,13 +58,17 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       const accessor = await this.readWriteInstance();
 
       // Always retrieve current tokens defined in the plugin, as Supernova can't yet reconstruct the tokens properly
+      // TODO: Supernova, add connection to live server for JSON backup
       return [];
     } catch (error) {
       throw new Error('There was an error connecting to Supernova. Check your API key / Design System URL.');
     }
   }
 
-  public async write(files: Array<RemoteTokenStorageFile<any>>, saveOptions?: SupernovaStorageSaveOptions): Promise<boolean> {
+  public async write(
+    files: Array<RemoteTokenStorageFile<any>>,
+    saveOptions?: SupernovaStorageSaveOptions
+  ): Promise<boolean> {
     // Create writable Supernova instance
     const accessor = await this.readWriteInstance();
 
@@ -72,10 +77,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     } as any;
     files.forEach((file) => {
       if (file.type === 'themes') {
-        dataObject.$themes = [
-          ...(dataObject.$themes ?? []),
-          ...file.data,
-        ];
+        dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
       } else if (file.type === 'tokenSet') {
         dataObject[file.name] = file.data;
       }
@@ -130,7 +132,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       console.log(error);
     }
     throw new Error(
-      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.',
+      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.'
     );
   }
 }

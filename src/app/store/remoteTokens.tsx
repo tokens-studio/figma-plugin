@@ -73,6 +73,7 @@ export default function useRemoteTokens() {
     addNewSupernovaCredentials,
     syncTokensWithSupernova,
     pushTokensToSupernova,
+    pullTokensFromSupernova,
   } = useSupernova();
   const {
     addNewADOCredentials,
@@ -126,7 +127,7 @@ export default function useRemoteTokens() {
           break;
         }
         case StorageProviderType.SUPERNOVA: {
-          throw new Error('Pull from Supernova not yet supported');
+          remoteData = await pullTokensFromSupernova(context);
           break;
         }
         default:
@@ -161,6 +162,7 @@ export default function useRemoteTokens() {
       pullTokensFromJSONBin,
       pullTokensFromURL,
       pullTokensFromADO,
+      pullTokensFromSupernova,
     ],
   );
 
@@ -190,7 +192,7 @@ export default function useRemoteTokens() {
           break;
         }
         case StorageProviderType.SUPERNOVA: {
-          await syncTokensWithSupernova(context);
+          content = await syncTokensWithSupernova(context);
           break;
         }
         default:

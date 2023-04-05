@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -19,6 +20,7 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { saveLastSyncedState } from '../../../../utils/saveLastSyncedState';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
+import { applyTokenSetOrder } from '../../../../utils/tokenset';
 
 type SupernovaCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.SUPERNOVA }>;
 type SupernovaFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
@@ -116,6 +118,37 @@ export function useSupernova() {
     [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme]
   );
 
+  const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+    const storage = storageClientFactory(context);
+
+    try {
+      const content = await storage.retrieve();
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
+      }
+      if (content) {
+        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
+        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+
+        return {
+          ...content,
+          tokens: sortedTokens,
+        };
+      }
+    } catch (e) {
+      return {
+        status: 'failure',
+        errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
+      };
+    }
+    return null;
+  }, [
+    storageClientFactory,
+  ]);
+
   // Function to initially check auth and sync tokens with Supernova
   const syncTokensWithSupernova = useCallback(
     async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
@@ -173,7 +206,8 @@ export function useSupernova() {
       addNewSupernovaCredentials,
       syncTokensWithSupernova,
       pushTokensToSupernova,
+      pullTokensFromSupernova,
     }),
-    [addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova],
+    [addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova],
   );
 }
