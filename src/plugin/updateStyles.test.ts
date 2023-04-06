@@ -238,6 +238,9 @@ describe('updateStyles', () => {
           id: 'light',
           name: 'light',
           selectedTokenSets: {},
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
         }],
       })
     ));
