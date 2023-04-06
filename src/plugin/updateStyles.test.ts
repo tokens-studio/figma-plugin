@@ -9,7 +9,7 @@ import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessa
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { createStyles } from './asyncMessageHandlers';
 
-type ExtendedSingleToken = SingleToken<true, { path: string, styleId: '' }>;
+type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
 
 describe('updateStyles', () => {
   const colorSpy = jest.spyOn(updateColorStyles, 'default');
