@@ -51,6 +51,7 @@ describe('updateColorStyles', () => {
         value: '#ff0000',
         type: TokenTypes.COLOR,
         path: 'colors/red',
+        styleId: '1234',
       }],
       true,
     );

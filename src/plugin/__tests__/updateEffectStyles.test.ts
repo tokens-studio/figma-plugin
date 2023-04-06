@@ -83,6 +83,7 @@ describe('updateEffectStyles', () => {
         },
         type: TokenTypes.BOX_SHADOW,
         path: 'shadows/lg',
+        styleId: '1234',
       }],
       baseFontSize,
       true,
