@@ -226,7 +226,7 @@ describe('updateStyles', () => {
         path: 'light/primary/500',
         value: '#ff0000',
         type: 'color',
-        styleId: '',
+        styleId: '1234',
       },
     ] as ExtendedSingleToken[];
 
