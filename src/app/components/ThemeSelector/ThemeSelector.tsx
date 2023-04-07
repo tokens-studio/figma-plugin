@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
+import compact from 'just-compact';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -30,6 +31,7 @@ export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
+  const groupNames = useMemo(() => compact(availableThemes.map((theme) => theme.group)), [availableThemes]);
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
@@ -58,27 +60,34 @@ export const ThemeSelector: React.FC = () => {
   }, [activeTheme, availableThemes]);
 
   const availableThemeOptions = useMemo(() => (
-    availableThemes.map(({ label, value }) => {
-      const handleSelect = () => handleSelectTheme(value);
+    groupNames.map((groupName) => (
+      <>
+        <Text css={{ color: '$textSubtle' }}>{groupName}</Text>
+        {
+          availableThemes.filter((t) => t.group === groupName).map(({ label, value }) => {
+            const handleSelect = () => handleSelectTheme(value);
 
-      return (
-        <DropdownMenuRadioItem
-          key={value}
-          value={value}
-          data-cy={`themeselector--themeoptions--${value}`}
-          data-testid={`themeselector--themeoptions--${value}`}
-          // @README we can disable this because we are using Memo for the whole list anyways
-          // eslint-disable-next-line react/jsx-no-bind
-          onSelect={handleSelect}
-        >
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          {label}
-        </DropdownMenuRadioItem>
-      );
-    })
-  ), [availableThemes, handleSelectTheme]);
+            return (
+              <DropdownMenuRadioItem
+                key={value}
+                value={value}
+                data-cy={`themeselector--themeoptions--${value}`}
+                data-testid={`themeselector--themeoptions--${value}`}
+                // @README we can disable this because we are using Memo for the whole list anyways
+                // eslint-disable-next-line react/jsx-no-bind
+                onSelect={handleSelect}
+              >
+                <DropdownMenuItemIndicator>
+                  <CheckIcon />
+                </DropdownMenuItemIndicator>
+                {label}
+              </DropdownMenuRadioItem>
+            );
+          })
+        }
+      </>
+    ))
+  ), [availableThemes, handleSelectTheme, groupNames]);
 
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
