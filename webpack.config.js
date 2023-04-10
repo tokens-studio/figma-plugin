@@ -30,11 +30,14 @@ module.exports = (env, argv) => ({
       },
       {
         test: /\.c?js$/,
+        //We don't add an exclude for node_modules as we need to aggressively optimize code deps
+        exclude: argv.mode === 'production' ? '' :  /node_modules\/(?!(colorjs.io)\/)/,
         use: [
           {
             loader: 'babel-loader',
           },
-          //We don't add an exclude for node_modules as we need to aggressively optimize code deps
+
+
         ],
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
@@ -79,11 +82,11 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-  optimization:{
+  optimization: {
     nodeEnv: 'production',
     minimize: true,
     usedExports: true,
-    concatenateModules:true
+    concatenateModules: true
   },
   output: {
     filename: '[name].js',
