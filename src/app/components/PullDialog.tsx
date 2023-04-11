@@ -38,7 +38,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4}>
             <Stack direction="row" gap={2}>
-              This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
+              This will override your current tokens. Make sure you copy your changes if you want to preserve them.
             </Stack>
             <ChangedStateList changedState={changedState} />
             <Box css={{
@@ -53,7 +53,7 @@ function PullDialog() {
                 Cancel
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                Override Tokens
+                Override tokens
               </Button>
             </Box>
           </Stack>
