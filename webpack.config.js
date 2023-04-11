@@ -30,7 +30,7 @@ module.exports = (env, argv) => ({
       },
       {
         test: /\.c?js$/,
-        //We don't add an exclude for node_modules as we need to aggressively optimize code deps
+        // We don't add an exclude for node_modules as we need to aggressively optimize code deps
         exclude: argv.mode === 'production' ? '' :  /node_modules\/(?!(colorjs.io)\/)/,
         use: [
           {
