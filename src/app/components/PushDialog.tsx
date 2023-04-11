@@ -25,7 +25,7 @@ import PushJSON from './PushJSON';
 import { tryParseJson } from '@/utils/tryParseJson';
 import { findDifferentState } from '@/utils/findDifferentState';
 import { LastSyncedState } from '@/utils/compareLastSyncedState';
-import PushSettingForm from './PushJSettingForm';
+import PushSettingForm from './PushSettingForm';
 
 function PushDialog() {
   const {
@@ -181,7 +181,7 @@ function PushDialog() {
                 Cancel
               </Button>
               <Button variant="primary" id="push-dialog-button-push-changes" onClick={handlePushChanges}>
-                Push Changes
+                Push changes
               </Button>
             </Box>
           </Stack>

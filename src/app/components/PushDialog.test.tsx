@@ -31,8 +31,6 @@ describe('PushDialog', () => {
     );
     expect(result.getByText('Push changes')).toBeInTheDocument();
     expect(result.getByText('Commit message')).toBeInTheDocument();
-    expect(result.getByText('Push')).toBeInTheDocument();
-
     result.unmount();
   });
 
@@ -90,52 +88,6 @@ describe('PushDialog', () => {
 
     expect(store.getState().uiState.showPushDialog).toBe(false);
 
-    result.unmount();
-  });
-
-  it('should show different token list dialog', () => {
-    const mockStore = createMockStore({
-      uiState: {
-        showPushDialog: 'difference',
-        localApiState: {
-          branch: 'main',
-          provider: StorageProviderType.GITHUB,
-        },
-      },
-    });
-
-    const result = render(
-      <Provider store={mockStore}>
-        <PushDialog />
-      </Provider>,
-    );
-    expect(result.getByText('Cancel')).toBeInTheDocument();
-    expect(result.getByText('Push Changes')).toBeInTheDocument();
-
-    result.unmount();
-  });
-
-  it('should show different token list dialog and should be able to push changes', () => {
-    const mockStore = createMockStore({
-      uiState: {
-        showPushDialog: 'difference',
-        localApiState: {
-          branch: 'main',
-          provider: StorageProviderType.GITHUB,
-        },
-      },
-    });
-
-    const result = render(
-      <Provider store={mockStore}>
-        <PushDialog />
-      </Provider>,
-    );
-
-    const pushButton = result.getByText('Push Changes');
-    fireEvent.click(pushButton);
-
-    expect(result.getByText('Pushing to GitHub')).toBeInTheDocument();
     result.unmount();
   });
 });

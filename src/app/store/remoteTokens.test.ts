@@ -32,7 +32,7 @@ const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
 const mockClosePushDialog = jest.fn();
-const mockPullDialog = jest.fn();
+const mockShowPullDialog = jest.fn();
 const mockClosePullDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
@@ -197,7 +197,7 @@ jest.mock('../hooks/usePushDialog', () => ({
 jest.mock('../hooks/usePullDialog', () => ({
   __esModule: true,
   default: () => ({
-    pullDialog: mockPullDialog,
+    showPullDialog: mockShowPullDialog,
     closePullDialog: mockClosePullDialog,
   }),
 }));
