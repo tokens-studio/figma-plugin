@@ -63,7 +63,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                         color: '$fgDanger',
                       }}
                     >
-                      Removed
+                      Configuration Removed
                     </Text>
                     )
                   }
@@ -81,7 +81,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                         color: '$fgSuccess',
                       }}
                     >
-                      {theme.importType === 'NEW' ? 'Added' : 'Changed' }
+                      {theme.importType === 'NEW' ? 'Configuration Added' : 'Configuration Changed' }
                     </Text>
                     )
                   }
@@ -96,31 +96,27 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
           <>
             <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
             {!collapsedTokenSets.includes('$metadata') && (
-              changedState.metadata.tokenSetOrder.map((theme) => (
-                <Stack
-                  direction="row"
-                  justify="between"
-                  align="center"
-                  gap={1}
-                  css={{ padding: '$2 $4' }}
+              <Stack
+                direction="row"
+                justify="end"
+                align="end"
+                css={{ padding: '$2 $4' }}
+              >
+                <Text
+                  size="small"
+                  css={{
+                    padding: '$2',
+                    wordBreak: 'break-all',
+                    fontWeight: '$bold',
+                    borderRadius: '$default',
+                    fontSize: '$xsmall',
+                    backgroundColor: '$bgSuccess',
+                    color: '$fgSuccess',
+                  }}
                 >
-                  <Text bold size="small">{theme}</Text>
-                  <Text
-                    size="small"
-                    css={{
-                      padding: '$2',
-                      wordBreak: 'break-all',
-                      fontWeight: '$bold',
-                      borderRadius: '$default',
-                      fontSize: '$xsmall',
-                      backgroundColor: '$bgSuccess',
-                      color: '$fgSuccess',
-                    }}
-                  >
-                    Added
-                  </Text>
-                </Stack>
-              ))
+                  Configuration changed
+                </Text>
+              </Stack>
             )}
           </>
         )
