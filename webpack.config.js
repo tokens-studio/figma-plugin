@@ -31,7 +31,7 @@ module.exports = (env, argv) => ({
       {
         test: /\.c?js$/,
         // We don't add an exclude for node_modules as we need to aggressively optimize code deps
-        exclude: argv.mode === 'production' ? '' :  /node_modules\/(?!(colorjs.io)\/)/,
+        exclude: argv.mode === 'production' ? undefined :  /node_modules\/(?!(colorjs.io)\/)/,
         use: [
           {
             loader: 'babel-loader',
