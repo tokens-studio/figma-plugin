@@ -45,7 +45,7 @@ export default function useRemoteTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
-  const { pullDialog, closePullDialog } = usePullDialog();
+  const { showPullDialog, closePullDialog } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -74,7 +74,7 @@ export default function useRemoteTokens() {
     context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
-    pullDialog('loading');
+    showPullDialog('loading');
     let remoteData: RemoteResponseData<unknown> | null = null;
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
@@ -116,7 +116,7 @@ export default function useRemoteTokens() {
             tokens: remoteData.tokens,
             themes: remoteData.themes,
           });
-          shouldOverride = !!await pullDialog();
+          shouldOverride = !!await showPullDialog();
         }
         if (shouldOverride || activeTab === Tabs.LOADING) {
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
@@ -150,7 +150,7 @@ export default function useRemoteTokens() {
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
-    pullDialog,
+    showPullDialog,
     closePullDialog,
   ]);
 

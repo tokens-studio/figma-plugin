@@ -6,19 +6,19 @@ import { Dispatch } from '../store';
 export type PullDialogPromiseResult = boolean;
 
 export type UseDialogResult = {
-  showPullDialog?: string | boolean
+  pullDialogMode?: string | boolean
   closePullDialog: () => void
-  pullDialog: (givenState?: string) => Promise<PullDialogPromiseResult | null>
+  showPullDialog: (givenState?: string) => Promise<PullDialogPromiseResult | null>
   onConfirm: () => void
   onCancel: () => void
 };
 
 let resolveCallback: (result: PullDialogPromiseResult | null) => void = () => {};
 function usePullDialog(): UseDialogResult {
-  const showPullDialog = useSelector(showPullDialogSelector);
+  const pullDialogMode = useSelector(showPullDialogSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const pullDialog: UseDialogResult['pullDialog'] = useCallback((givenState) => {
+  const showPullDialog: UseDialogResult['showPullDialog'] = useCallback((givenState) => {
     if (givenState) {
       dispatch.uiState.setShowPullDialog(givenState);
     } else {
@@ -44,8 +44,8 @@ function usePullDialog(): UseDialogResult {
   }, [closePullDialog]);
 
   return useMemo(() => ({
-    pullDialog, onConfirm, onCancel, showPullDialog, closePullDialog,
-  }), [pullDialog, onConfirm, onCancel, closePullDialog, showPullDialog]);
+    showPullDialog, onConfirm, onCancel, pullDialogMode, closePullDialog,
+  }), [showPullDialog, onConfirm, onCancel, closePullDialog, pullDialogMode]);
 }
 
 export default usePullDialog;

@@ -14,7 +14,7 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 
 function PullDialog() {
-  const { onConfirm, onCancel, showPullDialog } = usePullDialog();
+  const { onConfirm, onCancel, pullDialogMode } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
   const changedState = useSelector(changedStateSelector);
 
@@ -26,7 +26,7 @@ function PullDialog() {
     onCancel();
   }, [onCancel]);
 
-  switch (showPullDialog) {
+  switch (pullDialogMode) {
     case 'initial': {
       return (
         <Modal
