@@ -30,14 +30,14 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
     <Stack direction="column" gap={1}>
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
-        <>
-          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
-          {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
-            tokenList.map((token) => (
-              <ChangedTokenItem token={token} />
-            ))
-          )}
-        </>
+          <>
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
+            {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
+              tokenList.map((token) => (
+                <ChangedTokenItem token={token} />
+              ))
+            )}
+          </>
         )
       ))}
       {

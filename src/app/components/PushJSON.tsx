@@ -14,18 +14,25 @@ const StyledJSONContent = styled('pre', {
 function PushJSON() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const [collapsedTokenSets, setCollapsedTokenSets] = React.useState<Array<string>>([]);
+  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
 
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
     if (e.altKey) {
-      setCollapsedTokenSets([]);
-    } else if (collapsedTokenSets.includes(tokenSet)) {
-      setCollapsedTokenSets(collapsedTokenSets.filter((item) => item !== tokenSet));
+      if (collapsed) {
+        setCollapsedChangedStateList([]);
+      } else {
+        const collapsedStateSetList = [...Object.keys(tokens), '$themes', '$metadata'];
+        setCollapsedChangedStateList(collapsedStateSetList);
+      }
+      setCollapsed(!collapsed);
+    } else if (collapsedChangedStateList.includes(tokenSet)) {
+      setCollapsedChangedStateList(collapsedChangedStateList.filter((item) => item !== tokenSet));
     } else {
-      setCollapsedTokenSets([...collapsedTokenSets, tokenSet]);
+      setCollapsedChangedStateList([...collapsedChangedStateList, tokenSet]);
     }
-  }, [collapsedTokenSets]);
+  }, [collapsedChangedStateList, tokens, collapsed]);
 
   return (
     <Stack
@@ -34,21 +41,21 @@ function PushJSON() {
     >
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
-        <>
-          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
-          {!collapsedTokenSets.includes(tokenSet) && tokenList && (
+          <>
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
+            {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
             <StyledJSONContent>
               {stringifyTokens(tokens, tokenSet)}
             </StyledJSONContent>
-          )}
-        </>
+            )}
+          </>
         )
       ))}
       {
         themes.length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
-            {!collapsedTokenSets.includes('$themes') && (
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$themes" label="$themes" isCollapsed={collapsedChangedStateList.includes('$themes')} />
+            {!collapsedChangedStateList.includes('$themes') && (
             <StyledJSONContent>
               {JSON.stringify(themes, null, 2)}
               {' '}
@@ -60,8 +67,8 @@ function PushJSON() {
       {
         Object.keys(tokens).length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
-            {!collapsedTokenSets.includes('$metadata') && (
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$metadata" label="$metadata" isCollapsed={collapsedChangedStateList.includes('$metadata')} />
+            {!collapsedChangedStateList.includes('$metadata') && (
             <StyledJSONContent>
               {JSON.stringify(Object.keys(tokens), null, 2)}
             </StyledJSONContent>

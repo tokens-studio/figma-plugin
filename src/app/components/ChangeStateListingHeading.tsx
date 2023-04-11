@@ -42,8 +42,8 @@ export default function ChangeStateListingHeading({
   onCollapse,
 }: Props) {
   const handleCollapse = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    onCollapse(e, key);
-  }, [onCollapse, key]);
+    onCollapse(e, label);
+  }, [onCollapse, label]);
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
