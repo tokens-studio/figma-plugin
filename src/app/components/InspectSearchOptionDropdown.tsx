@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
+import { CheckIcon } from '@radix-ui/react-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
 import { inspectStateSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import { isEqual } from '@/utils/isEqual';
+import IconSetting from '@/icons/settings.svg';
 
 export default function InspectSearchOptionDropdown() {
   const inspectState = useSelector(inspectStateSelector, isEqual);
@@ -27,7 +28,7 @@ export default function InspectSearchOptionDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger data-testid="inspect-search-option-dropdown">
-        <GearIcon />
+        <IconSetting />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="left">

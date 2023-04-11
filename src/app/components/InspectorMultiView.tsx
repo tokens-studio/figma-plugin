@@ -40,7 +40,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
   const filteredSelectionValues = React.useMemo(() => {
     let result = uiState.selectionValues;
     if (!inspectState.isShowBrokenReferences) {
-      result = result.filter((token) => resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && token.resolvedValue);
+      result = result.filter((token) => resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) || token.resolvedValue);
     }
     if (!inspectState.isShowResolvedReferences) {
       result = result.filter((token) => (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue));
