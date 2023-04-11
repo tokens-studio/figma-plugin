@@ -4,6 +4,12 @@ import Stack from './Stack';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { themesListSelector, tokensSelector } from '@/selectors';
 import stringifyTokens from '@/utils/stringifyTokens';
+import { styled } from '@/stitches.config';
+
+const StyledJSONContent = styled('pre', {
+  padding: '$2 $4',
+  whiteSpace: 'pre-wrap',
+});
 
 function PushJSON() {
   const tokens = useSelector(tokensSelector);
@@ -29,11 +35,11 @@ function PushJSON() {
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
         <>
-          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
+          <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedTokenSets.includes(tokenSet)} />
           {!collapsedTokenSets.includes(tokenSet) && tokenList && (
-            <pre style={{ padding: '$2 $4' }}>
+            <StyledJSONContent>
               {stringifyTokens(tokens, tokenSet)}
-            </pre>
+            </StyledJSONContent>
           )}
         </>
         )
@@ -41,12 +47,12 @@ function PushJSON() {
       {
         themes.length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$themes" label="$themes" isCollapsed={collapsedTokenSets.includes('$themes')} />
             {!collapsedTokenSets.includes('$themes') && (
-            <pre style={{ padding: '$2 $4' }}>
+            <StyledJSONContent>
               {JSON.stringify(themes, null, 2)}
               {' '}
-            </pre>
+            </StyledJSONContent>
             )}
           </>
         )
@@ -54,11 +60,11 @@ function PushJSON() {
       {
         Object.keys(tokens).length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} tokenKey="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$metadata" label="$metadata" isCollapsed={collapsedTokenSets.includes('$metadata')} />
             {!collapsedTokenSets.includes('$metadata') && (
-            <pre style={{ padding: '$2 $4' }}>
+            <StyledJSONContent>
               {JSON.stringify(Object.keys(tokens), null, 2)}
-            </pre>
+            </StyledJSONContent>
             )}
           </>
         )

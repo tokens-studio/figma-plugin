@@ -1,8 +1,8 @@
 import React from 'react';
 import Stack from './Stack';
-import Box from './Box';
 import Text from './Text';
 import { ImportToken } from '@/types/tokens';
+import { StyledText } from './StyledText';
 
 export default function ChangedTokenItem({
   token,
@@ -19,31 +19,13 @@ export default function ChangedTokenItem({
               <Text size="small">Value</Text>
               <Stack direction="row" align="center" gap={1}>
                 {token.oldValue ? (
-                  <Box css={{
-                    padding: '$2',
-                    wordBreak: 'break-all',
-                    fontWeight: '$bold',
-                    borderRadius: '$default',
-                    fontSize: '$xsmall',
-                    backgroundColor: '$bgDanger',
-                    color: '$fgDanger',
-                  }}
-                  >
+                  <StyledText size="small" type="danger">
                     {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
-                  </Box>
+                  </StyledText>
                 ) : null}
-                <Box css={{
-                  padding: '$2',
-                  wordBreak: 'break-all',
-                  fontWeight: '$bold',
-                  borderRadius: '$default',
-                  fontSize: '$xsmall',
-                  backgroundColor: '$bgSuccess',
-                  color: '$fgSuccess',
-                }}
-                >
+                <StyledText size="small" type="success">
                   {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
-                </Box>
+                </StyledText>
               </Stack>
             </Stack>
           )
@@ -53,50 +35,21 @@ export default function ChangedTokenItem({
           <Text size="small">Description</Text>
           <Stack direction="column" align="end" gap={1}>
             {token.oldDescription ? (
-              <Box css={{
-                padding: '$2',
-                wordBreak: 'break-all',
-                fontWeight: '$bold',
-                borderRadius: '$default',
-                fontSize: '$xsmall',
-                backgroundColor: '$bgDanger',
-                color: '$fgDanger',
-              }}
-              >
+              <StyledText size="small" type="danger">
                 {token.oldDescription}
-              </Box>
+              </StyledText>
             ) : null}
-            <Box css={{
-              padding: '$2',
-              wordBreak: 'break-all',
-              fontWeight: '$bold',
-              borderRadius: '$default',
-              fontSize: '$xsmall',
-              backgroundColor: '$bgSuccess',
-              color: '$fgSuccess',
-            }}
-            >
+            <StyledText size="small" type="success">
               {token.description}
-            </Box>
+            </StyledText>
           </Stack>
         </Stack>
         )}
         {
           token.importType === 'REMOVE' && (
-          <Text
-            size="small"
-            css={{
-              padding: '$2',
-              wordBreak: 'break-all',
-              fontWeight: '$bold',
-              borderRadius: '$default',
-              fontSize: '$xsmall',
-              backgroundColor: '$bgDanger',
-              color: '$fgDanger',
-            }}
-          >
-            Removed
-          </Text>
+            <StyledText size="small" type="danger">
+              Removed
+            </StyledText>
           )
         }
       </Stack>

@@ -26,19 +26,13 @@ function PullDialog() {
     onCancel();
   }, [onCancel]);
 
-  switch (showPullDialog) {
-    case 'initial': {
-      return (
-        <Modal
-          title={`Pull from ${transformProviderName(storageType.provider)}`}
-          showClose
-          large
-          isOpen
-          close={onCancel}
-        >
+  const renderContent = React.useCallback(() => {
+    switch (showPullDialog) {
+      case 'initial': {
+        return (
           <Stack direction="column" gap={4}>
             <Stack direction="row" gap={2}>
-              This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
+              This will override your current tokens. Make sure you copy your changes if you want to preserve them.
             </Stack>
             <ChangedStateList changedState={changedState} />
             <Box css={{
@@ -53,25 +47,15 @@ function PullDialog() {
                 Cancel
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                Override Tokens
+                Override tokens
               </Button>
             </Box>
           </Stack>
-        </Modal>
-      );
-    }
-    case 'loading': {
-      return (
-        <Modal
-          large
-          isOpen
-          close={onCancel}
-          title={`Pull from ${transformProviderName(storageType.provider)}`}
-        >
+        );
+      }
+      case 'loading': {
+        return (
           <Stack direction="column" gap={4} justify="center" align="center">
-            <Stack direction="row" gap={2}>
-              This will override your current tokens. Make sure you copy your changes if you want to preserve theme.
-            </Stack>
             <Spinner />
             <Heading size="medium">
               Fetching Tokens from
@@ -79,12 +63,24 @@ function PullDialog() {
               {transformProviderName(storageType.provider)}
             </Heading>
           </Stack>
-        </Modal>
-      );
+        );
+      }
+      default: {
+        return null;
+      }
     }
-    default: {
-      return null;
-    }
-  }
+  }, [changedState, showPullDialog, storageType.provider]);
+
+  return (
+    <Modal
+      title={`Pull from ${transformProviderName(storageType.provider)}`}
+      showClose
+      large
+      isOpen
+      close={onCancel}
+    >
+      {renderContent()}
+    </Modal>
+  );
 }
 export default PullDialog;
