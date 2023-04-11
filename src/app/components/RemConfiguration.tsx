@@ -52,6 +52,7 @@ const RemConfiguration = () => {
         setInputValue={handleDownShiftInputChange}
         placeholder="Choose a new token"
         suffix
+        arrow="top"
       />
     </Box>
 

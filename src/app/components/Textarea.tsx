@@ -39,7 +39,7 @@ function Textarea({
   value: string;
   placeholder?: string;
   isDisabled?: boolean;
-  onChange?: Function;
+  onChange?: (val: string, event: any) => void
   css?: any;
   border?: boolean
 }) {
@@ -53,7 +53,7 @@ function Textarea({
       value={value}
       disabled={isDisabled}
       border={border}
-      onChange={(event) => onChange && onChange(event.target.value, event)}
+      onChange={(event: any) => onChange && onChange(event.target.value, event)}
     />
   );
 }

@@ -1,0 +1,6 @@
+**/*.d.ts
+coverage
+dist
+storybook-static
+**/jest.config.ts
+**/*.js

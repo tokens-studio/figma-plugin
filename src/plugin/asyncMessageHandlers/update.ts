@@ -18,6 +18,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       usedTokenSets: msg.usedTokenSet,
       updatedAt: msg.updatedAt,
       checkForChanges: msg.checkForChanges ?? false,
+      collapsedTokenSets: msg.collapsedTokenSets,
     });
   }
   if (msg.settings.updateStyles && msg.tokens) {

@@ -113,6 +113,9 @@ describe('editToken', () => {
             activeTokenSet: 'global',
             collapsedTokens: [],
           },
+          settings: {
+            updateOnChange: true,
+          },
         },
       },
       models,
@@ -131,7 +134,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{brand.primary}');
+    expect(tokens.global[1].value).toEqual('$brand.primary');
   });
 
   it('doesnt interfere with tokens that have a similar name', async () => {
@@ -146,7 +149,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{secondary}');
+    expect(tokens.global[1].value).toEqual('$secondary');
     expect(tokens.global[3].value).toEqual('$primary50');
     expect(tokens.global[3].value).toEqual('$primary50');
   });
@@ -178,7 +181,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.options[0].value).toEqual('{secondary}');
+    expect(tokens.options[0].value).toEqual('$secondary');
   });
 
   it('does a deep equality check on object values', async () => {
@@ -346,7 +349,7 @@ describe('editToken', () => {
   });
 
   it('can duplicate token set', () => {
-    store.dispatch.tokenState.duplicateTokenSet('global');
+    store.dispatch.tokenState.duplicateTokenSet('global_Copy', 'global');
     const { tokens, usedTokenSet } = store.getState().tokenState;
     expect(tokens.global_Copy).toEqual([
       {
@@ -417,7 +420,7 @@ describe('editToken', () => {
   it('will notify the UI if the token set to duplicate does not exist', () => {
     const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
     notifyToUISpy.mockReturnValueOnce();
-    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant_Copy', 'nonexistant');
     expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
   });
 
@@ -663,6 +666,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global', 'options'],
       $extensions: {
         'studio.tokens': {
           modify: {
@@ -672,6 +676,7 @@ describe('editToken', () => {
           },
         },
       },
+      shouldUpdate: true,
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
@@ -748,6 +753,26 @@ describe('editToken', () => {
         value: '$font.small',
       },
     ]);
+    expect(tokens.options).toEqual([
+      {
+        name: 'background',
+        value: '$primary',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              type: 'lighten',
+              value: '0.5',
+              space: 'sRGB',
+            },
+          },
+        },
+      },
+    ]);
   });
 
   it('can duplicate token without extension', () => {
@@ -757,6 +782,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global'],
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
@@ -955,7 +981,7 @@ describe('editToken', () => {
       {
         name: 'text.alias',
         type: 'sizing',
-        value: '{text.small}',
+        value: '$text.small',
       },
     ]);
   });
@@ -1149,6 +1175,7 @@ describe('editToken', () => {
           },
         },
       ],
+      shouldUpdate: true,
     });
     const { activeTokenSet } = store.getState().tokenState;
     expect(activeTokenSet).toBe('global');
@@ -1190,6 +1217,42 @@ describe('editToken', () => {
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',
         name: 'rounded.md',
+      },
+    ]);
+  });
+
+  it('can set usedTokenSets', async () => {
+    await store.dispatch.tokenState.setUsedTokenSet({
+      global: TokenSetStatus.DISABLED,
+    });
+
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: 'disabled',
+    });
+  });
+
+  it('can set themes', async () => {
+    await store.dispatch.tokenState.setThemes([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
+      },
+    ]);
+
+    const { themes } = store.getState().tokenState;
+    expect(themes).toEqual([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
       },
     ]);
   });

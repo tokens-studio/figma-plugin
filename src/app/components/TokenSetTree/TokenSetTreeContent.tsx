@@ -9,24 +9,22 @@ import {
   collapsedTokenSetsSelector,
 } from '@/selectors';
 
-type TreeOrListItem<ItemType = unknown> = {
+type TreeItem<ItemType = unknown> = {
   key: string
   level: number
   parent: string | null
   isLeaf: boolean
 } & ItemType;
 
-type SharedProps<T extends TreeOrListItem> = {
-  displayType: 'tree' | 'list'
+type SharedProps<T extends TreeItem> = {
   items: T[]
   renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
   renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
 };
 
-type Props<T extends TreeOrListItem> = SharedProps<T>;
+type Props<T extends TreeItem> = SharedProps<T>;
 
-export function TokenSetListOrTree<T extends TreeOrListItem>({
-  displayType,
+export function TokenSetTreeContent<T extends TreeItem>({
   items,
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
@@ -55,7 +53,7 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
         <RenderItem key={item.key} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf && displayType === 'tree') && (
+              {(!item.isLeaf) && (
                 <StyledFolderButton
                   type="button"
                   onClick={onToggleCollapsed}

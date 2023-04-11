@@ -57,6 +57,7 @@ describe('Can set values on node', () => {
       fillStyleId: '',
       strokeStyleId: '',
       dashPattern: [],
+      visible: true,
       getSharedPluginData: () => '',
       setSharedPluginData: () => undefined,
     } as unknown) as RectangleNode;
@@ -723,5 +724,14 @@ describe('Can set values on node', () => {
       emptyThemeInfo,
     );
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
+  });
+
+  it('can set boolean token', async () => {
+    const values = {
+      boolean: 'false',
+    };
+    const data = { boolean: 'boolean-false' };
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    expect(solidNodeMock.visible).toEqual(false);
   });
 });

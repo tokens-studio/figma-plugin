@@ -3,7 +3,6 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json'
   },
-  ignorePatterns: ['**/*.js'],
   globals: {
     figma: 'readable',
     __html__: 'readable',
@@ -35,12 +34,13 @@ module.exports = {
       },
       "extendDefaults": true
     }],
+    "import/no-extraneous-dependencies":0,
     "react/jsx-no-bind": [2, {
       ignoreDOMComponents: false,
       ignoreRefs: false,
-      allowArrowFunctions: false,
-      allowFunctions: false,
-      allowBind: false,
+      allowArrowFunctions: true,
+      allowFunctions: true,
+      allowBind: true,
     }],
     "@typescript-eslint/no-shadow": 1
   }

@@ -6,6 +6,7 @@ export * from './setEmptyTokens';
 export * from './setDefaultTokens';
 export * from './assignStyleIdsToCurrentTheme';
 export * from './renameTokenSet';
+export * from './renameTokenSetFolder';
 export * from './toggleManyTokenSets';
 export * from './toggleUsedTokenSet';
 export * from './assignStyleIdsToTheme';

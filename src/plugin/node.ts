@@ -1,5 +1,6 @@
 import compact from 'just-compact';
 import omit from 'just-omit';
+import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
@@ -25,6 +26,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
+import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 
 // @TODO fix typings
 
@@ -52,7 +54,16 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
     if (!resolvedToken) return acc;
-    acc[key] = isSingleToken(resolvedToken) ? resolvedToken[returnValueToLookFor(key)] || resolvedToken.value : resolvedToken;
+    if (isSingleToken(resolvedToken)) {
+      if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
+        const modifier = resolvedToken.$extensions['studio.tokens'].modify;
+        acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
+      } else {
+        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
+      }
+    } else {
+      acc[key] = resolvedToken;
+    }
     return acc;
   }, {});
   return mappedValues;
@@ -65,6 +76,7 @@ export async function getTokenData(): Promise<{
   updatedAt: string;
   version: string;
   checkForChanges: boolean | null
+  collapsedTokenSets: string[] | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
@@ -73,6 +85,7 @@ export async function getTokenData(): Promise<{
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);
+    const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
@@ -85,6 +98,7 @@ export async function getTokenData(): Promise<{
         updatedAt: updatedAt || '',
         version: version || '',
         checkForChanges,
+        collapsedTokenSets,
       };
     }
   } catch (e) {

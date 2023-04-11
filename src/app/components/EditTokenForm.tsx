@@ -15,7 +15,7 @@ import {
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import {
-  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector,
+  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -35,6 +35,7 @@ import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -45,9 +46,11 @@ type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokens = useSelector(tokensSelector);
   const editToken = useSelector(editTokenSelector);
   const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
+  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
   const { remapToken, renameStylesFromTokens } = useTokens();
   const dispatch = useDispatch<Dispatch>();
@@ -118,7 +121,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
-      e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
@@ -126,7 +128,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
         setError('Value must include either px or rem');
@@ -156,15 +158,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      e.persist();
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: {
-            ...internalEditToken.value,
-            [e.target.name]: e.target.value,
-          },
-        });
+        if (e.target.value) {
+          setInternalEditToken({
+            ...internalEditToken,
+            value: {
+              ...internalEditToken.value,
+              [e.target.name]: e.target.value,
+            },
+          });
+        } else if (internalEditToken.value) {
+          delete internalEditToken.value[e.target.name as keyof typeof internalEditToken.value];
+          setInternalEditToken({
+            ...internalEditToken,
+          });
+        }
       }
     },
     [internalEditToken],
@@ -181,7 +189,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      e.persist();
       if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,
@@ -330,6 +337,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
+          tokenSets: selectedTokenSets,
           ...($extensions ? { $extensions } : {}),
         });
       }
@@ -365,6 +373,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
   }, [dispatch]);
+
+  const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
+    setSelectedTokenSets(selectedItems);
+  }, []);
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
@@ -504,6 +516,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
             border
           />
         </Box>
+        {
+          internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
+            <Box>
+              <Heading size="xsmall">Set</Heading>
+              <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
+            </Box>
+          )
+        }
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel

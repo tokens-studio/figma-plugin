@@ -29,6 +29,7 @@ type PullTokensOptions = {
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
   activeTheme?: string | null
+  collapsedTokenSets?: string[] | null
 };
 
 // @TODO typings and hooks
@@ -61,7 +62,7 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
     dispatch.uiState.startJob({
@@ -111,7 +112,7 @@ export default function useRemoteTokens() {
         activeTheme: activeTheme ?? null,
         usedTokenSet: usedTokenSet ?? {},
       });
-      dispatch.tokenState.setCollapsedTokenSets([]);
+      dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
       track('Launched with token sets', {
         count: Object.keys(remoteData.tokens).length,
         setNames: Object.keys(remoteData.tokens),

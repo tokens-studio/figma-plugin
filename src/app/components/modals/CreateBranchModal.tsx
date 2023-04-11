@@ -6,7 +6,9 @@ import Heading from '../Heading';
 import Button from '../Button';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
-import { apiSelector, localApiStateSelector } from '@/selectors';
+import {
+  activeThemeSelector, apiSelector, localApiStateSelector, usedTokenSetSelector,
+} from '@/selectors';
 import Stack from '../Stack';
 import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
@@ -27,10 +29,14 @@ type FormData = {
 export default function CreateBranchModal({
   isOpen, onClose, onSuccess, startBranch, isCurrentChanges,
 }: Props) {
-  const { addNewBranch, pushTokens, fetchBranches } = useRemoteTokens();
+  const {
+    addNewBranch, pushTokens, fetchBranches, pullTokens,
+  } = useRemoteTokens();
 
   const localApiState = useSelector(localApiStateSelector);
   const apiData = useSelector(apiSelector);
+  const activeTheme = useSelector(activeThemeSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
 
   const [formFields, setFormFields] = React.useState<FormData>({} as FormData);
   const [hasErrored, setHasErrored] = React.useState<boolean>(false);
@@ -67,6 +73,9 @@ export default function CreateBranchModal({
       const branches = await fetchBranches(localApiState as StorageTypeCredentials);
       if (response) {
         onSuccess(branch, branches ?? []);
+        if (!isCurrentChanges) {
+          await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+        }
       } else {
         setHasErrored(true);
       }

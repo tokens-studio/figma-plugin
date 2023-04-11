@@ -1,10 +1,11 @@
+import { getRootReferences, findReferences } from '../findReferences';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { TokenBorderValue, TokenBoxshadowValue, TokenTypographyValue } from '@/types/values';
 import { convertToRgb } from '../color';
 import { convertModifiedColorToHex } from '../convertModifiedColorToHex';
-import { findReferences } from '../findReferences';
+
 import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
 // eslint-disable-next-line import/no-cycle
@@ -45,22 +46,24 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   // The logic was copied from the original function in aliases.tsx
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {
-    const tokenReferences = typeof returnedValue === 'string' ? findReferences(returnedValue) : null;
+    const tokenReferences = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
 
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {
           let nameToLookFor: string;
           if (ref.startsWith('{')) {
-            if (ref.endsWith('}')) nameToLookFor = ref.slice(1, ref.length - 1);
-            else nameToLookFor = ref.slice(1, ref.length);
+            nameToLookFor = ref.slice(1, ref.length - 1);
           } else { nameToLookFor = ref.substring(1); }
-
           if (
             (typeof token === 'object' && nameToLookFor === token.name)
             || nameToLookFor === token
           ) {
             return isSingleTokenValueObject(token) ? token.value.toString() : token.toString();
+          }
+          const nameToLookForReferences = getRootReferences(nameToLookFor);
+          if (nameToLookForReferences?.length) {
+            nameToLookFor = String(getAliasValue(nameToLookFor, tokens, isResolved, previousCount));
           }
 
           const tokenAliasSplitted = nameToLookFor.split('.');
@@ -70,7 +73,9 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
           const tokenAliasLastPreviousExcluded = tokenAliasSplitted.join('.');
           const foundToken = tokens.find((t) => t.name === nameToLookFor || t.name === tokenAliasLastExcluded || t.name === tokenAliasLastPreviousExcluded);
 
-          if (foundToken?.name === nameToLookFor) { return getAliasValue(foundToken, tokens, isResolved, previousCount); }
+          if (foundToken?.name === nameToLookFor) {
+            return getAliasValue(foundToken, tokens, isResolved, previousCount);
+          }
 
           if (
             !!tokenAliasSplittedLast

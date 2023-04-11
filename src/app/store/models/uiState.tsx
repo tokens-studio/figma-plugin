@@ -79,7 +79,9 @@ export interface UIState {
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  figmaFonts: Font[]
   secondScreenEnabled: boolean;
+  showAutoSuggest: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -131,7 +133,9 @@ export const uiState = createModel<RootModel>()({
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
+    figmaFonts: [],
     secondScreenEnabled: false,
+    showAutoSuggest: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
@@ -360,12 +364,22 @@ export const uiState = createModel<RootModel>()({
         scrollPositionSet: payload,
       };
     },
+    setFigmaFonts(state, payload: Font[]) {
+      return {
+        ...state,
+        figmaFonts: payload,
+      };
+    },
     toggleSecondScreen(state) {
       return {
         ...state,
         secondScreenEnabled: !state.secondScreenEnabled,
       };
     },
+    setShowAutoSuggest: (state, data: boolean) => ({
+      ...state,
+      showAutoSuggest: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {

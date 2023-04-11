@@ -39,7 +39,7 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
   }, [dispatch, theme.id, isActive]);
 
   return (
-    <Box key={theme.id} data-cy="singlethemeentry">
+    <Box key={theme.id} data-cy="singlethemeentry" css={{ width: '100%' }}>
       <Stack direction="row" align="center" justify="between">
         <Stack gap={4} direction="row" align="center">
           <Switch checked={isActive} onCheckedChange={handleToggle}>

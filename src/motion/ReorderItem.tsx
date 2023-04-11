@@ -70,6 +70,7 @@ export function ReorderItem<V>(
         x: point.x,
         y: point.y,
         zIndex,
+        transform: 'none',
       }}
       layout={layout}
       onDrag={handleDrag}
