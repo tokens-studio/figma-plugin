@@ -63,7 +63,7 @@ export const ThemeSelector: React.FC = () => {
       const filteredThemes = availableThemes.filter((t) => (groupName === 'No Group' ? typeof t.group === 'undefined' : t.group === groupName));
       return (
         filteredThemes.length > 0 && (
-          <>
+          <DropdownMenuRadioGroup value={activeTheme ?? ''}>
             <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
             {
               filteredThemes.map(({ label, value }) => {
@@ -87,7 +87,7 @@ export const ThemeSelector: React.FC = () => {
                 );
               })
             }
-          </>
+          </DropdownMenuRadioGroup>
         )
       );
     })
@@ -108,14 +108,12 @@ export const ThemeSelector: React.FC = () => {
           side="bottom"
           css={{ minWidth: '180px' }}
         >
-          <DropdownMenuRadioGroup value={activeTheme ?? ''}>
-            {availableThemes.length === 0 && (
-              <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-                <Text>No themes</Text>
-              </DropdownMenuRadioItem>
-            )}
-            {availableThemeOptions}
-          </DropdownMenuRadioGroup>
+          {availableThemes.length === 0 && (
+          <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+            <Text>No themes</Text>
+          </DropdownMenuRadioItem>
+          )}
+          {availableThemeOptions}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             data-cy="themeselector-managethemes"
