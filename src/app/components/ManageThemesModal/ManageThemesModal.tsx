@@ -18,7 +18,6 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { DragItem } from '../StyledDragger/DragItem';
 import { ThemeListItemContent } from '../ThemeSelector/ThemeListItemContent';
-import Input from '../Input';
 import Text from '../Text';
 
 type Props = unknown;
@@ -29,16 +28,14 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const [groupEditorOpen, setGroupEditorOpen] = useState<boolean | string>(false);
-  const [newGroupName, setNewGroupName] = useState('');
-  const [groupNames, setGroupNames] = useState(compact(themes.map((theme) => theme.group)));
-  const isNewGroupNameValid = useMemo(() => newGroupName && !groupNames.find((g) => g === newGroupName), [newGroupName, groupNames]);
+  const groupNames = useMemo(() => compact(['No Group', ...themes.map((theme) => theme.group)]), [themes]);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
     if (themeObject) {
       return {
         name: themeObject.name,
+        group: themeObject.group,
         tokenSets: themeObject.selectedTokenSets,
       };
     }
@@ -83,8 +80,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
     dispatch.tokenState.saveTheme({
       id,
       name: values.name,
+      group: values.group,
       selectedTokenSets: values.tokenSets,
-      group: 'empty',
     });
     setThemeEditorOpen(false);
   }, [themeEditorOpen, dispatch]);
@@ -93,24 +90,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
     const reorderedThemeList = compact(reorderedItems.map((item) => themes.find((theme) => theme.id === item.id)));
     dispatch.tokenState.setThemes(reorderedThemeList);
   }, [dispatch.tokenState, themes]);
-
-  const handleShowGroupEditor = useCallback(() => {
-    setGroupEditorOpen(true);
-  }, []);
-
-  const handleNewGroupNameChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    setNewGroupName(e.target.value);
-  }, []);
-
-  const handleResetNewGroupName = useCallback(() => {
-    setNewGroupName('');
-  }, []);
-
-  const handleSaveNewEmptyGroup = useCallback(() => {
-    if (isNewGroupNameValid) {
-      setGroupNames([...groupNames, newGroupName]);
-    }
-  }, [groupNames, newGroupName, isNewGroupNameValid]);
 
   return (
     <Modal
@@ -174,77 +153,31 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <>
-          <ReorderGroup
-            layoutScroll
-            values={themes}
-            onReorder={handleReorder}
-          >
-            <Text css={{ color: '$textSubtle' }}>No group</Text>
-            {
-              themes.filter((t) => t.group === 'empty').map((theme) => (
-                <DragItem<ThemeObject> key={theme.id} item={theme}>
-                  <ThemeListItemContent item={theme} isActive={activeTheme === theme.id} onOpen={handleToggleThemeEditor} />
-                </DragItem>
-              ))
-            }
-            {
-              groupNames.map((groupName) => (
-                <>
-                  <Text css={{ color: '$textSubtle' }}>{groupName}</Text>
-                  {
-                    themes.filter((t) => t.group === groupName).map((theme) => (
-                      <DragItem<ThemeObject> key={theme.id} item={theme}>
-                        <ThemeListItemContent item={theme} isActive={activeTheme === theme.id} onOpen={handleToggleThemeEditor} />
-                      </DragItem>
-                    ))
-                  }
-                  {
-                    !themes.filter((t) => t.group === groupName).length && (
-                      <Blankslate
-                        css={{ padding: '$8 $4' }}
-                        title="No themes yet"
-                        text="No themes yet"
-                      />
-                    )
-                  }
-                </>
-              ))
-            }
-          </ReorderGroup>
+        <ReorderGroup
+          layoutScroll
+          values={themes}
+          onReorder={handleReorder}
+        >
           {
-            !groupEditorOpen ? (
-              <Button
-                id="button-manage-themes-modal-new-group"
-                variant="secondary"
-                icon={<IconPlus />}
-                onClick={handleShowGroupEditor}
-              >
-                New group
-              </Button>
-            ) : (
-              <Stack direction="row">
-                <Input
-                  required
-                  full
-                  label="Group Name"
-                  value={newGroupName}
-                  onChange={handleNewGroupNameChange}
-                  type="text"
-                  autofocus
-                  name="groupName"
-                  placeholder="Unique name"
-                />
-                <Button variant="secondary" type="button" onClick={handleResetNewGroupName}>
-                  Cancel
-                </Button>
-                <Button disabled={!isNewGroupNameValid} variant="primary" onClick={handleSaveNewEmptyGroup}>
-                  Save
-                </Button>
-              </Stack>
-            )
+            groupNames.map((groupName) => {
+              const filteredThemes = themes.filter((t) => (groupName === 'No Group' ? typeof t.group === 'undefined' : t.group === groupName));
+              return (
+                filteredThemes.length > 0 && (
+                  <>
+                    <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
+                    {
+                      filteredThemes.map((theme) => (
+                        <DragItem<ThemeObject> key={theme.id} item={theme}>
+                          <ThemeListItemContent item={theme} isActive={activeTheme === theme.id} onOpen={handleToggleThemeEditor} />
+                        </DragItem>
+                      ))
+                    }
+                  </>
+                )
+              );
+            })
           }
-        </>
+        </ReorderGroup>
       )}
       {themeEditorOpen && (
         <CreateOrEditThemeForm

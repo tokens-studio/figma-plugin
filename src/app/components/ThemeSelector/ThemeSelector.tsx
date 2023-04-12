@@ -31,8 +31,7 @@ export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-  const groupNames = useMemo(() => compact(availableThemes.map((theme) => theme.group)), [availableThemes]);
-
+  const groupNames = useMemo(() => compact(['No Group', ...availableThemes.map((theme) => theme.group)]), [availableThemes]);
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
   }, [dispatch]);
@@ -60,33 +59,38 @@ export const ThemeSelector: React.FC = () => {
   }, [activeTheme, availableThemes]);
 
   const availableThemeOptions = useMemo(() => (
-    groupNames.map((groupName) => (
-      <>
-        <Text css={{ color: '$textSubtle' }}>{groupName}</Text>
-        {
-          availableThemes.filter((t) => t.group === groupName).map(({ label, value }) => {
-            const handleSelect = () => handleSelectTheme(value);
+    groupNames.map((groupName) => {
+      const filteredThemes = availableThemes.filter((t) => (groupName === 'No Group' ? typeof t.group === 'undefined' : t.group === groupName));
+      return (
+        filteredThemes.length > 0 && (
+          <>
+            <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
+            {
+              filteredThemes.map(({ label, value }) => {
+                const handleSelect = () => handleSelectTheme(value);
 
-            return (
-              <DropdownMenuRadioItem
-                key={value}
-                value={value}
-                data-cy={`themeselector--themeoptions--${value}`}
-                data-testid={`themeselector--themeoptions--${value}`}
-                // @README we can disable this because we are using Memo for the whole list anyways
-                // eslint-disable-next-line react/jsx-no-bind
-                onSelect={handleSelect}
-              >
-                <DropdownMenuItemIndicator>
-                  <CheckIcon />
-                </DropdownMenuItemIndicator>
-                {label}
-              </DropdownMenuRadioItem>
-            );
-          })
-        }
-      </>
-    ))
+                return (
+                  <DropdownMenuRadioItem
+                    key={value}
+                    value={value}
+                    data-cy={`themeselector--themeoptions--${value}`}
+                    data-testid={`themeselector--themeoptions--${value}`}
+                    // @README we can disable this because we are using Memo for the whole list anyways
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onSelect={handleSelect}
+                  >
+                    <DropdownMenuItemIndicator>
+                      <CheckIcon />
+                    </DropdownMenuItemIndicator>
+                    {label}
+                  </DropdownMenuRadioItem>
+                );
+              })
+            }
+          </>
+        )
+      );
+    })
   ), [availableThemes, handleSelectTheme, groupNames]);
 
   return (
