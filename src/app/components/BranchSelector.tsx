@@ -201,6 +201,10 @@ export default function BranchSelector() {
     setSearchTextForCreateBranch(e.target.value);
   }, []);
 
+  const handleKeyDown = React.useCallback((event) => {
+    event.preventDefault();
+  }, []);
+
   return (
     currentBranch
       ? (
@@ -210,7 +214,7 @@ export default function BranchSelector() {
             <span>{currentBranch}</span>
           </BranchSwitchMenuMainTrigger>
 
-          <BranchSwitchMenuContent side="top" sideOffset={5}>
+          <BranchSwitchMenuContent side="top" sideOffset={5} onKeyDown={handleKeyDown}>
             {!gitBranchSelector && (
             <>
               <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -233,7 +237,15 @@ export default function BranchSelector() {
             />
             <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
-                && branchState.branches.filter((b) => b.includes(searchTextForBaseBranch)).map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
+                && branchState.branches.filter((b) => b.includes(searchTextForBaseBranch)).map((branch, index) => (
+                  <BranchSwitchMenuRadioElement
+                    disabled={!gitBranchSelector}
+                    key={`radio_${seed(index)}`}
+                    branch={branch}
+                    branchSelected={onBranchSelected}
+                    onKeyDown={handleKeyDown}
+                  />
+                ))}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>

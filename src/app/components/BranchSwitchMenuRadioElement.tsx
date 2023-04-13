@@ -11,13 +11,16 @@ type Props = {
   branch: string,
   branchSelected: (branch: string) => void
   disabled?: boolean
+  onKeyDown: (event: any) => void
 };
 
-export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ disabled, branch, branchSelected }) => {
+export const BranchSwitchMenuRadioElement: React.FC<Props> = ({
+  disabled, branch, branchSelected, onKeyDown,
+}) => {
   const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
 
   return (
-    <BranchSwitchMenuRadioItem disabled={disabled} data-cy={`branch-switch-menu-radio-element-${branch}`} value={branch} onSelect={onSelect}>
+    <BranchSwitchMenuRadioItem disabled={disabled} data-cy={`branch-switch-menu-radio-element-${branch}`} value={branch} onSelect={onSelect} onKeyDown={onKeyDown}>
       <Box css={{ width: '$5' }}>
         <BranchSwitchMenuItemIndicator>
           <CheckIcon data-cy="branch-switch-menu-check-icon" />
