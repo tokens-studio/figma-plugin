@@ -71,11 +71,15 @@ export default function CompositionTokenForm({
 
   const handleReorder = React.useCallback((reorderedItems: string[]) => {
     const newOrderObj: NodeTokenRefMap = {};
+    const internalEditTokenValue = internalEditToken.value || internalEditToken.schema.schemas.value.properties;
     reorderedItems.forEach((key, index) => {
       newOrderObj[key as keyof typeof Properties] = String(index);
     });
+    const rearrangedTokenValue = Object.assign({}, ...Object.keys(internalEditTokenValue).sort((a, b) => Number(newOrderObj[a as CompositionTokenProperty]) - Number(newOrderObj[b as CompositionTokenProperty]))
+      .map((x) => ({ [x as CompositionTokenProperty]: internalEditTokenValue[x as CompositionTokenProperty] })));
     setOrderObj(newOrderObj);
-  }, []);
+    setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
+  }, [internalEditToken, setTokenValue]);
 
   return (
     <div>
