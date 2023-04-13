@@ -202,7 +202,8 @@ export default function BranchSelector() {
   }, []);
 
   const handleKeyDown = React.useCallback((event) => {
-    event.preventDefault();
+    console.log('key down clicked');
+    event.stopPropagation();
   }, []);
 
   return (

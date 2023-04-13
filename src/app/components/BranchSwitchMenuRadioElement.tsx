@@ -20,7 +20,13 @@ export const BranchSwitchMenuRadioElement: React.FC<Props> = ({
   const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
 
   return (
-    <BranchSwitchMenuRadioItem disabled={disabled} data-cy={`branch-switch-menu-radio-element-${branch}`} value={branch} onSelect={onSelect} onKeyDown={onKeyDown}>
+    <BranchSwitchMenuRadioItem
+      disabled={disabled}
+      data-cy={`branch-switch-menu-radio-element-${branch}`}
+      value={branch}
+      onSelect={onSelect}
+      onKeyDown={onKeyDown}
+    >
       <Box css={{ width: '$5' }}>
         <BranchSwitchMenuItemIndicator>
           <CheckIcon data-cy="branch-switch-menu-check-icon" />
