@@ -9,7 +9,7 @@ import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessa
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { createStyles } from './asyncMessageHandlers';
 
-type ExtendedSingleToken = SingleToken<true, { path: string }>;
+type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
 
 describe('updateStyles', () => {
   const colorSpy = jest.spyOn(updateColorStyles, 'default');
@@ -99,6 +99,7 @@ describe('updateStyles', () => {
         path: '500',
         value: '#ff0000',
         type: 'color',
+        styleId: '',
       }],
       false,
     );
@@ -112,6 +113,7 @@ describe('updateStyles', () => {
           fontSize: '24',
         },
         type: 'typography',
+        styleId: '',
       }],
       undefined,
       false,
@@ -130,6 +132,7 @@ describe('updateStyles', () => {
           blur: 10,
           spread: 0,
         },
+        styleId: '',
       }],
       undefined,
       false,
@@ -143,6 +146,7 @@ describe('updateStyles', () => {
         path: 'primary/500',
         value: '#ff0000',
         type: 'color',
+        styleId: '',
       },
     ] as ExtendedSingleToken[];
 
@@ -168,6 +172,7 @@ describe('updateStyles', () => {
           fontSize: '24',
         },
         type: 'typography',
+        styleId: '',
       },
     ] as ExtendedSingleToken[];
 
@@ -198,6 +203,7 @@ describe('updateStyles', () => {
           blur: 10,
           spread: 0,
         },
+        styleId: '',
       },
     ] as ExtendedSingleToken[];
 
@@ -220,6 +226,7 @@ describe('updateStyles', () => {
         path: 'light/primary/500',
         value: '#ff0000',
         type: 'color',
+        styleId: '1234',
       },
     ] as ExtendedSingleToken[];
 
@@ -231,6 +238,9 @@ describe('updateStyles', () => {
           id: 'light',
           name: 'light',
           selectedTokenSets: {},
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
         }],
       })
     ));
