@@ -185,5 +185,20 @@
     "webpack": "5",
     "webpack-cli": "^3.3.6",
     "whatwg-fetch": "^3.6.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{js,jsx,css,json}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
