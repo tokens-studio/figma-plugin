@@ -12,6 +12,8 @@ describe('inspectState', () => {
         initialState: {
           inspectState: {
             selectedTokens: [],
+            isShowBrokenReferences: true,
+            isShowResolvedReferences: true,
           },
         },
       },
@@ -42,5 +44,15 @@ describe('inspectState', () => {
     });
     store.dispatch.inspectState.toggleSelectedTokens('size.primary');
     expect(store.getState().inspectState.selectedTokens).toEqual(['color.red']);
+  });
+
+  it('should be able to toggle isShowBrokenReferences', () => {
+    store.dispatch.inspectState.toggleShowBrokenReferences(false);
+    expect(store.getState().inspectState.isShowBrokenReferences).toEqual(false);
+  });
+
+  it('should be able to toggle isShowResolvedReferences', () => {
+    store.dispatch.inspectState.toggleShowResolvedReferences(false);
+    expect(store.getState().inspectState.isShowResolvedReferences).toEqual(false);
   });
 });

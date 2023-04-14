@@ -19,18 +19,17 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import Button from './Button';
-import BulkRemapModal from './modals/BulkRemapModal';
+import Input from './Input';
+import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
-  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
+  const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
-
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => (
     resolveTokenValues(mergeTokenGroups(tokens, {
@@ -49,17 +48,13 @@ function Inspector() {
   function renderInspectView() {
     switch (inspectView) {
       case 'debug': return <InspectorDebugView resolvedTokens={resolvedTokens} />;
-      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} />;
+      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} tokenToSearch={searchInputValue} />;
       default: return null;
     }
   }
 
-  const handleShowBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(true);
-  }, []);
-
-  const handleHideBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(false);
+  const handleSearchInputChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInputValue(event.target.value);
   }, []);
 
   return (
@@ -79,6 +74,20 @@ function Inspector() {
             gap: '$3',
           }}
         >
+          <Input
+            full
+            value={searchInputValue}
+            onChange={handleSearchInputChange}
+            type="text"
+            autofocus
+            placeholder="Search..."
+          />
+        </Box>
+        <Box
+          css={{
+            display: 'flex', gap: '$4', flexDirection: 'row', alignItems: 'center',
+          }}
+        >
           <Checkbox
             checked={inspectDeep}
             id="inspectDeep"
@@ -89,15 +98,6 @@ function Inspector() {
               <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
             </Label>
           </Tooltip>
-        </Box>
-        <Box
-          css={{
-            display: 'flex', gap: '$4', flexDirection: 'row', alignItems: 'center',
-          }}
-        >
-          <Button onClick={handleShowBulkRemap} variant="secondary">
-            Bulk remap
-          </Button>
           <IconButton
             variant={inspectView === 'multi' ? 'primary' : 'default'}
             dataCy="inspector-multi"
@@ -114,15 +114,9 @@ function Inspector() {
             tooltipSide="bottom"
             tooltip="Debug & Annotate"
           />
+          <InspectSearchOptionDropdown />
         </Box>
-        {bulkRemapModalVisible && (
-        <BulkRemapModal
-          isOpen={bulkRemapModalVisible}
-          onClose={handleHideBulkRemap}
-        />
-        )}
       </Box>
-
       {renderInspectView()}
     </Box>
   );
