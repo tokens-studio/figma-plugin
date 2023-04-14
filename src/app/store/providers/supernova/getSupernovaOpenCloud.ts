@@ -1,6 +1,4 @@
-/** Returns a URL to a page where the user can create a pull request with a given branch */
-export function getSupernovaOpenCloud(
-  url: string | undefined,
-) {
+/** Returns a URL to a user workspace. If no workspace is provided, opens url to primary cloud environment that redirects to the first DS automatically */
+export function getSupernovaOpenCloud(url: string | undefined) {
   return url ?? 'https://cloud.supernova.io';
 }
