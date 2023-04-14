@@ -111,17 +111,17 @@ function PushDialog() {
         <Modal title="Push changes" showClose large isOpen close={onCancel}>
           <form onSubmit={handleSubmit}>
             <Stack direction="column" gap={4}>
-                            <Stack direction="column" gap={3}>
+              <Stack direction="column" gap={3}>
                 {localApiState.provider !== StorageProviderType.SUPERNOVA ? (
-                <>
-                  <Text size="small">Push your local changes to your repository.</Text>
-                  <Box css={{
-                    padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
-                  }}
-                  >
-                    {'id' in localApiState ? localApiState.id : null}
-                  </Box>
-                  <Heading size="small">Commit message</Heading>
+                  <>
+                    <Text size="small">Push your local changes to your repository.</Text>
+                    <Box css={{
+                      padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+                    }}
+                    >
+                      {'id' in localApiState ? localApiState.id : null}
+                    </Box>
+                    <Heading size="small">Commit message</Heading>
                     <Textarea
                       id="push-dialog-commit-message"
                       border
@@ -146,7 +146,8 @@ function PushDialog() {
                     <Heading size="small">Design system</Heading>
                     <Box css={{
                       padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
-                    }}>
+                    }}
+                    >
                       {'designSystemUrl' in localApiState ? localApiState.designSystemUrl : null}
                     </Box>
                   </>
