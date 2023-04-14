@@ -16,7 +16,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
-    "lint":"eslint . --quiet --fix",
+    "lint": "eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -37,7 +37,7 @@
     "@sentry/react": "^6.19.7",
     "@stitches/react": "^1.2.8",
     "@storybook/addon-postcss": "^2.0.0",
-    "@supernovaio/supernova-sdk": "1.8.69",
+    "@supernovaio/supernova-sdk": "1.8.70",
     "@supabase/postgrest-js": "^1.1.0",
     "@supabase/realtime-js": "^2.1.0",
     "@supabase/storage-js": "^2.0.0",

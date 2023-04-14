@@ -1,16 +1,8 @@
-import {
-  DesignSystem,
-  DesignSystemVersion,
-  DTPluginToSupernovaMap,
-  DTPluginToSupernovaMapType,
-  DTPluginToSupernovaSettings,
-  Supernova,
-  SupernovaToolsDesignTokensPlugin,
-} from '@supernovaio/supernova-sdk';
-import { DeepTokensMap, ThemeObjectsList } from '@/types';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { DesignSystem, DesignSystemVersion, Supernova } from '@supernovaio/supernova-sdk';
+import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { GitSingleFileObject } from './GitTokenStorage';
+import { ErrorMessages } from '../constants/ErrorMessages';
+import { SystemFilenames } from '../constants/SystemFilenames';
 
 export type SupernovaStorageSaveOptions = {
   commitMessage?: string;
@@ -29,23 +21,20 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
 
   constructor(url: string, mapping: string, secret: string) {
     super();
-
     // Deconstruct url to WS ID / DS ID
     try {
-      let parsedURL = new URL(url);
-      let fragments = parsedURL.pathname.split('/');
+      const parsedURL = new URL(url);
+      const fragments = parsedURL.pathname.split('/');
       if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
         throw new Error(
-          'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.'
+          'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
         );
       } else {
         this.workspaceHandle = fragments[2];
         this.designSystemId = fragments[4].split('-')[0];
-        console.log(this.workspaceHandle);
-        console.log(this.designSystemId);
         this.secret = secret;
         this.mapping = mapping;
-        this.sdkInstance = new Supernova(this.secret, null, null);
+        this.sdkInstance = new Supernova(this.secret, this.networkInstanceFromURL(url), null);
       }
     } catch (error) {
       throw error;
@@ -56,61 +45,100 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     try {
       // Create Supernova instance, fetch design system and version, checking if this is possible
       const accessor = await this.readWriteInstance();
+      let payload: any;
+      let mapping: any;
 
-      // Always retrieve current tokens defined in the plugin, as Supernova can't yet reconstruct the tokens properly
-      // TODO: Supernova, add connection to live server for JSON backup
-      return [];
+      try {
+        const data: any = await accessor.version.getTokenStudioData();
+        payload = data.payload; // Discard all the other data that we get from the API and only focus on payload
+        mapping = data.mapping;
+      } catch (error) {
+        // There is nothing to read, design system didn't have any tokens pushed before.
+        return [];
+      }
+      return [
+        {
+          type: 'themes',
+          path: `${SystemFilenames.THEMES}.json`,
+          data: payload.$themes ?? [],
+        },
+        ...(payload.$metadata
+          ? [
+              {
+                type: 'metadata' as const,
+                path: `${SystemFilenames.METADATA}.json`,
+                data: payload.$metadata,
+              },
+            ]
+          : []),
+        ...(Object.entries(payload).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
+          string,
+          AnyTokenSet<false>,
+        ][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+          name,
+          type: 'tokenSet',
+          path: `${name}.json`,
+          data: tokenSet,
+        })),
+      ];
     } catch (error) {
-      throw new Error('There was an error connecting to Supernova. Check your API key / Design System URL.');
+      console.log(error);
+      return {
+        errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
+      };
     }
   }
 
   public async write(
     files: Array<RemoteTokenStorageFile<any>>,
-    saveOptions?: SupernovaStorageSaveOptions
+    saveOptions?: SupernovaStorageSaveOptions,
   ): Promise<boolean> {
-    // Create writable Supernova instance
-    const accessor = await this.readWriteInstance();
-
-    const dataObject = {
-      $themes: [],
-    } as any;
-    files.forEach((file) => {
-      if (file.type === 'themes') {
-        dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
-      } else if (file.type === 'tokenSet') {
-        dataObject[file.name] = file.data;
-      }
-    });
-
-    const syncTool = new SupernovaToolsDesignTokensPlugin(accessor.version);
-    const settings: DTPluginToSupernovaSettings = {
-      dryRun: false,
-      preciseCopy: true,
-      verbose: false,
-    };
-
-    const maps = new Array<DTPluginToSupernovaMap>();
+    // Create Supernova instance, fetch design system and version
     try {
-      const rawMaps = JSON.parse(this.mapping);
-      for (const map of rawMaps) {
-        maps.push({
-          type: map.tokenSets ? DTPluginToSupernovaMapType.set : DTPluginToSupernovaMapType.theme,
-          pluginSets: map.tokenSets ?? null,
-          pluginTheme: map.tokensTheme ?? null,
-          bindToBrand: map.supernovaBrand,
-          bindToTheme: map.supernovaTheme ?? null,
-          nodes: null,
-          processedNodes: null,
-          processedGroups: null,
-        });
-      }
-    } catch (e) {
-      throw new Error(`Provided mapping is incorrectly formatted: ${e}`);
-    }
+      // Create writable Supernova instance
+      const accessor = await this.readWriteInstance();
+      const dataObject = {
+        $themes: [],
+      } as any;
+      files.forEach((file) => {
+        if (file.type === 'themes') {
+          dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
+        } else if (file.type === 'tokenSet') {
+          dataObject[file.name] = file.data;
+        }
+      });
 
-    const result = await syncTool.synchronizeTokensFromData(dataObject, maps, settings);
-    return result;
+      const mapObject = JSON.parse(this.mapping);
+      const object: any = {
+        connection: {
+          name: 'name',
+        },
+        settings: {
+          dryRun: false,
+          preciseCopy: true,
+          verbose: false,
+        },
+        mapping: mapObject,
+        payload: dataObject,
+      };
+
+      const writer = accessor.version.writer();
+      await writer.writeTokenStudioData(object);
+      return true;
+    } catch (error: any) {
+      // Will throw always when something goes wrong
+      throw error;
+    }
+  }
+
+  private networkInstanceFromURL(url: string): string {
+    if (url.includes('cloud.supernova.io')) {
+      return 'https://api.supernova.io/api';
+    }
+    if (url.includes('cloud.dev.supernova.io')) {
+      return 'https://dev.api2.supernova.io/api';
+    }
+    throw new Error('Unsupported Supernova URL');
   }
 
   private async readWriteInstance(): Promise<{
@@ -131,8 +159,6 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       // Will throw always when something goes wrong
       console.log(error);
     }
-    throw new Error(
-      'Unable to connect to your design system. Provide valid access token and design systen ID and try again.'
-    );
+    throw new Error(ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR);
   }
 }

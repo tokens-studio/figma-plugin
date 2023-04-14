@@ -11,6 +11,7 @@ import { generateId } from '@/utils/generateId';
 import Heading from '../Heading';
 import Link from '../Link';
 import Textarea from '../Textarea';
+import { ErrorMessage } from '../ErrorMessage'
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
@@ -114,9 +115,9 @@ export default function SupernovaForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <div className="bg-red-200 text-red-700 rounded p-4 text-xs font-bold" data-cy="provider-modal-error">
+          <ErrorMessage data-cy="provider-modal-error">
             {errorMessage}
-          </div>
+          </ErrorMessage>
         )}
       </Stack>
     </form>

@@ -7,6 +7,7 @@ export enum ErrorMessages {
   URL_CREDENTIAL_ERROR = 'Error fetching from URL, check console (F12)',
   JSONBIN_CREDENTIAL_ERROR = 'Error fetching from JSONbin, check console (F12)',
   SUPERNOVA_CREDENTIAL_ERROR = 'Error syncing with Supernova, check credentials or your mapping configuration',
+  SUPERNOVA_NOT_UPLOADED_YET_ERROR = 'There were no tokens imported from Token Studio to Supernova previously, please push your tokens first',
   FILE_CREDENTIAL_ERROR = 'Error fetching from file, check console (F12)',
   EMPTY_BRANCH_ERROR = 'There is no branch',
   VALIDATION_ERROR = "Contents don't pass schema validation",

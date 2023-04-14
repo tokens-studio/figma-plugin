@@ -97,13 +97,21 @@ export function useSupernova() {
             themes,
             metadata: {},
           };
-        } catch (e) {
+        } catch (e: any) {
           closeDialog();
-          console.log('Error syncing tokens with Supernova', e);
-          console.log('sending error message');
+          // Response can also be JSON because of how Supernova server works
+          try {
+            const parsedMessage = JSON.parse((e as any).message);
+            if (parsedMessage?.message) {
+              return {
+                status: 'failure',
+                errorMessage: parsedMessage.message,
+              };
+            }
+          } catch {}
           return {
             status: 'failure',
-            errorMessage: (e as Error).message,
+            errorMessage: (e as any).message,
           };
         }
       } else {
