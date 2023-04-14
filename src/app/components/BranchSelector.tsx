@@ -217,10 +217,9 @@ export default function BranchSelector() {
   const handleSearchTextForCreateBranchChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setSearchTextForCreateBranch(e.target.value);
   }, []);
-
-  const handleKeyDown = React.useCallback((event) => {
-    console.log('key down');
-    event.stopPropagation();
+  // TODO: I'm not sure there is another way instead of stopImmediatePropagation to prevent option selection when typing the first letter of the option
+  const handleKeyDown = React.useCallback((event: any) => {
+    event.stopImmediatePropagation();
   }, []);
 
   return (
@@ -272,7 +271,7 @@ export default function BranchSelector() {
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent side="right" sideOffset={5} align="end">
+              <BranchSwitchMenuContent side="right" sideOffset={5} align="end" onKeyDown={handleKeyDown}>
                 { branchState.branches.length > MINIMUM_BRANCH_LENGTH && (
                   <Input
                     full
