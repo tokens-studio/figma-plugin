@@ -4,6 +4,10 @@ import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
 import useTokens from '../../store/useTokens';
+import Box from '../Box';
+import Checkbox from '../Checkbox';
+import Label from '../Label';
+import { UpdateMode } from '@/constants/UpdateMode';
 
 type Props = {
   isOpen: boolean
@@ -13,6 +17,7 @@ type Props = {
 export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const [oldName, setOldName] = React.useState('');
   const [newName, setNewName] = React.useState('');
+  const [shouldRemapDocument, setShouldRemapDocument] = React.useState(false);
   const { handleBulkRemap } = useTokens();
 
   const handleClose = React.useCallback(() => {
@@ -20,9 +25,10 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   }, [onClose]);
 
   const onConfirm = React.useCallback(async () => {
-    await handleBulkRemap(newName, oldName);
+    const updateMode = shouldRemapDocument ? UpdateMode.DOCUMENT : UpdateMode.SELECTION;
+    await handleBulkRemap(newName, oldName, updateMode);
     onClose();
-  }, [handleBulkRemap, onClose, newName, oldName]);
+  }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument]);
 
   const handleOldNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setOldName(e.target.value);
@@ -31,6 +37,10 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   const handleNewNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
     setNewName(e.target.value);
   }, []);
+
+  const updateShouldRemapDocument = React.useCallback(() => {
+    setShouldRemapDocument(!shouldRemapDocument);
+  }, [shouldRemapDocument]);
 
   return (
     <Modal large showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
@@ -59,6 +69,19 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
             onChange={handleNewNameChange}
             name="newName"
           />
+          <Box css={{
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+          }}
+          >
+            <Checkbox
+              checked={shouldRemapDocument}
+              id="remapDocument"
+              onCheckedChange={updateShouldRemapDocument}
+            />
+            <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+              Remap across document (slow)
+            </Label>
+          </Box>
           <Stack direction="row" gap={4} justify="between">
             <Button variant="secondary" onClick={onClose}>
               Cancel
