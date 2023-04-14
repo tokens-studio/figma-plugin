@@ -41,6 +41,8 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
 import Input from './Input';
 
+const MINIMUM_BRANCH_LENGTH = 5;
+
 const BranchSwitchMenuItemElement: React.FC<{
   branch: string
   createNewBranchFrom: (branch: string) => void
@@ -206,11 +208,15 @@ export default function BranchSelector() {
     event.stopPropagation();
   }, []);
 
+  const handleBranchSwitchMenuTrigger = React.useCallback(() => {
+    setSearchTextForBaseBranch('');
+  }, []);
+
   return (
     currentBranch
       ? (
         <BranchSwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <BranchSwitchMenuMainTrigger data-cy="branch-selector-menu-trigger">
+          <BranchSwitchMenuMainTrigger data-cy="branch-selector-menu-trigger" onClick={handleBranchSwitchMenuTrigger}>
             <GitBranchIcon size={16} />
             <span>{currentBranch}</span>
           </BranchSwitchMenuMainTrigger>
@@ -227,16 +233,20 @@ export default function BranchSelector() {
               <BranchSwitchMenuSeparator />
             </>
             )}
-            <Input
-              full
-              value={searchTextForBaseBranch}
-              onChange={handleSearchTextForBaseBranchChange}
-              type="text"
-              autofocus
-              name="base-branch-filter"
-              placeholder="Search branch"
-            />
-            <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
+            {
+              branchState.branches.length > MINIMUM_BRANCH_LENGTH && (
+                <Input
+                  full
+                  value={searchTextForBaseBranch}
+                  onChange={handleSearchTextForBaseBranchChange}
+                  type="text"
+                  autofocus
+                  name="base-branch-filter"
+                  placeholder="Search branch"
+                />
+              )
+            }
+            <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight', overflowY: 'auto' }} value={currentBranch}>
               {branchState.branches.length > 0
                 && branchState.branches.filter((b) => b.includes(searchTextForBaseBranch)).map((branch, index) => (
                   <BranchSwitchMenuRadioElement
@@ -253,16 +263,20 @@ export default function BranchSelector() {
                 Create new branch from
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="right" align="end">
-                <Input
-                  full
-                  value={searchTextForCreateBranch}
-                  onChange={handleSearchTextForCreateBranchChange}
-                  type="text"
-                  autofocus
-                  name="create-branch-filter"
-                  placeholder="Search branch"
-                />
+              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight', overflowY: 'auto' }} side="right" align="end">
+                {
+                  branchState.branches.length > MINIMUM_BRANCH_LENGTH && (
+                    <Input
+                      full
+                      value={searchTextForCreateBranch}
+                      onChange={handleSearchTextForCreateBranchChange}
+                      type="text"
+                      autofocus
+                      name="create-branch-filter"
+                      placeholder="Search branch"
+                    />
+                  )
+                }
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
