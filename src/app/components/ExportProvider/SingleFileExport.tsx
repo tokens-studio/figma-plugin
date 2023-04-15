@@ -72,7 +72,7 @@ export default function SingleFileExport({ onClose }: Props) {
         tokenSetOrder: Object.keys(tokens),
       });
     }
-    return JSON.stringify(returnValue, null, 2);
+    return JSON.stringify(returnValue, null, '\t');
   }, [formattedTokens, tokens, themes, includeAllTokens]);
 
   return (

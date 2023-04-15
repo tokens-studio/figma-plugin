@@ -8,6 +8,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
 import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
+import { JSONIndentationSettings } from '@/types';
 
 type WindowSettingsType = {
   width: number;
@@ -26,6 +27,7 @@ export interface SettingsState {
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
+  jsonIndentation?: JSONIndentationSettings
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
@@ -53,6 +55,7 @@ export const settings = createModel<RootModel>()({
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
+    jsonIndentation: '2',
     inspectDeep: false,
     shouldSwapStyles: false,
     baseFontSize: defaultBaseFontSize,

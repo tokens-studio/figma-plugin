@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledText = styled('div', {
-  lineHeight: '$default',
+  lineHeight: '130%',
   variants: {
     bold: {
       true: {

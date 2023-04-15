@@ -46,7 +46,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
           version: pjs.plugin_version,
           updatedAt,
         },
-      }, null, 2),
+      }, null, '\t'),
       headers: new Headers([
         ['Content-Type', 'application/json'],
         ['X-Master-Key', secret],
