@@ -2,7 +2,7 @@ import React from 'react';
 import Stack from './Stack';
 import Text from './Text';
 import { ImportToken } from '@/types/tokens';
-import { StyledText } from './StyledText';
+import { StyledDiff } from './StyledDiff';
 
 export default function ChangedTokenItem({
   token,
@@ -19,13 +19,13 @@ export default function ChangedTokenItem({
               <Text size="small">Value</Text>
               <Stack direction="row" align="center" gap={1}>
                 {token.oldValue ? (
-                  <StyledText size="small" type="danger">
+                  <StyledDiff size="small" type="danger">
                     {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
-                  </StyledText>
+                  </StyledDiff>
                 ) : null}
-                <StyledText size="small" type="success">
+                <StyledDiff size="small" type="success">
                   {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
-                </StyledText>
+                </StyledDiff>
               </Stack>
             </Stack>
           )
@@ -35,21 +35,21 @@ export default function ChangedTokenItem({
           <Text size="small">Description</Text>
           <Stack direction="column" align="end" gap={1}>
             {token.oldDescription ? (
-              <StyledText size="small" type="danger">
+              <StyledDiff size="small" type="danger">
                 {token.oldDescription}
-              </StyledText>
+              </StyledDiff>
             ) : null}
-            <StyledText size="small" type="success">
+            <StyledDiff size="small" type="success">
               {token.description}
-            </StyledText>
+            </StyledDiff>
           </Stack>
         </Stack>
         )}
         {
           token.importType === 'REMOVE' && (
-            <StyledText size="small" type="danger">
+            <StyledDiff size="small" type="danger">
               Removed
-            </StyledText>
+            </StyledDiff>
           )
         }
       </Stack>

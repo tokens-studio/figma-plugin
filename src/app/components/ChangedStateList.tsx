@@ -4,7 +4,7 @@ import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { CompareStateType } from '@/utils/findDifferentState';
 import Text from './Text';
 import ChangedTokenItem from './ChangedTokenItem';
-import { StyledText } from './StyledText';
+import { StyledDiff } from './StyledDiff';
 
 function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -56,16 +56,16 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   <Text bold size="small">{theme.name}</Text>
                   {
                     theme.importType === 'REMOVE' && (
-                    <StyledText size="small" type="danger">
+                    <StyledDiff size="small" type="danger">
                       Configuration Removed
-                    </StyledText>
+                    </StyledDiff>
                     )
                   }
                   {
                     (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
-                    <StyledText size="small" type="success">
+                    <StyledDiff size="small" type="success">
                       {theme.importType === 'NEW' ? 'Configuration Added' : 'Configuration Changed' }
-                    </StyledText>
+                    </StyledDiff>
                     )
                   }
                 </Stack>
@@ -85,9 +85,9 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                 align="end"
                 css={{ padding: '$2 $4' }}
               >
-                <StyledText size="small" type="danger">
+                <StyledDiff size="small" type="danger">
                   Configuration changed
-                </StyledText>
+                </StyledDiff>
               </Stack>
             )}
           </>

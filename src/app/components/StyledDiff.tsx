@@ -1,7 +1,7 @@
 import { styled } from '@/stitches.config';
 import Text from './Text';
 
-export const StyledText = styled((Text), {
+export const StyledDiff = styled((Text), {
   padding: '$2',
   wordBreak: 'break-all',
   fontWeight: '$bold',
