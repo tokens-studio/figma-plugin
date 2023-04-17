@@ -54,21 +54,21 @@ export default function MentionsInput({
         .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
         )).map((resolvedToken) => ({
-          id: resolvedToken.name,
-          display: `{${resolvedToken.name}}`,
+          id: `${resolvedToken.name}}`,
+          display: resolvedToken.name,
         }));
     }
     return resolvedTokens
       .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
         a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
       )).map((resolvedToken) => ({
-        id: resolvedToken.name,
-        display: `{${resolvedToken.name}}`,
+        id: `${resolvedToken.name}}`,
+        display: resolvedToken.name,
       }));
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
-  const handleMentionInputChange = React.useCallback((value: string) => {
-    handleChange(name, value);
+  const handleMentionInputChange = React.useCallback((newValue: string) => {
+    handleChange(name, newValue);
   }, [handleChange, name]);
 
   const handleInputBlur = React.useCallback(() => {
@@ -96,7 +96,7 @@ export default function MentionsInput({
   const renderMentionListItem = React.useCallback((
     suggestion: SuggestionDataItem,
   ) => {
-    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.id);
+    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.display);
     return (
       <Option
         key={(suggestion.id as string) || 'not-found'}
