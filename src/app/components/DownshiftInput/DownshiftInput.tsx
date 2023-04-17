@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
-import { MentionsRef } from 'rc-mentions/lib/Mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import Box from '../Box';
@@ -78,7 +77,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const downShiftSearchContainerRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const mentionInputRef = React.useRef<MentionsRef>(null);
   const portalRef = React.useRef<HTMLDivElement>(null);
   const blankBoxRef = React.useRef<HTMLDivElement>(null);
   const windowHeight = React.useRef(window.innerHeight);
@@ -226,7 +224,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       }
     }
     setShowAutoSuggest(false);
-    mentionInputRef.current?.focus();
   }, [setInputValue, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
@@ -269,7 +266,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               handleChange={handleChange}
               handleBlur={handleBlur}
               handleOnFocus={handleOnFocus}
-              inputRef={mentionInputRef}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>

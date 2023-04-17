@@ -64,10 +64,10 @@ export default function SingleBoxShadowInput({
 
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
-  const onChange = React.useCallback((property: string, inputValue: string) => {
+  const onChange = React.useCallback((property: string, newValue: string) => {
     if (Array.isArray(value)) {
       const values = value;
-      const newShadow = { ...value[index], [property]: inputValue };
+      const newShadow = { ...value[index], [property]: newValue };
       values.splice(index, 1, newShadow);
 
       handleBoxShadowValueChange(values);
@@ -75,7 +75,7 @@ export default function SingleBoxShadowInput({
       handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
-        [property]: inputValue,
+        [property]: newValue,
       });
     }
   }, [index, value, handleBoxShadowValueChange]);

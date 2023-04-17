@@ -1,6 +1,5 @@
-import React, { Ref, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Mentions from 'rc-mentions';
-import { MentionsRef } from 'rc-mentions/lib/Mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { Properties } from '@/constants/Properties';
@@ -25,7 +24,6 @@ interface Props {
   initialName?: string;
   placeholder?: string;
   resolvedTokens: ResolveTokenValuesResult[];
-  inputRef: Ref<MentionsRef>;
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
   handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
@@ -41,7 +39,6 @@ export default function MentionsInput({
   initialName,
   placeholder,
   resolvedTokens,
-  inputRef,
   handleChange,
   handleBlur,
   handleOnFocus,
@@ -123,7 +120,6 @@ export default function MentionsInput({
       autoSize
       name={name}
       value={value}
-      ref={inputRef}
       placeholder={placeholder}
       prefix={['{']}
       placement="bottom"
