@@ -16,7 +16,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
-    "lint":"eslint . --quiet --fix",
+    "lint": "eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -89,6 +89,7 @@
     "popmotion": "^11.0.0",
     "postcss": "^8.2.13",
     "postcss-calc-ast-parser": "^0.1.4",
+    "rc-mentions": "^2.2.0",
     "react": "17.0.0",
     "react-colorful": "^5.5.1",
     "react-copy-to-clipboard": "^5.1.0",

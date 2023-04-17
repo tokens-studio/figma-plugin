@@ -64,7 +64,23 @@ export default function SingleBoxShadowInput({
 
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
-  const onChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onChange = React.useCallback((property: string, inputValue: string) => {
+    if (Array.isArray(value)) {
+      const values = value;
+      const newShadow = { ...value[index], [property]: inputValue };
+      values.splice(index, 1, newShadow);
+
+      handleBoxShadowValueChange(values);
+    } else {
+      handleBoxShadowValueChange({
+        ...newTokenValue,
+        ...value,
+        [property]: inputValue,
+      });
+    }
+  }, [index, value, handleBoxShadowValueChange]);
+
+  const onTypeChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     if (Array.isArray(value)) {
       const values = value;
       const newShadow = { ...value[index], [e.target.name]: e.target.value };
@@ -198,7 +214,7 @@ export default function SingleBoxShadowInput({
           </Box>
         )}
         <Tooltip label="type"><StyledPrefix isText>Type</StyledPrefix></Tooltip>
-        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
+        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onTypeChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>

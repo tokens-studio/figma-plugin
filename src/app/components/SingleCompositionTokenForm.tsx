@@ -61,9 +61,9 @@ export default function SingleCompositionTokenForm({
     setError(false);
   }, [tokenValue]);
 
-  const onPropertyValueChanged = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      tokenValue[property as CompositionTokenProperty] = e.target.value;
+  const onPropertyValueChanged = React.useCallback(
+    (type: string, value: string) => {
+      tokenValue[property as CompositionTokenProperty] = value;
       setTokenValue(tokenValue);
     },
     [tokenValue],
