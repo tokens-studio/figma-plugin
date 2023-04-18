@@ -107,7 +107,7 @@ export default function InspectorTokenSingle({
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
         {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
-        <InspectorResolvedToken token={tokenToDisplay} />
+          <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
           css={{

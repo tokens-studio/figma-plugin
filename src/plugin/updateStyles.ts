@@ -29,7 +29,8 @@ export default async function updateStyles(
       ...token,
       path,
       value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings.baseFontSize) : token.value,
-    } as SingleToken<true, { path: string }>;
+      styleId: activeThemeObject?.$figmaStyleReferences ? activeThemeObject?.$figmaStyleReferences[token.name] : '',
+    } as SingleToken<true, { path: string, styleId: string }>;
   });
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
