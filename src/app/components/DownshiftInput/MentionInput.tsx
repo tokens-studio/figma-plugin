@@ -128,6 +128,7 @@ export default function MentionsInput({
       onBlur={handleInputBlur}
       onFocus={handleOnFocus}
       data-testid={`mention-input-${name}`}
+      data-cy={`mention-input-${name}`}
     >
       {mentionData.map((item) => (
         renderMentionListItem(item)

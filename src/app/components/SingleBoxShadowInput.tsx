@@ -69,7 +69,6 @@ export default function SingleBoxShadowInput({
       const values = value;
       const newShadow = { ...value[index], [property]: newValue };
       values.splice(index, 1, newShadow);
-
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -85,7 +84,6 @@ export default function SingleBoxShadowInput({
       const values = value;
       const newShadow = { ...value[index], [e.target.name]: e.target.value };
       values.splice(index, 1, newShadow);
-
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -101,7 +99,6 @@ export default function SingleBoxShadowInput({
       const values = value;
       const newShadow = { ...value[index], [property]: newInputValue };
       values.splice(index, 1, newShadow);
-
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -121,7 +118,6 @@ export default function SingleBoxShadowInput({
       const values = value;
       const newShadow = { ...value[index], color: color.trim() };
       values.splice(index, 1, newShadow);
-
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({

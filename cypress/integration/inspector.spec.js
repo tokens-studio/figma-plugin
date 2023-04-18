@@ -207,7 +207,7 @@ describe('Inspector tokens', () => {
       timeout: 1000
     });
     cy.get('[data-cy=inspector-token-single-opacity] [data-cy=button-token-remap]').click();
-    cy.get(`input[name=value]`).type('$opacity.100').type('{enter}');
+    cy.get(`[data-cy=mention-input-value]`).type('$opacity.100').type('{enter}');
     cy.receiveSelectionValues({
       selectionValues: [{
         category: "sizing",
