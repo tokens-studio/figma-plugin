@@ -30,7 +30,7 @@ export default function BoxShadowInput({
   resolvedTokens: ResolveTokenValuesResult[];
   internalEditToken: EditTokenType;
   handleBoxShadowValueChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
-  handleBoxShadowAliasValueChange: React.ChangeEventHandler;
+  handleBoxShadowAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();

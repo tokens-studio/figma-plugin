@@ -31,11 +31,10 @@ export default function BorderTokenDownShiftInput({
   value: string;
   type: string;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleChange: React.ChangeEventHandler;
+  handleChange: (property: string, value: string) => void;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
 }) {
-  const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBorderDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
   return (
@@ -46,7 +45,7 @@ export default function BorderTokenDownShiftInput({
       label={getIconComponent}
       inlineLabel
       resolvedTokens={resolvedTokens}
-      handleChange={onChange}
+      handleChange={handleChange}
       setInputValue={handleBorderDownShiftInputChange}
       placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder]}
       prefix={
