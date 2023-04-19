@@ -4,7 +4,7 @@ import { tryParseJson } from './tryParseJson';
 import type { ThemeObjectsList } from '@/types';
 import type { AnyTokenList } from '@/types/tokens';
 
-type LastSyncedState<Metadata = null> =
+export type LastSyncedState<Metadata = null> =
   [Record<string, AnyTokenList>]
   | [Record<string, AnyTokenList>, ThemeObjectsList]
   | [Record<string, AnyTokenList>, ThemeObjectsList, Metadata];

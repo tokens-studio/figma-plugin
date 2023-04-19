@@ -46,6 +46,7 @@ function Textarea({
   return (
     <StyledTextarea
       data-cy={id}
+      data-testid={id}
       spellCheck={false}
       rows={rows}
       placeholder={placeholder}

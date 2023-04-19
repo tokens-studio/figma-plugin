@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { localApiStateSelector } from '@/selectors';
+import {
+  lastSyncedStateSelector, localApiStateSelector, storageTypeSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
@@ -8,22 +10,51 @@ import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import Button from './Button';
 import Heading from './Heading';
-import Input from './Input';
 import Text from './Text';
 import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
-import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
+import { transformProviderName } from '@/utils/transformProviderName';
+import ChangedStateList from './ChangedStateList';
+import { TabButton } from './TabButton';
+import PushJSON from './PushJSON';
+import { tryParseJson } from '@/utils/tryParseJson';
+import { findDifferentState } from '@/utils/findDifferentState';
+import { LastSyncedState } from '@/utils/compareLastSyncedState';
+import PushSettingForm from './PushSettingForm';
 
 function PushDialog() {
-  const { onConfirm, onCancel, showPushDialog } = usePushDialog();
+  const {
+    onConfirm, onCancel, showPushDialog,
+  } = usePushDialog();
   const localApiState = useSelector(localApiStateSelector);
+  const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
+  const [activeTab, setActiveTab] = React.useState('commit');
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
+  const changedState = React.useMemo(() => {
+    const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
+    if (parsedState) {
+      const tokenSetOrder = Object.keys(tokens);
+      return findDifferentState({
+        tokens: parsedState[0],
+        themes: parsedState[1] || [],
+        metadata: parsedState[2],
+      }, {
+        tokens,
+        themes,
+        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+      });
+    }
+    return { tokens: {}, themes: [] };
+  }, [lastSyncedState, tokens, themes, storageType]);
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
@@ -76,10 +107,6 @@ function PushDialog() {
     [setBranch],
   );
 
-  const handleSubmit = React.useCallback(() => {
-    onConfirm(commitMessage, branch);
-  }, [branch, commitMessage, onConfirm]);
-
   React.useEffect(() => {
     if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
       setCommitMessage('');
@@ -87,57 +114,77 @@ function PushDialog() {
     }
   }, [showPushDialog, localApiState]);
 
+  const handlePushChanges = React.useCallback(() => {
+    onConfirm(commitMessage, branch);
+  }, [branch, commitMessage, onConfirm]);
+
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
     if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
-      handleSubmit();
+      handlePushChanges();
     }
-  }, [handleSubmit, showPushDialog]);
+  }, [handlePushChanges, showPushDialog]);
 
   useShortcut(['Enter'], handleSaveShortcut);
+
+  const handleSwitch = React.useCallback((tab: string) => {
+    setActiveTab(tab);
+  }, []);
 
   switch (showPushDialog) {
     case 'initial': {
       return (
-        <Modal title="Push changes" showClose large isOpen close={onCancel}>
-          <form onSubmit={handleSubmit}>
-            <Stack direction="column" gap={4}>
-              <Stack direction="column" gap={3}>
-                <Text size="small">Push your local changes to your repository.</Text>
-                <Box css={{
-                  padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
-                }}
-                >
-                  {'id' in localApiState ? localApiState.id : null}
-                </Box>
-                <Heading size="small">Commit message</Heading>
-                <Textarea
-                  id="push-dialog-commit-message"
-                  border
-                  rows={3}
-                  value={commitMessage}
-                  onChange={handleCommitMessageChange}
-                  placeholder="Enter commit message"
-                />
-                <Input
-                  full
-                  label="Branch"
-                  value={branch}
-                  onChange={handleBranchChange}
-                  type="text"
-                  name="branch"
-                  required
-                />
-              </Stack>
-              <Stack direction="row" gap={4} justify="between">
-                <Button variant="secondary" onClick={onCancel}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={!commitMessage} variant="primary">
-                  Push
-                </Button>
-              </Stack>
-            </Stack>
-          </form>
+        <Modal
+          title={`Push to ${transformProviderName(storageType.provider)}`}
+          showClose
+          large
+          isOpen
+          close={onCancel}
+        >
+          <Stack direction="column" gap={4}>
+            <div>
+              <TabButton<string> name="commit" activeTab={activeTab} label="Commit" onSwitch={handleSwitch} />
+              <TabButton<string> name="diff" activeTab={activeTab} label="Diff" onSwitch={handleSwitch} />
+              <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
+            </div>
+            {
+              activeTab !== 'commit' && (
+                <Stack direction="row" gap={2} align="center">
+                  This will push your local changes to the
+                  {' '}
+                  <Text bold css={{ background: '$bgSubtle', padding: '$2' }}>
+                    {' '}
+                    {branch}
+                  </Text>
+                  {' '}
+                  branch
+                </Stack>
+              )
+            }
+            {
+              activeTab === 'commit' && <PushSettingForm commitMessage={commitMessage} branch={branch} handleBranchChange={handleBranchChange} handleCommitMessageChange={handleCommitMessageChange} />
+            }
+            {
+              activeTab === 'diff' && <ChangedStateList changedState={changedState} />
+            }
+            {
+              activeTab === 'json' && <PushJSON />
+            }
+            <Box css={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '$4',
+              borderTop: '1px solid',
+              borderColor: '$borderMuted',
+            }}
+            >
+              <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
+                Cancel
+              </Button>
+              <Button variant="primary" id="push-dialog-button-push-changes" onClick={handlePushChanges}>
+                Push changes
+              </Button>
+            </Box>
+          </Stack>
         </Modal>
       );
     }
