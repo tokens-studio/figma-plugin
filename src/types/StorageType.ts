@@ -121,3 +121,4 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   >)
   | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>>)
   | { new?: boolean; provider: StorageProviderType.LOCAL };
+export { StorageProviderType };

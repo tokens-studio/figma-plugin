@@ -31,11 +31,13 @@ describe('JSONBinTokenStorage', () => {
     });
   });
 
-  it('should return false when there is an error creating a new bin', async () => {
+  it('should return throw an error when there is an error creating a new bin', async () => {
+    const errorText = 'An error occurred';
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
+      statusText: errorText,
     }));
-    expect(await JSONBinTokenStorage.create('', '', '')).toEqual(false);
+    await expect(async () => JSONBinTokenStorage.create('', '', '')).rejects.toThrow(errorText);
   });
 
   it('can read JSONBin data (root version and updatedAt)', async () => {
@@ -239,17 +241,6 @@ describe('JSONBinTokenStorage', () => {
     });
   });
 
-  it('returns an empty dataset on error', async () => {
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: false,
-      })
-    ));
-
-    const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
-    expect(await storage.read()).toEqual([]);
-  });
-
   it('can write to JSONBin (with metadata)', async () => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
@@ -444,12 +435,15 @@ describe('JSONBinTokenStorage', () => {
     });
   });
 
-  it('returns false on write error', async () => {
+  it('throws the write Error', async () => {
+    const errorText = 'Something went wrong';
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
+      statusText: errorText,
     }));
     const storage = new JSONBinTokenStorage('jsonbinid', 'secret');
-    expect(await storage.write([])).toEqual(false);
+
+    await expect(async () => storage.write([])).rejects.toThrow(errorText);
   });
 
   it('should return validation error when the content(s) are invalid', async () => {
