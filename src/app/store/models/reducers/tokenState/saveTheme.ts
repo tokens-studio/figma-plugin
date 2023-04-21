@@ -31,11 +31,14 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
 
   const newActiveTheme = state.activeTheme;
   if (isActiveTheme) {
-    delete newActiveTheme[data.group];
+    Object.keys(newActiveTheme).forEach((group) => {
+      if (newActiveTheme[group] === themeId) {
+        delete newActiveTheme[group];
+      }
+    });
   } else {
     newActiveTheme[data.group] = themeId;
   }
-
   const nextState: TokenState = {
     ...state,
     themes: updatedThemes,
