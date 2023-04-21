@@ -19,7 +19,9 @@ describe('ThemeSelector', () => {
   it('should show the active theme name', () => {
     const mockStore = createMockStore({
       tokenState: {
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
         themes: [{
           id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
         }],
@@ -37,7 +39,9 @@ describe('ThemeSelector', () => {
   it('should show the unknown if the active theme is somehow not available anymore', () => {
     const mockStore = createMockStore({
       tokenState: {
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
       },
     });
     const component = render(
@@ -75,6 +79,6 @@ describe('ThemeSelector', () => {
       await userEvent.keyboard('[Enter]');
     });
 
-    expect(mockStore.getState().tokenState.activeTheme).toEqual('light');
+    expect(mockStore.getState().tokenState.activeTheme).toEqual({ noGroup: 'light' });
   });
 });

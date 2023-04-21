@@ -15,7 +15,7 @@ describe('Can set values on node', () => {
   };
 
   const emptyThemeInfo = {
-    activeTheme: null as string | null,
+    activeTheme: {},
     themes: [] as ThemeObjectsList,
   };
 
@@ -355,7 +355,9 @@ describe('Can set values on node', () => {
         effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
       },
       {
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
         themes: [{ id: 'light', name: 'light', selectedTokenSets: {} }],
       },
       false,

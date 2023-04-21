@@ -8,6 +8,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { createStyles } from './asyncMessageHandlers';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
 
@@ -19,7 +20,7 @@ describe('updateStyles', () => {
   let disconnectAsyncMessageChannel = () => {};
   const mockGetThemeInfo = jest.fn(async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: null,
+    activeTheme: {},
     themes: [],
   }));
 
@@ -227,17 +228,22 @@ describe('updateStyles', () => {
         value: '#ff0000',
         type: 'color',
         styleId: '1234',
+        internal__Parent: 'global',
       },
     ] as ExtendedSingleToken[];
 
     mockGetThemeInfo.mockImplementationOnce(() => (
       Promise.resolve({
         type: AsyncMessageTypes.GET_THEME_INFO,
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
         themes: [{
           id: 'light',
           name: 'light',
-          selectedTokenSets: {},
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
           $figmaStyleReferences: {
             'primary.500': '1234',
           },

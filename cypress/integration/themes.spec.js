@@ -5,7 +5,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 describe('Themes', () => {
   const mockStartupParams = {
-    activeTheme: null,
+    activeTheme: {},
     lastOpened: Date.now(),
     onboardingExplainer: {
       sets: true,
@@ -33,7 +33,7 @@ describe('Themes', () => {
       name: 'Jan Six',
     },
     localTokenData: {
-      activeTheme: null,
+      activeTheme: {},
       checkForChanges: false,
       themes: [],
       usedTokenSet: {},
@@ -68,6 +68,7 @@ describe('Themes', () => {
     cy.get('[data-cy="themeselector-dropdown"]').click();
     cy.get('[data-cy="themeselector-managethemes"]').click();
     cy.get('[data-cy="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-cy="create-or-edit-theme-form--group--name"]').type('GroupA');
     cy.get('[data-cy="create-or-edit-theme-form--input--name"]').type('My first theme');
     cy.get('[data-cy="tokensettheme-item--dropdown-trigger--global-set"]').click();
     cy.get('[data-cy="tokensettheme-item--dropdown-content--source"]').click();

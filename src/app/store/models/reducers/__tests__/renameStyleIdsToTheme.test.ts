@@ -21,7 +21,9 @@ describe('renameStyleIdsToCurrentTheme', () => {
             'colors.red': 'S:0285',
           },
         }],
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
       },
     });
     await mockStore.dispatch.tokenState.renameStyleIdsToCurrentTheme(['S:1234', 'S:2345'], 'new');

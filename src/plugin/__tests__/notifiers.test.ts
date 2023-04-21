@@ -32,7 +32,7 @@ describe('notifySetTokens', () => {
       values: {},
       usedTokenSet: {},
       checkForChanges: true,
-      activeTheme: null,
+      activeTheme: {},
       themes: [],
       storageType: {
         provider: StorageProviderType.LOCAL,

@@ -40,13 +40,13 @@ export default async function setValuesOnNode(
   baseFontSize = defaultBaseFontSize,
 ) {
   // Filter activeThemes e.g light, desktop
-  const activeThemes = themeInfo.themes.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
+  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
   const figmaStyleReferences: Record<string, string> = {};
-  activeThemes.forEach((theme) => {
+  activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
       if (!figmaStyleReferences[token]) {
         figmaStyleReferences[token] = styleId;

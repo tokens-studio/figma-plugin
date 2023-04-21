@@ -32,7 +32,9 @@ describe('renameStylesFromPlugin', () => {
 
   const mockGetThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: 'light',
+    activeTheme: {
+      noGroup: 'light',
+    },
     themes: [{
       id: 'light',
       name: 'Light',

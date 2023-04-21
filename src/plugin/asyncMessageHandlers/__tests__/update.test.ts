@@ -22,7 +22,9 @@ describe('update', () => {
 
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
-    activeTheme: 'light',
+    activeTheme: {
+      noGroup: 'light',
+    },
     themes: [
       {
         id: 'light',
@@ -72,7 +74,7 @@ describe('update', () => {
 
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async () => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: null,
+      activeTheme: {},
       themes: [],
     }));
 

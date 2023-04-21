@@ -356,7 +356,9 @@ describe('useToken test', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
-        activeTheme: 'light',
+        activeTheme: {
+          noGroup: 'light',
+        },
         themes: [{
           id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
         }],
@@ -381,7 +383,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, mockPullStylesHandler);
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: null,
+      activeTheme: {},
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);

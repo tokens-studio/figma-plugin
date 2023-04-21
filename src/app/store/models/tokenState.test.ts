@@ -109,7 +109,7 @@ describe('editToken', () => {
               updatedTokens: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             activeTokenSet: 'global',
             collapsedTokens: [],
           },
@@ -275,7 +275,7 @@ describe('editToken', () => {
   it('can set token data', () => {
     store.dispatch.tokenState.setTokenData({
       values: {},
-      activeTheme: 'base',
+      activeTheme: { noGroup: 'base' },
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
       },
@@ -1103,10 +1103,10 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: 'default',
+      activeTheme: { noGroup: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
-    expect(activeTheme).toBe('default');
+    expect(activeTheme).toEqual({ noGroup: 'default' });
   });
 
   it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
@@ -1128,10 +1128,10 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: 'default',
+      activeTheme: { noGroup: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
-    expect(activeTheme).toBe(null);
+    expect(activeTheme).toEqual({});
   });
 
   it('should be able to keep activeTokenSet when there is a matching tokenSet in tokenList', () => {
