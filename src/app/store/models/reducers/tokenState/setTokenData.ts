@@ -25,7 +25,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
           )),
       ),
     })),
-    activeTheme: payload.themes?.find((theme) => theme.id === payload.activeTheme) ? payload.activeTheme ?? null : null,
+    activeTheme: payload.activeTheme ?? {},
     ...(Object.keys(payload.values).includes(state.activeTokenSet) ? {} : {
       activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
     }),

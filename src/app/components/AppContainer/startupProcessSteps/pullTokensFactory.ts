@@ -23,6 +23,7 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
+  const activeTheme = typeof params.activeTheme === 'string' ? { noGroup: params.activeTheme } : params.activeTheme;
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
@@ -70,14 +71,14 @@ export function pullTokensFactory(
           dispatch.uiState.setApiData(matchingSet);
           dispatch.uiState.setLocalApiState(matchingSet);
           // we don't want to update nodes if we're pulling from remote
-          dispatch.tokenState.setActiveTheme({ themeId: params.activeTheme || null, shouldUpdateNodes: false });
+          dispatch.tokenState.setActiveTheme({ activeThemeObj: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
           if (shouldPull) {
             const remoteData = await useRemoteTokensResult.pullTokens({
               context: matchingSet,
               featureFlags: flags,
-              activeTheme: params.activeTheme,
+              activeTheme,
               usedTokenSet: params.localTokenData?.usedTokenSet,
               collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
             });
@@ -111,7 +112,7 @@ export function pullTokensFactory(
         dispatch.uiState.setActiveTab(Tabs.START);
       }
     } else if (params.localTokenData) {
-      dispatch.tokenState.setTokenData(params.localTokenData);
+      dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
       const existTokens = hasTokenValues(params.localTokenData.values);
       if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
       else dispatch.uiState.setActiveTab(Tabs.START);
@@ -136,7 +137,7 @@ export function pullTokensFactory(
         await getApiCredentials(true);
       } else {
         // no local changes and user did not confirm to pull tokens
-        dispatch.tokenState.setTokenData(params.localTokenData);
+        dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
         const hasTokens = Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
         if (hasTokens) {
           // local tokens found

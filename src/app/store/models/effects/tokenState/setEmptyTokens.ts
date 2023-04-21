@@ -6,7 +6,7 @@ export function setEmptyTokens(dispatch: RematchDispatch<RootModel>) {
     dispatch.tokenState.setTokenData({
       values: [],
       themes: [],
-      activeTheme: null,
+      activeTheme: {},
     });
   };
 }

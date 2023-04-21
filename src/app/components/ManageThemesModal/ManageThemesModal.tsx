@@ -11,12 +11,10 @@ import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import Button from '../Button';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
-import { ThemeObject, ThemeObjectsList } from '@/types';
+import { ThemeObject } from '@/types';
 import Box from '../Box';
 import { track } from '@/utils/analytics';
 import useConfirm from '@/app/hooks/useConfirm';
-import { ReorderGroup } from '@/motion/ReorderGroup';
-import { DragItem } from '../StyledDragger/DragItem';
 import { ThemeListItemContent } from '../ThemeSelector/ThemeListItemContent';
 import Text from '../Text';
 
@@ -28,7 +26,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const groupNames = useMemo(() => compact(['No Group', ...themes.map((theme) => theme.group)]), [themes]);
+  const groupNames = useMemo(() => compact(themes.map((theme) => theme.group)), [themes]);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -85,11 +83,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
     });
     setThemeEditorOpen(false);
   }, [themeEditorOpen, dispatch]);
-
-  const handleReorder = React.useCallback((reorderedItems: ThemeObjectsList) => {
-    const reorderedThemeList = compact(reorderedItems.map((item) => themes.find((theme) => theme.id === item.id)));
-    dispatch.tokenState.setThemes(reorderedThemeList);
-  }, [dispatch.tokenState, themes]);
 
   return (
     <Modal
@@ -153,23 +146,29 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <ReorderGroup
-          layoutScroll
-          values={themes}
-          onReorder={handleReorder}
-        >
+        <>
+          {
+            themes.filter((t) => (typeof t.group === 'undefined')).length > 0 && (
+              <>
+                <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>No Group</Text>
+                {
+                  themes.filter((t) => (typeof t.group === 'undefined')).map((theme) => (
+                    <ThemeListItemContent item={theme} isActive={activeTheme?.noGroup === theme.id} onOpen={handleToggleThemeEditor} groupName="noGroup" />
+                  ))
+                }
+              </>
+            )
+          }
           {
             groupNames.map((groupName) => {
-              const filteredThemes = themes.filter((t) => (groupName === 'No Group' ? typeof t.group === 'undefined' : t.group === groupName));
+              const filteredThemes = themes.filter((t) => (t.group === groupName));
               return (
                 filteredThemes.length > 0 && (
                   <>
                     <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
                     {
                       filteredThemes.map((theme) => (
-                        <DragItem<ThemeObject> key={theme.id} item={theme}>
-                          <ThemeListItemContent item={theme} isActive={activeTheme === theme.id} onOpen={handleToggleThemeEditor} />
-                        </DragItem>
+                        <ThemeListItemContent item={theme} isActive={activeTheme[groupName] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
                       ))
                     }
                   </>
@@ -177,7 +176,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
               );
             })
           }
-        </ReorderGroup>
+        </>
       )}
       {themeEditorOpen && (
         <CreateOrEditThemeForm

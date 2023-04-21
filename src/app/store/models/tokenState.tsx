@@ -44,7 +44,7 @@ export interface TokenState {
     newTokens: ImportToken[];
     updatedTokens: ImportToken[];
   };
-  activeTheme: string | null;
+  activeTheme: Record<string, string>;
   activeTokenSet: string;
   usedTokenSet: UsedTokenSetsMap;
   editProhibited: boolean;
@@ -67,7 +67,7 @@ export const tokenState = createModel<RootModel>()({
       newTokens: [],
       updatedTokens: [],
     },
-    activeTheme: null,
+    activeTheme: {},
     activeTokenSet: 'global',
     usedTokenSet: {
       global: TokenSetStatus.ENABLED,

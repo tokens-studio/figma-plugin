@@ -8,6 +8,7 @@ import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
@@ -17,11 +18,11 @@ export default async function updateStyles(
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const activeThemeObject = themeInfo.activeTheme
-    ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
-    : null;
+  const activeThemes = themeInfo.themes.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
 
   const styleTokens = tokens.map((token) => {
+    // When multiple theme has the same active Token set then the last activeTheme wins
+    const activeThemeObject = activeThemes.reverse().find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));
     const prefix = settings.prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
     const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);

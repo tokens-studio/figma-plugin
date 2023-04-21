@@ -11,7 +11,7 @@ export function toggleManyTokenSets(state: TokenState, data: ToggleManyTokenSets
   if (data.shouldCheck) {
     return {
       ...state,
-      activeTheme: null,
+      activeTheme: {},
       usedTokenSet: {
         ...oldSetsWithoutInput,
         ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.ENABLED]))),
@@ -21,7 +21,7 @@ export function toggleManyTokenSets(state: TokenState, data: ToggleManyTokenSets
 
   return {
     ...state,
-    activeTheme: null,
+    activeTheme: {},
     usedTokenSet: {
       ...oldSetsWithoutInput,
       ...Object.fromEntries(data.sets.map((tokenSet) => ([tokenSet, TokenSetStatus.DISABLED]))),

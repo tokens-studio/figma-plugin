@@ -23,8 +23,8 @@ function getRootNode(updateMode: UpdateMode) {
 }
 
 // Go through layers to swap styles
-export async function swapStyles(activeTheme: string, themes: ThemeObjectsList, updateMode: UpdateMode) {
-  const newTheme = themes.find((theme) => theme.id === activeTheme)?.name;
+export async function swapStyles(activeTheme: Record<string, string>, themes: ThemeObjectsList, updateMode: UpdateMode) {
+  const activeThemes = themes.filter((theme) => Object.values(activeTheme).some((v) => v === theme.id)).map((t) => t.name);
   // Creates an object that groups sibling styles by token name and theme name, e.g. { 'color.background': { 'dark': 'S:1234,4:16', 'light': 'S:1235,4:16' } }
   const mappedStyleReferences = themes.reduce((acc, theme) => {
     if (theme.$figmaStyleReferences) {
@@ -42,11 +42,11 @@ export async function swapStyles(activeTheme: string, themes: ThemeObjectsList, 
     });
     return acc;
   }, {} as StyleIdMap);
-  if (!newTheme || !mappedStyleReferences || !allStyleIds) {
+  if (activeThemes.length < 1 || !mappedStyleReferences || !allStyleIds) {
     return;
   }
 
   getRootNode(updateMode).forEach((layer) => {
-    applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, newTheme);
+    applySiblingStyleId(layer, allStyleIds, mappedStyleReferences, activeThemes);
   });
 }

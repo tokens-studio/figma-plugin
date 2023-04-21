@@ -10,7 +10,7 @@ export type TokenStore = {
   values: Record<string, AnyTokenList>;
   usedTokenSet?: UsedTokenSetsMap | null;
   checkForChanges?: boolean | null;
-  activeTheme: string | null;
+  activeTheme: Record<string, string>;
   themes: ThemeObjectsList;
   storageType?: StorageType;
 };

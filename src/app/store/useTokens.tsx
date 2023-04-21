@@ -250,7 +250,7 @@ export default function useTokens() {
         tokens: tokensToCreate,
         settings,
       });
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 

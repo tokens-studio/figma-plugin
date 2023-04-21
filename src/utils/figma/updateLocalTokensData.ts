@@ -12,7 +12,7 @@ type Payload = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
   usedTokenSets: UsedTokenSetsMap
-  activeTheme: string | null
+  activeTheme: Record<string, string>
   updatedAt: string
   checkForChanges: boolean
   collapsedTokenSets: string[]

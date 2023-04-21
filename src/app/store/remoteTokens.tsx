@@ -28,7 +28,7 @@ type PullTokensOptions = {
   context?: StorageTypeCredentials,
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
-  activeTheme?: string | null
+  activeTheme?: Record<string, string>
   collapsedTokenSets?: string[] | null
 };
 
@@ -109,7 +109,7 @@ export default function useRemoteTokens() {
       dispatch.tokenState.setTokenData({
         values: remoteData.tokens,
         themes: remoteData.themes,
-        activeTheme: activeTheme ?? null,
+        activeTheme: activeTheme ?? {},
         usedTokenSet: usedTokenSet ?? {},
       });
       dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
@@ -354,7 +354,7 @@ export default function useRemoteTokens() {
 
   const fetchTokensFromFileOrDirectory = useCallback(async ({
     files, usedTokenSet, activeTheme,
-  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: string | null }) => {
+  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: Record<string, string> }) => {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
@@ -365,7 +365,7 @@ export default function useRemoteTokens() {
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
           themes: remoteData.themes,
-          activeTheme: activeTheme ?? null,
+          activeTheme: activeTheme ?? {},
           usedTokenSet: usedTokenSet ?? {},
         });
         track('Launched with token sets', {
