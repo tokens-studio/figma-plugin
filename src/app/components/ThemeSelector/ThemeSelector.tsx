@@ -25,6 +25,11 @@ const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
 
+type AvailableTheme = {
+  value: string
+  label: string
+  group?: string
+};
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
@@ -75,6 +80,26 @@ export const ThemeSelector: React.FC = () => {
     return 'None';
   }, [activeTheme, availableThemes]);
 
+  const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.filter((t) => typeof t.group === 'undefined').map(({ label, value }) => {
+    const handleSelect = () => handleSelectTheme(value);
+    return (
+      <DropdownMenuRadioItem
+        key={value}
+        value={value}
+        data-cy={`themeselector--themeoptions--${value}`}
+        data-testid={`themeselector--themeoptions--${value}`}
+          // @README we can disable this because we are using Memo for the whole list anyways
+          // eslint-disable-next-line react/jsx-no-bind
+        onSelect={handleSelect}
+      >
+        <DropdownMenuItemIndicator>
+          <CheckIcon />
+        </DropdownMenuItemIndicator>
+        {label}
+      </DropdownMenuRadioItem>
+    );
+  }), [handleSelectTheme]);
+
   const availableThemeOptions = useMemo(() => (
     <>
       {
@@ -82,25 +107,7 @@ export const ThemeSelector: React.FC = () => {
           <DropdownMenuRadioGroup value={typeof activeTheme?.noGroup !== 'undefined' ? activeTheme.noGroup : ''}>
             <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>No Group</Text>
             {
-              availableThemes.filter((t) => typeof t.group === 'undefined').map(({ label, value }) => {
-                const handleSelect = () => handleSelectTheme(value);
-                return (
-                  <DropdownMenuRadioItem
-                    key={value}
-                    value={value}
-                    data-cy={`themeselector--themeoptions--${value}`}
-                    data-testid={`themeselector--themeoptions--${value}`}
-                    // @README we can disable this because we are using Memo for the whole list anyways
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onSelect={handleSelect}
-                  >
-                    <DropdownMenuItemIndicator>
-                      <CheckIcon />
-                    </DropdownMenuItemIndicator>
-                    {label}
-                  </DropdownMenuRadioItem>
-                );
-              })
+              renderThemeOption(availableThemes.filter((t) => typeof t.group === 'undefined'))
             }
           </DropdownMenuRadioGroup>
         )
@@ -113,25 +120,7 @@ export const ThemeSelector: React.FC = () => {
             <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
               <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
               {
-                filteredThemes.map(({ label, value }) => {
-                  const handleSelect = () => handleSelectTheme(value);
-                  return (
-                    <DropdownMenuRadioItem
-                      key={value}
-                      value={value}
-                      data-cy={`themeselector--themeoptions--${value}`}
-                      data-testid={`themeselector--themeoptions--${value}`}
-                      // @README we can disable this because we are using Memo for the whole list anyways
-                      // eslint-disable-next-line react/jsx-no-bind
-                      onSelect={handleSelect}
-                    >
-                      <DropdownMenuItemIndicator>
-                        <CheckIcon />
-                      </DropdownMenuItemIndicator>
-                      {label}
-                    </DropdownMenuRadioItem>
-                  );
-                })
+                renderThemeOption(filteredThemes)
               }
             </DropdownMenuRadioGroup>
             )
@@ -139,7 +128,7 @@ export const ThemeSelector: React.FC = () => {
         })
       }
     </>
-  ), [availableThemes, handleSelectTheme, groupNames, activeTheme]);
+  ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
@@ -157,9 +146,9 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           {availableThemes.length === 0 && (
-          <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-            <Text>No themes</Text>
-          </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text>No themes</Text>
+            </DropdownMenuRadioItem>
           )}
           {availableThemeOptions}
           <DropdownMenuSeparator />
