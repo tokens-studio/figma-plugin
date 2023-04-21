@@ -59,7 +59,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   // rename styles
   if (options.renameStyle && activeThemes.length > 0) {
     // Filter styles whose name starts with one of activeTheme (e.g light/color/black,  desktop/color/black, we ignore dark/color/black)
-    allStyles.filter((style) => activeThemes.map((theme) => `${theme.name}/`).includes(style.name)).forEach((style) => {
+    allStyles.filter((style) => activeThemes.map((theme) => `${theme.name}/`).some((n) => style.name.startsWith(n))).forEach((style) => {
       if (figmaStyleReferences) {
         Object.entries(figmaStyleReferences).forEach(([tokenName, styleIds]) => {
           if (styleIds.includes(style.id) && style.name !== tokenName) {
