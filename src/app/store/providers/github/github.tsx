@@ -32,7 +32,7 @@ export function useGitHub() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
     const splitContextId = context.id.split('/');
@@ -111,7 +111,7 @@ export function useGitHub() {
           themes,
         };
       } catch (e) {
-        closeDialog();
+        closePushDialog();
         console.log('Error pushing to GitHub', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -137,7 +137,7 @@ export function useGitHub() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
-    closeDialog,
+    closePushDialog,
     tokens,
     themes,
     localApiState,

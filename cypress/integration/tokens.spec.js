@@ -8,8 +8,8 @@ const fillTokenForm = ({
   value
 }) => {
   cy.get('input[name=name]').type(name);
-  cy.get('input[name=value]').type(value);
-  cy.get('input[name=value]').type('{enter}');
+  cy.get('[data-cy=mention-input-value]').type(value);
+  cy.get('input[name=name]').type('{enter}');
 };
 
 const fillInput = ({
@@ -24,16 +24,28 @@ const fillInput = ({
   }
 };
 
+const fillValueInput = ({
+  submit = false,
+  input,
+  value
+}) => {
+  cy.get(`[data-cy=mention-input-${input}]`).type(`{selectall} ${value}`);
+
+  if (submit) {
+    cy.get(`[data-cy=mention-input-${input}]`).type('{enter}');
+  }
+};
+
 const fillInputNth = ({
   submit = false,
   input,
   value,
   nth,
 }) => {
-  cy.get(`input[name=${input}]`).eq(nth).type(`{selectall}${value}`);
+  cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type(`{selectall}${value}`);
 
   if (submit) {
-    cy.get(`input[name=${input}]`).eq(nth).type('{enter}');
+    cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type('{enter}');
   }
 };
 
@@ -147,23 +159,23 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'boxshadow.regular',
     });
-    fillInput({
+    fillValueInput({
       input: 'x',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'y',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'spread',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'color',
       value: '#ff0000',
     });
-    fillInput({
+    fillValueInput({
       input: 'blur',
       value: '0',
       submit: true,
@@ -197,23 +209,23 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'boxshadow.large',
     });
-    fillInput({
+    fillValueInput({
       input: 'x',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'y',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'spread',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'color',
       value: '#ff0000',
     });
-    fillInput({
+    fillValueInput({
       input: 'blur',
       value: '0',
     });
@@ -259,27 +271,27 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'typography.regular',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontFamily',
       value: 'Inter',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontWeight',
       value: 'Bold',
     });
-    fillInput({
+    fillValueInput({
       input: 'lineHeight',
       value: '100%',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontSize',
       value: '14',
     });
-    fillInput({
+    fillValueInput({
       input: 'letterSpacing',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'paragraphSpacing',
       value: '0',
       submit: true,
@@ -384,7 +396,7 @@ describe('TokenListing', () => {
     });
     cy.get('[data-cy=composition-token-dropdown]').click();
     cy.get('[data-cy=item-dropdown-menu-element-sizing]').click();
-    fillInput({
+    fillValueInput({
       input: 'value',
       value: '$sizing.xs',
     });

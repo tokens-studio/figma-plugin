@@ -1256,4 +1256,117 @@ describe('editToken', () => {
       },
     ]);
   });
+
+  it('should be able to set changedState', () => {
+    store.dispatch.tokenState.setChangedState({
+      tokens: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+          {
+            name: 'alias',
+            value: '$primary',
+          },
+          {
+            name: 'primary50',
+            value: '0.50',
+          },
+          {
+            name: 'alias50',
+            value: '$primary50',
+          },
+          {
+            name: 'header 1',
+            type: 'typography',
+            value: {
+              fontWeight: '400',
+              fontSize: '16',
+            },
+          },
+          {
+            name: 'header 1',
+            type: 'typography',
+            value: {
+              fontWeight: '400',
+              fontSize: '16',
+            },
+          },
+          {
+            name: 'shadow.mixed',
+            type: 'boxShadow',
+            description: 'the one with mixed shadows',
+            value: shadowArray,
+          },
+          {
+            name: 'font.big',
+            type: 'sizing',
+            value: '24px',
+          },
+          {
+            name: 'font.small',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+        ],
+      },
+      themes: [],
+    });
+    const { changedState } = store.getState().tokenState;
+    expect(changedState).toEqual({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+        options: [
+          {
+            importType: 'REMOVE',
+            name: 'background',
+            value: '$primary',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+    });
+  });
+
+  it('should be able to reset changedState', () => {
+    store.dispatch.tokenState.resetChangedState();
+    const { changedState } = store.getState().tokenState;
+    expect(changedState).toEqual({
+      tokens: {},
+      themes: [],
+    });
+  });
 });

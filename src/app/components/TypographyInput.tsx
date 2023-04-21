@@ -35,8 +35,8 @@ export default function TypographyInput({
   handleDownShiftInputChange,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.TYPOGRAPHY }>;
-  handleTypographyValueChange: React.ChangeEventHandler;
-  handleTypographyAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTypographyValueChange: (property: string, value: string) => void;
+  handleTypographyAliasValueChange: (property: string, value: string) => void;
   resolvedTokens: ResolveTokenValuesResult[];
   handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;

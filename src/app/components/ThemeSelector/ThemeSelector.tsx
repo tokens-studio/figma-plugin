@@ -80,7 +80,7 @@ export const ThemeSelector: React.FC = () => {
     return 'None';
   }, [activeTheme, availableThemes]);
 
-  const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.filter((t) => typeof t.group === 'undefined').map(({ label, value }) => {
+  const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.map(({ label, value }) => {
     const handleSelect = () => handleSelectTheme(value);
     return (
       <DropdownMenuRadioItem

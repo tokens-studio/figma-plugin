@@ -26,9 +26,9 @@ const RemConfiguration = () => {
     }))
   ), [tokens, usedTokenSet, activeTokenSet]);
 
-  const handleBaseFontSizeChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    dispatch.settings.setAliasBaseFontSize(e.target.value);
-    const resolvedValue = getAliasValue(e.target.value, resolvedTokens);
+  const handleBaseFontSizeChange = React.useCallback((property: string, value: string) => {
+    dispatch.settings.setAliasBaseFontSize(value);
+    const resolvedValue = getAliasValue(value, resolvedTokens);
     if (typeof resolvedValue === 'string' || typeof resolvedValue === 'number') {
       dispatch.settings.setBaseFontSize(String(resolvedValue));
     }

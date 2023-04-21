@@ -74,7 +74,9 @@ export default function CreateBranchModal({
       if (response) {
         onSuccess(branch, branches ?? []);
         if (!isCurrentChanges) {
-          await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+          await pullTokens({
+            context: { ...apiData, branch }, usedTokenSet, activeTheme,
+          });
         }
       } else {
         setHasErrored(true);

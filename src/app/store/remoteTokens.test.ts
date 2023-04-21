@@ -31,10 +31,14 @@ const mockSetBranches = jest.fn();
 const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
-const mockCloseDialog = jest.fn();
+const mockClosePushDialog = jest.fn();
+const mockShowPullDialog = jest.fn();
+const mockClosePullDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
+const mocksetChangedState = jest.fn();
+const mockResetChangedState = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -79,6 +83,8 @@ jest.mock('react-redux', () => ({
       setTokenData: mockSetTokenData,
       setEditProhibited: mockSetEditProhibited,
       setCollapsedTokenSets: mockSetCollapsedTokenSets,
+      setChangedState: mocksetChangedState,
+      resetChangedState: mockResetChangedState,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -185,7 +191,14 @@ jest.mock('../hooks/usePushDialog', () => ({
   __esModule: true,
   default: () => ({
     pushDialog: mockPushDialog,
-    closeDialog: mockCloseDialog,
+    closePushDialog: mockClosePushDialog,
+  }),
+}));
+jest.mock('../hooks/usePullDialog', () => ({
+  __esModule: true,
+  default: () => ({
+    showPullDialog: mockShowPullDialog,
+    closePullDialog: mockClosePullDialog,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -454,11 +467,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(1);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -503,11 +511,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(0);
         expect(mockSetTokenData).toBeCalledTimes(0);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -542,11 +545,6 @@ describe('remoteTokens', () => {
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(mockPushDialog).toBeCalledTimes(1);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -667,7 +665,7 @@ describe('remoteTokens', () => {
           throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
         });
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
       });
     }
   });
@@ -734,7 +732,7 @@ describe('remoteTokens', () => {
         });
 
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
           errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
