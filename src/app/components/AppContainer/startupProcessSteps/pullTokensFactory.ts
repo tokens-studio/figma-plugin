@@ -71,7 +71,7 @@ export function pullTokensFactory(
           dispatch.uiState.setApiData(matchingSet);
           dispatch.uiState.setLocalApiState(matchingSet);
           // we don't want to update nodes if we're pulling from remote
-          dispatch.tokenState.setActiveTheme({ activeThemeObj: activeTheme || null, shouldUpdateNodes: false });
+          dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
           if (shouldPull) {

@@ -2,7 +2,6 @@ import React, {
   useCallback, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import compact from 'just-compact';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -26,7 +25,15 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const groupNames = useMemo(() => compact(themes.map((theme) => theme.group)), [themes]);
+  const groupNames = useMemo(() => {
+    const newArray: string[] = [];
+    themes.forEach((theme) => {
+      if (theme.group !== undefined && !newArray.includes(theme.group)) {
+        newArray.push(theme.group);
+      }
+    });
+    return newArray;
+  }, [themes]);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
-import compact from 'just-compact';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -31,15 +30,23 @@ export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-  const groupNames = useMemo(() => compact(availableThemes.map((theme) => theme.group)), [availableThemes]);
+  const groupNames = useMemo(() => {
+    const newArray: string[] = [];
+    availableThemes.forEach((theme) => {
+      if (theme.group !== undefined && !newArray.includes(theme.group)) {
+        newArray.push(theme.group);
+      }
+    });
+    return newArray;
+  }, [availableThemes]);
   const handleClearTheme = useCallback(() => {
-    dispatch.tokenState.setActiveTheme({ activeThemeObj: {}, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ newActiveTheme: {}, shouldUpdateNodes: true });
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? 'noGroup';
     const nextTheme = activeTheme;
-    if (typeof nextTheme[groupOfTheme] !== 'undefined') {
+    if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
       delete nextTheme[groupOfTheme];
     } else {
       nextTheme[groupOfTheme] = themeId;
@@ -49,7 +56,7 @@ export const ThemeSelector: React.FC = () => {
     } else {
       track('Reset theme');
     }
-    dispatch.tokenState.setActiveTheme({ activeThemeObj: nextTheme, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ newActiveTheme: nextTheme, shouldUpdateNodes: true });
   }, [dispatch, activeTheme, availableThemes]);
 
   const handleManageThemes = useCallback(() => {

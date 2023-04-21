@@ -45,7 +45,7 @@ export const SingleThemeEntry: React.FC<Props> = ({
     } else {
       newActiveTheme[groupName] = theme.id;
     }
-    dispatch.tokenState.setActiveTheme({ activeThemeObj: newActiveTheme, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ newActiveTheme, shouldUpdateNodes: true });
   }, [dispatch, theme.id, isActive, activeTheme, groupName]);
 
   return (

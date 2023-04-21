@@ -10,9 +10,9 @@ export function assignStyleIdsToCurrentTheme(state: TokenState, styleIds: Record
   const activeThemes = state.themes.filter((theme) => Object.values(state.activeTheme).some((v) => v === theme.id));
   Object.entries(styleIds).forEach(([tokenName, styleId]) => {
     // Find the activeTheme object which involved this token
-    const activeThemeObject = activeThemes.reverse().find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED
+    const newActiveTheme = activeThemes.reverse().find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED
         && tokenSet === tokens.find((t) => t.name === tokenName)?.internal__Parent));
-    const themeObjectIndex = state.themes.findIndex(({ id }) => activeThemeObject?.id === id);
+    const themeObjectIndex = state.themes.findIndex(({ id }) => newActiveTheme?.id === id);
     if (themeObjectIndex !== -1) {
       updatedThemes.splice(themeObjectIndex, 1, {
         ...state.themes[themeObjectIndex],
