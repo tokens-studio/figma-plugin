@@ -19,6 +19,7 @@ describe('PushDialog', () => {
         localApiState: {
           branch: 'main',
           provider: StorageProviderType.GITHUB,
+          id: '1234',
         },
       },
     });
@@ -30,8 +31,6 @@ describe('PushDialog', () => {
     );
     expect(result.getByText('Push changes')).toBeInTheDocument();
     expect(result.getByText('Commit message')).toBeInTheDocument();
-    expect(result.getByText('Push')).toBeInTheDocument();
-
     result.unmount();
   });
 
@@ -73,6 +72,11 @@ describe('PushDialog', () => {
         <PushDialog />
       </Provider>,
     );
+
+    const commitMessageInput = result.getByTestId('push-dialog-commit-message');
+    fireEvent.change(commitMessageInput, {
+      target: { value: 'initial commit' },
+    });
 
     act(() => {
       fireEvent.keyDown(document, {

@@ -321,6 +321,9 @@ export class ADOTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      if (singleItem.errorCode === 0) {
+        return [];
+      }
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };

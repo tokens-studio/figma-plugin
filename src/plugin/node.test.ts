@@ -1,7 +1,7 @@
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  destructureToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders,
+  destructureToken, mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders, destructureTokenForAlias,
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -134,6 +134,14 @@ const tokens = new Map([
       value: multipleShadowToken.value,
     },
   ],
+  ['global.border.general',
+    {
+      ...borderToken,
+      name: 'border.general',
+      rawValue: borderToken.value,
+      value: borderToken.value,
+    },
+  ],
 ]);
 
 const values = [
@@ -144,6 +152,7 @@ const values = [
   { composition: 'global.composition.containMultiBoxshadow' },
   { boxShadow: 'global.shadow.single' },
   { boxShadow: 'global.shadow.multiple' },
+  { border: 'global.border.general' },
 ];
 
 const mappedTokens = [
@@ -205,10 +214,77 @@ const applyProperties = [
   { borderBottom: borderToken.value, borderColor: '#ff0000' },
 ];
 
+const applyTokens = [
+  { fill: 'global.colors.blue' },
+  { opacity: 'opacity.40' },
+  {
+    opacity: 'opacity.40',
+    borderRadius: 'border-radius.7',
+  },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { border: 'global.border.general', borderColor: 'global.border.general' },
+];
+
 describe('mapValuesToTokens', () => {
   it('maps values to tokens', () => {
     values.forEach((value, index) => {
       expect(mapValuesToTokens(tokens, value)).toEqual(mappedTokens[index]);
+    });
+  });
+
+  it('return rawValue with modifier', () => {
+    const tokens = new Map([
+      ['global.colors.mix',
+        {
+          name: 'global.colors.mix',
+          type: 'color' as const,
+          value: '#0000ff',
+          rawValue: '#0000ff',
+          $extensions: {
+            'studio.tokens': {
+              modify: {
+                type: 'mix',
+                value: 0.4,
+                space: 'lch',
+                color: '#0033ff',
+              },
+            },
+          },
+        },
+      ],
+      ['global.colors.lighten',
+        {
+          name: 'global.colors.lighten',
+          type: 'color' as const,
+          value: '#0000ff',
+          rawValue: '#0000ff',
+          $extensions: {
+            'studio.tokens': {
+              modify: {
+                type: 'lighten',
+                value: 0.4,
+                space: 'lch',
+              },
+            },
+          },
+        },
+      ],
+    ]);
+
+    const values = [
+      { tokenValue: 'global.colors.lighten' },
+      { tokenValue: 'global.colors.mix' },
+    ];
+
+    const output = [
+      { tokenValue: '#0000ff / lighten(0.4) / lch' }, { tokenValue: '#0000ff / mix(#0033ff, 0.4) / lch' },
+    ];
+
+    values.forEach((value, index) => {
+      expect(mapValuesToTokens(tokens, value)).toEqual(output[index]);
     });
   });
 });
@@ -217,6 +293,14 @@ describe('destructureToken', () => {
   it('return properties in compositionToken', () => {
     mappedTokens.forEach((token, index) => {
       expect(destructureToken(token)).toEqual(applyProperties[index]);
+    });
+  });
+});
+
+describe('destructureTokenForAliasa', () => {
+  it('return extract border color from border token', () => {
+    values.forEach((value, index) => {
+      expect(destructureTokenForAlias(tokens, value)).toEqual(applyTokens[index]);
     });
   });
 });

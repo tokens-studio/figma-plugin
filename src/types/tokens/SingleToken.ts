@@ -1,3 +1,4 @@
+import { SingleBooleanToken } from './SingleBooleanToken';
 import { SingleColorToken } from './SingleColorToken';
 import { SingleBorderRadiusToken } from './SingleBorderRadiusToken';
 import { SingleTextToken } from './SingleTextToken';
@@ -42,4 +43,5 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleCompositionToken<Named, P>
   | SingleCompositionToken<Named, P>
   | SingleDimensionToken<Named, P>
-  | SingleAssetToken<Named, P>;
+  | SingleAssetToken<Named, P>
+  | SingleBooleanToken<Named, P>;

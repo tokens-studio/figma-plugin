@@ -6,9 +6,11 @@ import {
   activeTokenSetSelector,
   collapsedTokenSetsSelector,
   editProhibitedSelector,
+  tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { isEqual } from '@/utils/isEqual';
 import {
   tokenSetListToTree, TreeItem, findOrderableTargetIndexesInTokenSetTreeList, ensureFolderIsTogether,
 } from '@/utils/tokenset';
@@ -43,11 +45,19 @@ type TokenSetTreeProps = {
 export default function TokenSetTree({
   tokenSets, onReorder, onRename, onDelete, onDuplicate, saveScrollPositionSet,
 }: TokenSetTreeProps) {
+  const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const items = tokenSetListToTree(tokenSets);
+
+  React.useEffect(() => {
+    // Compare saved tokenSet order with GUI tokenSet order and update the tokenSet if there is a difference
+    if (!isEqual(Object.keys(tokens), items.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
+      onReorder(items.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
+    }
+  }, [items, tokens, onReorder]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {

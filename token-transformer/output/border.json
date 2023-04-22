@@ -1,0 +1,18 @@
+{
+  "border": {
+    "base": {
+      "width": {
+        "value": 4,
+        "type": "dimension"
+      },
+      "color": {
+        "value": "#1B1F24",
+        "type": "color"
+      },
+      "style": {
+        "value": "solid",
+        "type": "strokeStyle"
+      }
+    }
+  }
+}

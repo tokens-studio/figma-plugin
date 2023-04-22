@@ -12,7 +12,9 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { apiSelector } from '@/selectors';
+import {
+  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -23,12 +25,16 @@ import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponse
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { isEqual } from '@/utils/isEqual';
+import usePullDialog from '../hooks/usePullDialog';
+import { Tabs } from '@/constants/Tabs';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
   activeTheme?: string | null
+  collapsedTokenSets?: string[] | null
 };
 
 // @TODO typings and hooks
@@ -36,6 +42,10 @@ type PullTokensOptions = {
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
+  const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
+  const activeTab = useSelector(activeTabSelector);
+  const { showPullDialog, closePullDialog } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -61,14 +71,10 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_PULLTOKENS,
-      isInfinite: true,
-    });
-
+    showPullDialog('loading');
     let remoteData: RemoteResponseData<unknown> | null = null;
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
@@ -103,24 +109,38 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
-
-      dispatch.tokenState.setTokenData({
-        values: remoteData.tokens,
-        themes: remoteData.themes,
-        activeTheme: activeTheme ?? null,
-        usedTokenSet: usedTokenSet ?? {},
-      });
-      dispatch.tokenState.setCollapsedTokenSets([]);
-      track('Launched with token sets', {
-        count: Object.keys(remoteData.tokens).length,
-        setNames: Object.keys(remoteData.tokens),
-      });
+      if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
+        let shouldOverride = false;
+        if (activeTab !== Tabs.LOADING) {
+          dispatch.tokenState.setChangedState({
+            tokens: remoteData.tokens,
+            themes: remoteData.themes,
+          });
+          shouldOverride = !!await showPullDialog();
+        }
+        if (shouldOverride || activeTab === Tabs.LOADING) {
+          saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+          dispatch.tokenState.setTokenData({
+            values: remoteData.tokens,
+            themes: remoteData.themes,
+            activeTheme: activeTheme ?? null,
+            usedTokenSet: usedTokenSet ?? {},
+          });
+          dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+          track('Launched with token sets', {
+            count: Object.keys(remoteData.tokens).length,
+            setNames: Object.keys(remoteData.tokens),
+          });
+        }
+      }
     }
-
-    dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+    dispatch.tokenState.resetChangedState();
+    closePullDialog();
     return remoteData;
   }, [
+    tokens,
+    themes,
+    activeTab,
     dispatch,
     api,
     pullTokensFromGenericVersionedStorage,
@@ -130,6 +150,8 @@ export default function useRemoteTokens() {
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
+    showPullDialog,
+    closePullDialog,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {

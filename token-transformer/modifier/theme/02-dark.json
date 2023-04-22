@@ -1,0 +1,23 @@
+{
+  "color": {
+    "button": {
+      "primary": {
+        "press": {
+          "bg-color": {
+            "value": "#00a2ba",
+            "type": "color",
+            "$extensions": {
+              "studio.tokens": {
+                "modify": {
+                  "type": "darken",
+                  "value": "0.3",
+                  "space": "srgb"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

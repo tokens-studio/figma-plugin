@@ -151,6 +151,8 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     expect(result.getByText('#e2e8f0')).toBeInTheDocument();
     expect(result.getByText('#b91c1c')).toBeInTheDocument();
+    result.getByText('#e2e8f0').click();
+    expect(result.queryByText('#e2e8f0')).not.toBeInTheDocument();
   });
 
   it('should return filtered color tokens', async () => {
@@ -222,6 +224,8 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     result.getByText('Fonts').click();
     expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
+    result.getAllByTestId('downshift-input-item')[0].click();
+    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
   });
 
   it('should return fontWeights when type is fontWeight', () => {
@@ -260,5 +264,26 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     result.getByText('Weights').click();
     expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
+    fireEvent.focus(result.getByTestId('mention-input-value'));
+    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
+  });
+
+  it('should blankBox when there is no matching suggestions', async () => {
+    const result = render(
+      <DownshiftInput
+        type="color"
+        resolvedTokens={resolvedTokens}
+        setInputValue={mockSetInputValue}
+        handleChange={mockHandleChange}
+        value="{"
+        suffix
+      />,
+    );
+    result.getByTestId('downshift-input-suffix-button').click();
+    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+    fireEvent.change(searchInput, {
+      target: { value: 'nonexist' },
+    });
+    expect(result.getByText('No suggestions found')).toBeInTheDocument();
   });
 });

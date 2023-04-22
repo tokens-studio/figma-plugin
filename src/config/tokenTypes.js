@@ -234,6 +234,17 @@ const tokenTypes = {
       },
     },
   },
+  boolean: {
+    label: 'Boolean',
+    property: 'Boolean',
+    type: 'boolean',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+    explainer: 'true | false',
+  },
   other: {
     label: 'Other',
     property: 'other',

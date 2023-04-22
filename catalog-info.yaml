@@ -1,0 +1,25 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: figma-plugin
+  title: Figma Plugin
+  description: The Figma plugin monorepo
+  links:
+    - url: https://docs.tokens.studio/
+      title: Documentation
+      icon: dashboard
+    - url: https://www.figma.com/community/plugin/843461159747178978
+      title: Figma Plugin 
+      icon: dashboard
+  annotations:
+    github.com/project-slug: tokens-studio/figma-plugin
+    sentry.io/project-slug: figma-tokens
+spec:
+  type: library
+  system: tokens-studio
+  lifecycle: production
+  owner: user:default/jan@hyma.io 
+  dependsOn:
+    - component/default:stripe-keygen-integration
+    - component/default:customer-portal
+    - component/default:token-studio-sdk

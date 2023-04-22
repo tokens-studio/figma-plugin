@@ -118,7 +118,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
-  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleChange = React.useCallback(
+    (property: string, value: string) => {
+      setError(null);
+      if (internalEditToken) {
+        setInternalEditToken({ ...internalEditToken, [property]: value });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
       if (internalEditToken) {
@@ -156,16 +166,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
+  const handleTypographyValueChange = React.useCallback(
+    (property: string, value: string) => {
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: {
-            ...internalEditToken.value,
-            [e.target.name]: e.target.value,
-          },
-        });
+        if (value) {
+          setInternalEditToken({
+            ...internalEditToken,
+            value: {
+              ...internalEditToken.value,
+              [property]: value,
+            },
+          });
+        } else if (internalEditToken.value) {
+          delete internalEditToken.value[property as keyof typeof internalEditToken.value];
+          setInternalEditToken({
+            ...internalEditToken,
+          });
+        }
       }
     },
     [internalEditToken],
@@ -180,14 +197,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken]);
 
-  const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
+  const handleBorderValueChange = React.useCallback(
+    (property: string, value: string) => {
       if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,
           value: {
             ...internalEditToken.value,
-            [e.target.name]: e.target.value,
+            [property]: value,
           },
         });
       }
@@ -488,7 +505,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           full
           label="Name"
           value={internalEditToken?.name}
-          onChange={handleChange}
+          onChange={handleNameChange}
           type="text"
           autofocus
           name="name"

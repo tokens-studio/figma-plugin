@@ -99,37 +99,39 @@ export function TokenSetItem({
 
   return (
     <StyledWrapper>
-      {!item.isLeaf ? (
-        <StyledDragButton
-          itemType="folder"
-          type="button"
-          data-testid={`tokensetitem-${item.path}`}
-          css={{
-            paddingLeft: `${5 * item.level}px`,
-          }}
-          isActive={isActive}
-          onClick={handleClick}
-        >
-          <DragGrabber
-            item={item}
-            canReorder={canReorder}
-            onDragStart={handleGrabberPointerDown}
-          />
-          <Box
-            css={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              color: '$textMuted',
-              fontWeight: '$normal',
-              userSelect: 'none',
-            }}
-          >
-            {item.label}
-          </Box>
-          {extraBefore}
-        </StyledDragButton>
-      ) : (
-        <ContextMenu>
+      <ContextMenu>
+        {!item.isLeaf ? (
+          <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+            <StyledDragButton
+              itemType="folder"
+              type="button"
+              data-testid={`tokensetitem-${item.path}`}
+              css={{
+                paddingLeft: `${5 * item.level}px`,
+              }}
+              isActive={isActive}
+              onClick={handleClick}
+            >
+              <DragGrabber
+                item={item}
+                canReorder={canReorder}
+                onDragStart={handleGrabberPointerDown}
+              />
+              <Box
+                css={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: '$textMuted',
+                  fontWeight: '$normal',
+                  userSelect: 'none',
+                }}
+              >
+                {item.label}
+              </Box>
+              {extraBefore}
+            </StyledDragButton>
+          </ContextMenuTrigger>
+        ) : (
           <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
             <StyledDragButton
               type="button"
@@ -156,25 +158,28 @@ export function TokenSetItem({
               </Box>
             </StyledDragButton>
           </ContextMenuTrigger>
-          {canEdit ? (
-            <ContextMenuContent>
-              <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
-              <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
-              <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
-                Delete
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
-                <ContextMenuItemIndicator>
-                  <CheckIcon />
-                </ContextMenuItemIndicator>
-                Treat as source
-              </ContextMenuCheckboxItem>
-            </ContextMenuContent>
-          ) : null}
-        </ContextMenu>
-      )}
-
+        )}
+        {canEdit ? (
+          <ContextMenuContent>
+            <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
+            {item.isLeaf && (
+              <>
+                <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
+                <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
+                  Delete
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
+                  <ContextMenuItemIndicator>
+                    <CheckIcon />
+                  </ContextMenuItemIndicator>
+                  Treat as source
+                </ContextMenuCheckboxItem>
+              </>
+            )}
+          </ContextMenuContent>
+        ) : null}
+      </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         <Checkbox
           id={item.path}

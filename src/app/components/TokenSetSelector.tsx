@@ -48,7 +48,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const [showNewTokenSetFields, setShowNewTokenSetFields] = React.useState(false);
   const [showRenameTokenSetFields, setShowRenameTokenSetFields] = React.useState(false);
   const [newTokenSetName, handleNewTokenSetNameChange] = React.useState('');
-  const [tokenSetMarkedForChange, setTokenSetMarkedForChange] = React.useState('');
+  const [oldTokenSetName, setOldTokenSetName] = React.useState('');
   const [isDuplicate, setIsDuplicate] = React.useState(false);
   const allTokenSets = React.useMemo(() => Object.keys(tokens), [tokens]);
 
@@ -62,13 +62,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   React.useEffect(() => {
     setShowNewTokenSetFields(false);
-    handleNewTokenSetNameChange(tokenSetMarkedForChange);
   }, [tokens]);
 
   const handleNewTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
     dispatch.tokenState.addTokenSet(newTokenSetName.trim());
+    handleNewTokenSetNameChange('');
   }, [dispatch, newTokenSetName]);
 
   const handleDeleteTokenSet = React.useCallback(async (tokenSet: string) => {
@@ -86,28 +86,33 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
     handleNewTokenSetNameChange(tokenSet);
-    setTokenSetMarkedForChange(tokenSet);
+    setOldTokenSetName(tokenSet);
     setIsDuplicate(false);
     setShowRenameTokenSetFields(true);
   }, []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
     const newTokenSetName = `${tokenSet}_Copy`;
-    track('Duplicate token set', { name: newTokenSetName });
-    dispatch.tokenState.duplicateTokenSet(tokenSet);
-
     handleNewTokenSetNameChange(newTokenSetName);
-    setTokenSetMarkedForChange(newTokenSetName);
+    setOldTokenSetName(tokenSet);
     setIsDuplicate(true);
     setShowRenameTokenSetFields(true);
-  }, [dispatch]);
+  }, []);
 
   const handleRenameTokenSetSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch.tokenState.renameTokenSet({ oldName: tokenSetMarkedForChange, newName: newTokenSetName.trim() });
-    setTokenSetMarkedForChange('');
+    if (isDuplicate) {
+      track('Duplicate token set', { name: newTokenSetName });
+      dispatch.tokenState.duplicateTokenSet(newTokenSetName, oldTokenSetName);
+    } else if (tokens.hasOwnProperty(oldTokenSetName)) {
+      dispatch.tokenState.renameTokenSet({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
+    } else {
+      dispatch.tokenState.renameTokenSetFolder({ oldName: oldTokenSetName, newName: newTokenSetName.trim() });
+    }
+    setOldTokenSetName('');
+    handleNewTokenSetNameChange('');
     setShowRenameTokenSetFields(false);
-  }, [dispatch, newTokenSetName, tokenSetMarkedForChange]);
+  }, [dispatch, newTokenSetName, oldTokenSetName, isDuplicate, tokens]);
 
   const handleReorder = useCallback((values: string[]) => {
     dispatch.tokenState.setTokenSetOrder(values);
@@ -123,6 +128,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
 
   const handleCloseRenameModal = useCallback(() => {
     setShowRenameTokenSetFields(false);
+    handleNewTokenSetNameChange('');
   }, []);
 
   const handleChangeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +165,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${tokenSetMarkedForChange}`}
+        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${oldTokenSetName}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
@@ -172,14 +178,17 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               onChange={handleChangeName}
               type="text"
               name="tokensetname"
+              data-testId="rename-set-input"
               required
             />
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" size="large" disabled={tokenSetMarkedForChange === newTokenSetName}>
-                Change
+              <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
+                {
+                  isDuplicate ? 'Save' : 'Change'
+                }
               </Button>
             </Stack>
           </Stack>
@@ -200,6 +209,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               name="tokensetname"
               required
               data-cy="token-set-input"
+              data-testId="create-set-input"
               autofocus
             />
             <Stack direction="row" gap={4}>
@@ -213,7 +223,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-cy="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-cy="button-new-token-set" data-testId="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         New set
         <IconAdd />
       </StyledButton>

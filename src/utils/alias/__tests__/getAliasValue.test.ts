@@ -463,11 +463,84 @@ describe('getAliasValue', () => {
       },
       type: TokenTypes.BORDER,
     },
+    {
+      name: 'color.light-10',
+      input: '#ffffff',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.light-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-10',
+      input: '#000000',
+      value: '#000000',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'color.dark-20',
+      input: '#1f1f1f',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'mode',
+      input: 'light',
+      value: 'light',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'mode',
+      input: 'dark',
+      value: 'dark',
+      type: TokenTypes.OTHER,
+    },
+    {
+      name: 'foreground.default',
+      input: '{color.{mode}-10}',
+      value: '#ffffff',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'foreground.subtle',
+      input: '{color.{mode}-20}',
+      value: '#1f1f1f',
+      type: TokenTypes.COLOR,
+    },
+    {
+      name: 'clamped', input: 'clamped($xx,2,4)', value: 2, type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'clamp', input: 'clamp($xx,2,4)', value: 'clamp(1,2,4)', type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'xx',
+      input: '1',
+      value: 1,
+      type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'yy',
+      input: '0.2',
+      value: 0.2,
+      type: TokenTypes.DIMENSION,
+    },
+    {
+      // Note that we cannot do {sample(cubicBezier1D($yy,$yy),$yy)}px to inject px values, it must have a semantic intermediary as shown in the following
+      name: 'cubicSample', input: 'sample(cubicBezier1D($yy,$yy),$yy)', value: 0.104, type: TokenTypes.DIMENSION,
+    },
+    {
+      name: 'cubicSamplePx', input: '{cubicSample}px', value: '0.104px', type: TokenTypes.DIMENSION,
+    },
   ];
 
   allTokens.forEach((token) => {
     it(`alias ${token.name}`, () => {
-      // @TODO check this test typing
+      // @TODO check this test typing,
       expect(getAliasValue({ ...token, value: token.input, type: token.type } as SingleToken, allTokens as unknown as SingleToken[], false)).toEqual(token.value);
     });
   });

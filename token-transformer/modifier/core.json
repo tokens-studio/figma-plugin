@@ -1,0 +1,18 @@
+{
+  "core": {
+    "color": {
+      "neutral": {
+        "white": {
+          "value": "#ffffff",
+          "type": "color"
+        }
+      },
+      "transparent": {
+        "white-10": {
+          "value": "rgba($core.color.neutral.white, 0.1)",
+          "type": "color"
+        }
+      }
+    }
+  }
+}

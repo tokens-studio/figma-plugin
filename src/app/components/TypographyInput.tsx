@@ -35,8 +35,8 @@ export default function TypographyInput({
   handleDownShiftInputChange,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.TYPOGRAPHY }>;
-  handleTypographyValueChange: React.ChangeEventHandler;
-  handleTypographyAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleTypographyValueChange: (property: string, value: string) => void;
+  handleTypographyAliasValueChange: (property: string, value: string) => void;
   resolvedTokens: ResolveTokenValuesResult[];
   handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
@@ -56,8 +56,7 @@ export default function TypographyInput({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;

@@ -43,7 +43,7 @@ export default function ColorTokenForm({
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COLOR }>;
   resolvedTokens: ResolveTokenValuesResult[];
   resolvedValue: ReturnType<typeof getAliasValue>
-  handleColorChange: React.ChangeEventHandler;
+  handleColorChange: (property: string, value: string) => void;
   handleColorDownShiftInputChange: (newInputValue: string) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
   handleRemoveColorModify: () => void;
@@ -169,11 +169,11 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const handleModifyValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleModifyValueChange = useCallback((property: string, value: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        value: e.target.value.replace(',', '.'),
+        value: value.replace(',', '.'),
       });
     }
   }, [internalEditToken, handleModifyChange]);
@@ -196,11 +196,11 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const handleMixColorInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMixColorInputChange = useCallback((property: string, value: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        color: e.target.value,
+        color: value,
       } as MixModifier);
     }
   }, [internalEditToken, handleModifyChange]);

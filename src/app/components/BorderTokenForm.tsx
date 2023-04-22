@@ -31,9 +31,9 @@ export default function BorderTokenForm({
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.BORDER }>;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleBorderValueChange: React.ChangeEventHandler;
+  handleBorderValueChange: (newInputValue: string, property: string) => void;
   handleBorderValueDownShiftInputChange: (newInputValue: string, property: string) => void;
-  handleBorderAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBorderAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();
@@ -45,8 +45,7 @@ export default function BorderTokenForm({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;

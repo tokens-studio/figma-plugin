@@ -26,6 +26,11 @@ describe('token-transformer', () => {
     var testResult = fs.readFileSync('temp/typography.json');
     expect(testResult.toString()).toEqual(expectedResult.toString());
   });
+  it('generates border theme files correctly', async () => {
+    var expectedResult = fs.readFileSync('output/border.json');
+    var testResult = fs.readFileSync('temp/border.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
   it('generates light theme files correctly from folder', async () => {
     var expectedResult = fs.readFileSync('output/folder-light.json');
     var testResult = fs.readFileSync('temp/folder-light.json');
@@ -59,6 +64,11 @@ describe('token-transformer', () => {
   it('respects order set in $metadata for light hteme', async () => {
     var expectedResult = fs.readFileSync('output/lightOrder.json');
     var testResult = fs.readFileSync('temp/lightOrder.json');
+    expect(testResult.toString()).toEqual(expectedResult.toString());
+  });
+  it('generates color modifier file correctly', async () => {
+    var expectedResult = fs.readFileSync('output/tokens-modifier.json');
+    var testResult = fs.readFileSync('temp/tokens-modifier.json');
     expect(testResult.toString()).toEqual(expectedResult.toString());
   });
 });

@@ -2,7 +2,7 @@ import * as setTextValuesOnTarget from './setTextValuesOnTarget';
 import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
 
-type ExtendedSingleToken = SingleTypographyToken<true, { path: string }>;
+type ExtendedSingleToken = SingleTypographyToken<true, { path: string, styleId: string }>;
 
 const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
 
@@ -18,6 +18,7 @@ const typographyTokens = [
       paragraphSpacing: '48',
       letterSpacing: '-5%',
     },
+    styleId: '',
   },
   {
     name: 'H1.withValueDescription',
@@ -30,6 +31,7 @@ const typographyTokens = [
       paragraphSpacing: '24',
       letterSpacing: '-5%',
     },
+    styleId: '1234',
     description: 'A standard description',
   },
 ] as ExtendedSingleToken[];
@@ -40,6 +42,7 @@ const matchingFigmaStyle = {
     family: 'Inter',
     style: 'Bold',
   },
+  id: '1234',
 };
 
 describe('updateTextStyles', () => {
@@ -63,7 +66,7 @@ describe('updateTextStyles', () => {
 
   it('calls functions with correct transformed values when a matching style was found', () => {
     const baseFontSize = '16';
-    figma.getLocalTextStyles.mockReturnValueOnce([matchingFigmaStyle]);
+    figma.getLocalTextStyles.mockReturnValue([matchingFigmaStyle]);
     updateTextStyles(typographyTokens, baseFontSize);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
