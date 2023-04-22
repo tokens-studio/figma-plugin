@@ -44,6 +44,7 @@ StorageProviderType.GITHUB | StorageProviderType.GITLAB,
   branch: string; // this is the base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
+  commitSha?: string; // this is the commit sha of the current file or folder
 }
 >;
 

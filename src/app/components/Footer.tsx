@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
@@ -34,6 +34,7 @@ import SecondScreen from './SecondScreen';
 import { useFlags } from './LaunchDarkly';
 
 export default function Footer() {
+  const [hasRemoteChange, setHasRemoteChange] = useState(false);
   const storageType = useSelector(storageTypeSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
@@ -44,7 +45,7 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
-  const { pullTokens, pushTokens } = useRemoteTokens();
+  const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { secondScreen } = useFlags();
 
   const checkForChanges = React.useCallback(() => {
@@ -63,13 +64,15 @@ export default function Footer() {
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      console.log('This will run every second!');
-      checkForChanges();
-    }, 1000);
+      checkRemoteChange().then((response: boolean) => {
+        console.log('response', response);
+        setHasRemoteChange(response);
+      });
+    }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [checkRemoteChange]);
 
-  const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
+  const hasChanges = React.useMemo(() => checkForChanges() || hasRemoteChange, [checkForChanges, hasRemoteChange]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
