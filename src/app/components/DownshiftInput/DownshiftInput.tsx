@@ -18,13 +18,13 @@ import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 import { ErrorValidation } from '../ErrorValidation';
 import useFigmaFonts from '@/hooks/useFigmaFonts';
 import { figmaFontsSelector } from '@/selectors';
-import { MentionInput } from './MentionInput';
 import {
   StyledButton,
   StyledDownshiftInput,
   StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
+import MentionsInput from './MentionInput';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 type Arrow = 'top' | 'down';
@@ -43,7 +43,7 @@ interface DownShiftProps {
   externalFontFamily?: string;
   arrow?: Arrow;
   setInputValue(value: string): void;
-  handleChange: React.ChangeEventHandler<HTMLInputElement>;
+  handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
 }
 
@@ -77,7 +77,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const inputContainerRef = React.useRef<HTMLDivElement>(null);
   const downShiftSearchContainerRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const mentionInputRef = React.useRef<HTMLInputElement>(null);
   const portalRef = React.useRef<HTMLDivElement>(null);
   const blankBoxRef = React.useRef<HTMLDivElement>(null);
   const windowHeight = React.useRef(window.innerHeight);
@@ -225,7 +224,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       }
     }
     setShowAutoSuggest(false);
-    mentionInputRef.current?.focus();
   }, [setInputValue, value, currentSearchField]);
 
   const handleAutoSuggest = React.useCallback(() => {
@@ -258,21 +256,16 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
-            <MentionInput
+            <MentionsInput
               name={name}
               type={type}
               value={value}
               initialName={initialName}
               placeholder={placeholder}
               resolvedTokens={resolvedTokens}
-              inputContainerWith={inputContainerWith}
-              inputContainerPosX={inputContainerPosX}
-              inputContainerPosY={inputContainerPosY}
               handleChange={handleChange}
               handleBlur={handleBlur}
-              portalPlaceholder={portalPlaceholder}
               handleOnFocus={handleOnFocus}
-              inputRef={mentionInputRef}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>

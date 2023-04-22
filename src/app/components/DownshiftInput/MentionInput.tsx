@@ -1,89 +1,48 @@
-import React, { useCallback, useMemo } from 'react';
-import ReactDOM from 'react-dom';
-import { Mention, MentionsInput, SuggestionDataItem } from 'react-mentions';
+import React, { useMemo } from 'react';
+import Mentions from 'rc-mentions';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
-import Box from '../Box';
+import { isDocumentationType } from '@/utils/is/isDocumentationType';
+import { Properties } from '@/constants/Properties';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { Properties } from '@/constants/Properties';
-import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
+import './mentions.css';
 import {
-  StyledDropdown, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
+  StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
 
-interface MentionInputProps {
+export interface SuggestionDataItem {
+  id: string;
+  display: string;
+}
+
+interface Props {
+  autoFocus?: boolean;
   name?: string;
   type: string;
   value?: string;
   initialName?: string;
   placeholder?: string;
   resolvedTokens: ResolveTokenValuesResult[];
-  portalPlaceholder: HTMLDivElement
-  inputRef: React.RefObject<HTMLInputElement>;
-  inputContainerWith: number,
-  inputContainerPosX: number,
-  inputContainerPosY: number,
-  handleChange: React.ChangeEventHandler<HTMLInputElement>;
+  handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
   handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
 }
 
-const mentionInputStyles = {
-  width: '100%',
-  input: {
-    width: '100%',
-    height: '28px',
-    padding: '0 var(--space-3)',
-    backgroundColor: 'var(--colors-bgDefault)',
-    border: '1px solid var(--colors-borderMuted)',
-    borderRadius: 'var(--radii-input)',
-    fontSize: 'var(--fontSizes-small)',
-    '&:focus-within': {
-      boxShadow: 'var(--shadows-focus)',
-    },
-  },
-  suggestions: {
-    borderRadius: 'var(--radii-contextMenu)',
-    boxShadow: 'var(--shadows-contextMenu)',
-    background: 'var(--colors-bgDefault)',
-    list: {
-      top: 'var(--space-3)',
-      fontSize: 'var(--fontSizes-small)',
-      borderRadius: 'var(--radii-contextMenu)',
-      cursor: 'pointer',
-      zIndex: '10',
-    },
-    item: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 'var(--space-2)',
-      padding: 'var(--space-2) var(--space-3)',
-      color: 'var(--colors-fgDefault)',
-      fontSize: 'var(--fontSizes-xsmall)',
-      '&focused': {
-        background: 'var(--colors-interaction)',
-      },
-    },
-  },
-};
+const { Option } = Mentions;
 
-export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
+export default function MentionsInput({
+  autoFocus = false,
   name = 'value',
   type,
   value,
   initialName,
   placeholder,
   resolvedTokens,
-  portalPlaceholder,
-  inputContainerWith,
-  inputContainerPosX,
-  inputContainerPosY,
-  inputRef,
   handleChange,
   handleBlur,
   handleOnFocus,
-}) => {
+}: Props) {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
 
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
@@ -92,7 +51,7 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
         .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
           a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
         )).map((resolvedToken) => ({
-          id: resolvedToken.name,
+          id: `${resolvedToken.name}}`,
           display: resolvedToken.name,
         }));
     }
@@ -100,12 +59,22 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
       .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
         a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
       )).map((resolvedToken) => ({
-        id: resolvedToken.name,
+        id: `${resolvedToken.name}}`,
         display: resolvedToken.name,
       }));
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
-  const getHighlightedText = useCallback((text: string, highlight: string) => {
+  const handleMentionInputChange = React.useCallback((newValue: string) => {
+    handleChange(name, newValue);
+  }, [handleChange, name]);
+
+  const handleInputBlur = React.useCallback(() => {
+    if (handleBlur) {
+      handleBlur();
+    }
+  }, [handleBlur]);
+
+  const getHighlightedText = React.useCallback((text: string, highlight: string) => {
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
@@ -121,82 +90,49 @@ export const MentionInput: React.FunctionComponent<MentionInputProps> = ({
     );
   }, []);
 
-  const handleInputBlur = React.useCallback(() => {
-    if (handleBlur) {
-      handleBlur();
-    }
-  }, [handleBlur]);
-
-  const handleMentionInputChange = React.useCallback((e) => {
-    e.target.name = name ?? 'value';
-    handleChange(e);
-  }, [handleChange, name]);
-
-  const renderMentionList = React.useCallback((children: React.ReactNode) => ReactDOM.createPortal(
-    <Box css={{
-      position: 'absolute', background: '$bgDefault', top: '0', width: `${inputContainerWith}px`, padding: '$2', zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
-    }}
-    >
-      <StyledDropdown className="content scroll-container">
-        {children}
-      </StyledDropdown>
-    </Box>,
-    portalPlaceholder,
-  ), [inputContainerWith, inputContainerPosX, inputContainerPosY, portalPlaceholder]);
-
   const renderMentionListItem = React.useCallback((
     suggestion: SuggestionDataItem,
-    search,
-    highlightedDisplay,
-    index,
-    focused,
   ) => {
-    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.id);
+    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.display);
     return (
-      <StyledItem
-        className="dropdown-item"
-        css={{
-          backgroundColor: focused ? '$interaction' : '$bgDefault', width: '100%', padding: '0',
-        }}
-        isFocused={focused}
+      <Option
+        key={(suggestion.id as string) || 'not-found'}
+        value={suggestion.id as string}
+        className="mentions-item"
       >
-        {type === 'color' && (
+        <StyledItem
+          className="dropdown-item"
+        >
+          {type === 'color' && (
           <StyledItemColorDiv>
             <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
           </StyledItemColorDiv>
-        )}
-        <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', search || '')}</StyledItemName>
-        <StyledItemValue>{resolvedToken?.value}</StyledItemValue>
-      </StyledItem>
+          )}
+          <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
+          <StyledItemValue>{resolvedToken?.value}</StyledItemValue>
+        </StyledItem>
+      </Option>
     );
-  }, [resolvedTokens, type]);
-
-  const renderDisplayTransform = React.useCallback((id: string, display: string) => `{${display}}`, []);
+  }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
 
   return (
-    <MentionsInput
-      singleLine
-      style={{ ...mentionInputStyles }}
-      value={value}
-      onChange={handleMentionInputChange}
-      placeholder={placeholder}
-      autoComplete="off"
-      allowSpaceInQuery={false}
-      customSuggestionsContainer={renderMentionList}
-      onBlur={handleInputBlur}
+    <Mentions
+      autoSize
       name={name}
-      inputRef={inputRef}
+      value={value}
+      placeholder={placeholder}
+      prefix={['{']}
+      placement="bottom"
+      autoFocus={autoFocus}
+      onChange={handleMentionInputChange}
+      onBlur={handleInputBlur}
       onFocus={handleOnFocus}
       data-testid={`mention-input-${name}`}
+      data-cy={`mention-input-${name}`}
     >
-      <Mention
-        trigger={/({([^{]*))$/}
-        data={mentionData}
-        markup="{__id__}"
-        renderSuggestion={renderMentionListItem}
-        displayTransform={renderDisplayTransform}
-      />
-    </MentionsInput>
-
+      {mentionData.map((item) => (
+        renderMentionListItem(item)
+      ))}
+    </Mentions>
   );
-};
+}

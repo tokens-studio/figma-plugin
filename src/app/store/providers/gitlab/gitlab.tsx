@@ -48,7 +48,7 @@ export function useGitLab() {
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(clientFactory, []);
 
@@ -121,7 +121,7 @@ export function useGitLab() {
           metadata: {},
         };
       } catch (e) {
-        closeDialog();
+        closePushDialog();
         console.log('Error pushing to GitLab', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -145,7 +145,7 @@ export function useGitLab() {
     dispatch,
     storageClientFactory,
     pushDialog,
-    closeDialog,
+    closePushDialog,
     tokens,
     themes,
     localApiState,
@@ -166,7 +166,6 @@ export function useGitLab() {
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-
     await checkAndSetAccess({
       context, receivedFeatureFlags,
     });

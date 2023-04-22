@@ -22,6 +22,7 @@ import { globalStyles } from '../globalStyles';
 import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
+import PullDialog from '../PullDialog';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -88,6 +89,9 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <ConfirmDialog />
       <ImportedTokensDialog />
       <PushDialog />
+      {
+        !showLoadingScreen && <PullDialog />
+      }
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />

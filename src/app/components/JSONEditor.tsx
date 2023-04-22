@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import Editor from '@monaco-editor/react';
+import Editor, { useMonaco } from '@monaco-editor/react';
 import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
 import { editProhibitedSelector } from '@/selectors';
@@ -19,6 +19,15 @@ function JSONEditor({
   const editProhibited = useSelector(editProhibitedSelector);
   const { handleJSONUpdate } = useTokens();
   const { isDarkTheme } = useFigmaTheme();
+  const monaco = useMonaco();
+
+  monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
+    schemas: [{
+      fileMatch: ['*'],
+      uri: 'https://schemas.tokens.studio/latest/tokens-schema.json',
+    }],
+    enableSchemaRequest: true,
+  });
 
   const handleJsonEditChange = React.useCallback((value: string | undefined) => {
     handleChange(value ?? '');

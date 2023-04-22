@@ -224,6 +224,8 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     result.getByText('Fonts').click();
     expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
+    result.getAllByTestId('downshift-input-item')[0].click();
+    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
   });
 
   it('should return fontWeights when type is fontWeight', () => {
@@ -262,6 +264,8 @@ describe('DownShiftInput', () => {
     result.getByTestId('downshift-input-suffix-button').click();
     result.getByText('Weights').click();
     expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
+    fireEvent.focus(result.getByTestId('mention-input-value'));
+    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
   });
 
   it('should blankBox when there is no matching suggestions', async () => {

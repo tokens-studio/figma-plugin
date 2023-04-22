@@ -74,6 +74,7 @@ export interface UIState {
   tokenFilter: string;
   confirmState: ConfirmProps;
   showPushDialog: string | false;
+  showPullDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
@@ -128,6 +129,7 @@ export const uiState = createModel<RootModel>()({
     tokenFilterVisible: false,
     confirmState: defaultConfirmState,
     showPushDialog: false,
+    showPullDialog: false,
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
@@ -141,6 +143,10 @@ export const uiState = createModel<RootModel>()({
     setShowPushDialog: (state, data: string | false) => ({
       ...state,
       showPushDialog: data,
+    }),
+    setShowPullDialog: (state, data: string | false) => ({
+      ...state,
+      showPullDialog: data,
     }),
     setShowConfirm: (
       state,

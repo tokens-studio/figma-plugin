@@ -31,9 +31,9 @@ export default function BorderTokenForm({
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.BORDER }>;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleBorderValueChange: React.ChangeEventHandler;
+  handleBorderValueChange: (newInputValue: string, property: string) => void;
   handleBorderValueDownShiftInputChange: (newInputValue: string, property: string) => void;
-  handleBorderAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBorderAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
 }) {
   const seed = useUIDSeed();
