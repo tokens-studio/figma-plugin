@@ -109,6 +109,8 @@ export const stitchesInstance = createStitches({
       bgProSubtle: 'var(--figma-color-bg-component-tertiary)',
       borderPro: 'var(--figma-color-bg-component)',
       spinnerInverse: '#ffffff',
+      staticBgDark: '#2c2c2c',
+      staticBorderDark: '#424242',
     },
     space: {
       1: '2px',

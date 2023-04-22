@@ -244,6 +244,7 @@ export default function BranchSelector() {
             {
               branchState.branches.length > MINIMUM_BRANCH_LENGTH && (
                 <Input
+                  css={{ background: '$staticBgDark', border: '1px solid $staticBorderDark' }}
                   full
                   value={searchTextForBaseBranch}
                   onChange={handleSearchTextForBaseBranchChange}
