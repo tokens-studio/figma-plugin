@@ -55,6 +55,7 @@ export interface TokenState {
   checkForChanges: boolean;
   collapsedTokens: string[];
   changedState: CompareStateType;
+  remoteData: CompareStateType;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -84,6 +85,11 @@ export const tokenState = createModel<RootModel>()({
     checkForChanges: false,
     collapsedTokens: [],
     changedState: {},
+    remoteData: {
+      tokens: {},
+      themes: [],
+      metadata: null,
+    },
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -471,6 +477,10 @@ export const tokenState = createModel<RootModel>()({
         tokens: {},
         themes: [],
       },
+    }),
+    setRemoteData: (state, data: CompareStateType): TokenState => ({
+      ...state,
+      remoteData: data,
     }),
     ...tokenStateReducers,
   },

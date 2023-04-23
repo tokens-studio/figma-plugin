@@ -77,6 +77,11 @@ export const useADO = () => {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    dispatch.tokenState.setRemoteData({
+      tokens: content?.tokens ?? {},
+      themes: content?.themes ?? [],
+      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
+    });
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
