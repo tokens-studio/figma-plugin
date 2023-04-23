@@ -65,7 +65,6 @@ export default function Footer() {
   React.useEffect(() => {
     const interval = setInterval(() => {
       checkRemoteChange().then((response: boolean) => {
-        console.log('response', response);
         setHasRemoteChange(response);
       });
     }, 3000);
