@@ -36,8 +36,8 @@ StorageProviderType.JSONBIN,
 }
 >;
 
-export type GitStorageType = GenericStorageType<
-StorageProviderType.GITHUB | StorageProviderType.GITLAB,
+export type GitHubStorageType = GenericStorageType<
+StorageProviderType.GITHUB,
 {
   name: string; // this is only for refrence
   id: string; // this should be the repository identifier; eg {username}/{repo}
@@ -45,6 +45,18 @@ StorageProviderType.GITHUB | StorageProviderType.GITLAB,
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
   commitSha?: string; // this is the commit sha of the current file or folder
+}
+>;
+
+export type GitLabStorageType = GenericStorageType<
+StorageProviderType.GITLAB,
+{
+  name: string; // this is only for refrence
+  id: string; // this should be the repository identifier; eg {username}/{repo}
+  branch: string; // this is the base branch
+  filePath: string; // this is the path to the token file or files (depends on multifile support)
+  baseUrl?: string; // this is the base API url. This is important for self hosted environments
+  commitDate?: Date; // this is the commit sha of the current file or folder
 }
 >;
 
@@ -86,7 +98,8 @@ export type StorageType =
   | LocalStorageType
   | URLStorageType
   | JSONBinStorageType
-  | GitStorageType
+  | GitHubStorageType
+  | GitLabStorageType
   | GenericVersionedStorageType
   | ADOStorageType
   | BitbucketStorageType;
@@ -94,7 +107,8 @@ export type StorageType =
 export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
   | StorageTypeCredential<JSONBinStorageType>
-  | StorageTypeCredential<GitStorageType>
+  | StorageTypeCredential<GitHubStorageType>
+  | StorageTypeCredential<GitLabStorageType>
   | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>;
@@ -108,9 +122,13 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<JSONBinStorageType>, 'provider' | 'id'>
   >)
-  | ({ new?: boolean; provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB } & OptionalPartial<
+  | ({ new?: boolean; provider: StorageProviderType.GITHUB } & OptionalPartial<
   Incomplete,
-  Omit<StorageTypeCredential<GitStorageType>, 'provider'>
+  Omit<StorageTypeCredential<GitHubStorageType>, 'provider'>
+  >)
+  | ({ new?: boolean; provider: StorageProviderType.GITLAB } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<GitLabStorageType>, 'provider'>
   >)
   | ({ new?: boolean; provider: StorageProviderType.BITBUCKET } & OptionalPartial<
   Incomplete,

@@ -54,7 +54,7 @@ export default function useRemoteTokens() {
     addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches, checkRemoteChangeForGitHub,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch, checkRemoteChangeForGitLab,
   } = useGitLab();
   const {
     addNewBitbucketCredentials,
@@ -134,6 +134,7 @@ export default function useRemoteTokens() {
               break;
             }
             case StorageProviderType.GITLAB: {
+              dispatch.uiState.setApiData({ ...context, ...(remoteData.commitDate ? { commitDate: remoteData.commitDate } : {}) });
               break;
             }
             case StorageProviderType.ADO: {
@@ -450,7 +451,7 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.GITLAB: {
-        hasChange = false;
+        hasChange = await checkRemoteChangeForGitLab(context);
         break;
       }
       case StorageProviderType.ADO: {
@@ -469,6 +470,7 @@ export default function useRemoteTokens() {
   }, [
     api,
     checkRemoteChangeForGitHub,
+    checkRemoteChangeForGitLab,
   ]);
 
   return useMemo(() => ({

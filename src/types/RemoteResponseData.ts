@@ -8,6 +8,7 @@ type RemoteResponseSuccess<Metadata = unknown> = {
   themes: ThemeObjectsList
   metadata?: RemoteTokenStorageMetadata & Metadata | null
   commitSha?: string
+  commitDate?: Date
 };
 
 type RemoteResponseFailure = {

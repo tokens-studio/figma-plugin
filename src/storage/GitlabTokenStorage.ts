@@ -234,4 +234,33 @@ export class GitlabTokenStorage extends GitTokenStorage {
     );
     return !!response;
   }
+
+  public async getLatestCommitDate(): Promise<Date | null> {
+    if (!this.projectId) throw new Error('Missing Project ID');
+
+    try {
+      if (!this.path.endsWith('.json')) {
+        const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
+          path: this.path,
+          ref: this.branch,
+          recursive: true,
+        });
+        const jsonFiles = trees.filter((file) => (
+          file.path.endsWith('.json')
+        )).sort((a, b) => (
+          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+        ));
+
+        const file = await this.gitlabClient.RepositoryFiles.show(this.projectId!, jsonFiles[0].path, this.branch);
+        const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
+        return commit.committed_date ?? null;
+      }
+      const file = await this.gitlabClient.RepositoryFiles.show(this.projectId, this.path, this.branch);
+      const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
+      return commit.committed_date ?? null;
+    } catch (e) {
+      console.error('Error', e);
+      return null;
+    }
+  }
 }
