@@ -4,7 +4,7 @@ import type { RootModel } from '@/types/RootModel';
 export function renameStyleNamesToCurrentTheme(dispatch: RematchDispatch<RootModel>) {
   return (): void => {
     dispatch.tokenState.updateDocument({
-      updateRemote: true,
+      updateRemote: false,
       shouldUpdateNodes: false,
     });
   };

@@ -36,6 +36,9 @@ const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
 
+// Hide log calls unless they are expected
+jest.spyOn(console, 'log').mockImplementation(() => { });
+
 const mockSelector = (selector: Selector) => {
   switch (selector) {
     case tokensSelector:
