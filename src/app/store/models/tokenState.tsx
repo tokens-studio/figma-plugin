@@ -465,10 +465,7 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     deleteToken() {
-      dispatch.tokenState.updateDocument({
-        shouldUpdateRemote: true,
-        shouldUpdateNodes: false,
-      });
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     deleteTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
