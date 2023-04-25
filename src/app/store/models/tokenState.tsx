@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import omit from 'just-omit';
+import set from 'set-value';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import * as tokenStateReducers from './reducers/tokenState';
@@ -38,7 +39,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
-  tokenGroupDescription: Record<string, string>;
+  tokenGroupDescription: Record<string, Record<TokenTypes, Record<string, string>>>; // {global: {sizing: {'group': 'description 1', 'group': {'nest': 'description 2'}}}}
   stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
@@ -348,7 +349,7 @@ export const tokenState = createModel<RootModel>()({
 
     editTokenGroup: (state, data: EditTokenGroupPayload) => {
       const {
-        oldName, newName, type, parent,
+        oldName, newName, type, parent, description,
       } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
@@ -363,6 +364,11 @@ export const tokenState = createModel<RootModel>()({
         return token;
       }) as AnyTokenList;
       const newTokenGroupDescription = state.tokenGroupDescription;
+      delete newTokenGroupDescription?.[parent]?.[type as TokenTypes]?.[oldName];
+      if (description) {
+        set(newTokenGroupDescription, `${parent}/${type}/${newName}`, description, { separator: '/' });
+      }
+      console.log('result', newTokenGroupDescription);
 
       const newState = {
         ...state,
@@ -370,6 +376,7 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           [parent]: renamedTokensInParent,
         },
+        tokenGroupDescription: { ...newTokenGroupDescription },
       };
       return newState as TokenState;
     },
@@ -475,9 +482,6 @@ export const tokenState = createModel<RootModel>()({
         themes: [],
       },
     }),
-    setTokenGroupDescription: (state, data) => ({
-      ...state,
-    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -543,6 +547,7 @@ export const tokenState = createModel<RootModel>()({
       tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
         dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
+      // dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
