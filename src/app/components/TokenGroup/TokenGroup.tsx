@@ -64,7 +64,7 @@ const TokenGroup: React.FC<Props> = ({
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             // Need to add class to self-reference in css traversal
             <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} description="temp description" />
               <TokenGroup
                 tokenValues={item.value}
                 showNewForm={showNewForm}

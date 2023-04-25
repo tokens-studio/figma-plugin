@@ -152,11 +152,13 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (oldName: string, newName: string, type: string) => {
+  const renameGroup = useCallback(async ({
+    oldName, newName, type, description,
+  }:{ oldName: string, newName: string, type: string, description?: string }) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
     await renameTokenGroup({
-      parent: activeTokenSet, oldName, newName, type,
+      parent: activeTokenSet, oldName, newName, type, description,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
   }, [store, renameTokenGroup, dispatch.uiState]);

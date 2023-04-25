@@ -3,4 +3,5 @@ export type RenameTokenGroupPayload = {
   oldName: string;
   newName: string;
   type: string;
+  description?: string;
 };
