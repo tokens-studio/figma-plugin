@@ -66,10 +66,11 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async listBranches() {
-    return this.octokitClient.repos.listBranches({
+    return this.octokitClient.paginate(this.octokitClient.repos.listBranches, {
       owner: this.owner,
       repo: this.repository,
       headers: octokitClientDefaultHeaders,
+      per_page: 30, // Set to desired page size (max 100)
     });
   }
 
@@ -78,7 +79,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     // however when pulling from the root directory we can  not do this, but we can take the SHA from the branch
     if (path === '') {
       const branches = await this.listBranches();
-      const branch = branches.data.find((entry) => entry.name === this.branch);
+      const branch = branches.find((entry) => entry.name === this.branch);
       if (!branch) throw new Error(`Branch not found, ${this.branch}`);
       return branch.commit.sha;
     }
@@ -110,7 +111,7 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async fetchBranches() {
     const branches = await this.listBranches();
-    return branches.data.map((branch) => branch.name);
+    return branches.map((branch) => branch.name);
   }
 
   public async createBranch(branch: string, source?: string) {
