@@ -31,7 +31,7 @@ const MockEnv = () => {
     }
   }).as('getContent');
 
-  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/branches', [
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/branches?per_page=30', [
     {
       name: 'main',
     },

@@ -111,7 +111,7 @@ export class GithubTokenStorage extends GitTokenStorage {
 
   public async fetchBranches() {
     const branches = await this.listBranches();
-    return branches.map((branch) => branch.name);
+    return branches?.map((branch) => branch.name);
   }
 
   public async createBranch(branch: string, source?: string) {

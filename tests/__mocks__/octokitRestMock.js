@@ -14,6 +14,10 @@ export const mockGetContent = jest.fn();
 export const mockCreateOrUpdateFiles = jest.fn();
 export const mockCreateTree = jest.fn();
 export const mockGetTree = jest.fn();
+export const mockPaginate = jest.fn(() => Promise.resolve([
+    { name: 'main' },
+    { name: 'development' },
+]));
 
 jest.mock('@octokit/rest', () => ({
   Octokit: {
@@ -40,6 +44,7 @@ jest.mock('@octokit/rest', () => ({
           listBranches: mockListBranches,
           createOrUpdateFiles: mockCreateOrUpdateFiles,
         },
+        paginate: mockPaginate
       }))
     )),
   },
