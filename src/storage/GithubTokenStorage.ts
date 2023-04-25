@@ -79,7 +79,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     // however when pulling from the root directory we can  not do this, but we can take the SHA from the branch
     if (path === '') {
       const branches = await this.listBranches();
-      const branch = branches.find((entry) => entry.name === this.branch);
+      const branch = branches?.find((entry) => entry.name === this.branch);
       if (!branch) throw new Error(`Branch not found, ${this.branch}`);
       return branch.commit.sha;
     }
