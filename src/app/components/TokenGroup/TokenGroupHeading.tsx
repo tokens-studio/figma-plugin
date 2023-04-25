@@ -15,6 +15,7 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import EditTokenGroupModal, { EditTokenGroupFormValues } from '../modals/EditTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import Box from '../Box';
 
 export type Props = {
   id: string
@@ -35,9 +36,9 @@ export function TokenGroupHeading({
   const [editTokenFormFields, setEditTokenFormFields] = React.useState<EditTokenGroupFormValues>(React.useMemo(() => ({
     name: path,
     type,
-    description,
+    description: description ?? '',
   }), [path, description, type]));
-  const { deleteGroup, renameGroup } = useManageTokens();
+  const { deleteGroup, editGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup } = useTokens();
@@ -69,15 +70,15 @@ export function TokenGroupHeading({
   }, [path]);
 
   const handleEditTokenGroupSubmit = React.useCallback((value: EditTokenGroupFormValues) => {
-    renameGroup({
+    editGroup({
       oldName: path,
       newName: value.name,
       type: value.type,
-      ...(value.description ? { description: value.description } : {}),
+      description: value.description,
     });
     remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.` });
     setShowEditTokenGroupModal(false);
-  }, [newTokenGroupName, path, remapTokensInGroup, renameGroup]);
+  }, [newTokenGroupName, path, remapTokensInGroup, editGroup]);
 
   const handleEditTokenGroupFormChange = React.useCallback((value: EditTokenGroupFormValues) => {
     setEditTokenFormFields({ ...editTokenFormFields, ...value });
@@ -102,6 +103,7 @@ export function TokenGroupHeading({
             <Stack direction="row" gap={2} align="center" css={{ color: '$textMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
               <Heading muted size="small">{label}</Heading>
+              <Box>{description}</Box>
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuContent>

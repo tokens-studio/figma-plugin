@@ -11,7 +11,7 @@ import Textarea from '../Textarea';
 export type EditTokenGroupFormValues = {
   name: string;
   type: string
-  description?: string;
+  description: string;
 };
 type Props = {
   isOpen: boolean;

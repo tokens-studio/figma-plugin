@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { TokenGroupHeading } from './TokenGroupHeading';
 import { StyledTokenGroup, StyledTokenGroupItems } from './StyledTokenGroup';
 import { TokenButton } from '@/app/components/TokenButton';
-import { displayTypeSelector } from '@/selectors';
+import { displayTypeSelector, tokenGroupDescriptionSelector } from '@/selectors';
 import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
@@ -23,7 +23,7 @@ const TokenGroup: React.FC<Props> = ({
 }) => {
   const collapsed = useSelector(collapsedTokensSelector);
   const displayType = useSelector(displayTypeSelector);
-
+  const tokenGroupDescription = useSelector(tokenGroupDescriptionSelector);
   const tokenValuesEntries = React.useMemo(() => (
     Object.entries(tokenValues).map(([name, value]) => {
       const stringPath = [path, name].filter((n) => n).join('.');
@@ -64,7 +64,7 @@ const TokenGroup: React.FC<Props> = ({
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             // Need to add class to self-reference in css traversal
             <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} description="temp description" />
+              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} description={tokenGroupDescription[item.stringPath]} />
               <TokenGroup
                 tokenValues={item.value}
                 showNewForm={showNewForm}

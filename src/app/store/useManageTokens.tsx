@@ -43,7 +43,7 @@ export default function useManageTokens() {
   const { confirm } = useConfirm();
   const { removeStylesFromTokens } = useTokens();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, editTokenGroup, duplicateTokenGroup,
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -152,16 +152,16 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async ({
+  const editGroup = useCallback(async ({
     oldName, newName, type, description,
-  }:{ oldName: string, newName: string, type: string, description?: string }) => {
+  }:{ oldName: string, newName: string, type: string, description: string }) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
-    await renameTokenGroup({
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_EDITTOKENGROUP, isInfinite: true });
+    await editTokenGroup({
       parent: activeTokenSet, oldName, newName, type, description,
     });
-    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
-  }, [store, renameTokenGroup, dispatch.uiState]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_EDITTOKENGROUP);
+  }, [store, editTokenGroup, dispatch.uiState]);
 
   const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
@@ -174,6 +174,6 @@ export default function useManageTokens() {
   }, [store, duplicateTokenGroup, dispatch.uiState]);
 
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup,
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, editGroup, duplicateGroup,
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, editGroup, duplicateGroup]);
 }

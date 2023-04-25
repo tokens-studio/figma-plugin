@@ -20,7 +20,7 @@ import {
   SetTokensFromStylesPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
-  RenameTokenGroupPayload,
+  EditTokenGroupPayload,
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
   DeleteTokenGroupPayload,
@@ -38,6 +38,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  tokenGroupDescription: Record<string, string>;
   stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
@@ -62,6 +63,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    tokenGroupDescription: {},
     stringTokens: '',
     themes: [],
     lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
@@ -344,7 +346,7 @@ export const tokenState = createModel<RootModel>()({
       return newState;
     },
 
-    renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
+    editTokenGroup: (state, data: EditTokenGroupPayload) => {
       const {
         oldName, newName, type, parent,
       } = data;
@@ -360,6 +362,7 @@ export const tokenState = createModel<RootModel>()({
         }
         return token;
       }) as AnyTokenList;
+      const newTokenGroupDescription = state.tokenGroupDescription;
 
       const newState = {
         ...state,
@@ -472,6 +475,9 @@ export const tokenState = createModel<RootModel>()({
         themes: [],
       },
     }),
+    setTokenGroupDescription: (state, data) => ({
+      ...state,
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -529,7 +535,7 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
+    editTokenGroup(data: EditTokenGroupPayload, rootState) {
       const {
         oldName, newName, type, parent,
       } = data;
