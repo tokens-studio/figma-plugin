@@ -36,6 +36,7 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
+import removeEmptyValues from '@/utils/remoevEmptyValues';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -368,8 +369,8 @@ export const tokenState = createModel<RootModel>()({
       if (description) {
         set(newTokenGroupDescription, `${parent}/${type}/${newName}`, description, { separator: '/' });
       }
-      console.log('result', newTokenGroupDescription);
-
+      removeEmptyValues(newTokenGroupDescription);
+      console.log('newe', newTokenGroupDescription);
       const newState = {
         ...state,
         tokens: {
@@ -547,7 +548,7 @@ export const tokenState = createModel<RootModel>()({
       tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
         dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
-      // dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
