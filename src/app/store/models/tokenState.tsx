@@ -222,33 +222,29 @@ export const tokenState = createModel<RootModel>()({
           if (existingTokenIndex > -1) {
             const existingTokens = [...state.tokens[tokenSet]];
             existingTokens.splice(existingTokenIndex + 1, 0, {
-              ...state.tokens[tokenSet][existingTokenIndex],
-              name: data.newName,
-              value: data.value,
-              type: data.type,
-              ...(data.description ? {
+              ...omit(state.tokens[tokenSet][existingTokenIndex], 'description', '$extensions'),
+              ...updateTokenPayloadToSingleToken({
+                parent: data.parent,
+                name: data.newName,
+                type: data.type,
+                value: data.value,
                 description: data.description,
-              } : {}),
-              ...(data.$extensions ? {
+                oldName: data.oldName,
                 $extensions: data.$extensions,
-              } : {}),
+              } as UpdateTokenPayload),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
         } else if (data.tokenSets.includes(tokenSet)) {
           const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
           if (existingTokenIndex < 0) {
-            const newToken = {
+            const newToken = updateTokenPayloadToSingleToken({
               name: data.newName,
-              value: data.value,
               type: data.type,
-              ...(data.description ? {
-                description: data.description,
-              } : {}),
-              ...(data.$extensions ? {
-                $extensions: data.$extensions,
-              } : {}),
-            };
+              value: data.value,
+              description: data.description,
+              $extensions: data.$extensions,
+            } as UpdateTokenPayload);
             newTokens[tokenSet] = [
               ...state.tokens[tokenSet], newToken as SingleToken,
             ];
