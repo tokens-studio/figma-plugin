@@ -492,6 +492,9 @@ export const tokenState = createModel<RootModel>()({
     duplicateTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
+    duplicateTokenGroup() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
     renameTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
@@ -515,27 +518,24 @@ export const tokenState = createModel<RootModel>()({
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken(payload: DuplicateTokenPayload, rootState) {
-      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
-      }
+    duplicateToken() {
+      dispatch.tokenState.updateDocument();
     },
-    createToken(payload: UpdateTokenPayload, rootState) {
-      if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
-      }
+    createToken() {
+      dispatch.tokenState.updateDocument();
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {
         oldName, newName, type, parent,
       } = data;
+
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
       tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
         dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
     },
     updateCheckForChanges() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setCollapsedTokenSets() {
       dispatch.tokenState.updateDocument({ updateRemote: false });

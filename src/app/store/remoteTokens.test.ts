@@ -40,6 +40,9 @@ const mockSetCollapsedTokenSets = jest.fn();
 const mocksetChangedState = jest.fn();
 const mockResetChangedState = jest.fn();
 
+// Hide log calls unless they are expected
+jest.spyOn(console, 'log').mockImplementation(() => { });
+
 const mockSelector = (selector: Selector) => {
   switch (selector) {
     case tokensSelector:

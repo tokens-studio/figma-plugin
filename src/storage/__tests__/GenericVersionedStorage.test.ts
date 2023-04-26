@@ -42,11 +42,13 @@ describe('GenericVersionedStorage', () => {
     });
   });
 
-  it('should return false when there is an error during creation', async () => {
+  it('should throw an error when there is an error during creation', async () => {
+    const errorText = 'An error occurred';
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
+      statusText: errorText,
     }));
-    expect(await GenericVersionedStorage.create(url, '', GenericVersionedStorageFlow.READ_WRITE_CREATE)).toEqual(false);
+    await expect(async () => GenericVersionedStorage.create(url, '', GenericVersionedStorageFlow.READ_WRITE_CREATE)).rejects.toThrow(errorText);
   });
 
   it('can read GenericVersioned data', async () => {
@@ -182,17 +184,6 @@ describe('GenericVersionedStorage', () => {
     });
   });
 
-  it('returns an empty dataset on error', async () => {
-    mockFetch.mockImplementationOnce(() => (
-      Promise.resolve({
-        ok: false,
-      })
-    ));
-
-    const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
-    expect(await storage.read()).toEqual([]);
-  });
-
   it('can write to GenericVersioned endpoint', async () => {
     jest.useFakeTimers('modern');
     jest.setSystemTime(Date.UTC(2022, 5, 15, 10, 0, 0));
@@ -258,11 +249,13 @@ describe('GenericVersionedStorage', () => {
     });
   });
 
-  it('returns false on write error', async () => {
+  it('throws on write error', async () => {
+    const errorText = 'Something went wrong';
     mockFetch.mockImplementationOnce(() => ({
       ok: false,
+      statusText: errorText,
     }));
     const storage = new GenericVersionedStorage(url, GenericVersionedStorageFlow.READ_WRITE_CREATE, defaultHeaders);
-    expect(await storage.write([])).toEqual(false);
+    await expect(async () => storage.write([])).rejects.toThrow(errorText);
   });
 });
