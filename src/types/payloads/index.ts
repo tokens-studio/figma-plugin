@@ -4,7 +4,7 @@ export * from './DeleteTokenPayload';
 export * from './SetTokenDataPayload';
 export * from './UpdateDocumentPayload';
 export * from './ToggleManyTokenSetsPayload';
-export * from './RenameTokenGroupPayload';
+export * from './EditTokenGroupPayload';
 export * from './DuplicateTokenGroupPayload';
 export * from './DuplicateTokenPayload';
 export * from './DeleteTokenGroupPayload';

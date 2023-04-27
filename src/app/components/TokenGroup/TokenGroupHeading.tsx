@@ -13,25 +13,32 @@ import { Dispatch } from '../../store';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
-import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
+import EditTokenGroupModal, { EditTokenGroupFormValues } from '../modals/EditTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import Box from '../Box';
 
 export type Props = {
   id: string
   label: string
   path: string
   type: string
+  description?: string
   showNewForm: (opts: ShowNewFormOptions) => void;
 };
 
 export function TokenGroupHeading({
-  label, path, id, type, showNewForm,
+  label, path, id, type, description, showNewForm,
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
-  const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
+  const [showEditTokenGroupModal, setShowEditTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
-  const { deleteGroup, renameGroup } = useManageTokens();
+  const [editTokenFormFields, setEditTokenFormFields] = React.useState<EditTokenGroupFormValues>(React.useMemo(() => ({
+    name: path,
+    type,
+    description: description ?? '',
+  }), [path, description, type]));
+  const { deleteGroup, editGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup } = useTokens();
@@ -40,24 +47,17 @@ export function TokenGroupHeading({
     deleteGroup(path, type);
   }, [deleteGroup, path, type]);
 
-  const handleRename = React.useCallback(() => {
+  const handleEdit = React.useCallback(() => {
     setNewTokenGroupName(path);
-    setShowRenameTokenGroupModal(true);
+    setShowEditTokenGroupModal(true);
   }, [path]);
-
-  const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    renameGroup(path, newTokenGroupName, type);
-    remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.` });
-    setShowRenameTokenGroupModal(false);
-  }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
   const handleNewTokenGroupNameChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewTokenGroupName(e.target.value);
   }, []);
 
-  const handleRenameTokenGroupModalClose = React.useCallback(() => {
-    setShowRenameTokenGroupModal(false);
+  const handleEditTokenGroupModalClose = React.useCallback(() => {
+    setShowEditTokenGroupModal(false);
   }, []);
 
   const handleDuplicateTokenGroupModalClose = React.useCallback(() => {
@@ -68,6 +68,21 @@ export function TokenGroupHeading({
     setNewTokenGroupName(`${path}-copy`);
     setShowDuplicateTokenGroupModal(true);
   }, [path]);
+
+  const handleEditTokenGroupSubmit = React.useCallback((value: EditTokenGroupFormValues) => {
+    editGroup({
+      oldName: path,
+      newName: value.name,
+      type: value.type,
+      description: value.description,
+    });
+    remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.` });
+    setShowEditTokenGroupModal(false);
+  }, [newTokenGroupName, path, remapTokensInGroup, editGroup]);
+
+  const handleEditTokenGroupFormChange = React.useCallback((value: EditTokenGroupFormValues) => {
+    setEditTokenFormFields({ ...editTokenFormFields, ...value });
+  }, [editTokenFormFields]);
 
   const handleToggleCollapsed = useCallback(() => {
     dispatch.tokenState.setCollapsedTokens(collapsed.includes(path) ? collapsed.filter((s) => s !== path) : [...collapsed, path]);
@@ -88,11 +103,12 @@ export function TokenGroupHeading({
             <Stack direction="row" gap={2} align="center" css={{ color: '$textMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
               <Heading muted size="small">{label}</Heading>
+              <Box>{description}</Box>
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuContent>
-            <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
-              Rename
+            <ContextMenuItem disabled={editProhibited} onSelect={handleEdit}>
+              Edit
             </ContextMenuItem>
             <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
               Duplicate
@@ -104,13 +120,12 @@ export function TokenGroupHeading({
         </ContextMenu>
       </StyledTokenGroupHeadingCollapsable>
 
-      <RenameTokenGroupModal
-        isOpen={showRenameTokenGroupModal}
-        newName={newTokenGroupName}
-        oldName={path}
-        onClose={handleRenameTokenGroupModalClose}
-        handleRenameTokenGroupSubmit={handleRenameTokenGroupSubmit}
-        handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+      <EditTokenGroupModal
+        isOpen={showEditTokenGroupModal}
+        values={editTokenFormFields}
+        handleFormChange={handleEditTokenGroupFormChange}
+        handleEditTokenGroupSubmit={handleEditTokenGroupSubmit}
+        onClose={handleEditTokenGroupModalClose}
       />
 
       <DuplicateTokenGroupModal

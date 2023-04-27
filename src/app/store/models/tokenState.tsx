@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import omit from 'just-omit';
+import set from 'set-value';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import * as tokenStateReducers from './reducers/tokenState';
@@ -20,7 +21,7 @@ import {
   SetTokensFromStylesPayload,
   UpdateDocumentPayload,
   UpdateTokenPayload,
-  RenameTokenGroupPayload,
+  EditTokenGroupPayload,
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
   DeleteTokenGroupPayload,
@@ -35,9 +36,11 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
+import removeEmptyValues from '@/utils/remoevEmptyValues';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
+  tokenGroupDescription: Record<string, Record<TokenTypes, Record<string, string>>>; // {global: {sizing: {'group': 'description 1', 'group': {'nest': 'description 2'}}}}
   stringTokens: string;
   themes: ThemeObjectsList;
   lastSyncedState: string; // @README for reference, at this time this is a JSON stringified representation of the tokens and themes ([tokens, themes])
@@ -62,6 +65,7 @@ export const tokenState = createModel<RootModel>()({
     tokens: {
       global: [],
     },
+    tokenGroupDescription: {},
     stringTokens: '',
     themes: [],
     lastSyncedState: JSON.stringify([{ global: [] }, []], null, 2),
@@ -340,9 +344,9 @@ export const tokenState = createModel<RootModel>()({
       return newState;
     },
 
-    renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
+    editTokenGroup: (state, data: EditTokenGroupPayload) => {
       const {
-        oldName, newName, type, parent,
+        oldName, newName, type, parent, description,
       } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
@@ -356,13 +360,20 @@ export const tokenState = createModel<RootModel>()({
         }
         return token;
       }) as AnyTokenList;
-
+      const newTokenGroupDescription = state.tokenGroupDescription;
+      delete newTokenGroupDescription?.[parent]?.[type as TokenTypes]?.[oldName];
+      if (description) {
+        set(newTokenGroupDescription, `${parent}/${type}/${newName}`, description, { separator: '/' });
+      }
+      removeEmptyValues(newTokenGroupDescription);
+      console.log('newe', newTokenGroupDescription);
       const newState = {
         ...state,
         tokens: {
           ...state.tokens,
           [parent]: renamedTokensInParent,
         },
+        tokenGroupDescription: { ...newTokenGroupDescription },
       };
       return newState as TokenState;
     },
@@ -524,7 +535,7 @@ export const tokenState = createModel<RootModel>()({
     createToken() {
       dispatch.tokenState.updateDocument();
     },
-    renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
+    editTokenGroup(data: EditTokenGroupPayload, rootState) {
       const {
         oldName, newName, type, parent,
       } = data;
@@ -533,6 +544,7 @@ export const tokenState = createModel<RootModel>()({
       tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
         dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
