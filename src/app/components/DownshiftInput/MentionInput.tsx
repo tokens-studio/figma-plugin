@@ -90,6 +90,31 @@ export default function MentionsInput({
     );
   }, []);
 
+  const getResolveValue = React.useCallback((token: SingleToken) => {
+    let returnValue: string = '';
+    if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
+      if (Array.isArray(token.value)) {
+        returnValue = token.value.reduce<string>((totalAcc, item) => {
+          const singleReturnValue = Object.entries(item).reduce<string>((acc, [, propertyValue]) => (
+            `${acc}${propertyValue.toString()}/`
+          ), '');
+          return `${totalAcc}${singleReturnValue},`;
+        }, '');
+      } else {
+        returnValue = Object.entries(token.value).reduce<string>((acc, [, propertyValue]) => (
+          `${acc}${propertyValue.toString()}/`
+        ), '');
+      }
+    } else if (token.type === TokenTypes.COMPOSITION) {
+      returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
+        `${acc}${property}:${value}`
+      ), '');
+    } else if (typeof token.value === 'string' || typeof token.value === 'number') {
+      returnValue = token.value;
+    }
+    return returnValue;
+  }, []);
+
   const renderMentionListItem = React.useCallback((
     suggestion: SuggestionDataItem,
   ) => {
@@ -109,11 +134,13 @@ export default function MentionsInput({
           </StyledItemColorDiv>
           )}
           <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
-          <StyledItemValue>{resolvedToken?.value}</StyledItemValue>
+          {
+            resolvedToken && <StyledItemValue>{getResolveValue(resolvedToken)}</StyledItemValue>
+          }
         </StyledItem>
       </Option>
     );
-  }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
+  }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value, getResolveValue]);
 
   return (
     <Mentions
