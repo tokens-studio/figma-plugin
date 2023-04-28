@@ -71,7 +71,7 @@ export default function Footer() {
     return () => clearInterval(interval);
   }, [checkRemoteChange]);
 
-  const hasChanges = React.useMemo(() => checkForChanges() || hasRemoteChange, [checkForChanges, hasRemoteChange]);
+  const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
@@ -93,7 +93,7 @@ export default function Footer() {
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />
-            <IconButton dataCy="footer-pull-button" icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton dataCy="footer-pull-button" badge={hasRemoteChange} icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
             <IconButton dataCy="footer-push-button" badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
