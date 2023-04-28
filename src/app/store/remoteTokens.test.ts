@@ -217,13 +217,16 @@ const gitHubContext = {
   id: 'six7/figma-tokens',
   provider: 'github',
   secret: 'github',
+  commitSha: '234',
 };
 const gitLabContext = {
+  name: 'six7',
   branch: 'main',
   filePath: 'data/tokens.json',
   id: 'six7/figma-tokens',
   provider: 'gitlab',
   secret: 'gitlab',
+  commitDate: 'Fri Apr 28 2023 22:01:01 GMT+0900',
 };
 const bitbucketContext = {
   name: 'six7',
@@ -968,5 +971,23 @@ describe('remoteTokens', () => {
 
   it('Read tokens from File, should return null if there is no file', async () => {
     expect(await result.current.fetchTokensFromFileOrDirectory({ files: null })).toEqual(null);
+  });
+
+  Object.values(contextMap).forEach((context) => {
+    it(`checkRemoteChange from ${context.provider}`, async () => {
+      if (context === gitHubContext) {
+        mockGetCommitSha.mockImplementation(() => (
+          Promise.resolve('456')
+        ));
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(true);
+      } else if (context === gitLabContext) {
+        mockGetLatestCommitDate.mockImplementation(() => (
+          Promise.resolve('Fri Apr 28 2023 23:01:01 GMT+0900')
+        ));
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(true);
+      } else {
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(false);
+      }
+    });
   });
 });

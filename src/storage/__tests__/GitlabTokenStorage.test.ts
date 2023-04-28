@@ -13,6 +13,8 @@ const mockGetProjectMembers = jest.fn();
 const mockGetRepositories = jest.fn();
 const mockGetRepositoryFiles = jest.fn();
 const mockCreateCommits = jest.fn();
+const mockShowCommits = jest.fn();
+const mockShowRepositoryFiles = jest.fn();
 
 jest.mock('@gitbeaker/browser', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
@@ -38,9 +40,11 @@ jest.mock('@gitbeaker/browser', () => ({
     },
     RepositoryFiles: {
       showRaw: mockGetRepositoryFiles,
+      show: mockShowRepositoryFiles,
     },
     Commits: {
       create: mockCreateCommits,
+      show: mockShowCommits,
     },
   }
   )),
@@ -643,5 +647,66 @@ describe('GitlabTokenStorage', () => {
     await expect(provider.write([]))
       .rejects
       .toThrow('Project ID not assigned');
+  });
+
+  it('should return the committed date of a JSON file', async () => {
+    mockShowRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        commit_id: '1234',
+      })
+    ));
+    mockShowCommits.mockImplementationOnce(() => (
+      Promise.resolve({
+        committed_date: '2022-01-31T12:34:56Z',
+      })
+    ));
+    expect(await storageProvider.getLatestCommitDate()).toEqual('2022-01-31T12:34:56Z');
+  });
+
+  it('should return the committed date of the latest JSON file in a directory (recursive)', async () => {
+    storageProvider.changePath('data');
+    mockGetRepositories.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'global.json',
+          path: 'data/global.json',
+          type: 'blob',
+        },
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'core.json',
+          path: 'data/core.json',
+          type: 'blob',
+        },
+        {
+          id: 'b2ce0083a14576540b8eed3de53bc6d7a43e00e6',
+          mode: '100644',
+          name: 'internal.json',
+          path: 'data/internal.json',
+          type: 'blob',
+        },
+        {
+          id: '3d037ff17e986f4db21aabaefca3e3ddba113d85',
+          mode: '100644',
+          name: '$themes.json',
+          path: 'data/$themes.json',
+          type: 'blob',
+        },
+      ])
+    ));
+    mockShowRepositoryFiles.mockImplementationOnce(() => (
+      Promise.resolve({
+        commit_id: '1234',
+      })
+    ));
+    mockShowCommits.mockImplementationOnce(() => (
+      Promise.resolve({
+        committed_date: '2022-01-31T12:34:56Z',
+      })
+    ));
+    expect(await storageProvider.getLatestCommitDate()).toEqual('2022-01-31T12:34:56Z');
   });
 });
