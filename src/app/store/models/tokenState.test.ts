@@ -122,6 +122,11 @@ describe('editToken', () => {
             activeTheme: null,
             activeTokenSet: 'global',
             collapsedTokens: [],
+            remoteData: {
+              tokens: {},
+              themes: [],
+              metadata: null,
+            },
           },
           settings: {
             updateRemote: true,
@@ -1462,6 +1467,77 @@ describe('editToken', () => {
     expect(changedState).toEqual({
       tokens: {},
       themes: [],
+    });
+  });
+
+  it('should be able to set remoteData', () => {
+    store.dispatch.tokenState.setRemoteData({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+    });
+    const { remoteData } = store.getState().tokenState;
+    expect(remoteData).toEqual({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+
     });
   });
 });

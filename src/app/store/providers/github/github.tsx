@@ -21,8 +21,8 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
-type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
-type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
+type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
   const activeTheme = useSelector(activeThemeSelector);
@@ -79,7 +79,11 @@ export function useGitHub() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
-
+    dispatch.tokenState.setRemoteData({
+      tokens: content?.tokens ?? {},
+      themes: content?.themes ?? [],
+      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
+    });
     const pushSettings = await pushDialog();
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
@@ -95,9 +99,10 @@ export function useGitHub() {
         }, {
           commitMessage,
         });
+        const commitSha = await storage.getCommitSha();
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
-        dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
@@ -175,10 +180,11 @@ export function useGitHub() {
       if (content) {
         // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
-
+        const commitSha = await storage.getCommitSha();
         return {
           ...content,
           tokens: sortedTokens,
+          commitSha,
         };
       }
     } catch (e) {
@@ -224,6 +230,7 @@ export function useGitHub() {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
+            const commitSha = await storage.getCommitSha();
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
             saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
@@ -233,6 +240,7 @@ export function useGitHub() {
               usedTokenSet,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
+            dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
             notifyToUI('Pulled tokens from GitHub');
           }
         }
@@ -285,9 +293,6 @@ export function useGitHub() {
     syncTokensWithGitHub,
     tokens,
     themes,
-    dispatch.tokenState,
-    usedTokenSet,
-    activeTheme,
   ]);
 
   const fetchGithubBranches = useCallback(async (context: GithubCredentials) => {
@@ -300,6 +305,19 @@ export function useGitHub() {
     return storage.createBranch(newBranch, source);
   }, [storageClientFactory]);
 
+  const checkRemoteChangeForGitHub = useCallback(async (context: GithubCredentials): Promise<boolean> => {
+    const storage = storageClientFactory(context);
+    try {
+      const remoteSha = await storage.getCommitSha();
+      if (remoteSha && context.commitSha && context.commitSha !== remoteSha) {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, [storageClientFactory]);
+
   return useMemo(() => ({
     addNewGitHubCredentials,
     syncTokensWithGitHub,
@@ -307,6 +325,7 @@ export function useGitHub() {
     pushTokensToGitHub,
     fetchGithubBranches,
     createGithubBranch,
+    checkRemoteChangeForGitHub,
   }), [
     addNewGitHubCredentials,
     syncTokensWithGitHub,
@@ -314,5 +333,6 @@ export function useGitHub() {
     pushTokensToGitHub,
     fetchGithubBranches,
     createGithubBranch,
+    checkRemoteChangeForGitHub,
   ]);
 }
