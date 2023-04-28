@@ -39,6 +39,9 @@ const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
 const mocksetChangedState = jest.fn();
 const mockResetChangedState = jest.fn();
+const mockGetCommitSha = jest.fn();
+const mockGetLatestCommitDate = jest.fn();
+const mockSetRemoteData = jest.fn();
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -85,6 +88,7 @@ jest.mock('react-redux', () => ({
       setCollapsedTokenSets: mockSetCollapsedTokenSets,
       setChangedState: mocksetChangedState,
       resetChangedState: mockResetChangedState,
+      setRemoteData: mockSetRemoteData,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -100,6 +104,7 @@ jest.mock('../../storage/GithubTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
+      getCommitSha: mockGetCommitSha,
       fetchBranches: mockFetchBranches,
       save: mockSave,
       createBranch: mockCreateBranch,
@@ -126,6 +131,7 @@ jest.mock('../../storage/GitlabTokenStorage', () => ({
         fetchBranches: mockFetchBranches,
         save: mockSave,
         createBranch: mockCreateBranch,
+        getLatestCommitDate: mockGetLatestCommitDate,
       })),
     }
   )),
