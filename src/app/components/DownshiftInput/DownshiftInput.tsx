@@ -191,8 +191,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
-  const getValueText = React.useCallback((token: SingleToken) => getResolvedValue(token), []);
-
   const handleSelect = useCallback((selectedItem: any) => {
     if (selectedItem) {
       if (currentSearchField === 'Tokens') {
@@ -311,7 +309,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             </StyledItemColorDiv>
                             )}
                             <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                            <StyledItemValue>{getValueText(token)}</StyledItemValue>
+                            <StyledItemValue>{getResolvedValue(token)}</StyledItemValue>
                           </StyledItem>
 
                         );
