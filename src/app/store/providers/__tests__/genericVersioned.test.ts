@@ -1,20 +1,21 @@
 import { ThemeObjectsList } from '@/types';
-import { StorageTypeCredentials } from '@/types/StorageType';
 import { SingleToken } from '@/types/tokens';
-import { updateJSONBinTokens } from '../jsonbin';
+import { updateGenericVersionedTokens } from '../generic/versionedStorage';
 import * as pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
+import { notifyToUI } from '@/plugin/notifiers';
 import {
   StorageProviderType,
-} from '@/constants/StorageProviderType';
-import { notifyToUI } from '@/plugin/notifiers';
+  GenericVersionedStorageFlow,
+  GenericVersionedStorageType,
+} from '@/types/StorageType';
 
 const mockRetrieve = jest.fn();
 const mockSave = jest.fn();
 
-jest.mock('@/storage/JSONBinTokenStorage', () => ({
-  JSONBinTokenStorage: jest.fn().mockImplementation(() => (
+jest.mock('@/storage/GenericVersionedStorage', () => ({
+  GenericVersionedStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
       save: mockSave,
@@ -26,7 +27,7 @@ jest.mock('@/plugin/notifiers', (() => ({
   notifyToUI: jest.fn(),
 })));
 
-describe('jsonbin', () => {
+describe('Generic Versioned Storage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -49,25 +50,29 @@ describe('jsonbin', () => {
       },
     },
   ];
-  const context: Partial<StorageTypeCredentials> = {
-    name: 'six7',
-    id: 'six7/figma-tokens',
-    provider: StorageProviderType.JSONBIN,
-    secret: 'jsonbin',
+  const context: GenericVersionedStorageType = {
+    internalId: 'test',
+    name: 'test',
+    id: 'http://test.com',
+    flow: GenericVersionedStorageFlow.READ_WRITE_CREATE,
+    additionalHeaders: [],
+    provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+
   };
-  it('return old data when remote data is older', async () => {
+  it('return new data when remote data is older', async () => {
     const mockStore = createMockStore({});
     const updatedAt = '2022-09-20T08:43:03.844Z';
     const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
+    const remoteUpdatedAt = '2022-09-19T07:43:03.844Z';
 
     mockRetrieve.mockImplementationOnce(() => Promise.resolve({
       metadata: {
-        updatedAt: '2022-09-19T07:43:03.844Z',
+        updatedAt: remoteUpdatedAt,
       },
     }));
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
-    expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+    expect(await updateGenericVersionedTokens({
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual({
       tokens: {
         global: [
@@ -88,30 +93,31 @@ describe('jsonbin', () => {
         },
       ],
       metadata: {
-        tokenSetOrder: ['global'],
-        updatedAt: '2022-09-20T08:43:03.844Z',
+        updatedAt,
         version: pjs.plugin_version,
       },
     });
+    expect(notifyToUI).not.toHaveBeenCalled();
   });
 
-  it('notify updating error when remote data is newer', async () => {
+  it('indicates to the user that new data is available and does not save data when remote is newer', async () => {
     const mockStore = createMockStore({});
     const updatedAt = '2022-09-20T08:43:03.844Z';
-    const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
+    const oldUpdatedAt = '2021-09-20T07:43:03.844Z';
+    const RemoteUpdatedAt = '2023-09-20T07:43:03.844Z';
 
-    mockRetrieve.mockImplementation(() => Promise.resolve({
+    mockRetrieve.mockImplementationOnce(() => Promise.resolve({
       metadata: {
-        updatedAt: '2022-09-21T07:43:03.844Z',
+        updatedAt: RemoteUpdatedAt,
       },
     }));
-    mockSave.mockImplementation(() => Promise.resolve(true));
-    await updateJSONBinTokens({
+    mockSave.mockImplementationOnce(() => Promise.resolve(true));
+
+    const response = await updateGenericVersionedTokens({
       tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     });
-    expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
-    })).toEqual(null);
+
+    expect(response).toBeUndefined();
     expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', { error: true });
     expect(mockSave).not.toBeCalled();
   });
@@ -125,12 +131,12 @@ describe('jsonbin', () => {
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     }));
-    expect(await updateJSONBinTokens({
+    expect(await updateGenericVersionedTokens({
       tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     });
-    expect(notifyToUI).toHaveBeenCalledWith('Error updating JSONBin, check console (F12)', { error: true });
+    expect(notifyToUI).toHaveBeenCalledWith('Error updating Generic Storage, check console (F12) ', { error: true });
   });
 });

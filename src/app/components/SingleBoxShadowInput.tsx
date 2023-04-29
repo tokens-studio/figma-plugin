@@ -66,9 +66,8 @@ export default function SingleBoxShadowInput({
 
   const onChange = React.useCallback((property: string, newValue: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], [property]: newValue };
-      values.splice(index, 1, newShadow);
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [property]: newValue });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -81,9 +80,8 @@ export default function SingleBoxShadowInput({
 
   const onTypeChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], [e.target.name]: e.target.value };
-      values.splice(index, 1, newShadow);
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [e.target.name]: e.target.value });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -96,9 +94,8 @@ export default function SingleBoxShadowInput({
 
   const handleBoxshadowValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], [property]: newInputValue };
-      values.splice(index, 1, newShadow);
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [property]: newInputValue });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -115,9 +112,8 @@ export default function SingleBoxShadowInput({
 
   const onColorChange = React.useCallback((color: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], color: color.trim() };
-      values.splice(index, 1, newShadow);
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], color: color.trim() });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({

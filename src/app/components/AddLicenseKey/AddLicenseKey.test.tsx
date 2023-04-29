@@ -16,6 +16,9 @@ import { AddLicenseSource } from '@/app/store/models/userState';
 import ConfirmDialog from '../ConfirmDialog';
 import * as notifiers from '@/plugin/notifiers';
 
+// Hide log calls unless they are expected. This is mainly related to react-modal
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 jest.mock('launchdarkly-react-client-sdk', () => ({
   LDProvider: (props: React.PropsWithChildren<unknown>) => props.children,
   useLDClient: () => ({

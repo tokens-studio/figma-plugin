@@ -84,10 +84,12 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       ]),
     });
 
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
     if (response.ok) {
       return response.json();
     }
-
     return false;
   }
 
@@ -136,6 +138,9 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       ]),
     });
 
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
     if (response.ok) {
       const parsedJsonData = await response.json();
       const validationResult = await genericVersionedSchema.safeParseAsync(parsedJsonData);
@@ -146,6 +151,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       }
     }
 
+    // Required to satisfy typescript
     return [];
   }
 
@@ -185,10 +191,14 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       ]),
     });
 
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
+
     if (response.ok) {
       return true;
     }
-
+    // Required to make typescript happy
     return false;
   }
 }

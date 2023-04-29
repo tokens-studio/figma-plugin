@@ -55,6 +55,10 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
       ]),
     });
 
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
+
     if (response.ok) {
       return response.json();
     }
@@ -112,6 +116,11 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         ['X-Bin-Meta', '0'],
       ]),
     });
+
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
+
     if (response.ok) {
       const parsedJsonData = await response.json();
       const validationResult = await z.object({
@@ -166,6 +175,10 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         ...this.defaultHeaders.entries(),
       ]),
     });
+
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
 
     if (response.ok) {
       return true;

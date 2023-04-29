@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
@@ -34,6 +34,7 @@ import SecondScreen from './SecondScreen';
 import { useFlags } from './LaunchDarkly';
 
 export default function Footer() {
+  const [hasRemoteChange, setHasRemoteChange] = useState(false);
   const storageType = useSelector(storageTypeSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
@@ -44,7 +45,7 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
-  const { pullTokens, pushTokens } = useRemoteTokens();
+  const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { secondScreen } = useFlags();
 
   const checkForChanges = React.useCallback(() => {
@@ -60,6 +61,15 @@ export default function Footer() {
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      checkRemoteChange().then((response: boolean) => {
+        setHasRemoteChange(response);
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [checkRemoteChange]);
 
   const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
@@ -83,7 +93,7 @@ export default function Footer() {
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />
-            <IconButton dataCy="footer-pull-button" icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
+            <IconButton dataCy="footer-pull-button" badge={hasRemoteChange} icon={<DownloadIcon />} onClick={onPullButtonClicked} tooltipSide="top" tooltip={`Pull from ${transformProviderName(storageType.provider)}`} />
             <IconButton dataCy="footer-push-button" badge={hasChanges} icon={<UploadIcon />} onClick={onPushButtonClicked} tooltipSide="top" disabled={editProhibited} tooltip={`Push to ${transformProviderName(storageType.provider)}`} />
           </>
         )}
