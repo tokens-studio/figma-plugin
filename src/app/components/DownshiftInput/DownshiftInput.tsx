@@ -25,6 +25,7 @@ import {
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
+import getResolvedValue from '@/utils/getResolvedValue';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 type Arrow = 'top' | 'down';
@@ -190,30 +191,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     );
   }, []);
 
-  const getResolveValue = useCallback((token: SingleToken) => {
-    let returnValue: string = '';
-    if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
-      if (Array.isArray(token.value)) {
-        returnValue = token.value.reduce<string>((totalAcc, item) => {
-          const singleReturnValue = Object.entries(item).reduce<string>((acc, [, propertyValue]) => (
-            `${acc}${propertyValue.toString()}/`
-          ), '');
-          return `${totalAcc}${singleReturnValue},`;
-        }, '');
-      } else {
-        returnValue = Object.entries(token.value).reduce<string>((acc, [, propertyValue]) => (
-          `${acc}${propertyValue.toString()}/`
-        ), '');
-      }
-    } else if (token.type === TokenTypes.COMPOSITION) {
-      returnValue = Object.entries(token.value).reduce<string>((acc, [property, value]) => (
-        `${acc}${property}:${value}`
-      ), '');
-    } else if (typeof token.value === 'string' || typeof token.value === 'number') {
-      returnValue = token.value;
-    }
-    return returnValue;
-  }, []);
+  const getValueText = React.useCallback((token: SingleToken) => getResolvedValue(token), []);
 
   const handleSelect = useCallback((selectedItem: any) => {
     if (selectedItem) {
@@ -333,7 +311,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             </StyledItemColorDiv>
                             )}
                             <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                            <StyledItemValue>{getResolveValue(token)}</StyledItemValue>
+                            <StyledItemValue>{getValueText(token)}</StyledItemValue>
                           </StyledItem>
 
                         );
