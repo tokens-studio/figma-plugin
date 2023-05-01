@@ -21,7 +21,7 @@ function PushSettingForm({
   const localApiState = useSelector(localApiStateSelector);
 
   return (
-    <Stack direction="column" gap={3}>
+    <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Text size="small">Push your local changes to your repository.</Text>
       <Box css={{
         padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',

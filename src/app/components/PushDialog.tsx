@@ -124,6 +124,7 @@ function PushDialog() {
     case 'initial': {
       return (
         <Modal
+          full
           title={`Push to ${transformProviderName(storageType.provider)}`}
           showClose
           large
@@ -138,10 +139,15 @@ function PushDialog() {
             </div>
             {
               activeTab !== 'commit' && (
-                <Stack direction="row" gap={2} align="center">
+                <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
                   This will push your local changes to the
                   {' '}
-                  <Text bold css={{ background: '$bgSubtle', padding: '$2' }}>
+                  <Text
+                    bold
+                    css={{
+                      display: 'inline', whiteSpace: 'nowrap', background: '$bgSubtle', padding: '$2',
+                    }}
+                  >
                     {' '}
                     {branch}
                   </Text>
@@ -165,6 +171,11 @@ function PushDialog() {
               padding: '$4',
               borderTop: '1px solid',
               borderColor: '$borderMuted',
+              position: 'sticky',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '$bgDefault',
             }}
             >
               <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>

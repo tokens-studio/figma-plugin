@@ -9,6 +9,7 @@ import { styled } from '@/stitches.config';
 const StyledJSONContent = styled('pre', {
   padding: '$2 $4',
   whiteSpace: 'pre-wrap',
+  overflow: 'hiden',
 });
 
 function PushJSON() {

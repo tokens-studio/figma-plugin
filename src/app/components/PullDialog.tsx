@@ -32,12 +32,13 @@ function PullDialog() {
         <Modal
           title={`Pull from ${transformProviderName(storageType.provider)}`}
           showClose
+          full
           large
           isOpen
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
-            <Stack direction="row" gap={2}>
+            <Stack direction="row" gap={2} css={{ padding: '$4' }}>
               This will override your current tokens. Make sure you copy your changes if you want to preserve them.
             </Stack>
             <ChangedStateList changedState={changedState} />
@@ -47,13 +48,18 @@ function PullDialog() {
               padding: '$4',
               borderTop: '1px solid',
               borderColor: '$borderMuted',
+              position: 'sticky',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '$bgDefault',
             }}
             >
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
                 Cancel
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                Override tokens
+                Pull tokens
               </Button>
             </Box>
           </Stack>
