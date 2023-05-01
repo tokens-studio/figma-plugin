@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
-  lastSyncedStateSelector, localApiStateSelector, storageTypeSelector, themesListSelector, tokensSelector,
+  localApiStateSelector, remoteDataSelector, storageTypeSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
@@ -22,9 +22,7 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
-import { tryParseJson } from '@/utils/tryParseJson';
 import { findDifferentState } from '@/utils/findDifferentState';
-import { LastSyncedState } from '@/utils/compareLastSyncedState';
 import PushSettingForm from './PushSettingForm';
 
 function PushDialog() {
@@ -36,25 +34,17 @@ function PushDialog() {
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
   const [activeTab, setActiveTab] = React.useState('commit');
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
+  const remoteData = useSelector(remoteDataSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const changedState = React.useMemo(() => {
-    const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
-    if (parsedState) {
-      const tokenSetOrder = Object.keys(tokens);
-      return findDifferentState({
-        tokens: parsedState[0],
-        themes: parsedState[1] || [],
-        metadata: parsedState[2],
-      }, {
-        tokens,
-        themes,
-        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
-      });
-    }
-    return { tokens: {}, themes: [] };
-  }, [lastSyncedState, tokens, themes, storageType]);
+    const tokenSetOrder = Object.keys(tokens);
+    return findDifferentState(remoteData, {
+      tokens,
+      themes,
+      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+    });
+  }, [remoteData, tokens, themes, storageType]);
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';

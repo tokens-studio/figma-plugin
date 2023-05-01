@@ -117,10 +117,10 @@ export default async function updateTokensOnSources({
   collapsedTokenSets,
   dispatch,
 }: UpdateTokensOnSourcesPayload) {
-  if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
+  if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
-      tokens,
+      tokens: tokenValues,
       themes,
       context: api,
       updatedAt,

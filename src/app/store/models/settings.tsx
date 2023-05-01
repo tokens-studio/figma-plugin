@@ -196,7 +196,7 @@ export const settings = createModel<RootModel>()({
     },
     setBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);

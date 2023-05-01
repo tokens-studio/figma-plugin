@@ -33,6 +33,11 @@ const checkForChangesPropertyReadSpy = jest.spyOn(CheckForChangesProperty, 'read
 const licenseKeyPropertyReadSpy = jest.spyOn(LicenseKeyProperty, 'read');
 const validateLicenseSpy = jest.spyOn(validateLicenseModule, 'default');
 
+// Hide error calls unless they are expected. This is mainly related to react-modal
+jest.spyOn(console, 'error').mockImplementation(() => { });
+// Hide warn calls from shortcut hooks
+jest.spyOn(console, 'warn').mockImplementation(() => { });
+
 const mockUser = {
   figmaId: 'figma:1234',
   userId: 'uid:1234',

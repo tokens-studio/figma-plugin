@@ -8,7 +8,7 @@ import {
 } from '../../../tests/config/setupTest';
 import SyncSettings from './SyncSettings';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { GitStorageType, StorageTypeCredential } from '@/types/StorageType';
+import { GitHubStorageType, StorageTypeCredential } from '@/types/StorageType';
 
 describe('ConfirmDialog', () => {
   const defaultStore = {
@@ -24,14 +24,14 @@ describe('ConfirmDialog', () => {
         filePath: 'data/tokens.json',
         id: 'six7/figma-tokens',
         provider: 'github',
-      } as GitStorageType,
+      } as GitHubStorageType,
       apiProviders: [
         {
           branch: 'main',
           filePath: 'data/tokens.json',
           id: 'six7/figma-tokens',
           provider: 'github',
-        } as StorageTypeCredential<GitStorageType>,
+        } as StorageTypeCredential<GitHubStorageType>,
       ],
     },
   };

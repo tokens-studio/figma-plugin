@@ -51,10 +51,10 @@ export default function useRemoteTokens() {
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches, checkRemoteChangeForGitHub,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch, checkRemoteChangeForGitLab,
   } = useGitLab();
   const {
     addNewBitbucketCredentials,
@@ -119,6 +119,33 @@ export default function useRemoteTokens() {
           shouldOverride = !!await showPullDialog();
         }
         if (shouldOverride || activeTab === Tabs.LOADING) {
+          switch (context.provider) {
+            case StorageProviderType.JSONBIN: {
+              break;
+            }
+            case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+              break;
+            }
+            case StorageProviderType.GITHUB: {
+              dispatch.uiState.setApiData({ ...context, ...(remoteData.commitSha ? { commitSha: remoteData.commitSha } : {}) });
+              break;
+            }
+            case StorageProviderType.BITBUCKET: {
+              break;
+            }
+            case StorageProviderType.GITLAB: {
+              dispatch.uiState.setApiData({ ...context, ...(remoteData.commitDate ? { commitDate: remoteData.commitDate } : {}) });
+              break;
+            }
+            case StorageProviderType.ADO: {
+              break;
+            }
+            case StorageProviderType.URL: {
+              break;
+            }
+            default:
+              break;
+          }
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
           dispatch.tokenState.setTokenData({
             values: remoteData.tokens,
@@ -403,6 +430,49 @@ export default function useRemoteTokens() {
     readTokensFromFileOrDirectory,
   ]);
 
+  const checkRemoteChange = useCallback(async (context: StorageTypeCredentials = api): Promise<boolean> => {
+    track('checkRemoteChange', { provider: context.provider });
+    let hasChange = false;
+    switch (context.provider) {
+      case StorageProviderType.JSONBIN: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GITHUB: {
+        hasChange = await checkRemoteChangeForGitHub(context);
+        break;
+      }
+      case StorageProviderType.BITBUCKET: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        hasChange = await checkRemoteChangeForGitLab(context);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.URL: {
+        hasChange = false;
+        break;
+      }
+      default:
+        hasChange = false;
+        break;
+    }
+    return hasChange;
+  }, [
+    api,
+    checkRemoteChangeForGitHub,
+    checkRemoteChangeForGitLab,
+  ]);
+
   return useMemo(() => ({
     restoreStoredProvider,
     deleteProvider,
@@ -412,6 +482,7 @@ export default function useRemoteTokens() {
     fetchBranches,
     addNewBranch,
     fetchTokensFromFileOrDirectory,
+    checkRemoteChange,
   }), [
     restoreStoredProvider,
     deleteProvider,
@@ -421,5 +492,6 @@ export default function useRemoteTokens() {
     fetchBranches,
     addNewBranch,
     fetchTokensFromFileOrDirectory,
+    checkRemoteChange,
   ]);
 }

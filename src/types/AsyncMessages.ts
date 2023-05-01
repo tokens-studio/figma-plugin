@@ -124,7 +124,9 @@ export type PullStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PULL_S
 
 export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
   msg: string;
-  opts: NotificationOptions;
+  opts: {
+    error?: boolean
+  };
 }>;
 export type NotifyAsyncMessageResult = AsyncMessage<AsyncMessageTypes.NOTIFY>;
 

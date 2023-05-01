@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import { captureException } from '@sentry/react';
 import { Dispatch } from '@/app/store';
-import { notifyToUI } from '../../../../plugin/notifiers';
+import { notifyToUI } from '@/plugin/notifiers';
 import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
@@ -20,7 +21,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export async function updateGenericVersionedTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null,
+  tokens, themes, context, updatedAt, oldUpdatedAt = null, dispatch,
 }: UpdateRemoteFunctionPayload) {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
   try {
@@ -40,6 +41,7 @@ export async function updateGenericVersionedTokens({
       const remoteTokens = await storage.retrieve();
       if (remoteTokens?.status === 'failure') {
         // eslint-disable-next-line no-console
+        notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
         console.log('Error updating Generic storage', remoteTokens?.errorMessage);
         return {
           status: 'failure',
@@ -51,9 +53,15 @@ export async function updateGenericVersionedTokens({
       if (comparison === 'remote_older') {
         // Read Only is not allowed to save to external
         switch (flow) {
+          case GenericVersionedStorageFlow.READ_ONLY:
+            notifyToUI('Generic versioned storage is operating in read only mode. You cannot save tokens to remote', { error: true });
+            return payload;
+            break;
           case GenericVersionedStorageFlow.READ_WRITE:
           case GenericVersionedStorageFlow.READ_WRITE_CREATE:
-            storage.save(payload);
+            await storage.save(payload);
+            saveLastSyncedState(dispatch, payload.tokens, payload?.themes, payload.metadata);
+            return payload;
             break;
           default:
         }
@@ -61,10 +69,14 @@ export async function updateGenericVersionedTokens({
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else {
-      storage.save(payload);
+      await storage.save(payload);
+      saveLastSyncedState(dispatch, payload.tokens, payload?.themes, payload.metadata);
     }
   } catch (e) {
-    console.log('Error updating Generic Storage', e);
+    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+    // eslint-disable-next-line no-console
+    console.error('Error ', e);
+    captureException(e);
   }
   return undefined;
 }
@@ -82,35 +94,40 @@ export function useGenericVersionedStorage() {
       id, name, additionalHeaders, internalId, flow,
     } = context;
     const updatedAt = new Date().toISOString();
-    const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
-    if (result) {
-      updateGenericVersionedTokens({
-        tokens,
-        context: {
-          id,
-          additionalHeaders,
-          flow,
-        },
-        themes,
-        updatedAt,
-        dispatch,
-      });
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: {
-          provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-          id,
-          flow,
-          internalId,
-          name,
-          additionalHeaders,
-        },
-      });
-      dispatch.uiState.setProjectURL(id);
 
-      return result.metadata.id;
+    try {
+      const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
+      if (result) {
+        updateGenericVersionedTokens({
+          tokens,
+          context: {
+            id,
+            additionalHeaders,
+            flow,
+          },
+          themes,
+          updatedAt,
+          dispatch,
+        });
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREDENTIALS,
+          credential: {
+            provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+            id,
+            flow,
+            internalId,
+            name,
+            additionalHeaders,
+          },
+        });
+        dispatch.uiState.setProjectURL(id);
+
+        return result.metadata.id;
+      }
+    } catch (err) {
+      notifyToUI('Something went wrong. See console for details', { error: true });
+      console.error(err);
     }
-    notifyToUI('Something went wrong. See console for details', { error: true });
     return null;
   }, [dispatch, themes, tokens]);
 
@@ -150,7 +167,9 @@ export function useGenericVersionedStorage() {
       return null;
     } catch (e) {
       notifyToUI('Error fetching from Generic Versioned Storage, check console (F12)', { error: true });
-      console.log('Error:', e);
+      // eslint-disable-next-line no-console
+      console.error('Error fetching from Generic Versioned Storage:', e);
+      captureException(e);
       return null;
     }
   }, [dispatch]);
@@ -190,7 +209,7 @@ export function useGenericVersionedStorage() {
         },
         shouldSetInDocument: true,
       });
-      saveLastSyncedState(dispatch, content.tokens, content?.themes, {});
+      saveLastSyncedState(dispatch, content.tokens, content?.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,
