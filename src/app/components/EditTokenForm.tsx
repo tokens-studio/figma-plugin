@@ -10,7 +10,7 @@ import Text from './Text';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import {
-  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken,
+  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
@@ -193,6 +193,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setInternalEditToken({
         ...internalEditToken,
         value: { ...internalEditToken.value, [property]: newInputValue },
+      });
+    }
+  }, [internalEditToken]);
+
+  const setTypographyValue = React.useCallback((newTypographyValue: SingleTypographyToken['value']) => {
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof newTypographyValue === 'object') {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: { ...newTypographyValue },
       });
     }
   }, [internalEditToken]);
@@ -421,6 +430,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            setTypographyValue={setTypographyValue}
           />
         );
       }
