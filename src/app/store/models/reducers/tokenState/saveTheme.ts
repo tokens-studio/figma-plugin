@@ -3,7 +3,7 @@ import { ThemeObject } from '@/types';
 import type { TokenState } from '../../tokenState';
 import { setActiveTheme } from './setActiveTheme';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
   id?: string,
@@ -38,7 +38,7 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
       }
     });
   } else {
-    newActiveTheme[data?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL] = themeId;
+    newActiveTheme[data?.group ?? INTERNAL_THEMES_NO_GROUP] = themeId;
   }
   const nextState: TokenState = {
     ...state,

@@ -39,8 +39,8 @@ export const ThemeSelector: React.FC = () => {
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     availableThemes.forEach((theme) => {
-      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP_LABEL))) {
-        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL);
+      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
+        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
       }
     });
     return newArray;
@@ -103,11 +103,11 @@ export const ThemeSelector: React.FC = () => {
 
   const availableThemeOptions = useMemo(() => (
     groupNames.map((groupName) => {
-      const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
+      const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
       return (
         filteredThemes.length > 0 && (
-        <DropdownMenuRadioGroup value={typeof activeTheme[groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? INTERNAL_THEMES_NO_GROUP : groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-          <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
+        <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+          <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
           {
             renderThemeOption(filteredThemes)
           }

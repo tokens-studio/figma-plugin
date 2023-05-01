@@ -26,13 +26,14 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
+  console.log('active', activeTheme);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     themes.forEach((theme) => {
-      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP_LABEL))) {
-        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL);
+      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
+        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
       }
     });
     return newArray;
@@ -105,7 +106,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
   }, [dispatch.tokenState, themes]);
 
   const handleGroupReorder = React.useCallback((reorderedItems: string[]) => {
-    const reorderedThemeList = themes.sort((a, b) => reorderedItems.indexOf(a?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL) - reorderedItems.indexOf(b?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL));
+    const reorderedThemeList = themes.sort((a, b) => reorderedItems.indexOf(a?.group ?? INTERNAL_THEMES_NO_GROUP) - reorderedItems.indexOf(b?.group ?? INTERNAL_THEMES_NO_GROUP));
     dispatch.tokenState.setThemes(reorderedThemeList);
   }, [dispatch.tokenState, themes]);
   return (
@@ -177,11 +178,11 @@ export const ManageThemesModal: React.FC<Props> = () => {
         >
           {
             groupNames.map((groupName) => {
-              const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? themes.filter((t) => (typeof t?.group === 'undefined')) : themes.filter((t) => (t?.group === groupName));
+              const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? themes.filter((t) => (typeof t?.group === 'undefined')) : themes.filter((t) => (t?.group === groupName));
               return (
                 filteredThemes.length > 0 && (
                 <DragItem<string> key={groupName} item={groupName}>
-                  <ThemeListGroupHeader groupName={groupName} item={groupName} />
+                  <ThemeListGroupHeader groupName={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName} item={groupName} />
                   <ReorderGroup
                     layoutScroll
                     values={filteredThemes}
@@ -189,7 +190,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
                   >
                     {filteredThemes.map((theme) => (
                       <DragItem<ThemeObject> key={theme.id} item={theme}>
-                        <ThemeListItemContent item={theme} isActive={activeTheme?.[INTERNAL_THEMES_NO_GROUP] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
+                        <ThemeListItemContent item={theme} isActive={activeTheme?.[groupName] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
                       </DragItem>
                     ))}
                   </ReorderGroup>
