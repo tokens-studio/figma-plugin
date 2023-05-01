@@ -1,14 +1,14 @@
-import getResolvedValue from './getResolvedValue';
+import getResolvedTextValue from './getResolvedTextValue';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 
-describe('getResolvedValue', () => {
+describe('getResolvedTextValue', () => {
   it('returns empty string for invalid token type', () => {
     const token = {
       type: 'INVALID_TYPE',
       value: {},
     } as unknown as SingleToken;
-    expect(getResolvedValue(token)).toEqual('');
+    expect(getResolvedTextValue(token)).toEqual('');
   });
 
   it('returns resolved value for typography token with object value', () => {
@@ -19,7 +19,7 @@ describe('getResolvedValue', () => {
         lineHeight: '1.5',
       },
     } as unknown as SingleToken;
-    expect(getResolvedValue(token)).toEqual('16px/1.5');
+    expect(getResolvedTextValue(token)).toEqual('16px/1.5');
   });
 
   it('returns resolved value for box shadow token with single value', () => {
@@ -32,7 +32,7 @@ describe('getResolvedValue', () => {
         color: '#000',
       },
     } as unknown as SingleToken;
-    expect(getResolvedValue(token)).toEqual('10px/20px/30px/#000');
+    expect(getResolvedTextValue(token)).toEqual('10px/20px/30px/#000');
   });
 
   it('returns resolved value for box shadow token with multiple values', () => {
@@ -53,7 +53,7 @@ describe('getResolvedValue', () => {
         },
       ],
     } as unknown as SingleToken;
-    expect(getResolvedValue(token)).toEqual('10px/20px/30px/#000,5px/10px/15px/#fff');
+    expect(getResolvedTextValue(token)).toEqual('10px/20px/30px/#000,5px/10px/15px/#fff');
   });
 
   it('returns resolved value for composition token with object value', () => {
@@ -65,7 +65,7 @@ describe('getResolvedValue', () => {
         borderRadius: '13px',
       },
     } as unknown as SingleToken;
-    expect(getResolvedValue(token)).toEqual('sizing:300px,color:#fff,borderRadius:13px');
+    expect(getResolvedTextValue(token)).toEqual('sizing:300px,color:#fff,borderRadius:13px');
   });
 
   it('returns resolved value for string or number token', () => {
@@ -74,6 +74,6 @@ describe('getResolvedValue', () => {
       value: '12px',
     } as unknown as SingleToken;
 
-    expect(getResolvedValue(token1)).toEqual('12px');
+    expect(getResolvedTextValue(token1)).toEqual('12px');
   });
 });

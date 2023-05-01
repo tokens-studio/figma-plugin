@@ -10,7 +10,7 @@ import './mentions.css';
 import {
   StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
-import getResolvedValue from '@/utils/getResolvedValue';
+import getResolvedTextValue from '@/utils/getResolvedTextValue';
 
 export interface SuggestionDataItem {
   id: string;
@@ -111,7 +111,7 @@ export default function MentionsInput({
           )}
           <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
           {
-            resolvedToken && <StyledItemValue>{getResolvedValue(resolvedToken)}</StyledItemValue>
+            resolvedToken && <StyledItemValue>{getResolvedTextValue(resolvedToken)}</StyledItemValue>
           }
         </StyledItem>
       </Option>

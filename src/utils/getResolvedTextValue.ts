@@ -1,7 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 
-export default function getResolvedValue(token: SingleToken) {
+export default function getResolvedTextValue(token: SingleToken) {
   let returnValue: string = '';
   if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW) {
     if (Array.isArray(token.value)) {
@@ -9,7 +9,6 @@ export default function getResolvedValue(token: SingleToken) {
         const singleReturnValue = Object.entries(item).reduce<Array<string>>((acc, [, propertyValue]) => (
           acc.concat(`${propertyValue.toString()}`)
         ), []);
-        // return `${totalAcc}${singleReturnValue.join('/')},`;
         return totalAcc.concat(`${singleReturnValue.join('/')}`);
       }, []);
       returnValue = array.join(',');

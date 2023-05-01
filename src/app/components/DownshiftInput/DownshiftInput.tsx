@@ -25,7 +25,7 @@ import {
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
-import getResolvedValue from '@/utils/getResolvedValue';
+import getResolvedText from '@/utils/getResolvedTextValue';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 type Arrow = 'top' | 'down';
@@ -309,7 +309,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             </StyledItemColorDiv>
                             )}
                             <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                            <StyledItemValue>{getResolvedValue(token)}</StyledItemValue>
+                            <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
                           </StyledItem>
 
                         );
