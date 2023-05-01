@@ -21,7 +21,7 @@ import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 
 export type FormValues = {
   name: string
-  group: string
+  group?: string
   tokenSets: Record<string, TokenSetStatus>
 };
 
@@ -92,7 +92,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
             autofocus
             data-cy="create-or-edit-theme-form--group--name"
             data-testid="create-or-edit-theme-form--group--name"
-            {...register('group', { required: true })}
+            {...register('group')}
           />
           <Box>/</Box>
           <Input

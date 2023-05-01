@@ -9,6 +9,7 @@ import {
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('update', () => {
   const findNodesWithDataSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findNodesWithData');
@@ -23,7 +24,7 @@ describe('update', () => {
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
     activeTheme: {
-      noGroup: 'light',
+      [INTERNAL_THEMES_NO_GROUP]: 'light',
     },
     themes: [
       {

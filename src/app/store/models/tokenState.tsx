@@ -121,7 +121,7 @@ export const tokenState = createModel<RootModel>()({
     }),
     setThemes: (state, data: ThemeObjectsList) => ({
       ...state,
-      themes: data,
+      themes: [...data],
     }),
     setNewTokenData: (state, data: TokenData['synced_data']) => ({
       ...state,

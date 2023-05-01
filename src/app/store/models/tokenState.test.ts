@@ -5,6 +5,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
 import updateTokensOnSources from '../updateSources';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction<typeof updateTokensOnSources>;
 
@@ -295,7 +296,7 @@ describe('editToken', () => {
   it('can set token data', () => {
     store.dispatch.tokenState.setTokenData({
       values: {},
-      activeTheme: { noGroup: 'base' },
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'base' },
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
       },
@@ -1202,10 +1203,10 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: { noGroup: 'default' },
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
-    expect(activeTheme).toEqual({ noGroup: 'default' });
+    expect(activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'default' });
   });
 
   it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
@@ -1227,7 +1228,7 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: { noGroup: 'default' },
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
     expect(activeTheme).toEqual({});

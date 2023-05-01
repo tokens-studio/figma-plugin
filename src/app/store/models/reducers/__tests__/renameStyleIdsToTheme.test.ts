@@ -1,3 +1,4 @@
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 
 describe('renameStyleIdsToCurrentTheme', () => {
@@ -22,7 +23,7 @@ describe('renameStyleIdsToCurrentTheme', () => {
           },
         }],
         activeTheme: {
-          noGroup: 'light',
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
       },
     });

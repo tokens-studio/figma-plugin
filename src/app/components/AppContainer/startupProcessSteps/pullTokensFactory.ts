@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react';
 import type { LDFlagSet } from 'launchdarkly-js-client-sdk';
 import { Store } from 'redux';
+import { INTERNAL_THEMES_NO_GROUP } from '../../../../constants/InternalTokenGroup';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import type { Dispatch, RootState } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
@@ -23,7 +24,7 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const activeTheme = typeof params.activeTheme === 'string' ? { noGroup: params.activeTheme } : params.activeTheme;
+  const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',

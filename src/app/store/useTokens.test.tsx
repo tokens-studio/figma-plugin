@@ -18,6 +18,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { NodeInfo } from '@/types/NodeInfo';
 import { Properties } from '@/constants/Properties';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -357,7 +358,7 @@ describe('useToken test', () => {
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
         activeTheme: {
-          noGroup: 'light',
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
         themes: [{
           id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},

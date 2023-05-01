@@ -10,12 +10,15 @@ import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import Button from '../Button';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
-import { ThemeObject } from '@/types';
+import { ThemeObject, ThemeObjectsList } from '@/types';
 import Box from '../Box';
 import { track } from '@/utils/analytics';
 import useConfirm from '@/app/hooks/useConfirm';
-import { ThemeListItemContent } from '../ThemeSelector/ThemeListItemContent';
-import Text from '../Text';
+import { ThemeListItemContent } from './ThemeListItemContent';
+import { DragItem } from '../StyledDragger/DragItem';
+import { ReorderGroup } from '@/motion/ReorderGroup';
+import { ThemeListGroupHeader } from './ThemeListGroupHeader';
+import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 
 type Props = unknown;
 
@@ -28,8 +31,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     themes.forEach((theme) => {
-      if (theme.group !== undefined && !newArray.includes(theme.group)) {
-        newArray.push(theme.group);
+      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP_LABEL))) {
+        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL);
       }
     });
     return newArray;
@@ -40,8 +43,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
     if (themeObject) {
       return {
         name: themeObject.name,
-        group: themeObject.group,
         tokenSets: themeObject.selectedTokenSets,
+        ...(themeObject?.group ? { group: themeObject.group } : {}),
       };
     }
     return {};
@@ -85,12 +88,26 @@ export const ManageThemesModal: React.FC<Props> = () => {
     dispatch.tokenState.saveTheme({
       id,
       name: values.name,
-      group: values.group,
       selectedTokenSets: values.tokenSets,
+      ...(values?.group ? { group: values.group } : {}),
     });
     setThemeEditorOpen(false);
   }, [themeEditorOpen, dispatch]);
 
+  const handleReorder = React.useCallback((reorderedItems: ThemeObjectsList) => {
+    const reorderedThemeList = [...themes];
+    reorderedThemeList.forEach((theme, index) => {
+      if (theme?.group === reorderedItems[0]?.group) {
+        reorderedThemeList.splice(index, 1, reorderedItems.shift() || theme);
+      }
+    });
+    dispatch.tokenState.setThemes(reorderedThemeList);
+  }, [dispatch.tokenState, themes]);
+
+  const handleGroupReorder = React.useCallback((reorderedItems: string[]) => {
+    const reorderedThemeList = themes.sort((a, b) => reorderedItems.indexOf(a?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL) - reorderedItems.indexOf(b?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL));
+    dispatch.tokenState.setThemes(reorderedThemeList);
+  }, [dispatch.tokenState, themes]);
   return (
     <Modal
       isOpen
@@ -153,37 +170,35 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <>
-          {
-            themes.filter((t) => (typeof t.group === 'undefined')).length > 0 && (
-              <>
-                <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>No Group</Text>
-                {
-                  themes.filter((t) => (typeof t.group === 'undefined')).map((theme) => (
-                    <ThemeListItemContent item={theme} isActive={activeTheme?.noGroup === theme.id} onOpen={handleToggleThemeEditor} groupName="noGroup" />
-                  ))
-                }
-              </>
-            )
-          }
+        <ReorderGroup
+          layoutScroll
+          values={groupNames}
+          onReorder={handleGroupReorder}
+        >
           {
             groupNames.map((groupName) => {
-              const filteredThemes = themes.filter((t) => (t.group === groupName));
+              const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? themes.filter((t) => (typeof t?.group === 'undefined')) : themes.filter((t) => (t?.group === groupName));
               return (
                 filteredThemes.length > 0 && (
-                  <>
-                    <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
-                    {
-                      filteredThemes.map((theme) => (
-                        <ThemeListItemContent item={theme} isActive={activeTheme[groupName] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
-                      ))
-                    }
-                  </>
+                <DragItem<string> key={groupName} item={groupName}>
+                  <ThemeListGroupHeader groupName={groupName} item={groupName} />
+                  <ReorderGroup
+                    layoutScroll
+                    values={filteredThemes}
+                    onReorder={handleReorder}
+                  >
+                    {filteredThemes.map((theme) => (
+                      <DragItem<ThemeObject> key={theme.id} item={theme}>
+                        <ThemeListItemContent item={theme} isActive={activeTheme?.[INTERNAL_THEMES_NO_GROUP] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
+                      </DragItem>
+                    ))}
+                  </ReorderGroup>
+                </DragItem>
                 )
               );
             })
           }
-        </>
+        </ReorderGroup>
       )}
       {themeEditorOpen && (
         <CreateOrEditThemeForm

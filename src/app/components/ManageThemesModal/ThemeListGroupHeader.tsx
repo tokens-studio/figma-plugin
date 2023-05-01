@@ -6,21 +6,16 @@ import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
-import { SingleThemeEntry } from '../ManageThemesModal/SingleThemeEntry';
-import { ThemeObject } from '@/types';
+import Text from '../Text';
 
 type Props = React.PropsWithChildren<{
-  item: ThemeObject
-  isActive: boolean
+  item: string
   groupName: string
-  onOpen: (theme?: ThemeObject) => void;
 }>;
 
-export function ThemeListItemContent({
+export function ThemeListGroupHeader({
   item,
-  isActive,
   groupName,
-  onOpen,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -34,18 +29,12 @@ export function ThemeListItemContent({
       type="button"
       style={{ cursor: 'inherit' }}
     >
-      <DragGrabber<ThemeObject>
+      <DragGrabber<string>
         item={item}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
       />
-      <SingleThemeEntry
-        key={item.id}
-        theme={item}
-        isActive={isActive}
-        groupName={groupName}
-        onOpen={onOpen}
-      />
+      <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
     </StyledDragButton>
   );
 }

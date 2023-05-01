@@ -20,6 +20,7 @@ import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
+import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
@@ -38,7 +39,7 @@ export const ThemeSelector: React.FC = () => {
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     availableThemes.forEach((theme) => {
-      if (theme.group !== undefined && !newArray.includes(theme.group)) {
+      if (theme?.group !== undefined && !newArray.includes(theme?.group)) {
         newArray.push(theme.group);
       }
     });
@@ -49,7 +50,7 @@ export const ThemeSelector: React.FC = () => {
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
-    const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? 'noGroup';
+    const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
     const nextTheme = activeTheme;
     if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
       delete nextTheme[groupOfTheme];
@@ -103,18 +104,18 @@ export const ThemeSelector: React.FC = () => {
   const availableThemeOptions = useMemo(() => (
     <>
       {
-        availableThemes.filter((t) => typeof t.group === 'undefined').length > 0 && (
-          <DropdownMenuRadioGroup value={typeof activeTheme?.noGroup !== 'undefined' ? activeTheme.noGroup : ''}>
-            <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>No Group</Text>
+        availableThemes.filter((t) => typeof t?.group === 'undefined').length > 0 && (
+          <DropdownMenuRadioGroup value={typeof activeTheme?.[INTERNAL_THEMES_NO_GROUP] !== 'undefined' ? activeTheme[INTERNAL_THEMES_NO_GROUP] : ''}>
+            <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{INTERNAL_THEMES_NO_GROUP_LABEL}</Text>
             {
-              renderThemeOption(availableThemes.filter((t) => typeof t.group === 'undefined'))
+              renderThemeOption(availableThemes.filter((t) => typeof t?.group === 'undefined'))
             }
           </DropdownMenuRadioGroup>
         )
       }
       {
         groupNames.map((groupName) => {
-          const filteredThemes = availableThemes.filter((t) => (t.group === groupName));
+          const filteredThemes = availableThemes.filter((t) => (t?.group === groupName));
           return (
             filteredThemes.length > 0 && (
             <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>

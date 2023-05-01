@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { act, createMockStore, render } from '../../../../tests/config/setupTest';
 import { ThemeSelector } from './ThemeSelector';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('ThemeSelector', () => {
   it('should show none if no active theme is selected', () => {
@@ -20,7 +21,7 @@ describe('ThemeSelector', () => {
     const mockStore = createMockStore({
       tokenState: {
         activeTheme: {
-          noGroup: 'light',
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
         themes: [{
           id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
@@ -40,7 +41,7 @@ describe('ThemeSelector', () => {
     const mockStore = createMockStore({
       tokenState: {
         activeTheme: {
-          noGroup: 'light',
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
       },
     });
@@ -79,6 +80,6 @@ describe('ThemeSelector', () => {
       await userEvent.keyboard('[Enter]');
     });
 
-    expect(mockStore.getState().tokenState.activeTheme).toEqual({ noGroup: 'light' });
+    expect(mockStore.getState().tokenState.activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'light' });
   });
 });

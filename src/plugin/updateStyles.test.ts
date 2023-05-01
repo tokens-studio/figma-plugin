@@ -9,6 +9,7 @@ import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessa
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { createStyles } from './asyncMessageHandlers';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
 
@@ -236,7 +237,7 @@ describe('updateStyles', () => {
       Promise.resolve({
         type: AsyncMessageTypes.GET_THEME_INFO,
         activeTheme: {
-          noGroup: 'light',
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
         themes: [{
           id: 'light',
