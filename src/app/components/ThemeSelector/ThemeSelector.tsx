@@ -39,8 +39,8 @@ export const ThemeSelector: React.FC = () => {
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     availableThemes.forEach((theme) => {
-      if (theme?.group !== undefined && !newArray.includes(theme?.group)) {
-        newArray.push(theme.group);
+      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP_LABEL))) {
+        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP_LABEL);
       }
     });
     return newArray;
@@ -102,33 +102,19 @@ export const ThemeSelector: React.FC = () => {
   }), [handleSelectTheme]);
 
   const availableThemeOptions = useMemo(() => (
-    <>
-      {
-        availableThemes.filter((t) => typeof t?.group === 'undefined').length > 0 && (
-          <DropdownMenuRadioGroup value={typeof activeTheme?.[INTERNAL_THEMES_NO_GROUP] !== 'undefined' ? activeTheme[INTERNAL_THEMES_NO_GROUP] : ''}>
-            <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{INTERNAL_THEMES_NO_GROUP_LABEL}</Text>
-            {
-              renderThemeOption(availableThemes.filter((t) => typeof t?.group === 'undefined'))
-            }
-          </DropdownMenuRadioGroup>
+    groupNames.map((groupName) => {
+      const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
+      return (
+        filteredThemes.length > 0 && (
+        <DropdownMenuRadioGroup value={typeof activeTheme[groupName === INTERNAL_THEMES_NO_GROUP_LABEL ? INTERNAL_THEMES_NO_GROUP : groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+          <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
+          {
+            renderThemeOption(filteredThemes)
+          }
+        </DropdownMenuRadioGroup>
         )
-      }
-      {
-        groupNames.map((groupName) => {
-          const filteredThemes = availableThemes.filter((t) => (t?.group === groupName));
-          return (
-            filteredThemes.length > 0 && (
-            <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-              <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
-              {
-                renderThemeOption(filteredThemes)
-              }
-            </DropdownMenuRadioGroup>
-            )
-          );
-        })
-      }
-    </>
+      );
+    })
   ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
