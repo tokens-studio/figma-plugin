@@ -26,7 +26,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
-  console.log('active', activeTheme);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const groupNames = useMemo(() => {
