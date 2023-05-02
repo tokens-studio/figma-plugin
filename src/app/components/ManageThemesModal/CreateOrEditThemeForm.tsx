@@ -13,11 +13,12 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Box from '../Box';
 import { RootState } from '@/app/store';
 import IconButton from '../IconButton';
-import { IconBack } from '@/icons';
+import { IconBack, IconPlus } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagentForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
+import Button from '../Button';
 
 export type FormValues = {
   name: string
@@ -42,6 +43,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
 }) => {
   const store = useStore<RootState>();
   const [activeTab, setActiveTab] = useState(ThemeFormTabs.SETS);
+  const [showGroupInput, setShowGroupInput] = useState(!!defaultValues?.group);
   const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = useMemo(() => (
     usedTokenSetSelector(store.getState())
@@ -77,6 +79,10 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
     />
   ), [control]);
 
+  const handleAddGroup = React.useCallback(() => [
+    setShowGroupInput(true),
+  ], []);
+
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
       <StyledNameInputBox>
@@ -88,12 +94,25 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
             icon={<IconBack />}
             onClick={onCancel}
           />
-          <Input
-            autofocus
-            data-cy="create-or-edit-theme-form--group--name"
-            data-testid="create-or-edit-theme-form--group--name"
-            {...register('group')}
-          />
+          {
+            showGroupInput ? (
+              <Input
+                autofocus
+                data-cy="create-or-edit-theme-form--group--name"
+                data-testid="create-or-edit-theme-form--group--name"
+                {...register('group')}
+              />
+            ) : (
+              <Button
+                id="button-manage-themes-modal-new-group"
+                variant="secondary"
+                icon={<IconPlus />}
+                onClick={handleAddGroup}
+              >
+                Add group
+              </Button>
+            )
+          }
           <Box>/</Box>
           <Input
             data-cy="create-or-edit-theme-form--input--name"
