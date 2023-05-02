@@ -77,7 +77,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && !error;
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -379,11 +379,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
+    if (isValid && internalEditToken) {
+      event.preventDefault();
+      submitTokenValue(internalEditToken);
+      dispatch.uiState.setShowEditForm(false);
     }
   }, [submitTokenValue, dispatch, internalEditToken, isValid]);
 
