@@ -733,7 +733,7 @@ describe('Can set values on node', () => {
     const values = {
       visibility: 'false',
     };
-    const data = { boolean: 'boolean-false' };
+    const data = { visibility: 'boolean-false' };
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
     expect(solidNodeMock.visible).toEqual(false);
   });
