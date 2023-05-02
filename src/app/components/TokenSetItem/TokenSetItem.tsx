@@ -111,6 +111,7 @@ export function TokenSetItem({
               type="button"
               data-testid={`tokensetitem-${item.path}`}
               css={{
+                padding: '$3 $6 $3 $1',
                 paddingLeft: `${5 * item.level}px`,
               }}
               isActive={isActive}
@@ -136,6 +137,7 @@ export function TokenSetItem({
             <StyledDragButton
               type="button"
               css={{
+                padding: '$3 $6 $3 $1',
                 paddingLeft: `${5 * item.level}px`,
               }}
               data-testid={`tokensetitem-${item.path}`}

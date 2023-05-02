@@ -112,9 +112,10 @@ export const ManageThemesModal: React.FC<Props> = () => {
     <Modal
       isOpen
       compact={!!themeEditorOpen}
-      full={!themeEditorOpen}
+      full
       large
       title="Themes"
+      stickyFooter
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
@@ -170,12 +171,13 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <ReorderGroup
-          layoutScroll
-          values={groupNames}
-          onReorder={handleGroupReorder}
-        >
-          {
+        <Box css={{ padding: '$3' }}>
+          <ReorderGroup
+            layoutScroll
+            values={groupNames}
+            onReorder={handleGroupReorder}
+          >
+            {
             groupNames.map((groupName) => {
               const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? themes.filter((t) => (typeof t?.group === 'undefined')) : themes.filter((t) => (t?.group === groupName));
               return (
@@ -198,15 +200,18 @@ export const ManageThemesModal: React.FC<Props> = () => {
               );
             })
           }
-        </ReorderGroup>
+          </ReorderGroup>
+        </Box>
       )}
       {themeEditorOpen && (
-        <CreateOrEditThemeForm
-          id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
-          defaultValues={themeEditorDefaultValues}
-          onSubmit={handleSubmit}
-          onCancel={handleCancelEdit}
-        />
+        <Box css={{ padding: '$4' }}>
+          <CreateOrEditThemeForm
+            id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
+            defaultValues={themeEditorDefaultValues}
+            onSubmit={handleSubmit}
+            onCancel={handleCancelEdit}
+          />
+        </Box>
       )}
     </Modal>
   );
