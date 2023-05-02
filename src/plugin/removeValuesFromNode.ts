@@ -192,6 +192,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       }
       break;
     case 'boolean':
+    case 'visible':
       if ('visible' in node && typeof node.visible !== 'undefined') {
         node.visible = true;
       }

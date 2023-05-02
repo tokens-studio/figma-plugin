@@ -473,6 +473,14 @@ export default async function setValuesOnNode(
         }
       }
 
+      if ('visible' in node && typeof values.visible === 'string' && typeof data.visible !== 'undefined') {
+        if (values.visible === 'true') {
+          node.visible = true;
+        } else if (values.visible === 'false') {
+          node.visible = false;
+        }
+      }
+
       // Real value for text layers
       if ('value' in values) {
         if ('characters' in node && node.fontName !== figma.mixed) {

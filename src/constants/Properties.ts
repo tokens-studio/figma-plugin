@@ -43,6 +43,7 @@ export enum Properties {
   boolean = 'boolean',
   textDecoration = 'textDecoration',
   asset = 'asset',
+  visible = 'visible',
   tokenValue = 'tokenValue',
   value = 'value',
   tokenName = 'tokenName',
