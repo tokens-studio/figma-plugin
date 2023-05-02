@@ -6,6 +6,7 @@ import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { mockCreateImage } from '../../../tests/__mocks__/figmaMock';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('Can set values on node', () => {
   const emptyStylesMap = {
@@ -15,7 +16,7 @@ describe('Can set values on node', () => {
   };
 
   const emptyThemeInfo = {
-    activeTheme: null as string | null,
+    activeTheme: {},
     themes: [] as ThemeObjectsList,
   };
 
@@ -355,7 +356,9 @@ describe('Can set values on node', () => {
         effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
       },
       {
-        activeTheme: 'light',
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
         themes: [{ id: 'light', name: 'light', selectedTokenSets: {} }],
       },
       false,

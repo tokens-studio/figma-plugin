@@ -51,7 +51,7 @@ const fillInputNth = ({
 
 describe('TokenListing', () => {
   const mockStartupParams = {
-    activeTheme: null,
+    activeTheme: {},
     lastOpened: Date.now(),
     onboardingExplainer: {
       sets: true,
@@ -79,7 +79,7 @@ describe('TokenListing', () => {
       name: 'Jan Six',
     },
     localTokenData: {
-      activeTheme: null,
+      activeTheme: {},
       checkForChanges: false,
       themes: [],
       usedTokenSet: {},

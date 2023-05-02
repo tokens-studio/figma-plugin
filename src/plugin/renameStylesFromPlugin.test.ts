@@ -2,6 +2,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import renameStylesFromPlugin from './renameStylesFromPlugin';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('renameStylesFromPlugin', () => {
   figma.getLocalPaintStyles.mockReturnValue([
@@ -32,7 +33,9 @@ describe('renameStylesFromPlugin', () => {
 
   const mockGetThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: 'light',
+    activeTheme: {
+      [INTERNAL_THEMES_NO_GROUP]: 'light',
+    },
     themes: [{
       id: 'light',
       name: 'Light',

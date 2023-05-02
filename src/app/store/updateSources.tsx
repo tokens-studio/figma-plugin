@@ -27,7 +27,7 @@ type UpdateTokensOnSourcesPayload = {
   tokenValues: Record<string, AnyTokenList>;
   usedTokenSet: UsedTokenSetsMap;
   themes: ThemeObjectsList;
-  activeTheme: string | null;
+  activeTheme: Record<string, string>;
   settings: SettingsState;
   updatedAt: string;
   shouldUpdateRemote: boolean;

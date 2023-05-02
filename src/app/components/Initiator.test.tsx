@@ -216,7 +216,7 @@ describe('Initiator', () => {
               },
               usedTokenSet: {},
               checkForChanges: true,
-              activeTheme: null,
+              activeTheme: {},
               themes: [],
               storageType: {
                 provider: StorageProviderType.LOCAL,
@@ -260,7 +260,7 @@ describe('Initiator', () => {
               values: {},
               usedTokenSet: {},
               checkForChanges: true,
-              activeTheme: null,
+              activeTheme: {},
               themes: [],
               storageType: {
                 provider: StorageProviderType.LOCAL,

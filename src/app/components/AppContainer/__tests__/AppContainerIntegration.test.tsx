@@ -117,7 +117,7 @@ const mockThemes: ThemeObjectsList = [
 
 const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
-  activeTheme: null,
+  activeTheme: {},
   lastOpened: Date.now(),
   onboardingExplainer: {
     sets: true,
@@ -131,7 +131,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   },
   user: mockUser,
   localTokenData: {
-    activeTheme: null,
+    activeTheme: {},
     checkForChanges: true,
     themes: [],
     usedTokenSet: {},

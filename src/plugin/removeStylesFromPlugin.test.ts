@@ -2,6 +2,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import removeStylesFromPlugin from './removeStylesFromPlugin';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('removeStylesFromPlugin', () => {
   const tokenToDelete = {
@@ -39,7 +40,9 @@ describe('removeStylesFromPlugin', () => {
 
   const mockGetThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: 'light',
+    activeTheme: {
+      [INTERNAL_THEMES_NO_GROUP]: 'light',
+    },
     themes: [{
       id: 'light',
       name: 'Light',

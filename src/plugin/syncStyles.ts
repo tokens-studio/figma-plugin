@@ -28,9 +28,19 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const activeThemeObject = themeInfo.activeTheme
-    ? themeInfo.themes.find(({ id }) => id === themeInfo.activeTheme)
-    : null;
+  // Filter activeThemes e.g light, desktop
+  const activeThemes = themeInfo.themes.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
+  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
+  const figmaStyleReferences: Record<string, string[]> = {};
+  activeThemes.forEach((theme) => {
+    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
+      if (!figmaStyleReferences[token]) {
+        figmaStyleReferences[token] = [styleId];
+      } else {
+        figmaStyleReferences[token] = [...figmaStyleReferences[token], styleId];
+      }
+    });
+  });
 
   // styleSet store all possible styles which could be created from current tokens
   const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
@@ -47,12 +57,13 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   });
 
   // rename styles
-  if (options.renameStyle && activeThemeObject) {
-    allStyles.filter((style) => style.name.startsWith(`${activeThemeObject.name}/`)).forEach((style) => {
-      if (activeThemeObject.$figmaStyleReferences) {
-        Object.entries(activeThemeObject.$figmaStyleReferences).forEach(([key, value]) => {
-          if (style.id === value && style.name !== key) {
-            const newPath = key.split('.').map((part) => part.trim()).join('/');
+  if (options.renameStyle && activeThemes.length > 0) {
+    // Filter styles whose name starts with one of activeTheme (e.g light/color/black,  desktop/color/black, we ignore dark/color/black)
+    allStyles.filter((style) => activeThemes.map((theme) => `${theme.name}/`).some((n) => style.name.startsWith(n))).forEach((style) => {
+      if (figmaStyleReferences) {
+        Object.entries(figmaStyleReferences).forEach(([tokenName, styleIds]) => {
+          if (styleIds.includes(style.id) && style.name !== tokenName) {
+            const newPath = tokenName.split('.').map((part) => part.trim()).join('/');
             const styleNameWithoutTheme = style.name.slice(style.name.indexOf('/') + 1);
             style.name = style.name.replace(styleNameWithoutTheme, newPath);
           }
@@ -66,8 +77,8 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   if (options.removeStyle) {
     allStyles = allStyles.filter((style) => {
       if (!Object.keys(styleSet).some((pathName) => isMatchingStyle(pathName, style))) {
-        if (activeThemeObject && activeThemeObject.$figmaStyleReferences) {
-          if (!Object.entries(activeThemeObject.$figmaStyleReferences).some(([, value]) => value === style.id)) {
+        if (activeThemes.length > 0 && figmaStyleReferences) {
+          if (!Object.entries(figmaStyleReferences).some(([, value]) => value.includes(style.id))) {
             style.remove();
             styleIdsToRemove.push(style.id);
             return false;

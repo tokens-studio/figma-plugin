@@ -5,6 +5,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { AnyTokenList } from '@/types/tokens';
 import syncStyles from './syncStyles';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('syncStyles', () => {
   const mockValues: Record<string, AnyTokenList> = {
@@ -63,7 +64,9 @@ describe('syncStyles', () => {
 
   const mockGetThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
     type: AsyncMessageTypes.GET_THEME_INFO,
-    activeTheme: 'light',
+    activeTheme: {
+      [INTERNAL_THEMES_NO_GROUP]: 'light',
+    },
     themes: [
       {
         id: 'light',

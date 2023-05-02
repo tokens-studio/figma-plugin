@@ -1,4 +1,5 @@
 import { AsyncMessageChannel } from './AsyncMessageChannel';
+import { INTERNAL_THEMES_NO_GROUP } from './constants/InternalTokenGroup';
 import {
   AsyncMessageTypes, GetThemeInfoMessageResult,
 } from './types/AsyncMessages';
@@ -9,7 +10,9 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
 
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: 'light',
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
@@ -22,7 +25,9 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
     });
     expect(result).toEqual({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: 'light',
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
@@ -34,7 +39,9 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
 
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: 'light',
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
@@ -47,7 +54,9 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
     });
     expect(result).toEqual({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: 'light',
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 

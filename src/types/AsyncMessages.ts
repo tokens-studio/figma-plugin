@@ -193,7 +193,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;
-  activeTheme: string | null;
+  activeTheme: Record<string, string>;
   checkForChanges?: boolean
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
@@ -228,7 +228,7 @@ export type ResolveStyleInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_STYL
 
 export type GetThemeInfoMessage = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO>;
 export type GetThemeInfoMessageResult = AsyncMessage<AsyncMessageTypes.GET_THEME_INFO, {
-  activeTheme: string | null
+  activeTheme: Record<string, string>
   themes: ThemeObjectsList
 }>;
 

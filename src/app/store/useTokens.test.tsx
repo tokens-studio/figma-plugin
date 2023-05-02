@@ -18,6 +18,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { NodeInfo } from '@/types/NodeInfo';
 import { Properties } from '@/constants/Properties';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -356,7 +357,9 @@ describe('useToken test', () => {
     const tokenMockStore = createMockStore({
       tokenState: {
         usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
-        activeTheme: 'light',
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
         themes: [{
           id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
         }],
@@ -381,7 +384,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, mockPullStylesHandler);
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: null,
+      activeTheme: {},
       themes: [],
     }));
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);

@@ -72,7 +72,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
 export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
-  activeTheme: string | null
+  activeTheme: string | Record<string, string>
   updatedAt: string;
   version: string;
   checkForChanges: boolean | null
@@ -81,7 +81,7 @@ export async function getTokenData(): Promise<{
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
     const themes = await ThemesProperty.read(figma.root) ?? [];
-    const activeTheme = await ActiveThemeProperty.read(figma.root);
+    const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);

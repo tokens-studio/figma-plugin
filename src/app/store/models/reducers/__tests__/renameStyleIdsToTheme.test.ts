@@ -1,3 +1,4 @@
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 
 describe('renameStyleIdsToCurrentTheme', () => {
@@ -21,7 +22,9 @@ describe('renameStyleIdsToCurrentTheme', () => {
             'colors.red': 'S:0285',
           },
         }],
-        activeTheme: 'light',
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
       },
     });
     await mockStore.dispatch.tokenState.renameStyleIdsToCurrentTheme(['S:1234', 'S:2345'], 'new');

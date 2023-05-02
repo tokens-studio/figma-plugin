@@ -20,30 +20,50 @@ import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
+import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
 });
 
+type AvailableTheme = {
+  value: string
+  label: string
+  group?: string
+};
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-
+  const groupNames = useMemo(() => {
+    const newArray: string[] = [];
+    availableThemes.forEach((theme) => {
+      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
+        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
+      }
+    });
+    return newArray;
+  }, [availableThemes]);
   const handleClearTheme = useCallback(() => {
-    dispatch.tokenState.setActiveTheme({ themeId: null, shouldUpdateNodes: true });
+    dispatch.tokenState.setActiveTheme({ newActiveTheme: {}, shouldUpdateNodes: true });
   }, [dispatch]);
 
   const handleSelectTheme = useCallback((themeId: string) => {
-    const nextTheme = (activeTheme === themeId) ? null : themeId;
+    const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
+    const nextTheme = activeTheme;
+    if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
+      delete nextTheme[groupOfTheme];
+    } else {
+      nextTheme[groupOfTheme] = themeId;
+    }
     if (nextTheme) {
       track('Apply theme', { id: nextTheme });
     } else {
       track('Reset theme');
     }
-    dispatch.tokenState.setActiveTheme({ themeId: nextTheme, shouldUpdateNodes: true });
-  }, [dispatch, activeTheme]);
+    dispatch.tokenState.setActiveTheme({ newActiveTheme: nextTheme, shouldUpdateNodes: true });
+  }, [dispatch, activeTheme, availableThemes]);
 
   const handleManageThemes = useCallback(() => {
     dispatch.uiState.setManageThemesModalOpen(true);
@@ -51,34 +71,51 @@ export const ThemeSelector: React.FC = () => {
 
   const activeThemeLabel = useMemo(() => {
     if (activeTheme) {
-      const themeOption = availableThemes.find(({ value }) => value === activeTheme);
-      return themeOption ? themeOption.label : 'Unknown';
+      if (Object.keys(activeTheme).length === 0) return 'None';
+      if (Object.keys(activeTheme).length === 1) {
+        const themeOption = availableThemes.find(({ value }) => value === Object.values(activeTheme)[0]);
+        return themeOption ? themeOption.label : 'Unknown';
+      }
+      return `${Object.keys(activeTheme).length} active`;
     }
     return 'None';
   }, [activeTheme, availableThemes]);
 
-  const availableThemeOptions = useMemo(() => (
-    availableThemes.map(({ label, value }) => {
-      const handleSelect = () => handleSelectTheme(value);
-
-      return (
-        <DropdownMenuRadioItem
-          key={value}
-          value={value}
-          data-cy={`themeselector--themeoptions--${value}`}
-          data-testid={`themeselector--themeoptions--${value}`}
+  const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.map(({ label, value }) => {
+    const handleSelect = () => handleSelectTheme(value);
+    return (
+      <DropdownMenuRadioItem
+        key={value}
+        value={value}
+        data-cy={`themeselector--themeoptions--${value}`}
+        data-testid={`themeselector--themeoptions--${value}`}
           // @README we can disable this because we are using Memo for the whole list anyways
           // eslint-disable-next-line react/jsx-no-bind
-          onSelect={handleSelect}
-        >
-          <DropdownMenuItemIndicator>
-            <CheckIcon />
-          </DropdownMenuItemIndicator>
-          {label}
-        </DropdownMenuRadioItem>
+        onSelect={handleSelect}
+      >
+        <DropdownMenuItemIndicator>
+          <CheckIcon />
+        </DropdownMenuItemIndicator>
+        {label}
+      </DropdownMenuRadioItem>
+    );
+  }), [handleSelectTheme]);
+
+  const availableThemeOptions = useMemo(() => (
+    groupNames.map((groupName) => {
+      const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
+      return (
+        filteredThemes.length > 0 && (
+        <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+          <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+          {
+            renderThemeOption(filteredThemes)
+          }
+        </DropdownMenuRadioGroup>
+        )
       );
     })
-  ), [availableThemes, handleSelectTheme]);
+  ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
     <Flex alignItems="center" css={{ flexShrink: 0 }}>
@@ -95,14 +132,12 @@ export const ThemeSelector: React.FC = () => {
           side="bottom"
           css={{ minWidth: '180px' }}
         >
-          <DropdownMenuRadioGroup value={activeTheme ?? ''}>
-            {availableThemes.length === 0 && (
-              <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-                <Text>No themes</Text>
-              </DropdownMenuRadioItem>
-            )}
-            {availableThemeOptions}
-          </DropdownMenuRadioGroup>
+          {availableThemes.length === 0 && (
+            <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text>No themes</Text>
+            </DropdownMenuRadioItem>
+          )}
+          {availableThemeOptions}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             data-cy="themeselector-managethemes"
