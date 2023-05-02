@@ -218,8 +218,8 @@ export default function BranchSelector() {
     setSearchTextForCreateBranch(e.target.value);
   }, []);
   // TODO: I'm not sure there is another way instead of stopImmediatePropagation to prevent option selection when typing the first letter of the option
-  const handleKeyDown = React.useCallback((event: any) => {
-    event.stopImmediatePropagation();
+  const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event as unknown as KeyboardEvent).stopImmediatePropagation();
   }, []);
 
   return (
