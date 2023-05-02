@@ -363,28 +363,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   };
 
-  const handleSubmit = React.useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError('Value must include either px or rem');
-        return;
-      }
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
-    },
-    [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken],
-  );
-
-  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+  const checkAndSubmitTokenValue = React.useCallback(() => {
+    if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+      setError('Value must include either px or rem');
+      return;
+    }
     if (isValid && internalEditToken) {
-      event.preventDefault();
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [submitTokenValue, dispatch, internalEditToken, isValid]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+
+  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
+
+  const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 
