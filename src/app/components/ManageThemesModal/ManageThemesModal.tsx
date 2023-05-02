@@ -111,7 +111,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
   return (
     <Modal
       isOpen
-      compact={!!themeEditorOpen}
       full
       large
       title="Themes"
@@ -204,7 +203,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
         </Box>
       )}
       {themeEditorOpen && (
-        <Box css={{ padding: '$4' }}>
+        <Box css={{ padding: '$4 $3' }}>
           <CreateOrEditThemeForm
             id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
             defaultValues={themeEditorDefaultValues}
