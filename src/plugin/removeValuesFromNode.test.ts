@@ -226,7 +226,7 @@ describe('removeTokensByValue', () => {
   });
 
   it('should set visible as true when removing values from node', () => {
-    removeValuesFromNode(mockNode, Properties.boolean);
+    removeValuesFromNode(mockNode, Properties.visibility);
     expect(mockNode.visible).toEqual(true);
   });
 });
