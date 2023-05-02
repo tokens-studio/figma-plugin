@@ -729,9 +729,9 @@ describe('Can set values on node', () => {
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
 
-  it('can set boolean token', async () => {
+  it('can set boolean token for visibility', async () => {
     const values = {
-      boolean: 'false',
+      visibility: 'false',
     };
     const data = { boolean: 'boolean-false' };
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
