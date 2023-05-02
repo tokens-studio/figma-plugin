@@ -12,7 +12,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   );
   const newActiveTheme = payload.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
-    if (payload.themes?.find((t) => t.id !== activeTheme) && newActiveTheme) {
+    if (!payload.themes?.find((t) => t.id === activeTheme) && newActiveTheme) {
       delete newActiveTheme[group];
     }
   });
