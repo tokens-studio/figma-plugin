@@ -21,6 +21,7 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Input from './Input';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
+import Stack from './Stack';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
@@ -38,12 +39,15 @@ function Inspector() {
     }))
   ), [tokens, usedTokenSet, activeTokenSet]);
 
-  function handleSetInspectView(view: string) {
-    setInspectView(view);
-    track('setInspectView', {
-      view,
-    });
-  }
+  const handleSetInspectViewMulti = React.useCallback(() => {
+    setInspectView('multi');
+    track('setInspectView', { view: 'multi' });
+  }, []);
+
+  const handleSetInspectViewDebug = React.useCallback(() => {
+    setInspectView('debug');
+    track('setInspectView', { view: 'debug' });
+  }, []);
 
   function renderInspectView() {
     switch (inspectView) {
@@ -56,6 +60,8 @@ function Inspector() {
   const handleSearchInputChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInputValue(event.target.value);
   }, []);
+
+  const handleSetInspectDeep = React.useCallback(() => dispatch.settings.setInspectDeep(!inspectDeep), [dispatch, inspectDeep]);
 
   return (
     <Box css={{
@@ -83,39 +89,39 @@ function Inspector() {
             placeholder="Search..."
           />
         </Box>
-        <Box
-          css={{
-            display: 'flex', gap: '$4', flexDirection: 'row', alignItems: 'center',
-          }}
-        >
-          <Checkbox
-            checked={inspectDeep}
-            id="inspectDeep"
-            onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
-          />
-          <Tooltip label="Scans selected layer and all of its children" side="bottom">
-            <Label htmlFor="inspectDeep">
-              <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
-            </Label>
-          </Tooltip>
-          <IconButton
-            variant={inspectView === 'multi' ? 'primary' : 'default'}
-            dataCy="inspector-multi"
-            onClick={() => handleSetInspectView('multi')}
-            icon={<IconInspect />}
-            tooltipSide="bottom"
-            tooltip="Inspect layers"
-          />
-          <IconButton
-            variant={inspectView === 'debug' ? 'primary' : 'default'}
-            dataCy="inspector-debug"
-            onClick={() => handleSetInspectView('debug')}
-            icon={<IconDebug />}
-            tooltipSide="bottom"
-            tooltip="Debug & Annotate"
-          />
+        <Stack direction="row" align="center" gap={4}>
+          <Stack direction="row" align="center" gap={2}>
+            <Checkbox
+              checked={inspectDeep}
+              id="inspectDeep"
+              onCheckedChange={handleSetInspectDeep}
+            />
+            <Tooltip label="Scans selected layer and all of its children" side="bottom">
+              <Label htmlFor="inspectDeep">
+                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
+              </Label>
+            </Tooltip>
+          </Stack>
+          <Stack direction="row">
+            <IconButton
+              variant={inspectView === 'multi' ? 'primary' : 'default'}
+              dataCy="inspector-multi"
+              onClick={handleSetInspectViewMulti}
+              icon={<IconInspect />}
+              tooltipSide="bottom"
+              tooltip="Inspect layers"
+            />
+            <IconButton
+              variant={inspectView === 'debug' ? 'primary' : 'default'}
+              dataCy="inspector-debug"
+              onClick={handleSetInspectViewDebug}
+              icon={<IconDebug />}
+              tooltipSide="bottom"
+              tooltip="Debug & Annotate"
+            />
+          </Stack>
           <InspectSearchOptionDropdown />
-        </Box>
+        </Stack>
       </Box>
       {renderInspectView()}
     </Box>

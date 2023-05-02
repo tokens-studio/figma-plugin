@@ -27,6 +27,13 @@ export const StyledDragButton = styled('button', {
         },
       },
     },
+    grabberVisible: {
+      true: {
+        [`${StyledGrabber}`]: {
+          opacity: 1,
+        },
+      },
+    },
     itemType: {
       folder: {
         cursor: 'default',
