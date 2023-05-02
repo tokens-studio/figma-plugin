@@ -108,6 +108,7 @@ describe('TokenListing', () => {
     cy.get('[data-cy="themeselector-dropdown"]').click();
     cy.get('[data-cy="themeselector-managethemes"]').click();
     cy.get('[data-cy="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-cy="button-manage-themes-modal-new-group"]').click();
     cy.get('[data-cy="create-or-edit-theme-form--group--name"]').type('GroupA');
     cy.get('[data-cy="create-or-edit-theme-form--input--name"]').type('My first theme');
     cy.get('[data-cy="tokensettheme-item--dropdown-trigger--token-source-set"]').click();
