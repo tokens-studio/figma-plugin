@@ -20,7 +20,7 @@ import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export async function updateGenericVersionedTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null,
+  tokens, themes, context, updatedAt, oldUpdatedAt = null, dispatch,
 }: UpdateRemoteFunctionPayload) {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
   try {
@@ -53,15 +53,23 @@ export async function updateGenericVersionedTokens({
         switch (flow) {
           case GenericVersionedStorageFlow.READ_WRITE:
           case GenericVersionedStorageFlow.READ_WRITE_CREATE:
-            storage.save(payload);
+            if (await storage.save(payload)) {
+              saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
+                tokenSetOrder: Object.keys(payload.tokens),
+              });
+              return payload;
+            }
             break;
           default:
         }
       } else {
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
-    } else {
-      storage.save(payload);
+    } else if (await storage.save(payload)) {
+      saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
+        tokenSetOrder: Object.keys(payload.tokens),
+      });
+      return payload;
     }
   } catch (e) {
     console.log('Error updating Generic Storage', e);
@@ -142,9 +150,14 @@ export function useGenericVersionedStorage() {
           errorMessage: data.errorMessage,
         };
       }
-      if (data && data?.tokens) {
+      if (data?.metadata && data?.tokens) {
         dispatch.tokenState.setEditProhibited(false);
-        return data;
+        return {
+          ...data,
+          metadata: {
+            tokenSetOrder: Object.keys(data.tokens),
+          },
+        };
       }
       notifyToUI('No tokens stored on remote', { error: true });
       return null;
@@ -190,7 +203,7 @@ export function useGenericVersionedStorage() {
         },
         shouldSetInDocument: true,
       });
-      saveLastSyncedState(dispatch, content.tokens, content?.themes, {});
+      saveLastSyncedState(dispatch, content.tokens, content?.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: content.tokens,
         themes: content.themes,
