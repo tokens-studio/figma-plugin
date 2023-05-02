@@ -31,7 +31,6 @@ export default {
   textCase: 'textCase',
   textDecoration: 'textDecoration',
   dimension: 'dimension',
-  boolean: 'boolean',
   tokenValue: 'documentation',
   value: 'documentation',
   tokenName: 'documentation',

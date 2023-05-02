@@ -465,18 +465,10 @@ export default async function setValuesOnNode(
         }
       }
 
-      if ('visible' in node && typeof values.boolean === 'string' && typeof data.boolean !== 'undefined') {
-        if (values.boolean === 'true') {
+      if ('visible' in node && typeof values.visibility === 'string' && typeof data.visibility !== 'undefined') {
+        if (values.visibility === 'true') {
           node.visible = true;
-        } else if (values.boolean === 'false') {
-          node.visible = false;
-        }
-      }
-
-      if ('visible' in node && typeof values.visible === 'string' && typeof data.visible !== 'undefined') {
-        if (values.visible === 'true') {
-          node.visible = true;
-        } else if (values.visible === 'false') {
+        } else if (values.visibility === 'false') {
           node.visible = false;
         }
       }
