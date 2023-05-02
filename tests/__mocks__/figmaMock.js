@@ -36,6 +36,9 @@ module.exports.mockCreatePaintStyle = jest.fn(() => ({
 module.exports.mockCreateEffectStyle = jest.fn(() => ({
   id: 'effectstyle',
 }));
+module.exports.mockGetStyleById = jest.fn((id) => ({
+  id,
+}));
 module.exports.mockImportStyleByKeyAsync = jest.fn(() => Promise.reject());
 module.exports.mockUiOn = jest.fn((eventName, handler) => {
   figmaUiOnHandlers.push([eventName, handler]);
@@ -54,6 +57,7 @@ module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
 });
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
+module.exports.mockRootFindAll = jest.fn(() => []);
 module.exports.mockParentPostMessage = jest.fn((data) => {
   figmaUiOnHandlers
     .filter(([eventName]) => eventName === 'message')
@@ -85,11 +89,13 @@ module.exports.figma = {
   root: {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
     getSharedPluginData: module.exports.mockRootGetSharedPluginData,
+    findAll: module.exports.mockRootFindAll,
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
   getLocalEffectStyles: module.exports.mockGetLocalEffectStyles,
   loadFontAsync: module.exports.mockLoadFontAsync,
+  getStyleById: module.exports.mockGetStyleById,
   createTextStyle: module.exports.mockCreateTextStyle,
   createPaintStyle: module.exports.mockCreatePaintStyle,
   createEffectStyle: module.exports.mockCreateEffectStyle,
