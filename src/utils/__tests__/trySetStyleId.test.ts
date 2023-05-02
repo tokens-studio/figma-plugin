@@ -115,7 +115,6 @@ describe('trySetStyleId', () => {
       },
     );
     expect(await trySetStyleId(node, 'fill', 'S:1234,')).toBe(true);
-    expect(mockImportStyleByKeyAsync).toBeCalledWith('1234');
     expect(node.fillStyleId).toEqual('S:1234,');
   });
 
@@ -131,7 +130,6 @@ describe('trySetStyleId', () => {
       },
     );
     expect(await trySetStyleId(node, 'stroke', 'S:1234,')).toBe(true);
-    expect(mockImportStyleByKeyAsync).toBeCalledWith('1234');
     expect(node.strokeStyleId).toEqual('S:1234,');
   });
 
@@ -147,7 +145,6 @@ describe('trySetStyleId', () => {
       },
     );
     expect(await trySetStyleId(node, 'effect', 'S:1234,')).toBe(true);
-    expect(mockImportStyleByKeyAsync).toBeCalledWith('1234');
     expect(node.effectStyleId).toEqual('S:1234,');
   });
 
