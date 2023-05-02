@@ -47,18 +47,18 @@ export default function ChangeStateListingHeading({
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
-      <StyledChangedStateGroupHeadingButton
-        isCollapsed={isCollapsed}
-        data-cy={`changestatelisting-header-${key}`}
-        type="button"
-        onClick={handleCollapse}
-        data-testid={`changestatelisting-${key}-collapse-button`}
-      >
-        <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
-          <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
-        </Tooltip>
-        <Heading size="small">{label}</Heading>
-      </StyledChangedStateGroupHeadingButton>
+      <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
+        <StyledChangedStateGroupHeadingButton
+          isCollapsed={isCollapsed}
+          data-cy={`changestatelisting-header-${key}`}
+          type="button"
+          onClick={handleCollapse}
+          data-testid={`changestatelisting-${key}-collapse-button`}
+        >
+          <Box css={{ padding: '$2', marginLeft: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
+          <Heading size="medium">{label}</Heading>
+        </StyledChangedStateGroupHeadingButton>
+      </Tooltip>
     </Stack>
   );
 }

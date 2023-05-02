@@ -50,7 +50,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   direction="row"
                   justify="between"
                   align="center"
-                  gap={1}
+                  gap={3}
                   css={{ padding: '$2 $4' }}
                 >
                   <Text bold size="small">{theme.name}</Text>
@@ -64,7 +64,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   {
                     (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
                     <StyledDiff size="small" type="success">
-                      {theme.importType === 'NEW' ? 'Configuration Added' : 'Configuration Changed' }
+                      {theme.importType === 'NEW' ? 'Configuration added' : 'Configuration changed' }
                     </StyledDiff>
                     )
                   }

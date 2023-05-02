@@ -15,7 +15,7 @@ export default function ChangedTokenItem({
         <Text bold size="small">{token.name}</Text>
         {
           ((token.importType === 'UPDATE' && token.oldValue) || token.importType === 'NEW') && (
-            <Stack direction="row" align="center" justify="between" gap={1}>
+            <Stack direction="row" align="center" justify="between" gap={3}>
               <Text size="small">Value</Text>
               <Stack direction="row" align="center" gap={1}>
                 {token.oldValue ? (
