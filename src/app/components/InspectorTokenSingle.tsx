@@ -20,6 +20,7 @@ import Stack from './Stack';
 import { IconBrokenLink } from '@/icons';
 import StyleIcon from '@/icons/style.svg';
 import Tooltip from './Tooltip';
+import { useShortcut } from '@/hooks/useShortcut';
 
 export default function InspectorTokenSingle({
   token,
@@ -74,6 +75,15 @@ export default function InspectorTokenSingle({
   const onCheckedChanged = React.useCallback(() => {
     dispatch.inspectState.toggleSelectedTokens(`${token.category}-${token.value}`);
   }, [token, dispatch.inspectState]);
+
+  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
+    if (newTokenName) {
+      event.preventDefault();
+      onConfirm();
+    }
+  }, [newTokenName, onConfirm]);
+
+  useShortcut(['Enter'], handleSaveShortcut);
 
   return (
     <Box
