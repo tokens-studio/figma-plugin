@@ -263,7 +263,6 @@ export default function BranchSelector() {
                     key={`radio_${seed(index)}`}
                     branch={branch}
                     branchSelected={onBranchSelected}
-                    onKeyDown={handleKeyDown}
                   />
                 ))}
             </BranchSwitchMenuRadioGroup>
