@@ -118,6 +118,12 @@ export default function MentionsInput({
     );
   }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
 
+  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  }, []);
+
   return (
     <Mentions
       autoSize
@@ -130,6 +136,7 @@ export default function MentionsInput({
       onChange={handleMentionInputChange}
       onBlur={handleInputBlur}
       onFocus={handleOnFocus}
+      onKeyDown={handleKeyDown}
       data-testid={`mention-input-${name}`}
       data-cy={`mention-input-${name}`}
     >

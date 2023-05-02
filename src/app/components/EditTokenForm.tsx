@@ -77,7 +77,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && !error;
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -363,29 +363,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   };
 
-  const handleSubmit = React.useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError('Value must include either px or rem');
-        return;
-      }
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
-    },
-    [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken],
-  );
-
-  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
+  const checkAndSubmitTokenValue = React.useCallback(() => {
+    if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+      setError('Value must include either px or rem');
+      return;
     }
-  }, [submitTokenValue, dispatch, internalEditToken, isValid]);
+    if (isValid && internalEditToken) {
+      submitTokenValue(internalEditToken);
+      dispatch.uiState.setShowEditForm(false);
+    }
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+
+  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
+
+  const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 
