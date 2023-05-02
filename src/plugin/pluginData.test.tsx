@@ -1,4 +1,4 @@
-import { mockGetNodeById } from 'tests/__mocks__/figmaMock';
+import { mockGetNodeById } from '../../tests/__mocks__/figmaMock';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { transformPluginDataToSelectionValues, updatePluginData } from './pluginData';
 
