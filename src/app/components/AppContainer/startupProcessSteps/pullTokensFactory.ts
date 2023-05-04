@@ -42,6 +42,7 @@ export function pullTokensFactory(
       StorageProviderType.GITLAB,
       StorageProviderType.BITBUCKET,
       StorageProviderType.JSONBIN,
+      StorageProviderType.GENERIC_VERSIONED_STORAGE,
       StorageProviderType.URL,
     ].includes(storageType.provider);
 
