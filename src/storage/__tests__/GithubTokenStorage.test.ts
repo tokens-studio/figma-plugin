@@ -10,7 +10,7 @@ import {
   mockGetContent,
   mockGetRef,
   mockGetTree,
-  mockListBranches,
+  mockPaginate,
 } from '../../../tests/__mocks__/octokitRestMock';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
@@ -1260,10 +1260,8 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should return false if there are no branches', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [],
-      })
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([])
     ));
 
     expect(await storageProvider.write([], {
@@ -1272,15 +1270,13 @@ describe('GithubTokenStorage', () => {
   });
 
   it('should be able to get the tree sha for a given path', async () => {
-    mockListBranches.mockImplementationOnce(() => (
-      Promise.resolve({
-        data: [
-          {
-            name: 'main',
-            commit: { sha: 'root-sha' },
-          },
-        ],
-      })
+    mockPaginate.mockImplementationOnce(() => (
+      Promise.resolve([
+        {
+          name: 'main',
+          commit: { sha: 'root-sha' },
+        },
+      ])
     ));
     expect(await storageProvider.getTreeShaForDirectory('')).toEqual('root-sha');
 
