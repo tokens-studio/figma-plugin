@@ -56,8 +56,12 @@ export async function updateGenericVersionedTokens({
 
       if (remoteTokens?.status === 'failure') {
         // eslint-disable-next-line no-console
-        console.log('Error updating Generic storage', remoteTokens?.errorMessage);
-        return remoteTokens;
+        const errorMessage = remoteTokens?.errorMessage || ErrorMessages.GENERAL_CONNECTION_ERROR;
+        console.log('Error updating Generic storage', errorMessage);
+        return {
+          status: 'failure',
+          errorMessage,
+        };
       }
 
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');

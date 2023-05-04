@@ -21,7 +21,7 @@ jest.mock('../../../../plugin/notifiers', () => ({
   notifyToUI: jest.fn(),
 }));
 
-describe('genericVersioned', () => {
+describe.only('genericVersioned', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -189,6 +189,78 @@ describe('genericVersioned', () => {
   });
 
   describe('when READ_WRITE_CREATE', () => {
+    it('saves lastSyncedState when updating', async () => {
+      const mockStore = createMockStore({});
+      const updatedAt = '2022-09-20T08:43:03.844Z';
+
+      mockRetrieve.mockResolvedValue({
+        metadata: {
+          updatedAt: '2022-09-19T07:43:03.844Z',
+        },
+      });
+      mockSave.mockResolvedValueOnce(true);
+
+      await updateGenericVersionedTokens({
+        tokens: tokens as Record<string, SingleToken[]>,
+        themes: themes as ThemeObjectsList,
+        context,
+        updatedAt,
+        dispatch: mockStore.dispatch,
+      });
+
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.plugin_version,
+        },
+      });
+
+      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
+        tokens,
+        themes,
+        {
+          tokenSetOrder: ['global'],
+        },
+      ]);
+    });
+
+    it('updates remote even if retrieve returns null', async () => {
+      const mockStore = createMockStore({});
+      const updatedAt = '2022-09-20T08:43:03.844Z';
+
+      mockRetrieve.mockResolvedValue(null);
+      mockSave.mockResolvedValueOnce(true);
+
+      await updateGenericVersionedTokens({
+        tokens: tokens as Record<string, SingleToken[]>,
+        themes: themes as ThemeObjectsList,
+        context,
+        updatedAt,
+        dispatch: mockStore.dispatch,
+      });
+
+      expect(mockSave).toHaveBeenCalledWith({
+        tokens,
+        themes,
+        metadata: {
+          tokenSetOrder: ['global'],
+          updatedAt: '2022-09-20T08:43:03.844Z',
+          version: pjs.plugin_version,
+        },
+      });
+
+      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
+        tokens,
+        themes,
+        {
+          tokenSetOrder: ['global'],
+        },
+      ]);
+    });
+
     it('notify updating error when remote data is newer', async () => {
       const mockStore = createMockStore({});
       const updatedAt = '2022-09-20T08:43:03.844Z';
@@ -231,6 +303,29 @@ describe('genericVersioned', () => {
       mockRetrieve.mockResolvedValue({
         status: 'failure',
         errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+      });
+      expect(
+        await updateGenericVersionedTokens({
+          tokens: tokens as Record<string, SingleToken[]>,
+          themes: themes as ThemeObjectsList,
+          context: context as Partial<StorageTypeCredentials>,
+          updatedAt,
+          oldUpdatedAt,
+          dispatch: mockStore.dispatch,
+        }),
+      ).toEqual({
+        status: 'failure',
+        errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
+      });
+    });
+
+    it('return generic error message when there is a error while retrieving the data and no message is supplied', async () => {
+      const mockStore = createMockStore({});
+      const updatedAt = '2022-09-20T08:43:03.844Z';
+      const oldUpdatedAt = '2022-09-20T07:43:03.844Z';
+
+      mockRetrieve.mockResolvedValue({
+        status: 'failure',
       });
       expect(
         await updateGenericVersionedTokens({
