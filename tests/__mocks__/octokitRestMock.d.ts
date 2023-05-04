@@ -7,3 +7,4 @@ export const mockGetContent: jest.Mock;
 export const mockCreateOrUpdateFiles: jest.Mock;
 export const mockCreateTree: jest.Mock;
 export const mockGetTree: jest.Mock;
+export const mockPaginate: jest.Mock;
