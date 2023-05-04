@@ -21,7 +21,7 @@ jest.mock('../../../../plugin/notifiers', () => ({
   notifyToUI: jest.fn(),
 }));
 
-describe.only('genericVersioned', () => {
+describe('genericVersioned', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
