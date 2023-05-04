@@ -27,7 +27,7 @@ export default function InspectSearchOptionDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger data-testid="inspect-search-option-dropdown">
+      <DropdownMenuTrigger css={{ padding: '$2' }} data-testid="inspect-search-option-dropdown">
         <IconSetting />
       </DropdownMenuTrigger>
 

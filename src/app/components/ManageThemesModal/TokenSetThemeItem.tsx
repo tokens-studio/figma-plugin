@@ -45,8 +45,8 @@ export const TokenSetThemeItem: React.FC<Props> = ({
   return (
     <>
       {children}
-      <Box css={{ paddingLeft: '$2', width: '100%' }}>
-        <Box css={{ padding: '$2', paddingLeft: `${5 * item.level}px` }}>
+      <Box css={{ width: '100%' }}>
+        <Box css={{ paddingLeft: `${5 * item.level}px` }}>
           <Stack direction="row" justify="between" align="center" css={{ width: '100%' }}>
             <StyledThemeLabel variant={item.isLeaf ? 'leaf' : 'folder'}>
               {item.label}

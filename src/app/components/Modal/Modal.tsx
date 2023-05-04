@@ -40,6 +40,7 @@ export type ModalProps = {
   isOpen: boolean;
   children: React.ReactNode;
   footer?: React.ReactNode
+  stickyFooter?: boolean;
   showClose?: boolean;
   close: () => void;
 };
@@ -80,6 +81,7 @@ export function Modal({
   close,
   children,
   footer,
+  stickyFooter = false,
   showClose = false,
   compact = false,
 }: ModalProps) {
@@ -123,7 +125,7 @@ export function Modal({
         {children}
       </StyledBody>
       {(!!footer) && (
-        <ModalFooter>
+        <ModalFooter stickyFooter={stickyFooter}>
           {footer}
         </ModalFooter>
       )}

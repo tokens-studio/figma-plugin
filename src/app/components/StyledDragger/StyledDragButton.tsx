@@ -3,7 +3,6 @@ import { StyledCheckbox } from './StyledCheckbox';
 import { StyledGrabber } from './StyledGrabber';
 
 export const StyledDragButton = styled('button', {
-  padding: '$3 $6 $3 $1',
   display: 'flex',
   width: '100%',
   textAlign: 'left',
@@ -25,6 +24,13 @@ export const StyledDragButton = styled('button', {
       false: {
         '&:focus, &:hover': {
           background: '$bgSubtle',
+        },
+      },
+    },
+    grabberVisible: {
+      true: {
+        [`${StyledGrabber}`]: {
+          opacity: 1,
         },
       },
     },

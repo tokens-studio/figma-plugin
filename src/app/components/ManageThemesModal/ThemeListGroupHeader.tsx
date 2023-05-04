@@ -28,13 +28,14 @@ export function ThemeListGroupHeader({
     <StyledDragButton
       type="button"
       style={{ cursor: 'inherit' }}
+      css={{ marginTop: '$4' }}
     >
       <DragGrabber<string>
         item={item}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
       />
-      <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName}</Text>
+      <Text css={{ color: '$textMuted' }}>{groupName}</Text>
     </StyledDragButton>
   );
 }

@@ -46,8 +46,10 @@ export function SingleCompositionTokenContent({
 
   return (
     <StyledDragButton
+      grabberVisible
       type="button"
       style={{ cursor: 'inherit' }}
+      css={{ padding: '$1 0 $1 $1' }}
     >
       <DragGrabber<string>
         item={property}
