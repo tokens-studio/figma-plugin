@@ -11,7 +11,7 @@ import { generateId } from '@/utils/generateId';
 import Heading from '../Heading';
 import Link from '../Link';
 import Textarea from '../Textarea';
-import { ErrorMessage } from '../ErrorMessage'
+import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
@@ -94,13 +94,13 @@ export default function SupernovaForm({
         />
         <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
           <label htmlFor="mapping" className="block font-medium text-xxs">
-            Supernova &lt;&gt; Token Studio mapping
+            Supernova &lt;&gt; Tokens Studio mapping
           </label>
         </Stack>
         <Textarea
           id="mapping"
           name="mapping"
-          border={true}
+          border
           rows={8}
           value={values.mapping ?? ''}
           onChange={handleMappingChange}

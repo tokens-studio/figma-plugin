@@ -1,4 +1,5 @@
 import { DesignSystem, DesignSystemVersion, Supernova } from '@supernovaio/supernova-sdk';
+import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
@@ -64,12 +65,12 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         },
         ...(payload.$metadata
           ? [
-              {
-                type: 'metadata' as const,
-                path: `${SystemFilenames.METADATA}.json`,
-                data: payload.$metadata,
-              },
-            ]
+            {
+              type: 'metadata' as const,
+              path: `${SystemFilenames.METADATA}.json`,
+              data: payload.$metadata,
+            },
+          ]
           : []),
         ...(Object.entries(payload).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
           string,
@@ -157,6 +158,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       }
     } catch (error) {
       // Will throw always when something goes wrong
+      Sentry.captureException(error);
       console.log(error);
     }
     throw new Error(ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR);

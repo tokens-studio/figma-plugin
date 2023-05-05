@@ -123,7 +123,7 @@ export function useSupernova() {
         };
       }
     },
-    [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme]
+    [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
   );
 
   const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
@@ -160,13 +160,10 @@ export function useSupernova() {
   // Function to initially check auth and sync tokens with Supernova
   const syncTokensWithSupernova = useCallback(
     async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
-      console.log('SYNC TOKENS');
       try {
-        console.log(context);
         return (await pushTokensToSupernova(context)) as any;
       } catch (e) {
         notifyToUI('Error syncing with Supernova, check credentials', { error: true });
-        console.log('Error', e);
         return {
           status: 'failure',
           errorMessage: 'Beta error message',

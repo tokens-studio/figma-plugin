@@ -19,6 +19,7 @@ import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernova
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
+import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -59,12 +60,11 @@ function PushDialog() {
         default:
           break;
       }
-    } else if (localApiState && 'designSystemUrl' in localApiState) {
+    } else {
       switch (localApiState.provider) {
-        case StorageProviderType.SUPERNOVA: {
+        case StorageProviderType.SUPERNOVA:
           redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
           break;
-        }
         default:
           break;
       }
@@ -140,18 +140,7 @@ function PushDialog() {
                       required
                     />
                   </>
-                ) : (
-                  <>
-                    <p className="text-xs">Push your local changes to your Supernova.io design system.</p>
-                    <Heading size="small">Design system</Heading>
-                    <Box css={{
-                      padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
-                    }}
-                    >
-                      {'designSystemUrl' in localApiState ? localApiState.designSystemUrl : null}
-                    </Box>
-                  </>
-                )}
+                ) : <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} />}
               </Stack>
               <Stack direction="row" gap={4} justify="between">
                 <Button variant="secondary" onClick={onCancel}>
