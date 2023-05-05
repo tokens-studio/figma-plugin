@@ -15,7 +15,7 @@ const genericVersionedSchema = singleFileSchema.extend({
   updatedAt: z.coerce.date().optional(),
 });
 
-type GenericVersionedMeta = {
+export type GenericVersionedMeta = {
   version: string
   updatedAt: string
 };

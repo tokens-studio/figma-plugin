@@ -1,8 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { captureException } from '@sentry/react';
 import { Dispatch } from '@/app/store';
-import { notifyToUI } from '@/plugin/notifiers';
+import { notifyToUI } from '../../../../plugin/notifiers';
 import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
@@ -10,28 +9,43 @@ import {
   activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
-import { GenericVersionedStorage } from '@/storage';
+import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
-  StorageTypeCredentials, StorageTypeFormValues, GenericVersionedStorageFlow, GenericVersionedStorageType,
+  StorageTypeCredentials,
+  StorageTypeFormValues,
+  GenericVersionedStorageFlow,
+  GenericVersionedStorageType,
 } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 export async function updateGenericVersionedTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null, dispatch,
-}: UpdateRemoteFunctionPayload) {
+  tokens,
+  themes,
+  context,
+  updatedAt,
+  oldUpdatedAt = null,
+  dispatch,
+}: UpdateRemoteFunctionPayload): Promise<RemoteResponseData<GenericVersionedMeta> | null> {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
+
   try {
     if (!id) throw new Error('Missing Generic Versioned Storage ID');
 
+    // Read Only is not allowed to save to external
+    if (flow === GenericVersionedStorageFlow.READ_ONLY) return null;
+
     const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
+    const tokenSetOrder = Object.keys(tokens);
     const payload = {
       tokens,
       themes,
       metadata: {
+        tokenSetOrder,
         updatedAt: updatedAt ?? new Date().toISOString(),
         version: pjs.plugin_version,
       },
@@ -39,46 +53,57 @@ export async function updateGenericVersionedTokens({
 
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
+
       if (remoteTokens?.status === 'failure') {
         // eslint-disable-next-line no-console
+        const errorMessage = remoteTokens?.errorMessage || ErrorMessages.GENERAL_CONNECTION_ERROR;
         notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
-        console.log('Error updating Generic storage', remoteTokens?.errorMessage);
+        console.error('Error updating Generic storage', errorMessage);
         return {
           status: 'failure',
-          errorMessage: remoteTokens?.errorMessage,
+          errorMessage,
         };
       }
 
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
-      if (comparison === 'remote_older') {
-        // Read Only is not allowed to save to external
-        switch (flow) {
-          case GenericVersionedStorageFlow.READ_ONLY:
-            notifyToUI('Generic versioned storage is operating in read only mode. You cannot save tokens to remote', { error: true });
-            return payload;
-            break;
-          case GenericVersionedStorageFlow.READ_WRITE:
-          case GenericVersionedStorageFlow.READ_WRITE_CREATE:
-            await storage.save(payload);
-            saveLastSyncedState(dispatch, payload.tokens, payload?.themes, payload.metadata);
-            return payload;
-            break;
-          default:
-        }
-      } else {
+
+      if (comparison === 'remote_newer') {
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.REMOTE_VERSION_NEWER,
+        };
       }
-    } else {
-      await storage.save(payload);
-      saveLastSyncedState(dispatch, payload.tokens, payload?.themes, payload.metadata);
     }
-  } catch (e) {
-    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+
+    // If the oldUpdatedAt doesn't exist, we still save the tokens
+    // This happens in createNewGenericVersionedStorage
+    const success = await storage.save(payload);
+
+    if (success) {
+      saveLastSyncedState(dispatch, payload.tokens, payload.themes, { tokenSetOrder });
+      return {
+        status: 'success',
+        ...payload,
+      };
+    }
+
     // eslint-disable-next-line no-console
-    console.error('Error ', e);
-    captureException(e);
+    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+    console.error('Error updating Generic storage');
+    return {
+      status: 'failure',
+      errorMessage: ErrorMessages.REMOTE_CREDENTIAL_ERROR,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    notifyToUI('Error updating Generic Storage, check console (F12) ', { error: true });
+    console.error('Error updating Generic Storage', e);
+    return {
+      status: 'failure',
+      errorMessage: String(e),
+    };
   }
-  return undefined;
 }
 
 export function useGenericVersionedStorage() {
@@ -89,13 +114,14 @@ export function useGenericVersionedStorage() {
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
 
-  const createNewGenericVersionedStorage = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>) => {
-    const {
-      id, name, additionalHeaders, internalId, flow,
-    } = context;
-    const updatedAt = new Date().toISOString();
-
-    try {
+  const createNewGenericVersionedStorage = useCallback(
+    async (
+      context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
+    ) => {
+      const {
+        id, name, additionalHeaders, internalId, flow,
+      } = context;
+      const updatedAt = new Date().toISOString();
       const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
       if (result) {
         updateGenericVersionedTokens({
@@ -124,117 +150,136 @@ export function useGenericVersionedStorage() {
 
         return result.metadata.id;
       }
-    } catch (err) {
       notifyToUI('Something went wrong. See console for details', { error: true });
-      console.error(err);
-    }
-    return null;
-  }, [dispatch, themes, tokens]);
+      return null;
+    },
+    [dispatch, themes, tokens],
+  );
 
   // Read tokens from endpoint
-  const pullTokensFromGenericVersionedStorage = useCallback(async (context: Extract<StorageTypeCredentials, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>): Promise<RemoteResponseData | null> => {
-    const {
-      id, additionalHeaders, name, internalId, flow,
-    } = context;
-    if (!id) return null;
-    try {
-      const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
-      const data = await storage.retrieve();
-      dispatch.uiState.setProjectURL(id);
+  const pullTokensFromGenericVersionedStorage = useCallback(
+    async (
+      context: Extract<StorageTypeCredentials, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
+    ): Promise<RemoteResponseData | null> => {
+      const {
+        id, additionalHeaders, name, internalId, flow,
+      } = context;
+      if (!id) return null;
+      try {
+        const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
+        const data = await storage.retrieve();
+        dispatch.uiState.setProjectURL(id);
 
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: {
-          internalId,
-          name,
-          id,
-          flow,
-          additionalHeaders,
-          provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-        },
-      });
-      if (data?.status === 'failure') {
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREDENTIALS,
+          credential: {
+            internalId,
+            name,
+            id,
+            flow,
+            additionalHeaders,
+            provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+          },
+        });
+        if (data?.status === 'failure') {
+          notifyToUI('Error fetching from Generic Versioned Storage, check console (F12)', { error: true });
+          console.error('Error:', data);
+          return {
+            status: 'failure',
+            errorMessage: data.errorMessage,
+          };
+        }
+        if (data?.metadata && data?.tokens) {
+          dispatch.tokenState.setEditProhibited(false);
+          return {
+            ...data,
+            metadata: {
+              // Define a fallback
+              tokenSetOrder: Object.keys(data.tokens),
+              ...data.metadata,
+            },
+          };
+        }
+        notifyToUI('No tokens stored on remote', { error: true });
+        return null;
+      } catch (e) {
+        notifyToUI('Error fetching from Generic Versioned Storage, check console (F12)', { error: true });
+        console.error('Error:', e);
+        return null;
+      }
+    },
+    [dispatch],
+  );
+
+  const addGenericVersionedCredentials = useCallback(
+    async (
+      context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
+    ): Promise<RemoteResponseData | null> => {
+      const {
+        provider, id, name, additionalHeaders, internalId, flow,
+      } = context;
+      if (!id) return null;
+
+      // Always attempt create first if required
+      const updatedAt = new Date().toISOString();
+      const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
+
+      if (!result) {
         return {
           status: 'failure',
-          errorMessage: data.errorMessage,
+          errorMessage: 'Failed to create endpoint',
         };
       }
-      if (data && data?.tokens) {
-        dispatch.tokenState.setEditProhibited(false);
-        return data;
+
+      const content = await pullTokensFromGenericVersionedStorage(context);
+
+      if (content?.status === 'failure') {
+        return {
+          status: 'failure',
+          errorMessage: content.errorMessage,
+        };
       }
-      notifyToUI('No tokens stored on remote', { error: true });
-      return null;
-    } catch (e) {
-      notifyToUI('Error fetching from Generic Versioned Storage, check console (F12)', { error: true });
-      // eslint-disable-next-line no-console
-      console.error('Error fetching from Generic Versioned Storage:', e);
-      captureException(e);
-      return null;
-    }
-  }, [dispatch]);
+      if (content) {
+        dispatch.uiState.setApiData({
+          provider,
+          id,
+          name,
+          additionalHeaders,
+          internalId,
+          flow,
+        });
+        setStorageType({
+          provider: {
+            provider,
+            id,
+            additionalHeaders,
+            name,
+            internalId,
+            flow,
+          },
+          shouldSetInDocument: true,
+        });
+        saveLastSyncedState(dispatch, content.tokens, content?.themes, content.metadata);
+        dispatch.tokenState.setTokenData({
+          values: content.tokens,
+          themes: content.themes,
+          usedTokenSet: usedTokenSets,
+          activeTheme,
+        });
+        return content;
+      }
 
-  const addGenericVersionedCredentials = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>): Promise<RemoteResponseData | null> => {
-    const {
-      provider, id, name, additionalHeaders, internalId, flow,
-    } = context;
-    if (!id) return null;
-
-    // Always attempt create first if required
-    const updatedAt = new Date().toISOString();
-    const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
-
-    if (!result) {
-      return {
-        status: 'failure',
-        errorMessage: 'Failed to create endpoint',
-      };
-    }
-
-    const content = await pullTokensFromGenericVersionedStorage(context);
-
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content.errorMessage,
-      };
-    }
-    if (content) {
-      dispatch.uiState.setApiData({
-        provider, id, name, additionalHeaders, internalId, flow,
-      });
-      setStorageType({
-        provider: {
-          provider, id, additionalHeaders, name, internalId, flow,
-        },
-        shouldSetInDocument: true,
-      });
-      saveLastSyncedState(dispatch, content.tokens, content?.themes, content.metadata);
-      dispatch.tokenState.setTokenData({
-        values: content.tokens,
-        themes: content.themes,
-        usedTokenSet: usedTokenSets,
-        activeTheme,
-      });
       return content;
-    }
+    },
+    [dispatch, pullTokensFromGenericVersionedStorage, setStorageType, usedTokenSets, activeTheme],
+  );
 
-    return content;
-  }, [
-    dispatch,
-    pullTokensFromGenericVersionedStorage,
-    setStorageType,
-    usedTokenSets,
-    activeTheme,
-  ]);
-
-  return useMemo(() => ({
-    addGenericVersionedCredentials,
-    pullTokensFromGenericVersionedStorage,
-    createNewGenericVersionedStorage,
-  }), [
-    addGenericVersionedCredentials,
-    pullTokensFromGenericVersionedStorage,
-    createNewGenericVersionedStorage,
-  ]);
+  return useMemo(
+    () => ({
+      addGenericVersionedCredentials,
+      pullTokensFromGenericVersionedStorage,
+      createNewGenericVersionedStorage,
+    }),
+    [addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage],
+  );
 }
