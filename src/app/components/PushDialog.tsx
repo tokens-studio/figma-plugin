@@ -60,14 +60,8 @@ function PushDialog() {
         default:
           break;
       }
-    } else {
-      switch (localApiState.provider) {
-        case StorageProviderType.SUPERNOVA:
-          redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
-          break;
-        default:
-          break;
-      }
+    } else if (localApiState.provider === StorageProviderType.SUPERNOVA) {
+      redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
     }
     return redirectHref;
   }, [branch, localApiState]);
