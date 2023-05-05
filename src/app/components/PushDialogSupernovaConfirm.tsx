@@ -7,7 +7,6 @@ type Props = {
 };
 
 function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
-  console.log(designSystemUrl);
   return (
     <>
       <p className="text-xs">Push your local changes to your Supernova.io design system.</p>
