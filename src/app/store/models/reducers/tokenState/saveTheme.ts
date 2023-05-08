@@ -23,11 +23,11 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
 
   const updatedThemes = [...state.themes];
   updatedThemes.splice(startIndex, 1, {
-    ...state.themes[themeObjectIndex],
-    ...data,
     id: themeId,
+    name: data.name,
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
     selectedTokenSets,
+    ...(data?.group ? { group: data.group } : {}),
   });
 
   const newActiveTheme = state.activeTheme;
