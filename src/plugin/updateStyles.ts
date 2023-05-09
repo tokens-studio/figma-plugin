@@ -9,6 +9,7 @@ import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { notifyUI } from './notifiers';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
@@ -31,7 +32,7 @@ export default async function updateStyles(
       value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings.baseFontSize) : token.value,
       styleId: activeTheme?.$figmaStyleReferences ? activeTheme?.$figmaStyleReferences[token.name] : '',
     } as SingleToken<true, { path: string, styleId: string }>;
-  });
+  }).filter((token) => token.path);
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
     typeof styleTokens[number],
@@ -53,5 +54,9 @@ export default async function updateStyles(
     ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
     ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, settings.baseFontSize, shouldCreate) : {}),
   };
+  if (styleTokens.length < tokens.length && shouldCreate) {
+    notifyUI('Some styles were not created due to your user Settings. Make sure Settings > Ignore first part of token name doesn\'t conflict', { error: true });
+  }
+
   return allStyleIds;
 }
