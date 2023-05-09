@@ -80,29 +80,33 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
       )}
       isOpenByDefault={false}
     >
-      <Box css={{
-        display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1',
-      }}
-      >
-        <Box css={{
-          display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
-        }}
-        >
-          <Checkbox
-            checked={selectedStyles.length === stylesEntries.length}
-            id="detachSelected"
-            onCheckedChange={handleSelectAll}
-          />
-          <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$bold' }}>
-            Select all
-          </Label>
-        </Box>
-        <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-          <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="secondary">
-            Detach Selected
-          </Button>
-        </Box>
-      </Box>
+      {
+        stylesEntries.length > 0 && (
+          <Box css={{
+            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1',
+          }}
+          >
+            <Box css={{
+              display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+            }}
+            >
+              <Checkbox
+                checked={selectedStyles.length === stylesEntries.length}
+                id="detachSelected"
+                onCheckedChange={handleSelectAll}
+              />
+              <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+                Select all
+              </Label>
+            </Box>
+            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+              <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="secondary">
+                Detach Selected
+              </Button>
+            </Box>
+          </Box>
+        )
+      }
       <Box css={{
         display: 'grid', gap: '$2', gridTemplateColumns: 'minmax(0, 1fr)', padding: '$1',
       }}
