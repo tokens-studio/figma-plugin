@@ -21,9 +21,22 @@ import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
+import Box from '../Box';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
+});
+
+const StyledDropdownMenuItemIndicator = styled(DropdownMenuItemIndicator, {
+  position: 'relative',
+  left: 0,
+});
+
+const StyledDropdownMenuRadioItem = styled(DropdownMenuRadioItem, {
+  padding: '$2 $3 $2 $2',
+  userselect: 'none',
+  display: 'flex',
+  alignItems: 'center',
 });
 
 type AvailableTheme = {
@@ -31,6 +44,7 @@ type AvailableTheme = {
   label: string
   group?: string
 };
+
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
@@ -84,7 +98,7 @@ export const ThemeSelector: React.FC = () => {
   const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.map(({ label, value }) => {
     const handleSelect = () => handleSelectTheme(value);
     return (
-      <DropdownMenuRadioItem
+      <StyledDropdownMenuRadioItem
         key={value}
         value={value}
         data-cy={`themeselector--themeoptions--${value}`}
@@ -93,11 +107,15 @@ export const ThemeSelector: React.FC = () => {
           // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
-        <DropdownMenuItemIndicator>
-          <CheckIcon />
-        </DropdownMenuItemIndicator>
-        {label}
-      </DropdownMenuRadioItem>
+        <Box css={{ width: '$5', marginRight: '$2' }}>
+          <StyledDropdownMenuItemIndicator>
+            <CheckIcon />
+          </StyledDropdownMenuItemIndicator>
+        </Box>
+        <Box>
+          {label}
+        </Box>
+      </StyledDropdownMenuRadioItem>
     );
   }), [handleSelectTheme]);
 
@@ -106,7 +124,7 @@ export const ThemeSelector: React.FC = () => {
       const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
       return (
         filteredThemes.length > 0 && (
-        <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+        <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '70vh' }} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
           <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
           {
             renderThemeOption(filteredThemes)
@@ -133,9 +151,9 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           {availableThemes.length === 0 && (
-            <DropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+            <StyledDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
               <Text>No themes</Text>
-            </DropdownMenuRadioItem>
+            </StyledDropdownMenuRadioItem>
           )}
           {availableThemeOptions}
           <DropdownMenuSeparator />
