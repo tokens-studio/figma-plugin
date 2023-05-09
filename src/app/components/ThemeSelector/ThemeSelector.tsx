@@ -124,7 +124,7 @@ export const ThemeSelector: React.FC = () => {
       const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
       return (
         filteredThemes.length > 0 && (
-        <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+        <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '70vh' }} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
           <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
           {
             renderThemeOption(filteredThemes)
