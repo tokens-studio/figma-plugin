@@ -1,4 +1,3 @@
-import omit from 'just-omit';
 import type { TokenState } from '../../tokenState';
 
 type Payload = {
@@ -13,21 +12,21 @@ export function disconnectStyleFromTheme(state: TokenState, data: Payload): Toke
     themeObjectIndex === -1
     || !state.themes[themeObjectIndex].$figmaStyleReferences
     || (typeof data.key === 'string' && !(data.key in state.themes[themeObjectIndex].$figmaStyleReferences!))
-    || (Array.isArray(data.key) && data.key.some((key) => (key in state.themes[themeObjectIndex].$figmaStyleReferences!)))
+    || (Array.isArray(data.key) && !data.key.some((key) => (key in state.themes[themeObjectIndex].$figmaStyleReferences!)))
   ) return state;
 
   const updatedThemes = [...state.themes];
   const updatedFigmaStyleReferences = state.themes[themeObjectIndex].$figmaStyleReferences ?? {};
   if (typeof data.key === 'string') {
-    omit(updatedFigmaStyleReferences, data.key);
+    delete updatedFigmaStyleReferences[data.key];
   } else {
     data.key.forEach((key) => {
-      omit(updatedFigmaStyleReferences, key);
+      delete updatedFigmaStyleReferences[key];
     });
   }
   updatedThemes.splice(themeObjectIndex, 1, {
     ...state.themes[themeObjectIndex],
-    $figmaStyleReferences: updatedFigmaStyleReferences,
+    $figmaStyleReferences: { ...updatedFigmaStyleReferences },
   });
 
   return {
