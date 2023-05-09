@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Box from '../Box';
 import Accordion from '../Accordion';
@@ -10,6 +10,8 @@ import { RootState } from '@/app/store';
 import { StyleInfo, ThemeStyleManagementCategoryStyleEntry } from './ThemeStyleManagementCategoryStyleEntry';
 import Stack from '../Stack';
 import { Count } from '../Count';
+import Checkbox from '../Checkbox';
+import Label from '../Label';
 
 type Props = {
   label: string
@@ -17,6 +19,7 @@ type Props = {
   icon?: React.ReactNode | null
   onAttachLocalStyles: () => void
   onDisconnectStyle: (name: string) => void
+  onDisconnectSelectedStyle: (names: string[]) => void
 };
 
 export const ThemeStyleManagementCategory: React.FC<Props> = ({
@@ -25,12 +28,34 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
   styles,
   onAttachLocalStyles,
   onDisconnectStyle,
+  onDisconnectSelectedStyle,
 }) => {
   const isAttachingLocalStyles = useSelector(useCallback((state: RootState) => (
     isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_STYLES)
   ), []));
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
 
   const stylesEntries = useMemo(() => Object.entries(styles), [styles]);
+
+  const handleSelectAll = React.useCallback(() => {
+    setSelectedStyles(
+      selectedStyles.length === stylesEntries.length
+        ? []
+        : stylesEntries.map(([token]) => token),
+    );
+  }, [selectedStyles, stylesEntries]);
+
+  const handleDisconnectSelectedStyles = useCallback(() => {
+    onDisconnectSelectedStyle(selectedStyles);
+  }, [selectedStyles, onDisconnectSelectedStyle]);
+
+  const handleToggleSelectedStyle = useCallback((token: string) => {
+    setSelectedStyles(
+      selectedStyles.includes(token)
+        ? selectedStyles.filter((style) => style !== token)
+        : [...selectedStyles, token],
+    );
+  }, [selectedStyles]);
 
   return (
     <Accordion
@@ -55,14 +80,42 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
       )}
       isOpenByDefault={false}
     >
-      <Box css={{ display: 'grid', gap: '$2', gridTemplateColumns: 'minmax(0, 1fr)' }}>
+      <Box css={{
+        display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1',
+      }}
+      >
+        <Box css={{
+          display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+        }}
+        >
+          <Checkbox
+            checked={selectedStyles.length === stylesEntries.length}
+            id="detachSelected"
+            onCheckedChange={handleSelectAll}
+          />
+          <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+            Select all
+          </Label>
+        </Box>
+        <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+          <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="secondary">
+            Detach Selected
+          </Button>
+        </Box>
+      </Box>
+      <Box css={{
+        display: 'grid', gap: '$2', gridTemplateColumns: 'minmax(0, 1fr)', padding: '$1',
+      }}
+      >
         {stylesEntries.map(([token, styleInfo]) => (
           <ThemeStyleManagementCategoryStyleEntry
             key={token}
             icon={icon}
             token={token}
             styleInfo={styleInfo}
+            isChecked={selectedStyles.includes(token)}
             onDisconnectStyle={onDisconnectStyle}
+            handleToggleSelectedStyle={handleToggleSelectedStyle}
           />
         ))}
       </Box>

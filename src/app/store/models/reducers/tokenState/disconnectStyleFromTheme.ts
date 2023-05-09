@@ -3,7 +3,7 @@ import type { TokenState } from '../../tokenState';
 
 type Payload = {
   id: string
-  key: string
+  key: string | string[]
 };
 
 export function disconnectStyleFromTheme(state: TokenState, data: Payload): TokenState {
@@ -12,13 +12,22 @@ export function disconnectStyleFromTheme(state: TokenState, data: Payload): Toke
   if (
     themeObjectIndex === -1
     || !state.themes[themeObjectIndex].$figmaStyleReferences
-    || !(data.key in state.themes[themeObjectIndex].$figmaStyleReferences!)
+    || (typeof data.key === 'string' && !(data.key in state.themes[themeObjectIndex].$figmaStyleReferences!))
+    || (Array.isArray(data.key) && data.key.some((key) => (key in state.themes[themeObjectIndex].$figmaStyleReferences!)))
   ) return state;
 
   const updatedThemes = [...state.themes];
+  const updatedFigmaStyleReferences = state.themes[themeObjectIndex].$figmaStyleReferences ?? {};
+  if (typeof data.key === 'string') {
+    omit(updatedFigmaStyleReferences, data.key);
+  } else {
+    data.key.forEach((key) => {
+      omit(updatedFigmaStyleReferences, key);
+    });
+  }
   updatedThemes.splice(themeObjectIndex, 1, {
     ...state.themes[themeObjectIndex],
-    $figmaStyleReferences: omit(state.themes[themeObjectIndex].$figmaStyleReferences ?? {}, data.key),
+    $figmaStyleReferences: updatedFigmaStyleReferences,
   });
 
   return {

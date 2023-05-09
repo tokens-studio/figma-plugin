@@ -107,6 +107,16 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     }
   }, [theme, dispatch.tokenState]);
 
+  const handleDisconnectSelectedStyle = useCallback((tokens: string[]) => {
+    if (theme) {
+      track('Disconnect selected styles', { tokens });
+      dispatch.tokenState.disconnectStyleFromTheme({
+        id: theme.id,
+        key: tokens,
+      });
+    }
+  }, [theme, dispatch.tokenState]);
+
   const handleAttachLocalTextStyles = useCallback(() => {
     attachLocalStyles('typography');
   }, [attachLocalStyles]);
@@ -115,7 +125,7 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
     attachLocalStyles('colors');
   }, [attachLocalStyles]);
 
-  const handleAttachLocaEffectStyles = useCallback(() => {
+  const handleAttachLocalEffectStyles = useCallback(() => {
     attachLocalStyles('effects');
   }, [attachLocalStyles]);
 
@@ -177,18 +187,21 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
         styles={resolvedStyleInfo.typography ?? {}}
         onAttachLocalStyles={handleAttachLocalTextStyles}
         onDisconnectStyle={handleDisconnectStyle}
+        onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
       />
       <ThemeStyleManagementCategory
         label="Colors"
         styles={resolvedStyleInfo.colors ?? {}}
         onAttachLocalStyles={handleAttachLocalColorStyles}
         onDisconnectStyle={handleDisconnectStyle}
+        onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
       />
       <ThemeStyleManagementCategory
         label="Effects"
         styles={resolvedStyleInfo.effects ?? {}}
-        onAttachLocalStyles={handleAttachLocaEffectStyles}
+        onAttachLocalStyles={handleAttachLocalEffectStyles}
         onDisconnectStyle={handleDisconnectStyle}
+        onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
       />
     </Box>
   );
