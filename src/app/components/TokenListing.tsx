@@ -36,13 +36,15 @@ const TokenListing: React.FC<Props> = ({
 
   const showForm = React.useCallback(({ token, name, status }: ShowFormOptions) => {
     dispatch.uiState.setShowEditForm(true);
+    const type = token?.type || schema.type;
     dispatch.uiState.setEditToken({
       ...token,
-      type: token?.type || schema.type,
+      type,
       schema,
       status,
       initialName: name,
       name,
+      value: (type === TokenTypes.COLOR && !token?.value) ? '#' : token?.value,
     } as EditTokenObject);
   }, [schema, dispatch]);
 
