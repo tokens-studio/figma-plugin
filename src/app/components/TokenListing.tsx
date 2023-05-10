@@ -87,6 +87,7 @@ const TokenListing: React.FC<Props> = ({
               showNewForm={showNewForm}
               showForm={showForm}
               schema={schema}
+              tokenKey={tokenKey}
             />
           </Box>
         </DndProvider>

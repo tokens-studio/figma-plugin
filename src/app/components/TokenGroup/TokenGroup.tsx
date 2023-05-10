@@ -14,12 +14,13 @@ type Props = {
   schema: TokenTypeSchema;
   tokenValues: DeepKeyTokenMap;
   path?: string | null;
+  tokenKey: string;
   showNewForm: (opts: ShowNewFormOptions) => void;
   showForm: (opts: ShowFormOptions) => void;
 };
 
 const TokenGroup: React.FC<Props> = ({
-  tokenValues, showNewForm, showForm, schema, path = null,
+  tokenValues, showNewForm, showForm, schema, path = null, tokenKey,
 }) => {
   const collapsed = useSelector(collapsedTokensSelector);
   const displayType = useSelector(displayTypeSelector);
@@ -56,7 +57,6 @@ const TokenGroup: React.FC<Props> = ({
   if (mappedItems.length === 0) {
     return null;
   }
-
   return (
     <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
       {mappedItems.map(({ item }) => (
@@ -64,13 +64,14 @@ const TokenGroup: React.FC<Props> = ({
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             // Need to add class to self-reference in css traversal
             <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type || tokenKey} />
               <TokenGroup
                 tokenValues={item.value}
                 showNewForm={showNewForm}
                 showForm={showForm}
                 schema={schema}
                 path={item.stringPath}
+                tokenKey={tokenKey}
               />
             </StyledTokenGroupItems>
           ) : (
