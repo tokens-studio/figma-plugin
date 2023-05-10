@@ -33,7 +33,7 @@ export function ThemeListItemContent({
     <StyledDragButton
       type="button"
       style={{ cursor: 'inherit' }}
-      css={{ padding: '0 $6 0 $1' }}
+      css={{ padding: '0 $6 0 $1', background: '$bgDefault' }}
     >
       <DragGrabber<ThemeObject>
         item={item}
