@@ -1,7 +1,7 @@
 {
   "name": "tokens-studio-for-figma",
   "version": "1.0.0",
-  "plugin_version": "1.35.2",
+  "plugin_version": "1.35.4",
   "description": "Tokens Studio for Figma",
   "license": "MIT",
   "scripts": {
@@ -16,6 +16,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
+    "lint":"eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -105,7 +106,7 @@
     "set-value": "^3.0.2",
     "storyblok-js-client": "^3.3.1",
     "use-debounce": "^6.0.1",
-    "zod": "^3.14.4"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

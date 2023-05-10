@@ -36,11 +36,11 @@ export default function DuplicateTokenGroupModal({
       oldName, newName, tokenSets: selectedTokenSets, type,
     });
     onClose();
-  }, [duplicateGroup, oldName, newName, type, selectedTokenSets]);
+  }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
 
   return (
     <Modal
-      title="Duplicate Group"
+      title="Duplicate group"
       isOpen={isOpen}
       close={onClose}
       large
