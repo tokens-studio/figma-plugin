@@ -55,7 +55,7 @@ export default async function updateStyles(
     ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, settings.baseFontSize, shouldCreate) : {}),
   };
   if (styleTokens.length < tokens.length && shouldCreate) {
-    notifyUI('Some styles were not created due to your user Settings. Make sure Settings > Ignore first part of token name doesn\'t conflict', { error: true });
+    notifyUI('Some styles were not created due to your settings. Make sure Ignore first part of token name doesn\'t conflict', { error: true });
   }
 
   return allStyleIds;
