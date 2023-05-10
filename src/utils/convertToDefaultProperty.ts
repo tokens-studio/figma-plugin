@@ -40,6 +40,7 @@ export function convertToDefaultProperty(property: string): string {
       type = Properties.fontWeights;
       break;
     case 'lineHeights':
+    case 'lineHeight':
       type = Properties.lineHeights;
       break;
     case 'style':
