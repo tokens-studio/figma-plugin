@@ -1,0 +1,44 @@
+import { useState } from 'react';
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+import {tokensForStories} from './tokensForStories';
+import JSONEditor from '@/app/components/JSONEditor';
+import { Provider } from 'react-redux';
+import { store } from '@/app/store';
+
+<Meta title='JSON Editor'/>
+
+<ArgsTable of={JSONEditor} />
+
+export const DefaultStory = (args) => {
+  
+  function noop() {
+    return;
+  }
+
+  const stringTokens= JSON.stringify(tokensForStories,null,4);
+  const style = {
+    height: '800px',
+    width: '100%',
+
+  };
+    return (
+      <div style={style}>
+      <Provider store={store}>
+        <JSONEditor {...args} stringTokens={stringTokens} handleChange={noop}/> 
+      </Provider>
+      </div>
+  );
+}
+
+<Canvas>
+  <Story
+    name='Primary'
+    args={{
+      title: 'primary',
+      full: true,
+      footer: 'Standard Modal',
+    }}
+  >
+    {DefaultStory.bind({})}
+  </Story>
+</Canvas>

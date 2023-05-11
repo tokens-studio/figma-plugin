@@ -1,5 +1,3 @@
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import './styles/figma.css';

@@ -39,7 +39,7 @@ function Textarea({
   value: string;
   placeholder?: string;
   isDisabled?: boolean;
-  onChange?: Function;
+  onChange?: (event: React.ChangeEvent) => void;
   css?: any;
   border?: boolean
 }) {

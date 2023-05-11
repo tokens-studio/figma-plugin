@@ -25,6 +25,12 @@ module.exports = (env, argv) => ({
           {
             loader: 'babel-loader',
           },
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            }
+          }
         ],
         exclude: /node_modules/,
       },
@@ -35,7 +41,7 @@ module.exports = (env, argv) => ({
         use: [
           {
             loader: 'babel-loader',
-          },
+          }
         ],
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code

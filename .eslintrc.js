@@ -38,10 +38,11 @@ module.exports = {
     "react/jsx-no-bind": [2, {
       ignoreDOMComponents: false,
       ignoreRefs: false,
-      allowArrowFunctions: false,
-      allowFunctions: false,
+      allowArrowFunctions: true,
+      allowFunctions: true,
       allowBind: false,
     }],
+    
     "@typescript-eslint/no-shadow": 1
   }
 };

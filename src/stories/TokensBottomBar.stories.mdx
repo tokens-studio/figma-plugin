@@ -1,17 +1,13 @@
 import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import { Provider } from 'react-redux';
-
 import { store } from '@/app/store';
-
 import TokensBottomBar from '@/app/components/TokensBottomBar';
-<Meta 
-  title='TokensBottomBar'
-  component={TokensBottomBar}
-/>
+
+<Meta title='TokensBottomBar'component={TokensBottomBar}/>
 
 <ArgsTable of={TokensBottomBar} />
 
-export const TokensBottomBarDefaultStory = (args) => {
+export const TokensBottomBarDefaultStory  = (args) => {
   return (
     <Provider store={store}>
       <TokensBottomBar {...args} />
@@ -25,6 +21,6 @@ export const TokensBottomBarDefaultStory = (args) => {
     path: 'default.token',
     id: 'listing',
   }}>
-    {TokensBottomBarDefaultStory.bind({})}
+   {TokensBottomBarDefaultStory.bind({})}
   </Story>
 </Canvas>

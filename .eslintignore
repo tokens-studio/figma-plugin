@@ -1,0 +1,4 @@
+*.d.ts
+# This gives false values regarding the use of msw
+src/mocks/**
+jest.config.ts

@@ -1,6 +1,4 @@
 /* eslint-disable no-param-reassign */
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 import * as asyncHandlers from './asyncMessageHandlers';
 import { defaultWorker } from './Worker';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';

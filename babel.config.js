@@ -1,8 +1,17 @@
 module.exports = {
   presets: [['@babel/preset-env', {
     modules: false,
-  }], '@babel/preset-typescript', '@babel/preset-react'],
-  plugins: ['@babel/proposal-class-properties', '@babel/proposal-object-rest-spread', "@babel/transform-typescript", "@babel/plugin-proposal-private-methods"],
+    "targets": {
+       "node": "12" 
+    }
+  }], '@babel/preset-react'],
+  plugins: [
+    '@babel/proposal-class-properties',
+    '@babel/proposal-object-rest-spread',
+    '@babel/plugin-proposal-optional-chaining',
+    '@babel/plugin-proposal-nullish-coalescing-operator',
+    "@babel/plugin-proposal-private-methods"
+  ],
   env: {
     test: {
       presets: [
