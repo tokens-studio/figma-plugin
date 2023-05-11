@@ -28,7 +28,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const [themeGroupNameEditing, setThemeGroupNameEditing] = useState(false);
+  const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
   const groupNames = useMemo(() => {
     const newArray: string[] = [];
     themes.forEach((theme) => {
@@ -52,10 +52,10 @@ export const ManageThemesModal: React.FC<Props> = () => {
   }, [themes, themeEditorOpen]);
 
   const handleClose = useCallback(() => {
-    if (!themeGroupNameEditing) {
+    if (!IsThemeGroupNameEditing) {
       dispatch.uiState.setManageThemesModalOpen(false);
     }
-  }, [themeGroupNameEditing, dispatch]);
+  }, [IsThemeGroupNameEditing, dispatch]);
 
   const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
     if (theme && typeof theme !== 'boolean') {
@@ -112,8 +112,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
     dispatch.tokenState.setThemes(reorderedThemeList);
   }, [dispatch.tokenState, themes]);
 
-  const handleUpdateEditing = React.useCallback((editing: boolean) => {
-    setThemeGroupNameEditing(editing);
+  const handleUpdateIsEditing = React.useCallback((editing: boolean) => {
+    setIsThemeGroupNameEditing(editing);
   }, []);
 
   return (
@@ -190,7 +190,12 @@ export const ManageThemesModal: React.FC<Props> = () => {
               return (
                 filteredThemes.length > 0 && (
                 <DragItem<string> key={groupName} item={groupName}>
-                  <ThemeListGroupHeader label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName} groupName={groupName} editing={themeGroupNameEditing} setEditing={handleUpdateEditing} />
+                  <ThemeListGroupHeader
+                    label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}
+                    groupName={groupName}
+                    isEditing={IsThemeGroupNameEditing}
+                    setIsEditing={handleUpdateIsEditing}
+                  />
                   <ReorderGroup
                     layoutScroll
                     values={filteredThemes}
