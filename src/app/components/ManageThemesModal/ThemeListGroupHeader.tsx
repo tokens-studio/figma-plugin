@@ -16,17 +16,20 @@ import { Dispatch } from '@/app/store';
 type Props = React.PropsWithChildren<{
   groupName: string
   label: string
+  editing: boolean
+  setEditing: (value: boolean) => void
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
+  editing,
+  setEditing,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
   const [hovered, setHovered] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [currentGroupName, setCurrentGroupName] = useState(label);
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
@@ -51,7 +54,7 @@ export function ThemeListGroupHeader({
     } else if (e.key === 'Escape') {
       setEditing(false);
     }
-  }, [currentGroupName, groupName, dispatch.tokenState]);
+  }, [currentGroupName, groupName, dispatch.tokenState, setEditing]);
 
   const handleGroupNameChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentGroupName(event.target.value);
