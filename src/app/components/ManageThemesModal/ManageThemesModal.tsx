@@ -182,7 +182,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
               return (
                 filteredThemes.length > 0 && (
                 <DragItem<string> key={groupName} item={groupName}>
-                  <ThemeListGroupHeader groupName={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName} item={groupName} />
+                  <ThemeListGroupHeader label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName} groupName={groupName} />
                   <ReorderGroup
                     layoutScroll
                     values={filteredThemes}
