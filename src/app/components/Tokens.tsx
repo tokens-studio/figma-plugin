@@ -324,10 +324,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 ))}
                 <ToggleEmptyButton />
                 {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
-                {manageThemesModalOpen && <ManageThemesModal />}
               </Box>
             )}
           </Box>
+          {manageThemesModalOpen && <ManageThemesModal />}
         </Box>
         <TokensBottomBar
           hasJSONError={!!error}
