@@ -124,6 +124,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
                     />
                   ) : (
                     <Button
+                      id="button-manage-themes-modal-new-group"
                       variant="secondary"
                       icon={<IconPlus />}
                       onClick={handleAddGroup}
