@@ -112,7 +112,6 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
                     <Controller
                       name="group"
                       control={control}
-                      // this is the only way to do this
                       // eslint-disable-next-line
                       render={({ field }) => (
                         <ThemeGroupDropDownMenu

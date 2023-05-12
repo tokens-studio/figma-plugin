@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
 import Box from '../Box';
-
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -71,10 +70,7 @@ export const ThemeGroupDropDownMenu: React.FC<Props> = ({
           )
         }
       </StyledDropdownMenuTrigger>
-      <DropdownMenuContent
-        side="bottom"
-        css={{ minWidth: '180px' }}
-      >
+      <DropdownMenuContent side="bottom">
         <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
           {
             themeGroupList
