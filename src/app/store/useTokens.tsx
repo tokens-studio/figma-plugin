@@ -204,7 +204,7 @@ export default function useTokens() {
       ],
     });
     if (shouldRemap) {
-      await handleBulkRemap(newGroupName, oldGroupName, shouldRemap.data[0]);
+      await handleBulkRemap(newGroupName, oldGroupName, shouldRemap.data[0] as UpdateMode);
       dispatch.settings.setUpdateMode(shouldRemap.data[0] as UpdateMode);
     }
   }, [settings.updateMode, confirm, handleBulkRemap, dispatch.settings]);

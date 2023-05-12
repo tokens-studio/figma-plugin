@@ -339,10 +339,12 @@ export default function ColorTokenForm({
           display: 'flex', gap: '$3', background: '$bgSubtle', color: '$fgSubtle', padding: '$3', borderRadius: '$2',
         }}
         >
-          {internalEditToken.type === 'color' ? (
-            <ColorPickerTrigger background={String(displayColor)} />
-          ) : null}
-          {modifiedColor}
+          <>
+            {internalEditToken.type === 'color' ? (
+              <ColorPickerTrigger background={String(displayColor)} />
+            ) : null}
+            {modifiedColor}
+          </>
         </Box>
       )}
     </>

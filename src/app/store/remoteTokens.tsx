@@ -393,7 +393,7 @@ export default function useRemoteTokens() {
     }
   }, [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches]);
 
-  const deleteProvider = useCallback((provider) => {
+  const deleteProvider = useCallback((provider: any) => {
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,
@@ -402,7 +402,7 @@ export default function useRemoteTokens() {
 
   const fetchTokensFromFileOrDirectory = useCallback(async ({
     files, usedTokenSet, activeTheme,
-  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: Record<string, string> }) => {
+  }: { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: Record<string, string> }) => {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 

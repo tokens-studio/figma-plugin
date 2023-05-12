@@ -1,11 +1,16 @@
 require('dotenv').config();
 
+import { defaults  as tsjPreset } from 'ts-jest/presets'
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/en/configuration.html
  */
 
-export default {
+console.log(tsjPreset)
+const jestConfig = {
+	transform: {
+		'^.+\\.(ts|tsx)$': 'ts-jest',
+  },
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -37,10 +42,10 @@ export default {
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
-     "json",
-     "text",
-     "lcov",
-     "clover"
+    "json",
+    "text",
+    "lcov",
+    "clover"
   ],
 
   // An object that configures minimum threshold enforcement for coverage results
@@ -71,12 +76,12 @@ export default {
   moduleDirectories: ['node_modules', 'src'],
 
   // An array of file extensions your modules use
-  // moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
+  moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-            '<rootDir>/tests/__mocks__/fileMock.js',
+      '<rootDir>/tests/__mocks__/fileMock.js',
     '\\.(css)$': '<rootDir>/tests/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
@@ -172,9 +177,6 @@ export default {
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
   // timers: "real",
 
-  // A map from regular expressions to paths to transformers
-  // transform: null,
-
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin)/)', '\\.pnp\\.[^\\/]+$'],
 
@@ -190,3 +192,4 @@ export default {
   // Whether to use watchman for file crawling
   // watchman: true,
 };
+export default jestConfig;

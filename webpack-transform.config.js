@@ -16,6 +16,12 @@ module.exports = (env, argv) => ({
           {
             loader: 'babel-loader',
           },
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            }
+          }
         ],
         exclude: /node_modules/,
       },
@@ -27,7 +33,7 @@ module.exports = (env, argv) => ({
             loader: 'babel-loader',
           },
         ],
-        exclude:  /node_modules\/(?!(colorjs.io)\/)/,
+        exclude: /node_modules\/(?!(colorjs.io)\/)/,
       }
     ],
   },

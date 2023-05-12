@@ -22,7 +22,7 @@ export const MoreButtonProperty: React.FC<Props> = ({
   const isActive = React.useMemo(() => (
     mainNodeSelectionValues[property.name] === value
   ), [value, property, mainNodeSelectionValues]);
-  const handleClick = React.useCallback((e) => {
+  const handleClick = React.useCallback((e:Event) => {
     e.preventDefault();
     onClick(property, isActive);
   }, [property, isActive, onClick]);

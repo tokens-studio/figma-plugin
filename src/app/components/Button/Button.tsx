@@ -4,7 +4,7 @@ import { StyledButtonIconContainer } from './StyledButtonIconContainer';
 import { StyledButton } from './StyledButton';
 import type { StitchesCSS } from '@/types';
 
-export interface ButtonProps {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   type?: 'button' | 'submit';
   form?: string;
   variant: 'secondary' | 'primary' | 'ghost' | 'danger';

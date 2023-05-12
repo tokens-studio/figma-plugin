@@ -23,6 +23,7 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
+import { TooltipProvider } from '../Tooltip';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -83,7 +84,9 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
         onCancel={handleCancelLoadingScreen}
       >
-        <App />
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
       </FigmaLoading>
       <Initiator />
       <ConfirmDialog />

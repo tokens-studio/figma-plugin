@@ -22,15 +22,17 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Input from './Input';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 import Stack from './Stack';
+import { AnyTokenList } from '@/types/tokens';
+import { UsedTokenSetsMap } from '@/types';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
   const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
-  const tokens = useSelector(tokensSelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
-  const inspectDeep = useSelector(inspectDeepSelector);
+  const tokens: Record<string, AnyTokenList> = useSelector(tokensSelector);
+  const activeTokenSet: string = useSelector(activeTokenSetSelector);
+  const usedTokenSet: UsedTokenSetsMap = useSelector(usedTokenSetSelector);
+  const inspectDeep: boolean = useSelector(inspectDeepSelector);
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => (
     resolveTokenValues(mergeTokenGroups(tokens, {

@@ -12,7 +12,7 @@ export default function WindowResizer() {
 
   const debouncedSizeChange = React.useRef(
     debounce(
-      (width, height) => track('Set Window Size', { width, height }),
+      (width: number, height: number) => track('Set Window Size', { width, height }),
       300,
     ),
   ).current;
@@ -28,14 +28,14 @@ export default function WindowResizer() {
     debouncedSizeChange(size.width, size.height);
   }, [debouncedSizeChange, dispatch.settings]);
 
-  const onDown = React.useCallback((e) => {
+  const onDown = React.useCallback((e: React.PointerEvent) => {
     if (cornerRef.current) {
       cornerRef.current.onpointermove = handleSizeChange;
       cornerRef.current.setPointerCapture(e.pointerId);
     }
   }, [handleSizeChange]);
 
-  const onUp = React.useCallback((e) => {
+  const onUp = React.useCallback((e: React.PointerEvent) => {
     if (cornerRef.current) {
       cornerRef.current.onpointermove = null;
       cornerRef.current.releasePointerCapture(e.pointerId);

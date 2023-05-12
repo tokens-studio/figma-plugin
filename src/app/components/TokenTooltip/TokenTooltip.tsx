@@ -4,6 +4,7 @@ import Tooltip from '../Tooltip';
 import { TokenTooltipContent } from './TokenTooltipContent';
 
 type Props = {
+  children?: React.ReactNode;
   token: SingleToken;
 };
 

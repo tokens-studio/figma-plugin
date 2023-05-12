@@ -37,6 +37,7 @@ const Toolip: React.FC<Props> = ({
 }) => (
   label ? (
     <Tooltip.Root delayDuration={0}>
+      {/* @ts-ignore */}
       <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
       <StyledContent side={side}>
         <StyledArrow offset={10} />
@@ -45,5 +46,7 @@ const Toolip: React.FC<Props> = ({
     </Tooltip.Root>
   ) : children
 );
+
+export const TooltipProvider = Tooltip.Provider;
 
 export default Toolip;

@@ -28,11 +28,11 @@ const TokenFilter = () => {
   const [tokenString, setTokenString] = React.useState(tokenFilter);
   const dispatch = useDispatch<Dispatch>();
 
-  const debounced = useDebouncedCallback((value) => {
+  const debounced = useDebouncedCallback((value: string) => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = React.useCallback((value) => {
+  const handleChange = React.useCallback((value: string) => {
     setTokenString(value);
     debounced(value);
   }, [debounced]);
@@ -52,7 +52,7 @@ const TokenFilter = () => {
         spellCheck={false}
         type="text"
         value={tokenString}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e: { target: { value: string; }; }) => handleChange(e.target.value)}
         placeholder="Search"
       />
     </Box>

@@ -15,11 +15,11 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconChevronDown from '@/icons/chevrondown.svg';
 
-type Props = {
+type Props = React.PropsWithChildren<{
   item: TreeItem
   value: Record<string, TokenSetStatus>
   onChange: (value: Record<string, TokenSetStatus>) => void
-};
+}>;
 
 const tokenSetStatusValues = Object.values(TokenSetStatus);
 const tokenSetSatusLabels = {

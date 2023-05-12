@@ -5,6 +5,7 @@ import { SingleToken } from '@/types/tokens';
 import { Dispatch, RootState } from '@/app/store';
 
 type Props = {
+  children?: React.ReactNode;
   token: SingleToken;
   draggedToken: SingleToken | null;
   dragOverToken: SingleToken | null;
@@ -17,7 +18,7 @@ export const DraggableWrapper: React.FC<Props> = ({
 }) => {
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
-  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const activeTokenSet = useSelector<RootState, string>(activeTokenSetSelector);
 
   const isDraggable = useMemo(() => (
     token.name && isNaN(Number(token.name.split('.')[token.name.split('.').length - 1]))
@@ -52,7 +53,7 @@ export const DraggableWrapper: React.FC<Props> = ({
     let dropTokenIndex: number | null = null;
 
     if (draggedToken && token && draggedToken.type === token.type) {
-      tokens[activeTokenSet].forEach((element, index) => {
+      tokens[activeTokenSet].forEach((element, index:number) => {
         if (element.name === draggedToken.name) draggedTokenIndex = index;
         if (element.name === token.name) dropTokenIndex = index;
       });

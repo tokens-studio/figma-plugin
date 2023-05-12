@@ -19,6 +19,7 @@ import Heading from '../Heading';
 import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
 import Link from '../Link';
+import { GenericVersionedAdditionalHeaders } from '@/storage';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -80,7 +81,7 @@ export default function GenericVersionedForm({
   // Always leave headers at the end
   const headers = useMemo(() => [...(values.additionalHeaders || []), { name: '', value: '' }], [values.additionalHeaders]);
 
-  const headerChange = useCallback((changedHeaders) => {
+  const headerChange = useCallback((changedHeaders:GenericVersionedAdditionalHeaders) => {
     onChange({
       target: {
         name: 'additionalHeaders',
@@ -110,8 +111,8 @@ export default function GenericVersionedForm({
     headerChange(newHeaders);
   }, [headerChange, headers]);
 
-  const handleClose = useCallback((e) => {
-    const index = Number(e.target.dataset.index);
+  const handleClose = useCallback((e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const index = Number((e.target as HTMLElement).dataset.index);
 
     const removedHeaders = [...headers];
     removedHeaders.splice(index, 1);

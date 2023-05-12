@@ -78,7 +78,7 @@ const SyncSettings = () => {
   );
 
   const handleEditClick = React.useCallback(
-    (provider) => () => {
+    (provider: StorageTypeCredentials) => () => {
       track('Edit Credentials');
       dispatch.uiState.setLocalApiState(provider);
       setShowEditStorageModalVisible(true);

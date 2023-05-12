@@ -39,7 +39,7 @@ function Textarea({
   value: string;
   placeholder?: string;
   isDisabled?: boolean;
-  onChange?: (event: React.ChangeEvent) => void;
+  onChange?: (value: string, event: React.ChangeEvent) => void;
   css?: any;
   border?: boolean
 }) {
@@ -54,7 +54,7 @@ function Textarea({
       value={value}
       disabled={isDisabled}
       border={border}
-      onChange={(event) => onChange && onChange(event.target.value, event)}
+      onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => onChange && onChange(event.target.value, event)}
     />
   );
 }
