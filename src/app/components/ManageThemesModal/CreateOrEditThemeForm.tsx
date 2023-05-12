@@ -51,7 +51,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
   ), [store]);
   const availableTokenSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
-  const groupNames = useMemo(() => ([...new Set(themes.filter((t) => typeof t?.group === 'string').map((t) => t.group as string))]), [themes]);
+  const groupNames = useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
 
   const treeOrListItems = useMemo(() => (
     githubMfsEnabled

@@ -28,15 +28,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const groupNames = useMemo(() => {
-    const newArray: string[] = [];
-    themes.forEach((theme) => {
-      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
-        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
-      }
-    });
-    return newArray;
-  }, [themes]);
+  const groupNames = useMemo(() => ([...new Set(themes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [themes]);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);

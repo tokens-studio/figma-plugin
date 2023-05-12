@@ -38,15 +38,8 @@ export const ThemeSelector: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-  const groupNames = useMemo(() => {
-    const newArray: string[] = [];
-    availableThemes.forEach((theme) => {
-      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
-        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
-      }
-    });
-    return newArray;
-  }, [availableThemes]);
+  const groupNames = useMemo(() => ([...new Set(availableThemes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
+
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ newActiveTheme: {}, shouldUpdateNodes: true });
   }, [dispatch]);
