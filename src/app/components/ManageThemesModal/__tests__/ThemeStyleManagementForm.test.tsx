@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { MotionConfig } from 'framer-motion';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { act, createMockStore, render } from '../../../../../tests/config/setupTest';
-import { ThemeStyleManagementForm } from '../ThemeStyleManagentForm';
+import { ThemeStyleManagementForm } from '../ThemeStyleManagementForm';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
