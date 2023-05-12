@@ -101,7 +101,7 @@ export const ThemeStyleManagementCategory: React.FC<Props> = ({
             </Box>
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
               <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="secondary">
-                Detach Selected
+                Detach selected
               </Button>
             </Box>
           </Box>

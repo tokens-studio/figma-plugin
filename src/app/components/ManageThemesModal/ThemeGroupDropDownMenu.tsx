@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { styled } from '@/stitches.config';
-import Button from '../Button';
 import { IconPlus } from '@/icons';
 
 type Props = {
@@ -22,9 +21,7 @@ type Props = {
   addGroup: () => void
 };
 
-const StyledDropdownMenuTrigger = styled(DropdownMenuTrigger, {
-  padding: 0,
-});
+const StyledDropdownMenuTrigger = styled(DropdownMenuTrigger, {});
 
 export const ThemeGroupDropDownMenu: React.FC<Props> = ({
   availableGroups, selectedGroup, onChange, addGroup,
@@ -61,12 +58,10 @@ export const ThemeGroupDropDownMenu: React.FC<Props> = ({
           selectedGroup ? (
             <span>{selectedGroup}</span>
           ) : (
-            <Button
-              variant="secondary"
-              icon={<IconPlus />}
-            >
+            <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+              <IconPlus />
               Add group
-            </Button>
+            </Box>
           )
         }
       </StyledDropdownMenuTrigger>

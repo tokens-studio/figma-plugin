@@ -57,7 +57,7 @@ export function ThemeListGroupHeader({
     <StyledDragButton
       type="button"
       style={{ cursor: 'inherit' }}
-      css={{ marginTop: '$4' }}
+      css={{ '&:not(:first-of-type)': { marginTop: '$4' } }}
     >
       <DragGrabber<string>
         item={groupName}
@@ -77,7 +77,12 @@ export function ThemeListGroupHeader({
       >
         {!isEditing ? (
           <>
-            <Text css={{ color: '$textMuted', padding: '$2' }}>{label}</Text>
+            <Text css={{
+              color: '$textMuted', height: '28px', display: 'flex', alignItems: 'center',
+            }}
+            >
+              {label}
+            </Text>
             <IconButton
               onClick={handleEditButtonClick}
               icon={<IconPencil />}
