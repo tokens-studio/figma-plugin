@@ -16,45 +16,38 @@ import { Dispatch } from '@/app/store';
 type Props = React.PropsWithChildren<{
   groupName: string
   label: string
-  isEditing: boolean
-  setIsEditing: (value: boolean) => void
+  setIsGroupEditing: (value: boolean) => void
 }>;
 
 export function ThemeListGroupHeader({
   groupName,
   label,
-  isEditing,
-  setIsEditing,
+  setIsGroupEditing,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
-  const [isHovered, setIsHovered] = useState(false);
   const [currentGroupName, setCurrentGroupName] = useState(label);
+  const [isEditing, setIsEditing] = useState(false);
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
   }, [dragContext.controls]);
 
   const handleEditButtonClick = useCallback(() => {
     setIsEditing(true);
-  }, [setIsEditing]);
-
-  const onMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
-
-  const onMouseLeave = useCallback(() => {
-    setIsHovered(false);
-  }, []);
+    setIsGroupEditing(true);
+  }, [setIsEditing, setIsGroupEditing]);
 
   const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       dispatch.tokenState.updateThemeGroupName(groupName, currentGroupName);
       setIsEditing(false);
+      setIsGroupEditing(false);
     } else if (e.key === 'Escape') {
       setIsEditing(false);
+      setIsGroupEditing(false);
     }
-  }, [currentGroupName, groupName, dispatch.tokenState, setIsEditing]);
+  }, [currentGroupName, groupName, dispatch.tokenState, setIsEditing, setIsGroupEditing]);
 
   const handleGroupNameChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentGroupName(event.target.value);
@@ -71,18 +64,24 @@ export function ThemeListGroupHeader({
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
       />
-      <Box css={{ display: 'flex', alignItems: 'center' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <Box css={{
+        display: 'flex',
+        alignItems: 'center',
+        '& > div > button ': {
+          display: 'none',
+        },
+        '&:hover > div > button ': {
+          display: 'block',
+        },
+      }}
+      >
         {!isEditing ? (
           <>
             <Text css={{ color: '$textMuted', padding: '$2' }}>{label}</Text>
-            {
-              isHovered && (
-                <IconButton
-                  onClick={handleEditButtonClick}
-                  icon={<IconPencil />}
-                />
-              )
-            }
+            <IconButton
+              onClick={handleEditButtonClick}
+              icon={<IconPencil />}
+            />
           </>
         ) : (
           <Input

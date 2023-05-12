@@ -193,8 +193,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
                   <ThemeListGroupHeader
                     label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}
                     groupName={groupName}
-                    isEditing={IsThemeGroupNameEditing}
-                    setIsEditing={handleUpdateIsEditing}
+                    setIsGroupEditing={handleUpdateIsEditing}
                   />
                   <ReorderGroup
                     layoutScroll
