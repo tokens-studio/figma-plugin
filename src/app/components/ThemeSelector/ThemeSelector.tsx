@@ -8,8 +8,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
+  ScrollDropdownMenuRadioItem,
+  ScrollDropdownMenuItemIndicator,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { Flex } from '../Flex';
@@ -25,18 +25,6 @@ import Box from '../Box';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
-});
-
-const StyledDropdownMenuItemIndicator = styled(DropdownMenuItemIndicator, {
-  position: 'relative',
-  left: 0,
-});
-
-const StyledDropdownMenuRadioItem = styled(DropdownMenuRadioItem, {
-  padding: '$2 $3 $2 $2',
-  userselect: 'none',
-  display: 'flex',
-  alignItems: 'center',
 });
 
 type AvailableTheme = {
@@ -98,7 +86,7 @@ export const ThemeSelector: React.FC = () => {
   const renderThemeOption = useCallback((themes: AvailableTheme[]) => themes.map(({ label, value }) => {
     const handleSelect = () => handleSelectTheme(value);
     return (
-      <StyledDropdownMenuRadioItem
+      <ScrollDropdownMenuRadioItem
         key={value}
         value={value}
         data-cy={`themeselector--themeoptions--${value}`}
@@ -108,31 +96,35 @@ export const ThemeSelector: React.FC = () => {
         onSelect={handleSelect}
       >
         <Box css={{ width: '$5', marginRight: '$2' }}>
-          <StyledDropdownMenuItemIndicator>
+          <ScrollDropdownMenuItemIndicator>
             <CheckIcon />
-          </StyledDropdownMenuItemIndicator>
+          </ScrollDropdownMenuItemIndicator>
         </Box>
         <Box>
           {label}
         </Box>
-      </StyledDropdownMenuRadioItem>
+      </ScrollDropdownMenuRadioItem>
     );
   }), [handleSelectTheme]);
 
   const availableThemeOptions = useMemo(() => (
-    groupNames.map((groupName) => {
-      const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
-      return (
-        filteredThemes.length > 0 && (
-        <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '70vh' }} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-          <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
-          {
-            renderThemeOption(filteredThemes)
-          }
-        </DropdownMenuRadioGroup>
-        )
-      );
-    })
+    <Box className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+      {
+        groupNames.map((groupName) => {
+          const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
+          return (
+            filteredThemes.length > 0 && (
+            <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+              <Text css={{ color: '$textSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+              {
+                renderThemeOption(filteredThemes)
+              }
+            </DropdownMenuRadioGroup>
+            )
+          );
+        })
+      }
+    </Box>
   ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
@@ -151,9 +143,9 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           {availableThemes.length === 0 && (
-            <StyledDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+            <ScrollDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
               <Text>No themes</Text>
-            </StyledDropdownMenuRadioItem>
+            </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}
           <DropdownMenuSeparator />

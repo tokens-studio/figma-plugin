@@ -79,6 +79,16 @@ const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$co
 
 const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
 
+const StyledScrollDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, {
+  ...itemStyles,
+  padding: '$2 $3 $2 $2',
+  userselect: 'none',
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const StyledScrollDropdownMenuItemIndicator = styled(DropdownMenuPrimitive.ItemIndicator, {});
+
 export const DropdownMenuContent = StyledDropdownMenuContent;
 export const DropdownMenuCheckboxItem = StyledDropdownMenuCheckboxItem;
 export const DropdownMenuRadioGroup = StyledDropdownMenuRadioGroup;
@@ -90,3 +100,5 @@ export const DropdownMenuItemIndicator = StyledDropdownMenuItemIndicator;
 export const DropdownMenu = StyledDropdownMenu;
 export const DropdownSubmenu = StyledDropdownSubmenu;
 export const DropdownMenuArrow = StyledDropdownMenuArrow;
+export const ScrollDropdownMenuRadioItem = StyledScrollDropdownMenuRadioItem;
+export const ScrollDropdownMenuItemIndicator = StyledScrollDropdownMenuItemIndicator;

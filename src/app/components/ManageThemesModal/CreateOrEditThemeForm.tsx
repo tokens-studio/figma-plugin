@@ -16,7 +16,7 @@ import IconButton from '../IconButton';
 import { IconBack, IconPlus } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';
-import { ThemeStyleManagementForm } from './ThemeStyleManagentForm';
+import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import Button from '../Button';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
