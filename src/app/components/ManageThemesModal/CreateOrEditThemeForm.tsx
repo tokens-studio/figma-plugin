@@ -128,6 +128,8 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
                       variant="secondary"
                       icon={<IconPlus />}
                       onClick={handleAddGroup}
+                      size="small"
+                      css={{ display: 'flex', alignItems: 'center', height: '28px' }}
                     >
                       Add group
                     </Button>

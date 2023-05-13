@@ -11,6 +11,7 @@ const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
 const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   backgroundColor: '$bgDefault',
+  flexShrink: 0,
   borderRadius: '$input',
   border: '1px solid $interaction',
   display: 'flex',

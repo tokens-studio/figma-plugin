@@ -65,7 +65,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
         }}
       >
         <Box css={{
-          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3',
+          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
         }}
         >
           <Text size="small">{token}</Text>
