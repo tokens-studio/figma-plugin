@@ -155,6 +155,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
+            keyPosition="end"
           />
         </Box>
       )}
