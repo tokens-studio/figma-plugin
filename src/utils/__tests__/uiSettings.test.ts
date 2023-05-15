@@ -3,6 +3,9 @@ import { mockSetAsync, mockGetAsync, mockNotify } from '../../../tests/__mocks__
 import { getUISettings, updateUISettings } from '../uiSettings';
 import { UiSettingsProperty } from '@/figmaStorage';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
   const uiSettingsWriteSpy = jest.spyOn(UiSettingsProperty, 'write');

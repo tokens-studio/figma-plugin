@@ -1,15 +1,16 @@
 require('dotenv').config();
 
-import { defaults  as tsjPreset } from 'ts-jest/presets'
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/en/configuration.html
  */
 
-console.log(tsjPreset)
 const jestConfig = {
-	transform: {
-		'^.+\\.(ts|tsx)$': 'ts-jest',
+  transform: {
+    "\\.[jt]sx?$": ["babel-jest", {
+      configFile: './babel.test.config.js'
+    }]
   },
   // All imported modules in your tests should be mocked automatically
   // automock: false,

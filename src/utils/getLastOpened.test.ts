@@ -1,6 +1,9 @@
 import getLastOpened from './getLastOpened';
 import { mockGetAsync } from '../../tests/__mocks__/figmaMock';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('fetchChangelog', () => {
   it('user lanch the plugin for the first time', async () => {
     expect.assertions(1);

@@ -8,6 +8,9 @@ import type useRemoteTokens from '@/app/store/remoteTokens';
 import { Tabs } from '@/constants/Tabs';
 import type { StorageType } from '@/types/StorageType';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('pullTokensFactory', () => {
   const mockConfirm = jest.fn();
   const mockFetchBranches = jest.fn();

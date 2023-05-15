@@ -4,6 +4,9 @@ import {
   AsyncMessageTypes, GetThemeInfoMessageResult,
 } from './types/AsyncMessages';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('Testing the mock functionality of the AsyncMessageChannel', () => {
   it('should be able to communicate between UI and plugin', async () => {
     const runAfter: (() => void)[] = [];

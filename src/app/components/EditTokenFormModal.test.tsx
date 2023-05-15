@@ -5,6 +5,9 @@ import { EditTokenObject } from '@/types/tokens';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import EditTokenFormModal from './EditTokenFormModal';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('EditTokenFormModal', () => {
   beforeEach(() => {
     resetStore();

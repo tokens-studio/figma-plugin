@@ -4,6 +4,9 @@ import type { StartupMessage } from '@/types/AsyncMessages';
 import { getLdFlagsFactory } from '../getLdFlagsFactory';
 import * as analytics from '@/utils/analytics';
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('getLdFlagsFactory', () => {
   const setUserDataSpy = jest.spyOn(analytics, 'setUserData');
 

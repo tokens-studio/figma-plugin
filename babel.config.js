@@ -2,7 +2,7 @@ module.exports = {
   presets: [['@babel/preset-env', {
     modules: false,
     "targets": {
-       "node": "12" 
+      "node": "12"
     }
   }], '@babel/preset-react'],
   plugins: [
@@ -25,6 +25,13 @@ module.exports = {
           },
         ],
       ],
+      plugins: ['@babel/proposal-class-properties',
+      '@babel/proposal-object-rest-spread',
+      '@babel/plugin-proposal-optional-chaining',
+      '@babel/plugin-proposal-nullish-coalescing-operator',
+      "@babel/plugin-proposal-private-methods",
+      "@babel/transform-typescript"],
     },
   },
+
 };

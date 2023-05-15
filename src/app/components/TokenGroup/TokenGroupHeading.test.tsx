@@ -6,6 +6,9 @@ import { TokenGroupHeading } from './TokenGroupHeading';
 
 const mockShowNewForm = jest.fn();
 
+// Hide errors unless they are expected
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('TokenGroupHeading', () => {
   it('should render group context menu', async () => {
     const { getByText } = render(<TokenGroupHeading
