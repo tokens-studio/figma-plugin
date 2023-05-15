@@ -28,15 +28,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const groupNames = useMemo(() => {
-    const newArray: string[] = [];
-    themes.forEach((theme) => {
-      if ((theme?.group !== undefined && !newArray.includes(theme?.group)) || (theme?.group === undefined && !newArray.includes(INTERNAL_THEMES_NO_GROUP))) {
-        newArray.push(theme?.group ?? INTERNAL_THEMES_NO_GROUP);
-      }
-    });
-    return newArray;
-  }, [themes]);
+  const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
+  const groupNames = useMemo(() => ([...new Set(themes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [themes]);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -51,8 +44,10 @@ export const ManageThemesModal: React.FC<Props> = () => {
   }, [themes, themeEditorOpen]);
 
   const handleClose = useCallback(() => {
-    dispatch.uiState.setManageThemesModalOpen(false);
-  }, [dispatch]);
+    if (!IsThemeGroupNameEditing) {
+      dispatch.uiState.setManageThemesModalOpen(false);
+    }
+  }, [IsThemeGroupNameEditing, dispatch]);
 
   const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
     if (theme && typeof theme !== 'boolean') {
@@ -108,6 +103,11 @@ export const ManageThemesModal: React.FC<Props> = () => {
     const reorderedThemeList = themes.sort((a, b) => reorderedItems.indexOf(a?.group ?? INTERNAL_THEMES_NO_GROUP) - reorderedItems.indexOf(b?.group ?? INTERNAL_THEMES_NO_GROUP));
     dispatch.tokenState.setThemes(reorderedThemeList);
   }, [dispatch.tokenState, themes]);
+
+  const handleUpdateIsEditing = React.useCallback((editing: boolean) => {
+    setIsThemeGroupNameEditing(editing);
+  }, []);
+
   return (
     <Modal
       isOpen
@@ -182,7 +182,11 @@ export const ManageThemesModal: React.FC<Props> = () => {
               return (
                 filteredThemes.length > 0 && (
                 <DragItem<string> key={groupName} item={groupName}>
-                  <ThemeListGroupHeader groupName={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName} item={groupName} />
+                  <ThemeListGroupHeader
+                    label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}
+                    groupName={groupName}
+                    setIsGroupEditing={handleUpdateIsEditing}
+                  />
                   <ReorderGroup
                     layoutScroll
                     values={filteredThemes}

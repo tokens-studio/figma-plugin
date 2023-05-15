@@ -8,6 +8,7 @@ import { Dispatch } from '../../store';
 import {
   collapsedTokenSetsSelector,
 } from '@/selectors';
+import { StyledThemeLabel } from '../ManageThemesModal/StyledThemeLabel';
 
 type TreeItem<ItemType = unknown> = {
   key: string
@@ -20,6 +21,7 @@ type SharedProps<T extends TreeItem> = {
   items: T[]
   renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
   renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
+  keyPosition?: 'start' | 'end'
 };
 
 type Props<T extends TreeItem> = SharedProps<T>;
@@ -28,6 +30,7 @@ export function TokenSetTreeContent<T extends TreeItem>({
   items,
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
+  keyPosition = 'start',
 }: Props<T>) {
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -57,10 +60,13 @@ export function TokenSetTreeContent<T extends TreeItem>({
                 <StyledFolderButton
                   type="button"
                   onClick={onToggleCollapsed}
+                  size={keyPosition === 'start' ? 'small' : 'default'}
                 >
+                  {keyPosition === 'start' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
                   <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                     <IconExpandArrow />
                   </StyledFolderButtonChevronBox>
+                  {keyPosition === 'end' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
                 </StyledFolderButton>
               )}
             </RenderItemContent>

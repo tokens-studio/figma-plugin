@@ -100,5 +100,6 @@ export const globalStyles = globalCss({
     backgroundColor: '$bgDefault !important',
     border: '1px solid !important',
     borderColor: '$contextMenuBorder !important',
+    overflowX: 'hidden !important',
   },
 });
