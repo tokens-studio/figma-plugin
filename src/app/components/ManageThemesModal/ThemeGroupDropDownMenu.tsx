@@ -74,11 +74,11 @@ export const ThemeGroupDropDownMenu: React.FC<Props> = ({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           css={{
-            paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
+            paddingLeft: '$6',
           }}
           onSelect={addGroup}
         >
-          <span>Create new group</span>
+          Create new group
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
