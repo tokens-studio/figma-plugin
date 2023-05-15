@@ -47,6 +47,4 @@ const Toolip: React.FC<Props> = ({
   ) : children
 );
 
-export const TooltipProvider = Tooltip.Provider;
-
 export default Toolip;
