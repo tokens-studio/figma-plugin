@@ -39,6 +39,7 @@ export default function ColorTokenForm({
   handleColorDownShiftInputChange,
   handleColorModifyChange,
   handleRemoveColorModify,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COLOR }>;
   resolvedTokens: ResolveTokenValuesResult[];
@@ -47,6 +48,7 @@ export default function ColorTokenForm({
   handleColorDownShiftInputChange: (newInputValue: string) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
   handleRemoveColorModify: () => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
@@ -222,6 +224,7 @@ export default function ColorTokenForm({
           <ColorPickerTrigger onClick={handleToggleInputHelper} background={String(resolvedValue)} />
         )}
         suffix
+        onSubmit={onSubmit}
       />
       {inputHelperOpen && (
         <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
@@ -313,6 +316,7 @@ export default function ColorTokenForm({
                       <ColorPickerTrigger onClick={handleToggleMixInputHelper} background={String(resolvedMixValue)} />
                     )}
                     suffix
+                    onSubmit={onSubmit}
                   />
                   {inputMixHelperOpen && (
                     <ColorPicker value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color} onChange={handleMixColorChange} />
@@ -330,6 +334,7 @@ export default function ColorTokenForm({
               suffix
               label={getLabel}
               inlineLabel
+              onSubmit={onSubmit}
             />
           </>
         )

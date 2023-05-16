@@ -34,6 +34,7 @@ export default function TypographyInput({
   handleTypographyValueDownShiftInputChange,
   handleDownShiftInputChange,
   setTypographyValue,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.TYPOGRAPHY }>;
   handleTypographyValueChange: (property: string, value: string) => void;
@@ -42,6 +43,7 @@ export default function TypographyInput({
   handleTypographyValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
   setTypographyValue: (newTypographyValue: SingleTypographyToken['value']) => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
@@ -106,6 +108,7 @@ export default function TypographyInput({
               handleChange={handleTypographyValueChange}
               setInputValue={handleTypographyValueDownShiftInputChange}
               externalFontFamily={selectedFontFamily}
+              onSubmit={onSubmit}
             />
           ))}
         </Stack>
@@ -122,6 +125,7 @@ export default function TypographyInput({
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"
             suffix
+            onSubmit={onSubmit}
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (

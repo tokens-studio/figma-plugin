@@ -49,6 +49,7 @@ export default function SingleBoxShadowInput({
   onRemove,
   id,
   resolvedTokens,
+  onSubmit,
 }: {
   value?: TokenBoxshadowValue | TokenBoxshadowValue[]
   isMultiple?: boolean;
@@ -58,6 +59,7 @@ export default function SingleBoxShadowInput({
   onRemove: (index: number) => void;
   id?: string;
   resolvedTokens: ResolveTokenValuesResult[];
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
@@ -238,6 +240,7 @@ export default function SingleBoxShadowInput({
                 handleChange={onChange}
                 setInputValue={handleBoxshadowValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
+                onSubmit={onSubmit}
               />
               {inputHelperOpen && key === 'color' && (
                 <ColorPicker value={shadowItem?.[key] || newTokenValue?.[key]} onChange={onColorChange} />

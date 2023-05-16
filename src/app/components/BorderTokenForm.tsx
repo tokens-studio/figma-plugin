@@ -28,6 +28,7 @@ export default function BorderTokenForm({
   handleBorderValueDownShiftInputChange,
   handleBorderAliasValueChange,
   handleDownShiftInputChange,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.BORDER }>;
   resolvedTokens: ResolveTokenValuesResult[];
@@ -35,6 +36,7 @@ export default function BorderTokenForm({
   handleBorderValueDownShiftInputChange: (newInputValue: string, property: string) => void;
   handleBorderAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
@@ -97,6 +99,7 @@ export default function BorderTokenForm({
                 handleChange={handleBorderValueChange}
                 setInputValue={handleBorderValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
+                onSubmit={onSubmit}
               />
               {inputHelperOpen && key === 'color' && (
                 <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
@@ -117,6 +120,7 @@ export default function BorderTokenForm({
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"
             suffix
+            onSubmit={onSubmit}
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (
