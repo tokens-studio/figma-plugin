@@ -20,10 +20,12 @@ export default function CompositionTokenForm({
   internalEditToken,
   setTokenValue,
   resolvedTokens,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COMPOSITION }>;
   setTokenValue: (newTokenValue: NodeTokenRefMap) => void;
   resolvedTokens: ResolveTokenValuesResult[];
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
@@ -107,6 +109,7 @@ export default function CompositionTokenForm({
                 onRemove={removeToken}
                 setOrderObj={handleOrderObj}
                 setError={setError}
+                onSubmit={onSubmit}
               />
             ) : (
               <ReorderGroup
@@ -129,6 +132,7 @@ export default function CompositionTokenForm({
                         onRemove={removeToken}
                         setOrderObj={handleOrderObj}
                         setError={setError}
+                        onSubmit={onSubmit}
                       />
                     </DragItem>
                   ))

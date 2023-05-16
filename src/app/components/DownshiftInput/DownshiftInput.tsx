@@ -46,6 +46,7 @@ interface DownShiftProps {
   setInputValue(value: string): void;
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
+  onSubmit?: () => void
 }
 
 export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
@@ -65,6 +66,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   arrow = 'down',
   handleChange,
   handleBlur,
+  onSubmit,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
   const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
@@ -242,6 +244,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               handleChange={handleChange}
               handleBlur={handleBlur}
               handleOnFocus={handleOnFocus}
+              onSubmit={onSubmit}
             />
             {suffix && (
               <StyledInputSuffix type="button" data-testid="downshift-input-suffix-button" onClick={handleAutoSuggest}>

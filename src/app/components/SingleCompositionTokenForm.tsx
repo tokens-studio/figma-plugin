@@ -28,6 +28,7 @@ export default function SingleCompositionTokenForm({
   onRemove,
   setOrderObj,
   setError,
+  onSubmit,
 }: {
   index: number;
   property: string;
@@ -39,6 +40,7 @@ export default function SingleCompositionTokenForm({
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
+  onSubmit: () => void
 }) {
   const [menuOpened, setMenuOpened] = useState(false);
   const propertyType = useTypeForProperty(property);
@@ -123,6 +125,7 @@ export default function SingleCompositionTokenForm({
             propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
           }
           suffix
+          onSubmit={onSubmit}
         />
       </Box>
       <Box css={{ width: '$5', marginRight: '$3' }}>

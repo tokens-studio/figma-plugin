@@ -26,12 +26,14 @@ export default function BoxShadowInput({
   handleBoxShadowValueChange,
   handleBoxShadowAliasValueChange,
   handleDownShiftInputChange,
+  onSubmit,
 }: {
   resolvedTokens: ResolveTokenValuesResult[];
   internalEditToken: EditTokenType;
   handleBoxShadowValueChange: (shadow: TokenBoxshadowValue | TokenBoxshadowValue[]) => void;
   handleBoxShadowAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
@@ -121,6 +123,7 @@ export default function BoxShadowInput({
                     key={`single-shadow-${seed(index)}`}
                     onRemove={removeShadow}
                     resolvedTokens={resolvedTokens}
+                    onSubmit={onSubmit}
                   />
                 ))
               ) : (
@@ -131,6 +134,7 @@ export default function BoxShadowInput({
                   shadowItem={mappedItems}
                   onRemove={removeShadow}
                   resolvedTokens={resolvedTokens}
+                  onSubmit={onSubmit}
                 />
               )}
             </DndProvider>
@@ -150,6 +154,7 @@ export default function BoxShadowInput({
                 setInputValue={handleDownShiftInputChange}
                 placeholder="Value or {alias}"
                 suffix
+                onSubmit={onSubmit}
               />
               {(
                 isAliasMode

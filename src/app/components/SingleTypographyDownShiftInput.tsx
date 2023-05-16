@@ -11,6 +11,7 @@ export default function SingleTypographyDownShiftInput({
   externalFontFamily,
   handleChange,
   setInputValue,
+  onSubmit,
 }: {
   name: string,
   value: string;
@@ -19,6 +20,7 @@ export default function SingleTypographyDownShiftInput({
   externalFontFamily?: string;
   handleChange: (property: string, value: string) => void;
   setInputValue: (newInputValue: string, property: string) => void;
+  onSubmit: () => void
 }) {
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
 
@@ -37,6 +39,7 @@ export default function SingleTypographyDownShiftInput({
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={`${name} value or {alias}`}
       suffix
+      onSubmit={onSubmit}
     />
   );
 }

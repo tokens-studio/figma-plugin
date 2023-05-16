@@ -379,8 +379,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [checkAndSubmitTokenValue]);
 
   const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
-    e.preventDefault();
-    checkAndSubmitTokenValue();
+    if (e.metaKey || e.ctrlKey) {
+      checkAndSubmitTokenValue();
+    }
   }, [checkAndSubmitTokenValue]);
 
   useShortcut(['Enter'], handleSaveShortcut);
@@ -414,6 +415,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -427,6 +429,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setTypographyValue={setTypographyValue}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -436,6 +439,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
             resolvedTokens={resolvedTokens}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -448,6 +452,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -461,6 +466,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleColorDownShiftInputChange={handleDownShiftInputChange}
             handleColorModifyChange={handleColorModifyChange}
             handleRemoveColorModify={removeColorModify}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -478,6 +484,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               setInputValue={handleDownShiftInputChange}
               placeholder="Value or {alias}"
               suffix
+              onSubmit={checkAndSubmitTokenValue}
             />
 
             {checkIfContainsAlias(internalEditToken.value) && (

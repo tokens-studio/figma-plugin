@@ -26,6 +26,7 @@ export default function BorderTokenDownShiftInput({
   handleChange,
   setInputValue,
   handleToggleInputHelper,
+  onSubmit,
 }: {
   name: string,
   value: string;
@@ -34,6 +35,7 @@ export default function BorderTokenDownShiftInput({
   handleChange: (property: string, value: string) => void;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
+  onSubmit: () => void
 }) {
   const handleBorderDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
@@ -60,6 +62,7 @@ export default function BorderTokenDownShiftInput({
         )
       }
       suffix
+      onSubmit={onSubmit}
     />
   );
 }
