@@ -31,7 +31,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
+            <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
             {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
               tokenList.map((token) => (
                 <ChangedTokenItem token={token} />
@@ -43,7 +43,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
       {
         changedState.themes.length > 0 && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$themes" label="$themes" isCollapsed={collapsedChangedStateList.includes('$themes')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} set="$themes" label="$themes" isCollapsed={collapsedChangedStateList.includes('$themes')} />
             {!collapsedChangedStateList.includes('$themes') && (
               changedState.themes.map((theme) => (
                 <Stack
@@ -51,13 +51,13 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   justify="between"
                   align="center"
                   gap={3}
-                  css={{ padding: '$2 $4' }}
+                  css={{ padding: '$1 $4' }}
                 >
                   <Text bold size="small">{theme.name}</Text>
                   {
                     theme.importType === 'REMOVE' && (
                     <StyledDiff size="small" type="danger">
-                      Configuration Removed
+                      Configuration removed
                     </StyledDiff>
                     )
                   }
@@ -77,13 +77,13 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
       {
         (changedState.metadata?.tokenSetOrder && Object.entries(changedState.metadata.tokenSetOrder).length > 0) && (
           <>
-            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} key="$metadata" label="$metadata" isCollapsed={collapsedChangedStateList.includes('$metadata')} />
+            <ChangeStateListingHeading onCollapse={handleSetIntCollapsed} set="$metadata" label="$metadata" isCollapsed={collapsedChangedStateList.includes('$metadata')} />
             {!collapsedChangedStateList.includes('$metadata') && (
               <Stack
                 direction="row"
                 justify="end"
                 align="end"
-                css={{ padding: '$2 $4' }}
+                css={{ padding: '$1 $4' }}
               >
                 <StyledDiff size="small" type="danger">
                   Configuration changed

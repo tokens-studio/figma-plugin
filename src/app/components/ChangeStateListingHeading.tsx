@@ -6,12 +6,14 @@ import Heading from './Heading';
 import Tooltip from './Tooltip';
 import Box from './Box';
 import Stack from './Stack';
+import { Count } from './Count';
 import { styled } from '@/stitches.config';
 
 type Props = {
   isCollapsed: boolean;
+  count?: number;
   label: string;
-  key: string;
+  set: string;
   onCollapse: (e: React.MouseEvent<HTMLButtonElement>, key: string) => void;
 };
 
@@ -20,7 +22,7 @@ const StyledChangedStateGroupHeadingButton = styled('button', {
   alignItems: 'center',
   width: '100%',
   height: '100%',
-  padding: '$4',
+  padding: '$2',
   gap: '$2',
   '&:hover, &:focus': {
     backgroundColor: '$bgSubtle',
@@ -37,8 +39,9 @@ const StyledChangedStateGroupHeadingButton = styled('button', {
 
 export default function ChangeStateListingHeading({
   isCollapsed,
+  count,
   label,
-  key,
+  set,
   onCollapse,
 }: Props) {
   const handleCollapse = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,17 +49,18 @@ export default function ChangeStateListingHeading({
   }, [onCollapse, label]);
 
   return (
-    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
+    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative', marginLeft: '$2' }}>
       <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
         <StyledChangedStateGroupHeadingButton
           isCollapsed={isCollapsed}
-          data-cy={`changestatelisting-header-${key}`}
+          data-cy={`changestatelisting-header-${set}`}
           type="button"
           onClick={handleCollapse}
-          data-testid={`changestatelisting-${key}-collapse-button`}
+          data-testid={`changestatelisting-${set}-collapse-button`}
         >
-          <Box css={{ padding: '$2', marginLeft: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
+          <Box css={{ padding: '$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
           <Heading size="medium">{label}</Heading>
+          {count && <Count count={count} />}
         </StyledChangedStateGroupHeadingButton>
       </Tooltip>
     </Stack>
