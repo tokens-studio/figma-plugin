@@ -57,7 +57,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
-
   const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
   const isValidColorToken = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
@@ -380,8 +379,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [checkAndSubmitTokenValue]);
 
   const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
-    e.preventDefault();
-    checkAndSubmitTokenValue();
+    if (e.metaKey || e.ctrlKey) {
+      checkAndSubmitTokenValue();
+    }
   }, [checkAndSubmitTokenValue]);
 
   useShortcut(['Enter'], handleSaveShortcut);
@@ -415,6 +415,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -428,6 +429,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
             setTypographyValue={setTypographyValue}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -437,6 +439,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
             resolvedTokens={resolvedTokens}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -449,6 +452,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -462,6 +466,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleColorDownShiftInputChange={handleDownShiftInputChange}
             handleColorModifyChange={handleColorModifyChange}
             handleRemoveColorModify={removeColorModify}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -479,6 +484,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               setInputValue={handleDownShiftInputChange}
               placeholder="Value or {alias}"
               suffix
+              onSubmit={checkAndSubmitTokenValue}
             />
 
             {checkIfContainsAlias(internalEditToken.value) && (

@@ -21,6 +21,7 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
+import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -91,6 +92,16 @@ export function TokenSetItem({
     [item, onDragStart],
   );
 
+  const getCheckboxTooltip = useCallback(() => {
+    if (tokenSetStatus === TokenSetStatus.SOURCE) {
+      return 'Source: This set acts as a source for other sets';
+    }
+    if (isChecked) {
+      return 'Active: This set is included in styles and tokens';
+    }
+    return 'Inactive: Activate to include for styles or tokens';
+  }, [isChecked, tokenSetStatus]);
+
   const renderIcon = useCallback(
     (checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
       if (tokenSetStatus === TokenSetStatus.SOURCE) {
@@ -111,24 +122,13 @@ export function TokenSetItem({
               type="button"
               data-testid={`tokensetitem-${item.path}`}
               css={{
-                padding: '$3 $6 $3 $1',
+                padding: '$3 $7 $3 $1',
                 paddingLeft: `${5 * item.level}px`,
               }}
               isActive={isActive}
               onClick={handleClick}
             >
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
-              <Box
-                css={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  color: '$textMuted',
-                  fontWeight: '$normal',
-                  userSelect: 'none',
-                }}
-              >
-                {item.label}
-              </Box>
               {extraBefore}
             </StyledDragButton>
           </ContextMenuTrigger>
@@ -184,13 +184,25 @@ export function TokenSetItem({
         </ContextMenuContent>
       </ContextMenu>
       <StyledCheckbox checked={isChecked}>
-        <Checkbox
-          id={item.path}
-          data-testid={`tokensetitem-${item.path}-checkbox`}
-          checked={isChecked}
-          renderIcon={renderIcon}
-          onCheckedChange={handleCheckedChange}
-        />
+        {item.isLeaf ? (
+          <Tooltip label={getCheckboxTooltip()}>
+            <Checkbox
+              id={item.path}
+              data-testid={`tokensetitem-${item.path}-checkbox`}
+              checked={isChecked}
+              renderIcon={renderIcon}
+              onCheckedChange={handleCheckedChange}
+            />
+          </Tooltip>
+        ) : (
+          <Checkbox
+            id={item.path}
+            data-testid={`tokensetitem-${item.path}-checkbox`}
+            checked={isChecked}
+            renderIcon={renderIcon}
+            onCheckedChange={handleCheckedChange}
+          />
+        )}
       </StyledCheckbox>
     </StyledWrapper>
   );

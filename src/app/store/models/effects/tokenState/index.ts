@@ -9,3 +9,4 @@ export * from './renameStyleIdsToCurrentTheme';
 export * from './removeStyleIdsFromThemes';
 export * from './renameStyleNamesToCurrentTheme';
 export * from './removeStyleNamesFromThemes';
+export * from './updateThemeGroupName';

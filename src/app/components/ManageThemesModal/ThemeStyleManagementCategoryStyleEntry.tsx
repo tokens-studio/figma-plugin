@@ -7,6 +7,7 @@ import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import IconButton from '../IconButton';
 import Stack from '../Stack';
+import Checkbox from '../Checkbox';
 
 export type StyleInfo = {
   id: string
@@ -18,18 +19,26 @@ type Props = {
   token: string
   styleInfo: StyleInfo
   icon?: React.ReactNode | null
+  isChecked: boolean
   onDisconnectStyle: (token: string) => void
+  handleToggleSelectedStyle: (token: string) => void
 };
 
 export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
   token,
   styleInfo,
   icon,
+  isChecked,
   onDisconnectStyle,
+  handleToggleSelectedStyle,
 }) => {
   const handleDisconnectStyle = useCallback(() => {
     onDisconnectStyle(token);
   }, [token, onDisconnectStyle]);
+
+  const onCheckedChanged = useCallback(() => {
+    handleToggleSelectedStyle(token);
+  }, [token, handleToggleSelectedStyle]);
 
   return (
     <Flex
@@ -40,6 +49,12 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
         alignItems: 'center',
       }}
     >
+      <Checkbox
+        checked={isChecked}
+        id={token}
+        onCheckedChange={onCheckedChanged}
+      />
+
       {icon && <Box>{icon}</Box>}
       <Flex
         css={{
@@ -50,7 +65,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
         }}
       >
         <Box css={{
-          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3',
+          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
         }}
         >
           <Text size="small">{token}</Text>

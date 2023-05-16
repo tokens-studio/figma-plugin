@@ -4,11 +4,23 @@ export const StyledFolderButton = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '$5',
-  height: '$5',
-  flexShrink: 0,
+  overflow: 'hidden',
+  flexShrink: 1,
   zIndex: 1,
   '&:focus': {
     boxShadow: 'none',
+  },
+  variants: {
+    size: {
+      small: {
+        padding: 0,
+        fontSize: '$xsmall',
+        gap: '$1',
+      },
+      default: {
+        padding: '$2',
+        gap: '$3',
+      },
+    },
   },
 });

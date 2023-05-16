@@ -28,6 +28,7 @@ interface Props {
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
   handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
+  onSubmit?: () => void
 }
 
 const { Option } = Mentions;
@@ -43,6 +44,7 @@ export default function MentionsInput({
   handleChange,
   handleBlur,
   handleOnFocus,
+  onSubmit,
 }: Props) {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
 
@@ -66,7 +68,7 @@ export default function MentionsInput({
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
   const handleMentionInputChange = React.useCallback((newValue: string) => {
-    handleChange(name, newValue);
+    handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}'));
   }, [handleChange, name]);
 
   const handleInputBlur = React.useCallback(() => {
@@ -118,11 +120,10 @@ export default function MentionsInput({
     );
   }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
 
-  const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
-  }, []);
+  const handleEnterKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    onSubmit?.();
+  }, [onSubmit]);
 
   return (
     <Mentions
@@ -136,7 +137,7 @@ export default function MentionsInput({
       onChange={handleMentionInputChange}
       onBlur={handleInputBlur}
       onFocus={handleOnFocus}
-      onKeyDown={handleKeyDown}
+      onPressEnter={handleEnterKeyDown}
       data-testid={`mention-input-${name}`}
       data-cy={`mention-input-${name}`}
     >

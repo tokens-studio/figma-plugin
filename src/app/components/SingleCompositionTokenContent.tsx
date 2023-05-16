@@ -22,6 +22,7 @@ type Props = React.PropsWithChildren<{
   onRemove: (property: string) => void;
   setOrderObj: (newOrderObj: NodeTokenRefMap) => void;
   setError: (newError: boolean) => void;
+  onSubmit: () => void
 }>;
 
 export function SingleCompositionTokenContent({
@@ -35,6 +36,7 @@ export function SingleCompositionTokenContent({
   onRemove,
   setOrderObj,
   setError,
+  onSubmit,
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
@@ -68,6 +70,7 @@ export function SingleCompositionTokenContent({
         onRemove={onRemove}
         setOrderObj={setOrderObj}
         setError={setError}
+        onSubmit={onSubmit}
       />
     </StyledDragButton>
   );
