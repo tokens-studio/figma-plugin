@@ -105,7 +105,9 @@ function PushDialog() {
   }, [showPushDialog, localApiState]);
 
   const handlePushChanges = React.useCallback(() => {
-    onConfirm(commitMessage, branch);
+    if (commitMessage && branch) {
+      onConfirm(commitMessage, branch);
+    }
   }, [branch, commitMessage, onConfirm]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
@@ -181,7 +183,7 @@ function PushDialog() {
               <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button variant="primary" id="push-dialog-button-push-changes" onClick={handlePushChanges}>
+              <Button variant="primary" id="push-dialog-button-push-changes" disabled={!commitMessage || !branch} onClick={handlePushChanges}>
                 Push changes
               </Button>
             </Box>
