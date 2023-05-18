@@ -57,11 +57,7 @@ export function ThemeListGroupHeader({
     <StyledDragButton
       type="button"
       style={{ cursor: 'inherit' }}
-      css={{
-        '&:not(:first-of-type)': { marginTop: '$4' },
-        padding: '$3 $7 $3 $1',
-        paddingLeft: '0px',
-      }}
+      css={{ '&:not(:first-of-type)': { marginTop: '$4' } }}
     >
       <DragGrabber<string>
         item={groupName}
