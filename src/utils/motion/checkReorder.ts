@@ -26,7 +26,7 @@ export function checkReorder<T>(
       nextIndex = [...allowedTargetIndexes].reverse().find((availableIndex) => availableIndex <= nextIndex) ?? -1;
     }
   }
-
+  console.log('nextIndex', nextIndex);
   const nextItem = order[nextIndex];
 
   if (
@@ -36,11 +36,16 @@ export function checkReorder<T>(
   const item = order[index];
   const originalNextLayout = nextItem.layout;
   const nextItemCenter = mix(originalNextLayout.min, originalNextLayout.max, 0.5);
-
+  console.log('offset', offset);
+  console.log('item.layout.max', item.layout.max);
+  console.log('item.layout.min', item.layout.min);
+  console.log('nextItemCenter', nextItemCenter);
+  console.log('nextOffset', nextOffset);
   if (
     (nextOffset === 1 && item.layout.max + offset > nextItemCenter)
           || (nextOffset === -1 && item.layout.min + offset < nextItemCenter)
   ) {
+    console.log('ifififi');
     return moveItem(order, index, nextIndex);
   }
 

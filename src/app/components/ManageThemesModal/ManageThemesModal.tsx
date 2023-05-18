@@ -19,6 +19,10 @@ import { DragItem } from '../StyledDragger/DragItem';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ThemeListGroupHeader } from './ThemeListGroupHeader';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
+import { TreeItem, themeListToTree } from '@/utils/tokenset/themeListToTree';
+import { ItemData } from '@/context';
+import { checkReorder } from '@/utils/motion';
+import { ensureFolderIsTogether, findOrderableTargetIndexesInTokenSetTreeList } from '@/utils/tokenset';
 
 type Props = unknown;
 
@@ -29,7 +33,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
-  const groupNames = useMemo(() => ([...new Set(themes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [themes]);
+  const treeItems = themeListToTree(themes);
+  console.log('tree', treeItems);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -89,20 +94,43 @@ export const ManageThemesModal: React.FC<Props> = () => {
     setThemeEditorOpen(false);
   }, [themeEditorOpen, dispatch]);
 
-  const handleReorder = React.useCallback((reorderedItems: ThemeObjectsList) => {
-    const reorderedThemeList = [...themes];
-    reorderedThemeList.forEach((theme, index) => {
-      if (theme?.group === reorderedItems[0]?.group) {
-        reorderedThemeList.splice(index, 1, reorderedItems.shift() || theme);
+  const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
+    console.log('reolre', reorderedItems);
+    let currentGroup = '';
+    const updatedThemes = reorderedItems.reduce<ThemeObjectsList>((acc, curr) => {
+      if (!curr.isLeaf && typeof curr.value === 'string') {
+        currentGroup = curr.value;
       }
-    });
-    dispatch.tokenState.setThemes(reorderedThemeList);
-  }, [dispatch.tokenState, themes]);
+      if (curr.isLeaf && typeof curr.value === 'object') {
+        acc.push({
+          ...curr.value,
+          group: currentGroup,
+        });
+      }
+      return acc;
+    }, []);
+    console.log('update', updatedThemes);
+    dispatch.tokenState.setThemes(updatedThemes);
+  }, [dispatch.tokenState]);
 
-  const handleGroupReorder = React.useCallback((reorderedItems: string[]) => {
-    const reorderedThemeList = themes.sort((a, b) => reorderedItems.indexOf(a?.group ?? INTERNAL_THEMES_NO_GROUP) - reorderedItems.indexOf(b?.group ?? INTERNAL_THEMES_NO_GROUP));
-    dispatch.tokenState.setThemes(reorderedThemeList);
-  }, [dispatch.tokenState, themes]);
+  const handleCheckReorder = React.useCallback((
+    order: ItemData<typeof treeItems[number]>[],
+    value: typeof treeItems[number],
+    offset: number,
+    velocity: number,
+  ) => {
+    const availableIndexes = findOrderableTargetIndexesInTokenSetTreeList(
+      velocity,
+      value,
+      order,
+    );
+    let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
+    // ensure folders stay together
+    if (!value.isLeaf) {
+      nextOrder = ensureFolderIsTogether<TreeItem>(value, order, nextOrder);
+    }
+    return nextOrder;
+  }, []);
 
   const handleUpdateIsEditing = React.useCallback((editing: boolean) => {
     setIsThemeGroupNameEditing(editing);
@@ -173,35 +201,26 @@ export const ManageThemesModal: React.FC<Props> = () => {
         <Box css={{ padding: '$3' }}>
           <ReorderGroup
             layoutScroll
-            values={groupNames}
-            onReorder={handleGroupReorder}
+            values={treeItems}
+            onReorder={handleReorder}
+            checkReorder={handleCheckReorder}
           >
             {
-            groupNames.map((groupName) => {
-              const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? themes.filter((t) => (typeof t?.group === 'undefined')) : themes.filter((t) => (t?.group === groupName));
-              return (
-                filteredThemes.length > 0 && (
-                <DragItem<string> key={groupName} item={groupName}>
-                  <ThemeListGroupHeader
-                    label={groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}
-                    groupName={groupName}
-                    setIsGroupEditing={handleUpdateIsEditing}
-                  />
-                  <ReorderGroup
-                    layoutScroll
-                    values={filteredThemes}
-                    onReorder={handleReorder}
-                  >
-                    {filteredThemes.map((theme) => (
-                      <DragItem<ThemeObject> key={theme.id} item={theme}>
-                        <ThemeListItemContent item={theme} isActive={activeTheme?.[groupName] === theme.id} onOpen={handleToggleThemeEditor} groupName={groupName} />
-                      </DragItem>
-                    ))}
-                  </ReorderGroup>
-                </DragItem>
-                )
-              );
-            })
+            treeItems.map((item) => (
+              <DragItem<TreeItem> key={item.key} item={item}>
+                {
+                  item.isLeaf && typeof item.value === 'object' ? (
+                    <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
+                  ) : (
+                    <ThemeListGroupHeader
+                      label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
+                      groupName={item.value as string}
+                      setIsGroupEditing={handleUpdateIsEditing}
+                    />
+                  )
+                }
+              </DragItem>
+            ))
           }
           </ReorderGroup>
         </Box>

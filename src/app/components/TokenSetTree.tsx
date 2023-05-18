@@ -150,6 +150,7 @@ export default function TokenSetTree({
     );
 
     let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
+    console.log('next', nextOrder);
     // ensure folders stay together
     if (!value.isLeaf) {
       nextOrder = ensureFolderIsTogether(value, order, nextOrder);
