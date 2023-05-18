@@ -1,7 +1,7 @@
 import { ItemData } from '@/context';
-import { TreeItem } from './tokenSetListToTree';
+import { TreeItem } from '../tokenset/tokenSetListToTree';
 
-export function findOrderableTargetIndexesInTokenSetTreeList<T extends TreeItem>(velocity: number, value: T, order: ItemData<T>[]) {
+export function findOrderableTargetIndexes<T extends TreeItem>(velocity: number, value: T, order: ItemData<T>[]) {
   const siblings = order.filter((item) => (
     item.value !== value
     && item.value.parent === value.parent

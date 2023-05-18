@@ -19,10 +19,10 @@ import { DragItem } from '../StyledDragger/DragItem';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ThemeListGroupHeader } from './ThemeListGroupHeader';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
-import { TreeItem, themeListToTree } from '@/utils/tokenset/themeListToTree';
+import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
-import { ensureFolderIsTogether, findOrderableTargetIndexesInTokenSetTreeList } from '@/utils/tokenset';
+import { ensureFolderIsTogether, findOrderableTargetIndexes } from '@/utils/dragDropOrder';
 
 type Props = unknown;
 
@@ -34,7 +34,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
   const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
   const treeItems = themeListToTree(themes);
-  console.log('tree', treeItems);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -95,7 +94,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
   }, [themeEditorOpen, dispatch]);
 
   const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
-    console.log('reolre', reorderedItems);
     let currentGroup = '';
     const updatedThemes = reorderedItems.reduce<ThemeObjectsList>((acc, curr) => {
       if (!curr.isLeaf && typeof curr.value === 'string') {
@@ -109,7 +107,6 @@ export const ManageThemesModal: React.FC<Props> = () => {
       }
       return acc;
     }, []);
-    console.log('update', updatedThemes);
     dispatch.tokenState.setThemes(updatedThemes);
   }, [dispatch.tokenState]);
 
@@ -119,7 +116,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
     offset: number,
     velocity: number,
   ) => {
-    const availableIndexes = findOrderableTargetIndexesInTokenSetTreeList(
+    const availableIndexes = findOrderableTargetIndexes(
       velocity,
       value,
       order,

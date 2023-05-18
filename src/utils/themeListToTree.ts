@@ -12,7 +12,6 @@ export type TreeItem = {
 };
 
 export function themeListToTree(items: ThemeObjectsList) {
-  console.log('themes', items);
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
     const parentIndex = acc.findIndex((item) => !item.isLeaf
       && ((typeof curr?.group !== 'undefined' && item.key === curr.group)
