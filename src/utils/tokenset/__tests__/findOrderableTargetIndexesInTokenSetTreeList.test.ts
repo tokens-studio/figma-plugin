@@ -1,5 +1,6 @@
 import type { ItemData } from '@/context';
 import type { TreeItem } from '../tokenSetListToTree';
+import { findOrderableTargetIndexesInTokenSetTreeList } from '../findOrderableTargetIndexesInTokenSetTreeList';
 
 describe('findOrderableTargetIndexesInTokenSetTreeList', () => {
   const list: ItemData<TreeItem>[] = [
