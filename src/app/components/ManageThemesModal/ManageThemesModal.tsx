@@ -109,7 +109,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
     }, []);
     const newActiveTheme = activeTheme;
     Object.keys(newActiveTheme).forEach((group) => {
-      // check whether the activeTheme is belong to the group
+      // check whether the activeTheme is still belong to the group
       if (updatedThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
         delete newActiveTheme[group];
       }
