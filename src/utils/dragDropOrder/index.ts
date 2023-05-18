@@ -1,2 +1,2 @@
 export { ensureFolderIsTogether } from './ensureFolderIsTogether';
-export { findOrderableTargetIndexes } from './findOrderableTargetIndexes';
+export { findOrderableTargetIndexesInThemeList } from './findOrderableTargetIndexesInThemeList';

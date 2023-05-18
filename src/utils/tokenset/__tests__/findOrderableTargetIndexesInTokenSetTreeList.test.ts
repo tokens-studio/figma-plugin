@@ -1,8 +1,7 @@
 import type { ItemData } from '@/context';
-import { findOrderableTargetIndexes } from '../../dragDropOrder/findOrderableTargetIndexes';
 import type { TreeItem } from '../tokenSetListToTree';
 
-describe('findOrderableTargetIndexes', () => {
+describe('findOrderableTargetIndexesInTokenSetTreeList', () => {
   const list: ItemData<TreeItem>[] = [
     {
       layout: { min: 0, max: 10 },
@@ -51,13 +50,13 @@ describe('findOrderableTargetIndexes', () => {
   ];
 
   it('should find the appropriate ordering target indexes', () => {
-    const rootIndexes = findOrderableTargetIndexes(1, list[0].value, list);
+    const rootIndexes = findOrderableTargetIndexesInTokenSetTreeList(1, list[0].value, list);
     expect(rootIndexes).toEqual([3]);
 
-    const rootIndexesReverse = findOrderableTargetIndexes(-1, list[0].value, list);
+    const rootIndexesReverse = findOrderableTargetIndexesInTokenSetTreeList(-1, list[0].value, list);
     expect(rootIndexesReverse).toEqual([1]);
 
-    const nestedIndexes = findOrderableTargetIndexes(1, list[2].value, list);
+    const nestedIndexes = findOrderableTargetIndexesInTokenSetTreeList(1, list[2].value, list);
     expect(nestedIndexes).toEqual([3]);
   });
 });

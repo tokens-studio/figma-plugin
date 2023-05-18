@@ -12,9 +12,10 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
 import {
+  findOrderableTargetIndexesInTokenSetTreeList,
   tokenSetListToTree, TreeItem,
 } from '@/utils/tokenset';
-import { ensureFolderIsTogether, findOrderableTargetIndexes } from '@/utils/dragDropOrder';
+import { ensureFolderIsTogether } from '@/utils/dragDropOrder';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
@@ -144,12 +145,11 @@ export default function TokenSetTree({
     offset: number,
     velocity: number,
   ) => {
-    const availableIndexes = findOrderableTargetIndexes(
+    const availableIndexes = findOrderableTargetIndexesInTokenSetTreeList(
       velocity,
       value,
       order,
     );
-
     let nextOrder = checkReorder(order, value, offset, velocity, availableIndexes);
     // ensure folders stay together
     if (!value.isLeaf) {

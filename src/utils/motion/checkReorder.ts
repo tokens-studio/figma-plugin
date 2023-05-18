@@ -26,7 +26,6 @@ export function checkReorder<T>(
       nextIndex = [...allowedTargetIndexes].reverse().find((availableIndex) => availableIndex <= nextIndex) ?? -1;
     }
   }
-  console.log('nextIndex', nextIndex);
   const nextItem = order[nextIndex];
 
   if (

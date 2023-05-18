@@ -22,7 +22,7 @@ import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/cons
 import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
-import { ensureFolderIsTogether, findOrderableTargetIndexes } from '@/utils/dragDropOrder';
+import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
 
 type Props = unknown;
 
@@ -107,8 +107,15 @@ export const ManageThemesModal: React.FC<Props> = () => {
       }
       return acc;
     }, []);
+    const newActiveTheme = activeTheme;
+    Object.keys(newActiveTheme).forEach((group) => {
+      // check whether the activeTheme is belong to the group
+      if (updatedThemes.findIndex((theme) => theme.id === activeTheme?.[group] && theme.group === group) < 0) {
+        delete newActiveTheme[group];
+      }
+    });
     dispatch.tokenState.setThemes(updatedThemes);
-  }, [dispatch.tokenState]);
+  }, [dispatch.tokenState, activeTheme]);
 
   const handleCheckReorder = React.useCallback((
     order: ItemData<typeof treeItems[number]>[],
@@ -116,8 +123,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
     offset: number,
     velocity: number,
   ) => {
-    const availableIndexes = findOrderableTargetIndexes(
-      velocity,
+    const availableIndexes = findOrderableTargetIndexesInThemeList(
       value,
       order,
     );
