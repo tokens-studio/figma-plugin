@@ -2,10 +2,10 @@ import { styled } from '@/stitches.config';
 import Text from './Text';
 
 export const StyledDiff = styled((Text), {
-  padding: '$2',
+  padding: '$1 $2',
   wordBreak: 'break-all',
   fontWeight: '$bold',
-  borderRadius: '$default',
+  borderRadius: '$badge',
   fontSize: '$xsmall',
   variants: {
     type: {

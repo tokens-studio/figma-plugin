@@ -201,7 +201,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <Box css={{ padding: '$3' }}>
+        <Box css={{ padding: '$3 $2 $3 0' }}>
           <ReorderGroup
             layoutScroll
             values={treeItems}

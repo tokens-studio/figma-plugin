@@ -30,12 +30,10 @@ describe('SettingsDropdown', () => {
       const updateChanges = result.getByTestId('update-on-change');
       const updateRemote = result.queryByTestId('update-remote');
       const updateStyles = result.getByTestId('update-styles');
-      const swapStylesAlpha = result.queryByTestId('swap-styles-alpha');
 
       expect(updateChanges).toBeInTheDocument();
       expect(updateStyles).toBeInTheDocument();
       expect(updateRemote).toBeNull();
-      expect(swapStylesAlpha).toBeNull();
     });
   });
   it('should show Update remote when jsonbin', async () => {
@@ -87,29 +85,14 @@ describe('SettingsDropdown', () => {
     });
   });
 
-  it('with swap styles feature flag', async () => {
-    process.env.LAUNCHDARKLY_FLAGS = 'swapStylesAlpha';
-    const result = renderStore();
-
-    const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
-      await userEvent.click(trigger);
-
-      const swapStylesAlpha = result.getByTestId('swap-styles-alpha');
-      expect(swapStylesAlpha).toBeInTheDocument();
-    });
-  });
-
-  it('should call swapStyles with feature flag', async () => {
-    process.env.LAUNCHDARKLY_FLAGS = 'swapStylesAlpha';
-
+  it('should call swapStyles', async () => {
     const shouldSwapStylesSpy = jest.spyOn(mockStore.dispatch.settings, 'setShouldSwapStyles');
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
     await act(async () => {
       await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('swap-styles-alpha');
+      const updateChanges = result.getByTestId('swap-styles');
       await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
       expect(shouldSwapStylesSpy).toBeCalledTimes(1);
     });

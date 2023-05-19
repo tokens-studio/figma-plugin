@@ -161,6 +161,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
       )}
       {(activeTab === ThemeFormTabs.STYLES && id) && (
         <Box css={{ paddingTop: '$4' }}>
+          <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
           <ThemeStyleManagementForm id={id} />
         </Box>
       )}

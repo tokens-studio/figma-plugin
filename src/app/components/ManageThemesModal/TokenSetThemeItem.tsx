@@ -87,8 +87,8 @@ export const TokenSetThemeItem: React.FC<Props> = ({
       >
         <Button size="small" variant="ghost" onClick={handleCycleValue}>
           <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
-            {item.label}
             <TokenSetStatusIcon status={mapStatus} />
+            {item.label}
           </StyledThemeLabel>
         </Button>
         <DropdownMenu>
