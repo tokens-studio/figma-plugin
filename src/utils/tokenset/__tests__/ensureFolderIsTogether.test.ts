@@ -1,5 +1,5 @@
 import { ItemData } from '@/context';
-import { ensureFolderIsTogether } from '../ensureFolderIsTogether';
+import { ensureFolderIsTogether } from '../../dragDropOrder/ensureFolderIsTogether';
 import { TreeItem } from '../tokenSetListToTree';
 
 describe('ensureFolderIsTogether', () => {

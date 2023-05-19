@@ -1,5 +1,5 @@
 import type { ItemData } from '@/context';
-import type { TreeItem } from './tokenSetListToTree';
+import type { TreeItem } from '../tokenset/tokenSetListToTree';
 import { moveItem } from '../motion';
 
 export function ensureFolderIsTogether<T extends TreeItem>(value: T, order: ItemData<T>[], nextOrder: ItemData<T>[]) {
