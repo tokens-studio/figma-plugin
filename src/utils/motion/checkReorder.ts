@@ -26,7 +26,6 @@ export function checkReorder<T>(
       nextIndex = [...allowedTargetIndexes].reverse().find((availableIndex) => availableIndex <= nextIndex) ?? -1;
     }
   }
-
   const nextItem = order[nextIndex];
 
   if (
@@ -36,7 +35,6 @@ export function checkReorder<T>(
   const item = order[index];
   const originalNextLayout = nextItem.layout;
   const nextItemCenter = mix(originalNextLayout.min, originalNextLayout.max, 0.5);
-
   if (
     (nextOffset === 1 && item.layout.max + offset > nextItemCenter)
           || (nextOffset === -1 && item.layout.min + offset < nextItemCenter)
