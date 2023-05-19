@@ -73,25 +73,37 @@ function Settings() {
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
           <Heading size="small">Settings</Heading>
-          <Stack direction="row" gap={2} align="center">
+          <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="ignoreFirstPartForStyles"
               checked={!!ignoreFirstPartForStyles}
               defaultChecked={ignoreFirstPartForStyles}
               onCheckedChange={handleIgnoreChange}
             />
-            <Label htmlFor="ignoreFirstPartForStyles">Ignore first part of token name for styles</Label>
+            <Label htmlFor="ignoreFirstPartForStyles">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>Ignore first part of token name for styles</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Useful if you want to ignore `colors` in a token called `colors.blue.500` for your styles</Box>
+              </Stack>
+            </Label>
           </Stack>
-          <Stack direction="row" gap={2} align="center">
+          <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="prefixStylesWithThemeName"
               checked={!!prefixStylesWithThemeName}
               defaultChecked={prefixStylesWithThemeName}
               onCheckedChange={handlePrefixWithThemeNameChange}
             />
-            <Label htmlFor="prefixStylesWithThemeName">Prefix styles with active theme name</Label>
+
+            <Label htmlFor="prefixStylesWithThemeName">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>Prefix styles with active theme name</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.</Box>
+              </Stack>
+            </Label>
           </Stack>
           <Heading size="small">Base font size token</Heading>
+          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Lets you configure the value 1rem represents. You can also set this to a token, to have it change between sets.</Box>
           <RemConfiguration />
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
