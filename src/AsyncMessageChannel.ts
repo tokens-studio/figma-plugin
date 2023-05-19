@@ -52,6 +52,11 @@ export class AsyncMessageChannel {
     }
 
     const listener = async (event: { data: { pluginMessage: Message } }) => {
+      if (!event.data.pluginMessage) {
+        console.warn('Ignoring message without pluginMessage', event);
+        return;
+      }
+
       const possiblePromise = callback(event.data.pluginMessage);
       if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
         window.removeEventListener('message', listener);
@@ -63,6 +68,7 @@ export class AsyncMessageChannel {
 
   public connect() {
     return this.attachMessageListener(async (msg: { id?: string; message?: AsyncMessages }) => {
+      console.trace(msg);
       if (!msg.id || !msg.message || !msg.message.type.startsWith('async/')) return;
       const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
       if (handler) {

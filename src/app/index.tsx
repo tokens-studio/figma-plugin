@@ -1,3 +1,4 @@
+import 'core-js/stable';
 import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import './styles/figma.css';
