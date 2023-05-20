@@ -10,6 +10,7 @@ import { useFlags } from './LaunchDarkly';
 import { ChangeEventHandler } from './StorageItemForm/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import SupernovaForm from './StorageItemForm/SupernovaForm';
 
 type Props = {
   values: StorageTypeFormValues<true>;
@@ -26,6 +27,7 @@ export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
+  const { supernovaSync } = useFlags();
 
   switch (values.provider) {
     case StorageProviderType.GITHUB:
@@ -101,6 +103,18 @@ export default function StorageItemForm({
           errorMessage={errorMessage}
         />
       );
+    }
+    case StorageProviderType.SUPERNOVA: {
+      return supernovaSync ? (
+        <SupernovaForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
+      ) : null;
     }
     default: {
       return null;

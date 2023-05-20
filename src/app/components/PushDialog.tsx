@@ -15,9 +15,11 @@ import Stack from './Stack';
 import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
+import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Textarea from './Textarea';
 import { useShortcut } from '@/hooks/useShortcut';
 import Box from './Box';
+import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -58,6 +60,8 @@ function PushDialog() {
         default:
           break;
       }
+    } else if (localApiState.provider === StorageProviderType.SUPERNOVA) {
+      redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
     }
     return redirectHref;
   }, [branch, localApiState]);
@@ -102,37 +106,41 @@ function PushDialog() {
           <form onSubmit={handleSubmit}>
             <Stack direction="column" gap={4}>
               <Stack direction="column" gap={3}>
-                <Text size="small">Push your local changes to your repository.</Text>
-                <Box css={{
-                  padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
-                }}
-                >
-                  {'id' in localApiState ? localApiState.id : null}
-                </Box>
-                <Heading size="small">Commit message</Heading>
-                <Textarea
-                  id="push-dialog-commit-message"
-                  border
-                  rows={3}
-                  value={commitMessage}
-                  onChange={handleCommitMessageChange}
-                  placeholder="Enter commit message"
-                />
-                <Input
-                  full
-                  label="Branch"
-                  value={branch}
-                  onChange={handleBranchChange}
-                  type="text"
-                  name="branch"
-                  required
-                />
+                {localApiState.provider !== StorageProviderType.SUPERNOVA ? (
+                  <>
+                    <Text size="small">Push your local changes to your repository.</Text>
+                    <Box css={{
+                      padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+                    }}
+                    >
+                      {'id' in localApiState ? localApiState.id : null}
+                    </Box>
+                    <Heading size="small">Commit message</Heading>
+                    <Textarea
+                      id="push-dialog-commit-message"
+                      border
+                      rows={3}
+                      value={commitMessage}
+                      onChange={handleCommitMessageChange}
+                      placeholder="Enter commit message"
+                    />
+                    <Input
+                      full
+                      label="Branch"
+                      value={branch}
+                      onChange={handleBranchChange}
+                      type="text"
+                      name="branch"
+                      required
+                    />
+                  </>
+                ) : <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} />}
               </Stack>
               <Stack direction="row" gap={4} justify="between">
                 <Button variant="secondary" onClick={onCancel}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={!commitMessage} variant="primary">
+                <Button type="submit" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && !commitMessage} variant="primary">
                   Push
                 </Button>
               </Stack>
@@ -152,6 +160,7 @@ function PushDialog() {
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
               {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+              {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
             </Heading>
           </Stack>
         </Modal>
@@ -169,10 +178,13 @@ function PushDialog() {
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+                {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
               </Text>
             </Stack>
             <Button variant="primary" href={redirectHref}>
-              Create Pull Request
+              {localApiState.provider === StorageProviderType.SUPERNOVA
+                ? <>Open Supernova Workspace</>
+                : <>Create Pull Request</>}
             </Button>
           </Stack>
         </Modal>

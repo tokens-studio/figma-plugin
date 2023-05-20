@@ -4,6 +4,7 @@ export enum StorageProviderType {
   JSONBIN = 'jsonbin',
   GITHUB = 'github',
   GITLAB = 'gitlab',
+  SUPERNOVA = 'supernova',
   ADO = 'ado',
   URL = 'url',
   BITBUCKET = 'bitbucket',
