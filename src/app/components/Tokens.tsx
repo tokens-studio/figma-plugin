@@ -2,17 +2,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { PlusIcon } from '@radix-ui/react-icons';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
-import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
-import ToggleEmptyButton from './ToggleEmptyButton';
-import { mappedTokens } from './createTokenObj';
+import { createTokenGroups, groupTokensByType } from './createTokenObj';
 import { Dispatch } from '../store';
 import TokenSetSelector from './TokenSetSelector';
-import TokenFilter from './TokenFilter';
 import EditTokenFormModal from './EditTokenFormModal';
 import JSONEditor from './JSONEditor';
 import Box from './Box';
+import TokenFilter from './TokenFilter';
 import IconButton from './IconButton';
 import IconListing from '@/icons/listing.svg';
 import IconJSON from '@/icons/json.svg';
@@ -29,6 +28,14 @@ import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure'
 import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
+import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+import { getAliasValue } from '@/utils/alias';
+import { UpdateMode } from '@/constants/UpdateMode';
+import TokenByTypeView from './TokenByTypeView';
+import TokensUngroupedView from './TokensUngroupedView';
+import Button from './Button';
+import Stack from './Stack';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
@@ -104,6 +111,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
+  const updateMode = useSelector(updateModeSelector);
+  const { confirm } = useConfirm();
+  const shouldConfirm = React.useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+  const [groupByType, setGroupByType] = React.useState(false);
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -139,23 +150,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
     dispatch.tokenState.setStringTokens(val);
   }, [dispatch.tokenState]);
 
+  const ungroupedTokens = React.useMemo(() => createTokenGroups(tokens[activeTokenSet], tokenFilter), [tokens, activeTokenSet, tokenFilter]);
+
   const memoizedTokens = React.useMemo(() => {
     if (tokens[activeTokenSet]) {
-      const mapped = mappedTokens(tokens[activeTokenSet], tokenFilter).sort((a, b) => {
-        if (b[1].values) {
-          return 1;
-        }
-        if (a[1].values) {
-          return -1;
-        }
-        return 0;
-      });
-      return mapped.map(([key, { values, isPro, ...schema }]) => ({
-        key,
-        values,
-        schema,
-        isPro,
-      }));
+      return groupTokensByType(tokens[activeTokenSet], tokenFilter);
     }
     return [];
   }, [tokens, activeTokenSet, tokenFilter]);
@@ -191,6 +190,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, tokens, stringTokens, activeTokenSet]);
 
   React.useEffect(() => {
@@ -203,6 +203,14 @@ function Tokens({ isActive }: { isActive: boolean }) {
       dispatch.uiState.setScrollPositionSet({ ...scrollPositionSet, [tokenSet]: tokenDiv.current?.scrollTop });
     }
   }, [dispatch, scrollPositionSet]);
+
+  const handleToggleGrouped = React.useCallback(() => {
+    setGroupByType(!groupByType);
+  }, [groupByType]);
+
+  const handleNewTokenClick = React.useCallback(() => {
+    dispatch.uiState.setShowEditForm(true);
+  }, [dispatch.uiState]);
 
   if (!isActive) return null;
 
@@ -217,45 +225,34 @@ function Tokens({ isActive }: { isActive: boolean }) {
           overflow: 'hidden',
         }}
       >
-        <Box
+        <Stack
+          direction="row"
+          gap={2}
+          justify="between"
           css={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '$2',
             borderBottom: '1px solid',
             borderColor: '$borderMuted',
+            paddingRight: '$2',
           }}
         >
-          <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisibility}>
-              <Box
-                css={{
-                  fontWeight: '$bold',
-                  height: '100%',
-                  fontSize: '$xsmall',
-                  gap: '$1',
-                  padding: '$3 $4',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                {activeTokenSet}
-                <IconToggleableDisclosure open={tokenSetsVisible} />
-              </Box>
-            </StyledButton>
-          </Box>
-          <TokenFilter />
-          <ThemeSelector />
-          <Box
-            css={{
-              display: 'flex',
-              gap: '$2',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: '$4',
-              paddingLeft: 0,
-            }}
-          >
+          <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisibility}>
+            <Box
+              css={{
+                fontWeight: '$bold',
+                height: '100%',
+                fontSize: '$xsmall',
+                gap: '$1',
+                padding: '$4 $5',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              {activeTokenSet}
+              <IconToggleableDisclosure open={tokenSetsVisible} />
+            </Box>
+          </StyledButton>
+          <Stack direction="row" gap={1} align="center">
+            <ThemeSelector />
             <IconButton
               variant={activeTokensTab === 'list' ? 'primary' : 'default'}
               dataCy="tokensTabList"
@@ -272,8 +269,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               tooltipSide="bottom"
               tooltip="JSON"
             />
-          </Box>
-        </Box>
+          </Stack>
+        </Stack>
         <Box
           css={{
             display: 'flex',
@@ -309,20 +306,22 @@ function Tokens({ isActive }: { isActive: boolean }) {
               </Box>
             ) : (
               <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(({
-                  key, values, isPro, schema,
-                }) => (
-                  <div key={key}>
-                    <TokenListing
-                      tokenKey={key}
-                      label={schema.label || key}
-                      schema={schema}
-                      values={values}
-                      isPro={isPro}
-                    />
-                  </div>
-                ))}
-                <ToggleEmptyButton />
+                <Stack direction="row" gap={2} css={{ borderBottom: '1px solid $borderMuted', padding: '$3' }}>
+                  <TokenFilter />
+
+                  <Stack direction="row" gap={2} css={{ flexShrink: 0 }}>
+                    <Button variant="secondary" size="small" onClick={handleToggleGrouped}>
+                      {groupByType ? 'Ungroup' : 'Group'}
+                    </Button>
+                    <Button size="small" icon={<PlusIcon />} variant="secondary" type="button" onClick={handleNewTokenClick}>New</Button>
+                  </Stack>
+                </Stack>
+                {groupByType ? (
+                // @ts-ignore
+                  <TokenByTypeView tokens={memoizedTokens} />
+                ) : (
+                  <TokensUngroupedView tokens={ungroupedTokens} />
+                )}
                 {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
                 {manageThemesModalOpen && <ManageThemesModal />}
               </Box>

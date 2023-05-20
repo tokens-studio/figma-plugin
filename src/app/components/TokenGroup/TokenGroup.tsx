@@ -4,14 +4,14 @@ import { TokenGroupHeading } from './TokenGroupHeading';
 import { StyledTokenGroup, StyledTokenGroupItems } from './StyledTokenGroup';
 import { TokenButton } from '@/app/components/TokenButton';
 import { displayTypeSelector } from '@/selectors';
-import { DeepKeyTokenMap, SingleToken, TokenTypeSchema } from '@/types/tokens';
+import { DeepKeyTokenMap, SingleToken } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { collapsedTokensSelector } from '@/selectors/collapsedTokensSelector';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 type Props = {
-  schema: TokenTypeSchema;
+  type?: TokenTypes;
   tokenValues: DeepKeyTokenMap;
   path?: string | null;
   showNewForm: (opts: ShowNewFormOptions) => void;
@@ -19,13 +19,15 @@ type Props = {
 };
 
 const TokenGroup: React.FC<Props> = ({
-  tokenValues, showNewForm, showForm, schema, path = null,
+  tokenValues, showNewForm, showForm, type, path = null,
 }) => {
   const collapsed = useSelector(collapsedTokensSelector);
   const displayType = useSelector(displayTypeSelector);
 
   const tokenValuesEntries = React.useMemo(() => (
     Object.entries(tokenValues).map(([name, value]) => {
+      console.log('name', name, value);
+
       const stringPath = [path, name].filter((n) => n).join('.');
       const isTokenGroup = !isSingleToken(value);
       const parent = path || '';
@@ -58,24 +60,24 @@ const TokenGroup: React.FC<Props> = ({
   }
 
   return (
-    <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
+    <StyledTokenGroup displayType={type === TokenTypes.COLOR ? displayType : 'GRID'}>
       {mappedItems.map(({ item }) => (
         <React.Fragment key={item.stringPath}>
           {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             // Need to add class to self-reference in css traversal
             <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type} />
+              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={type} />
               <TokenGroup
                 tokenValues={item.value}
                 showNewForm={showNewForm}
                 showForm={showForm}
-                schema={schema}
+                type={type}
                 path={item.stringPath}
               />
             </StyledTokenGroupItems>
           ) : (
             <TokenButton
-              type={schema.type}
+              type={item.value.type || type || TokenTypes.OTHER}
               token={item.value}
               showForm={showForm}
               draggedToken={draggedToken}

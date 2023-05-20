@@ -13,6 +13,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import SingleTypographyDownShiftInput from './SingleTypographyDownShiftInput';
 import DownshiftInput from './DownshiftInput';
 import Stack from './Stack';
+import tokenTypes from '@/config/tokenType.defs.json';
 
 const properties = {
   fontSize: 'fontSizes',
@@ -84,9 +85,9 @@ export default function TypographyInput({
           )
         }
       </Stack>
-      {(mode === 'input' && internalEditToken.schema.schemas.value.type === 'object') ? (
+      {(mode === 'input') ? (
         <Stack gap={2} direction="column">
-          {Object.entries(internalEditToken.schema.schemas.value.properties ?? {}).map(([key], keyIndex) => (
+          {Object.entries(tokenTypes[TokenTypes.TYPOGRAPHY].schemas.value.properties).map(([key], keyIndex) => (
             <SingleTypographyDownShiftInput
               name={key}
               key={`typography-input-${seed(keyIndex)}`}
@@ -102,8 +103,8 @@ export default function TypographyInput({
         <Stack direction="column" gap={2}>
           <DownshiftInput
             value={!isAliasMode ? '' : String(internalEditToken.value)}
-            type={internalEditToken.type}
-            label={internalEditToken.schema.property}
+            type={TokenTypes.TYPOGRAPHY}
+            label={tokenTypes[TokenTypes.TYPOGRAPHY].label}
             inlineLabel
             resolvedTokens={resolvedTokens}
             initialName={internalEditToken.initialName}

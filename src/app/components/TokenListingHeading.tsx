@@ -14,23 +14,20 @@ import Tooltip from './Tooltip';
 import Box from './Box';
 import Stack from './Stack';
 import { StyledTokenGroupHeadingButton } from './TokenGroup/StyledTokenGroupHeading';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type Props = {
   isCollapsed: boolean;
-  isPro?: boolean;
   showNewForm: (options: { name?: string }) => void;
-  label: string;
-  tokenKey: string;
+  type: TokenTypes;
   showDisplayToggle: boolean;
   onCollapse: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export default function TokenListingHeading({
-  isPro,
   isCollapsed,
   showNewForm,
-  label,
-  tokenKey,
+  type,
   showDisplayToggle,
   onCollapse,
 }: Props) {
@@ -45,19 +42,22 @@ export default function TokenListingHeading({
     dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
   }, [displayType, dispatch]);
 
+  // TODO: Add proper lookup for pro badge
+  const isPro = false;
+
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
       <StyledTokenGroupHeadingButton
         isCollapsed={isCollapsed}
-        data-cy={`tokenlisting-header-${tokenKey}`}
+        data-cy={`tokenlisting-header-${type}`}
         type="button"
         onClick={onCollapse}
-        data-testid={`tokenlisting-${tokenKey}-collapse-button`}
+        data-testid={`tokenlisting-${type}-collapse-button`}
       >
         <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
-        <Heading size="small">{label}</Heading>
+        <Heading size="small">{type}</Heading>
         {isPro ? <ProBadge /> : null}
       </StyledTokenGroupHeadingButton>
       <Box css={{

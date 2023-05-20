@@ -136,7 +136,7 @@ export default function useManageTokens() {
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
-  const deleteGroup = useCallback(async (path: string, type: string) => {
+  const deleteGroup = useCallback(async (path: string, type?: TokenTypes) => {
     const userConfirmation = await confirm({
       text: 'Delete group?',
       description: 'Are you sure you want to delete this group?',
@@ -152,7 +152,7 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (oldName: string, newName: string, type: string) => {
+  const renameGroup = useCallback(async (oldName: string, newName: string, type?: TokenTypes) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
     await renameTokenGroup({

@@ -316,7 +316,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
+          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type ? token.type === data.type : true)),
         },
       };
 
@@ -354,7 +354,7 @@ export const tokenState = createModel<RootModel>()({
       const {
         parent, oldName, newName, tokenSets, type,
       } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type ? token.type === type : true));
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(oldName, newName);
@@ -496,7 +496,7 @@ export const tokenState = createModel<RootModel>()({
         oldName, newName, type, parent,
       } = data;
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
+      tokensInParent.filter((token) => (token.name.startsWith(`${newName}.`) && token.type ? token.type === type : true)).forEach((updatedToken) => {
         dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
       });
     },

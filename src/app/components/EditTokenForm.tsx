@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -35,6 +36,8 @@ import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+import Select from './Select';
+import { enumKeys } from '@/utils/enumKeys';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -243,7 +246,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   );
 
   // @TODO update to useCallback
-  const submitTokenValue = async ({
+  const submitTokenValue = useCallback(async ({
     type, value, name, $extensions,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
@@ -334,7 +337,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       }
     }
-  };
+  }, [internalEditToken, createSingleToken, activeTokenSet, editSingleToken, updateMode, themes.length, confirm, remapToken, dispatch.settings, renameStylesFromTokens, duplicateSingleToken]);
 
   const handleSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -374,6 +377,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     return null;
   }, [internalEditToken, resolvedTokens]);
+
+  const handleTypeChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const type = e.target.value as EditTokenObject['type'];
+    console.log('changing', type, internalEditToken);
+
+    if (internalEditToken) {
+      setInternalEditToken({
+        ...internalEditToken,
+        // @ts-ignore
+        type,
+      });
+    }
+  }, [internalEditToken]);
 
   const renderTokenForm = () => {
     if (!internalEditToken) return null;
@@ -442,7 +458,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             <DownshiftInput
               value={internalEditToken.value}
               type={internalEditToken.type}
-              label={internalEditToken.schema?.property}
+              label="Value"
               resolvedTokens={resolvedTokens}
               initialName={internalEditToken.initialName}
               handleChange={handleChange}
@@ -490,6 +506,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
           error={error}
           placeholder="Unique name"
         />
+        <Select value={internalEditToken.type || TokenTypes.COLOR} id="type" onChange={handleTypeChange}>
+          {enumKeys(TokenTypes).map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </Select>
         {renderTokenForm()}
 
         {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
@@ -504,6 +527,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             border
           />
         </Box>
+        {JSON.stringify(internalEditToken)}
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel

@@ -2,6 +2,7 @@ import React from 'react';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltipContentValue } from './TokenTooltipContentValue';
 import Box from '../Box';
+import Text from '../Text';
 import Stack from '../Stack';
 import { TokensContext } from '@/context';
 import NotFoundBadge from './NotFoundBadge';
@@ -21,7 +22,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
     <Stack direction="column" gap={1} css={{ background: '$bgToolTip' }}>
       <Stack
         direction="row"
-        justify="start"
+        justify="between"
         align="center"
         gap={2}
         css={{
@@ -31,8 +32,11 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
           position: 'relative',
         }}
       >
-        {token.name.split('.')[token.name.split('.').length - 1]}
-        {failedToResolve ? <NotFoundBadge /> : null}
+        <Stack direction="row" gap={2}>
+          {token.name.split('.')[token.name.split('.').length - 1]}
+          {failedToResolve ? <NotFoundBadge /> : null}
+        </Stack>
+        <Text muted size="xsmall">{token.type}</Text>
       </Stack>
 
       <Stack direction="column" align="start" gap={2} wrap>

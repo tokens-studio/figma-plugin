@@ -118,6 +118,7 @@
     "label": "Font Weight",
     "property": "Font Weight",
     "type": "fontWeights",
+    "explainer": "Enter exactly as shown in Figma for that font family",
     "schemas": {
       "value": { "type": "string" }
     }
