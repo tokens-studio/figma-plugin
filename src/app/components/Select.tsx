@@ -3,15 +3,16 @@ import { styled } from '@/stitches.config';
 import type { StitchesCSS } from '@/types';
 
 const StyledSelect = styled('select', {
-  all: 'unset',
   borderRadius: '$input',
-  padding: '$3',
-  fontSize: 12,
+  fontSize: '$xsmall',
+  height: '$controlMedium',
+  paddingLeft: '$2',
   lineHeight: 1,
   backgroundColor: '$bgDefault',
   color: '$text',
   border: '1px solid $border',
-  '&:focus': { boxShadow: '$focus' },
+  cursor: 'pointer',
+  '&:focus': { boxShadow: '$focus', outline: 'none' },
 });
 
 type StyledSelectProps = React.ComponentProps<typeof StyledSelect>;
