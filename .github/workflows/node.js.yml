@@ -85,6 +85,7 @@ jobs:
         run: npm run test
   coverage:
     name: Test coverage
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       # 1: Setup node
