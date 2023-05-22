@@ -14,10 +14,10 @@ function isSameCredentials(
         return true;
       }
       return (
-        credential.id === stored.id
-        && credential.provider === stored.provider
-        && credential.filePath === stored.filePath
-        && credential.branch === stored.branch
+        credential.id === stored.id &&
+        credential.provider === stored.provider &&
+        credential.filePath === stored.filePath &&
+        credential.branch === stored.branch
       );
     }
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
@@ -25,6 +25,12 @@ function isSameCredentials(
     case StorageProviderType.URL: {
       return credential.id === stored.id && credential.provider === stored.provider;
     }
+    case StorageProviderType.SUPERNOVA:
+      return (
+        credential.id === stored.id &&
+        credential.provider === stored.provider &&
+        credential.designSystemUrl === stored.designSystemUrl
+      );
     default:
       return false;
   }

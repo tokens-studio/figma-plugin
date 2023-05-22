@@ -69,6 +69,13 @@ StorageProviderType.ADO,
 }
 >;
 
+export type SupernovaStorageType = GenericStorageType<StorageProviderType.SUPERNOVA, {
+  id: string; // Not used for now, but makes it easier to handle rest of code for other providers
+  name: string; // this is only for refrence
+  designSystemUrl: string; // URL of the design system
+  mapping: string; // Mapping configuration
+}>;
+
 export enum GenericVersionedStorageFlow {
   READ_WRITE_CREATE = 'Read/Write/Create',
   READ_WRITE = 'Read/Write',
@@ -88,7 +95,8 @@ export type StorageType =
   | GitStorageType
   | GenericVersionedStorageType
   | ADOStorageType
-  | BitbucketStorageType;
+  | BitbucketStorageType
+  | SupernovaStorageType;
 
 export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
@@ -96,7 +104,8 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<GitStorageType>
   | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
-  | StorageTypeCredential<ADOStorageType>;
+  | StorageTypeCredential<ADOStorageType>
+  | StorageTypeCredential<SupernovaStorageType>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<
@@ -115,9 +124,16 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   Incomplete,
   Omit<StorageTypeCredential<BitbucketStorageType>, 'provider'>
   >)
+  | ({ new?: boolean; provider: StorageProviderType.SUPERNOVA } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<SupernovaStorageType>, 'provider'>
+  >)
   | ({ new?: boolean; provider: StorageProviderType.ADO } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<ADOStorageType>, 'provider'>
   >)
-  | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<Incomplete, Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>>)
+  | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>
+  >)
   | { new?: boolean; provider: StorageProviderType.LOCAL };

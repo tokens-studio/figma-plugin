@@ -4,6 +4,7 @@ import { IconFile } from '@/icons';
 import GitLabIcon from '@/icons/gitlab.svg';
 import ADOIcon from '@/icons/azure.svg';
 import JSONBinIcon from '@/icons/jsonbin.svg';
+import SupernovaIcon from '@/icons/supernova.svg';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function getProviderIcon(provider: StorageProviderType) {
@@ -22,6 +23,8 @@ export function getProviderIcon(provider: StorageProviderType) {
       return <Link2Icon />;
     case StorageProviderType.JSONBIN:
       return <JSONBinIcon />;
+    case StorageProviderType.SUPERNOVA:
+      return <SupernovaIcon />;
     case StorageProviderType.GENERIC_VERSIONED_STORAGE:
       return <ArchiveIcon />;
     default:

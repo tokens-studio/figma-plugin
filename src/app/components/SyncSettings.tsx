@@ -25,6 +25,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
+import { useFlags } from './LaunchDarkly'
 
 const providers = [
   {
@@ -48,6 +49,10 @@ const providers = [
     type: StorageProviderType.ADO,
   },
   {
+    text: 'Supernova',
+    type: StorageProviderType.SUPERNOVA,
+  },
+  {
     text: 'Generic Versioned',
     type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
   },
@@ -66,6 +71,7 @@ const SyncSettings = () => {
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
   const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
+  const { supernovaSync } = useFlags();
 
   const setLocalBranches = React.useCallback(
     async (provider: StorageTypeCredentials) => {
@@ -176,12 +182,16 @@ const SyncSettings = () => {
               side="bottom"
             >
               {
-                providers.map((provider) => (
-                  <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                providers.map((provider) => {
+                  // Hide Supernova item behind feature flag
+                  if (provider.type === StorageProviderType.SUPERNOVA && !supernovaSync) {
+                    return null;
+                  }
+                  return <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
                     <Box css={{ color: '$contextMenuForeground' }}>{getProviderIcon(provider.type)}</Box>
                     {provider.text}
                   </DropdownMenuItem>
-                ))
+                })
               }
             </DropdownMenuContent>
           </DropdownMenu>

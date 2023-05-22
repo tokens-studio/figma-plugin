@@ -1,0 +1,31 @@
+import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
+
+import SupernovaForm from '@/app/components/StorageItemForm/SupernovaForm';
+
+<Meta
+  title="SupernovaForm"
+  component={SupernovaForm}
+  args={{
+    values: {
+      secret: '',
+      id: '',
+      branch: '',
+      filePath: '',
+      baseUrl: '',
+    },
+  }}
+/>
+
+<ArgsTable of={SupernovaForm} />
+
+export const SupernovaFormDefaultStory = (args) => {
+  return (
+    <>
+      <SupernovaForm values={args.values} />
+    </>
+  );
+};
+
+<Canvas>
+  <Story name="Default">{SupernovaFormDefaultStory.bind({})}</Story>
+</Canvas>
