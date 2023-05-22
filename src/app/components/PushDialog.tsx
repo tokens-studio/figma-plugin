@@ -143,7 +143,7 @@ function PushDialog() {
               <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
             </div>
             {
-              activeTab !== 'commit' && (
+              activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
                 <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
                   This will push your local changes to the
                   {' '}

@@ -83,7 +83,17 @@ function Settings() {
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>Ignore first part of token name for styles</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Useful if you want to ignore `colors` in a token called `colors.blue.500` for your styles</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+                  Useful if you want to ignore
+                  {' '}
+                  <code>colors</code>
+                  {' '}
+                  in a token called
+                  {' '}
+                  <code>colors.blue.500</code>
+                  {' '}
+                  for your styles
+                </Box>
               </Stack>
             </Label>
           </Stack>

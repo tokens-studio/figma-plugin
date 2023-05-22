@@ -17,7 +17,7 @@ import Label from '../Label';
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.SUPERNOVA }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
@@ -51,7 +51,7 @@ export default function SupernovaForm({
   }, [values, onSubmit]);
 
   const handleMappingChange = React.useCallback(
-    (val: string, event: React.ChangeEvent<any>) => {
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(event);
     },
     [onChange],
