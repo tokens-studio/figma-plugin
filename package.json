@@ -37,6 +37,7 @@
     "@rematch/core": "^2.2.0",
     "@sentry/react": "^6.19.7",
     "@stitches/react": "^1.2.8",
+    "@supernovaio/supernova-sdk": "1.8.74",
     "@supabase/postgrest-js": "^1.1.0",
     "@supabase/realtime-js": "^2.1.0",
     "@supabase/storage-js": "^2.0.0",

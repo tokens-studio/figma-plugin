@@ -6,6 +6,8 @@ export enum ErrorMessages {
   ADO_CREDENTIAL_ERROR = 'Error syncing with ADO, check credentials',
   URL_CREDENTIAL_ERROR = 'Error fetching from URL, check console (F12)',
   JSONBIN_CREDENTIAL_ERROR = 'Error fetching from JSONbin, check console (F12)',
+  SUPERNOVA_CREDENTIAL_ERROR = 'Error syncing with Supernova, check credentials or your mapping configuration',
+  SUPERNOVA_NOT_UPLOADED_YET_ERROR = 'There were no tokens imported from Tokens Studio to Supernova previously, please push your tokens first',
   FILE_CREDENTIAL_ERROR = 'Error fetching from file, check console (F12)',
   REMOTE_VERSION_NEWER = 'Remote version is newer than local version',
   REMOTE_CREDENTIAL_ERROR = 'Error fetching from remote, check console (F12)',

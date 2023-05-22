@@ -26,6 +26,7 @@ const StyledTextarea = styled('textarea', {
 
 function Textarea({
   id,
+  name,
   rows = 2,
   value,
   placeholder,
@@ -35,18 +36,26 @@ function Textarea({
   border,
 }: {
   id?: string;
+  name?: string;
   rows?: number;
   value: string;
   placeholder?: string;
   isDisabled?: boolean;
-  onChange?: Function;
+  onChange?: (val: string, event?: React.ChangeEvent<any>) => void;
   css?: any;
   border?: boolean
 }) {
+  const handleChange = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (onChange) {
+      onChange(event.target.value, event);
+    }
+  }, [onChange]);
+
   return (
     <StyledTextarea
       data-cy={id}
       data-testid={id}
+      name={name}
       spellCheck={false}
       rows={rows}
       placeholder={placeholder}
@@ -54,7 +63,7 @@ function Textarea({
       value={value}
       disabled={isDisabled}
       border={border}
-      onChange={(event) => onChange && onChange(event.target.value, event)}
+      onChange={handleChange}
     />
   );
 }

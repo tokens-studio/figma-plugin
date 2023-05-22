@@ -112,7 +112,7 @@ export function useJSONbin() {
             secret,
           },
         });
-        dispatch.uiState.setProjectURL(`https://jsonbin.io/${result.metadata.id}`);
+        dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
 
         return result.metadata.id;
       }
@@ -137,7 +137,7 @@ export function useJSONbin() {
     try {
       const storage = new JSONBinTokenStorage(id, secret);
       const data = await storage.retrieve();
-      dispatch.uiState.setProjectURL(`https://jsonbin.io/${id}`);
+      dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
 
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,

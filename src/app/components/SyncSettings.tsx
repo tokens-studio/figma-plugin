@@ -48,6 +48,10 @@ const providers = [
     type: StorageProviderType.ADO,
   },
   {
+    text: 'Supernova',
+    type: StorageProviderType.SUPERNOVA,
+  },
+  {
     text: 'Generic Versioned',
     type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
   },

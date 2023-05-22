@@ -27,8 +27,8 @@ module.exports = (env, argv) => ({
             loader: 'babel-loader',
           },
         ],
-        exclude:  /node_modules\/(?!(colorjs.io)\/)/,
-      }
+        exclude: /node_modules\/(?!(colorjs.io)\/)/,
+      },
     ],
   },
 

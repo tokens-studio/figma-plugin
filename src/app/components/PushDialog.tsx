@@ -24,6 +24,7 @@ import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
 import { findDifferentState } from '@/utils/findDifferentState';
 import PushSettingForm from './PushSettingForm';
+import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 
 function PushDialog() {
   const {
@@ -79,6 +80,8 @@ function PushDialog() {
         default:
           break;
       }
+    } else if (localApiState.provider === StorageProviderType.SUPERNOVA) {
+      redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
     }
     return redirectHref;
   }, [branch, localApiState]);
@@ -183,7 +186,7 @@ function PushDialog() {
               <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button variant="primary" id="push-dialog-button-push-changes" disabled={!commitMessage || !branch} onClick={handlePushChanges}>
+              <Button variant="primary" id="push-dialog-button-push-changes" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)} onClick={handlePushChanges}>
                 Push changes
               </Button>
             </Box>
@@ -202,6 +205,7 @@ function PushDialog() {
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
               {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
               {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+              {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
             </Heading>
           </Stack>
         </Modal>
@@ -219,10 +223,13 @@ function PushDialog() {
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
                 {localApiState.provider === StorageProviderType.ADO && ' ADO'}
+                {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
               </Text>
             </Stack>
             <Button variant="primary" href={redirectHref}>
-              Create Pull Request
+              {localApiState.provider === StorageProviderType.SUPERNOVA
+                ? <>Open Supernova Workspace</>
+                : <>Create Pull Request</>}
             </Button>
           </Stack>
         </Modal>

@@ -8,6 +8,8 @@ const StyledButton = styled('button', {
   width: '1.5rem',
   height: '1.5rem',
   borderRadius: '$default',
+  border: '1px solid',
+  borderColor: '$border',
   cursor: 'pointer',
 });
 

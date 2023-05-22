@@ -7,6 +7,8 @@ import Text from './Text';
 import Heading from './Heading';
 import Textarea from './Textarea';
 import Input from './Input';
+import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   commitMessage: string,
@@ -20,7 +22,7 @@ function PushSettingForm({
 }: Props) {
   const localApiState = useSelector(localApiStateSelector);
 
-  return (
+  return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Text size="small">Push your local changes to your repository.</Text>
       <Box css={{

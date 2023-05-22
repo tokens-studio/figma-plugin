@@ -44,6 +44,7 @@ export function pullTokensFactory(
       StorageProviderType.JSONBIN,
       StorageProviderType.GENERIC_VERSIONED_STORAGE,
       StorageProviderType.URL,
+      StorageProviderType.SUPERNOVA,
     ].includes(storageType.provider);
 
     if (isRemoteStorage) {
