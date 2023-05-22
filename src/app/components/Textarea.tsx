@@ -41,13 +41,13 @@ function Textarea({
   value: string;
   placeholder?: string;
   isDisabled?: boolean;
-  onChange?: (val: string, event?: React.ChangeEvent<any>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   css?: any;
   border?: boolean
 }) {
   const handleChange = React.useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (onChange) {
-      onChange(event.target.value, event);
+      onChange(event);
     }
   }, [onChange]);
 

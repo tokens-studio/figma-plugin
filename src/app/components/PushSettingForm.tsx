@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import Stack from './Stack';
 import { localApiStateSelector } from '@/selectors';
@@ -22,6 +22,10 @@ function PushSettingForm({
 }: Props) {
   const localApiState = useSelector(localApiStateSelector);
 
+  const handleMessageChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    handleCommitMessageChange(event.target.value);
+  }, [handleCommitMessageChange]);
+
   return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Text size="small">Push your local changes to your repository.</Text>
@@ -37,7 +41,7 @@ function PushSettingForm({
         border
         rows={3}
         value={commitMessage}
-        onChange={handleCommitMessageChange}
+        onChange={handleMessageChange}
         placeholder="Enter commit message"
       />
       <Input

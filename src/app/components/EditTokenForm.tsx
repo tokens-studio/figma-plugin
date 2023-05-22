@@ -256,11 +256,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleDescriptionChange = React.useCallback(
-    (val: string) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          description: val,
+          description: e.target.value,
         });
       }
     },
