@@ -237,12 +237,11 @@ export default function useTokens() {
         return;
       }
       const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-      const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
-        !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+      const withoutSourceTokens = resolved.filter((token) => (
+        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
 
-      const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => (
+      const tokensToCreate = withoutSourceTokens.filter((token) => (
         [
           userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
           userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
