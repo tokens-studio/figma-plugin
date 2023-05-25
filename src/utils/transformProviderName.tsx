@@ -14,6 +14,8 @@ export const transformProviderName = (provider: StorageProviderType) => {
       return 'ADO';
     case StorageProviderType.URL:
       return 'URL';
+    case StorageProviderType.SUPERNOVA:
+      return 'Supernova';
     default:
       return provider;
   }

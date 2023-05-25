@@ -49,6 +49,7 @@ export default function SingleBoxShadowInput({
   onRemove,
   id,
   resolvedTokens,
+  onSubmit,
 }: {
   value?: TokenBoxshadowValue | TokenBoxshadowValue[]
   isMultiple?: boolean;
@@ -58,18 +59,31 @@ export default function SingleBoxShadowInput({
   onRemove: (index: number) => void;
   id?: string;
   resolvedTokens: ResolveTokenValuesResult[];
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
 
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
-  const onChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onChange = React.useCallback((property: string, newValue: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], [e.target.name]: e.target.value };
-      values.splice(index, 1, newShadow);
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [property]: newValue });
+      handleBoxShadowValueChange(values);
+    } else {
+      handleBoxShadowValueChange({
+        ...newTokenValue,
+        ...value,
+        [property]: newValue,
+      });
+    }
+  }, [index, value, handleBoxShadowValueChange]);
 
+  const onTypeChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (Array.isArray(value)) {
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [e.target.name]: e.target.value });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -82,10 +96,8 @@ export default function SingleBoxShadowInput({
 
   const handleBoxshadowValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], [property]: newInputValue };
-      values.splice(index, 1, newShadow);
-
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], [property]: newInputValue });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -102,10 +114,8 @@ export default function SingleBoxShadowInput({
 
   const onColorChange = React.useCallback((color: string) => {
     if (Array.isArray(value)) {
-      const values = value;
-      const newShadow = { ...value[index], color: color.trim() };
-      values.splice(index, 1, newShadow);
-
+      const values = [...value];
+      values.splice(index, 1, { ...value[index], color: color.trim() });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
@@ -198,7 +208,7 @@ export default function SingleBoxShadowInput({
           </Box>
         )}
         <Tooltip label="type"><StyledPrefix isText>Type</StyledPrefix></Tooltip>
-        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onChange}>
+        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onTypeChange}>
           <option value="innerShadow">Inner Shadow</option>
           <option value="dropShadow">Drop Shadow</option>
         </Select>
@@ -230,6 +240,7 @@ export default function SingleBoxShadowInput({
                 handleChange={onChange}
                 setInputValue={handleBoxshadowValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
+                onSubmit={onSubmit}
               />
               {inputHelperOpen && key === 'color' && (
                 <ColorPicker value={shadowItem?.[key] || newTokenValue?.[key]} onChange={onColorChange} />

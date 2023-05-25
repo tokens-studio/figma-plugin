@@ -331,4 +331,27 @@ export class GithubTokenStorage extends GitTokenStorage {
       return await this.createOrUpdate(changeset, message, branch, shouldCreateBranch);
     }
   }
+
+  public async getCommitSha(): Promise<string> {
+    try {
+      const normalizedPath = compact(this.path.split('/')).join('/');
+      const response = await this.octokitClient.rest.repos.getContent({
+        path: normalizedPath,
+        owner: this.owner,
+        repo: this.repository,
+        ref: this.branch,
+        headers: octokitClientDefaultHeaders,
+      });
+      // read entire directory
+      if (Array.isArray(response.data)) {
+        const directorySha = await this.getTreeShaForDirectory(normalizedPath);
+        return directorySha;
+      }
+      return response.data.sha;
+    } catch (e) {
+      // Raise error (usually this is an auth error)
+      console.error('Error', e);
+      return '';
+    }
+  }
 }

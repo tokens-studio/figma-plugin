@@ -1,6 +1,8 @@
 import React from 'react';
 import Heading from './Heading';
 import Box from './Box';
+import Text from './Text';
+import Stack from './Stack';
 
 type Props = {
   designSystemUrl: string | undefined;
@@ -8,8 +10,8 @@ type Props = {
 
 function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
   return (
-    <>
-      <p className="text-xs">Push your local changes to your Supernova.io design system.</p>
+    <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+      <Text size="small">Push your local changes to your Supernova.io design system.</Text>
       <Heading size="small">Design system</Heading>
       <Box
         css={{
@@ -22,7 +24,7 @@ function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
       >
         {designSystemUrl || 'Design system'}
       </Box>
-    </>
+    </Stack>
   );
 }
 export default PushDialogSupernovaConfirm;

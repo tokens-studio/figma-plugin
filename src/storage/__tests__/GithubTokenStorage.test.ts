@@ -1326,4 +1326,43 @@ describe('GithubTokenStorage', () => {
     ));
     await expect(storageProvider.getTreeShaForDirectory('companyA/ds')).rejects.toThrow('Could not find directory SHA');
   });
+
+  it('should return the sha of the file if the response is not an array', async () => {
+    mockGetContent.mockImplementationOnce(() => (
+      Promise.resolve({
+        data: {
+          sha: 'abc123',
+        },
+      })
+    ));
+
+    expect(await storageProvider.getCommitSha()).toEqual('abc123');
+  });
+
+  it('should call return directory sha if the response is an array', async () => {
+    mockGetContent.mockImplementation((opts: { path: string }) => {
+      if (opts.path === 'data') {
+        return Promise.resolve({
+          data: [
+            {
+              path: 'data/tokens', sha: 'sha(data/tokens)', type: 'file', sha: 'abc123',
+            },
+          ],
+        });
+      }
+
+      if (opts.path === 'data/tokens') {
+        return Promise.resolve({
+          data: [
+            { path: 'data/tokens', sha: 'sha(data/tokens)', type: 'folder' },
+          ],
+        });
+      }
+
+      return Promise.reject();
+    });
+    storageProvider.changePath('data/tokens');
+
+    expect(await storageProvider.getCommitSha()).toEqual('abc123');
+  });
 });

@@ -109,6 +109,7 @@ export const stitchesInstance = createStitches({
       bgProSubtle: 'var(--figma-color-bg-component-tertiary)',
       borderPro: 'var(--figma-color-bg-component)',
       spinnerInverse: '#ffffff',
+      staticTextMuted: '#CECECE',
     },
     space: {
       1: '2px',
@@ -132,7 +133,7 @@ export const stitchesInstance = createStitches({
       8: '48px',
       10: '28px',
       controlMedium: '28px',
-      dropdownMaxHeight: '170px',
+      dropdownMaxHeight: '50vh',
     },
     radii: {
       default: globalTokens.radii.sm,

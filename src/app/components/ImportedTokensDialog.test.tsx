@@ -5,6 +5,9 @@ import {
 } from '../../../tests/config/setupTest';
 import ImportedTokensDialog from './ImportedTokensDialog';
 
+// Hide log calls unless they are expected. This is mainly related to react-modal
+jest.spyOn(console, 'error').mockImplementation(() => { });
+
 describe('ImportedTokensDialog', () => {
   const defaultStore = {
     tokenState: {

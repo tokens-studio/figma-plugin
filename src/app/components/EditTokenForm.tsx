@@ -10,12 +10,12 @@ import Text from './Text';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import {
-  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken,
+  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import {
-  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector,
+  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -35,6 +35,7 @@ import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -45,16 +46,17 @@ type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const tokens = useSelector(tokensSelector);
   const editToken = useSelector(editTokenSelector);
   const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
+  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
   const { remapToken, renameStylesFromTokens } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
-
   const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
   const isValidColorToken = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
@@ -74,7 +76,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && !error;
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -115,10 +117,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
-  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleChange = React.useCallback(
+    (property: string, value: string) => {
+      setError(null);
+      if (internalEditToken) {
+        setInternalEditToken({ ...internalEditToken, [property]: value });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const handleNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       setError(null);
-      e.persist();
       if (internalEditToken) {
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
@@ -126,7 +137,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
         setError('Value must include either px or rem');
@@ -154,17 +165,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
+  const handleTypographyValueChange = React.useCallback(
+    (property: string, value: string) => {
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-        setInternalEditToken({
-          ...internalEditToken,
-          value: {
-            ...internalEditToken.value,
-            [e.target.name]: e.target.value,
-          },
-        });
+        if (value) {
+          setInternalEditToken({
+            ...internalEditToken,
+            value: {
+              ...internalEditToken.value,
+              [property]: value,
+            },
+          });
+        } else if (internalEditToken.value) {
+          delete internalEditToken.value[property as keyof typeof internalEditToken.value];
+          setInternalEditToken({
+            ...internalEditToken,
+          });
+        }
       }
     },
     [internalEditToken],
@@ -179,15 +196,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [internalEditToken]);
 
-  const handleBorderValueChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      e.persist();
+  const setTypographyValue = React.useCallback((newTypographyValue: SingleTypographyToken['value']) => {
+    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof newTypographyValue === 'object') {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: { ...newTypographyValue },
+      });
+    }
+  }, [internalEditToken]);
+
+  const handleBorderValueChange = React.useCallback(
+    (property: string, value: string) => {
       if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
         setInternalEditToken({
           ...internalEditToken,
           value: {
             ...internalEditToken.value,
-            [e.target.name]: e.target.value,
+            [property]: value,
           },
         });
       }
@@ -231,11 +256,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleDescriptionChange = React.useCallback(
-    (val: string) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          description: val,
+          description: e.target.value,
         });
       }
     },
@@ -330,41 +355,44 @@ function EditTokenForm({ resolvedTokens }: Props) {
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
+          tokenSets: selectedTokenSets,
           ...($extensions ? { $extensions } : {}),
         });
       }
     }
   };
 
-  const handleSubmit = React.useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError('Value must include either px or rem');
-        return;
-      }
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
-    },
-    [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken],
-  );
-
-  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
-      if (isValid && internalEditToken) {
-        submitTokenValue(internalEditToken);
-        dispatch.uiState.setShowEditForm(false);
-      }
+  const checkAndSubmitTokenValue = React.useCallback(() => {
+    if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+      setError('Value must include either px or rem');
+      return;
     }
-  }, [submitTokenValue, dispatch, internalEditToken, isValid]);
+    if (isValid && internalEditToken) {
+      submitTokenValue(internalEditToken);
+      dispatch.uiState.setShowEditForm(false);
+    }
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+
+  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
+
+  const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
+    if (e.metaKey || e.ctrlKey) {
+      checkAndSubmitTokenValue();
+    }
+  }, [checkAndSubmitTokenValue]);
 
   useShortcut(['Enter'], handleSaveShortcut);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
   }, [dispatch]);
+
+  const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
+    setSelectedTokenSets(selectedItems);
+  }, []);
 
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
@@ -387,6 +415,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             internalEditToken={internalEditToken}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -399,6 +428,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
             resolvedTokens={resolvedTokens}
             handleTypographyValueDownShiftInputChange={handleTypographyValueDownShiftInputChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            setTypographyValue={setTypographyValue}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -408,6 +439,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             internalEditToken={internalEditToken}
             setTokenValue={handleCompositionChange}
             resolvedTokens={resolvedTokens}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -420,6 +452,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -433,6 +466,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleColorDownShiftInputChange={handleDownShiftInputChange}
             handleColorModifyChange={handleColorModifyChange}
             handleRemoveColorModify={removeColorModify}
+            onSubmit={checkAndSubmitTokenValue}
           />
         );
       }
@@ -450,6 +484,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               setInputValue={handleDownShiftInputChange}
               placeholder="Value or {alias}"
               suffix
+              onSubmit={checkAndSubmitTokenValue}
             />
 
             {checkIfContainsAlias(internalEditToken.value) && (
@@ -483,7 +518,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           full
           label="Name"
           value={internalEditToken?.name}
-          onChange={handleChange}
+          onChange={handleNameChange}
           type="text"
           autofocus
           name="name"
@@ -504,6 +539,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
             border
           />
         </Box>
+        {
+          internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
+            <Box>
+              <Heading size="xsmall">Set</Heading>
+              <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
+            </Box>
+          )
+        }
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             Cancel

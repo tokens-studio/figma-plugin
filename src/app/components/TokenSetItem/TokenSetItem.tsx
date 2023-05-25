@@ -12,17 +12,16 @@ import {
   ContextMenuItemIndicator,
   ContextMenuCheckboxItem,
 } from '../ContextMenu';
-import IconGrabber from '@/icons/grabber.svg';
-import { StyledGrabber } from './StyledGrabber';
-import { StyledCheckbox } from './StyledCheckbox';
-import { StyledButton } from './StyledButton';
+import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
 import { RootState } from '@/app/store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
-import { StyledBeforeFlex } from './StyledBeforeFlex';
+import { DragGrabber } from '../StyledDragger/DragGrabber';
+import { StyledDragButton } from '../StyledDragger/StyledDragButton';
+import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -59,9 +58,7 @@ export function TokenSetItem({
   onTreatAsSource,
   onDragStart,
 }: TokenSetItemProps) {
-  const statusSelector = useCallback((state: RootState) => (
-    tokenSetStatusSelector(state, item.path)
-  ), [item]);
+  const statusSelector = useCallback((state: RootState) => tokenSetStatusSelector(state, item.path), [item]);
   const tokenSetStatus = useSelector(statusSelector);
 
   const handleClick = useCallback(() => {
@@ -88,67 +85,66 @@ export function TokenSetItem({
     onCheck(!isChecked, item);
   }, [item, isChecked, onCheck]);
 
-  const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>((event) => {
-    if (onDragStart) onDragStart(event, item);
-  }, [item, onDragStart]);
+  const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>(
+    (event) => {
+      if (onDragStart) onDragStart(event, item);
+    },
+    [item, onDragStart],
+  );
 
-  const renderIcon = useCallback((checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
+  const getCheckboxTooltip = useCallback(() => {
     if (tokenSetStatus === TokenSetStatus.SOURCE) {
-      return <IconIndeterminateAlt />;
+      return 'Source: This set acts as a source for other sets';
     }
-    return fallbackIcon;
-  }, [tokenSetStatus]);
+    if (isChecked) {
+      return 'Active: This set is included in styles and tokens';
+    }
+    return 'Inactive: Activate to include for styles or tokens';
+  }, [isChecked, tokenSetStatus]);
 
-  const tokenSetItemBefore = (
-    <StyledBeforeFlex>
-      {canReorder ? (
-        <StyledGrabber data-testid={`tokensetitem-${item.path}-grabber`} onPointerDown={handleGrabberPointerDown}>
-          <IconGrabber />
-        </StyledGrabber>
-      ) : null}
-    </StyledBeforeFlex>
+  const renderIcon = useCallback(
+    (checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
+      if (tokenSetStatus === TokenSetStatus.SOURCE) {
+        return <IconIndeterminateAlt />;
+      }
+      return fallbackIcon;
+    },
+    [tokenSetStatus],
   );
 
   return (
     <StyledWrapper>
-      {!item.isLeaf ? (
-        <StyledButton
-          itemType="folder"
-          type="button"
-          data-testid={`tokensetitem-${item.path}`}
-          css={{
-            paddingLeft: `${5 * item.level}px`,
-          }}
-          isActive={isActive}
-          onClick={handleClick}
-        >
-          {tokenSetItemBefore}
-          <Box
-            css={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              color: '$textMuted',
-              fontWeight: '$normal',
-              userSelect: 'none',
-            }}
-          >
-            {item.label}
-          </Box>
-          {extraBefore}
-        </StyledButton>
-      ) : (
-        <ContextMenu>
+      <ContextMenu>
+        {!item.isLeaf ? (
           <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
-            <StyledButton
+            <StyledDragButton
+              itemType="folder"
+              type="button"
+              data-testid={`tokensetitem-${item.path}`}
+              css={{
+                padding: '$3 $7 $3 $1',
+                paddingLeft: `${5 * item.level}px`,
+              }}
+              isActive={isActive}
+              onClick={handleClick}
+            >
+              <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
+              {extraBefore}
+            </StyledDragButton>
+          </ContextMenuTrigger>
+        ) : (
+          <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+            <StyledDragButton
               type="button"
               css={{
+                padding: '$3 $6 $3 $1',
                 paddingLeft: `${5 * item.level}px`,
               }}
               data-testid={`tokensetitem-${item.path}`}
               isActive={isActive}
               onClick={handleClick}
             >
-              {tokenSetItemBefore}
+              <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
               <Box
                 css={{
                   overflow: 'hidden',
@@ -158,35 +154,55 @@ export function TokenSetItem({
               >
                 {item.label}
               </Box>
-            </StyledButton>
+            </StyledDragButton>
           </ContextMenuTrigger>
-          {canEdit ? (
-            <ContextMenuContent>
-              <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>
-              <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
-              <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
-                Delete
-              </ContextMenuItem>
-              <ContextMenuSeparator />
-              <ContextMenuCheckboxItem checked={tokenSetStatus === TokenSetStatus.SOURCE} onSelect={handleTreatAsSource}>
+        )}
+        <ContextMenuContent>
+          {canEdit && <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>}
+          {item.isLeaf && (
+            <>
+              {canEdit && (
+                <>
+                  <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
+                  <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
+                    Delete
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                </>
+              )}
+              <ContextMenuCheckboxItem
+                checked={tokenSetStatus === TokenSetStatus.SOURCE}
+                onSelect={handleTreatAsSource}
+              >
                 <ContextMenuItemIndicator>
                   <CheckIcon />
                 </ContextMenuItemIndicator>
                 Treat as source
               </ContextMenuCheckboxItem>
-            </ContextMenuContent>
-          ) : null}
-        </ContextMenu>
-      )}
-
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
       <StyledCheckbox checked={isChecked}>
-        <Checkbox
-          id={item.path}
-          data-testid={`tokensetitem-${item.path}-checkbox`}
-          checked={isChecked}
-          renderIcon={renderIcon}
-          onCheckedChange={handleCheckedChange}
-        />
+        {item.isLeaf ? (
+          <Tooltip label={getCheckboxTooltip()}>
+            <Checkbox
+              id={item.path}
+              data-testid={`tokensetitem-${item.path}-checkbox`}
+              checked={isChecked}
+              renderIcon={renderIcon}
+              onCheckedChange={handleCheckedChange}
+            />
+          </Tooltip>
+        ) : (
+          <Checkbox
+            id={item.path}
+            data-testid={`tokensetitem-${item.path}-checkbox`}
+            checked={isChecked}
+            renderIcon={renderIcon}
+            onCheckedChange={handleCheckedChange}
+          />
+        )}
       </StyledCheckbox>
     </StyledWrapper>
   );

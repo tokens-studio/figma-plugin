@@ -30,11 +30,12 @@ module.exports = (env, argv) => ({
       },
       {
         test: /\.c?js$/,
+        // We don't add an exclude for node_modules as we need to aggressively optimize code deps
+        exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
         use: [
           {
             loader: 'babel-loader',
           },
-          //We don't add an exclude for node_modules as we need to aggressively optimize code deps
         ],
       },
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
@@ -79,11 +80,17 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-  optimization:{
+  // Don't minimize the code in development mode, it causes the plugin to build much slower
+  optimization: argv.mode === 'production' ? {
     nodeEnv: 'production',
     minimize: true,
     usedExports: true,
-    concatenateModules:true
+    concatenateModules: true
+  } : {
+    nodeEnv: 'development',
+    minimize: false,
+    usedExports: true,
+    concatenateModules: false
   },
   output: {
     filename: '[name].js',

@@ -136,10 +136,21 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     .forEach((tokenGroup: [string, SingleToken[]]) => {
       if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
         tokenGroup[1].forEach((token) => {
-          if (!mergedTokens.some((t) => t.name === token.name)) {
+          const mergedTokenIndex = mergedTokens.findIndex((t) => t.name === token.name);
+          const mergedToken = mergedTokens[mergedTokenIndex];
+          if (mergedTokenIndex < 0) {
             mergedTokens.push({
               ...appendTypeToToken(token),
               internal__Parent: tokenGroup[0],
+            } as SingleToken);
+          }
+          if (mergedTokenIndex > -1 && typeof mergedToken.value === 'object' && typeof token.value === 'object') {
+            mergedTokens.splice(mergedTokenIndex, 1, {
+              ...mergedToken,
+              value: {
+                ...token.value,
+                ...mergedToken.value,
+              },
             } as SingleToken);
           }
         });

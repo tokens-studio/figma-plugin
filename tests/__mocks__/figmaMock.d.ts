@@ -12,6 +12,7 @@ export const mockLoadFontAsync: jest.Mock;
 export const mockCreateTextStyle: jest.Mock;
 export const mockCreatePaintStyle: jest.Mock;
 export const mockCreateEffectStyle: jest.Mock;
+export const mockGetStyleById: jest.Mock;
 export const mockImportStyleByKeyAsync: jest.Mock;
 export const mockUiOn: jest.Mock;
 export const mockRootSetSharedPluginData: jest.Mock;

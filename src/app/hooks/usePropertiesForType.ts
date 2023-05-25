@@ -230,7 +230,11 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
           },
         );
         break;
-
+      case TokenTypes.BOOLEAN:
+        properties.push(
+          { label: 'Visibility', name: Properties.visibility },
+        );
+        break;
       default:
         if (isPropertyType(type)) {
           properties.push({

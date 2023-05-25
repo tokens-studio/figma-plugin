@@ -147,7 +147,60 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.dashPattern = [0, 0];
       }
       break;
-
+    case 'borderTop':
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
+        node.strokes = [];
+      }
+      if ('strokeTopWeight' in node && typeof node.strokeTopWeight !== 'undefined') {
+        node.strokeTopWeight = 0;
+      }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
+      break;
+    case 'borderRight':
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
+        node.strokes = [];
+      }
+      if ('strokeRightWeight' in node && typeof node.strokeRightWeight !== 'undefined') {
+        node.strokeRightWeight = 0;
+      }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
+      break;
+    case 'borderBottom':
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
+        node.strokes = [];
+      }
+      if ('strokeBottomWeight' in node && typeof node.strokeBottomWeight !== 'undefined') {
+        node.strokeBottomWeight = 0;
+      }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
+      break;
+    case 'borderLeft':
+      if ('strokes' in node && typeof node.strokes !== 'undefined') {
+        node.strokes = [];
+      }
+      if ('strokeLeftWeight' in node && typeof node.strokeLeftWeight !== 'undefined') {
+        node.strokeLeftWeight = 0;
+      }
+      if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
+        node.dashPattern = [0, 0];
+      }
+      break;
+    case 'visibility':
+      if ('visible' in node && typeof node.visible !== 'undefined') {
+        node.visible = true;
+      }
+      break;
+    case 'textDecoration':
+      if ('textDecoration' in node && typeof node.textDecoration !== 'undefined') {
+        node.textDecoration = 'NONE';
+      }
+      break;
     default:
       break;
   }

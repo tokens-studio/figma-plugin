@@ -32,7 +32,7 @@ export const useADO = () => {
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = React.useCallback((context: AdoCredentials) => {
     const storageClient = new ADOTokenStorage(context);
@@ -77,6 +77,11 @@ export const useADO = () => {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    dispatch.tokenState.setRemoteData({
+      tokens: content?.tokens ?? {},
+      themes: content?.themes ?? [],
+      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
+    });
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
@@ -112,7 +117,7 @@ export const useADO = () => {
           themes,
         };
       } catch (e) {
-        closeDialog();
+        closePushDialog();
         console.log('Error pushing to ADO', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -138,7 +143,7 @@ export const useADO = () => {
     tokens,
     themes,
     pushDialog,
-    closeDialog,
+    closePushDialog,
     localApiState,
   ]);
 

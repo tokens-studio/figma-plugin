@@ -39,11 +39,20 @@ export default async function setValuesOnNode(
   prefixStylesWithThemeName = false,
   baseFontSize = defaultBaseFontSize,
 ) {
-  const activeThemeObject = themeInfo.activeTheme
-    ? themeInfo.themes.find(({ id }) => themeInfo.activeTheme === id) ?? null
-    : null;
+  // Filter activeThemes e.g light, desktop
+  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemeObject ? activeThemeObject.name : null;
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
+
+  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
+  const figmaStyleReferences: Record<string, string> = {};
+  activeThemes?.forEach((theme) => {
+    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
+      if (!figmaStyleReferences[token]) {
+        figmaStyleReferences[token] = styleId;
+      }
+    });
+  });
 
   try {
     // BORDER RADIUS
@@ -79,7 +88,7 @@ export default async function setValuesOnNode(
       // if applied border is just a string, it's the older version where border was just a color. apply color then.
       if (values.border && typeof values.border === 'string' && typeof data.border !== 'undefined') {
         setBorderColorValuesOnTarget({
-          node, data: data.border, value: values.border, stylePathPrefix, stylePathSlice, styleReferences: activeThemeObject?.$figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
+          node, data: data.border, value: values.border, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
         });
       }
 
@@ -154,7 +163,7 @@ export default async function setValuesOnNode(
         let matchingStyleId = matchStyleName(
           data.boxShadow,
           pathname,
-          activeThemeObject?.$figmaStyleReferences ?? {},
+          figmaStyleReferences ?? {},
           figmaStyleMaps.effectStyles,
         );
 
@@ -240,7 +249,7 @@ export default async function setValuesOnNode(
           let matchingStyleId = matchStyleName(
             data.fill,
             pathname,
-            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleReferences ?? {},
             figmaStyleMaps.paintStyles,
           );
 
@@ -277,7 +286,7 @@ export default async function setValuesOnNode(
           let matchingStyleId = matchStyleName(
             data.typography,
             pathname,
-            activeThemeObject?.$figmaStyleReferences ?? {},
+            figmaStyleReferences ?? {},
             figmaStyleMaps.textStyles,
           );
 
@@ -337,7 +346,7 @@ export default async function setValuesOnNode(
       if (typeof values.borderColor !== 'undefined' && typeof values.borderColor === 'string') {
         if ('strokes' in node && data.borderColor) {
           setBorderColorValuesOnTarget({
-            node, data: data.borderColor, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: activeThemeObject?.$figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
+            node, data: data.borderColor, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
           });
         }
       }
@@ -453,6 +462,14 @@ export default async function setValuesOnNode(
         } else if ('resize' in node) {
           const size = transformValue(String(values.dimension), 'sizing', baseFontSize);
           node.resize(size, size);
+        }
+      }
+
+      if ('visible' in node && typeof values.visibility === 'string' && typeof data.visibility !== 'undefined') {
+        if (values.visibility === 'true') {
+          node.visible = true;
+        } else if (values.visibility === 'false') {
+          node.visible = false;
         }
       }
 

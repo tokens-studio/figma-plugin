@@ -64,6 +64,8 @@ import IconExpandArrow from './expand-arrow.svg';
 import IconBorder from './border.svg';
 import IconImage from './image.svg';
 import IconExclamationTriangle from './exclamation-triangle.svg';
+import IconSettings from './settings.svg';
+import IconPencil from './pencil.svg';
 
 export {
   IconAdd,
@@ -132,4 +134,6 @@ export {
   IconBorder,
   IconImage,
   IconExclamationTriangle,
+  IconSettings,
+  IconPencil,
 };

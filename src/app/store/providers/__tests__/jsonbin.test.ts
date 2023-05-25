@@ -2,14 +2,18 @@ import { ThemeObjectsList } from '@/types';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { SingleToken } from '@/types/tokens';
 import { updateJSONBinTokens } from '../jsonbin';
-import * as pjs from '../../../../../package.json';
+import * as pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { createMockStore } from '../../../../../tests/config/setupTest';
+import { createMockStore } from '@/../tests/config/setupTest';
+import {
+  StorageProviderType,
+} from '@/constants/StorageProviderType';
+import { notifyToUI } from '@/plugin/notifiers';
 
 const mockRetrieve = jest.fn();
 const mockSave = jest.fn();
 
-jest.mock('../../../../storage/JSONBinTokenStorage', () => ({
+jest.mock('@/storage/JSONBinTokenStorage', () => ({
   JSONBinTokenStorage: jest.fn().mockImplementation(() => (
     {
       retrieve: mockRetrieve,
@@ -18,7 +22,7 @@ jest.mock('../../../../storage/JSONBinTokenStorage', () => ({
   )),
 }));
 
-jest.mock('../../../../plugin/notifiers', (() => ({
+jest.mock('@/plugin/notifiers', (() => ({
   notifyToUI: jest.fn(),
 })));
 
@@ -45,10 +49,10 @@ describe('jsonbin', () => {
       },
     },
   ];
-  const context = {
+  const context: Partial<StorageTypeCredentials> = {
     name: 'six7',
     id: 'six7/figma-tokens',
-    provider: 'jsonbin',
+    provider: StorageProviderType.JSONBIN,
     secret: 'jsonbin',
   };
   it('return old data when remote data is older', async () => {
@@ -103,11 +107,13 @@ describe('jsonbin', () => {
     }));
     mockSave.mockImplementation(() => Promise.resolve(true));
     await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     });
     expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual(null);
+    expect(notifyToUI).toHaveBeenCalledWith('Error updating tokens as remote is newer, please update first', { error: true });
+    expect(mockSave).not.toBeCalled();
   });
 
   it('return error message when there is a error while retrieving the data', async () => {
@@ -120,10 +126,11 @@ describe('jsonbin', () => {
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     }));
     expect(await updateJSONBinTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context: context as Partial<StorageTypeCredentials>, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
     })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     });
+    expect(notifyToUI).toHaveBeenCalledWith('Error updating JSONBin, check console (F12)', { error: true });
   });
 });

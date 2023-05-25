@@ -155,6 +155,11 @@ export async function updatePluginData({
   const promises: Set<Promise<void>> = new Set();
   entries.forEach(({ node, tokens }) => {
     promises.add(defaultWorker.schedule(async () => {
+      const figmaNode = figma.getNodeById(node.id);
+      if (!figmaNode) {
+        console.warn(`Node with ID ${node.id} no longer exists`);
+        return;
+      }
       const currentValuesOnNode = tokens ?? {};
       let newValuesOnNode: NodeTokenRefMap = {};
       if (values.composition === 'delete') newValuesOnNode = { ...values, ...currentValuesOnNode, composition: values.composition };

@@ -54,9 +54,8 @@ export default function InspectorTokenSingle({
     setNewTokenName(newInputValue.replace(/[{}$]/g, ''));
   }, []);
 
-  const handleChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>((e) => {
-    e.persist();
-    setNewTokenName(e.target.value);
+  const handleChange = React.useCallback((property: string, value: string) => {
+    setNewTokenName(value);
   }, []);
 
   const onConfirm = React.useCallback(() => {
@@ -108,7 +107,7 @@ export default function InspectorTokenSingle({
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
         }
         {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
-        <InspectorResolvedToken token={tokenToDisplay} />
+          <InspectorResolvedToken token={tokenToDisplay} />
         )}
         <Box
           css={{
@@ -137,7 +136,7 @@ export default function InspectorTokenSingle({
               <form
                 onSubmit={onConfirm}
               >
-                <Stack direction="column" gap={4} css={{ minHeight: '215px', justifyContent: 'center' }}>
+                <Stack direction="column" gap={4}>
                   <DownshiftInput
                     value={newTokenName}
                     type={property}
@@ -146,6 +145,7 @@ export default function InspectorTokenSingle({
                     setInputValue={handleDownShiftInputChange}
                     placeholder="Choose a new token"
                     suffix
+                    onSubmit={onConfirm}
                   />
 
                   <Stack direction="row" gap={4} justify="between">

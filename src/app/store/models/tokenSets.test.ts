@@ -18,7 +18,7 @@ describe('toggleUsedTokenSet', () => {
               c: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             usedTokenSet: {
               a: TokenSetStatus.ENABLED,
               b: TokenSetStatus.DISABLED,
@@ -72,7 +72,7 @@ describe('setActiveTokenSet', () => {
               c: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             activeTokenSet: 'c',
             themes: [],
           },
@@ -103,7 +103,7 @@ describe('deleteTokenSet', () => {
               c: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             usedTokenSet: {
               a: TokenSetStatus.DISABLED,
               b: TokenSetStatus.DISABLED,
@@ -153,7 +153,7 @@ describe('renameTokenSet', () => {
               c: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             activeTokenSet: 'a',
             usedTokenSet: {
               a: TokenSetStatus.ENABLED,
@@ -203,7 +203,7 @@ describe('addTokenSet', () => {
               global: 1,
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             usedTokenSet: {
               global: TokenSetStatus.DISABLED,
             },
@@ -247,7 +247,7 @@ describe('setTokenSetOrder', () => {
               c: 3,
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             usedTokenSet: {
               a: TokenSetStatus.DISABLED,
               b: TokenSetStatus.DISABLED,

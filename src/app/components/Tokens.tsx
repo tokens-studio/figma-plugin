@@ -301,7 +301,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           >
             {activeTokensTab === 'json' ? (
               <Box css={{ position: 'relative', height: '100%' }}>
-                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} hasError={Boolean(error)} />
+                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
                 <StatusToast
                   open={Boolean(error)}
                   error={error}
@@ -324,10 +324,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 ))}
                 <ToggleEmptyButton />
                 {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
-                {manageThemesModalOpen && <ManageThemesModal />}
               </Box>
             )}
           </Box>
+          {manageThemesModalOpen && <ManageThemesModal />}
         </Box>
         <TokensBottomBar
           hasJSONError={!!error}

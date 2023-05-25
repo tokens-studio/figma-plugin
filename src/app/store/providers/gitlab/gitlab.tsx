@@ -22,8 +22,8 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
-export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB; }>;
-type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
+type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
 
 export const clientFactory = async (context: GitlabCredentials, multiFileSync: boolean) => {
   const {
@@ -48,7 +48,7 @@ export function useGitLab() {
   const dispatch = useDispatch<Dispatch>();
 
   const { confirm } = useConfirm();
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(clientFactory, []);
 
@@ -87,6 +87,11 @@ export function useGitLab() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    dispatch.tokenState.setRemoteData({
+      tokens: content?.tokens ?? {},
+      themes: content?.themes ?? [],
+      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
+    });
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
@@ -103,9 +108,10 @@ export function useGitLab() {
         }, {
           commitMessage,
         });
+        const latestCommitDate = await storage.getLatestCommitDate();
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
-        dispatch.uiState.setApiData({ ...context, branch: customBranch });
+        dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
@@ -121,7 +127,7 @@ export function useGitLab() {
           metadata: {},
         };
       } catch (e) {
-        closeDialog();
+        closePushDialog();
         console.log('Error pushing to GitLab', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -145,7 +151,7 @@ export function useGitLab() {
     dispatch,
     storageClientFactory,
     pushDialog,
-    closeDialog,
+    closePushDialog,
     tokens,
     themes,
     localApiState,
@@ -166,7 +172,6 @@ export function useGitLab() {
   const pullTokensFromGitLab = useCallback(async (context: GitlabCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
     const storage = await storageClientFactory(context, multiFileSync);
     if (receivedFeatureFlags?.multiFileSync) storage.enableMultiFile();
-
     await checkAndSetAccess({
       context, receivedFeatureFlags,
     });
@@ -183,9 +188,11 @@ export function useGitLab() {
       if (content) {
         // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
         const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+        const latestCommitDate = await storage.getLatestCommitDate();
         return {
           ...content,
           tokens: sortedTokens,
+          ...(latestCommitDate ? { commitDate: latestCommitDate } : {}),
         };
       }
     } catch (e) {
@@ -228,6 +235,7 @@ export function useGitLab() {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
+            const latestCommitDate = await storage.getLatestCommitDate();
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
             saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
@@ -237,6 +245,7 @@ export function useGitLab() {
               activeTheme,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
+            dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
             notifyToUI('Pulled tokens from GitLab');
           }
         }
@@ -291,9 +300,6 @@ export function useGitLab() {
     syncTokensWithGitLab,
     tokens,
     themes,
-    dispatch.tokenState,
-    usedTokenSet,
-    activeTheme,
   ]);
 
   const fetchGitLabBranches = useCallback(async (context: GitlabCredentials) => {
@@ -306,6 +312,19 @@ export function useGitLab() {
     return storage.createBranch(newBranch, source);
   }, [storageClientFactory, multiFileSync]);
 
+  const checkRemoteChangeForGitLab = useCallback(async (context: GitlabCredentials): Promise<boolean> => {
+    const storage = await storageClientFactory(context, multiFileSync);
+    try {
+      const latestCommitDate = await storage.getLatestCommitDate();
+      if (!!latestCommitDate && !!context.commitDate && new Date(latestCommitDate) > new Date(context.commitDate)) {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, [storageClientFactory, multiFileSync]);
+
   return useMemo(() => ({
     addNewGitLabCredentials,
     syncTokensWithGitLab,
@@ -313,6 +332,7 @@ export function useGitLab() {
     pushTokensToGitLab,
     fetchGitLabBranches,
     createGitLabBranch,
+    checkRemoteChangeForGitLab,
   }), [
     addNewGitLabCredentials,
     syncTokensWithGitLab,
@@ -320,5 +340,6 @@ export function useGitLab() {
     pushTokensToGitLab,
     fetchGitLabBranches,
     createGitLabBranch,
+    checkRemoteChangeForGitLab,
   ]);
 }

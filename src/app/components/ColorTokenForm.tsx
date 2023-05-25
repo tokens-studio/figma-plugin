@@ -39,14 +39,16 @@ export default function ColorTokenForm({
   handleColorDownShiftInputChange,
   handleColorModifyChange,
   handleRemoveColorModify,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.COLOR }>;
   resolvedTokens: ResolveTokenValuesResult[];
   resolvedValue: ReturnType<typeof getAliasValue>
-  handleColorChange: React.ChangeEventHandler;
+  handleColorChange: (property: string, value: string) => void;
   handleColorDownShiftInputChange: (newInputValue: string) => void;
   handleColorModifyChange: (newModify: ColorModifier) => void;
   handleRemoveColorModify: () => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
@@ -169,11 +171,11 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const handleModifyValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleModifyValueChange = useCallback((property: string, value: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        value: e.target.value.replace(',', '.'),
+        value: value.replace(',', '.'),
       });
     }
   }, [internalEditToken, handleModifyChange]);
@@ -196,11 +198,11 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const handleMixColorInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMixColorInputChange = useCallback((property: string, value: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
-        color: e.target.value,
+        color: value,
       } as MixModifier);
     }
   }, [internalEditToken, handleModifyChange]);
@@ -222,6 +224,7 @@ export default function ColorTokenForm({
           <ColorPickerTrigger onClick={handleToggleInputHelper} background={String(resolvedValue)} />
         )}
         suffix
+        onSubmit={onSubmit}
       />
       {inputHelperOpen && (
         <ColorPicker value={internalEditToken.value} onChange={handleColorValueChange} />
@@ -313,6 +316,7 @@ export default function ColorTokenForm({
                       <ColorPickerTrigger onClick={handleToggleMixInputHelper} background={String(resolvedMixValue)} />
                     )}
                     suffix
+                    onSubmit={onSubmit}
                   />
                   {inputMixHelperOpen && (
                     <ColorPicker value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color} onChange={handleMixColorChange} />
@@ -330,6 +334,7 @@ export default function ColorTokenForm({
               suffix
               label={getLabel}
               inlineLabel
+              onSubmit={onSubmit}
             />
           </>
         )

@@ -6,7 +6,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 describe('Inspector tokens', () => {
   const mockStartupParams = {
-    activeTheme: null,
+    activeTheme: {},
     lastOpened: Date.now(),
     onboardingExplainer: {
       sets: true,
@@ -34,7 +34,7 @@ describe('Inspector tokens', () => {
       name: 'Jan Six',
     },
     localTokenData: {
-      activeTheme: null,
+      activeTheme: {},
       checkForChanges: false,
       themes: [],
       usedTokenSet: {},
@@ -207,7 +207,7 @@ describe('Inspector tokens', () => {
       timeout: 1000
     });
     cy.get('[data-cy=inspector-token-single-opacity] [data-cy=button-token-remap]').click();
-    cy.get(`input[name=value]`).type('$opacity.100').type('{enter}');
+    cy.get(`[data-cy=mention-input-value]`).type('$opacity.100').type('{enter}');
     cy.receiveSelectionValues({
       selectionValues: [{
         category: "sizing",

@@ -27,7 +27,7 @@ type UpdateTokensOnSourcesPayload = {
   tokenValues: Record<string, AnyTokenList>;
   usedTokenSet: UsedTokenSetsMap;
   themes: ThemeObjectsList;
-  activeTheme: string | null;
+  activeTheme: Record<string, string>;
   settings: SettingsState;
   updatedAt: string;
   shouldUpdateRemote: boolean;
@@ -38,6 +38,7 @@ type UpdateTokensOnSourcesPayload = {
   api: StorageTypeCredentials;
   checkForChanges: boolean;
   shouldSwapStyles?: boolean;
+  collapsedTokenSets: string[];
   dispatch: Dispatch
 };
 
@@ -116,12 +117,13 @@ export default async function updateTokensOnSources({
   lastUpdatedAt,
   checkForChanges,
   shouldSwapStyles,
+  collapsedTokenSets,
   dispatch,
 }: UpdateTokensOnSourcesPayload) {
-  if (tokens && !isLocal && shouldUpdateRemote && !editProhibited) {
+  if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
       provider: storageType.provider,
-      tokens,
+      tokens: tokenValues,
       themes,
       context: api,
       updatedAt,
@@ -144,5 +146,6 @@ export default async function updateTokensOnSources({
     checkForChanges,
     activeTheme,
     shouldSwapStyles,
+    collapsedTokenSets,
   });
 }

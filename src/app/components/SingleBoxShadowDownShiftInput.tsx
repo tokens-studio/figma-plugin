@@ -21,16 +21,17 @@ export default function SingleBoxShadowDownShiftInput({
   handleChange,
   setInputValue,
   handleToggleInputHelper,
+  onSubmit,
 }: {
   name: string,
   value: string;
   type: string;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleChange: React.ChangeEventHandler;
+  handleChange: (property: string, value: string) => void;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
+  onSubmit: () => void
 }) {
-  const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => handleChange(e), [handleChange]);
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
   return (
     <DownshiftInput
@@ -40,7 +41,7 @@ export default function SingleBoxShadowDownShiftInput({
       label={name}
       inlineLabel
       resolvedTokens={resolvedTokens}
-      handleChange={onChange}
+      handleChange={handleChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={
         name === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
@@ -57,6 +58,7 @@ export default function SingleBoxShadowDownShiftInput({
         )
       }
       suffix
+      onSubmit={onSubmit}
     />
   );
 }

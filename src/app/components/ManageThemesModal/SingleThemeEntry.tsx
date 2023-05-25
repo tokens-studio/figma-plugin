@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Box from '../Box';
 import { ThemeObject } from '@/types';
 import Stack from '../Stack';
@@ -9,14 +9,19 @@ import IconButton from '../IconButton';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Switch, SwitchThumb } from '../Switch';
 import { Dispatch } from '@/app/store';
+import { activeThemeSelector } from '@/selectors';
 
 type Props = {
   theme: ThemeObject
   isActive: boolean
+  groupName: string
   onOpen: (theme: ThemeObject) => void
 };
 
-export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) => {
+export const SingleThemeEntry: React.FC<Props> = ({
+  theme, isActive, groupName, onOpen,
+}) => {
+  const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
 
   const tokenSetCount = useMemo(() => (
@@ -34,12 +39,17 @@ export const SingleThemeEntry: React.FC<Props> = ({ theme, isActive, onOpen }) =
   }, [theme, onOpen]);
 
   const handleToggle = useCallback(() => {
-    const nextValue = isActive ? null : theme.id;
-    dispatch.tokenState.setActiveTheme({ themeId: nextValue, shouldUpdateNodes: true });
-  }, [dispatch, theme.id, isActive]);
+    const newActiveTheme = activeTheme;
+    if (isActive) {
+      delete newActiveTheme[groupName];
+    } else {
+      newActiveTheme[groupName] = theme.id;
+    }
+    dispatch.tokenState.setActiveTheme({ newActiveTheme, shouldUpdateNodes: true });
+  }, [dispatch, theme.id, isActive, activeTheme, groupName]);
 
   return (
-    <Box key={theme.id} data-cy="singlethemeentry">
+    <Box key={theme.id} data-cy="singlethemeentry" css={{ width: '100%' }}>
       <Stack direction="row" align="center" justify="between">
         <Stack gap={4} direction="row" align="center">
           <Switch checked={isActive} onCheckedChange={handleToggle}>

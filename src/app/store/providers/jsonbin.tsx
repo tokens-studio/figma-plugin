@@ -41,6 +41,7 @@ export async function updateJSONBinTokens({
     if (oldUpdatedAt) {
       const remoteTokens = await storage.retrieve();
       if (remoteTokens?.status === 'failure') {
+        notifyToUI('Error updating JSONBin, check console (F12)', { error: true });
         console.log('Error updating jsonbin', remoteTokens?.errorMessage);
         return {
           status: 'failure',
@@ -69,6 +70,7 @@ export async function updateJSONBinTokens({
       return payload;
     }
   } catch (e) {
+    notifyToUI('Error updating JSONBin, check console (F12)', { error: true });
     console.log('Error updating jsonbin', e);
   }
 
@@ -86,33 +88,38 @@ export function useJSONbin() {
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
     const updatedAt = new Date().toISOString();
-    const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
-    if (result) {
-      await updateJSONBinTokens({
-        tokens,
-        context: {
-          id: result.metadata.id,
-          secret,
-        },
-        themes,
-        updatedAt,
-        dispatch,
-      });
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: {
-          provider: StorageProviderType.JSONBIN,
-          id: result.metadata.id,
-          internalId,
-          name,
-          secret,
-        },
-      });
-      dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
+    try {
+      const result = await JSONBinTokenStorage.create(name, updatedAt, secret);
 
-      return result.metadata.id;
+      if (result) {
+        await updateJSONBinTokens({
+          tokens,
+          context: {
+            id: result.metadata.id,
+            secret,
+          },
+          themes,
+          updatedAt,
+          dispatch,
+        });
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREDENTIALS,
+          credential: {
+            provider: StorageProviderType.JSONBIN,
+            id: result.metadata.id,
+            internalId,
+            name,
+            secret,
+          },
+        });
+        dispatch.uiState.setProjectURL('https://jsonbin.io/app/bins');
+
+        return result.metadata.id;
+      }
+    } catch (e) {
+      notifyToUI('Something went wrong. See console for details', { error: true });
+      console.error(e);
     }
-    notifyToUI('Something went wrong. See console for details', { error: true });
     return null;
   }, [dispatch, themes, tokens]);
 

@@ -28,13 +28,15 @@ export default function BorderTokenForm({
   handleBorderValueDownShiftInputChange,
   handleBorderAliasValueChange,
   handleDownShiftInputChange,
+  onSubmit,
 }: {
   internalEditToken: Extract<EditTokenObject, { type: TokenTypes.BORDER }>;
   resolvedTokens: ResolveTokenValuesResult[];
-  handleBorderValueChange: React.ChangeEventHandler;
+  handleBorderValueChange: (newInputValue: string, property: string) => void;
   handleBorderValueDownShiftInputChange: (newInputValue: string, property: string) => void;
-  handleBorderAliasValueChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleBorderAliasValueChange: (property: string, value: string) => void;
   handleDownShiftInputChange: (newInputValue: string) => void;
+  onSubmit: () => void
 }) {
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
@@ -45,8 +47,7 @@ export default function BorderTokenForm({
   const selectedToken = React.useMemo(() => {
     const search = findReferences(String(internalEditToken.value));
     if (search && search.length > 0) {
-      const nameToLookFor = search[0].slice(1, search[0].length - 1);
-      const foundToken = resolvedTokens.find((t) => t.name === nameToLookFor);
+      const foundToken = resolvedTokens.find((t) => t.name === search[0]);
       if (foundToken) return foundToken;
     }
     return null;
@@ -98,6 +99,7 @@ export default function BorderTokenForm({
                 handleChange={handleBorderValueChange}
                 setInputValue={handleBorderValueDownShiftInputChange}
                 handleToggleInputHelper={handleToggleInputHelper}
+                onSubmit={onSubmit}
               />
               {inputHelperOpen && key === 'color' && (
                 <ColorPicker value={typeof internalEditToken.value === 'object' && get(internalEditToken.value, key, '')} onChange={onColorChange} />
@@ -118,6 +120,7 @@ export default function BorderTokenForm({
             setInputValue={handleDownShiftInputChange}
             placeholder="Value or {alias}"
             suffix
+            onSubmit={onSubmit}
           />
 
           {isAliasMode && typeof internalEditToken.value === 'string' && checkIfContainsAlias(internalEditToken.value) && (

@@ -27,7 +27,6 @@ export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
-  const { supernovaSync } = useFlags();
 
   switch (values.provider) {
     case StorageProviderType.GITHUB:
@@ -105,7 +104,7 @@ export default function StorageItemForm({
       );
     }
     case StorageProviderType.SUPERNOVA: {
-      return supernovaSync ? (
+      return (
         <SupernovaForm
           onChange={onChange}
           onSubmit={onSubmit}
@@ -114,7 +113,7 @@ export default function StorageItemForm({
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />
-      ) : null;
+      );
     }
     default: {
       return null;

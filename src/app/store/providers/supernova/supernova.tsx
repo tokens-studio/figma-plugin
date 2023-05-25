@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -32,7 +31,7 @@ export function useSupernova() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
   const localApiState = useSelector(localApiStateSelector);
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: SupernovaCredentials) => {
     const storageClient = new SupernovaTokenStorage(context.designSystemUrl, context.mapping, context.secret);
@@ -98,7 +97,7 @@ export function useSupernova() {
             metadata: {},
           };
         } catch (e: any) {
-          closeDialog();
+          closePushDialog();
           // Response can also be JSON because of how Supernova server works
           try {
             const parsedMessage = JSON.parse((e as any).message);
@@ -108,7 +107,9 @@ export function useSupernova() {
                 errorMessage: parsedMessage.message,
               };
             }
-          } catch {}
+          } catch (e) {
+            console.error(e);
+          }
           return {
             status: 'failure',
             errorMessage: (e as any).message,
@@ -123,10 +124,10 @@ export function useSupernova() {
         };
       }
     },
-    [dispatch, storageClientFactory, pushDialog, closeDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
+    [dispatch, storageClientFactory, pushDialog, closePushDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
   );
 
-  const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials, receivedFeatureFlags?: LDProps['flags']): Promise<RemoteResponseData | null> => {
+  const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials): Promise<RemoteResponseData | null> => {
     const storage = storageClientFactory(context);
 
     try {

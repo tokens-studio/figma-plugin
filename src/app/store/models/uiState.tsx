@@ -74,12 +74,15 @@ export interface UIState {
   tokenFilter: string;
   confirmState: ConfirmProps;
   showPushDialog: string | false;
+  showPullDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
   selectedLayers: number;
   manageThemesModalOpen: boolean;
   scrollPositionSet: Record<string, number>;
+  figmaFonts: Font[]
   secondScreenEnabled: boolean;
+  showAutoSuggest: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -126,17 +129,24 @@ export const uiState = createModel<RootModel>()({
     tokenFilterVisible: false,
     confirmState: defaultConfirmState,
     showPushDialog: false,
+    showPullDialog: false,
     showEmptyGroups: true,
     collapsed: false,
     selectedLayers: 0,
     manageThemesModalOpen: false,
     scrollPositionSet: {},
+    figmaFonts: [],
     secondScreenEnabled: false,
+    showAutoSuggest: false,
   } as unknown as UIState,
   reducers: {
     setShowPushDialog: (state, data: string | false) => ({
       ...state,
       showPushDialog: data,
+    }),
+    setShowPullDialog: (state, data: string | false) => ({
+      ...state,
+      showPullDialog: data,
     }),
     setShowConfirm: (
       state,
@@ -360,12 +370,22 @@ export const uiState = createModel<RootModel>()({
         scrollPositionSet: payload,
       };
     },
+    setFigmaFonts(state, payload: Font[]) {
+      return {
+        ...state,
+        figmaFonts: payload,
+      };
+    },
     toggleSecondScreen(state) {
       return {
         ...state,
         secondScreenEnabled: !state.secondScreenEnabled,
       };
     },
+    setShowAutoSuggest: (state, data: boolean) => ({
+      ...state,
+      showAutoSuggest: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {

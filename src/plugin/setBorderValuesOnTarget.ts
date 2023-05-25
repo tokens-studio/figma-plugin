@@ -2,6 +2,7 @@
 import { SingleBorderToken } from '@/types/tokens';
 import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
+import getFigmaDashPattern from './getFigmaDashPattern';
 
 export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>, baseFontSize: string, side?: 'top' | 'right' | 'bottom' | 'left') {
   const { value } = token;
@@ -30,7 +31,7 @@ export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<Si
           newDashPattern = [0, 0];
           break;
         case 'dashed':
-          newDashPattern = [10, 10];
+          newDashPattern = getFigmaDashPattern(transformValue(String(width), 'borderWidth', baseFontSize));
           break;
         default:
           break;

@@ -7,9 +7,16 @@ export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: st
   const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
   if (styleKeyMatch) {
     actualStyleId = await new Promise<string>((resolve) => {
-      figma.importStyleByKeyAsync(styleKeyMatch[1])
-        .then((style) => resolve(style.id))
-        .catch(() => resolve(styleId));
+      const localStyle = figma.getStyleById(styleId);
+      if (localStyle) {
+        resolve(localStyle.id);
+      } else {
+        figma.importStyleByKeyAsync(styleKeyMatch[1])
+          .then((remoteStyle) => resolve(remoteStyle.id))
+          .catch(() => {
+            resolve(styleId);
+          });
+      }
     });
   }
   try {

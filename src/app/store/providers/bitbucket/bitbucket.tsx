@@ -33,7 +33,7 @@ export function useBitbucket() {
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
-  const { pushDialog, closeDialog } = usePushDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback(
     (context: BitbucketCredentials, owner?: string, repo?: string) => {
@@ -87,6 +87,11 @@ export function useBitbucket() {
     }
 
     dispatch.uiState.setLocalApiState({ ...context });
+    dispatch.tokenState.setRemoteData({
+      tokens: content?.tokens ?? {},
+      themes: content?.themes ?? [],
+      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
+    });
 
     const pushSettings = await pushDialog();
     if (pushSettings) {
@@ -117,7 +122,7 @@ export function useBitbucket() {
           themes,
         };
       } catch (e) {
-        closeDialog();
+        closePushDialog();
         console.log('Error pushing to Bitbucket', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
@@ -143,7 +148,7 @@ export function useBitbucket() {
     dispatch.uiState,
     dispatch.tokenState,
     pushDialog,
-    closeDialog,
+    closePushDialog,
     tokens,
     themes,
     localApiState,

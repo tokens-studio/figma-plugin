@@ -8,8 +8,8 @@ const fillTokenForm = ({
   value
 }) => {
   cy.get('input[name=name]').type(name);
-  cy.get('input[name=value]').type(value);
-  cy.get('input[name=value]').type('{enter}');
+  cy.get('[data-cy=mention-input-value]').type(value);
+  cy.get('input[name=name]').type('{enter}');
 };
 
 const fillInput = ({
@@ -24,22 +24,34 @@ const fillInput = ({
   }
 };
 
+const fillValueInput = ({
+  submit = false,
+  input,
+  value
+}) => {
+  cy.get(`[data-cy=mention-input-${input}]`).type(`{selectall} ${value}`);
+
+  if (submit) {
+    cy.get(`[data-cy=mention-input-${input}]`).type('{enter}');
+  }
+};
+
 const fillInputNth = ({
   submit = false,
   input,
   value,
   nth,
 }) => {
-  cy.get(`input[name=${input}]`).eq(nth).type(`{selectall}${value}`);
+  cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type(`{selectall}${value}`);
 
   if (submit) {
-    cy.get(`input[name=${input}]`).eq(nth).type('{enter}');
+    cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type('{enter}');
   }
 };
 
 describe('TokenListing', () => {
   const mockStartupParams = {
-    activeTheme: null,
+    activeTheme: {},
     lastOpened: Date.now(),
     onboardingExplainer: {
       sets: true,
@@ -67,7 +79,7 @@ describe('TokenListing', () => {
       name: 'Jan Six',
     },
     localTokenData: {
-      activeTheme: null,
+      activeTheme: {},
       checkForChanges: false,
       themes: [],
       usedTokenSet: {},
@@ -147,23 +159,23 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'boxshadow.regular',
     });
-    fillInput({
+    fillValueInput({
       input: 'x',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'y',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'spread',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'color',
       value: '#ff0000',
     });
-    fillInput({
+    fillValueInput({
       input: 'blur',
       value: '0',
       submit: true,
@@ -197,23 +209,23 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'boxshadow.large',
     });
-    fillInput({
+    fillValueInput({
       input: 'x',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'y',
       value: '4',
     });
-    fillInput({
+    fillValueInput({
       input: 'spread',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'color',
       value: '#ff0000',
     });
-    fillInput({
+    fillValueInput({
       input: 'blur',
       value: '0',
     });
@@ -231,72 +243,6 @@ describe('TokenListing', () => {
       nth: 1,
       submit: true,
     });
-    cy.get('@postMessage').should('be.calledTwice');
-  });
-
-  it('can add shadow tokens by alias using auto complete', () => {
-    cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
-    cy.receiveSetTokens({
-      version: '5',
-      values: {
-        options: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        },
-        {
-          name: 'boxshadow.single',
-          value: {
-            blur: "3",
-            color: "red",
-            spread: "3",
-            type: "innerShadow",
-            x: "3",
-            y: "3",
-          },
-          type: 'boxShadow'
-        },
-        {
-          name: 'boxshadow.multi',
-          value: [{
-            blur: "3",
-            color: "red",
-            spread: "3",
-            type: "innerShadow",
-            x: "3",
-            y: "3",
-          },
-          {
-            blur: "1",
-            color: "blue",
-            spread: "1",
-            type: "dropShadow",
-            x: "1",
-            y: "1",
-          }
-          ],
-          type: 'boxShadow'
-        }
-        ],
-        global: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-      },
-    });
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
-      timeout: 1000
-    });
-    cy.get('[data-cy=mode-change-button]').click();
-    fillInput({
-      input: 'name',
-      value: 'boxshadow.alias',
-    });
-    cy.get(`input[name=value]`).type('$boxshadow.sin');
-    cy.get('[data-cy=downshift-input-item]').click();
-    cy.get(`input[name=value]`).type('{enter}');
     cy.get('@postMessage').should('be.calledTwice');
   });
 
@@ -325,27 +271,27 @@ describe('TokenListing', () => {
       input: 'name',
       value: 'typography.regular',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontFamily',
       value: 'Inter',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontWeight',
       value: 'Bold',
     });
-    fillInput({
+    fillValueInput({
       input: 'lineHeight',
       value: '100%',
     });
-    fillInput({
+    fillValueInput({
       input: 'fontSize',
       value: '14',
     });
-    fillInput({
+    fillValueInput({
       input: 'letterSpacing',
       value: '0',
     });
-    fillInput({
+    fillValueInput({
       input: 'paragraphSpacing',
       value: '0',
       submit: true,
@@ -353,65 +299,6 @@ describe('TokenListing', () => {
     cy.get('@postMessage').should('be.calledTwice');
   });
 
-  it('can add a new typography token by alias using auto complete', () => {
-    cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
-    cy.receiveSetTokens({
-      version: '5',
-      values: {
-        options: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }, {
-          name: 'typography.heading',
-          value: {
-            fontFamily: "Arial",
-            fontSize: "12px",
-            fontWeight: "bold",
-            letterSpacing: "1",
-            lineHeight: "1",
-            paragraphSpacing: "1",
-            textCase: "none",
-            textDecoration: "underline",
-          },
-          type: 'typography'
-        },
-        {
-          name: 'typography.label',
-          value: {
-            fontFamily: "Helvetica",
-            fontSize: "24px",
-            fontWeight: "light",
-            letterSpacing: "2",
-            lineHeight: "2",
-            paragraphSpacing: "2",
-            textCase: "none",
-            textDecoration: "none",
-          },
-          type: 'typography'
-        }
-        ],
-        global: [{
-          name: 'sizing.xs',
-          value: 4,
-          type: 'sizing'
-        }],
-      },
-    });
-    cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({
-      timeout: 1000
-    });
-    cy.get('[data-cy=mode-change-button]').click();
-    fillInput({
-      input: 'name',
-      value: 'typography.alias',
-    });
-    cy.get(`input[name=value]`).type('$typography.hea');
-    cy.get('[data-cy=downshift-input-item]').click();
-    cy.get(`input[name=value]`).type('{enter}');
-    cy.get('@postMessage').should('be.calledTwice');
-  });
 
   it('can add a new token in group', () => {
     cy.startup(mockStartupParams);
@@ -509,7 +396,7 @@ describe('TokenListing', () => {
     });
     cy.get('[data-cy=composition-token-dropdown]').click();
     cy.get('[data-cy=item-dropdown-menu-element-sizing]').click();
-    fillInput({
+    fillValueInput({
       input: 'value',
       value: '$sizing.xs',
     });

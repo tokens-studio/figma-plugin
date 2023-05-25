@@ -8,28 +8,29 @@ import { Dispatch } from '../../store';
 import {
   collapsedTokenSetsSelector,
 } from '@/selectors';
+import { StyledThemeLabel } from '../ManageThemesModal/StyledThemeLabel';
 
-type TreeOrListItem<ItemType = unknown> = {
+type TreeItem<ItemType = unknown> = {
   key: string
   level: number
   parent: string | null
   isLeaf: boolean
 } & ItemType;
 
-type SharedProps<T extends TreeOrListItem> = {
-  displayType: 'tree' | 'list'
+type SharedProps<T extends TreeItem> = {
   items: T[]
   renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
   renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
+  keyPosition?: 'start' | 'end'
 };
 
-type Props<T extends TreeOrListItem> = SharedProps<T>;
+type Props<T extends TreeItem> = SharedProps<T>;
 
-export function TokenSetListOrTree<T extends TreeOrListItem>({
-  displayType,
+export function TokenSetTreeContent<T extends TreeItem>({
   items,
   renderItem: RenderItem = ({ children }) => React.createElement(React.Fragment, {}, children),
   renderItemContent: RenderItemContent,
+  keyPosition = 'start',
 }: Props<T>) {
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -55,14 +56,17 @@ export function TokenSetListOrTree<T extends TreeOrListItem>({
         <RenderItem key={item.key} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf && displayType === 'tree') && (
+              {(!item.isLeaf) && (
                 <StyledFolderButton
                   type="button"
                   onClick={onToggleCollapsed}
+                  size={keyPosition === 'start' ? 'small' : 'default'}
                 >
+                  {keyPosition === 'start' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
                   <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                     <IconExpandArrow />
                   </StyledFolderButtonChevronBox>
+                  {keyPosition === 'end' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
                 </StyledFolderButton>
               )}
             </RenderItemContent>

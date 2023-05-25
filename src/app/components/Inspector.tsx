@@ -19,18 +19,18 @@ import {
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import Button from './Button';
-import BulkRemapModal from './modals/BulkRemapModal';
+import Input from './Input';
+import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
+import Stack from './Stack';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
-  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
+  const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
-
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => (
     resolveTokenValues(mergeTokenGroups(tokens, {
@@ -39,28 +39,29 @@ function Inspector() {
     }))
   ), [tokens, usedTokenSet, activeTokenSet]);
 
-  function handleSetInspectView(view: string) {
-    setInspectView(view);
-    track('setInspectView', {
-      view,
-    });
-  }
+  const handleSetInspectViewMulti = React.useCallback(() => {
+    setInspectView('multi');
+    track('setInspectView', { view: 'multi' });
+  }, []);
+
+  const handleSetInspectViewDebug = React.useCallback(() => {
+    setInspectView('debug');
+    track('setInspectView', { view: 'debug' });
+  }, []);
 
   function renderInspectView() {
     switch (inspectView) {
       case 'debug': return <InspectorDebugView resolvedTokens={resolvedTokens} />;
-      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} />;
+      case 'multi': return <InspectorMultiView resolvedTokens={resolvedTokens} tokenToSearch={searchInputValue} />;
       default: return null;
     }
   }
 
-  const handleShowBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(true);
+  const handleSearchInputChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInputValue(event.target.value);
   }, []);
 
-  const handleHideBulkRemap = React.useCallback(() => {
-    setShowBulkRemapModalVisible(false);
-  }, []);
+  const handleSetInspectDeep = React.useCallback(() => dispatch.settings.setInspectDeep(!inspectDeep), [dispatch, inspectDeep]);
 
   return (
     <Box css={{
@@ -79,50 +80,49 @@ function Inspector() {
             gap: '$3',
           }}
         >
-          <Checkbox
-            checked={inspectDeep}
-            id="inspectDeep"
-            onCheckedChange={() => dispatch.settings.setInspectDeep(!inspectDeep)}
-          />
-          <Tooltip label="Scans selected layer and all of its children" side="bottom">
-            <Label htmlFor="inspectDeep">
-              <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
-            </Label>
-          </Tooltip>
-        </Box>
-        <Box
-          css={{
-            display: 'flex', gap: '$4', flexDirection: 'row', alignItems: 'center',
-          }}
-        >
-          <Button onClick={handleShowBulkRemap} variant="secondary">
-            Bulk remap
-          </Button>
-          <IconButton
-            variant={inspectView === 'multi' ? 'primary' : 'default'}
-            dataCy="inspector-multi"
-            onClick={() => handleSetInspectView('multi')}
-            icon={<IconInspect />}
-            tooltipSide="bottom"
-            tooltip="Inspect layers"
-          />
-          <IconButton
-            variant={inspectView === 'debug' ? 'primary' : 'default'}
-            dataCy="inspector-debug"
-            onClick={() => handleSetInspectView('debug')}
-            icon={<IconDebug />}
-            tooltipSide="bottom"
-            tooltip="Debug & Annotate"
+          <Input
+            full
+            value={searchInputValue}
+            onChange={handleSearchInputChange}
+            type="text"
+            autofocus
+            placeholder="Search..."
           />
         </Box>
-        {bulkRemapModalVisible && (
-        <BulkRemapModal
-          isOpen={bulkRemapModalVisible}
-          onClose={handleHideBulkRemap}
-        />
-        )}
+        <Stack direction="row" align="center" gap={4}>
+          <Stack direction="row" align="center" gap={2}>
+            <Checkbox
+              checked={inspectDeep}
+              id="inspectDeep"
+              onCheckedChange={handleSetInspectDeep}
+            />
+            <Tooltip label="Scans selected layer and all of its children" side="bottom">
+              <Label htmlFor="inspectDeep">
+                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
+              </Label>
+            </Tooltip>
+          </Stack>
+          <Stack direction="row">
+            <IconButton
+              variant={inspectView === 'multi' ? 'primary' : 'default'}
+              dataCy="inspector-multi"
+              onClick={handleSetInspectViewMulti}
+              icon={<IconInspect />}
+              tooltipSide="bottom"
+              tooltip="Inspect layers"
+            />
+            <IconButton
+              variant={inspectView === 'debug' ? 'primary' : 'default'}
+              dataCy="inspector-debug"
+              onClick={handleSetInspectViewDebug}
+              icon={<IconDebug />}
+              tooltipSide="bottom"
+              tooltip="Debug & Annotate"
+            />
+          </Stack>
+          <InspectSearchOptionDropdown />
+        </Stack>
       </Box>
-
       {renderInspectView()}
     </Box>
   );

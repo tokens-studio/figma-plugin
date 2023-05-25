@@ -11,7 +11,7 @@ export type SetTokenDataPayload = {
   | Record<string, AnyTokenList>
   | Record<string, Partial<Record<TokenTypes, ShallowTokenMap | DeepTokenMap>>>
   themes?: ThemeObjectsList
-  activeTheme?: string | null
+  activeTheme?: Record<string, string>
   shouldUpdate?: boolean;
   usedTokenSet?: UsedTokenSetsMap | null
 };

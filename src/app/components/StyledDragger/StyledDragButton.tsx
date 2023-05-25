@@ -2,8 +2,7 @@ import { styled } from '@/stitches.config';
 import { StyledCheckbox } from './StyledCheckbox';
 import { StyledGrabber } from './StyledGrabber';
 
-export const StyledButton = styled('button', {
-  padding: '$3 $6 $3 $1',
+export const StyledDragButton = styled('button', {
   display: 'flex',
   width: '100%',
   textAlign: 'left',
@@ -25,6 +24,13 @@ export const StyledButton = styled('button', {
       false: {
         '&:focus, &:hover': {
           background: '$bgSubtle',
+        },
+      },
+    },
+    grabberVisible: {
+      true: {
+        [`${StyledGrabber}`]: {
+          opacity: 1,
         },
       },
     },

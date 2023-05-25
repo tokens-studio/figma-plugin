@@ -9,6 +9,7 @@ import {
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('update', () => {
   const findNodesWithDataSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findNodesWithData');
@@ -22,7 +23,9 @@ describe('update', () => {
 
   const mockUpdateMessage: UpdateAsyncMessage = {
     type: AsyncMessageTypes.UPDATE,
-    activeTheme: 'light',
+    activeTheme: {
+      [INTERNAL_THEMES_NO_GROUP]: 'light',
+    },
     themes: [
       {
         id: 'light',
@@ -72,7 +75,7 @@ describe('update', () => {
 
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async () => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: null,
+      activeTheme: {},
       themes: [],
     }));
 

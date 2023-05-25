@@ -17,7 +17,7 @@ export interface TokenData {
     sets: TokenSets | null;
     themes: ThemeObject[];
     usedTokenSets: UsedTokenSetsMap;
-    activeTheme: string | undefined;
+    activeTheme: Record<string, string>;
   };
   last_updated_by: Clients;
 }

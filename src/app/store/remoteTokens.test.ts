@@ -31,10 +31,20 @@ const mockSetBranches = jest.fn();
 const mockConfirm = jest.fn();
 const mockSetShowConfirm = jest.fn();
 const mockPushDialog = jest.fn();
-const mockCloseDialog = jest.fn();
+const mockClosePushDialog = jest.fn();
+const mockShowPullDialog = jest.fn();
+const mockClosePullDialog = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
+const mocksetChangedState = jest.fn();
+const mockResetChangedState = jest.fn();
+const mockGetCommitSha = jest.fn();
+const mockGetLatestCommitDate = jest.fn();
+const mockSetRemoteData = jest.fn();
+
+// Hide log calls unless they are expected
+jest.spyOn(console, 'log').mockImplementation(() => { });
 
 const mockSelector = (selector: Selector) => {
   switch (selector) {
@@ -79,6 +89,9 @@ jest.mock('react-redux', () => ({
       setTokenData: mockSetTokenData,
       setEditProhibited: mockSetEditProhibited,
       setCollapsedTokenSets: mockSetCollapsedTokenSets,
+      setChangedState: mocksetChangedState,
+      resetChangedState: mockResetChangedState,
+      setRemoteData: mockSetRemoteData,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -94,6 +107,7 @@ jest.mock('../../storage/GithubTokenStorage', () => ({
       changePath: mockChangePath,
       selectBranch: mockSelectBrach,
       enableMultiFile: mockEnableMultiFile,
+      getCommitSha: mockGetCommitSha,
       fetchBranches: mockFetchBranches,
       save: mockSave,
       createBranch: mockCreateBranch,
@@ -120,6 +134,7 @@ jest.mock('../../storage/GitlabTokenStorage', () => ({
         fetchBranches: mockFetchBranches,
         save: mockSave,
         createBranch: mockCreateBranch,
+        getLatestCommitDate: mockGetLatestCommitDate,
       })),
     }
   )),
@@ -185,7 +200,14 @@ jest.mock('../hooks/usePushDialog', () => ({
   __esModule: true,
   default: () => ({
     pushDialog: mockPushDialog,
-    closeDialog: mockCloseDialog,
+    closePushDialog: mockClosePushDialog,
+  }),
+}));
+jest.mock('../hooks/usePullDialog', () => ({
+  __esModule: true,
+  default: () => ({
+    showPullDialog: mockShowPullDialog,
+    closePullDialog: mockClosePullDialog,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -198,13 +220,16 @@ const gitHubContext = {
   id: 'six7/figma-tokens',
   provider: 'github',
   secret: 'github',
+  commitSha: '234',
 };
 const gitLabContext = {
+  name: 'six7',
   branch: 'main',
   filePath: 'data/tokens.json',
   id: 'six7/figma-tokens',
   provider: 'gitlab',
   secret: 'gitlab',
+  commitDate: 'Fri Apr 28 2023 22:01:01 GMT+0900',
 };
 const bitbucketContext = {
   name: 'six7',
@@ -454,11 +479,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(1);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -503,11 +523,6 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(0);
         expect(mockSetTokenData).toBeCalledTimes(0);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -542,11 +557,6 @@ describe('remoteTokens', () => {
       await waitFor(() => { result.current.restoreStoredProvider(context as StorageTypeCredentials); });
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(mockPushDialog).toBeCalledTimes(1);
-      } else {
-        expect(mockStartJob).toBeCalledWith({
-          isInfinite: true,
-          name: 'ui_pulltokens',
-        });
       }
     });
   });
@@ -667,7 +677,7 @@ describe('remoteTokens', () => {
           throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
         });
         await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
       });
     }
   });
@@ -734,7 +744,7 @@ describe('remoteTokens', () => {
         });
 
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        expect(mockCloseDialog).toBeCalledTimes(1);
+        expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
           errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
@@ -964,5 +974,23 @@ describe('remoteTokens', () => {
 
   it('Read tokens from File, should return null if there is no file', async () => {
     expect(await result.current.fetchTokensFromFileOrDirectory({ files: null })).toEqual(null);
+  });
+
+  Object.values(contextMap).forEach((context) => {
+    it(`checkRemoteChange from ${context.provider}`, async () => {
+      if (context === gitHubContext) {
+        mockGetCommitSha.mockImplementation(() => (
+          Promise.resolve('456')
+        ));
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(true);
+      } else if (context === gitLabContext) {
+        mockGetLatestCommitDate.mockImplementation(() => (
+          Promise.resolve('Fri Apr 28 2023 23:01:01 GMT+0900')
+        ));
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(true);
+      } else {
+        expect(await result.current.checkRemoteChange(context as StorageTypeCredentials)).toEqual(false);
+      }
+    });
   });
 });

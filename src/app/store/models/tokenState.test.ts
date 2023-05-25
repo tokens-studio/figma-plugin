@@ -4,6 +4,15 @@ import { models } from './index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import * as notifiers from '@/plugin/notifiers';
+import updateTokensOnSources from '../updateSources';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
+
+const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction<typeof updateTokensOnSources>;
+
+jest.mock('../updateSources', () => jest.fn());
+
+// Hide errors unless they are expected
+const consoleError = jest.spyOn(console, 'error').mockImplementation(() => { });
 
 const shadowArray = [
   {
@@ -26,6 +35,75 @@ const shadowArray = [
 
 type Store = RematchStore<RootModel, Record<string, never>>;
 
+const initialTokens = {
+  global: [
+    {
+      name: 'primary',
+      value: '1',
+    },
+    {
+      name: 'alias',
+      value: '$primary',
+    },
+    {
+      name: 'primary50',
+      value: '0.50',
+    },
+    {
+      name: 'alias50',
+      value: '$primary50',
+    },
+    {
+      name: 'header 1',
+      type: 'typography',
+      value: {
+        fontWeight: '400',
+        fontSize: '16',
+      },
+    },
+    {
+      name: 'header 1',
+      type: 'typography',
+      value: {
+        fontWeight: '400',
+        fontSize: '16',
+      },
+    },
+    {
+      name: 'shadow.mixed',
+      type: 'boxShadow',
+      description: 'the one with mixed shadows',
+      value: shadowArray,
+    },
+    {
+      name: 'font.big',
+      type: 'sizing',
+      value: '24px',
+    },
+    {
+      name: 'font.small',
+      type: 'sizing',
+      value: '12px',
+    },
+    {
+      name: 'font.medium',
+      type: 'fontSizes',
+      value: '18px',
+    },
+    {
+      name: 'font.alias',
+      type: 'sizing',
+      value: '$font.small',
+    },
+  ],
+  options: [
+    {
+      name: 'background',
+      value: '$primary',
+    },
+  ],
+};
+
 describe('editToken', () => {
   let store: Store;
   beforeEach(() => {
@@ -33,74 +111,7 @@ describe('editToken', () => {
       redux: {
         initialState: {
           tokenState: {
-            tokens: {
-              global: [
-                {
-                  name: 'primary',
-                  value: '1',
-                },
-                {
-                  name: 'alias',
-                  value: '$primary',
-                },
-                {
-                  name: 'primary50',
-                  value: '0.50',
-                },
-                {
-                  name: 'alias50',
-                  value: '$primary50',
-                },
-                {
-                  name: 'header 1',
-                  type: 'typography',
-                  value: {
-                    fontWeight: '400',
-                    fontSize: '16',
-                  },
-                },
-                {
-                  name: 'header 1',
-                  type: 'typography',
-                  value: {
-                    fontWeight: '400',
-                    fontSize: '16',
-                  },
-                },
-                {
-                  name: 'shadow.mixed',
-                  type: 'boxShadow',
-                  description: 'the one with mixed shadows',
-                  value: shadowArray,
-                },
-                {
-                  name: 'font.big',
-                  type: 'sizing',
-                  value: '24px',
-                },
-                {
-                  name: 'font.small',
-                  type: 'sizing',
-                  value: '12px',
-                },
-                {
-                  name: 'font.medium',
-                  type: 'fontSizes',
-                  value: '18px',
-                },
-                {
-                  name: 'font.alias',
-                  type: 'sizing',
-                  value: '$font.small',
-                },
-              ],
-              options: [
-                {
-                  name: 'background',
-                  value: '$primary',
-                },
-              ],
-            },
+            tokens: initialTokens,
             usedTokenSet: {
               global: TokenSetStatus.ENABLED,
             },
@@ -109,14 +120,27 @@ describe('editToken', () => {
               updatedTokens: [],
             },
             themes: [],
-            activeTheme: null,
+            activeTheme: {},
             activeTokenSet: 'global',
             collapsedTokens: [],
+            remoteData: {
+              tokens: {},
+              themes: [],
+              metadata: null,
+            },
+          },
+          settings: {
+            updateRemote: true,
+            updateOnChange: true,
           },
         },
       },
       models,
     });
+    jest.clearAllMocks();
+  });
+  afterEach(() => {
+    expect(consoleError).not.toHaveBeenCalled();
   });
 
   it('calls updateAliases if old name differs from new name', async () => {
@@ -131,7 +155,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{brand.primary}');
+    expect(tokens.global[1].value).toEqual('$brand.primary');
   });
 
   it('doesnt interfere with tokens that have a similar name', async () => {
@@ -146,7 +170,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global[1].value).toEqual('{secondary}');
+    expect(tokens.global[1].value).toEqual('$secondary');
     expect(tokens.global[3].value).toEqual('$primary50');
     expect(tokens.global[3].value).toEqual('$primary50');
   });
@@ -178,7 +202,7 @@ describe('editToken', () => {
     });
 
     const { tokens } = store.getState().tokenState;
-    expect(tokens.options[0].value).toEqual('{secondary}');
+    expect(tokens.options[0].value).toEqual('$secondary');
   });
 
   it('does a deep equality check on object values', async () => {
@@ -272,7 +296,7 @@ describe('editToken', () => {
   it('can set token data', () => {
     store.dispatch.tokenState.setTokenData({
       values: {},
-      activeTheme: 'base',
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'base' },
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
       },
@@ -326,15 +350,24 @@ describe('editToken', () => {
     const {
       tokens, usedTokenSet,
     } = store.getState().tokenState;
-    expect(tokens).toEqual({
+
+    const expectedTokens = {
       options: [
         {
           name: 'background',
           value: '$primary',
         },
       ],
-    });
+    };
+    expect(tokens).toEqual(expectedTokens);
     expect(usedTokenSet).toEqual({});
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: expectedTokens,
+      shouldUpdateRemote: true,
+    });
   });
 
   it('can treat set a token set as source', () => {
@@ -346,9 +379,10 @@ describe('editToken', () => {
   });
 
   it('can duplicate token set', () => {
-    store.dispatch.tokenState.duplicateTokenSet('global');
+    store.dispatch.tokenState.duplicateTokenSet('global_Copy', 'global');
     const { tokens, usedTokenSet } = store.getState().tokenState;
-    expect(tokens.global_Copy).toEqual([
+
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -407,17 +441,28 @@ describe('editToken', () => {
         type: 'sizing',
         value: '$font.small',
       },
-    ]);
+    ];
+
+    expect(tokens.global_Copy).toEqual(expectedTokens);
     expect(usedTokenSet).toEqual({
       global: TokenSetStatus.ENABLED,
       global_Copy: TokenSetStatus.DISABLED,
+    });
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        ...initialTokens,
+        global_Copy: expectedTokens,
+      },
+      shouldUpdateRemote: true,
     });
   });
 
   it('will notify the UI if the token set to duplicate does not exist', () => {
     const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
     notifyToUISpy.mockReturnValueOnce();
-    store.dispatch.tokenState.duplicateTokenSet('nonexistant');
+    store.dispatch.tokenState.duplicateTokenSet('nonexistant_Copy', 'nonexistant');
     expect(notifyToUISpy).toBeCalledWith('Token set does not exist', { error: true });
   });
 
@@ -447,7 +492,7 @@ describe('editToken', () => {
       value: '#000000',
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -511,10 +556,21 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
       },
-    ]);
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        ...initialTokens,
+        global: expectedTokens,
+      },
+      shouldUpdateRemote: true,
+    });
   });
 
-  it('can create token', () => {
+  it('can create a token with extensions', () => {
     store.dispatch.tokenState.createToken({
       name: 'test',
       parent: 'global',
@@ -531,7 +587,7 @@ describe('editToken', () => {
       },
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -604,7 +660,18 @@ describe('editToken', () => {
           },
         },
       },
-    ]);
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        ...initialTokens,
+        global: expectedTokens,
+      },
+      shouldUpdateRemote: true,
+    });
   });
 
   it('should save tokens from json data', () => {
@@ -663,6 +730,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global', 'options'],
       $extensions: {
         'studio.tokens': {
           modify: {
@@ -672,9 +740,10 @@ describe('editToken', () => {
           },
         },
       },
+      shouldUpdate: true,
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedGlobal = [
       {
         name: 'primary',
         value: '1',
@@ -747,7 +816,40 @@ describe('editToken', () => {
         type: 'sizing',
         value: '$font.small',
       },
-    ]);
+    ];
+    const expectedOptions = [
+      {
+        name: 'background',
+        value: '$primary',
+      },
+      {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            modify: {
+              type: 'lighten',
+              value: '0.5',
+              space: 'sRGB',
+            },
+          },
+        },
+      },
+    ];
+
+    expect(tokens.global).toEqual(expectedGlobal);
+    expect(tokens.options).toEqual(expectedOptions);
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        options: expectedOptions,
+        global: expectedGlobal,
+      },
+      shouldUpdateRemote: true,
+    });
   });
 
   it('can duplicate token without extension', () => {
@@ -757,6 +859,7 @@ describe('editToken', () => {
       parent: 'global',
       value: '1',
       type: 'sizing',
+      tokenSets: ['global'],
     });
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
@@ -832,7 +935,7 @@ describe('editToken', () => {
       path: 'font.big',
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -886,7 +989,18 @@ describe('editToken', () => {
         type: 'sizing',
         value: '$font.small',
       },
-    ]);
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        ...initialTokens,
+        global: expectedTokens,
+      },
+      shouldUpdateRemote: true,
+    });
   });
 
   it('can rename token group', () => {
@@ -898,7 +1012,7 @@ describe('editToken', () => {
       type: 'sizing',
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -955,9 +1069,10 @@ describe('editToken', () => {
       {
         name: 'text.alias',
         type: 'sizing',
-        value: '{text.small}',
+        value: '$text.small',
       },
-    ]);
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
   });
 
   it('can duplicate token group', () => {
@@ -969,7 +1084,7 @@ describe('editToken', () => {
       tokenSets: ['global'],
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         name: 'primary',
         value: '1',
@@ -1043,7 +1158,18 @@ describe('editToken', () => {
         type: 'sizing',
         value: '$font.small',
       },
-    ]);
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
+
+    // Expect that we indicate that the remote should update
+    expect(mockedUpdateTokensOnSources).toHaveBeenCalledTimes(1);
+    expect(mockedUpdateTokensOnSources.mock.calls[0][0]).toMatchObject({
+      tokenValues: {
+        ...initialTokens,
+        global: expectedTokens,
+      },
+      shouldUpdateRemote: true,
+    });
   });
 
   it('should be able to update checkForChanges', () => {
@@ -1077,10 +1203,10 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: 'default',
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
-    expect(activeTheme).toBe('default');
+    expect(activeTheme).toEqual({ [INTERNAL_THEMES_NO_GROUP]: 'default' });
   });
 
   it('should be able to set activeTheme as null when there is no matching theme in themeList', () => {
@@ -1102,10 +1228,10 @@ describe('editToken', () => {
           },
         },
       ],
-      activeTheme: 'default',
+      activeTheme: { [INTERNAL_THEMES_NO_GROUP]: 'default' },
     });
     const { activeTheme } = store.getState().tokenState;
-    expect(activeTheme).toBe(null);
+    expect(activeTheme).toEqual({});
   });
 
   it('should be able to keep activeTokenSet when there is a matching tokenSet in tokenList', () => {
@@ -1149,6 +1275,7 @@ describe('editToken', () => {
           },
         },
       ],
+      shouldUpdate: true,
     });
     const { activeTokenSet } = store.getState().tokenState;
     expect(activeTokenSet).toBe('global');
@@ -1175,7 +1302,7 @@ describe('editToken', () => {
       ],
     });
     const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual([
+    const expectedTokens = [
       {
         type: TokenTypes.COLOR,
         value: '#ff0000',
@@ -1191,6 +1318,227 @@ describe('editToken', () => {
         value: '12px',
         name: 'rounded.md',
       },
+    ];
+    expect(tokens.global).toEqual(expectedTokens);
+  });
+
+  it('can set usedTokenSets', async () => {
+    await store.dispatch.tokenState.setUsedTokenSet({
+      global: TokenSetStatus.DISABLED,
+    });
+
+    const { usedTokenSet } = store.getState().tokenState;
+    expect(usedTokenSet).toEqual({
+      global: 'disabled',
+    });
+  });
+
+  it('can set themes', async () => {
+    await store.dispatch.tokenState.setThemes([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
+      },
     ]);
+
+    const { themes } = store.getState().tokenState;
+    expect(themes).toEqual([
+      {
+        id: 'light',
+        name: 'Light',
+        selectedTokenSets: {
+          global: TokenSetStatus.ENABLED,
+        },
+        $figmaStyleReferences: {},
+      },
+    ]);
+  });
+
+  it('should be able to set changedState', () => {
+    store.dispatch.tokenState.setChangedState({
+      tokens: {
+        global: [
+          {
+            name: 'primary',
+            value: '1',
+          },
+          {
+            name: 'alias',
+            value: '$primary',
+          },
+          {
+            name: 'primary50',
+            value: '0.50',
+          },
+          {
+            name: 'alias50',
+            value: '$primary50',
+          },
+          {
+            name: 'header 1',
+            type: 'typography',
+            value: {
+              fontWeight: '400',
+              fontSize: '16',
+            },
+          },
+          {
+            name: 'header 1',
+            type: 'typography',
+            value: {
+              fontWeight: '400',
+              fontSize: '16',
+            },
+          },
+          {
+            name: 'shadow.mixed',
+            type: 'boxShadow',
+            description: 'the one with mixed shadows',
+            value: shadowArray,
+          },
+          {
+            name: 'font.big',
+            type: 'sizing',
+            value: '24px',
+          },
+          {
+            name: 'font.small',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+        ],
+      },
+      themes: [],
+    });
+    const { changedState } = store.getState().tokenState;
+    expect(changedState).toEqual({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+        options: [
+          {
+            importType: 'REMOVE',
+            name: 'background',
+            value: '$primary',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+    });
+  });
+
+  it('should be able to reset changedState', () => {
+    store.dispatch.tokenState.resetChangedState();
+    const { changedState } = store.getState().tokenState;
+    expect(changedState).toEqual({
+      tokens: {},
+      themes: [],
+    });
+  });
+
+  it('should be able to set remoteData', () => {
+    store.dispatch.tokenState.setRemoteData({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+    });
+    const { remoteData } = store.getState().tokenState;
+    expect(remoteData).toEqual({
+      tokens: {
+        global: [
+          {
+            importType: 'NEW',
+            name: 'font.medium-update',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'UPDATE',
+            name: 'font.small',
+            oldValue: '12px',
+            type: 'sizing',
+            value: '14px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.medium',
+            type: 'fontSizes',
+            value: '18px',
+          },
+          {
+            importType: 'REMOVE',
+            name: 'font.alias',
+            type: 'sizing',
+            value: '$font.small',
+          },
+        ],
+      },
+      themes: [],
+      metadata: null,
+
+    });
   });
 });

@@ -30,6 +30,7 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
+import { notifyToUI } from '@/plugin/notifiers';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles')[]
@@ -231,13 +232,16 @@ export default function useTokens() {
       const enabledTokenSets = Object.entries(usedTokenSet)
         .filter(([, status]) => status === TokenSetStatus.ENABLED)
         .map(([tokenSet]) => tokenSet);
+      if (enabledTokenSets.length === 0) {
+        notifyToUI('No styles created. Make sure token sets are active.', { error: true });
+        return;
+      }
       const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
-      const withoutIgnoredAndSourceTokens = resolved.filter((token) => (
-        !token.name.split('.').some((part) => part.startsWith('_')) // filter out ignored tokens
-        && (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) // filter out SOURCE tokens
+      const withoutSourceTokens = resolved.filter((token) => (
+        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
 
-      const tokensToCreate = withoutIgnoredAndSourceTokens.filter((token) => (
+      const tokensToCreate = withoutSourceTokens.filter((token) => (
         [
           userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
           userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
@@ -250,7 +254,7 @@ export default function useTokens() {
         tokens: tokensToCreate,
         settings,
       });
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds);
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
 

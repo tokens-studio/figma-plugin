@@ -10,7 +10,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 const defaultTokens: TokenStore = {
   version: pjs.plugin_version,
   themes: [],
-  activeTheme: null,
+  activeTheme: {},
   updatedAt: new Date().toString(),
   // @TODO this may not be correct
   values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),

@@ -18,8 +18,9 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
 import Stack from './Stack';
+import BulkRemapModal from './modals/BulkRemapModal';
 
-export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
+export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
   const onboardingData = {
     title: 'Inspect',
     text: 'This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.',
@@ -29,14 +30,26 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
   const inspectState = useSelector(inspectStateSelector, isEqual);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { removeTokensByValue, setNoneValuesOnNode } = useTokens();
+  const [bulkRemapModalVisible, setShowBulkRemapModalVisible] = React.useState(false);
   const dispatch = useDispatch<Dispatch>();
 
   React.useEffect(() => {
     dispatch.inspectState.setSelectedTokens([]);
   }, [uiState.selectionValues]);
 
+  const filteredSelectionValues = React.useMemo(() => {
+    let result = uiState.selectionValues;
+    if (!inspectState.isShowBrokenReferences) {
+      result = result.filter((token) => resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) || token.resolvedValue);
+    }
+    if (!inspectState.isShowResolvedReferences) {
+      result = result.filter((token) => (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue));
+    }
+    return tokenToSearch ? result.filter((token) => token.value.includes(tokenToSearch)) : result;
+  }, [uiState.selectionValues, inspectState.isShowBrokenReferences, inspectState.isShowResolvedReferences, resolvedTokens, tokenToSearch]);
+
   const groupedSelectionValues = React.useMemo(() => (
-    uiState.selectionValues.reduce<Partial<
+    filteredSelectionValues.reduce<Partial<
     Record<TokenTypes, SelectionGroup[]>
     & Record<Properties, SelectionGroup[]>
     >>((acc, curr) => {
@@ -55,7 +68,7 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
 
       return acc;
     }, {})
-  ), [uiState.selectionValues]);
+  ), [filteredSelectionValues]);
 
   const removeTokens = React.useCallback(() => {
     const valuesToRemove = uiState.selectionValues
@@ -84,6 +97,14 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
     setNoneValuesOnNode(resolvedTokens);
   }, [setNoneValuesOnNode, resolvedTokens]);
 
+  const handleShowBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(true);
+  }, []);
+
+  const handleHideBulkRemap = React.useCallback(() => {
+    setShowBulkRemapModalVisible(false);
+  }, []);
+
   return (
     <>
       {uiState.selectionValues.length > 0 && (
@@ -105,6 +126,9 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
           </Label>
         </Box>
         <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+          <Button onClick={handleShowBulkRemap} variant="secondary">
+            Bulk remap
+          </Button>
           <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
             Set to none
           </Button>
@@ -133,6 +157,12 @@ export default function InspectorMultiView({ resolvedTokens }: { resolvedTokens:
           </Stack>
         )}
       </Box>
+      {bulkRemapModalVisible && (
+        <BulkRemapModal
+          isOpen={bulkRemapModalVisible}
+          onClose={handleHideBulkRemap}
+        />
+      )}
     </>
   );
 }

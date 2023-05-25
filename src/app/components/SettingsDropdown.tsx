@@ -11,7 +11,6 @@ import {
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-import { useFlags } from './LaunchDarkly';
 import Box from './Box';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -21,8 +20,6 @@ export default function SettingsDropdown() {
   const {
     updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
-
-  const { swapStylesAlpha } = useFlags();
 
   const {
     setUpdateOnChange, setUpdateRemote, setUpdateStyles, setShouldSwapStyles,
@@ -92,21 +89,19 @@ export default function SettingsDropdown() {
             Updates the value of local styles when names match
           </Box>
         </DropdownMenuCheckboxItem>
-        {swapStylesAlpha && (
-          <DropdownMenuCheckboxItem
-            data-testid="swap-styles-alpha"
-            checked={shouldSwapStyles}
-            onCheckedChange={handleShouldSwapStyles}
-          >
-            <DropdownMenuItemIndicator>
-              <CheckIcon />
-            </DropdownMenuItemIndicator>
-            Swap styles (Alpha)
-            <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-              Swap themes by just changing styles, requires Themes
-            </Box>
-          </DropdownMenuCheckboxItem>
-        )}
+        <DropdownMenuCheckboxItem
+          data-testid="swap-styles"
+          checked={shouldSwapStyles}
+          onCheckedChange={handleShouldSwapStyles}
+        >
+          <DropdownMenuItemIndicator>
+            <CheckIcon />
+          </DropdownMenuItemIndicator>
+          Swap styles
+          <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+            Swap themes by just changing styles, requires Themes
+          </Box>
+        </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

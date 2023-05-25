@@ -23,22 +23,20 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   constructor(url: string, mapping: string, secret: string) {
     super();
     // Deconstruct url to WS ID / DS ID
-    try {
-      const parsedURL = new URL(url);
-      const fragments = parsedURL.pathname.split('/');
-      if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
-        throw new Error(
-          'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
-        );
-      } else {
-        this.workspaceHandle = fragments[2];
-        this.designSystemId = fragments[4].split('-')[0];
-        this.secret = secret;
-        this.mapping = mapping;
-        this.sdkInstance = new Supernova(this.secret, this.networkInstanceFromURL(url), null);
-      }
-    } catch (error) {
-      throw error;
+    const parsedURL = new URL(url);
+    const fragments = parsedURL.pathname.split('/');
+    if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
+      throw new Error(
+        'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
+      );
+    } else {
+      // eslint-disable-next-line prefer-destructuring
+      this.workspaceHandle = fragments[2];
+      // eslint-disable-next-line prefer-destructuring
+      this.designSystemId = fragments[4].split('-')[0];
+      this.secret = secret;
+      this.mapping = mapping;
+      this.sdkInstance = new Supernova(this.secret, this.networkInstanceFromURL(url), null);
     }
   }
 
@@ -47,12 +45,10 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
       // Create Supernova instance, fetch design system and version, checking if this is possible
       const accessor = await this.readWriteInstance();
       let payload: any;
-      let mapping: any;
 
       try {
         const data: any = await accessor.version.getTokenStudioData();
         payload = data.payload; // Discard all the other data that we get from the API and only focus on payload
-        mapping = data.mapping;
       } catch (error) {
         // There is nothing to read, design system didn't have any tokens pushed before.
         return [];
@@ -83,7 +79,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         })),
       ];
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return {
         errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
       };
@@ -92,44 +88,38 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
 
   public async write(
     files: Array<RemoteTokenStorageFile<any>>,
-    saveOptions?: SupernovaStorageSaveOptions,
   ): Promise<boolean> {
     // Create Supernova instance, fetch design system and version
-    try {
-      // Create writable Supernova instance
-      const accessor = await this.readWriteInstance();
-      const dataObject = {
-        $themes: [],
-      } as any;
-      files.forEach((file) => {
-        if (file.type === 'themes') {
-          dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
-        } else if (file.type === 'tokenSet') {
-          dataObject[file.name] = file.data;
-        }
-      });
+    // Create writable Supernova instance
+    const accessor = await this.readWriteInstance();
+    const dataObject = {
+      $themes: [],
+    } as any;
+    files.forEach((file) => {
+      if (file.type === 'themes') {
+        dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
+      } else if (file.type === 'tokenSet') {
+        dataObject[file.name] = file.data;
+      }
+    });
 
-      const mapObject = JSON.parse(this.mapping);
-      const object: any = {
-        connection: {
-          name: 'name',
-        },
-        settings: {
-          dryRun: false,
-          preciseCopy: true,
-          verbose: false,
-        },
-        mapping: mapObject,
-        payload: dataObject,
-      };
+    const mapObject = JSON.parse(this.mapping);
+    const object: any = {
+      connection: {
+        name: 'name',
+      },
+      settings: {
+        dryRun: false,
+        preciseCopy: true,
+        verbose: false,
+      },
+      mapping: mapObject,
+      payload: dataObject,
+    };
 
-      const writer = accessor.version.writer();
-      await writer.writeTokenStudioData(object);
-      return true;
-    } catch (error: any) {
-      // Will throw always when something goes wrong
-      throw error;
-    }
+    const writer = accessor.version.writer();
+    await writer.writeTokenStudioData(object);
+    return true;
   }
 
   private networkInstanceFromURL(url: string): string {

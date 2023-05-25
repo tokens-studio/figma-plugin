@@ -6,14 +6,16 @@ import {
   CheckForChangesProperty,
   ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
+import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
   usedTokenSets: UsedTokenSetsMap
-  activeTheme: string | null
+  activeTheme: Record<string, string>
   updatedAt: string
   checkForChanges: boolean
+  collapsedTokenSets: string[]
 };
 
 export async function updateLocalTokensData(payload: Payload) {
@@ -24,4 +26,5 @@ export async function updateLocalTokensData(payload: Payload) {
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
   await CheckForChangesProperty.write(payload.checkForChanges);
+  await CollapsedTokenSetsProperty.write(payload.collapsedTokenSets);
 }

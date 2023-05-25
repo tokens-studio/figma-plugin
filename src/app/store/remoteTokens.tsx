@@ -13,7 +13,9 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { apiSelector } from '@/selectors';
+import {
+  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
+} from '@/selectors';
 import { UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -24,12 +26,16 @@ import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponse
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { isEqual } from '@/utils/isEqual';
+import usePullDialog from '../hooks/usePullDialog';
+import { Tabs } from '@/constants/Tabs';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
   featureFlags?: LDProps['flags'],
   usedTokenSet?: UsedTokenSetsMap | null
-  activeTheme?: string | null
+  activeTheme?: Record<string, string>
+  collapsedTokenSets?: string[] | null
 };
 
 // @TODO typings and hooks
@@ -37,15 +43,19 @@ type PullTokensOptions = {
 export default function useRemoteTokens() {
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
+  const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
+  const activeTab = useSelector(activeTabSelector);
+  const { showPullDialog, closePullDialog } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
   const {
-    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches,
+    addNewGitHubCredentials, syncTokensWithGitHub, pullTokensFromGitHub, pushTokensToGitHub, createGithubBranch, fetchGithubBranches, checkRemoteChangeForGitHub,
   } = useGitHub();
   const {
-    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch,
+    addNewGitLabCredentials, syncTokensWithGitLab, pullTokensFromGitLab, pushTokensToGitLab, fetchGitLabBranches, createGitLabBranch, checkRemoteChangeForGitLab,
   } = useGitLab();
   const {
     addNewBitbucketCredentials, syncTokensWithBitbucket, pullTokensFromBitbucket, pushTokensToBitbucket, fetchBitbucketBranches, createBitbucketBranch,
@@ -60,14 +70,10 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, usedTokenSet, activeTheme,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_PULLTOKENS,
-      isInfinite: true,
-    });
-
+    showPullDialog('loading');
     let remoteData: RemoteResponseData<unknown> | null = null;
     switch (context.provider) {
       case StorageProviderType.JSONBIN: {
@@ -106,24 +112,65 @@ export default function useRemoteTokens() {
         throw new Error('Not implemented');
     }
     if (remoteData?.status === 'success') {
-      saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
-
-      dispatch.tokenState.setTokenData({
-        values: remoteData.tokens,
-        themes: remoteData.themes,
-        activeTheme: activeTheme ?? null,
-        usedTokenSet: usedTokenSet ?? {},
-      });
-      dispatch.tokenState.setCollapsedTokenSets([]);
-      track('Launched with token sets', {
-        count: Object.keys(remoteData.tokens).length,
-        setNames: Object.keys(remoteData.tokens),
-      });
+      if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
+        let shouldOverride = false;
+        if (activeTab !== Tabs.LOADING) {
+          dispatch.tokenState.setChangedState({
+            tokens: remoteData.tokens,
+            themes: remoteData.themes,
+          });
+          shouldOverride = !!await showPullDialog();
+        }
+        if (shouldOverride || activeTab === Tabs.LOADING) {
+          switch (context.provider) {
+            case StorageProviderType.JSONBIN: {
+              break;
+            }
+            case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+              break;
+            }
+            case StorageProviderType.GITHUB: {
+              dispatch.uiState.setApiData({ ...context, ...(remoteData.commitSha ? { commitSha: remoteData.commitSha } : {}) });
+              break;
+            }
+            case StorageProviderType.BITBUCKET: {
+              break;
+            }
+            case StorageProviderType.GITLAB: {
+              dispatch.uiState.setApiData({ ...context, ...(remoteData.commitDate ? { commitDate: remoteData.commitDate } : {}) });
+              break;
+            }
+            case StorageProviderType.ADO: {
+              break;
+            }
+            case StorageProviderType.URL: {
+              break;
+            }
+            default:
+              break;
+          }
+          saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+          dispatch.tokenState.setTokenData({
+            values: remoteData.tokens,
+            themes: remoteData.themes,
+            activeTheme: activeTheme ?? {},
+            usedTokenSet: usedTokenSet ?? {},
+          });
+          dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+          track('Launched with token sets', {
+            count: Object.keys(remoteData.tokens).length,
+            setNames: Object.keys(remoteData.tokens),
+          });
+        }
+      }
     }
-
-    dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+    dispatch.tokenState.resetChangedState();
+    closePullDialog();
     return remoteData;
   }, [
+    tokens,
+    themes,
+    activeTab,
     dispatch,
     api,
     pullTokensFromGenericVersionedStorage,
@@ -133,6 +180,8 @@ export default function useRemoteTokens() {
     pullTokensFromJSONBin,
     pullTokensFromURL,
     pullTokensFromADO,
+    showPullDialog,
+    closePullDialog,
     pullTokensFromSupernova,
   ]);
 
@@ -372,7 +421,7 @@ export default function useRemoteTokens() {
 
   const fetchTokensFromFileOrDirectory = useCallback(async ({
     files, usedTokenSet, activeTheme,
-  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: string | null }) => {
+  } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: Record<string, string> }) => {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
 
@@ -383,7 +432,7 @@ export default function useRemoteTokens() {
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
           themes: remoteData.themes,
-          activeTheme: activeTheme ?? null,
+          activeTheme: activeTheme ?? {},
           usedTokenSet: usedTokenSet ?? {},
         });
         track('Launched with token sets', {
@@ -400,6 +449,49 @@ export default function useRemoteTokens() {
     readTokensFromFileOrDirectory,
   ]);
 
+  const checkRemoteChange = useCallback(async (context: StorageTypeCredentials = api): Promise<boolean> => {
+    track('checkRemoteChange', { provider: context.provider });
+    let hasChange = false;
+    switch (context.provider) {
+      case StorageProviderType.JSONBIN: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GITHUB: {
+        hasChange = await checkRemoteChangeForGitHub(context);
+        break;
+      }
+      case StorageProviderType.BITBUCKET: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.GITLAB: {
+        hasChange = await checkRemoteChangeForGitLab(context);
+        break;
+      }
+      case StorageProviderType.ADO: {
+        hasChange = false;
+        break;
+      }
+      case StorageProviderType.URL: {
+        hasChange = false;
+        break;
+      }
+      default:
+        hasChange = false;
+        break;
+    }
+    return hasChange;
+  }, [
+    api,
+    checkRemoteChangeForGitHub,
+    checkRemoteChangeForGitLab,
+  ]);
+
   return useMemo(() => ({
     restoreStoredProvider,
     deleteProvider,
@@ -409,6 +501,7 @@ export default function useRemoteTokens() {
     fetchBranches,
     addNewBranch,
     fetchTokensFromFileOrDirectory,
+    checkRemoteChange,
   }), [
     restoreStoredProvider,
     deleteProvider,
@@ -418,5 +511,6 @@ export default function useRemoteTokens() {
     fetchBranches,
     addNewBranch,
     fetchTokensFromFileOrDirectory,
+    checkRemoteChange,
   ]);
 }

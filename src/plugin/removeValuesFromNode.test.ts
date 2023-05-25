@@ -55,6 +55,8 @@ describe('removeTokensByValue', () => {
       paddingBottom: 10,
       paddingLeft: 10,
       itemSpacing: 10,
+      textDecoration: 'underline',
+      visible: false,
     } as unknown) as BaseNode;
   });
 
@@ -138,6 +140,30 @@ describe('removeTokensByValue', () => {
     expect(mockNode.strokes).toEqual([]);
   });
 
+  it('should set strokeTopWeight as zero', () => {
+    removeValuesFromNode(mockNode, Properties.borderTop);
+    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokeTopWeight).toEqual(0);
+  });
+
+  it('should set strokeRightWeight as zero', () => {
+    removeValuesFromNode(mockNode, Properties.borderRight);
+    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokeRightWeight).toEqual(0);
+  });
+
+  it('should set strokeBottomWeight as zero', () => {
+    removeValuesFromNode(mockNode, Properties.borderBottom);
+    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokeBottomWeight).toEqual(0);
+  });
+
+  it('should set strokeLeftWeight as zero', () => {
+    removeValuesFromNode(mockNode, Properties.borderLeft);
+    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokeLeftWeight).toEqual(0);
+  });
+
   it('should set all spacings as 0', () => {
     removeValuesFromNode(mockNode, Properties.spacing);
     expect(mockNode.paddingLeft).toBe(0);
@@ -192,5 +218,15 @@ describe('removeTokensByValue', () => {
   it('should set cornerRadius as 0', () => {
     removeValuesFromNode(mockNode, Properties.borderColor);
     expect(mockNode.strokes).toEqual([]);
+  });
+
+  it('should set textDecoration as none', () => {
+    removeValuesFromNode(mockNode, Properties.textDecoration);
+    expect(mockNode.textDecoration).toEqual('NONE');
+  });
+
+  it('should set visible as true when removing values from node', () => {
+    removeValuesFromNode(mockNode, Properties.visibility);
+    expect(mockNode.visible).toEqual(true);
   });
 });

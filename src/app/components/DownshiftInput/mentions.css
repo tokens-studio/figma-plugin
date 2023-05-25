@@ -1,0 +1,103 @@
+.rc-mentions {
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  white-space: pre-wrap;
+}
+
+.rc-mentions > textarea,
+.rc-mentions-measure {
+  width: 100%;
+  height: 28px !important;
+  font-style: inherit;
+  font-variant: inherit;
+  font-stretch: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  padding: var(--space-2) var(--space-3);
+  word-break: inherit;
+  white-space: inherit;
+  word-wrap: break-word;
+  overflow-x: initial;
+  overflow-y: auto;
+}
+
+.rc-mentions > textarea {
+  border: 1px solid var(--colors-borderMuted);
+  border-radius: var(--radii-input);
+  background: transparent;
+  font-size: var(--fontSizes-small);
+}
+
+.rc-mentions > textarea::placeholder {
+  color: var(--colors-textSubtle);
+}
+
+.rc-mentions > textarea:focus-within {
+  box-shadow: var(--shadows-focus);
+}
+
+.rc-mentions-measure {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28;
+  bottom: 0;
+  pointer-events: none;
+  font-size: 0;
+  z-index: 10;
+}
+
+.rc-mentions-dropdown {
+  position: absolute;
+  border-radius: var(--radii-medium);
+  z-index: 10;
+}
+
+.rc-mentions-dropdown-menu {
+  width: 70vw;
+  margin: 0;
+  padding: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  margin: 0px;
+  padding: 0px;
+  list-style-type: none;
+  font-size: var(--fontSizes-small);
+  padding: var(--space-2);
+  border-radius: var(--radii-contextMenu);
+  box-shadow: var(--shadows-contextMenu);
+  background: var(--colors-bgDefault);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.rc-mentions-dropdown-menu-item {
+  width: 100%;
+  min-width: 150px;
+  position: relative;
+}
+
+.rc-mentions-dropdown-menu-item:focus {
+  background: var(--colors-interaction);
+}
+
+.rc-mentions-dropdown-menu-item-active {
+  background: var(--colors-interaction);
+}
+
+/* width */
+.rc-mentions-dropdown-menu::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+.rc-mentions-dropdown-menu::-webkit-scrollbar-track {
+  background: var(--canvas-Muted);
+}
+
+/* Handle */
+.rc-mentions-dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--colors-borderMuted);
+  border-radius: 10px;
+}

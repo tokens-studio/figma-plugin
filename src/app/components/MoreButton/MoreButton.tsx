@@ -122,7 +122,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   );
 
   const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (event.metaKey) {
+    if (event.metaKey || (event.ctrlKey && event.altKey)) {
       handleEditClick();
     } else {
       handleClick(properties[0]);

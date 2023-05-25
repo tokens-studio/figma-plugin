@@ -16,7 +16,7 @@ describe('Branch switcher', () => {
   };
 
   const mockStartupParams = {
-    activeTheme: null,
+    activeTheme: {},
     lastOpened: Date.now(),
     onboardingExplainer: {
       sets: true,
@@ -44,7 +44,7 @@ describe('Branch switcher', () => {
       name: 'Jan Six',
     },
     localTokenData: {
-      activeTheme: null,
+      activeTheme: {},
       checkForChanges: false,
       themes: [],
       usedTokenSet: {},
@@ -107,7 +107,7 @@ describe('Branch switcher', () => {
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
     cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
-    cy.get('button[type=submit]').click();
+    cy.get('[data-cy=push-dialog-button-push-changes]').click();
     cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });
 
@@ -139,7 +139,7 @@ describe('Branch switcher', () => {
     });
     cy.get('[data-cy=footer-push-button]').click();
     cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
-    cy.get('button[type=submit]').click();
+    cy.get('[data-cy=push-dialog-button-push-changes]').click();
     cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
   });
 });

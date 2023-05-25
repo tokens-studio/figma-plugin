@@ -33,6 +33,11 @@ const checkForChangesPropertyReadSpy = jest.spyOn(CheckForChangesProperty, 'read
 const licenseKeyPropertyReadSpy = jest.spyOn(LicenseKeyProperty, 'read');
 const validateLicenseSpy = jest.spyOn(validateLicenseModule, 'default');
 
+// Hide error calls unless they are expected. This is mainly related to react-modal
+jest.spyOn(console, 'error').mockImplementation(() => { });
+// Hide warn calls from shortcut hooks
+jest.spyOn(console, 'warn').mockImplementation(() => { });
+
 const mockUser = {
   figmaId: 'figma:1234',
   userId: 'uid:1234',
@@ -112,7 +117,7 @@ const mockThemes: ThemeObjectsList = [
 
 const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
-  activeTheme: null,
+  activeTheme: {},
   lastOpened: Date.now(),
   onboardingExplainer: {
     sets: true,
@@ -126,7 +131,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   },
   user: mockUser,
   localTokenData: {
-    activeTheme: null,
+    activeTheme: {},
     checkForChanges: true,
     themes: [],
     usedTokenSet: {},

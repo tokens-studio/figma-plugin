@@ -2,6 +2,7 @@ import omit from 'just-omit';
 import type { TokenState } from '@/app/store/models/tokenState';
 import type { AnyTokenList } from '@/types/tokens';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { tokenSetListToTree } from './tokenSetListToTree';
 
 export function updateTokenSetsInState(
   state: TokenState,
@@ -92,9 +93,16 @@ export function updateTokenSetsInState(
     });
   }
 
+  const updatedTokens = Object.fromEntries(entries);
+  const tokenSetItems = tokenSetListToTree(entries.map(([tokenSet]) => tokenSet));
+  const newTokens = {};
+  tokenSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path).forEach((set) => {
+    Object.assign(newTokens, { [set]: updatedTokens[set] });
+  });
+
   return {
     ...state,
-    tokens: Object.fromEntries(entries),
+    tokens: newTokens,
     activeTokenSet: nextActiveTokenSet,
     usedTokenSet: nextUsedTokenSet,
     themes: nextThemes,

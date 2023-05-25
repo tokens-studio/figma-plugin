@@ -12,11 +12,12 @@ import Heading from '../Heading';
 import Link from '../Link';
 import Textarea from '../Textarea';
 import { ErrorMessage } from '../ErrorMessage';
+import Label from '../Label';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.SUPERNOVA }>;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
   onSubmit: (values: ValidatedFormValues) => void;
   onCancel: () => void;
   hasErrored?: boolean;
@@ -50,7 +51,7 @@ export default function SupernovaForm({
   }, [values, onSubmit]);
 
   const handleMappingChange = React.useCallback(
-    (val: string, event: React.ChangeEvent<any>) => {
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange(event);
     },
     [onChange],
@@ -92,11 +93,9 @@ export default function SupernovaForm({
           name="designSystemUrl"
           required
         />
-        <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
-          <label htmlFor="mapping" className="block font-medium text-xxs">
-            Supernova &lt;&gt; Tokens Studio mapping
-          </label>
-        </Stack>
+        <Label htmlFor="mapping">
+          Supernova &lt;&gt; Tokens Studio mapping
+        </Label>
         <Textarea
           id="mapping"
           name="mapping"

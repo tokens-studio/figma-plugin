@@ -7,7 +7,7 @@ describe('startup', () => {
     const result = await startup();
     expect(result).toEqual({
       settings: {},
-      activeTheme: null,
+      activeTheme: {},
       authData: null,
       lastOpened: 0,
       onboardingExplainer: {
@@ -43,7 +43,7 @@ describe('startup', () => {
     const result = await startup();
     expect(result).toEqual({
       settings: {},
-      activeTheme: null,
+      activeTheme: {},
       authData: null,
       lastOpened: 0,
       onboardingExplainer: {
@@ -55,8 +55,9 @@ describe('startup', () => {
       localApiProviders: null,
       licenseKey: null,
       localTokenData: {
-        activeTheme: null,
+        activeTheme: {},
         checkForChanges: null,
+        collapsedTokenSets: null,
         themes: [],
         updatedAt: '',
         usedTokenSet: null,

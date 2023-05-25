@@ -26,6 +26,7 @@ describe('SingleThemeEntry', () => {
           isActive={false}
           theme={mockThemeObject}
           onOpen={mockOpen}
+          groupName="groupA"
         />
       </Provider>,
     );
@@ -39,6 +40,6 @@ describe('SingleThemeEntry', () => {
 
     const toggleSwitch = await result.findByRole('switch');
     act(() => toggleSwitch.click());
-    expect(mockStore.getState().tokenState.activeTheme).toEqual('light');
+    expect(mockStore.getState().tokenState.activeTheme).toEqual({ groupA: 'light' });
   });
 });

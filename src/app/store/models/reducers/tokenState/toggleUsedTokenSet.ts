@@ -4,7 +4,7 @@ import type { TokenState } from '../../tokenState';
 export function toggleUsedTokenSet(state: TokenState, tokenSet: string): TokenState {
   return {
     ...state,
-    activeTheme: null,
+    activeTheme: {},
     usedTokenSet: {
       ...state.usedTokenSet,
       // @README it was decided the user can not simply toggle to the intermediate SOURCE state
