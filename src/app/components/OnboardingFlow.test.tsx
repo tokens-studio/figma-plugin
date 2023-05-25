@@ -23,6 +23,6 @@ describe('Settings Component', () => {
         <OnboardingFlow />
       </Provider>,
     );
-    expect(result.getByText('Welcome!')).toBeInTheDocument();
+    expect(result.getByText('welcome')).toBeInTheDocument();
   });
 });

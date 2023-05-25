@@ -1,0 +1,14 @@
+{
+    "editCredentials": "Referenties bewerken",
+    "addNew": "Nieuw toevoegen",
+    "pat": "Persoonlijk toegangstoken",
+    "credentials": "referenties",
+    "gitExplained": "Toegang tot tokens die zijn opgeslagen in uw repository, push- en pull-tokens in tweerichtingssynchronisatie.",
+    "readMore": "Lees verder",
+    "cancel": "Annuleren",
+    "repo": "Repository (eigenaar/repo)",
+    "branch": "Tak",
+    "baseUrl": "basisUrl (optioneel)",
+    "saveCredentials": "Bewaar inloggegevens",
+    "filePath": "Bestandspad (bijv. tokens.json) of mappad (bijv. tokens)"
+}

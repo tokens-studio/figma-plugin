@@ -1,0 +1,14 @@
+{
+    "editCredentials": "Modifier les informations d'identification",
+    "addNew": "Ajouter nouveau",
+    "pat": "Jeton d'accès personnel",
+    "credentials": "crédits",
+    "gitExplained": "Accédez aux jetons stockés sur votre référentiel, poussez et tirez les jetons dans une synchronisation bidirectionnelle.",
+    "readMore": "En savoir plus",
+    "cancel": "Annuler",
+    "repo": "Référentiel (propriétaire/dépôt)",
+    "branch": "Bifurquer",
+    "baseUrl": "baseUrl (optionnel)",
+    "saveCredentials": "Enregistrer les informations d'identification",
+    "filePath": "Chemin du fichier (par exemple, tokens.json) ou chemin du dossier (par exemple, jetons)"
+}

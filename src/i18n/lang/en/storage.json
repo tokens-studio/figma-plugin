@@ -1,0 +1,14 @@
+{
+    "editCredentials": "Edit credentials",
+    "addNew": "Add new",
+    "pat":"Personal Access Token",
+    "credentials": "credentials",
+    "gitExplained": "Access tokens stored on your repository, push and pull tokens in a two-way sync.",
+    "readMore": "Read more",
+    "cancel": "Cancel",
+    "repo":"Repository (owner/repo)",
+    "branch": "Branch",
+    "baseUrl": "baseUrl (optional)",
+    "saveCredentials": "Save credentials",
+    "filePath": "File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
+}

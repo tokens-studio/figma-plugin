@@ -1,0 +1,10 @@
+{
+    "whereTokensStored": "设置应存储令牌的位置",
+    "whereTokensStoredOnboarding": "将您的代币连接到您可以推送和拉取的外部真实来源。这允许您跨文件使用令牌。",
+    "baseFontExplanation": "让您配置 1rem 代表的值。您也可以将它设置为一个标记，让它在集合之间改变。",
+    "ignorePrefix": "忽略样式的令牌名称的第一部分",
+    "prefixStyles": "带有活动主题名称的前缀样式",
+    "prefixStylesExplanation": "将活动主题名称添加到创建的任何样式。注意：将此与多维主题一起使用会导致意想不到的结果。",
+    "baseFont": "基本字体大小标记",
+    "resetOnboarding": "重置入职"
+}

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import Heading from './Heading';
@@ -43,6 +44,7 @@ const HelpfulLink = styled('a', {
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation('', { keyPrefix: 'startScreen' });
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
@@ -88,49 +90,53 @@ function StartScreen() {
           <StyledFigmaTokensLogo />
         </Stack>
         <Text muted>
-          Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.
+          {t('intro')}
         </Text>
         <Stack direction="column" gap={4}>
-          <Heading size="large">Guides</Heading>
+          <Heading size="large">
+            {' '}
+            {t('guides')}
+          </Heading>
           <Stack direction="column" gap={3}>
             <HelpfulLink href="https://docs.tokens.studio/getting-started?ref=startscreen" target="_blank">
               <BookmarkIcon />
-              Getting started
+              {t('gettingStarted')}
+
             </HelpfulLink>
             <HelpfulLink href="https://docs.tokens.studio/?ref=startscreen" target="_blank">
               <ReaderIcon />
-              Documentation
+              {t('documentation')}
             </HelpfulLink>
             <HelpfulLink href="https://tokens.studio/slack" target="_blank">
               <ChatBubbleIcon />
-              Join our Slack
+              {t('joinSlack')}
             </HelpfulLink>
           </Stack>
         </Stack>
         {storageType?.provider !== StorageProviderType.LOCAL ? (
           <Callout
             id="callout-action-setupsync"
-            heading={`Couldn't load tokens stored on ${transformProviderName(storageType?.provider)}`}
-            description="Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
+            heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
+            description={t('unableToFetchRemote')}
             action={{
               onClick: onSetSyncClick,
-              text: 'Enter credentials',
+              text: t('enterCredentials'),
             }}
           />
         ) : (
           <Stack direction="row" gap={2}>
             <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
-              New empty file
+              {t('newEmptyFile')}
             </Button>
             <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
-              Load example
+              {t('loadExample')}
             </Button>
           </Stack>
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
           <a href="https://github.com/tokens-studio/figma-plugin" style={{ textDecoration: 'underline', color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer">
-            Found an issue? We&#39;re on GitHub!
+            {t('foundIssue')}
           </a>
         </Stack>
       </Stack>

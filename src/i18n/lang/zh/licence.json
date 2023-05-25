@@ -1,0 +1,11 @@
+{
+    "pro": "临",
+    "getPro": "获得专业版",
+    "removeKey": "取下钥匙",
+    "License key": "注册码",
+    "Manage subscription": "管理订阅",
+    "addLicenseKey": "添加许可证密钥",
+    "keepLicenceSafe": "确保您在某处保存了许可证密钥的副本，因为它在您删除后不会存储在此设备上。",
+    "confirmRemove": "您确定要删除您的许可证密钥吗？",
+    "removeLicenceKey": "删除许可证密钥"
+}

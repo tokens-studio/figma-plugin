@@ -4,6 +4,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
+import { useTranslation } from 'react-i18next';
 import Box from '../Box';
 import Input from '../Input';
 import Button from '../Button';
@@ -31,6 +32,8 @@ export default function AddLicenseKey() {
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
 
+  const { t } = useTranslation('', { keyPrefix: 'licence' });
+
   const addKey = useCallback(async () => {
     if (newKey) {
       await dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
@@ -50,17 +53,16 @@ export default function AddLicenseKey() {
       dispatch.userState.removeLicenseKey('');
     } else {
       const confirmation = await confirm({
-        text: 'Are you sure you want to remove your license key?',
-        description: `Make sure you saved a copy of the license key somewhere,                    
-          as it won’t be stored on this device after you deleted it.`,
-        confirmAction: 'Remove license key',
+        text: t('confirmRemove') as string,
+        description: t('keepLicenceSafe'),
+        confirmAction: t('removeLicenceKey') as string,
       });
       if (confirmation) {
         dispatch.userState.removeLicenseKey('');
         removeAccessToFeatures();
       }
     }
-  }, [dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
+  }, [t, dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
     color: '$fgAccent',
@@ -85,25 +87,27 @@ export default function AddLicenseKey() {
 
   const addLicenseKeyButton = !existingKey && (
     <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-      Add license key
+      {t('addLicenseKey')}
     </Button>
   );
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="primary" onClick={removeKey}>
-      Remove key
+      {t('removeKey')}
     </Button>
   );
 
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="small">License key</Heading>
+        <Heading size="small">
+          {t('License key')}
+        </Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && !licenseKeyError && (
             <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
-              Manage subscription
+              {t('Manage subscription')}
             </ManageSubscriptionLink>
           )}
         </Stack>

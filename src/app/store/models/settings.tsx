@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
+import i18next from 'i18next';
 import { track } from '@/utils/analytics';
 import { RootModel } from '@/types/RootModel';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -18,6 +19,7 @@ type WindowSettingsType = {
 type TokenModeType = 'object' | 'array';
 
 export interface SettingsState {
+  language: string,
   uiWindow?: WindowSettingsType;
   updateMode: UpdateMode;
   updateRemote: boolean;
@@ -46,6 +48,7 @@ export const settings = createModel<RootModel>()({
       height: 600,
       isMinimized: false,
     },
+    language: 'en',
     updateMode: UpdateMode.PAGE,
     updateRemote: true,
     updateOnChange: true,
@@ -64,6 +67,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         inspectDeep: payload,
+      };
+    },
+    setLanguage(state, payload: string) {
+      return {
+        ...state,
+        language: payload,
       };
     },
     setWindowSize(state, payload: { width: number; height: number }) {
@@ -156,6 +165,12 @@ export const settings = createModel<RootModel>()({
     },
   },
   effects: (dispatch) => ({
+    setLanguage: (payload: string, rootState) => {
+      i18next.changeLanguage(payload);
+      console.log(i18next.languages);
+      console.log(i18next);
+      setUI(rootState.settings);
+    },
     setWindowSize: (payload) => {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.RESIZE_WINDOW,

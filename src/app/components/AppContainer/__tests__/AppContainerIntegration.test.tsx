@@ -45,6 +45,7 @@ const mockUser = {
 };
 
 const mockSettings: SavedSettings = {
+  language: 'en',
   width: 800,
   height: 500,
   ignoreFirstPartForStyles: false,

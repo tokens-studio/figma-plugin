@@ -1,0 +1,10 @@
+{
+    "whereTokensStored": "Stel in waar tokens moeten worden opgeslagen",
+    "whereTokensStoredOnboarding": "Verbind uw tokens met een externe bron van waarheid waarnaar u kunt duwen en trekken. Hierdoor kunt u tokens in verschillende bestanden gebruiken.",
+    "baseFontExplanation": "Hiermee kunt u de waarde configureren die 1rem vertegenwoordigt. Je kunt dit ook instellen op een token, om het tussen sets te laten veranderen.",
+    "ignorePrefix": "Negeer het eerste deel van de tokennaam voor stijlen",
+    "prefixStyles": "Voorvoegselstijlen met actieve themanaam",
+    "prefixStylesExplanation": "Voegt de naam van het actieve thema toe aan alle gemaakte stijlen. Opmerking: als u dit gebruikt met multidimensionale thema's, leidt dit tot onverwachte resultaten.",
+    "baseFont": "Token voor basistekengrootte",
+    "resetOnboarding": "Onboarding resetten"
+}

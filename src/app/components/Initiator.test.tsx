@@ -621,6 +621,7 @@ describe('Initiator', () => {
         height: 300,
         isMinimized: false,
       },
+      language: 'en',
       shouldSwapStyles: false,
       tokenType: 'object',
       updateMode: UpdateMode.PAGE,

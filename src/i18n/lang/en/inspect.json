@@ -1,0 +1,12 @@
+{
+    "inspect":"Inspect",
+    "inspectOnboard":"This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.",
+    "selectAll":"Select all",
+    "bulkRemap":"Bulk remap",
+    "setToNone":"Set to none",
+    "removeSelected":"Remove selected",
+    "noTokensFound":"No tokens found",
+    "noLayersSelected":"No layers selected",
+    "noLayersWithTokens":"None of the selected layers contain any tokens",
+    "selectLayer":"Select a layer to see applied tokens"
+}

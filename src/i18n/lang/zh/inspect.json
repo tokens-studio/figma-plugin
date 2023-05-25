@@ -1,0 +1,12 @@
+{
+    "inspect": "检查",
+    "inspectOnboard": "这是您选择的应用标记显示的地方，您可以使用 Deep Inspect 扫描所选层及其所有子层。",
+    "selectAll": "全选",
+    "bulkRemap": "批量重新映射",
+    "setToNone": "设置为无",
+    "removeSelected": "删除选定",
+    "noTokensFound": "未找到令牌",
+    "noLayersSelected": "未选择图层",
+    "noLayersWithTokens": "所选图层均不包含任何标记",
+    "selectLayer": "选择一个图层以查看应用的令牌"
+}

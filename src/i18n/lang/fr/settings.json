@@ -1,0 +1,10 @@
+{
+    "whereTokensStored": "Configurer où les jetons doivent être stockés",
+    "whereTokensStoredOnboarding": "Connectez vos jetons à une source de vérité externe vers laquelle vous pouvez pousser et tirer. Cela vous permet d'utiliser des jetons dans les fichiers.",
+    "baseFontExplanation": "Permet de configurer la valeur que représente 1rem. Vous pouvez également le définir sur un jeton, pour le faire changer entre les ensembles.",
+    "ignorePrefix": "Ignorer la première partie du nom du jeton pour les styles",
+    "prefixStyles": "Styles de préfixe avec le nom du thème actif",
+    "prefixStylesExplanation": "Ajoute le nom du thème actif à tous les styles créés. Remarque : L'utilisation de ceci avec des thèmes multidimensionnels conduira à des résultats inattendus.",
+    "baseFont": "Jeton de taille de police de base",
+    "resetOnboarding": "Réinitialiser l'intégration"
+}

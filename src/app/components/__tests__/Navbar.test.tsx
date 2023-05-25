@@ -18,7 +18,7 @@ describe('Navbar', () => {
       </Provider>,
     );
 
-    const settingsTabButton = await result.findByText('Settings');
+    const settingsTabButton = await result.findByText('settings');
     act(() => settingsTabButton.click());
 
     expect(mockStore.getState().uiState.activeTab).toEqual(Tabs.SETTINGS);

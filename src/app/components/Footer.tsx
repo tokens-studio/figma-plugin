@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
+import { useTranslation } from 'react-i18next';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -32,6 +33,7 @@ import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
 import SecondScreen from './SecondScreen';
 import { useFlags } from './LaunchDarkly';
+import { LanguageSelector } from './I18n';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -47,6 +49,7 @@ export default function Footer() {
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { secondScreen } = useFlags();
+  const { t } = useTranslation('', { keyPrefix: 'footer' });
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -112,11 +115,11 @@ export default function Footer() {
           && storageType.provider !== StorageProviderType.SUPERNOVA
           ? (
             <Stack align="center" direction="row" gap={2}>
-              <Text muted>Sync</Text>
+              <Text muted>{t('sync')}</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
-              <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
-                <IconButton icon={<IconLibrary />} href={projectURL} />
-              </Tooltip>
+                <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
+                  <IconButton icon={<IconLibrary />} href={projectURL} />
+                </Tooltip>
               )}
               <IconButton
                 tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
@@ -124,16 +127,17 @@ export default function Footer() {
                 icon={<RefreshIcon />}
               />
             </Stack>
-          ) : null }
+          ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
+        <LanguageSelector />
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.plugin_version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
-          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
-          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
+          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip={t('docs') as string} />
+          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip={t('feedback') as string} />
         </Stack>
       </Stack>
     </Box>

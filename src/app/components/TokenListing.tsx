@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
+import { useTranslation } from 'react-i18next';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
@@ -48,6 +49,8 @@ const TokenListing: React.FC<Props> = ({
     } as EditTokenObject);
   }, [schema, dispatch]);
 
+  const { t } = useTranslation('', { keyPrefix: 'tokens.types' });
+
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
     showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
   }, [showForm]);
@@ -73,7 +76,7 @@ const TokenListing: React.FC<Props> = ({
 
   return (
     <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
-      <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={label} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
+      <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={t(label)} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
       {values && (
         <DndProvider backend={HTML5Backend}>
           <Box

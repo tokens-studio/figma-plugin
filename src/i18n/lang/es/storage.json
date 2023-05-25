@@ -1,0 +1,14 @@
+{
+    "editCredentials": "Editar credenciales",
+    "addNew": "Agregar nuevo",
+    "pat": "Token de acceso personal",
+    "credentials": "cartas credenciales",
+    "gitExplained": "Acceda a los tokens almacenados en su repositorio, empuje y extraiga tokens en una sincronización bidireccional.",
+    "readMore": "Leer más",
+    "cancel": "Cancelar",
+    "repo": "Repositorio (propietario/repositorio)",
+    "branch": "Rama",
+    "baseUrl": "baseUrl (opcional)",
+    "saveCredentials": "Guardar credenciales",
+    "filePath": "Ruta del archivo (p. ej., tokens.json) o ruta de la carpeta (p. ej., tokens)"
+}

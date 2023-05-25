@@ -9,6 +9,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
     const data = await UiSettingsProperty.read();
     await UiSettingsProperty.write({
       width: uiSettings.width ?? data?.width,
+      language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
       updateMode: uiSettings.updateMode ?? data?.updateMode,
@@ -45,10 +46,12 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let shouldSwapStyles: boolean;
     let baseFontSize: string;
     let aliasBaseFontSize: string;
+    let language: string;
 
     if (data) {
       width = data.width || 400;
       height = data.height || 600;
+      language = data.language || 'en';
       showEmptyGroups = typeof data.showEmptyGroups === 'undefined' ? true : data.showEmptyGroups;
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
@@ -61,6 +64,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       settings = {
+        language,
         width: Math.max(300, width),
         height: Math.max(200, height),
         showEmptyGroups,

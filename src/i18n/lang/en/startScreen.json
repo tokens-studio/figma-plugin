@@ -1,0 +1,16 @@
+{
+    "intro": "Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.",
+    "gettingStarted": "Getting started",
+    "documentation": "Documentation",
+    "joinSlack": "Join our Slack",
+    "loadExample": " Load example",
+    "foundIssue": "Found an issue? We're on GitHub!",
+    "newEmptyFile": "New empty file",
+    "version": "Version",
+    "guides":"Guides",
+    "couldNotLoadTokens":"Couldn't load tokens stored on {{provider}}",
+    "cancel":"Cancel",
+    "loadingWait": "Loading, please wait",
+    "enterCredentials": "Enter credentials",
+    "unableToFetchRemote": "Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
+}

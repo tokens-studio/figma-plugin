@@ -1,0 +1,5 @@
+{
+    "override": "This will override your current tokens. Make sure you copy your changes if you want to preserve them.",
+    "cancel": "Cancel",
+    "pullTokens": "Pull Tokens"
+}

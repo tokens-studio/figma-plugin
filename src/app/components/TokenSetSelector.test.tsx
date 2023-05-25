@@ -27,19 +27,19 @@ describe('TokenSetSelector Component', () => {
     const newTokenSetButton = await result.findByTestId('new-set-button');
     fireEvent.click(newTokenSetButton);
     const newTokenSetInput = await result.findByTestId('create-set-input');
-    fireEvent.change(newTokenSetInput, { target: { value: 'Folder/newSet' } });
+    fireEvent.change(newTokenSetInput, { target: { value: 'Folder/newSetCreated' } });
     const createButton = await result.getByRole('button', {
       name: /create/i,
     });
 
     fireEvent.click(createButton);
     expect(store.getState().tokenState.tokens).toEqual({
-      'Folder/newSet': [],
+      'Folder/newSetCreated': [],
       global: [],
     });
 
     // rename token set
-    const createdTokenSet = result.getByText('newSet');
+    const createdTokenSet = result.getByText('newSetCreated');
     await fireEvent.contextMenu(createdTokenSet);
     let renameButton = await result.findByText('Rename');
     fireEvent.click(renameButton);

@@ -1,0 +1,14 @@
+{
+    "editCredentials": "编辑凭据",
+    "addNew": "添新",
+    "pat": "个人访问令牌",
+    "credentials": "证书",
+    "gitExplained": "访问存储在您的存储库中的令牌，以双向同步方式推送和拉取令牌。",
+    "readMore": "阅读更多",
+    "cancel": "取消",
+    "repo": "存储库（所有者/回购）",
+    "branch": "分支",
+    "baseUrl": "baseUrl（可选）",
+    "saveCredentials": "保存凭据",
+    "filePath": "文件路径（例如 tokens.json）或文件夹路径（例如 tokens）"
+}

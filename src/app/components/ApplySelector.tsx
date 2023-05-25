@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,6 +22,7 @@ import Box from './Box';
 
 export default function ApplySelector() {
   const { updateMode } = useSelector(settingsStateSelector, isEqual);
+  const { t } = useTranslation('', { keyPrefix: 'tokens' });
 
   const { handleUpdate } = useTokens();
 
@@ -46,7 +48,7 @@ export default function ApplySelector() {
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
-        Apply to
+        {t('applyTo')}
         {' '}
         {updateMode}
       </Button>
@@ -79,18 +81,18 @@ export default function ApplySelector() {
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              Apply to selection
+              {t('applyToSelection')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                Applies current tokens to current selection (fast!)
+                {t('applyToSelectionExplanation')}
               </Box>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              Apply to page
+              {t('applyToPage')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                Applies current tokens to the current page
+                {t('applyToPageExplanation')}
               </Box>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem
@@ -101,9 +103,10 @@ export default function ApplySelector() {
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              Apply to document
+              {t('applyToPageExplanation')}
+              {t('applyToDoc')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                Applies current tokens to the whole document (slow!)
+                {t('applyToDocExplanation')}
               </Box>
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

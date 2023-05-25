@@ -48,6 +48,7 @@ describe('uiSettings', () => {
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,
+      language: 'en',
       showEmptyGroups: true,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
@@ -81,6 +82,7 @@ describe('uiSettings', () => {
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,
+      language: 'en',
       showEmptyGroups: true,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
