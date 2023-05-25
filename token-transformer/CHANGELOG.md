@@ -1,3 +1,7 @@
+## v0.0.33 (2023-05-25)
+
+Fixed an issue when expanding typography tokens, causing lineHeight to be transformed inconsistently. It will now always return `lineHeights`.
+
 ## v0.0.32 (2023-03-24)
 
 Fixed an issue with borders using references not resolving correctly
