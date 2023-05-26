@@ -67,11 +67,15 @@ describe('PushDialog', () => {
       },
     });
 
+    expect(store.getState().uiState.showPushDialog).toBe(false);
+
     const result = render(
       <Provider store={mockStore}>
         <PushDialog />
       </Provider>,
     );
+
+    expect(store.getState().uiState.showPushDialog).toBe(false);
 
     const commitMessageInput = result.getByTestId('push-dialog-commit-message');
     fireEvent.change(commitMessageInput, {
@@ -84,6 +88,31 @@ describe('PushDialog', () => {
         code: 'Enter',
         ctrlKey: true,
       });
+    });
+
+    expect(store.getState().uiState.showPushDialog).toBe(false);
+
+    result.unmount();
+  });
+
+  it('should be able to push to Supernova by pressing ctrl/cmd + Enter', () => {
+    const mockStore = createMockStore({
+      uiState: {
+        showPushDialog: 'initial',
+        localApiState: {
+          provider: StorageProviderType.SUPERNOVA,
+        },
+      },
+    });
+
+    const result = render(
+      <Provider store={mockStore}>
+        <PushDialog />
+      </Provider>,
+    );
+
+    act(() => {
+      fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
     });
 
     expect(store.getState().uiState.showPushDialog).toBe(false);
