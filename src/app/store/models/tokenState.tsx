@@ -547,9 +547,6 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
-    setCollapsedTokenSets() {
-      dispatch.tokenState.updateDocument({ updateRemote: false });
-    },
 
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
