@@ -167,8 +167,6 @@ export const settings = createModel<RootModel>()({
   effects: (dispatch) => ({
     setLanguage: (payload: string, rootState) => {
       i18next.changeLanguage(payload);
-      console.log(i18next.languages);
-      console.log(i18next);
       setUI(rootState.settings);
     },
     setWindowSize: (payload) => {
