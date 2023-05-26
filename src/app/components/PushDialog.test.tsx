@@ -5,7 +5,6 @@ import {
   act, render, resetStore, createMockStore, fireEvent,
 } from '../../../tests/config/setupTest';
 import PushDialog from './PushDialog';
-import { store } from '../store';
 
 describe('PushDialog', () => {
   beforeEach(() => {
@@ -67,7 +66,7 @@ describe('PushDialog', () => {
       },
     });
 
-    expect(store.getState().uiState.showPushDialog).toBe(false);
+    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
 
     const result = render(
       <Provider store={mockStore}>
@@ -75,7 +74,7 @@ describe('PushDialog', () => {
       </Provider>,
     );
 
-    expect(store.getState().uiState.showPushDialog).toBe(false);
+    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
 
     const commitMessageInput = result.getByTestId('push-dialog-commit-message');
     fireEvent.change(commitMessageInput, {
@@ -90,7 +89,7 @@ describe('PushDialog', () => {
       });
     });
 
-    expect(store.getState().uiState.showPushDialog).toBe(false);
+    expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
 
     result.unmount();
   });
@@ -111,11 +110,13 @@ describe('PushDialog', () => {
       </Provider>,
     );
 
+    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
+
     act(() => {
       fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
     });
 
-    expect(store.getState().uiState.showPushDialog).toBe(false);
+    expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
 
     result.unmount();
   });
