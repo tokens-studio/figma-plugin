@@ -94,7 +94,7 @@ describe('PushDialog', () => {
     result.unmount();
   });
 
-  it('should be able to push to Supernova by pressing ctrl/cmd + Enter', () => {
+  it('should be able to push to Supernova by pressing ctrl/cmd + Enter', async () => {
     const mockStore = createMockStore({
       uiState: {
         showPushDialog: 'initial',
@@ -112,10 +112,11 @@ describe('PushDialog', () => {
 
     expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
 
-    act(() => {
-      fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
+    await act(async () => {
+      await fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
     });
 
+    expect(result.getByText('Pushing to Supernova.io')).toBeInTheDocument();
     expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
 
     result.unmount();
