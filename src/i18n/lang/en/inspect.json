@@ -1,5 +1,10 @@
 {
     "inspect":"Inspect",
+    "deepInspect":"Deep inspect",
+    "search":"Search",
+    "inspectLayers":"Inspect layers",
+    "scansSelected":"Scans selected layer and all of its children",
+    "debugAndAnnotate":"Debug & Annotate",
     "inspectOnboard":"This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.",
     "selectAll":"Select all",
     "bulkRemap":"Bulk remap",

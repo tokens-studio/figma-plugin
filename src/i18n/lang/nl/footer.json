@@ -1,5 +1,7 @@
 {
     "sync": "Synchroniseren",
     "docs": "Documenten",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "pullFrom": "Ophalen van {{provider}}",
+    "pushTo": "Pushen naar {{provider}}"
 }

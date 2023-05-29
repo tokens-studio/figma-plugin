@@ -1,5 +1,7 @@
 {
     "sync": "sincronizar",
     "docs": "Documentos",
-    "feedback": "Comentario"
+    "feedback": "Comentario",
+    "pullFrom": "Extraer de {{proveedor}}",
+    "pushTo": "Enviar a {{proveedor}}"
 }

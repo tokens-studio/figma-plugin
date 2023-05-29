@@ -31,6 +31,7 @@ export default function GitForm({
   const inputEl = useRef<HTMLInputElement | null>(null);
 
   const { t } = useTranslation('', { keyPrefix: 'storage' });
+  const { t: gt } = useTranslation('', { keyPrefix: 'general' });
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -127,11 +128,11 @@ export default function GitForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            {t('cancel')}
+            {gt('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            {t('saveCredentials')}
+            {gt('save')}
           </Button>
         </Stack>
         {hasErrored && (

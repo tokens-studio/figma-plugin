@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useUIDSeed } from 'react-uid';
+import { useTranslation } from 'react-i18next';
 import {
   BranchSwitchMenu,
   BranchSwitchMenuContent,
@@ -75,6 +76,8 @@ export default function BranchSelector() {
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const { t } = useTranslation('', { keyPrefix: 'licence' });
+  const { t: bt } = useTranslation('', { keyPrefix: 'branch' });
 
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
   const [startBranch, setStartBranch] = useState<string | null>(null);
@@ -103,17 +106,17 @@ export default function BranchSelector() {
 
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
-      text: 'You have unsaved changes',
+      text: bt('unSavedChanges') as string,
       description: (
         <div>
-          If you create or switch your branch without pushing your local changes
+          {bt('ifYouCreate')}
           <br />
           {' '}
-          to your repository, the changes will be lost.
+          {bt('toYourRepo')}
         </div>
       ),
-      confirmAction: 'Discard changes',
-      cancelAction: 'Cancel',
+      confirmAction: bt('discardChanges') as string,
+      cancelAction: bt('cancel') as string,
     });
     if (confirmResult) {
       return confirmResult.result;
@@ -201,15 +204,15 @@ export default function BranchSelector() {
 
           <BranchSwitchMenuContent side="top" sideOffset={5}>
             {!gitBranchSelector && (
-            <>
-              <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
+              <>
+                <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
 
-                <span>Upgrade to Pro</span>
-                <ProBadge compact />
+                  <span>{t('upgradeToPro')}</span>
+                  <ProBadge compact />
 
-              </BranchSwitchMenuItem>
-              <BranchSwitchMenuSeparator />
-            </>
+                </BranchSwitchMenuItem>
+                <BranchSwitchMenuSeparator />
+              </>
             )}
             <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
               {branchState.branches.length > 0
@@ -217,14 +220,15 @@ export default function BranchSelector() {
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
-                Create new branch from
+                {bt('createNewBranch')}
+
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
               <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="right" align="end">
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
-                      Current changes
+                      {bt('currentChanges')}
                     </BranchSwitchMenuItem>
                   )}
                 {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (

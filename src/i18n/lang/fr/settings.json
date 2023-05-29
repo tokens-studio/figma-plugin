@@ -6,5 +6,9 @@
     "prefixStyles": "Styles de préfixe avec le nom du thème actif",
     "prefixStylesExplanation": "Ajoute le nom du thème actif à tous les styles créés. Remarque : L'utilisation de ceci avec des thèmes multidimensionnels conduira à des résultats inattendus.",
     "baseFont": "Jeton de taille de police de base",
-    "resetOnboarding": "Réinitialiser l'intégration"
+    "resetOnboarding": "Réinitialiser l'intégration",
+    "settings": "Paramètres",
+    "usefulIgnore": "Utile si vous voulez ignorer",
+    "inAToken": "dans un jeton appelé",
+    "forYourStyles": "pour vos styles"
 }

@@ -1,5 +1,7 @@
 {
     "sync": "Sync",
     "docs": "Docs",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "pullFrom": "Pull from {{provider}}",
+    "pushTo": "Push to {{provider}}"
 }

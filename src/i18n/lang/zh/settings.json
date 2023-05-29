@@ -6,5 +6,9 @@
     "prefixStyles": "带有活动主题名称的前缀样式",
     "prefixStylesExplanation": "将活动主题名称添加到创建的任何样式。注意：将此与多维主题一起使用会导致意想不到的结果。",
     "baseFont": "基本字体大小标记",
-    "resetOnboarding": "重置入职"
+    "resetOnboarding": "重置入职",
+    "settings": "设置",
+    "usefulIgnore": "如果您想忽略，则很有用",
+    "inAToken": "在一个名为",
+    "forYourStyles": "适合你的风格"
 }

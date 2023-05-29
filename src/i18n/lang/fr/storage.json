@@ -8,7 +8,43 @@
     "cancel": "Annuler",
     "repo": "Référentiel (propriétaire/dépôt)",
     "branch": "Bifurquer",
-    "baseUrl": "baseUrl (optionnel)",
     "saveCredentials": "Enregistrer les informations d'identification",
-    "filePath": "Chemin du fichier (par exemple, tokens.json) ou chemin du dossier (par exemple, jetons)"
+    "filePath": "Chemin du fichier (par exemple, tokens.json) ou chemin du dossier (par exemple, jetons)",
+    "syncProviders": "Fournisseurs de synchronisation",
+    "providers": {
+        "generic": {
+            "title": "Générique versionné",
+            "url": "URL",
+            "addNew": "Ajouter un nouveau fournisseur de stockage générique",
+            "description": "Accédez aux jetons stockés sur votre propre fournisseur de stockage, permettant une synchronisation bidirectionnelle, des opérations de création et de lecture seule.",
+            "flowType": "Type de flux",
+            "readOnly": "Lecture seulement",
+            "readWrite": "Lire écrire",
+            "readWriteCreate": "Lire / Ecrire / Créer",
+            "additionalHeaders": "En-têtes supplémentaires",
+            "name": "Nom",
+            "value": "Valeur"
+        },
+        "url": {
+            "title": "URL",
+            "addNew": "Ajouter un nouveau fournisseur d'URL",
+            "description": "Les jetons stockés sur un serveur vous permettent de les ajouter en tant que fournisseur en lecture seule."
+        },
+        "jsonbin": {
+            "title": "JSONBIN"
+        },
+        "github": {
+            "title": "GitHub"
+        },
+        "gitlab": {
+            "title": "GitLab"
+        },
+        "supernova": {
+            "accessToken": "Jeton d'accès Supernova",
+            "addNew": "Ajouter de nouvelles informations d'identification Supernova",
+            "dsUrl": "URL du système de conception",
+            "description": "Vous permet de pousser des jetons dans une marque et un thème spécifiques dans un système de conception sélectionné."
+        }
+    },
+    "baseUrl": "URL de base (facultatif)"
 }

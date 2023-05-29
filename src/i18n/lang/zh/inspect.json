@@ -8,5 +8,10 @@
     "noTokensFound": "未找到令牌",
     "noLayersSelected": "未选择图层",
     "noLayersWithTokens": "所选图层均不包含任何标记",
-    "selectLayer": "选择一个图层以查看应用的令牌"
+    "selectLayer": "选择一个图层以查看应用的令牌",
+    "deepInspect": "深度检查",
+    "search": "搜索",
+    "inspectLayers": "检查图层",
+    "debugAndAnnotate": "调试",
+    "scansSelected": "扫描选定层及其所有子层"
 }

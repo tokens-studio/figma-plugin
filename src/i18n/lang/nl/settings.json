@@ -6,5 +6,9 @@
     "prefixStyles": "Voorvoegselstijlen met actieve themanaam",
     "prefixStylesExplanation": "Voegt de naam van het actieve thema toe aan alle gemaakte stijlen. Opmerking: als u dit gebruikt met multidimensionale thema's, leidt dit tot onverwachte resultaten.",
     "baseFont": "Token voor basistekengrootte",
-    "resetOnboarding": "Onboarding resetten"
+    "resetOnboarding": "Onboarding resetten",
+    "settings": "Instellingen",
+    "usefulIgnore": "Handig als je wilt negeren",
+    "inAToken": "in een token genoemd",
+    "forYourStyles": "voor uw stijlen"
 }

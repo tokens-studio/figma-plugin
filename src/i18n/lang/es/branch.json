@@ -1,0 +1,9 @@
+{
+    "ifYouCreate": "Si crea o cambia su sucursal sin impulsar sus cambios locales",
+    "toYourRepo": "a su repositorio, los cambios se perderán.",
+    "discardChanges": "Descartar los cambios",
+    "cancel": "Cancelar",
+    "createNewBranch": "Crear nueva sucursal desde",
+    "currentChanges": "Cambios actuales",
+    "unSavedChanges": "Tiene cambios sin guardar"
+}

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
+import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Box from '../Box';
@@ -28,6 +29,9 @@ export default function SupernovaForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
+
+  const { t: gt } = useTranslation('', { keyPrefix: 'general' });
+  const { t } = useTranslation('', { keyPrefix: 'storage.providers.supernova' });
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,19 +66,19 @@ export default function SupernovaForm({
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={1}>
           <Heading>
-            Add new Supernova credentials
+            {t('addNew')}
           </Heading>
           <Text muted>
-            Allows you to push tokens into specific brand and theme in a selected design system.
+            {t('description')}
             {' '}
-            <Link href="https://learn.supernova.io/">Read more</Link>
+            <Link href="https://learn.supernova.io/">{gt('readMore')}</Link>
           </Text>
         </Stack>
         <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Box css={{ position: 'relative' }}>
           <Input
             full
-            label="Supernova Access Token"
+            label={t('accessToken')}
             value={values.secret}
             onChange={onChange}
             inputRef={inputEl}
@@ -86,7 +90,7 @@ export default function SupernovaForm({
         </Box>
         <Input
           full
-          label="Design System URL"
+          label={t('dsUrl')}
           value={values.designSystemUrl}
           onChange={onChange}
           type="text"
@@ -107,10 +111,10 @@ export default function SupernovaForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
-            Cancel
+            {gt('cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}>
-            Save
+            {gt('save')}
           </Button>
         </Stack>
         {hasErrored && (

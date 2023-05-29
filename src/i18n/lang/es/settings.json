@@ -6,5 +6,9 @@
     "prefixStyles": "Estilos de prefijo con nombre de tema activo",
     "prefixStylesExplanation": "Agrega el nombre del tema activo a cualquier estilo creado. Nota: Usar esto con temas multidimensionales dará lugar a resultados inesperados.",
     "baseFont": "Token de tamaño de fuente base",
-    "resetOnboarding": "Restablecer incorporación"
+    "resetOnboarding": "Restablecer incorporación",
+    "settings": "Ajustes",
+    "usefulIgnore": "Útil si quieres ignorar",
+    "inAToken": "en una ficha llamada",
+    "forYourStyles": "para tus estilos"
 }

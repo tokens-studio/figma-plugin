@@ -43,9 +43,9 @@ describe('ConfirmDialog', () => {
         <SyncSettings />
       </Provider>,
     );
-    expect(result.queryByText('Sync providers')).toBeInTheDocument();
+    expect(result.queryByText('syncProviders')).toBeInTheDocument();
     expect(result.queryByText('Local document')).toBeInTheDocument();
-    expect(result.queryByText('Add new')).toBeInTheDocument();
+    expect(result.queryByText('addNew')).toBeInTheDocument();
   });
 
   it('should return ConfirmLocalStorageModal when seleting local storage', async () => {
@@ -156,6 +156,6 @@ describe('ConfirmDialog', () => {
     expect(result.queryByText('branch')).toBeInTheDocument();
     expect(result.queryByText('filePath')).toBeInTheDocument();
     expect(result.queryByText('baseUrl')).toBeInTheDocument();
-    expect(result.queryByText('saveCredentials')).toBeInTheDocument();
+    expect(result.queryByText('save')).toBeInTheDocument();
   });
 });

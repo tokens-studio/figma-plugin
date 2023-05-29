@@ -1,5 +1,7 @@
 {
     "sync": "Synchroniser",
     "docs": "Documents",
-    "feedback": "Retour"
+    "feedback": "Retour",
+    "pullFrom": "Tirer de {{fournisseur}}",
+    "pushTo": "Envoyer à {{fournisseur}}"
 }

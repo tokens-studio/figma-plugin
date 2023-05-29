@@ -8,5 +8,10 @@
     "noTokensFound": "कोई टोकन नहीं मिला",
     "noLayersSelected": "कोई परत नहीं चुनी गई",
     "noLayersWithTokens": "किसी भी चयनित परत में कोई टोकन नहीं है",
-    "selectLayer": "लागू टोकन देखने के लिए एक परत चुनें"
+    "selectLayer": "लागू टोकन देखने के लिए एक परत चुनें",
+    "deepInspect": "गहन निरीक्षण करें",
+    "search": "खोज",
+    "inspectLayers": "परतों का निरीक्षण करें",
+    "debugAndAnnotate": "डिबग",
+    "scansSelected": "चयनित परत और उसके सभी बच्चों को स्कैन करता है"
 }

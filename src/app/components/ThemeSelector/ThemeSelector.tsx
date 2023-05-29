@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -36,6 +37,7 @@ type AvailableTheme = {
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation('', { keyPrefix: 'tokens' });
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const groupNames = useMemo(() => ([...new Set(availableThemes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
@@ -84,8 +86,8 @@ export const ThemeSelector: React.FC = () => {
         value={value}
         data-cy={`themeselector--themeoptions--${value}`}
         data-testid={`themeselector--themeoptions--${value}`}
-          // @README we can disable this because we are using Memo for the whole list anyways
-          // eslint-disable-next-line react/jsx-no-bind
+        // @README we can disable this because we are using Memo for the whole list anyways
+        // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
         <Box css={{ width: '$5', marginRight: '$2' }}>
@@ -107,12 +109,12 @@ export const ThemeSelector: React.FC = () => {
           const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
           return (
             filteredThemes.length > 0 && (
-            <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-              <Text css={{ color: '$staticTextMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
-              {
-                renderThemeOption(filteredThemes)
-              }
-            </DropdownMenuRadioGroup>
+              <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+                <Text css={{ color: '$staticTextMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                {
+                  renderThemeOption(filteredThemes)
+                }
+              </DropdownMenuRadioGroup>
             )
           );
         })
@@ -125,7 +127,10 @@ export const ThemeSelector: React.FC = () => {
       <DropdownMenu>
         <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
-            <ThemeDropdownLabel muted size="small">Theme:</ThemeDropdownLabel>
+            <ThemeDropdownLabel muted size="small">
+              {t('theme')}
+              :
+            </ThemeDropdownLabel>
             <Text size="small">{activeThemeLabel}</Text>
           </Flex>
           <IconToggleableDisclosure />
@@ -137,7 +142,7 @@ export const ThemeSelector: React.FC = () => {
         >
           {availableThemes.length === 0 && (
             <ScrollDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text>No themes</Text>
+              <Text>{t('noThemes')}</Text>
             </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}
@@ -150,7 +155,7 @@ export const ThemeSelector: React.FC = () => {
             disabled={!tokenThemes}
             onSelect={handleManageThemes}
           >
-            <span>Manage themes</span>
+            <span>{t('manageThemes')}</span>
             {!tokenThemes && <ProBadge compact />}
           </DropdownMenuItem>
         </DropdownMenuContent>

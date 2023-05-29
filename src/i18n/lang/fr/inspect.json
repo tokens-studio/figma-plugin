@@ -8,5 +8,10 @@
     "noTokensFound": "Aucun jeton trouvé",
     "noLayersSelected": "Aucun calque sélectionné",
     "noLayersWithTokens": "Aucune des couches sélectionnées ne contient de jetons",
-    "selectLayer": "Sélectionnez un calque pour voir les jetons appliqués"
+    "selectLayer": "Sélectionnez un calque pour voir les jetons appliqués",
+    "deepInspect": "Inspecter en profondeur",
+    "search": "Recherche",
+    "inspectLayers": "Inspecter les calques",
+    "debugAndAnnotate": "Déboguer",
+    "scansSelected": "Analyse le calque sélectionné et tous ses enfants"
 }

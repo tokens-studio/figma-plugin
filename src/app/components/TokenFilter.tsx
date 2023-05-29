@@ -2,6 +2,7 @@ import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
@@ -27,6 +28,7 @@ const TokenFilter = () => {
   const tokenFilter = useSelector(tokenFilterSelector);
   const [tokenString, setTokenString] = React.useState(tokenFilter);
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation('', { keyPrefix: 'general' });
 
   const debounced = useDebouncedCallback((value) => {
     dispatch.uiState.setTokenFilter(value);
@@ -53,7 +55,7 @@ const TokenFilter = () => {
         type="text"
         value={tokenString}
         onChange={(e) => handleChange(e.target.value)}
-        placeholder="Search"
+        placeholder={t('search') as string}
       />
     </Box>
   );

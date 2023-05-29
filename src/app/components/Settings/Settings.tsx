@@ -75,7 +75,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">Settings</Heading>
+          <Heading size="small">{t('settings')}</Heading>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -87,15 +87,15 @@ function Settings() {
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-                  Useful if you want to ignore
+                  {t('usefulIgnore')}
                   {' '}
                   <code>colors</code>
                   {' '}
-                  in a token called
+                  {t('inAToken')}
                   {' '}
                   <code>colors.blue.500</code>
                   {' '}
-                  for your styles
+                  {t('forYourStyles')}
                 </Box>
               </Stack>
             </Label>

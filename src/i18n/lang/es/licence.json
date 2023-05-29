@@ -7,5 +7,6 @@
     "addLicenseKey": "Agregar clave de licencia",
     "keepLicenceSafe": "Asegúrese de guardar una copia de la clave de licencia en algún lugar, ya que no se almacenará en este dispositivo después de que la elimine.",
     "confirmRemove": "¿Está seguro de que desea eliminar su clave de licencia?",
-    "removeLicenceKey": "Eliminar clave de licencia"
+    "removeLicenceKey": "Eliminar clave de licencia",
+    "upgradeToPro": "Actualízate a Pro"
 }
