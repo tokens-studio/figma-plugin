@@ -23,7 +23,7 @@ module.exports = (env, argv) => ({
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: 'swc-loader',
           },
         ],
         exclude: /node_modules/,
@@ -34,7 +34,7 @@ module.exports = (env, argv) => ({
         exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: 'swc-loader',
           },
         ],
       },
