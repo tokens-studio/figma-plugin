@@ -10,15 +10,15 @@ import { editProhibitedSelector, themeOptionsSelector } from '@/selectors';
 export default function StylesDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
   const availableThemes = useSelector(themeOptionsSelector);
+  const {
+    pullStyles, createStylesFromTokens, syncStyles, createVariables,
+  } = useTokens();
 
-  const { pullStyles } = useTokens();
-  const { createStylesFromTokens } = useTokens();
-  const { syncStyles } = useTokens();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <span>
-          Styles
+          Styles & Variables
         </span>
         <IconChevronDown />
       </DropdownMenuTrigger>
@@ -27,6 +27,7 @@ export default function StylesDropdown() {
         <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>Sync styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>Import styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>Create styles</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create Variables" onSelect={createVariables}>Create Variables</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

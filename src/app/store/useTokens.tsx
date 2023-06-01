@@ -327,6 +327,16 @@ export default function useTokens() {
     });
   }, []);
 
+  const createVariables = useCallback(async () => {
+    track('createVariables');
+    const createVariableResult = await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      tokens,
+      settings,
+    });
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+  }, [dispatch.tokenState, tokens, settings]);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -345,6 +355,7 @@ export default function useTokens() {
     setNoneValuesOnNode,
     handleUpdate,
     handleJSONUpdate,
+    createVariables,
   }), [
     isAlias,
     getTokenValue,
@@ -363,5 +374,6 @@ export default function useTokens() {
     setNoneValuesOnNode,
     handleUpdate,
     handleJSONUpdate,
+    createVariables,
   ]);
 }

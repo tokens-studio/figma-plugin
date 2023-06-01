@@ -29,3 +29,6 @@ export * from './removeStyles';
 export * from './setAuthData';
 export * from './setNoneValuesOnNode';
 export * from './getFigmaFonts';
+export * from './createLocalVariables';
+export * from './resolveVariableInfo';
+export * from './attachLocalVariablesToTheme';

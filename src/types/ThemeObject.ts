@@ -11,4 +11,8 @@ export type ThemeObject = {
   // @README these are the style IDs from Figma
   // this is considered meta-data so it is prefixed with $
   $figmaStyleReferences?: Record<string, string>
+  // Local variables
+  $figmaCollectionId?: string
+  $figmaModeId?: string
+  $figmaVariableReferences?: Record<string, string>
 };
