@@ -450,9 +450,9 @@ export default function useRemoteTokens() {
   ]);
 
   const checkRemoteChange = useCallback(async (context: StorageTypeCredentials = api): Promise<boolean> => {
-    track('checkRemoteChange', { provider: context.provider });
+    track('checkRemoteChange', { provider: context?.provider });
     let hasChange = false;
-    switch (context.provider) {
+    switch (context?.provider) {
       case StorageProviderType.JSONBIN: {
         hasChange = false;
         break;
