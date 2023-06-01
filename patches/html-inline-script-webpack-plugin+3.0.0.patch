@@ -1,0 +1,13 @@
+diff --git a/node_modules/html-inline-script-webpack-plugin/dist/HtmlInlineScriptPlugin.js b/node_modules/html-inline-script-webpack-plugin/dist/HtmlInlineScriptPlugin.js
+index 0894da3..450761f 100644
+--- a/node_modules/html-inline-script-webpack-plugin/dist/HtmlInlineScriptPlugin.js
++++ b/node_modules/html-inline-script-webpack-plugin/dist/HtmlInlineScriptPlugin.js
+@@ -95,7 +95,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+                 }, function (assets) {
+                     if (_this.ignoredHtmlFiles.length === 0) {
+                         _this.processedScriptFiles.forEach(function (assetName) {
+-                            delete assets[assetName];
++                            // delete assets[assetName];
+                         });
+                     }
+                 });

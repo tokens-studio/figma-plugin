@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -81,16 +82,11 @@ module.exports = (env, argv) => ({
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
   // Don't minimize the code in development mode, it causes the plugin to build much slower
-  optimization: argv.mode === 'production' ? {
-    nodeEnv: 'production',
-    minimize: true,
+  optimization: {
+    nodeEnv: argv.mode === 'production' ? 'production' : 'development',
+    minimize: argv.mode === 'production',
     usedExports: true,
     concatenateModules: true
-  } : {
-    nodeEnv: 'development',
-    minimize: false,
-    usedExports: true,
-    concatenateModules: false
   },
   output: {
     filename: '[name].js',
@@ -102,8 +98,17 @@ module.exports = (env, argv) => ({
     new Dotenv({
       path: argv.mode === 'production' ? '.env.production' : '.env',
     }),
+    process.env.SENTRY_AUTH_TOKEN ?
+      sentryWebpackPlugin({
+        org: process.env.SENTRY_ORG,
+        project:  process.env.SENTRY_PROJECT,
+        // Auth tokens can be obtained from https://sentry.io/settings/account/api/auth-tokens/
+        // and need `project:releases` and `org:read` scopes
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      }) : undefined,
     new HtmlWebpackPlugin({
       template: './src/app/index.html',
+      inject: 'body',
       filename: 'index.html',
       chunks: ['ui'],
       cache: argv.mode === 'production',
@@ -120,6 +125,7 @@ module.exports = (env, argv) => ({
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    })
-  ],
+    }),
+
+  ].filter(Boolean),
 });

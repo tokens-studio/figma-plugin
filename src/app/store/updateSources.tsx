@@ -1,3 +1,5 @@
+import { startTransaction } from '@sentry/react';
+import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -10,6 +12,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import { closeTransaction, setTransaction } from '../profiling';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -131,6 +134,11 @@ export default async function updateTokensOnSources({
     });
   }
 
+
+  const transaction = startTransaction({
+    op: 'transaction',
+    name: 'Update Tokens',
+  });
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
@@ -143,5 +151,7 @@ export default async function updateTokensOnSources({
     activeTheme,
     shouldSwapStyles,
     collapsedTokenSets,
+  }).then(() => {
+    transaction.finish();
   });
 }
