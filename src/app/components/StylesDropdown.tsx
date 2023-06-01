@@ -12,10 +12,10 @@ export default function StylesDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const { t } = useTranslation('', { keyPrefix: 'tokens' });
+  const {
+    pullStyles, createStylesFromTokens, syncStyles, createVariables,
+  } = useTokens();
 
-  const { pullStyles } = useTokens();
-  const { createStylesFromTokens } = useTokens();
-  const { syncStyles } = useTokens();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -24,11 +24,11 @@ export default function StylesDropdown() {
         </span>
         <IconChevronDown />
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="top">
         <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>{t('syncStyles')}</DropdownMenuItem>
         <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>{t('importStyles')}</DropdownMenuItem>
         <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>{t('createStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create Variables" onSelect={createVariables}>Create Variables</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

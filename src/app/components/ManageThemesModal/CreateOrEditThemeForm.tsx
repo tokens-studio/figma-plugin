@@ -29,7 +29,7 @@ export type FormValues = {
 
 export enum ThemeFormTabs {
   SETS = 'sets',
-  STYLES = 'styles',
+  STYLES_VARIABLES = 'Styles & Variables',
 }
 
 type Props = {
@@ -146,7 +146,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
           />
           <StyledCreateOrEditThemeFormTabsFlex>
             <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
-            <TabButton name={ThemeFormTabs.STYLES} disabled={!id} activeTab={activeTab} label="Styles" onSwitch={setActiveTab} />
+            <TabButton name={ThemeFormTabs.STYLES_VARIABLES} disabled={!id} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} />
           </StyledCreateOrEditThemeFormTabsFlex>
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
@@ -159,7 +159,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
           />
         </Box>
       )}
-      {(activeTab === ThemeFormTabs.STYLES && id) && (
+      {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
         <Box css={{ paddingTop: '$4' }}>
           <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
           <ThemeStyleManagementForm id={id} />

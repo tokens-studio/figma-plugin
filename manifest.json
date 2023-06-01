@@ -6,5 +6,6 @@
   "ui": "dist/index.html",
   "editorType": ["figma"],
   "permissions": ["currentuser"],
-  "relaunchButtons": [{ "command": "edit", "name": "Tokens" }]
+  "relaunchButtons": [{ "command": "edit", "name": "Tokens" }],
+  "enableProposedApi": true
 }

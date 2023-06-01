@@ -15,6 +15,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import type { StyleInfo } from './ThemeStyleManagementCategoryStyleEntry';
 import { track } from '@/utils/analytics';
+import { ThemeVariableManagement } from './ThemeVariableManagement';
 
 type StyleInfoPerCategory = Partial<Record<'typography' | 'colors' | 'effects', Record<string, StyleInfo>>>;
 
@@ -202,6 +203,9 @@ export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
         onAttachLocalStyles={handleAttachLocalEffectStyles}
         onDisconnectStyle={handleDisconnectStyle}
         onDisconnectSelectedStyle={handleDisconnectSelectedStyle}
+      />
+      <ThemeVariableManagement
+        id={id}
       />
     </Box>
   );
