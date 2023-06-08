@@ -230,10 +230,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const removeColorModify = React.useCallback(() => {
-    const newValue = internalEditToken;
-    delete newValue?.$extensions;
+    const newValue = { ...internalEditToken.$extensions };
+    delete newValue?.['studio.tokens'];
+
     setInternalEditToken({
-      ...newValue,
+      ...internalEditToken,
+      $extensions: Object.keys(newValue).length > 0 ? newValue : undefined,
     });
   }, [internalEditToken]);
 
@@ -241,6 +243,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInternalEditToken({
       ...internalEditToken,
       $extensions: {
+        ...internalEditToken.$extensions,
         'studio.tokens': {
           modify: newModify,
         },
