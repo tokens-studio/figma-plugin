@@ -25,7 +25,8 @@ type EditSingleTokenData = {
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
-      modify: ColorModifier
+      [key: string]: any;
+      modify?: ColorModifier
     }
   }
 };
@@ -40,7 +41,7 @@ type CreateSingleTokenData = {
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
-      modify: ColorModifier
+      modify?: ColorModifier
     }
   }
 };

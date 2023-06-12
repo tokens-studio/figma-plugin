@@ -14,7 +14,8 @@ export type DuplicateTokenPayload = {
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
-      modify: ColorModifier
+      [key: string]: any;
+      modify?: ColorModifier
     }
   }
 };

@@ -13,7 +13,8 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
-      modify: ColorModifier
+      [key: string]: any;
+      modify?: ColorModifier
     }
   }
 } & (Named extends true ? {
