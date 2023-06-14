@@ -22,7 +22,13 @@ type EditSingleTokenData = {
   description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      modify?: ColorModifier
+    }
+  }
 };
 
 type CreateSingleTokenData = {
@@ -32,7 +38,12 @@ type CreateSingleTokenData = {
   value: SingleToken['value'];
   description?: string;
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      modify?: ColorModifier
+    }
+  }
 };
 
 type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };

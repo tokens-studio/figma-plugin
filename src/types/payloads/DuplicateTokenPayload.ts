@@ -11,5 +11,11 @@ export type DuplicateTokenPayload = {
   oldName?: string;
   shouldUpdate?: boolean;
   tokenSets: string[];
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      modify?: ColorModifier
+    }
+  }
 };
