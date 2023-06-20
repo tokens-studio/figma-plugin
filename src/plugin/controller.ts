@@ -43,6 +43,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, 
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, asyncHandlers.setNoneValuesOnNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 
 figma.on('close', () => {
   defaultWorker.stop();

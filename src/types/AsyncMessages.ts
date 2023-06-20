@@ -48,11 +48,12 @@ export enum AsyncMessageTypes {
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
+  SET_AUTH_DATA = 'async/set-auth-data',
+  SET_USED_EMAIL = 'async/set-used-email',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
-  SET_AUTH_DATA = 'async/set-auth-data',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -244,7 +245,14 @@ export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGM
 export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
   auth: AuthData | null
 }>;
+
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
+
+export type SetUsedEmailMessage = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL, {
+  email: string | undefined
+}>;
+
+export type SetUsedEmailMessageResult = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL>;
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
@@ -279,7 +287,8 @@ export type AsyncMessages =
   | ResolveStyleInfo
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
-  | SetAuthDataMessage;
+  | SetAuthDataMessage
+  | SetUsedEmailMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -314,7 +323,8 @@ export type AsyncMessageResults =
   | ResolveStyleInfoResult
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
-  | SetAuthDataMessageResult;
+  | SetAuthDataMessageResult
+  | SetUsedEmailMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

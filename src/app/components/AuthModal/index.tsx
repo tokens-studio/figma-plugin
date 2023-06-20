@@ -10,6 +10,7 @@ import Button from '../Button';
 import Text from '../Text';
 import Spinner from '../Spinner';
 import Link from '../Link';
+import { usedEmailSelector } from '@/selectors/usedEmailSelector';
 
 enum AuthModes {
   LOGIN = 'login',
@@ -23,9 +24,10 @@ export default function AuthModal() {
   const dispatch = useDispatch<Dispatch>();
   const [mode, setMode] = useState<AuthModes>(AuthModes.LOGIN);
   const secondScreenEnabled = useSelector(secondScreenSelector);
+  const usedEmail = useSelector(usedEmailSelector);
 
   const [values, setValues] = React.useState({
-    email: '',
+    email: usedEmail,
     password: '',
   });
 

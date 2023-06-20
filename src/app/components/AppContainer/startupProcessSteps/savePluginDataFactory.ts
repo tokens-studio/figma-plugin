@@ -5,7 +5,7 @@ import * as pjs from '../../../../../package.json';
 
 export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage) {
   return async () => {
-    const { user } = params;
+    const { user, usedEmail } = params;
     if (user) {
       // initiate analytics
       if (user.userId) {
@@ -28,6 +28,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
         ...rest,
       };
       dispatch.userState.setUserId(user.figmaId);
+      dispatch.userState.setUsedEmail(usedEmail ?? undefined);
       dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainer.sets);

@@ -6,6 +6,7 @@ import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
 import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
+import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
 
 export async function startup() {
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
@@ -21,6 +22,7 @@ export async function startup() {
     licenseKey,
     localTokenData,
     authData,
+    usedEmail,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -33,6 +35,7 @@ export async function startup() {
     LicenseKeyProperty.read(),
     getTokenData(),
     AuthDataProperty.read(),
+    UsedEmailProperty.read(),
   ]);
 
   return {
@@ -53,5 +56,6 @@ export async function startup() {
       name: figma.currentUser.name,
     } : null,
     authData,
+    usedEmail,
   };
 }

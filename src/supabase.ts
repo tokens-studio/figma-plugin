@@ -4,6 +4,8 @@ import {
   RealtimeChannel, RealtimeChannelOptions, RealtimeClient, RealtimeClientOptions,
 } from '@supabase/realtime-js';
 import { AuthData, AuthInfo } from './types/Auth';
+import { AsyncMessageChannel } from './AsyncMessageChannel';
+import { AsyncMessageTypes } from './types/AsyncMessages';
 
 const authUri = '/auth/v1';
 
@@ -90,6 +92,16 @@ class SupabaseClient {
         });
         if (!error) {
           this.initializeAuth(data);
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.SET_AUTH_DATA,
+            auth: data,
+          });
+        } else {
+          AsyncMessageChannel.ReactInstance.message({
+            type: AsyncMessageTypes.SET_AUTH_DATA,
+            auth: null,
+          });
+          clearInterval(this.refreshTokenInterval);
         }
       }
     }, this.intervalInSeconds * 1000);
@@ -107,6 +119,11 @@ class SupabaseClient {
     }
     // Expired
     return 'expired';
+  }
+
+  logout() {
+    this.auth = null;
+    clearInterval(this.refreshTokenInterval);
   }
 
   async verifyAuth(auth: AuthData, callback: (data: AuthData | null) => void) {
