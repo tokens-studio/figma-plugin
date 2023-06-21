@@ -158,8 +158,8 @@ class SupabaseClient {
         body: JSON.stringify(data),
       }).then((res) => res.json());
 
-      if (!auth.user && auth.error) {
-        return { data: null, error: auth.error };
+      if (!auth.user) {
+        return { data: null, error: auth };
       }
 
       const now = new Date().getTime() / 1000;
@@ -183,7 +183,7 @@ class SupabaseClient {
       }).then((res) => res.json());
 
       if (auth.error) {
-        return { data: null, error: auth.error };
+        return { data: null, error: auth };
       }
       const now = new Date().getTime() / 1000;
       const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };

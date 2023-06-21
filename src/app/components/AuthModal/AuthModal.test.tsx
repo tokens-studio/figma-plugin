@@ -111,10 +111,10 @@ describe('Add license key', () => {
   it('Displays login error', async () => {
     const email = 'test@email.com';
     const pass = 'pass';
-    const loginError = 'Error loggingg in';
+    const loginError = 'Invalid login credentials';
 
     mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ error: { msg: loginError } }),
+      json: () => Promise.resolve({ error: 'invalid_grant', error_description: loginError }),
     }));
 
     const mockStore = createMockStore({
@@ -160,7 +160,7 @@ describe('Add license key', () => {
     const signupError = 'Error signing up';
 
     mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ error: { msg: signupError } }),
+      json: () => Promise.resolve({ code: 422, msg: signupError }),
     }));
 
     const mockStore = createMockStore({
