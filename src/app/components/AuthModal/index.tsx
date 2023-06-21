@@ -68,7 +68,7 @@ export default function AuthModal() {
   };
 
   const getInfo = () => {
-    const text = mode === AuthModes.LOGIN ? 'Do not have an account ?' : 'Already have an account';
+    const text = mode === AuthModes.LOGIN ? 'Do not have an account ?' : 'Already have an account ?';
     const cta = mode === AuthModes.LOGIN ? 'Sign up here' : 'Log in here';
 
     return (

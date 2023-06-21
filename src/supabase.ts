@@ -151,41 +151,49 @@ class SupabaseClient {
   }
 
   async signUp(data: AuthInfo) {
-    const auth = await fetch(`${this.apiUrl + authUri}/signup`, {
-      method: 'POST',
-      headers: this.headers,
-      body: JSON.stringify(data),
-    }).then((res) => res.json());
+    try {
+      const auth = await fetch(`${this.apiUrl + authUri}/signup`, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify(data),
+      }).then((res) => res.json());
 
-    if (!auth.user) {
-      return { data: null, error: auth };
+      if (!auth.user && auth.error) {
+        return { data: null, error: auth.error };
+      }
+
+      const now = new Date().getTime() / 1000;
+      const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
+
+      // Logged in, initialize auth data
+      this.initializeAuth(authData);
+      return { data: authData, error: null };
+    } catch (error) {
+      return { data: null, error };
     }
-    const now = new Date().getTime() / 1000;
-    const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
-
-    // Logged in, initialize auth data
-    this.initializeAuth(authData);
-    return { data: authData, error: null };
   }
 
   async signIn(data: AuthInfo) {
     const url = `/token?grant_type=${data.email ? 'password' : 'refresh_token'}`;
+    try {
+      const auth = await fetch(this.apiUrl + authUri + url, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify(data),
+      }).then((res) => res.json());
 
-    const auth = await fetch(this.apiUrl + authUri + url, {
-      method: 'POST',
-      headers: this.headers,
-      body: JSON.stringify(data),
-    }).then((res) => res.json());
+      if (auth.error) {
+        return { data: null, error: auth.error };
+      }
+      const now = new Date().getTime() / 1000;
+      const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
 
-    if (auth.error) {
-      return { data: null, error: auth };
+      // Logged in, initialize auth data
+      this.initializeAuth(authData);
+      return { data: authData, error: null };
+    } catch (error) {
+      return { data: null, error };
     }
-    const now = new Date().getTime() / 1000;
-    const authData = { ...auth, expires_at: Math.floor(now + auth.expires_in) };
-
-    // Logged in, initialize auth data
-    this.initializeAuth(authData);
-    return { data: authData, error: null };
   }
 
   /**
