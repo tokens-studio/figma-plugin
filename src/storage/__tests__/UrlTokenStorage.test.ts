@@ -49,6 +49,7 @@ describe('Test URLTokenStorage', () => {
           $themes: [{
             id: 'light',
             name: 'Light',
+            group: 'Theme',
             selectedTokenSets: {
               global: TokenSetStatus.SOURCE,
               light: TokenSetStatus.ENABLED,
@@ -71,6 +72,7 @@ describe('Test URLTokenStorage', () => {
           {
             id: 'light',
             name: 'Light',
+            group: 'Theme',
             selectedTokenSets: {
               global: TokenSetStatus.SOURCE,
               light: TokenSetStatus.ENABLED,
