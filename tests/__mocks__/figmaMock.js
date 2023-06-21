@@ -66,6 +66,7 @@ module.exports.mockParentPostMessage = jest.fn((data) => {
 module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
+module.exports.mockGetLocalVariables = jest.fn(() => ([]));
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -90,6 +91,9 @@ module.exports.figma = {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
     getSharedPluginData: module.exports.mockRootGetSharedPluginData,
     findAll: module.exports.mockRootFindAll,
+  },
+  variables: {
+    getLocalVariables: module.exports.mockGetLocalVariables
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,

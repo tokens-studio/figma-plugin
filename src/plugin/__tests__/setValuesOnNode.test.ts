@@ -94,6 +94,11 @@ describe('Can set values on node', () => {
 
     const data = {
       boxShadow: 'shadows.lg',
+      borderRadius: 'border-radius-10',
+      borderRadiusTopLeft: 'border-radius-10',
+      borderRadiusTopRight: 'border-radius-10',
+      borderRadiusBottomRight: 'border-radius-10',
+      borderRadiusBottomLeft: 'border-radius-10',
     };
 
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
@@ -133,7 +138,7 @@ describe('Can set values on node', () => {
       {
         sizing: '100px',
       },
-      {},
+      { sizing: 'size.10' },
       emptyStylesMap,
       emptyThemeInfo,
     );
@@ -152,7 +157,7 @@ describe('Can set values on node', () => {
       {
         width: '100px',
       },
-      {},
+      { width: 'size.100' },
       emptyStylesMap,
       emptyThemeInfo,
     );
@@ -171,7 +176,7 @@ describe('Can set values on node', () => {
       {
         height: '100px',
       },
-      {},
+      { height: 'size.100' },
       emptyStylesMap,
       emptyThemeInfo,
     );
@@ -736,5 +741,34 @@ describe('Can set values on node', () => {
     const data = { visibility: 'boolean-false' };
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
     expect(solidNodeMock.visible).toEqual(false);
+  });
+
+  it('should resize when number token applied to the node which has no itemSpacing property', async () => {
+    const mockResize = jest.fn();
+    const mockNode = {
+      resize: mockResize,
+    } as unknown as RectangleNode;
+    const values = {
+      number: '12px',
+    };
+    const data = { number: 'number.regular' };
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    expect(mockResize).toBeCalledWith(12, 12);
+  });
+
+  it('should set itemSpacing when number token applied to the node which has itemSpacing property', async () => {
+    const mockResize = jest.fn();
+    const mockNode = {
+      resize: mockResize,
+      itemSpacing: 0,
+      primaryAxisAlignItems: 'SPACE_BETWEEN',
+    } as unknown as FrameNode;
+    const values = {
+      number: '12px',
+    };
+    const data = { number: 'number.regular' };
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    expect(mockResize).toBeCalledTimes(0);
+    expect(mockNode.itemSpacing).toEqual(12);
   });
 });

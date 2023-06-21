@@ -63,6 +63,7 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case 'paragraphSpacing':
     case 'paragraphIndent':
     case 'fontSizes':
+    case 'dimension':
       return convertTypographyNumberToFigma(value, baseFontSize);
     case 'fontWeights':
       return convertFontWeightToFigma(value);

@@ -403,20 +403,11 @@ describe('TokenListing', () => {
     cy.get('[data-cy=button-style-add-multiple]').click();
 
     cy.get('[data-cy=composition-token-dropdown]').eq(1).click();
-    cy.get('[data-cy=item-dropdown-menu-element-opacity]').click();
+    cy.get('[data-cy=item-dropdown-menu-element-fontFamilies]').click();
     fillInputNth({
       input: 'value',
-      value: '$opacity.30',
+      value: '$fontFamilies.aria',
       nth: 1,
-    });
-
-    cy.get('[data-cy=button-style-add-multiple]').click();
-    cy.get('[data-cy=composition-token-dropdown]').eq(2).click();
-    cy.get('[data-cy=item-dropdown-menu-element-fontSizes]').click();
-    fillInputNth({
-      input: 'value',
-      value: '$font-size.4',
-      nth: 2,
       submit: true,
     });
     cy.get('@postMessage').should('be.calledTwice');

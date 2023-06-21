@@ -7,6 +7,8 @@ import { defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
+import createLocalVariablesInPlugin from '../createLocalVariablesInPlugin';
+import { mergeTokenGroups, resolveTokenValues } from '../tokenHelpers';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -21,11 +23,17 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       collapsedTokenSets: msg.collapsedTokenSets,
     });
   }
-  if (msg.settings.updateStyles && msg.tokens) {
-    receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
+  const mergedTokens = msg.tokens
+    ? resolveTokenValues(mergeTokenGroups(msg.tokens, msg.usedTokenSet))
+    : null;
+
+  if (msg.settings.updateStyles && msg.tokens && mergedTokens) {
+    receivedStyleIds = await updateStyles(mergedTokens, msg.settings, false);
+
+    await createLocalVariablesInPlugin(msg.tokens, msg.settings, false);
   }
-  if (msg.tokens) {
-    const tokensMap = tokenArrayGroupToMap(msg.tokens);
+  if (mergedTokens) {
+    const tokensMap = tokenArrayGroupToMap(mergedTokens);
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode: msg.settings.updateMode,
     });

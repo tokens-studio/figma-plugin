@@ -265,7 +265,7 @@ describe('AppContainer (integration)', () => {
             </Provider>,
           );
 
-          expect(await result.findAllByText('global')).toHaveLength(2);
+          expect(await result.findAllByText('global')).toHaveLength(1);
           result.unmount();
         });
       })
@@ -324,7 +324,7 @@ describe('AppContainer (integration)', () => {
         </Provider>,
       );
 
-      expect(await result.findAllByText('global')).toHaveLength(2);
+      expect(await result.findAllByText('global')).toHaveLength(1);
 
       result.unmount();
     });

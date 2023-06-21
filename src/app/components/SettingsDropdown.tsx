@@ -84,9 +84,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Update styles
+          Update styles & variables
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Updates the value of local styles when names match
+            Updates the value of local styles and variables when names match
           </Box>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
