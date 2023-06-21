@@ -341,7 +341,7 @@ describe('useToken test', () => {
 
   it('remapTokensInGroup', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection', 'page', 'document'] }));
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection'], result: true }));
     await act(async () => {
       await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
     });

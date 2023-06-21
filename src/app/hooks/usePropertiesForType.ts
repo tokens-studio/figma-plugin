@@ -141,11 +141,19 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
         );
         break;
       case TokenTypes.DIMENSION:
-        properties.push(
-          {
+      case TokenTypes.NUMBER:
+        if (type === TokenTypes.DIMENSION) {
+          properties.push({
             name: Properties.dimension,
             invisible: true,
-          },
+          });
+        } else {
+          properties.push({
+            name: Properties.number,
+            invisible: true,
+          });
+        }
+        properties.push(
           {
             label: 'Spacing',
             name: Properties.spacing,

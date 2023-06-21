@@ -84,8 +84,8 @@ export const ThemeSelector: React.FC = () => {
         value={value}
         data-cy={`themeselector--themeoptions--${value}`}
         data-testid={`themeselector--themeoptions--${value}`}
-          // @README we can disable this because we are using Memo for the whole list anyways
-          // eslint-disable-next-line react/jsx-no-bind
+        // @README we can disable this because we are using Memo for the whole list anyways
+        // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
         <Box css={{ width: '$5', marginRight: '$2' }}>
@@ -107,12 +107,12 @@ export const ThemeSelector: React.FC = () => {
           const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
           return (
             filteredThemes.length > 0 && (
-            <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-              <Text css={{ color: '$staticTextMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
-              {
-                renderThemeOption(filteredThemes)
-              }
-            </DropdownMenuRadioGroup>
+              <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+                <Text css={{ color: '$staticTextMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                {
+                  renderThemeOption(filteredThemes)
+                }
+              </DropdownMenuRadioGroup>
             )
           );
         })
@@ -121,14 +121,14 @@ export const ThemeSelector: React.FC = () => {
   ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
-    <Flex alignItems="center" css={{ flexShrink: 0 }}>
+    <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
       <DropdownMenu>
-        <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
-          <Flex>
-            <ThemeDropdownLabel muted size="small">Theme:</ThemeDropdownLabel>
-            <Text size="small">{activeThemeLabel}</Text>
+        <DropdownMenuTrigger css={{ width: '100%' }} data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
+          <Flex css={{ overflow: 'hidden' }}>
+            <ThemeDropdownLabel muted size="small" css={{ flexShrink: 0 }}>Theme:</ThemeDropdownLabel>
+            <Text size="small" css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{activeThemeLabel}</Text>
           </Flex>
-          <IconToggleableDisclosure />
+          <IconToggleableDisclosure css={{ flexShrink: 0 }} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           data-testid="themeselector-dropdown-content"
@@ -136,8 +136,8 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           {availableThemes.length === 0 && (
-            <ScrollDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text>No themes</Text>
+            <ScrollDropdownMenuRadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text css={{ color: '$contextMenuForegroundMuted', fontSize: '$xsmall' }}>No themes</Text>
             </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}

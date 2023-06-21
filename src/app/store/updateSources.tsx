@@ -1,4 +1,3 @@
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -132,13 +131,10 @@ export default async function updateTokensOnSources({
     });
   }
 
-  const mergedTokens = tokens
-    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
-    : null;
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
-    tokens: tokens ? mergedTokens : null,
+    tokens,
     themes,
     updatedAt,
     settings,

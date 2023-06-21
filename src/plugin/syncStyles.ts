@@ -45,7 +45,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   // styleSet store all possible styles which could be created from current tokens
   const styleSet: Record<string, SingleToken<true, { path: string }>> = {};
   themeInfo.themes.forEach((theme) => {
-    const tokensToCreate = generateTokensToCreate(theme, tokens);
+    const tokensToCreate = generateTokensToCreate(theme, tokens, [TokenTypes.COLOR, TokenTypes.BOX_SHADOW, TokenTypes.TYPOGRAPHY]);
     tokensToCreate.forEach((token) => {
       const pathName = convertTokenNameToPath(token.name, theme.name);
       styleSet[pathName] = {

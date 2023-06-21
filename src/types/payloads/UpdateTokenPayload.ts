@@ -24,6 +24,7 @@ import {
   SingleBorderToken,
   SingleAssetToken,
   SingleBooleanToken,
+  SingleNumberToken,
 } from '../tokens';
 
 type GenericTokenInput<T extends TokenTypes, V = string> = {
@@ -61,4 +62,5 @@ export type UpdateTokenPayload =
   | GenericTokenInput<TokenTypes.BORDER, SingleBorderToken['value']>
   | GenericTokenInput<TokenTypes.ASSET, SingleAssetToken['value']>
   | GenericTokenInput<TokenTypes.OTHER, SingleOtherToken['value']>
-  | GenericTokenInput<TokenTypes.BOOLEAN, SingleBooleanToken['value']>;
+  | GenericTokenInput<TokenTypes.BOOLEAN, SingleBooleanToken['value']>
+  | GenericTokenInput<TokenTypes.NUMBER, SingleNumberToken['value']>;

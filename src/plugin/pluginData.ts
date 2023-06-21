@@ -18,6 +18,7 @@ import { SelectionGroup, SelectionValue } from '@/types';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
 import getAppliedStylesFromNode from './getAppliedStylesFromNode';
+import getAppliedVariablesFromNode from './getAppliedVariablesFromNode';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
@@ -33,15 +34,33 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         const category = get(Properties, key) as Properties | TokenTypes;
 
         acc.push({
-          value, type: key, category, nodes: [{ id, name, type }],
+          value, type: key, category, nodes: [{ id, name, type }], appliedType: 'token',
         });
       }
     });
 
-    // Second we add styles
+    // Second we add variables
+    const localVariables = getAppliedVariablesFromNode(curr.node);
+    localVariables.forEach((variable) => {
+      // Check if the token has been applied. If the token has been applied then we don't add variable.
+      const isTokenApplied = acc.find((item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      if (!isTokenApplied) {
+        const category = get(Properties, variable.type) as Properties | TokenTypes;
+        acc.push({
+          value: variable.name,
+          type: variable.type,
+          category,
+          nodes: [{ id, name, type }],
+          resolvedValue: variable.value,
+          appliedType: 'variable',
+        });
+      }
+    });
+
+    // Third we add styles
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
-      // Check if the token has been applied. If the token has been applied then we don't add style.
+      // Check if the token or variable has been applied. If the token has been applied then we don't add style.
       const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
@@ -51,6 +70,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
           category,
           nodes: [{ id, name, type }],
           resolvedValue: style.value,
+          appliedType: 'style',
         });
       }
     });
@@ -61,7 +81,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
 
 export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
   const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
-    // Fist we add styles. And then tokens. This way, styles will be override by the tokens
+    // Fist we add styles. And then variables. This way, styles will be override by the variables
     const localStyles = getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
       acc.push({
@@ -69,6 +89,13 @@ export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeMan
       });
     });
 
+    // Second we add variables. And then tokens. This way, variables will be override by the tokens
+    const localVariables = getAppliedVariablesFromNode(curr.node);
+    localVariables.forEach((style) => {
+      acc.push({
+        [style.type]: style.name,
+      });
+    });
     acc.push(curr.tokens);
     return acc;
   }, []);

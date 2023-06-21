@@ -23,4 +23,5 @@ export enum TokenTypes {
   BORDER = 'border',
   ASSET = 'asset',
   BOOLEAN = 'boolean',
+  NUMBER = 'number',
 }

@@ -34,6 +34,10 @@ export const SingleThemeEntry: React.FC<Props> = ({
     Object.values(theme.$figmaStyleReferences ?? {}).length
   ), [theme]);
 
+  const variablesCount = useMemo(() => (
+    Object.values(theme.$figmaVariableReferences ?? {}).length
+  ), [theme]);
+
   const handleOpenClick = useCallback(() => {
     onOpen(theme);
   }, [theme, onOpen]);
@@ -49,7 +53,7 @@ export const SingleThemeEntry: React.FC<Props> = ({
   }, [dispatch, theme.id, isActive, activeTheme, groupName]);
 
   return (
-    <Box key={theme.id} data-cy="singlethemeentry" css={{ width: '100%' }}>
+    <Box key={theme.id} data-cy="singlethemeentry" css={{ width: '100%', overflow: 'hidden' }}>
       <Stack direction="row" align="center" justify="between">
         <Stack gap={4} direction="row" align="center">
           <Switch checked={isActive} onCheckedChange={handleToggle}>
@@ -57,9 +61,9 @@ export const SingleThemeEntry: React.FC<Props> = ({
           </Switch>
           <span>{theme.name}</span>
         </Stack>
-        <Stack gap={4} direction="row" align="center">
+        <Stack gap={4} direction="row" align="center" css={{ overflow: 'hidden' }}>
           <StyledThemeMetaLabel>
-            {`${tokenSetCount} Sets, ${stylesCount} Styles`}
+            {`${tokenSetCount} sets, ${stylesCount} styles, ${variablesCount} variables`}
           </StyledThemeMetaLabel>
           <IconButton
             dataCy={`singlethemeentry-${theme.id}`}

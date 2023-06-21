@@ -25,20 +25,12 @@ import {
   activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
-import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
-import { styled } from '@/stitches.config';
 import { ManageThemesModal } from './ManageThemesModal';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
-
-const StyledButton = styled('button', {
-  '&:focus, &:hover': {
-    boxShadow: 'none',
-    background: '$bgSubtle',
-  },
-});
+import SidebarIcon from '@/icons/sidebar.svg';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -221,29 +213,22 @@ function Tokens({ isActive }: { isActive: boolean }) {
           css={{
             display: 'flex',
             flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft: '$4',
+            paddingRight: '$4',
+            paddingTop: '$2',
+            paddingBottom: '$2',
             gap: '$2',
             borderBottom: '1px solid',
             borderColor: '$borderMuted',
           }}
         >
-          <Box>
-            <StyledButton style={{ height: '100%' }} type="button" onClick={handleToggleTokenSetsVisibility}>
-              <Box
-                css={{
-                  fontWeight: '$bold',
-                  height: '100%',
-                  fontSize: '$xsmall',
-                  gap: '$1',
-                  padding: '$3 $4',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                {activeTokenSet}
-                <IconToggleableDisclosure open={tokenSetsVisible} />
-              </Box>
-            </StyledButton>
-          </Box>
+          <IconButton
+            onClick={handleToggleTokenSetsVisibility}
+            icon={<SidebarIcon />}
+            tooltipSide="bottom"
+            tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
+          />
           <TokenFilter />
           <ThemeSelector />
           <Box
@@ -252,8 +237,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
               gap: '$2',
               flexDirection: 'row',
               alignItems: 'center',
-              padding: '$4',
-              paddingLeft: 0,
             }}
           >
             <IconButton

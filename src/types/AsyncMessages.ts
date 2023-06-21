@@ -14,8 +14,11 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption } from '@/app/store/useTokens';
+import { SyncOption, SyncVariableOption } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
+import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
+import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
+import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -53,6 +56,11 @@ export enum AsyncMessageTypes {
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
   SET_AUTH_DATA = 'async/set-auth-data',
+  CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
+  RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
+  ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
+  RENAME_VARIABLES = 'async/rename-variables',
+  SYNC_VARIABLES = 'async/sync-variables',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -188,7 +196,7 @@ export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_S
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
-  tokens: AnyTokenList | null;
+  tokens: Record<string, AnyTokenList> | null;
   themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
@@ -246,6 +254,46 @@ export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
 }>;
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
 
+export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
+  tokens: Record<string, AnyTokenList>;
+  settings: SettingsState
+}>;
+export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
+  variableIds: Record<string, LocalVariableInfo>
+}>;
+
+export type ResolveVariableInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
+  variableIds: string[]
+}>;
+export type ResolveVariableInfoResult = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
+  resolvedValues: Record<string, ResolvedVariableInfo>;
+}>;
+
+export type AttachLocalVariablesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, {
+  theme: ThemeObject
+  tokens: Record<string, AnyTokenList>
+}>;
+export type AttachLocalVariablesToThemeResult = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, {
+  variableInfo: LocalVariableInfo | null
+}>;
+
+export type RenameVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
+  tokens: {
+    oldName: string;
+    newName: string;
+  }[]
+}>;
+export type RenameVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
+  renameVariableToken: RenameVariableToken[];
+}>;
+
+export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES, {
+  tokens: Record<string, AnyTokenList>;
+  options: Record<SyncVariableOption, boolean>;
+  settings: SettingsState;
+}>;
+export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -279,7 +327,12 @@ export type AsyncMessages =
   | ResolveStyleInfo
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
-  | SetAuthDataMessage;
+  | SetAuthDataMessage
+  | CreateLocalVariablesAsyncMessage
+  | ResolveVariableInfo
+  | AttachLocalVariablesToTheme
+  | RenameVariablesAsyncMessage
+  | SyncVariableAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -314,7 +367,12 @@ export type AsyncMessageResults =
   | ResolveStyleInfoResult
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
-  | SetAuthDataMessageResult;
+  | SetAuthDataMessageResult
+  | CreateLocalVariablesAsyncMessageResult
+  | ResolveVariableInfoResult
+  | AttachLocalVariablesToThemeResult
+  | RenameVariablesAsyncMessageResult
+  | SyncVariableAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

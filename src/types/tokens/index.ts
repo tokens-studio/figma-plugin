@@ -32,3 +32,4 @@ export * from './SingleDimensionToken';
 export * from './SingleBorderToken';
 export * from './SingleAssetToken';
 export * from './SingleBooleanToken';
+export * from './SingleNumberToken';

@@ -60,7 +60,7 @@ export const ThemeGroupDropDownMenu: React.FC<Props> = ({
           ) : (
             <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
               <IconPlus />
-              Add group
+              Add&nbsp;group
             </Box>
           )
         }
