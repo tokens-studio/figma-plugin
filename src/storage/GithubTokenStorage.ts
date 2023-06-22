@@ -206,7 +206,7 @@ export class GithubTokenStorage extends GitTokenStorage {
               const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
-              const parsed = JSON.parse(fileContent.data) as GitMultiFileObject;
+              const parsed = JSON.parse(fileContent.data as unknown as string) as GitMultiFileObject;
               // @README we will need to ensure these reserved names
 
               if (name === SystemFilenames.THEMES) {
