@@ -8,15 +8,27 @@ export type ResolvedVariableInfo = {
 };
 export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (msg) => {
   const localVariableMap = getVariablesMap();
-  const resolvedValues = msg.variableIds.reduce<Record<string, ResolvedVariableInfo>>((acc, curr) => {
-    if (localVariableMap[curr]) {
-      acc[curr] = {
-        name: localVariableMap[curr].name,
-        key: localVariableMap[curr].key,
-      };
+  const resolvedValues: Record<string, ResolvedVariableInfo> = {};
+
+  msg.variableIds.forEach(async (id) => {
+    try {
+      const remoteVariable = await figma.variables.importVariableByKeyAsync(id);
+      if (remoteVariable) {
+        resolvedValues[id] = {
+          key: remoteVariable.key,
+          name: remoteVariable.name,
+        };
+      } else if (localVariableMap[id]) {
+        resolvedValues[id] = {
+          key: localVariableMap[id].key,
+          name: localVariableMap[id].name,
+        };
+      }
+    } catch (err) {
+      console.error(err);
     }
-    return acc;
-  }, {});
+  });
+
   return {
     resolvedValues,
   };
