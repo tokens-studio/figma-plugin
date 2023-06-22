@@ -1,4 +1,5 @@
 import hash from 'object-hash';
+import omit from 'just-omit';
 import { ThemeObject } from '@/types';
 import type { TokenState } from '../../tokenState';
 import { setActiveTheme } from './setActiveTheme';
@@ -23,12 +24,12 @@ export function saveTheme(state: TokenState, data: Payload): TokenState {
 
   const updatedThemes = [...state.themes];
   updatedThemes.splice(startIndex, 1, {
-    ...state.themes[themeObjectIndex],
+    ...omit(state.themes[themeObjectIndex], 'group'),
     id: themeId,
     name: data.name,
     $figmaStyleReferences: state.themes[themeObjectIndex]?.$figmaStyleReferences ?? {},
     selectedTokenSets,
-    group: data.group,
+    ...(data?.group ? { group: data.group } : {}),
   });
 
   const newActiveTheme = state.activeTheme;
