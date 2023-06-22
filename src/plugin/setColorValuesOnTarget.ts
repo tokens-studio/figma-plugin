@@ -3,7 +3,20 @@ import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
 
-export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, token: Pick<SingleColorToken, 'value' | 'description'>, key: 'paints' | 'fills' | 'strokes' = 'paints') {
+type Token = Pick<SingleColorToken<true, { path?: string }>, 'value' | 'description' | 'path'>;
+
+function getBoundVariables(token: Token) {
+  const { path } = token;
+  if (!path) return undefined;
+
+  const localVariable = figma.variables.getLocalVariables('COLOR').find((lVar) => lVar.name === path);
+
+  if (!localVariable) return undefined;
+
+  return { color: figma.variables.createVariableAlias(localVariable) };
+}
+
+export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, token: Token, key: 'paints' | 'fills' | 'strokes' = 'paints') {
   try {
     const { description, value } = token;
 
@@ -31,7 +44,10 @@ export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, to
       }
     } else {
       const { color, opacity } = convertToFigmaColor(value);
-      const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+      const boundVariables = getBoundVariables(token);
+      const newPaint: SolidPaint = {
+        color, opacity, type: 'SOLID', boundVariables,
+      };
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
         if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
         if (key === 'fills' && 'fills' in target) target.fills = [newPaint];

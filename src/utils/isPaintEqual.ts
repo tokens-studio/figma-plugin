@@ -16,6 +16,7 @@ export function isPaintEqual(paint1?: Paint, paint2?: Paint) {
 
           // Compare using hex instead for now:
           && convertFigmaPaintToHex(paint1) === convertFigmaPaintToHex(paint2)
+          && paint1.boundVariables?.color?.id === paint2.boundVariables?.color?.id
         );
       }
 
