@@ -12,24 +12,29 @@ const MockEnv = () => {
     role_name: 'admin'
   }).as('getPermissions')
 
-  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/contents/tokens.json?ref=main', {
-    name: "tokens.json",
-    path: "data/tokens.json",
-    sha: "c0963ec8774877260d20e6a94f3ba8244c0828d9",
-    size: 163635,
-    url: "https://api.github.com/repos/LiamMartens/figma-tokens-sandbox/contents/data/tokens.json?ref=master",
-    html_url: "https://github.com/LiamMartens/figma-tokens-sandbox/blob/master/data/tokens.json",
-    git_url: "https://api.github.com/repos/LiamMartens/figma-tokens-sandbox/git/blobs/c0963ec8774877260d20e6a94f3ba8244c0828d9",
-    download_url: "https://raw.githubusercontent.com/LiamMartens/figma-tokens-sandbox/master/data/tokens.json?token=ABIFPLETS3MM24U5DGYQ6YDC4HJLA",
-    type: "file",
-    content: "ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==",
-    encoding: "base64",
-    _links: {
-      self: "https://api.github.com/repos/LiamMartens/figma-tokens-sandbox/contents/data/tokens.json?ref=master",
-      git: "https://api.github.com/repos/LiamMartens/figma-tokens-sandbox/git/blobs/c0963ec8774877260d20e6a94f3ba8244c0828d9",
-      html: "https://github.com/LiamMartens/figma-tokens-sandbox/blob/master/data/tokens.json"
-    }
-  }).as('getContent');
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/contents/tokens.json?ref=main', JSON.stringify({
+    "global": {
+      "red": {
+        "type": "color",
+        "name": "red",
+        "value": "#ff0000"
+      },
+      "black": {
+        "type": "color",
+        "name": "black",
+        "value": "#000000"
+      }
+    },
+    "$themes": [
+      {
+        "id": "light",
+        "name": "Light",
+        "selectedTokenSets": {
+          "global": "enabled"
+        }
+      }
+    ]
+  })).as('getContent');
 
   cy.intercept('GET', 'http://localhost:5000/six7six7/repos/122/figma-tokens/branches?per_page=30', [
     {
