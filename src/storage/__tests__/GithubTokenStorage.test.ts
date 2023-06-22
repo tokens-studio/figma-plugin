@@ -170,9 +170,30 @@ describe('GithubTokenStorage', () => {
   it('can read from Git in single file format', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
-        data: {
-          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0sCiAgIiRtZXRhZGF0YSI6IHt9Cn0=',
-        },
+        data: JSON.stringify({
+          global: {
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+            black: {
+              type: 'color',
+              name: 'black',
+              value: '#000000',
+            },
+          },
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ],
+          $metadata: {},
+        }),
       })
     ));
 
@@ -211,6 +232,7 @@ describe('GithubTokenStorage', () => {
       ref: 'main',
       headers: {
         'If-None-Match': '',
+        Accept: 'application/vnd.github.raw',
       },
     });
   });
@@ -219,9 +241,7 @@ describe('GithubTokenStorage', () => {
     storageProvider.changePath('data/tokens.json');
     mockGetContent.mockImplementation(() => (
       Promise.resolve({
-        data: {
-          content: 'RW1wdHkgZmlsZQ==',
-        },
+        data: 'Empty file',
       })
     ));
 
@@ -235,9 +255,7 @@ describe('GithubTokenStorage', () => {
   it('can handle invalid file content', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
-        data: {
-          content: 'RW1wdHkgZmlsZQ==',
-        },
+        data: 'Empty file',
       })
     ));
 
@@ -251,7 +269,7 @@ describe('GithubTokenStorage', () => {
   it('should empty array when there is no content', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
-        data: {},
+        data: '',
       })
     ));
 
@@ -327,25 +345,35 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/$metadata.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJ0b2tlblNldE9yZGVyIjogWyJnbG9iYWwiXQp9',
-          },
+          data: JSON.stringify({
+            tokenSetOrder: ['global'],
+          }),
         });
       }
 
       if (opts.path === 'data/$themes.json') {
         return Promise.resolve({
-          data: {
-            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
-          },
+          data: JSON.stringify([
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ]),
         });
       }
 
       if (opts.path === 'data/global.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
@@ -423,25 +451,35 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/$metadata.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJ0b2tlblNldE9yZGVyIjogWyJnbG9iYWwiXQp9',
-          },
+          data: JSON.stringify({
+            tokenSetOrder: ['global'],
+          }),
         });
       }
 
       if (opts.path === 'data/$themes.json') {
         return Promise.resolve({
-          data: {
-            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
-          },
+          data: JSON.stringify([
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ]),
         });
       }
 
       if (opts.path === 'data/global.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
@@ -513,9 +551,29 @@ describe('GithubTokenStorage', () => {
   it('should be able to write', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
-        data: {
-          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
-        },
+        data: JSON.stringify({
+          global: {
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+            black: {
+              type: 'color',
+              name: 'black',
+              value: '#000000',
+            },
+          },
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ],
+        }),
       })
     ));
 
@@ -698,9 +756,29 @@ describe('GithubTokenStorage', () => {
   it('should be able to rename and delete', async () => {
     mockGetContent.mockImplementationOnce(() => (
       Promise.resolve({
-        data: {
-          content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
-        },
+        data: JSON.stringify({
+          global: {
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+            black: {
+              type: 'color',
+              name: 'black',
+              value: '#000000',
+            },
+          },
+          $themes: [
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ],
+        }),
       })
     ));
     mockCreateOrUpdateFiles.mockImplementationOnce(() => (
@@ -823,33 +901,51 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/$themes.json') {
         return Promise.resolve({
-          data: {
-            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
-          },
+          data: JSON.stringify([
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ]),
         });
       }
 
       if (opts.path === 'data/colors/achieve.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
       if (opts.path === 'data/base/achieve.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
       if (opts.path === 'data/achieve.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
@@ -1022,33 +1118,53 @@ describe('GithubTokenStorage', () => {
 
       if (opts.path === 'data/$themes.json') {
         return Promise.resolve({
-          data: {
-            content: 'WwogIHsKICAgICJpZCI6ICJsaWdodCIsCiAgICAibmFtZSI6ICJMaWdodCIsCiAgICAic2VsZWN0ZWRUb2tlblNldHMiOiB7CiAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgIH0KICB9Cl0=',
-          },
+          data: JSON.stringify([
+            {
+              id: 'light',
+              name: 'Light',
+              selectedTokenSets: {
+                global: 'enabled',
+              },
+            },
+          ]),
         });
       }
 
       if (opts.path === 'data/global.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
       if (opts.path === 'data/core.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify({
+            red: {
+              type: 'color',
+              name: 'red',
+              value: '#ff0000',
+            },
+          }),
         });
       }
 
       if (opts.path === 'data/internal.json') {
         return Promise.resolve({
-          data: {
-            content: 'ewogICJyZWQiOiB7CiAgICAidHlwZSI6ICJjb2xvciIsCiAgICAibmFtZSI6ICJyZWQiLAogICAgInZhbHVlIjogIiNmZjAwMDAiCiAgfQp9',
-          },
+          data: JSON.stringify(
+            {
+              red: {
+                type: 'color',
+                name: 'red',
+                value: '#ff0000',
+              },
+            },
+          ),
         });
       }
 
