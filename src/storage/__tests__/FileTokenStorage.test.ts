@@ -15,6 +15,7 @@ const json = JSON.stringify({
     {
       id: '8722635276827d42671ab23df835867c9e0024dd',
       name: 'Light',
+      group: 'Color',
       selectedTokenSets: {
         global: 'enabled',
       },
@@ -38,16 +39,23 @@ describe('FileTokenStorage', () => {
     } as unknown as FileList;
     const mockFileTokenStorage = new FileTokenStorage(mockFileList);
 
-    expect(await mockFileTokenStorage.read()).toEqual([{
-      data: [{
-        $figmaStyleReferences: {}, id: '8722635276827d42671ab23df835867c9e0024dd', name: 'Light', selectedTokenSets: { global: 'enabled' },
-      }],
-      path: 'core.json',
-      type: 'themes',
-    },
-    { data: { tokenSetOrder: ['global'] }, path: 'core.json', type: 'metadata' },
-    {
-      data: { primary: { type: 'sizing', value: '1.5' }, secondary: { type: 'sizing', value: '4' } }, name: 'global', path: 'core.json', type: 'tokenSet',
-    }]);
+    expect(await mockFileTokenStorage.read()).toEqual([
+      {
+        data: [
+          {
+            $figmaStyleReferences: {},
+            id: '8722635276827d42671ab23df835867c9e0024dd',
+            name: 'Light',
+            group: 'Color',
+            selectedTokenSets: { global: 'enabled' },
+          },
+        ],
+        path: 'core.json',
+        type: 'themes',
+      },
+      { data: { tokenSetOrder: ['global'] }, path: 'core.json', type: 'metadata' },
+      {
+        data: { primary: { type: 'sizing', value: '1.5' }, secondary: { type: 'sizing', value: '4' } }, name: 'global', path: 'core.json', type: 'tokenSet',
+      }]);
   });
 });
