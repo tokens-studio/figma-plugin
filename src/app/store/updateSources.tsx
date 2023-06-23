@@ -12,7 +12,6 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
-import { closeTransaction, setTransaction } from '../profiling';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;

@@ -113,7 +113,9 @@ module.exports = (env, argv) => ({
       chunks: ['ui'],
       cache: argv.mode === 'production',
     }),
-    new HtmlInlineScriptPlugin(),
+    new HtmlInlineScriptPlugin({
+      assetPreservePattern: [/\.js$/],
+    }),
     new webpack.DefinePlugin({
       'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
     }),
