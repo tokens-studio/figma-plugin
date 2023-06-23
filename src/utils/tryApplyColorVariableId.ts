@@ -2,7 +2,6 @@ import { clone } from '@figma-plugin/helpers';
 import { matchVariableName } from './matchVariableName';
 
 export async function tryApplyColorVariableId(node: SceneNode, token: string, figmaVariableReferences: Record<string, string>, figmaVariableMaps: Record<string, Variable>) {
-  if (Object.keys(figmaVariableMaps).length < 1) return false;
   const pathname = token.split('.').join('/');
   const matchVariableId = matchVariableName(
     token,
@@ -10,9 +9,10 @@ export async function tryApplyColorVariableId(node: SceneNode, token: string, fi
     figmaVariableReferences,
     figmaVariableMaps,
   );
+
   if (matchVariableId && 'fills' in node) {
     try {
-      const colorVariable = figma.variables.getVariableById(matchVariableId);
+      const colorVariable = await figma.variables.importVariableByKeyAsync(matchVariableId);
       if (colorVariable) {
         const fillsCopy = clone(node.fills);
         // bind the first fill to a variable

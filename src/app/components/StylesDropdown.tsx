@@ -30,7 +30,7 @@ export default function StylesDropdown() {
         <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>Sync styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>Import styles</DropdownMenuItem>
         <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>Create styles</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create variables" onSelect={createVariables}>Create variables</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create variables" disabled={availableThemes.length < 1} onSelect={createVariables}>Create variables</DropdownMenuItem>
         <DropdownMenuItem textValue="Sync variables" disabled={availableThemes.length < 1} onSelect={syncVariables}>Sync variables</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
