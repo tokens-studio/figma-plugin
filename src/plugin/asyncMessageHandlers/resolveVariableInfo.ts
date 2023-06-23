@@ -9,7 +9,6 @@ export type ResolvedVariableInfo = {
 export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (msg) => {
   const localVariableMap = getVariablesMap();
   const resolvedValues: Record<string, ResolvedVariableInfo> = {};
-
   msg.variableIds.forEach(async (id) => {
     try {
       const remoteVariable = await figma.variables.importVariableByKeyAsync(id);
