@@ -35,8 +35,7 @@ export const LanguageSelector = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-
-          color: '$onInteraction',
+          color: '$textMuted',
           '&:hover, &:focus-visible': { backgroundColor: '$bgSubtle' },
         }}
         data-testid="choose-language"

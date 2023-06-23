@@ -102,11 +102,7 @@ export default function Footer() {
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
               tooltipSide="top"
-              tooltip={
-                t('pullFrom', {
-                  provider: transformProviderName(storageType.provider),
-                }) as string
-              }
+              tooltip={`${t('pullFrom')} ${storageType.provider}`}
             />
             <IconButton
               dataCy="footer-push-button"

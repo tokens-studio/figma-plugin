@@ -28,7 +28,7 @@ export default function StylesDropdown() {
         <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>{t('syncStyles')}</DropdownMenuItem>
         <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>{t('importStyles')}</DropdownMenuItem>
         <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>{t('createStyles')}</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create Variables" onSelect={createVariables}>Create Variables</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create Variables" onSelect={createVariables}>{t('createVariables')}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
