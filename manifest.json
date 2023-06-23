@@ -5,6 +5,6 @@
   "main": "dist/code.js",
   "ui": "dist/index.html",
   "editorType": ["figma"],
-  "permissions": ["currentuser", "teamlibrary"],
+  "permissions": ["currentuser"],
   "relaunchButtons": [{ "command": "edit", "name": "Tokens" }]
 }
