@@ -17,7 +17,7 @@ export async function tryApplyVariableId(node: SceneNode, type: VariableBindable
         if (node.boundVariables?.[type] !== undefined) {
           const figmaVariableId = node?.boundVariables?.[type]?.id;
           if (figmaVariableId) {
-            const appliedVariable = figma.variables.getVariableById(figmaVariableId);
+            const appliedVariable = await figma.variables.importVariableByKeyAsync(figmaVariableId);
             return appliedVariable?.resolveForConsumer(node).value === node[type as keyof typeof node];
           }
         }
