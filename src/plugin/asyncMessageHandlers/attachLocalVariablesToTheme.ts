@@ -38,7 +38,7 @@ export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessa
         default: break;
       }
       if (variable) {
-        collectionVariableIds[token.name] = variable.id;
+        collectionVariableIds[token.name] = variable.key;
       }
     });
     return {

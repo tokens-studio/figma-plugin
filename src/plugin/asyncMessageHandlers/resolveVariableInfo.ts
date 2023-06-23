@@ -9,25 +9,22 @@ export type ResolvedVariableInfo = {
 export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (msg) => {
   const localVariableMap = getVariablesMap();
   const resolvedValues: Record<string, ResolvedVariableInfo> = {};
-  msg.variableIds.forEach(async (id) => {
-    try {
-      const remoteVariable = await figma.variables.importVariableByKeyAsync(id);
-      if (remoteVariable) {
-        resolvedValues[id] = {
-          key: remoteVariable.key,
-          name: remoteVariable.name,
-        };
-      } else if (localVariableMap[id]) {
-        resolvedValues[id] = {
-          key: localVariableMap[id].key,
-          name: localVariableMap[id].name,
+  await Promise.all(msg.variableIds.map(async (variableId) => {
+    if (localVariableMap[variableId]) {
+      resolvedValues[variableId] = {
+        name: resolvedValues[variableId].name,
+        key: resolvedValues[variableId].key,
+      };
+    } else {
+      const variable = await figma.variables.importVariableByKeyAsync(variableId);
+      if (variable) {
+        resolvedValues[variableId] = {
+          name: variable.name,
+          key: variable.key,
         };
       }
-    } catch (err) {
-      console.error(err);
     }
-  });
-
+  }));
   return {
     resolvedValues,
   };

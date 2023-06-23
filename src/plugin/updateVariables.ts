@@ -45,7 +45,7 @@ export default function updateVariables({
     if (referenceVariable.shouldReferenceToVariable) {
       referenceVariableCandidate.push(referenceVariable);
     }
-    returnVariableIds[tokenName] = referenceVariable.variable.id;
+    returnVariableIds[tokenName] = referenceVariable.variable.key;
   });
   return {
     variableIds: returnVariableIds,

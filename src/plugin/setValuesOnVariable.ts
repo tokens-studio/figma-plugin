@@ -23,7 +23,7 @@ export default function setValuesOnVariable(
   const variableObj: Record<string, ReferenceVariableType> = {};
   tokens.forEach((t) => {
     // Find the connected variable
-    let variable = variablesInFigma.find((v) => (v.id === t.variableId && !v.remote) || v.name === t.path);
+    let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
     if (!variable && shouldCreate) {
       variable = figma.variables.createVariable(t.path, collection.id, variableType);
     }
