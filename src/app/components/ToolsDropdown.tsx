@@ -12,7 +12,7 @@ import ExportModal from './modals/ExportModal';
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
 
-  const { t } = useTranslation('', { keyPrefix: 'tokens' });
+  const { t } = useTranslation('');
 
   const [presetModalVisible, showPresetModal] = React.useState(false);
   const [exportModalVisible, showExportModal] = React.useState(false);
@@ -37,14 +37,14 @@ export default function ToolsDropdown() {
       <DropdownMenu>
         <DropdownMenuTrigger>
           <span>
-            {t('tools')}
+            {t('tokens.tools')}
           </span>
           <IconChevronDown />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="top">
-          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenuItem>
-          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenuItem>
+          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowPresetModal}>{t('tokens.loadFromFileOrPreset')}</DropdownMenuItem>
+          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowExportModal}>{t('tokens.exportToFile')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}

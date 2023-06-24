@@ -38,7 +38,7 @@ const zodSchema = zod.object({
   flow: zod.string(),
   additionalHeaders: zod.array(zod.object({
     name: zod.string(),
-    value: zod.string().default(''),
+    value: zod.string().default('storage.providers.generic.'),
   })),
   internalId: zod.string().optional(),
 });
@@ -46,8 +46,7 @@ const zodSchema = zod.object({
 export default function GenericVersionedForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const { t } = useTranslation('', { keyPrefix: 'storage.providers.generic' });
-  const { t: gt } = useTranslation('', { keyPrefix: 'general' });
+  const { t } = useTranslation('');
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -127,17 +126,17 @@ export default function GenericVersionedForm({
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={1}>
-          <Heading>{t('addNew')}</Heading>
+          <Heading>{t('storage.providers.generic.addNew')}</Heading>
           <Text muted>
-            {t('description')}
+            {t('storage.providers.generic.description')}
             {' '}
-            <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider">{gt('readMore')}</Link>
+            <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider">{t('general.readMore')}</Link>
           </Text>
         </Stack>
         <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Input
           full
-          label={t('URL')}
+          label={t('storage.providers.generic.url')}
           value={values.id}
           onChange={onChange}
           type="text"
@@ -146,7 +145,7 @@ export default function GenericVersionedForm({
         />
         <DropdownMenu>
           <Stack direction="column" gap={0}>
-            <Label htmlFor="flow-dropdown">{t('flowType')}</Label>
+            <Label htmlFor="flow-dropdown">{t('storage.providers.generic.flowType')}</Label>
             <DropdownMenuTrigger id="flow-dropdown" bordered data-cy="flow-dropdown" data-testid="flow-dropdown">
               <Text size="small">{flow}</Text>
               <TriangleDownIcon />
@@ -159,17 +158,17 @@ export default function GenericVersionedForm({
             <DropdownMenuRadioGroup onValueChange={handleValueChange}>
               <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
                 <Text>
-                  {t('readOnly')}
+                  {t('storage.providers.generic.readOnly')}
                 </Text>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
                 <Text>
-                  {t('readWrite')}
+                  {t('storage.providers.generic.readWrite')}
                 </Text>
               </DropdownMenuRadioItem>
               <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
                 <Text>
-                  {t('readWriteCreate')}
+                  {t('storage.providers.generic.readWriteCreate')}
 
                 </Text>
               </DropdownMenuRadioItem>
@@ -177,11 +176,11 @@ export default function GenericVersionedForm({
           </DropdownMenuContent>
         </DropdownMenu>
         <Stack direction="column" gap={4}>
-          <Heading>{t('additionalHeaders')}</Heading>
+          <Heading>{t('storage.providers.generic.additionalHeaders')}</Heading>
           {headers.map((x, i) => (
             <Box css={{ display: 'flex', gap: '1em' }}>
               <Input
-                label={t('name')}
+                label={t('storage.providers.generic.name')}
                 value={x?.name}
                 onChange={onHeaderChange}
                 type="text"
@@ -189,7 +188,7 @@ export default function GenericVersionedForm({
                 data-index={i}
               />
               <Input
-                label={t('value')}
+                label={t('storage.providers.generic.value')}
                 value={x.value}
                 disabled={!x.name}
                 isMasked
@@ -211,11 +210,11 @@ export default function GenericVersionedForm({
         </Stack>
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
-            {gt('cancel')}
+            {t('general.cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.id}>
-            {gt('save')}
+            {t('general.save')}
           </Button>
         </Stack>
         {hasErrored && (

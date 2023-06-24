@@ -60,9 +60,32 @@ async function autoTranslate() {
 
         const value = getProperty(sourceObj, key);
 
-        // @ts-ignore
-        const translated = await translate(value, { from: 'en', to: lang });
-        setProperty(newAcc, key, translated);
+        // Check if the value contains double braces with interpolation placeholders
+        const hasInterpolation = /\{\{([^{}]+?)\}\}/.test(value);
+        if (hasInterpolation) {
+            // Extract the interpolation placeholders and preserve the braces
+            const placeholders = value.match(/\{\{([^{}]+?)\}\}/g);
+
+            // Replace the interpolation placeholders with a placeholder token
+            const placeholderToken = '__PLACEHOLDER__';
+            const replacedValue = value.replace(/\{\{([^{}]+?)\}\}/g, placeholderToken);
+
+            // Translate the replaced value
+            // @ts-ignore
+            const translated = await translate(replacedValue, { from: 'en', to: lang });
+
+            // Restore the interpolation placeholders using the placeholder token
+            const translatedValue = placeholders.reduce((acc, placeholder) => {
+              return acc.replace(placeholderToken, placeholder);
+            }, translated);
+
+            setProperty(newAcc, key, translatedValue);
+        } else {
+          // @ts-ignore
+          const translated = await translate(value, { from: 'en', to: lang });
+
+          setProperty(newAcc, key, translated);
+        }
         return newAcc
       }, initial);
 

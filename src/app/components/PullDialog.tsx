@@ -19,7 +19,7 @@ function PullDialog() {
   const storageType = useSelector(storageTypeSelector);
   const changedState = useSelector(changedStateSelector);
 
-  const { t } = useTranslation('', { keyPrefix: 'sync' });
+  const { t } = useTranslation('');
 
   const handleOverrideClick = React.useCallback(() => {
     onConfirm();
@@ -42,7 +42,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4}>
             <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-              {t('override')}
+              {t('sync.override')}
             </Stack>
             <ChangedStateList changedState={changedState} />
             <Box css={{
@@ -59,10 +59,10 @@ function PullDialog() {
             }}
             >
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
-                {t('cancel')}
+                {t('sync.cancel')}
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                {t('pullTokens')}
+                {t('sync.pullTokens')}
               </Button>
             </Box>
           </Stack>

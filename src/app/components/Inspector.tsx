@@ -26,7 +26,7 @@ import Stack from './Stack';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
-  const { t } = useTranslation('', { keyPrefix: 'inspect' });
+  const { t } = useTranslation('');
   const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
@@ -88,7 +88,7 @@ function Inspector() {
             onChange={handleSearchInputChange}
             type="text"
             autofocus
-            placeholder={`${t('search')}...`}
+            placeholder={`${t('inspect.search')}...`}
           />
         </Box>
         <Stack direction="row" align="center" gap={4}>
@@ -98,10 +98,10 @@ function Inspector() {
               id="inspectDeep"
               onCheckedChange={handleSetInspectDeep}
             />
-            <Tooltip label={t('scansSelected') as string} side="bottom">
+            <Tooltip label={t('inspect.scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
                 <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>
-                  {t('deepInspect')}
+                  {t('inspect.deepInspect')}
 
                 </Box>
               </Label>
@@ -114,7 +114,7 @@ function Inspector() {
               onClick={handleSetInspectViewMulti}
               icon={<IconInspect />}
               tooltipSide="bottom"
-              tooltip={t('inspectLayers') as string}
+              tooltip={t('inspect.inspectLayers') as string}
             />
             <IconButton
               variant={inspectView === 'debug' ? 'primary' : 'default'}
@@ -122,7 +122,7 @@ function Inspector() {
               onClick={handleSetInspectViewDebug}
               icon={<IconDebug />}
               tooltipSide="bottom"
-              tooltip={t('debugAndAnnotate') as string}
+              tooltip={t('inspect.debugAndAnnotate') as string}
             />
           </Stack>
           <InspectSearchOptionDropdown />

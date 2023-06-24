@@ -34,10 +34,10 @@ const StyledButton = styled('button', {
 });
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
-  const { t } = useTranslation('', { keyPrefix: 'tokens' });
+  const { t } = useTranslation('');
   const onboardingData = {
-    title: t('sets'),
-    text: t('setExplanation'),
+    title: t('tokens.sets'),
+    text: t('tokens.setExplanation'),
     url: 'https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets',
   };
 
@@ -77,13 +77,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     track('Deleted token set');
 
     const userConfirmation = await confirm({
-      text: t('deleteTokenSet', { tokenSet }) as string,
-      description: t('deleteSetConfirmation'),
+      text: t('tokens.deleteTokenSet', { tokenSet }) as string,
+      description: t('tokens.deleteSetConfirmation'),
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
     }
-  }, [confirm, dispatch]);
+  }, [confirm, dispatch, t]);
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
@@ -167,7 +167,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`${isDuplicate ? t('duplicate') : t('rename')} ${oldTokenSetName}`}
+        title={`${isDuplicate ? t('tokens.duplicate') : t('tokens.rename')} ${oldTokenSetName}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
@@ -185,11 +185,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             />
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
-                {t('cancel')}
+                {t('tokens.cancel')}
               </Button>
               <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
                 {
-                  isDuplicate ? t('save') : t('change')
+                  isDuplicate ? t('tokens.save') : t('tokens.change')
                 }
               </Button>
             </Stack>
@@ -197,7 +197,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         </form>
       </Modal>
       <Modal
-        title={t('newSet') as string}
+        title={t('tokens.newSet') as string}
         data-testid="new-set-modal"
         isOpen={showNewTokenSetFields}
         close={handleCloseNewTokenSetModal}
@@ -217,17 +217,17 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             />
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
-                {t('cancel')}
+                {t('tokens.cancel')}
               </Button>
               <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
-                {t('create')}
+                {t('tokens.create')}
               </Button>
             </Stack>
           </Stack>
         </form>
       </Modal>
       <StyledButton data-cy="button-new-token-set" data-testid="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
-        {t('newSet')}
+        {t('tokens.newSet')}
         <IconAdd />
       </StyledButton>
       {uiState.onboardingExplainerSets && (

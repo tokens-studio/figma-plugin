@@ -32,7 +32,7 @@ type Props = {
 };
 
 export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
-  const { t } = useTranslation('', { keyPrefix: 'general' });
+  const { t } = useTranslation('');
   return (
     <Box css={data.title === 'Sets' ? {
       display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderTop: '1px solid $borderMuted', borderBottom: '1px solid $borderMuted',
@@ -51,7 +51,7 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
         {data.text}
       </StyledTextPlan>
       <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
-        {t('readMore')}
+        {t('general.readMore')}
       </StyledReadMoreLink>
     </Box>
   );

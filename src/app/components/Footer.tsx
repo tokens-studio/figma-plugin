@@ -49,7 +49,7 @@ export default function Footer() {
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { secondScreen } = useFlags();
-  const { t } = useTranslation('', { keyPrefix: 'footer' });
+  const { t } = useTranslation('');
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -102,7 +102,9 @@ export default function Footer() {
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
               tooltipSide="top"
-              tooltip={`${t('pullFrom')} ${storageType.provider}`}
+              tooltip={t('footer.pullFrom', {
+                provider: transformProviderName(storageType.provider),
+              }) as string}
             />
             <IconButton
               dataCy="footer-push-button"
@@ -112,7 +114,7 @@ export default function Footer() {
               tooltipSide="top"
               disabled={editProhibited}
               tooltip={
-              t('pushTo', {
+              t('footer.pushTo', {
                 provider: transformProviderName(storageType.provider),
               }) as string
 }
@@ -128,7 +130,7 @@ export default function Footer() {
               tooltipSide="top"
               tooltip={
 
-              t('pullFrom', {
+              t('footer.pullFrom', {
                 provider: transformProviderName(storageType.provider),
               }) as string
 }
@@ -141,7 +143,7 @@ export default function Footer() {
               tooltipSide="top"
               disabled={editProhibited}
               tooltip={
-                 t('pushTo', {
+                 t('footer.pushTo', {
                    provider: transformProviderName(storageType.provider),
                  }) as string
 }
@@ -157,7 +159,7 @@ export default function Footer() {
           && storageType.provider !== StorageProviderType.SUPERNOVA
           ? (
             <Stack align="center" direction="row" gap={2}>
-              <Text muted>{t('sync')}</Text>
+              <Text muted>{t('footer.sync')}</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
                 <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
                   <IconButton icon={<IconLibrary />} href={projectURL} />
@@ -178,8 +180,8 @@ export default function Footer() {
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
-          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip={t('docs') as string} />
-          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip={t('feedback') as string} />
+          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip={t('footer.docs') as string} />
+          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip={t('footer.feedback') as string} />
         </Stack>
       </Stack>
     </Box>

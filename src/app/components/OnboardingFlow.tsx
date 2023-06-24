@@ -38,30 +38,30 @@ function fetchOnboardingImage(idx: number) {
 }
 
 export default function OnboardingFlow() {
-  const { t } = useTranslation('', { keyPrefix: 'onBoarding' });
+  const { t } = useTranslation('');
   const onboardingflow = [
     {
-      title: t('welcome'),
-      excerpt: t('welcomeText'),
+      title: t('onboarding.welcome'),
+      excerpt: t('onboarding.welcomeText'),
     },
     {
-      title: t('createTokens'),
-      excerpt: t('createTokensText'),
+      title: t('onboarding.createTokens'),
+      excerpt: t('onboarding.createTokensText'),
       read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
     },
     {
-      title: t('reference'),
-      excerpt: t('referenceText'),
+      title: t('onboarding.reference'),
+      excerpt: t('onboarding.referenceText'),
       read_more_link: 'https://docs.tokens.studio/tokens/aliases',
     },
     {
-      title: t('apply'),
-      excerpt: t('applyText'),
+      title: t('onboarding.apply'),
+      excerpt: t('onboarding.applyText'),
       read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
     },
     {
-      title: t('knowMore'),
-      excerpt: t('knowMoreText'),
+      title: t('onboarding.knowMore'),
+      excerpt: t('onboarding.knowMoreText'),
       read_more_link: 'https://docs.tokens.studio',
     },
   ];
@@ -104,7 +104,7 @@ export default function OnboardingFlow() {
                 rel="noreferrer"
                 href={item.read_more_link}
               >
-                {t('readMore')}
+                {t('onboarding.readMore')}
               </StyledLink>
             )}
           </Stack>
@@ -112,16 +112,16 @@ export default function OnboardingFlow() {
         <Stack direction="row" gap={2} justify={activeIndex > 1 ? 'between' : 'end'}>
           {activeIndex > 1 && (
             <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
-              {t('previous')}
+              {t('onboarding.previous')}
             </Button>
           )}
           {onboardingflow.length > activeIndex + 1 ? (
             <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
-              {t('next')}
+              {t('onboarding.next')}
             </Button>
           ) : (
             <Button id="button-changelog-close" variant="primary" onClick={handleClose}>
-              {t('close')}
+              {t('onboarding.close')}
             </Button>
           )}
         </Stack>

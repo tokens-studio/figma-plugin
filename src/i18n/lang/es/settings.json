@@ -1,14 +1,14 @@
 {
-    "whereTokensStored": "Configurar dónde deben almacenarse los tokens",
-    "whereTokensStoredOnboarding": "Conecte sus tokens a una fuente externa de verdad a la que pueda empujar y tirar. Esto le permite usar tokens en todos los archivos.",
-    "baseFontExplanation": "Le permite configurar el valor que representa 1rem. También puede establecer esto en un token, para que cambie entre conjuntos.",
-    "ignorePrefix": "Ignorar la primera parte del nombre del token para estilos",
-    "prefixStyles": "Estilos de prefijo con nombre de tema activo",
-    "prefixStylesExplanation": "Agrega el nombre del tema activo a cualquier estilo creado. Nota: Usar esto con temas multidimensionales dará lugar a resultados inesperados.",
-    "baseFont": "Token de tamaño de fuente base",
-    "resetOnboarding": "Restablecer incorporación",
-    "settings": "Ajustes",
-    "usefulIgnore": "Útil si quieres ignorar",
-    "inAToken": "en una ficha llamada",
-    "forYourStyles": "para tus estilos"
+  "whereTokensStored": "Configurar dónde deben almacenarse los tokens",
+  "whereTokensStoredOnboarding": "Conecte sus tokens a una fuente externa de verdad a la que pueda empujar y tirar. Esto le permite usar tokens en todos los archivos.",
+  "baseFontExplanation": "Le permite configurar el valor que representa 1rem. También puede establecer esto en un token, para que cambie entre conjuntos.",
+  "ignorePrefix": "Ignorar la primera parte del nombre del token para estilos",
+  "prefixStyles": "Estilos de prefijo con nombre de tema activo",
+  "prefixStylesExplanation": "Agrega el nombre del tema activo a cualquier estilo creado. Nota: Usar esto con temas multidimensionales dará lugar a resultados inesperados.",
+  "baseFont": "Token de tamaño de fuente base",
+  "settings": "Ajustes",
+  "usefulIgnore": "Útil si quieres ignorar",
+  "inAToken": "en una ficha llamada",
+  "forYourStyles": "para tus estilos",
+  "resetOnboarding": "Restablecer incorporación"
 }

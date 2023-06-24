@@ -22,11 +22,11 @@ import Stack from './Stack';
 import BulkRemapModal from './modals/BulkRemapModal';
 
 export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
-  const { t } = useTranslation('', { keyPrefix: 'inspect' });
+  const { t } = useTranslation('');
 
   const onboardingData = {
-    title: t('inspect'),
-    text: t('inspectOnboard'),
+    title: t('inspect.inspect'),
+    text: t('inspect.inspectOnboard'),
     url: 'https://docs.figmatokens.com/inspect/multi-inspect?ref=onboarding_explainer_inspect',
   };
 
@@ -125,18 +125,18 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
               onCheckedChange={handleSelectAll}
             />
             <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
-              {t('selectAll')}
+              {t('inspect.selectAll')}
             </Label>
           </Box>
           <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
             <Button onClick={handleShowBulkRemap} variant="secondary">
-              {t('bulkRemap')}
+              {t('inspect.bulkRemap')}
             </Button>
             <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-              {t('setToNone')}
+              {t('inspect.setToNone')}
             </Button>
             <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-              {t('removeSelected')}
+              {t('inspect.removeSelected')}
             </Button>
           </Box>
         </Box>
@@ -153,7 +153,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
           </Box>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
-            <Blankslate title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} text={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
+            <Blankslate title={uiState.selectedLayers > 0 ? t('inspect.noTokensFound') : t('inspect.noLayersSelected')} text={uiState.selectedLayers > 0 ? t('inspect.noLayersWithTokens') : t('inspect.selectLayer')} />
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
             )}

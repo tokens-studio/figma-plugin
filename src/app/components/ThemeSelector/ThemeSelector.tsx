@@ -37,10 +37,10 @@ type AvailableTheme = {
 export const ThemeSelector: React.FC = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
-  const { t } = useTranslation('', { keyPrefix: 'tokens' });
+  const { t } = useTranslation('');
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
-  const groupNames = useMemo(() => ([...new Set(availableThemes.map((t) => t.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
+  const groupNames = useMemo(() => ([...new Set(availableThemes.map((theme) => theme.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ newActiveTheme: {}, shouldUpdateNodes: true });
@@ -106,7 +106,7 @@ export const ThemeSelector: React.FC = () => {
     <Box className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
       {
         groupNames.map((groupName) => {
-          const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((t) => (typeof t?.group === 'undefined')) : availableThemes.filter((t) => (t?.group === groupName));
+          const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((theme) => (typeof theme?.group === 'undefined')) : availableThemes.filter((theme) => (theme?.group === groupName));
           return (
             filteredThemes.length > 0 && (
               <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
@@ -128,7 +128,7 @@ export const ThemeSelector: React.FC = () => {
         <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
             <ThemeDropdownLabel muted size="small">
-              {t('theme')}
+              {t('tokens.theme')}
               :
             </ThemeDropdownLabel>
             <Text size="small">{activeThemeLabel}</Text>
@@ -142,7 +142,7 @@ export const ThemeSelector: React.FC = () => {
         >
           {availableThemes.length === 0 && (
             <ScrollDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text>{t('noThemes')}</Text>
+              <Text>{t('tokens.noThemes')}</Text>
             </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}
@@ -155,7 +155,7 @@ export const ThemeSelector: React.FC = () => {
             disabled={!tokenThemes}
             onSelect={handleManageThemes}
           >
-            <span>{t('manageThemes')}</span>
+            <span>{t('tokens.manageThemes')}</span>
             {!tokenThemes && <ProBadge compact />}
           </DropdownMenuItem>
         </DropdownMenuContent>

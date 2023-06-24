@@ -1,7 +1,7 @@
 {
-    "sync": "同步",
-    "docs": "文档",
-    "feedback": "反馈",
-    "pullFrom": "从 {{provider}} 拉取",
-    "pushTo": "推送到{{provider}}"
+  "sync": "同步",
+  "docs": "文档",
+  "feedback": "反馈",
+  "pullFrom": "从 {{provider}} 中提取",
+  "pushTo": "推至 {{provider}}"
 }

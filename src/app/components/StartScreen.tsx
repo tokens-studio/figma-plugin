@@ -44,7 +44,7 @@ const HelpfulLink = styled('a', {
 
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
-  const { t } = useTranslation('', { keyPrefix: 'startScreen' });
+  const { t } = useTranslation('');
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
@@ -90,53 +90,53 @@ function StartScreen() {
           <StyledFigmaTokensLogo />
         </Stack>
         <Text muted>
-          {t('intro')}
+          {t('startScreen.intro')}
         </Text>
         <Stack direction="column" gap={4}>
           <Heading size="large">
             {' '}
-            {t('guides')}
+            {t('startScreen.guides')}
           </Heading>
           <Stack direction="column" gap={3}>
             <HelpfulLink href="https://docs.tokens.studio/getting-started?ref=startscreen" target="_blank">
               <BookmarkIcon />
-              {t('gettingStarted')}
+              {t('startScreen.gettingStarted')}
 
             </HelpfulLink>
             <HelpfulLink href="https://docs.tokens.studio/?ref=startscreen" target="_blank">
               <ReaderIcon />
-              {t('documentation')}
+              {t('startScreen.documentation')}
             </HelpfulLink>
             <HelpfulLink href="https://tokens.studio/slack" target="_blank">
               <ChatBubbleIcon />
-              {t('joinSlack')}
+              {t('startScreen.joinSlack')}
             </HelpfulLink>
           </Stack>
         </Stack>
         {storageType?.provider !== StorageProviderType.LOCAL ? (
           <Callout
             id="callout-action-setupsync"
-            heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
-            description={t('unableToFetchRemote')}
+            heading={t('startScreen.couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
+            description={t('startScreen.unableToFetchRemote')}
             action={{
               onClick: onSetSyncClick,
-              text: t('enterCredentials'),
+              text: t('startScreen.enterCredentials'),
             }}
           />
         ) : (
           <Stack direction="row" gap={2}>
             <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
-              {t('newEmptyFile')}
+              {t('startScreen.newEmptyFile')}
             </Button>
             <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
-              {t('loadExample')}
+              {t('startScreen.loadExample')}
             </Button>
           </Stack>
         )}
         <Stack direction="row" align="center" gap={3}>
           <GitHubLogoIcon />
           <a href="https://github.com/tokens-studio/figma-plugin" style={{ textDecoration: 'underline', color: '$textMuted', fontSize: '$xsmall' }} target="_blank" rel="noreferrer">
-            {t('foundIssue')}
+            {t('startScreen.foundIssue')}
           </a>
         </Stack>
       </Stack>

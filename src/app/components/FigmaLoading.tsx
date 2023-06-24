@@ -31,7 +31,7 @@ type Props = PropsWithChildren<{
 export default function FigmaLoading({
   isLoading, label, onCancel, children,
 }: Props) {
-  const { t } = useTranslation('', { keyPrefix: 'startScreen' });
+  const { t } = useTranslation('');
 
   if (!isLoading) {
     return (
@@ -49,18 +49,18 @@ export default function FigmaLoading({
           <FigmaLetter />
         </Stack>
         <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted' }}>
-          {t('version')}
+          {t('startScreen.version')}
           {' '}
           {pjs.plugin_version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner inverse />
           <Stack direction="column" gap={4} justify="center" align="center">
-            {label ?? t('loadingWait')}
+            {label ?? t('startScreen.loadingWait')}
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>
-          <StyledLoadingButton type="button" onClick={onCancel}>{t('cancel')}</StyledLoadingButton>
+          <StyledLoadingButton type="button" onClick={onCancel}>{t('startScreen.cancel')}</StyledLoadingButton>
         </Stack>
       </Stack>
     </StyledLoadingScreen>

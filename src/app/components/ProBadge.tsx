@@ -31,9 +31,9 @@ type Props = {
 export default function ProBadge({ compact }: Props) {
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
-  const { t } = useTranslation('', { keyPrefix: 'licence' });
+  const { t } = useTranslation('');
 
   return (
-    <StyledProBadge href="https://tokens.studio" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
+    <StyledProBadge href="https://tokens.studio" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('licence.pro') : t('licence.getPro')}</StyledProBadge>
   );
 }

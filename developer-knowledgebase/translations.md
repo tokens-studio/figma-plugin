@@ -38,3 +38,26 @@ export const languages = [{
 ```
 
 6. Build the plugin and confirm that the translations are correct
+
+# i18n-ally
+
+We use the VSCode extension i18n-ally to handle translations.
+
+https://github.com/lokalise/i18n-ally
+
+
+For the extension to work, requires these settings:
+
+
+```.json
+# .vscode/settings.json
+
+{
+    "i18n-ally.localesPaths": [
+        "src/i18n/lang"
+    ],
+    "i18n-ally.namespace": true,
+    "i18n-ally.pathMatcher": "{locale}/{namespaces}.json",
+    "i18n-ally.keystyle": "nested",
+}
+```

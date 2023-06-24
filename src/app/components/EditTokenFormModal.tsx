@@ -27,6 +27,7 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
     return null;
   }
 
+  // TODO: add translations - can't use hooks in conditionals
   return (
     <Modal
       compact
