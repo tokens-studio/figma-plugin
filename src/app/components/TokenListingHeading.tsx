@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
 } from '@/icons';
@@ -45,6 +46,7 @@ export default function TokenListingHeading({
     dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
   }, [displayType, dispatch]);
 
+  const { t } = useTranslation(['tokens']);
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
       <StyledTokenGroupHeadingButton
@@ -77,7 +79,7 @@ export default function TokenListingHeading({
           // TODO: Add proper logic to disable adding a token type depending on flags
           disabled={editProhibited || (isPro && !gitBranchSelector)}
           icon={<IconAdd />}
-          tooltip="Add a new token"
+          tooltip={t('addNew')}
           onClick={handleShowNewForm}
         />
       </Box>

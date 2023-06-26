@@ -1,6 +1,9 @@
 {
-    "readMore": "और पढ़ें",
-    "save": "बचाना",
-    "cancel": "रद्द करना",
-    "search": "खोज"
+  "readMore": "और पढ़ें",
+  "save": "बचाना",
+  "cancel": "रद्द करना",
+  "search": "खोज",
+  "rename": "नाम बदलें",
+  "duplicate": "डुप्लिकेट",
+  "delete": "मिटाना"
 }

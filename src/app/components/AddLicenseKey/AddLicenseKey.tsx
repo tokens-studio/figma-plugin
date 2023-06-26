@@ -32,7 +32,7 @@ export default function AddLicenseKey() {
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['licence']);
 
   const addKey = useCallback(async () => {
     if (newKey) {
@@ -53,9 +53,9 @@ export default function AddLicenseKey() {
       dispatch.userState.removeLicenseKey('');
     } else {
       const confirmation = await confirm({
-        text: t('licence.confirmRemove') as string,
-        description: t('licence.keepLicenseSafe'),
-        confirmAction: t('licence.removeLicenseKey') as string,
+        text: t('confirmRemove') as string,
+        description: t('keepLicenseSafe'),
+        confirmAction: t('removeLicenseKey') as string,
       });
       if (confirmation) {
         dispatch.userState.removeLicenseKey('');
@@ -87,13 +87,13 @@ export default function AddLicenseKey() {
 
   const addLicenseKeyButton = !existingKey && (
     <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
-      {t('licence.addLicenseKey')}
+      {t('addLicenseKey')}
     </Button>
   );
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="primary" onClick={removeKey}>
-      {t('licence.removeKey')}
+      {t('removeKey')}
     </Button>
   );
 
@@ -101,13 +101,13 @@ export default function AddLicenseKey() {
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
         <Heading size="small">
-          {t('licence.licenseKey')}
+          {t('licenseKey')}
         </Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && !licenseKeyError && (
             <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
-              {t('licence.manageSubscription')}
+              {t('manageSubscription')}
             </ManageSubscriptionLink>
           )}
         </Stack>

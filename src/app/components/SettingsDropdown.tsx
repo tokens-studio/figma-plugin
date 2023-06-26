@@ -18,7 +18,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['tokens']);
 
   const {
     updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
@@ -59,9 +59,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          {t('tokens.update.onChange.title')}
+          {t('update.onChange.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            {t('tokens.update.onChange.description')}
+            {t('update.onChange.description')}
           </Box>
         </DropdownMenuCheckboxItem>
         {localApiState?.provider === StorageProviderType.JSONBIN ? (
@@ -73,9 +73,9 @@ export default function SettingsDropdown() {
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
-            {t('tokens.update.remoteJSONBin.title')}
+            {t('update.remoteJSONBin.title')}
             <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-              {t('tokens.update.remoteJSONBin.description')}
+              {t('update.remoteJSONBin.description')}
             </Box>
           </DropdownMenuCheckboxItem>
         ) : null}
@@ -87,9 +87,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          {t('tokens.update.styles.title')}
+          {t('update.styles.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            {t('tokens.update.styles.description')}
+            {t('update.styles.description')}
           </Box>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
@@ -100,9 +100,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          {t('tokens.update.swapStyles.title')}
+          {t('update.swapStyles.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            {t('tokens.update.swapStyles.description')}
+            {t('update.swapStyles.description')}
           </Box>
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>

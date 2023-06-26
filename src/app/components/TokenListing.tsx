@@ -49,7 +49,7 @@ const TokenListing: React.FC<Props> = ({
     } as EditTokenObject);
   }, [schema, dispatch]);
 
-  const { t } = useTranslation('', { keyPrefix: 'tokens.types' });
+  const { t } = useTranslation(['tokens'], { keyPrefix: 'types' });
 
   const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
     showForm({ token: null, name, status: EditTokenFormStatus.CREATE });

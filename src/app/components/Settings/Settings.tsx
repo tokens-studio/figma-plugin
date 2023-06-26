@@ -21,11 +21,11 @@ import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
 
 function Settings() {
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['settings']);
 
   const onboardingData = {
-    title: t('settings.whereTokensStored'),
-    text: t('settings.whereTokensStoredOnboarding'),
+    title: t('whereTokensStored'),
+    text: t('whereTokensStoredOnboarding'),
     url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
@@ -75,7 +75,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">{t('settings.settings')}</Heading>
+          <Heading size="small">{t('settings')}</Heading>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -85,17 +85,17 @@ function Settings() {
             />
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('settings.ignorePrefix')}</Box>
+                <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-                  {t('settings.usefulIgnore')}
+                  {t('usefulIgnore')}
                   {' '}
                   <code>colors</code>
                   {' '}
-                  {t('settings.inAToken')}
+                  {t('inAToken')}
                   {' '}
                   <code>colors.blue.500</code>
                   {' '}
-                  {t('settings.forYourStyles')}
+                  {t('forYourStyles')}
                 </Box>
               </Stack>
             </Label>
@@ -110,19 +110,19 @@ function Settings() {
 
             <Label htmlFor="prefixStylesWithThemeName">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('settings.prefixStyles')}</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('settings.prefixStylesExplanation')}</Box>
+                <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
               </Stack>
             </Label>
           </Stack>
-          <Heading size="small">{t('settings.baseFont')}</Heading>
+          <Heading size="small">{t('baseFont')}</Heading>
           <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-            {t('settings.baseFontExplanation')}
+            {t('baseFontExplanation')}
 
           </Box>
           <RemConfiguration />
           <Box>
-            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('settings.resetOnboarding')}</Button>
+            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
           </Box>
         </Stack>
       </Stack>

@@ -22,7 +22,7 @@ import Box from './Box';
 
 export default function ApplySelector() {
   const { updateMode } = useSelector(settingsStateSelector, isEqual);
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['tokens']);
 
   const { handleUpdate } = useTokens();
 
@@ -48,7 +48,7 @@ export default function ApplySelector() {
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
-        {t('tokens.applyTo.applyTo')}
+        {t('applyTo.applyTo')}
         {' '}
         {updateMode}
       </Button>
@@ -81,18 +81,18 @@ export default function ApplySelector() {
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              {t('tokens.applyTo.selection.title')}
+              {t('applyTo.selection.title')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                {t('tokens.applyTo.selection.description')}
+                {t('applyTo.selection.description')}
               </Box>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              {t('tokens.applyTo.page.title')}
+              {t('applyTo.page.title')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                {t('tokens.applyTo.page.description')}
+                {t('applyTo.page.description')}
               </Box>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem
@@ -103,10 +103,10 @@ export default function ApplySelector() {
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              {t('tokens.applyTo.page.description')}
-              {t('tokens.applyTo.doc.title')}
+              {t('applyTo.page.description')}
+              {t('applyTo.doc.title')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-                {t('tokens.applyTo.doc.description')}
+                {t('applyTo.doc.description')}
               </Box>
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

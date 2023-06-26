@@ -11,7 +11,7 @@ import { Direction } from '@/constants/Direction';
 import IconButton from './IconButton';
 
 export default function AnnotationBuilder() {
-  const { t } = useTranslation('');
+  const { t } = useTranslation();
   const uiState = useSelector(uiStateSelector, isEqual);
 
   const createAnnotationLeft = React.useCallback(() => {

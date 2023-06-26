@@ -10,7 +10,7 @@ export default function ToggleEmptyButton() {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['tokens']);
 
   const handleShowEmptyGroups = React.useCallback(() => {
     dispatch.uiState.toggleShowEmptyGroups(null);
@@ -21,7 +21,7 @@ export default function ToggleEmptyButton() {
       <Button variant="secondary" size="small" onClick={handleShowEmptyGroups}>
         {t(showEmptyGroups ? 'hide' : 'show')}
         {' '}
-        {t('tokens.emptyGroups')}
+        {t('emptyGroups')}
       </Button>
     </Stack>
   );

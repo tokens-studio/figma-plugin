@@ -8,24 +8,24 @@ import hiTranslations from './lang/hi';
 import nlTranslations from './lang/nl';
 import zhTranslations from './lang/zh';
 
-const resources = {
+export const resources = {
   en: {
-    translation: enTranslations,
+    ...enTranslations,
   },
   fr: {
-    translation: frTranslations,
+    ...frTranslations,
   },
   es: {
-    translation: esTranslations,
+    ...esTranslations,
   },
   hi: {
-    translation: hiTranslations,
+    ...hiTranslations,
   },
   nl: {
-    translation: nlTranslations,
+    ...nlTranslations,
   },
   zh: {
-    translation: zhTranslations,
+    ...zhTranslations,
   },
 };
 
@@ -63,6 +63,7 @@ export const i18nInstance = i18n
   .init({
     fallbackLng: 'en',
     resources,
+    ns: ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'],
     lng: 'en',
     interpolation: {
       escapeValue: false, // react already safes from xss

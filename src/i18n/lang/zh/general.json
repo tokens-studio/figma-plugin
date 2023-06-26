@@ -1,6 +1,9 @@
 {
-    "readMore": "阅读更多",
-    "save": "节省",
-    "cancel": "取消",
-    "search": "搜索"
+  "readMore": "阅读更多",
+  "save": "节省",
+  "cancel": "取消",
+  "search": "搜索",
+  "rename": "改名",
+  "duplicate": "复制",
+  "delete": "删除"
 }

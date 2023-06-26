@@ -28,7 +28,7 @@ const TokenFilter = () => {
   const tokenFilter = useSelector(tokenFilterSelector);
   const [tokenString, setTokenString] = React.useState(tokenFilter);
   const dispatch = useDispatch<Dispatch>();
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['general']);
 
   const debounced = useDebouncedCallback((value) => {
     dispatch.uiState.setTokenFilter(value);
@@ -56,7 +56,7 @@ const TokenFilter = () => {
         type="text"
         value={tokenString}
         onChange={handleChange}
-        placeholder={t('general.search') as string}
+        placeholder={t('search') as string}
       />
     </Box>
   );

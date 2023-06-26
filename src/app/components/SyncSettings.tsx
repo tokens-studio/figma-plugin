@@ -30,15 +30,15 @@ import { getProviderIcon } from '@/utils/getProviderIcon';
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['storage']);
 
   const providers = useMemo(() => [
     {
-      text: t('storage.providers.url.title'),
+      text: t('providers.url.title'),
       type: StorageProviderType.URL,
     },
     {
-      text: t('storage.providers.jsonbin.title'),
+      text: t('providers.jsonbin.title'),
       type: StorageProviderType.JSONBIN,
     },
     {
@@ -58,7 +58,7 @@ const SyncSettings = () => {
       type: StorageProviderType.SUPERNOVA,
     },
     {
-      text: t('storage.providers.generic.title'),
+      text: t('providers.generic.title'),
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
     },
   ], [t]);
@@ -161,7 +161,7 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={3} direction="column">
-            <Heading size="small">{t('storage.syncProviders')}</Heading>
+            <Heading size="small">{t('syncProviders')}</Heading>
           </Stack>
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">
@@ -177,7 +177,7 @@ const SyncSettings = () => {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
-              <Text size="small">{t('storage.addNew')}</Text>
+              <Text size="small">{t('addNew')}</Text>
               <IconToggleableDisclosure />
             </DropdownMenuTrigger>
             <DropdownMenuContent

@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['navbar']);
 
   const handleSwitch = useCallback(
     (tab: Tabs) => {
@@ -42,15 +42,15 @@ const Navbar: React.FC = () => {
     >
       <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
         <div>
-          <TabButton name={Tabs.TOKENS} activeTab={activeTab} label={t('navbar.tokens')} onSwitch={handleSwitch} />
-          <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label={t('navbar.inspect')} onSwitch={handleSwitch} />
-          <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label={t('navbar.settings')} onSwitch={handleSwitch} />
+          <TabButton name={Tabs.TOKENS} activeTab={activeTab} label={t('tokens')} onSwitch={handleSwitch} />
+          <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label={t('inspect')} onSwitch={handleSwitch} />
+          <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label={t('settings')} onSwitch={handleSwitch} />
         </div>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" gap={1} css={{ paddingRight: '$2' }}>
         <TokenFlowButton />
-        <IconButton size="large" tooltip={t('navbar.minimize') as string} onClick={handleResize} icon={<Minimize />} />
+        <IconButton size="large" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

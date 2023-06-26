@@ -1,6 +1,9 @@
 {
-    "readMore": "En savoir plus",
-    "save": "Sauvegarder",
-    "cancel": "Annuler",
-    "search": "Recherche"
+  "readMore": "En savoir plus",
+  "save": "Sauvegarder",
+  "cancel": "Annuler",
+  "search": "Recherche",
+  "rename": "Renommer",
+  "duplicate": "Dupliquer",
+  "delete": "Supprimer"
 }
