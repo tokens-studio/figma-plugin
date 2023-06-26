@@ -13,5 +13,6 @@
   "noTokensFound": "未找到代币",
   "noLayersSelected": "未选择图层",
   "noLayersWithTokens": "所选图层均不包含任何标记",
-  "selectLayer": "选择一个图层以查看应用的令牌"
+  "selectLayer": "选择一个图层以查看应用的令牌",
+  "addAnnotation": "添加为注释"
 }

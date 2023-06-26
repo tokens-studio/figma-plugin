@@ -13,5 +13,6 @@
   "noTokensFound": "Aucun jeton trouvé",
   "noLayersSelected": "Aucun calque sélectionné",
   "noLayersWithTokens": "Aucune des couches sélectionnées ne contient de jetons",
-  "selectLayer": "Sélectionnez un calque pour voir les jetons appliqués"
+  "selectLayer": "Sélectionnez un calque pour voir les jetons appliqués",
+  "addAnnotation": "Ajouter comme annotation"
 }

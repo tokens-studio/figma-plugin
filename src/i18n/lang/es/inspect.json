@@ -13,5 +13,6 @@
   "noTokensFound": "No se encontraron fichas",
   "noLayersSelected": "No hay capas seleccionadas",
   "noLayersWithTokens": "Ninguna de las capas seleccionadas contiene tokens",
-  "selectLayer": "Seleccione una capa para ver los tokens aplicados"
+  "selectLayer": "Seleccione una capa para ver los tokens aplicados",
+  "addAnnotation": "Agregar como anotación"
 }

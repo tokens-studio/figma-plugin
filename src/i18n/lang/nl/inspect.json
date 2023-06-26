@@ -13,5 +13,6 @@
   "noTokensFound": "Geen tokens gevonden",
   "noLayersSelected": "Geen lagen geselecteerd",
   "noLayersWithTokens": "Geen van de geselecteerde lagen bevat tokens",
-  "selectLayer": "Selecteer een laag om toegepaste tokens te zien"
+  "selectLayer": "Selecteer een laag om toegepaste tokens te zien",
+  "addAnnotation": "Voeg toe als annotatie"
 }
