@@ -5,6 +5,8 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
+import { SettingsState } from '@/app/store/models/settings';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -17,6 +19,7 @@ export default function setValuesOnVariable(
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
   mode: string,
+  settings: SettingsState,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -59,11 +62,15 @@ export default function setValuesOnVariable(
           referenceTokenName = t.rawValue!.toString().substring(1);
         }
         variableKeyMap[t.name] = variable.key;
+
+        const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
+        const referenceVariable = convertTokenNameToPath(referenceTokenName, null, slice);
+
         if (checkCanReferenceVariable(t)) {
           referenceVariableCandidates.push({
             variable,
             modeId: mode,
-            referenceVariable: referenceTokenName.split('.').join('/'),
+            referenceVariable,
           });
         }
       }
