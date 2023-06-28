@@ -1,50 +1,53 @@
 {
-    "editCredentials": "Edit credentials",
-    "addNew": "Add new",
-    "pat": "Personal Access Token",
-    "credentials": "credentials",
-    "gitExplained": "Access tokens stored on your repository, push and pull tokens in a two-way sync.",
-    "readMore": "Read more",
-    "cancel": "Cancel",
-    "repo": "Repository (owner/repo)",
-    "branch": "Branch",
-    "baseUrl": "Base URL (optional)",
-    "saveCredentials": "Save credentials",
-    "filePath": "File Path (e.g. tokens.json) or Folder Path (e.g. tokens)",
-    "syncProviders":"Sync providers",
-    "providers": {
-        "generic": {
-            "title": "Generic Versioned",
-            "url": "URL",
-            "addNew": "Add a new generic storage provider",
-            "description": " Access tokens stored on your own storage provider, allowing two-way sync, create and read-only operations.",
-            "flowType": "Flow type",
-            "readOnly": "Read Only",
-            "readWrite": "Read / Write",
-            "readWriteCreate": "Read / Write / Create",
-            "additionalHeaders": "Additional headers",
-            "name": "Name",
-            "value": "Value"
-        },
-        "url": {
-            "title": "URL",
-            "addNew": "Add a new URL provider",
-            "description":"Tokens stored on a server allow you to add them as a read-only provider."
-        },
-        "jsonbin": {
-            "title": "JSONBIN"
-        },
-        "github": {
-            "title": "GitHub"
-        },
-        "gitlab": {
-            "title": "GitLab"
-        },
-        "supernova":{
-            "accessToken":"Supernova Access Token",
-            "addNew": "Add new Supernova credentials",
-            "dsUrl":"Design System URL",
-            "description":"Allows you to push tokens into specific brand and theme in a selected design system."
-        }
+  "editCredentials": "Edit credentials",
+  "addNew": "Add new",
+  "pat": "Personal Access Token",
+  "credentials": "credentials",
+  "gitExplained": "Access tokens stored on your repository, push and pull tokens in a two-way sync.",
+  "readMore": "Read more",
+  "cancel": "Cancel",
+  "repo": "Repository (owner/repo)",
+  "branch": "Branch",
+  "baseUrl": "Base URL (optional)",
+  "saveCredentials": "Save credentials",
+  "filePath": "File Path (e.g. tokens.json) or Folder Path (e.g. tokens)",
+  "syncProviders": "Sync providers",
+  "providers": {
+    "generic": {
+      "title": "Generic Versioned",
+      "url": "URL",
+      "addNew": "Add a new generic storage provider",
+      "description": " Access tokens stored on your own storage provider, allowing two-way sync, create and read-only operations.",
+      "flowType": "Flow type",
+      "readOnly": "Read Only",
+      "readWrite": "Read / Write",
+      "readWriteCreate": "Read / Write / Create",
+      "additionalHeaders": "Additional headers",
+      "name": "Name",
+      "value": "Value"
+    },
+    "url": {
+      "title": "URL",
+      "addNew": "Add a new URL provider",
+      "description": "Tokens stored on a server allow you to add them as a read-only provider."
+    },
+    "jsonbin": {
+      "title": "JSONBIN"
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Supernova Access Token",
+      "addNew": "Add new Supernova credentials",
+      "dsUrl": "Design System URL",
+      "description": "Allows you to push tokens into specific brand and theme in a selected design system."
     }
+  },
+  "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
+  "localDocument": "Local document",
+  "apply": "Apply"
 }

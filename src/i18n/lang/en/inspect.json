@@ -14,5 +14,20 @@
   "noLayersSelected": "No layers selected",
   "noLayersWithTokens": "None of the selected layers contain any tokens",
   "selectLayer": "Select a layer to see applied tokens",
-  "addAnnotation": "Add as annotation"
+  "addAnnotation": "Add as annotation",
+  "moreThan1Layer": {
+    "title": "More than 1 layer selected",
+    "description": "Select only 1 layer to see applied tokens"
+  },
+  "selectedLayerContainsNoTokens": "Selected layer contains no tokens",
+  "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
+  "tokenNotFound": "Token not found",
+  "appliedStyle": "Applied style",
+  "changeToAnotherToken": "Change to another token",
+  "chooseANewTokenForValue": "Choose a new value for {{value}}",
+  "chooseANewToken": "Choose a new token",
+  "cancel": "Cancel",
+  "remap": "Remap",
+  "showBrokenReferences": "Show broken references",
+  "showResolvedReferences": "Show resolved references"
 }

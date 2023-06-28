@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Box from './Box';
 import Tooltip from './Tooltip';
 import IconBrokenLink from '@/icons/brokenlink.svg';
@@ -14,11 +15,14 @@ type Props = {
   type: string;
 };
 
+
+
 export default function InspectorResolvedToken({ token }: { token: Props }) {
+  const { t } = useTranslation(['inspect']);
   // TODO: Introduce shared component for token tooltips
   if (!token) {
     return (
-      <Tooltip label="Token not found" side="bottom">
+      <Tooltip label={t('tokenNotFound')} side="bottom">
         <Box
           css={{
             width: '24px',

@@ -19,7 +19,7 @@ function PullDialog() {
   const storageType = useSelector(storageTypeSelector);
   const changedState = useSelector(changedStateSelector);
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['sync']);
 
   const handleOverrideClick = React.useCallback(() => {
     onConfirm();
@@ -33,7 +33,7 @@ function PullDialog() {
     case 'initial': {
       return (
         <Modal
-          title={`Pull from ${transformProviderName(storageType.provider)}`}
+          title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
           showClose
           full
           large
@@ -42,7 +42,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4}>
             <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-              {t('sync.override')}
+              {t('override')}
             </Stack>
             <ChangedStateList changedState={changedState} />
             <Box css={{
@@ -59,10 +59,10 @@ function PullDialog() {
             }}
             >
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
-                {t('sync.cancel')}
+                {t('cancel')}
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                {t('sync.pullTokens')}
+                {t('pullTokens')}
               </Button>
             </Box>
           </Stack>
@@ -80,9 +80,7 @@ function PullDialog() {
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">
-              Fetching Tokens from
-              {' '}
-              {transformProviderName(storageType.provider)}
+              {t('pullFrom', { provider: transformProviderName(storageType.provider) })}
             </Heading>
           </Stack>
         </Modal>

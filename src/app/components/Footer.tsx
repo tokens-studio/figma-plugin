@@ -161,12 +161,16 @@ export default function Footer() {
             <Stack align="center" direction="row" gap={2}>
               <Text muted>{t('sync')}</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
-                <Tooltip label={`Go to ${transformProviderName(storageType.provider)}`}>
+                <Tooltip label={ t('goTo', {
+                  provider: transformProviderName(storageType.provider),
+                }) as string}>
                   <IconButton icon={<IconLibrary />} href={projectURL} />
                 </Tooltip>
               )}
               <IconButton
-                tooltip={`Pull from ${transformProviderName(storageType.provider)}`}
+                tooltip={t('pullFrom', {
+                  provider: transformProviderName(storageType.provider),
+                }) as string}
                 onClick={handlePullTokens}
                 icon={<RefreshIcon />}
               />

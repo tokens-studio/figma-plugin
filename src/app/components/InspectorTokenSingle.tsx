@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { SingleToken } from '@/types/tokens';
@@ -37,6 +38,8 @@ export default function InspectorTokenSingle({
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
+
+  const { t } = useTranslation(['inspect']);
 
   const tokenToDisplay = React.useMemo(() => {
     const resolvedToken = getTokenValue(token.value, resolvedTokens);
@@ -117,12 +120,12 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          {token.resolvedValue && <Tooltip label="Applied style"><StyleIcon /></Tooltip>}
+          {token.resolvedValue && <Tooltip label={t('appliedStyle')}><StyleIcon /></Tooltip>}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           {
             !token.resolvedValue && (
             <IconButton
-              tooltip="Change to another token"
+              tooltip={t('changeToAnotherToken')}
               dataCy="button-token-remap"
               onClick={handleClick}
               icon={<IconToggleableDisclosure />}
@@ -132,7 +135,7 @@ export default function InspectorTokenSingle({
         </Box>
         {
           showDialog && (
-            <Modal title={`Choose a new token for ${tokenToDisplay?.name || token.value}`} large isOpen close={onCancel}>
+            <Modal title={t('chooseANewTokenForValue', { value: tokenToDisplay?.name || token.value })} large isOpen close={onCancel}>
               <form
                 onSubmit={onConfirm}
               >
@@ -143,17 +146,17 @@ export default function InspectorTokenSingle({
                     resolvedTokens={resolvedTokens}
                     handleChange={handleChange}
                     setInputValue={handleDownShiftInputChange}
-                    placeholder="Choose a new token"
+                    placeholder={t('chooseANewToken')}
                     suffix
                     onSubmit={onConfirm}
                   />
 
                   <Stack direction="row" gap={4} justify="between">
                     <Button variant="secondary" onClick={onCancel}>
-                      Cancel
+                      {t('cancel')}
                     </Button>
                     <Button type="submit" variant="primary">
-                      Remap
+                      {t('remap')}
                     </Button>
                   </Stack>
                 </Stack>

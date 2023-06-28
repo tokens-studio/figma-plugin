@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Heading from './Heading';
 import Box from './Box';
 import Text from './Text';
@@ -9,10 +10,12 @@ type Props = {
 };
 
 function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
+  const { t } = useTranslation(['sync']);
+
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-      <Text size="small">Push your local changes to your Supernova.io design system.</Text>
-      <Heading size="small">Design system</Heading>
+      <Text size="small">{t('pushYourLocalChangesToYourSupernovaIoDesignSystem')}</Text>
+      <Heading size="small">{t('designSystem')}</Heading>
       <Box
         css={{
           padding: '$2',
@@ -22,7 +25,7 @@ function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
           borderRadius: '$card',
         }}
       >
-        {designSystemUrl || 'Design system'}
+        {designSystemUrl || t('designSystem')}
       </Box>
     </Stack>
   );

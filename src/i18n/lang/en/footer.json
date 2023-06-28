@@ -3,5 +3,6 @@
   "docs": "Docs",
   "feedback": "feedback",
   "pullFrom": "Pull from {{provider}}",
-  "pushTo": "Push to {{provider}}"
+  "pushTo": "Push to {{provider}}",
+  "goTo": "Go to {{provider}}"
 }

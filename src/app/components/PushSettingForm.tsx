@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Stack from './Stack';
 import { localApiStateSelector } from '@/selectors';
 import Box from './Box';
@@ -26,16 +27,18 @@ function PushSettingForm({
     handleCommitMessageChange(event.target.value);
   }, [handleCommitMessageChange]);
 
+  const { t } = useTranslation(['sync']);
+
   return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-      <Text size="small">Push your local changes to your repository.</Text>
+      <Text size="small">{t('pushYourLocalChangesToYourRepository')}</Text>
       <Box css={{
         padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
       }}
       >
         {'id' in localApiState ? localApiState.id : null}
       </Box>
-      <Heading size="small">Commit message</Heading>
+      <Heading size="small">{t('commitMessage')}</Heading>
       <Textarea
         id="push-dialog-commit-message"
         border

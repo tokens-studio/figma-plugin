@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Box from './Box';
 import Blankslate from './Blankslate';
 import AnnotationBuilder from './AnnotationBuilder';
@@ -38,9 +39,11 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
     return undefined;
   }, [getTokenValue, resolvedTokens, uiState.selectionValues]);
 
+  const { t } = useTranslation(['inspect']);
+
   function renderBlankslate() {
-    if (uiState.selectedLayers > 1) return <Blankslate title="More than 1 layer selected" text="Select a single layer to see applied tokens" />;
-    return <Blankslate title={uiState.selectedLayers === 1 ? 'No tokens found' : 'No layer selected'} text={uiState.selectedLayers === 1 ? 'Selected layer contains no tokens' : 'Select a layer to see applied tokens'} />;
+    if (uiState.selectedLayers > 1) return <Blankslate title={t('moreThan1Layer.title')} text={t('moreThan1Layer.description')} />;
+    return <Blankslate title={uiState.selectedLayers === 1 ? t('noTokensFound') : t('noLayersSelected')} text={uiState.selectedLayers === 1 ? t('selectedLayerContainsNoTokens') : t('selectALayerToSeeAppliedTokens')} />;
   }
 
   return (

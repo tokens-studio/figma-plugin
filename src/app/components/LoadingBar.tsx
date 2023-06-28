@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
 import Button from './Button';
@@ -12,6 +13,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import Box from './Box';
 
+
+//TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
   [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determining nodes to update...',

@@ -32,7 +32,7 @@ type Props = {
 };
 
 export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['general']);
   return (
     <Box css={data.title === 'Sets' ? {
       display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderTop: '1px solid $borderMuted', borderBottom: '1px solid $borderMuted',
