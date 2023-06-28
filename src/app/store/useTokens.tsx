@@ -31,6 +31,7 @@ import { TokensContext } from '@/context';
 import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { notifyToUI } from '@/plugin/notifiers';
+import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -401,6 +402,14 @@ export default function useTokens() {
     }
   }, [confirm, tokens, settings]);
 
+  const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
+    track('updateVariables', payload);
+    await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.UPDATE_VARIABLES,
+      payload,
+    });
+  }, []);
+
   return useMemo(() => ({
     isAlias,
     getTokenValue,
@@ -422,6 +431,7 @@ export default function useTokens() {
     createVariables,
     renameVariablesFromToken,
     syncVariables,
+    updateVariablesFromToken,
   }), [
     isAlias,
     getTokenValue,
@@ -443,5 +453,6 @@ export default function useTokens() {
     createVariables,
     renameVariablesFromToken,
     syncVariables,
+    updateVariablesFromToken,
   ]);
 }

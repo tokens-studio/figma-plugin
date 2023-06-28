@@ -53,7 +53,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const updateMode = useSelector(updateModeSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
-  const { remapToken, renameStylesFromTokens, renameVariablesFromToken } = useTokens();
+  const {
+    remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken,
+  } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
@@ -274,6 +276,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const resolvedValue = React.useMemo(() => {
+    if (internalEditToken) {
+      return typeof internalEditToken?.value === 'string'
+        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        : null;
+    }
+    return null;
+  }, [internalEditToken, resolvedTokens]);
+
   // @TODO update to useCallback
   const submitTokenValue = async ({
     type, value, name, $extensions,
@@ -315,6 +326,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
+        if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+          updateVariablesFromToken({
+            parent: activeTokenSet,
+            name: newName,
+            type,
+            value: resolvedValue,
+            rawValue: internalEditToken.value,
+          });
+        }
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
@@ -387,7 +407,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken, resolvedValue]);
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -409,15 +429,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
     setSelectedTokenSets(selectedItems);
   }, []);
-
-  const resolvedValue = React.useMemo(() => {
-    if (internalEditToken) {
-      return typeof internalEditToken?.value === 'string'
-        ? getAliasValue(internalEditToken.value, resolvedTokens)
-        : null;
-    }
-    return null;
-  }, [internalEditToken, resolvedTokens]);
 
   const renderTokenForm = () => {
     if (!internalEditToken) return null;
