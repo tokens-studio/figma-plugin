@@ -121,7 +121,7 @@ export default function BorderTokenForm({
             initialName={internalEditToken.initialName}
             handleChange={handleBorderAliasValueChange}
             setInputValue={handleDownShiftInputChange}
-            placeholder={t('value-or-alias')}
+            placeholder={t('valueOrAlias')}
             suffix
             onSubmit={onSubmit}
           />

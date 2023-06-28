@@ -84,7 +84,7 @@ export default function TokenListingHeading({
           // TODO: Add proper logic to disable adding a token type depending on flags
           disabled={editProhibited || (isPro && !gitBranchSelector)}
           icon={<IconAdd />}
-          tooltip="Add new token"
+          tooltip={t('addNew')}
           onClick={handleShowNewForm}
         />
       </Box>

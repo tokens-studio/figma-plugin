@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
 import IconMinus from '@/icons/minus.svg';
 import IconButton from './IconButton';
@@ -84,6 +85,8 @@ export default function SingleCompositionTokenForm({
     onRemove(property);
   }, [onRemove, property]);
 
+  const { t } = useTranslation(['tokens']);
+
   return (
     <Box css={{
       width: '100%',
@@ -104,7 +107,7 @@ export default function SingleCompositionTokenForm({
             width: '130px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', height: '$10',
           }}
         >
-          {property || 'Choose a property'}
+          {property || t('chooseAProperty')}
         </DropdownMenuTrigger>
         <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
           {' '}
@@ -122,7 +125,7 @@ export default function SingleCompositionTokenForm({
           handleChange={onPropertyValueChanged}
           setInputValue={handleDownShiftInputChange}
           placeholder={
-            propertyType === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
+            propertyType === 'color' ? t('colorOrAlias') : t('valueOrAlias')
           }
           suffix
           onSubmit={onSubmit}
@@ -130,7 +133,7 @@ export default function SingleCompositionTokenForm({
       </Box>
       <Box css={{ width: '$5', marginRight: '$3' }}>
         <IconButton
-          tooltip="Remove this style"
+          tooltip={t('removeThisStyle')}
           dataCy="button-style-remove-multiple"
           onClick={handleRemove}
           icon={<IconMinus />}

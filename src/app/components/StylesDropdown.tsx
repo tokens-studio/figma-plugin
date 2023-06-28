@@ -25,10 +25,10 @@ export default function StylesDropdown() {
         <IconChevronDown />
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top">
-        <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>{t('syncStyles')}</DropdownMenuItem>
-        <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>{t('importStyles')}</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>{t('createStyles')}</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create Variables" onSelect={createVariables}>{t('createVariables')}</DropdownMenuItem>
+        <DropdownMenuItem textValue={t('syncStyles')} disabled={availableThemes.length < 1} onSelect={syncStyles}>{t('syncStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue={t('importStyles')} disabled={editProhibited} onSelect={pullStyles}>{t('importStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue={t('createStyles')} onSelect={createStylesFromTokens}>{t('createStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue={t('createVariables')} onSelect={createVariables}>{t('createVariables')}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
