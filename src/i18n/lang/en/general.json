@@ -5,5 +5,14 @@
   "search": "Search",
   "rename": "Rename",
   "duplicate": "Duplicate",
-  "delete": "Delete"
+  "delete": "Delete",
+  "set": "Set",
+  "unsavedChanges": "Unsaved changes",
+  "value": "Value",
+  "description": "Description",
+  "removed": "Removed",
+  "changelog": "Changelog",
+  "next": "Next",
+  "previous": "Previous",
+  "close": "Close"
 }

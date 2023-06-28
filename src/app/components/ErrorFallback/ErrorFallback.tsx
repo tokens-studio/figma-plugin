@@ -11,21 +11,22 @@ const StyledLink = styled('a', {
 });
 
 export function ErrorFallback({ error }: { error: Error }) {
-  const { t } = useTranslation('');
+  // const { t } = useTranslation(["errors"]);
 
   return (
     <Stack direction="column" align="center" gap={4} justify="center" css={{ padding: '$4', height: '100%', textAlign: 'center' }}>
-      <Heading>{t('error.wentWrong')}</Heading>
+      {/* <Heading>{t('wentWrong')}</Heading>
       <Stack direction="column" gap={3}>
         <Text size="xsmall" muted>{error.message}</Text>
-        <Text size="xsmall" muted>{t('error.restart')}</Text>
+        <Text size="xsmall" muted>{t('restart')}</Text>
         <Text size="xsmall" muted>
-          {t('error.reset')}
+          {t('reset')}
           {' '}
-          <StyledLink href="https://docs.tokens.studio/reset-tokens" target="_blank" rel="noreferrer">{t('error.readHow')}</StyledLink>
+          <StyledLink href="https://docs.tokens.studio/reset-tokens" target="_blank" rel="noreferrer">{t('readHow')}</StyledLink>
         </Text>
 
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 }
+ 

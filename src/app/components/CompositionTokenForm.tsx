@@ -15,6 +15,7 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { SingleCompositionTokenContent } from './SingleCompositionTokenContent';
 import { DragItem } from './StyledDragger/DragItem';
+import { useTranslation } from 'react-i18next';
 
 export default function CompositionTokenForm({
   internalEditToken,
@@ -83,12 +84,14 @@ export default function CompositionTokenForm({
     setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
   }, [internalEditToken, setTokenValue]);
 
+  const { t } = useTranslation(["tokens"])
+
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Heading size="small">Tokens</Heading>
+        <Heading size="small">t('tokens')</Heading>
         <IconButton
-          tooltip={error ? 'Choose a property first' : 'Add another style'}
+          tooltip={error ? t('chooseAPropertyFirst') : t('addAnotherStyle')}
           dataCy="button-style-add-multiple"
           onClick={addToken}
           icon={<IconPlus />}

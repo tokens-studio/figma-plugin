@@ -12,6 +12,7 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { DragControlsContext } from '@/context';
 import { TreeItem } from '@/utils/tokenset';
+import { useTranslation } from 'react-i18next';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -33,10 +34,12 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
 
+  const { t } = useTranslation(["tokens"])
+
   const handleClick = useCallback(async (set: TreeItem) => {
     if (set.isLeaf) {
       if (hasUnsavedChanges) {
-        const userChoice = await confirm({ text: 'You have unsaved changes.', description: 'Your changes will be discarded.' });
+        const userChoice = await confirm({ text: t('youHaveUnsavedChanges'), description: t('changesWillBeDiscarded') });
         if (userChoice) {
           dispatch.tokenState.setActiveTokenSet(set.path);
           item.saveScrollPositionSet(activeTokenSet);

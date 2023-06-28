@@ -7,76 +7,88 @@ import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/token
 import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
 import { TokenTypes } from '@/constants/TokenTypes';
-import {
-  collapsedSelector, collapsedTokenTypeObjSelector, showEmptyGroupsSelector,
-} from '@/selectors';
+import { collapsedSelector, collapsedTokenTypeObjSelector, showEmptyGroupsSelector } from '@/selectors';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { ShowFormOptions, ShowNewFormOptions } from '@/types';
 import Box from './Box';
 import TokenListingHeading from './TokenListingHeading';
 
 type Props = {
-  tokenKey: string
-  label: string
-  schema: TokenTypeSchema
-  values: DeepKeyTokenMap
-  isPro?: boolean
+  tokenKey: string;
+  label: string;
+  schema: TokenTypeSchema;
+  values: DeepKeyTokenMap;
+  isPro?: boolean;
 };
 
-const TokenListing: React.FC<Props> = ({
-  tokenKey,
-  label,
-  schema,
-  values,
-  isPro,
-}) => {
+const TokenListing: React.FC<Props> = ({ tokenKey, label, schema, values, isPro }) => {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsedTokenTypeObj = useSelector(collapsedTokenTypeObjSelector);
   const collapsed = useSelector(collapsedSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const showForm = React.useCallback(({ token, name, status }: ShowFormOptions) => {
-    dispatch.uiState.setShowEditForm(true);
-    const type = token?.type || schema.type;
-    dispatch.uiState.setEditToken({
-      ...token,
-      type,
-      schema,
-      status,
-      initialName: name,
-      name,
-      value: (type === TokenTypes.COLOR && !token?.value) ? '#' : token?.value,
-    } as EditTokenObject);
-  }, [schema, dispatch]);
+  const showForm = React.useCallback(
+    ({ token, name, status }: ShowFormOptions) => {
+      dispatch.uiState.setShowEditForm(true);
+      const type = token?.type || schema.type;
+      dispatch.uiState.setEditToken({
+        ...token,
+        type,
+        schema,
+        status,
+        initialName: name,
+        name,
+        value: type === TokenTypes.COLOR && !token?.value ? '#' : token?.value,
+      } as EditTokenObject);
+    },
+    [schema, dispatch],
+  );
 
-  const { t } = useTranslation(['tokens'], { keyPrefix: 'types' });
+  const { t } = useTranslation(["tokens"]);
 
-  const showNewForm = React.useCallback(({ name = '' }: ShowNewFormOptions) => {
-    showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
-  }, [showForm]);
+  const showNewForm = React.useCallback(
+    ({ name = '' }: ShowNewFormOptions) => {
+      showForm({ token: null, name, status: EditTokenFormStatus.CREATE });
+    },
+    [showForm],
+  );
 
   const showDisplayToggle = React.useMemo(() => schema.type === TokenTypes.COLOR, [schema.type]);
 
   // TODO: Move this to state
-  const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    if (e.altKey) {
-      dispatch.uiState.toggleCollapsed();
-      const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
-        acc[key] = !collapsed;
-        return acc;
-      }, {});
-      dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
-    } else {
-      dispatch.tokenState.setCollapsedTokenTypeObj({ ...collapsedTokenTypeObj, [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes] });
-    }
-  }, [dispatch, collapsedTokenTypeObj, tokenKey, collapsed]);
+  const handleSetIntCollapsed = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      if (e.altKey) {
+        dispatch.uiState.toggleCollapsed();
+        const newCollapsedObj = Object.keys(collapsedTokenTypeObj).reduce<Record<string, boolean>>((acc, key) => {
+          acc[key] = !collapsed;
+          return acc;
+        }, {});
+        dispatch.tokenState.setCollapsedTokenTypeObj(newCollapsedObj);
+      } else {
+        dispatch.tokenState.setCollapsedTokenTypeObj({
+          ...collapsedTokenTypeObj,
+          [tokenKey]: !collapsedTokenTypeObj[tokenKey as TokenTypes],
+        });
+      }
+    },
+    [dispatch, collapsedTokenTypeObj, tokenKey, collapsed],
+  );
 
   if (!values && !showEmptyGroups) return null;
 
   return (
     <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
-      <TokenListingHeading onCollapse={handleSetIntCollapsed} showDisplayToggle={showDisplayToggle} tokenKey={tokenKey} label={t(label)} isPro={isPro} showNewForm={showNewForm} isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]} />
+      <TokenListingHeading
+        onCollapse={handleSetIntCollapsed}
+        showDisplayToggle={showDisplayToggle}
+        tokenKey={tokenKey}
+        label={label}
+        isPro={isPro}
+        showNewForm={showNewForm}
+        isCollapsed={collapsedTokenTypeObj[tokenKey as TokenTypes]}
+      />
       {values && (
         <DndProvider backend={HTML5Backend}>
           <Box

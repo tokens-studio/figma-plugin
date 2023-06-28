@@ -10,6 +10,7 @@ import SettingsDropdown from './SettingsDropdown';
 import useTokens from '../store/useTokens';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import ToolsDropdown from './ToolsDropdown';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   hasJSONError: boolean;
@@ -24,6 +25,8 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
   const handleSaveJSON = useCallback(() => {
     handleJSONUpdate(stringTokens);
   }, [handleJSONUpdate, stringTokens]);
+
+  const { t } = useTranslation(["general"])
 
   return (
     <Box css={{
@@ -41,9 +44,9 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
             justifyContent: 'space-between',
           }}
         >
-          <Box css={{ fontSize: '$xsmall' }}>Unsaved changes</Box>
+          <Box css={{ fontSize: '$xsmall' }}>{t('unsavedChanges')}</Box>
           <Button variant="primary" disabled={hasJSONError} onClick={handleSaveJSON}>
-            Save JSON
+            {t('save')} JSON
           </Button>
         </Box>
       )

@@ -32,6 +32,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
+import { useTranslation } from 'react-i18next';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -206,6 +207,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   if (!isActive) return null;
 
+  const { t } = useTranslation(['tokens'])
+
   return (
     <TokensContext.Provider value={tokensContextValue}>
       <Box
@@ -262,7 +265,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               onClick={handleSetTokensTabToList}
               icon={<IconListing />}
               tooltipSide="bottom"
-              tooltip="Listing"
+              tooltip={t('listing')}
             />
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}

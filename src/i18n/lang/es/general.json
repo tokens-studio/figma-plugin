@@ -5,5 +5,6 @@
   "search": "Buscar",
   "rename": "Rebautizar",
   "duplicate": "Duplicar",
-  "delete": "Borrar"
+  "delete": "Borrar",
+  "set": "Colocar"
 }

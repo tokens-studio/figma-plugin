@@ -5,6 +5,7 @@ import { CompareStateType } from '@/utils/findDifferentState';
 import Text from './Text';
 import ChangedTokenItem from './ChangedTokenItem';
 import { StyledDiff } from './StyledDiff';
+import { useTranslation } from 'react-i18next';
 
 function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -25,6 +26,8 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
       setCollapsedChangedStateList([...collapsedChangedStateList, tokenSet]);
     }
   }, [collapsedChangedStateList, changedState.tokens, collapsed]);
+
+  const { t } = useTranslation(["tokens"])
 
   return (
     <Stack direction="column" gap={1}>
@@ -57,14 +60,14 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   {
                     theme.importType === 'REMOVE' && (
                     <StyledDiff size="small" type="danger">
-                      Configuration removed
+                      {t('configurationRemoved')}
                     </StyledDiff>
                     )
                   }
                   {
                     (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
                     <StyledDiff size="small" type="success">
-                      {theme.importType === 'NEW' ? 'Configuration added' : 'Configuration changed' }
+                      {theme.importType === 'NEW' ? t('configuration-added') : t('configurationChanged') }
                     </StyledDiff>
                     )
                   }
@@ -86,7 +89,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                 css={{ padding: '$1 $4' }}
               >
                 <StyledDiff size="small" type="danger">
-                  Configuration changed
+                  t('configurationChanged')
                 </StyledDiff>
               </Stack>
             )}

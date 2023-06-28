@@ -3,5 +3,5 @@
   "docs": "Documentos",
   "feedback": "comentario",
   "pullFrom": "Extraer de {{provider}}",
-  "pushTo": "Empuje a __LUGAR__"
+  "pushTo": "Empuje a {{provider}}"
 }

@@ -36,6 +36,7 @@ import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -64,6 +65,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     return true;
   }, [internalEditToken]);
+
+
+  const { t } = useTranslation(["tokens", "errors"])
 
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
@@ -107,13 +111,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   React.useEffect(() => {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
-      setError('Token names must be unique');
+      setError(t('tokenNamesMustBeUnique', {ns: "errors"}));
     }
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
-      setError('Must not use name of another group');
+      setError(t('mustNotUseNameOfAnotherGroup', {ns: "errors"}));
     }
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
-      setError('Tokens can\'t share name with a group');
+      setError(t('tokensCantShareNameWithGroup', {ns: "errors"}));
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
@@ -140,7 +144,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError('Value must include either px or rem');
+        setError(t('valueMustIncludePxOrRem', {ns: "errors"}));
       }
     },
     [internalEditToken, isValidDimensionToken],
@@ -364,7 +368,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-      setError('Value must include either px or rem');
+      setError(t('valueMustIncludePxOrRem', {ns: "errors"}));
       return;
     }
     if (isValid && internalEditToken) {
@@ -516,24 +520,24 @@ function EditTokenForm({ resolvedTokens }: Props) {
         <Input
           required
           full
-          label="Name"
+          label={t('name')}
           value={internalEditToken?.name}
           onChange={handleNameChange}
           type="text"
           autofocus
           name="name"
           error={error}
-          placeholder="Unique name"
+          placeholder={t('uniqueName')}
         />
         {renderTokenForm()}
 
         {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
         <Box>
-          <Heading size="xsmall">Description</Heading>
+          <Heading size="xsmall">{t('description')}</Heading>
           <Textarea
             key="description"
             value={internalEditToken?.description || ''}
-            placeholder="Optional description"
+            placeholder={t('optionalDescription')}
             onChange={handleDescriptionChange}
             rows={3}
             border
@@ -542,22 +546,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
         {
           internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
             <Box>
-              <Heading size="xsmall">Set</Heading>
+              <Heading size="xsmall">{t('set', {ns: "general"})}</Heading>
               <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
             </Box>
           )
         }
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" type="button" onClick={handleReset}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button disabled={!isValid} variant="primary" type="submit">
-            {internalEditToken?.status === EditTokenFormStatus.CREATE && 'Create'}
-            {internalEditToken?.status === EditTokenFormStatus.EDIT && 'Save'}
+            {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
+            {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
             {(
               internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT
-            ) && 'Duplicate'}
+            ) && t('duplicate')}
           </Button>
         </Stack>
       </Stack>

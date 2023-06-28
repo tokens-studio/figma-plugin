@@ -5,5 +5,6 @@
   "search": "Zoekopdracht",
   "rename": "Hernoemen",
   "duplicate": "Duplicaat",
-  "delete": "Verwijderen"
+  "delete": "Verwijderen",
+  "set": "Set"
 }

@@ -1,9 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import {
-  IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
-} from '@/icons';
+import { IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd } from '@/icons';
 import { displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import Heading from './Heading';
 import IconButton from './IconButton';
@@ -46,7 +44,8 @@ export default function TokenListingHeading({
     dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
   }, [displayType, dispatch]);
 
-  const { t } = useTranslation(['tokens']);
+  const { t } = useTranslation(["tokens"])
+
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
       <StyledTokenGroupHeadingButton
@@ -56,20 +55,24 @@ export default function TokenListingHeading({
         onClick={onCollapse}
         data-testid={`tokenlisting-${tokenKey}-collapse-button`}
       >
-        <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
+        <Tooltip label={ 'Alt + Click ' + t('toggle')}>
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
         <Heading size="small">{label}</Heading>
         {isPro ? <ProBadge /> : null}
       </StyledTokenGroupHeadingButton>
-      <Box css={{
-        position: 'absolute', right: 0, display: 'flex', marginRight: '$2',
-      }}
+      <Box
+        css={{
+          position: 'absolute',
+          right: 0,
+          display: 'flex',
+          marginRight: '$2',
+        }}
       >
         {showDisplayToggle && (
           <IconButton
             icon={displayType === 'GRID' ? <IconList /> : <IconGrid />}
-            tooltip={displayType === 'GRID' ? 'Show as List' : 'Show as Grid'}
+            tooltip={displayType === 'GRID' ? t('showAsList') : t('showAsGrid')}
             onClick={handleToggleDisplayType}
           />
         )}
@@ -79,7 +82,7 @@ export default function TokenListingHeading({
           // TODO: Add proper logic to disable adding a token type depending on flags
           disabled={editProhibited || (isPro && !gitBranchSelector)}
           icon={<IconAdd />}
-          tooltip={t('addNew')}
+          tooltip="Add new token"
           onClick={handleShowNewForm}
         />
       </Box>

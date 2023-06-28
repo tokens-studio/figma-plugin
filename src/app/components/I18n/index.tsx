@@ -40,7 +40,7 @@ export const LanguageSelector = () => {
         }}
         data-testid="choose-language"
       >
-        <Trans>Lang</Trans>
+        Lang
         {' '}
         -
         {' '}

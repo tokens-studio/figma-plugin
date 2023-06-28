@@ -7,6 +7,7 @@ import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
+import { useTranslation } from 'react-i18next';
 
 const StyledReadMoreLink = styled('a', {
   color: '$fgAccent',
@@ -36,8 +37,10 @@ export default function Changelog() {
     setChangelogOpen(false);
   }, []);
 
+  const { t } = useTranslation(["general"]) 
+
   return (
-    <Modal title="Changelog" showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
+    <Modal title={t('changelog')} showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <div>
           {changelog.map((item, index) => (
@@ -58,7 +61,7 @@ export default function Changelog() {
                   rel="noreferrer"
                   href={item.read_more_link}
                 >
-                  {item.read_more_text ? item.read_more_text : 'Read more'}
+                  {item.read_more_text ? item.read_more_text : t('readMore')}
                 </StyledReadMoreLink>
               )}
             </Stack>
@@ -66,17 +69,17 @@ export default function Changelog() {
         </div>
         <Stack direction="row" gap={2} justify="between">
           <Button id="button-changelog-close" onClick={handleClose} variant="secondary">
-            Close
+            {t('close')}
           </Button>
           <Stack direction="row" justify="between" gap={2}>
             {activeIndex !== 0 && (
               <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
-                Previous
+                {t('previous')}
               </Button>
             )}
             {changelog.length > activeIndex + 1 && (
               <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
-                Next
+                {t('next')}
               </Button>
             )}
           </Stack>

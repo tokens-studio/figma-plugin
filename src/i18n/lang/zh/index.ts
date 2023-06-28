@@ -3,7 +3,7 @@ import startScreen from './startScreen.json';
 import licence from './licence.json';
 import tokens from './tokens.json';
 import footer from './footer.json';
-import error from './error.json';
+import errors from './errors.json';
 import sync from './sync.json';
 import navbar from './navbar.json';
 import inspect from './inspect.json';
@@ -22,7 +22,7 @@ export default {
   inspect,
   tokens,
   footer,
-  error,
+  errors,
   sync,
   storage,
   settings,
