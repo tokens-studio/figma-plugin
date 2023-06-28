@@ -14,13 +14,12 @@ export type CreateVariableTypes = {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
-  shouldCreate: boolean;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default function updateVariables({
-  collection, mode, theme, tokens, settings, shouldCreate,
+  collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];
@@ -34,10 +33,10 @@ export default function updateVariables({
   const numberVariables = variablesToCreate.filter((t) => [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING, TokenTypes.NUMBER].includes(t.type));
   const stringVariables = variablesToCreate.filter((t) => t.type === TokenTypes.TEXT) as Extract<VariableToken, { type: TokenTypes.TEXT }>[];
   const variableObj: Record<string, ReferenceVariableType> = {
-    ...setValuesOnVariable(figma.variables.getLocalVariables('COLOR').filter((v) => v.variableCollectionId === collection.id), colorVariables, 'COLOR', collection, mode, shouldCreate),
-    ...setValuesOnVariable(figma.variables.getLocalVariables('BOOLEAN').filter((v) => v.variableCollectionId === collection.id), booleanVariables, 'BOOLEAN', collection, mode, shouldCreate),
-    ...setValuesOnVariable(figma.variables.getLocalVariables('FLOAT').filter((v) => v.variableCollectionId === collection.id), numberVariables, 'FLOAT', collection, mode, shouldCreate),
-    ...setValuesOnVariable(figma.variables.getLocalVariables('STRING').filter((v) => v.variableCollectionId === collection.id), stringVariables, 'STRING', collection, mode, shouldCreate),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('COLOR').filter((v) => v.variableCollectionId === collection.id), colorVariables, 'COLOR', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('BOOLEAN').filter((v) => v.variableCollectionId === collection.id), booleanVariables, 'BOOLEAN', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('FLOAT').filter((v) => v.variableCollectionId === collection.id), numberVariables, 'FLOAT', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('STRING').filter((v) => v.variableCollectionId === collection.id), stringVariables, 'STRING', collection, mode),
   };
   const returnVariableIds: Record<string, string> = {};
   const referenceVariableCandidate: ReferenceVariableType[] = [];

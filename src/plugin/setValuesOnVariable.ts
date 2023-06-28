@@ -18,13 +18,12 @@ export default function setValuesOnVariable(
   variableType: VariableResolvedDataType,
   collection: VariableCollection,
   mode: string,
-  shouldCreate: boolean,
 ): Record<string, ReferenceVariableType> {
   const variableObj: Record<string, ReferenceVariableType> = {};
   tokens.forEach((t) => {
     // Find the connected variable
     let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
-    if (!variable && shouldCreate) {
+    if (!variable) {
       variable = figma.variables.createVariable(t.path, collection.id, variableType);
     }
     if (variable && variableType === 'BOOLEAN' && typeof t.value === 'string') {
