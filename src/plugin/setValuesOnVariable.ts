@@ -28,19 +28,29 @@ export default function setValuesOnVariable(
       if (!variable && shouldCreate) {
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
       }
-      if (variable && variableType === 'BOOLEAN' && typeof t.value === 'string') {
-        setBooleanValuesOnVariable(variable, mode, t.value);
-      }
-      if (variable && variableType === 'COLOR' && typeof t.value === 'string') {
-        setColorValuesOnVariable(variable, mode, t.value);
-      }
-      if (variable && variableType === 'FLOAT') {
-        setNumberValuesOnVariable(variable, mode, Number(t.value));
-      }
-      if (variable && variableType === 'STRING' && typeof t.value === 'string') {
-        setStringValuesOnVariable(variable, mode, t.value);
-      }
       if (variable) {
+        switch (variableType) {
+          case 'BOOLEAN':
+            if (typeof t.value === 'string') {
+              setBooleanValuesOnVariable(variable, mode, t.value);
+            }
+            break;
+          case 'COLOR':
+            if (typeof t.value === 'string') {
+              setColorValuesOnVariable(variable, mode, t.value);
+            }
+            break;
+          case 'FLOAT':
+            setNumberValuesOnVariable(variable, mode, Number(t.value));
+            break;
+          case 'STRING':
+            if (typeof t.value === 'string') {
+              setStringValuesOnVariable(variable, mode, t.value);
+            }
+            break;
+          default:
+            break;
+        }
         let referenceTokenName: string = '';
         if (t.rawValue && t.rawValue?.toString().startsWith('{')) {
           referenceTokenName = t.rawValue?.toString().slice(1, t.rawValue.toString().length - 1);
