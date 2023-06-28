@@ -20,7 +20,6 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
 
   const { t } = useTranslation(['tokens']);
 
-
   const handleReset = React.useCallback(() => {
     if (!showAutoSuggest) {
       dispatch.uiState.setShowEditForm(false);
@@ -30,7 +29,6 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
   if (!editToken) {
     return null;
   }
-
 
   return (
     <Modal

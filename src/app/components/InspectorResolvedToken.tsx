@@ -15,8 +15,6 @@ type Props = {
   type: string;
 };
 
-
-
 export default function InspectorResolvedToken({ token }: { token: Props }) {
   const { t } = useTranslation(['inspect']);
   // TODO: Introduce shared component for token tooltips

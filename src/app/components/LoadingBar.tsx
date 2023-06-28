@@ -13,8 +13,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import Box from './Box';
 
-
-//TODO : i18n needs some refactoring
+// TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
   [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determining nodes to update...',

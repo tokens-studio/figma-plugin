@@ -126,7 +126,6 @@ function PushDialog() {
     setActiveTab(tab);
   }, []);
 
-
   const { t } = useTranslation(['sync']);
 
   switch (showPushDialog) {

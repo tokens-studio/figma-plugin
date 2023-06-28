@@ -37,7 +37,6 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
     }
   }, [selectedItems, handleSelectedItemChange]);
 
-
   const { t } = useTranslation(['tokens']);
 
   return (

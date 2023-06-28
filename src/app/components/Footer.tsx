@@ -161,9 +161,10 @@ export default function Footer() {
             <Stack align="center" direction="row" gap={2}>
               <Text muted>{t('sync')}</Text>
               {storageType.provider === StorageProviderType.JSONBIN && (
-                <Tooltip label={ t('goTo', {
+                <Tooltip label={t('goTo', {
                   provider: transformProviderName(storageType.provider),
-                }) as string}>
+                }) as string}
+                >
                   <IconButton icon={<IconLibrary />} href={projectURL} />
                 </Tooltip>
               )}

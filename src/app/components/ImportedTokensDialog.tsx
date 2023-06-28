@@ -15,8 +15,6 @@ import Box from './Box';
 import { ImportToken } from '@/types/tokens';
 import Text from './Text';
 
-
-
 function NewOrExistingToken({
   token,
   updateAction,
