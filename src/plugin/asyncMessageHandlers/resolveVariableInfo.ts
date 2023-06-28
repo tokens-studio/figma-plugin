@@ -12,8 +12,8 @@ export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.
   await Promise.all(msg.variableIds.map(async (variableId) => {
     if (localVariableMap[variableId]) {
       resolvedValues[variableId] = {
-        name: resolvedValues[variableId].name,
-        key: resolvedValues[variableId].key,
+        name: localVariableMap[variableId].name,
+        key: localVariableMap[variableId].key,
       };
     } else {
       const variable = await figma.variables.importVariableByKeyAsync(variableId);
