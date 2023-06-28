@@ -34,3 +34,4 @@ export * from './resolveVariableInfo';
 export * from './attachLocalVariablesToTheme';
 export * from './renameVariables';
 export * from './syncVariables';
+export * from './updateVariables';

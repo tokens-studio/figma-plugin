@@ -33,7 +33,7 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
       const collection = figma.variables.getVariableCollectionById(theme.$figmaCollectionId);
       if (collection) {
         const allVariableObj = updateVariables({
-          collection, mode: theme.$figmaModeId, theme, tokens, settings, shouldCreate: false,
+          collection, mode: theme.$figmaModeId, theme, tokens, settings,
         });
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }

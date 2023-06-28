@@ -133,6 +133,9 @@ export default async function updateTokensOnSources({
     });
   }
 
+  const mergedTokens = tokens
+    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
+    : null;
 
   const transaction = startTransaction({
     op: 'transaction',
@@ -141,7 +144,7 @@ export default async function updateTokensOnSources({
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
-    tokens,
+    tokens: mergedTokens,
     themes,
     updatedAt,
     settings,

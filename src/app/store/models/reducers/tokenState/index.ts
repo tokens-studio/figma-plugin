@@ -19,3 +19,5 @@ export * from './updateThemeGroupName';
 export * from './assignVariableIdsToTheme';
 export * from './disconnectVariableFromTheme';
 export * from './renameVariableIdsToTheme';
+export * from './renameVariableNamesToThemes';
+export * from './removeVariableNamesFromThemes';
