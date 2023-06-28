@@ -52,12 +52,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   });
   const figmaVariables = figma.variables.getLocalVariables();
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
-  if (shouldCreate) {
-    if (figmaVariables.length === 0) {
-      notifyUI('No variables were created');
-    } else {
-      notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
-    }
+  if (figmaVariables.length === 0) {
+    notifyUI('No variables were created');
+  } else {
+    notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
   return allVariableCollectionIds;
 }

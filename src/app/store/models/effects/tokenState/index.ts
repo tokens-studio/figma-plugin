@@ -13,3 +13,4 @@ export * from './updateThemeGroupName';
 export * from './assignVariableIdsToTheme';
 export * from './renameVariableIdsToTheme';
 export * from './renameVariableNamesToThemes';
+export * from './removeVariableNamesFromThemes';

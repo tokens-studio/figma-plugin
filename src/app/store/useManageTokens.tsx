@@ -145,6 +145,7 @@ export default function useManageTokens() {
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
+      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 
