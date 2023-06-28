@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -36,7 +37,6 @@ import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -66,8 +66,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return true;
   }, [internalEditToken]);
 
-
-  const { t } = useTranslation(["tokens", "errors"])
+  const { t } = useTranslation(['tokens', 'errors']);
 
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
@@ -111,13 +110,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   React.useEffect(() => {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
-      setError(t('tokenNamesMustBeUnique', {ns: "errors"}));
+      setError(t('tokenNamesMustBeUnique', { ns: 'errors' }));
     }
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
-      setError(t('mustNotUseNameOfAnotherGroup', {ns: "errors"}));
+      setError(t('mustNotUseNameOfAnotherGroup', { ns: 'errors' }));
     }
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
-      setError(t('tokensCantShareNameWithGroup', {ns: "errors"}));
+      setError(t('tokensCantShareNameWithGroup', { ns: 'errors' }));
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
@@ -144,7 +143,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleBlur = React.useCallback(
     () => {
       if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError(t('valueMustIncludePxOrRem', {ns: "errors"}));
+        setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
       }
     },
     [internalEditToken, isValidDimensionToken],
@@ -368,7 +367,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-      setError(t('valueMustIncludePxOrRem', {ns: "errors"}));
+      setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
       return;
     }
     if (isValid && internalEditToken) {
@@ -546,7 +545,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         {
           internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
             <Box>
-              <Heading size="xsmall">{t('set', {ns: "general"})}</Heading>
+              <Heading size="xsmall">{t('set', { ns: 'general' })}</Heading>
               <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
             </Box>
           )

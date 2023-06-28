@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Heading from './Heading';
 import Text from './Text';
 import Button from './Button';
@@ -7,7 +8,6 @@ import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
-import { useTranslation } from 'react-i18next';
 
 const StyledReadMoreLink = styled('a', {
   color: '$fgAccent',
@@ -37,7 +37,7 @@ export default function Changelog() {
     setChangelogOpen(false);
   }, []);
 
-  const { t } = useTranslation(["general"]) 
+  const { t } = useTranslation(['general']);
 
   return (
     <Modal title={t('changelog')} showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>

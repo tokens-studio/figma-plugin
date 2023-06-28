@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useUIDSeed } from 'react-uid';
+import { useTranslation } from 'react-i18next';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
 import { EditTokenObject } from '@/types/tokens';
@@ -15,7 +16,6 @@ import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { SingleCompositionTokenContent } from './SingleCompositionTokenContent';
 import { DragItem } from './StyledDragger/DragItem';
-import { useTranslation } from 'react-i18next';
 
 export default function CompositionTokenForm({
   internalEditToken,
@@ -84,7 +84,7 @@ export default function CompositionTokenForm({
     setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
   }, [internalEditToken, setTokenValue]);
 
-  const { t } = useTranslation(["tokens"])
+  const { t } = useTranslation(['tokens']);
 
   return (
     <div>

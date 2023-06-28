@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import Checkbox from '../Checkbox';
 import Box from '../Box';
 import {
@@ -22,7 +23,6 @@ import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import Tooltip from '../Tooltip';
-import { useTranslation } from 'react-i18next';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -93,16 +93,16 @@ export function TokenSetItem({
     [item, onDragStart],
   );
 
-    const { t } = useTranslation(["tokens"])
-  
+  const { t } = useTranslation(['tokens']);
+
   const getCheckboxTooltip = useCallback(() => {
     if (tokenSetStatus === TokenSetStatus.SOURCE) {
-      return t('sets.sourceDescription') as string
+      return t('sets.sourceDescription') as string;
     }
     if (isChecked) {
-      return t('sets.activeDescription') as string
+      return t('sets.activeDescription') as string;
     }
-    return t('sets.inactiveDescription') as string
+    return t('sets.inactiveDescription') as string;
   }, [isChecked, tokenSetStatus]);
 
   const renderIcon = useCallback(

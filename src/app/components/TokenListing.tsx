@@ -21,7 +21,9 @@ type Props = {
   isPro?: boolean;
 };
 
-const TokenListing: React.FC<Props> = ({ tokenKey, label, schema, values, isPro }) => {
+const TokenListing: React.FC<Props> = ({
+  tokenKey, label, schema, values, isPro,
+}) => {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);
   const collapsedTokenTypeObj = useSelector(collapsedTokenTypeObjSelector);
   const collapsed = useSelector(collapsedSelector);
@@ -44,7 +46,7 @@ const TokenListing: React.FC<Props> = ({ tokenKey, label, schema, values, isPro 
     [schema, dispatch],
   );
 
-  const { t } = useTranslation(["tokens"]);
+  const { t } = useTranslation(['tokens']);
 
   const showNewForm = React.useCallback(
     ({ name = '' }: ShowNewFormOptions) => {

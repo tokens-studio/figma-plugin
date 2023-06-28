@@ -29,4 +29,3 @@ export function ErrorFallback({ error }: { error: Error }) {
     </Stack>
   );
 }
- 

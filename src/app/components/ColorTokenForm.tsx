@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
+import { useTranslation } from 'react-i18next';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -28,7 +29,6 @@ import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 import ProBadge from './ProBadge';
 import { useFlags } from './LaunchDarkly';
-import { useTranslation } from 'react-i18next';
 
 const defaultValue = '0';
 
@@ -210,7 +210,7 @@ export default function ColorTokenForm({
 
   const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || `${t('tokens.amount')}`), [internalEditToken]);
 
-  const { t } = useTranslation(["tokens"])
+  const { t } = useTranslation(['tokens']);
 
   return (
     <>

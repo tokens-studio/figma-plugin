@@ -1,7 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd } from '@/icons';
+import {
+  IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
+} from '@/icons';
 import { displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import Heading from './Heading';
 import IconButton from './IconButton';
@@ -44,7 +46,7 @@ export default function TokenListingHeading({
     dispatch.uiState.setDisplayType(displayType === 'GRID' ? 'LIST' : 'GRID');
   }, [displayType, dispatch]);
 
-  const { t } = useTranslation(["tokens"])
+  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
@@ -55,7 +57,7 @@ export default function TokenListingHeading({
         onClick={onCollapse}
         data-testid={`tokenlisting-${tokenKey}-collapse-button`}
       >
-        <Tooltip label={ 'Alt + Click ' + t('toggle')}>
+        <Tooltip label={`Alt + Click ${t('toggle')}`}>
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
         <Heading size="small">{label}</Heading>

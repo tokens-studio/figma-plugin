@@ -63,7 +63,7 @@ export const i18nInstance = i18n
   .init({
     fallbackLng: 'en',
     resources,
-    defaultNS: "general",
+    defaultNS: 'general',
     ns: ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'],
     lng: 'en',
     interpolation: {

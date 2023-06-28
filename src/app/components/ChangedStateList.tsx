@@ -1,11 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Stack from './Stack';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { CompareStateType } from '@/utils/findDifferentState';
 import Text from './Text';
 import ChangedTokenItem from './ChangedTokenItem';
 import { StyledDiff } from './StyledDiff';
-import { useTranslation } from 'react-i18next';
 
 function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -27,7 +27,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
     }
   }, [collapsedChangedStateList, changedState.tokens, collapsed]);
 
-  const { t } = useTranslation(["tokens"])
+  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="column" gap={1}>

@@ -1,16 +1,16 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Stack from './Stack';
 import Text from './Text';
 import { ImportToken } from '@/types/tokens';
 import { StyledDiff } from './StyledDiff';
-import { useTranslation } from 'react-i18next';
 
 export default function ChangedTokenItem({
   token,
 }: {
   token: ImportToken;
 }) {
-  const { t } = useTranslation(["general"])
+  const { t } = useTranslation(['general']);
 
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>

@@ -34,7 +34,7 @@ const StyledButton = styled('button', {
 });
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
-  const { t } = useTranslation(["tokens"]);
+  const { t } = useTranslation(['tokens']);
 
   const onboardingData = {
     title: t('sets.title'),

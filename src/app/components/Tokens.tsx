@@ -2,6 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -32,7 +33,6 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
-import { useTranslation } from 'react-i18next';
 
 const StyledButton = styled('button', {
   '&:focus, &:hover': {
@@ -207,7 +207,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   if (!isActive) return null;
 
-  const { t } = useTranslation(['tokens'])
+  const { t } = useTranslation(['tokens']);
 
   return (
     <TokensContext.Provider value={tokensContextValue}>

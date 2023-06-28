@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Dispatch } from '../store';
 import { TokenSetItem } from './TokenSetItem';
 import useConfirm from '../hooks/useConfirm';
@@ -12,7 +13,6 @@ import {
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { DragControlsContext } from '@/context';
 import { TreeItem } from '@/utils/tokenset';
-import { useTranslation } from 'react-i18next';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -34,7 +34,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const { t } = useTranslation(["tokens"])
+  const { t } = useTranslation(['tokens']);
 
   const handleClick = useCallback(async (set: TreeItem) => {
     if (set.isLeaf) {
