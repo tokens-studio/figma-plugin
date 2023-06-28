@@ -144,7 +144,7 @@ export default async function updateTokensOnSources({
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
-    tokens: tokens ? mergedTokens : null,
+    tokens: mergedTokens,
     themes,
     updatedAt,
     settings,

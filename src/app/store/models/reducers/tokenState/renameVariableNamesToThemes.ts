@@ -1,8 +1,7 @@
 import type { TokenState } from '../../tokenState';
 
 export function renameVariableNamesToThemes(state: TokenState, oldName: string, newName: string): TokenState {
-  const updatedThemes = [...state.themes];
-  updatedThemes.forEach((theme) => {
+  const newThemes = state.themes.map((theme) => {
     const updatedTokens = theme.$figmaVariableReferences;
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([key]) => {
@@ -12,13 +11,13 @@ export function renameVariableNamesToThemes(state: TokenState, oldName: string, 
         }
       });
     }
-    theme = {
+    return {
       ...theme,
       $figmaVariableReferences: updatedTokens,
     };
   });
   return {
     ...state,
-    themes: updatedThemes,
+    themes: newThemes,
   };
 }

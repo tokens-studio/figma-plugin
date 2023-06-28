@@ -11,23 +11,22 @@ export default async function renameVariablesFromPlugin(tokens: { oldName: strin
   figma.variables.getLocalVariables().forEach((v) => {
     Object.entries(v.valuesByMode).forEach(([mode, variableValue]) => {
       if (typeof variableValue === 'object' && 'type' in variableValue && variableValue.type === 'VARIABLE_ALIAS') {
-        if (referenceVariableValues[variableValue.id]) {
-          referenceVariableValues[variableValue.id].push([v.id, mode]);
-        } else {
-          referenceVariableValues[variableValue.id] = [[v.id, mode]];
+        if (!referenceVariableValues[variableValue.id]) {
+          referenceVariableValues[variableValue.id] = [];
         }
+        referenceVariableValues[variableValue.id].push([v.id, mode]);
       }
     });
   });
 
   const renamedVariableToken = tokens.map((token) => {
-    const originalVariableIdsToRename: string[] = [];
     const renamedVariableIds: string[] = [];
-    themeInfo.themes.forEach((theme) => {
-      if (theme.$figmaVariableReferences?.[token.oldName]) {
-        originalVariableIdsToRename.push(theme.$figmaVariableReferences?.[token.oldName]);
+    const originalVariableIdsToRename = themeInfo.themes.reduce<string[]>((acc, theme) => {
+      if (theme.$figmaVariableReferences?.[token.newName]) {
+        acc.push(theme.$figmaVariableReferences?.[token.newName]);
       }
-    });
+      return acc;
+    }, []);
     originalVariableIdsToRename.forEach((variableId) => {
       const variable = variableMap[variableId];
       if (variable) {
