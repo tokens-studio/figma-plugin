@@ -81,6 +81,7 @@ export default function useManageTokens() {
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
+        dispatch.tokenState.renameVariableNamesToThemes(oldName, name);
       }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
