@@ -15,7 +15,7 @@ export function identify({ userId, figmaId, name }: { userId: string; figmaId?: 
       USER_ID: userId,
       FIGMA_USER_ID: figmaId,
       NAME: name,
-      version: pjs.plugin_version,
+      version: pjs.version,
     });
   }
 }

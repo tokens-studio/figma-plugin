@@ -90,7 +90,7 @@ describe('jsonbin', () => {
       metadata: {
         tokenSetOrder: ['global'],
         updatedAt: '2022-09-20T08:43:03.844Z',
-        version: pjs.plugin_version,
+        version: pjs.version,
       },
     });
   });

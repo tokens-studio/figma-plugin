@@ -8,7 +8,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 describe('Footer', () => {
   it('displays current version number', () => {
     const { getByText } = render(<Footer />, { store });
-    expect(getByText(`V ${pjs.plugin_version}`)).toBeInTheDocument();
+    expect(getByText(`V ${pjs.version}`)).toBeInTheDocument();
   });
 
   it('shows branch selector for users on a free plan', () => {

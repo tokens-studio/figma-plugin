@@ -128,7 +128,7 @@ export default function Footer() {
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.plugin_version}`}</a>
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
