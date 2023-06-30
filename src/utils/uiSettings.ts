@@ -8,6 +8,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await UiSettingsProperty.read();
     await UiSettingsProperty.write({
+      sessionRecording: uiSettings.sessionRecording ?? data?.sessionRecording,
       width: uiSettings.width ?? data?.width,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
@@ -45,6 +46,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let shouldSwapStyles: boolean;
     let baseFontSize: string;
     let aliasBaseFontSize: string;
+    let sessionRecording: boolean;
 
     if (data) {
       width = data.width || 400;
@@ -60,9 +62,11 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
+      sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       settings = {
         width: Math.max(300, width),
         height: Math.max(200, height),
+        sessionRecording,
         showEmptyGroups,
         updateMode,
         updateOnChange,
