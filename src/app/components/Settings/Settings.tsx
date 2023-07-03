@@ -113,7 +113,7 @@ function Settings() {
             </Label>
           </Stack>
           <Heading size="small">Base font size token</Heading>
-          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Lets you configure the value 1rem represents. You can also set this to a token, to have it change between sets.</Box>
+          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHe ight: 1.5 }}>Lets you configure the value 1rem represents. You can also set this to a token, to have it change between sets.</Box>
           <RemConfiguration />
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
