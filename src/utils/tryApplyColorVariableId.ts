@@ -1,7 +1,12 @@
 import { clone } from '@figma-plugin/helpers';
 import { matchVariableName } from './matchVariableName';
 
-export async function tryApplyColorVariableId(node: SceneNode, token: string, figmaVariableReferences: Record<string, string>, figmaVariableMaps: Record<string, Variable>, type: 'fills' | 'strokes') {
+export enum ColorPaintType {
+  FILLS = 'fills',
+  STROKES = 'strokes',
+}
+
+export async function tryApplyColorVariableId(node: SceneNode, token: string, figmaVariableReferences: Record<string, string>, figmaVariableMaps: Record<string, Variable>, type: ColorPaintType) {
   const pathname = token.split('.').join('/');
   const matchVariableId = matchVariableName(
     token,

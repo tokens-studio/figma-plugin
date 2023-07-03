@@ -28,7 +28,7 @@ import removeValuesFromNode from './removeValuesFromNode';
 import { Properties } from '@/constants/Properties';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
-import { tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
+import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 
 // @README values typing is wrong
 
@@ -280,7 +280,7 @@ export default async function setValuesOnNode(
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
-          if (!(await tryApplyColorVariableId(node, data.fill, figmaVariableReferences, figmaVariableMaps, 'fills'))) {
+          if (!(await tryApplyColorVariableId(node, data.fill, figmaVariableReferences, figmaVariableMaps, ColorPaintType.FILLS))) {
             const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
             let matchingStyleId = matchStyleName(
               data.fill,

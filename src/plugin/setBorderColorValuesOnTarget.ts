@@ -4,7 +4,7 @@ import { trySetStyleId } from '@/utils/trySetStyleId';
 import { paintStyleMatchesColorToken } from './figmaUtils/styleMatchers';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
-import { tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
+import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 
 type Props = {
   data: string;
@@ -22,7 +22,7 @@ export async function setBorderColorValuesOnTarget({
   data, value, node, stylePathPrefix = null, stylePathSlice, styleReferences, paintStyles, figmaVariableReferences, figmaVariableMaps,
 }: Props) {
   if ('strokes' in node) {
-    if (!(await tryApplyColorVariableId(node, data, figmaVariableReferences, figmaVariableMaps, 'strokes'))) {
+    if (!(await tryApplyColorVariableId(node, data, figmaVariableReferences, figmaVariableMaps, ColorPaintType.STROKES))) {
       const pathname = convertTokenNameToPath(data, stylePathPrefix, stylePathSlice);
       let matchingStyleId = matchStyleName(
         data,
