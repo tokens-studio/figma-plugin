@@ -98,7 +98,7 @@ export default async function setValuesOnNode(
       // if applied border is just a string, it's the older version where border was just a color. apply color then.
       if (values.border && typeof values.border === 'string' && typeof data.border !== 'undefined') {
         setBorderColorValuesOnTarget({
-          node, data: data.border, value: values.border, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles, figmaVariableReferences, figmaVariableMaps,
+          node, data: data.border, value: values.border, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
         });
       }
 
@@ -280,7 +280,7 @@ export default async function setValuesOnNode(
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
-          if (!(await tryApplyColorVariableId(node, data.fill, figmaVariableReferences, figmaVariableMaps, 'fills'))) {
+          if (!(await tryApplyColorVariableId(node, data.fill, figmaVariableReferences, figmaVariableMaps))) {
             const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
             let matchingStyleId = matchStyleName(
               data.fill,
@@ -383,7 +383,7 @@ export default async function setValuesOnNode(
       if (typeof values.borderColor !== 'undefined' && typeof values.borderColor === 'string') {
         if ('strokes' in node && data.borderColor) {
           setBorderColorValuesOnTarget({
-            node, data: data.borderColor, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles, figmaVariableReferences, figmaVariableMaps,
+            node, data: data.borderColor, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles,
           });
         }
       }
