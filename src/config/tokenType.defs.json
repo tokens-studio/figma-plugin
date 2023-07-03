@@ -211,6 +211,22 @@
       "value": { "type": "string" }
     }
   },
+  "text": {
+    "label": "Text",
+    "property": "Text",
+    "type": "text",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
+  "number": {
+    "label": "Number",
+    "property": "Number",
+    "type": "number",
+    "schemas": {
+      "value": { "type": "string" }
+    }
+  },
   "other": {
     "label": "Other",
     "property": "other",

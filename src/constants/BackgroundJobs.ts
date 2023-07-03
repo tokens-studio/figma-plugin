@@ -16,4 +16,5 @@ export enum BackgroundJobs {
   UI_UNDOING = 'ui_undoing',
   UI_REDOING = 'ui_redoing',
   UI_ATTACHING_LOCAL_STYLES = 'ui_attaching_local_styles',
+  UI_ATTACHING_LOCAL_VARIABLES = 'ui_attaching_local_variables',
 }

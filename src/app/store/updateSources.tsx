@@ -1,3 +1,4 @@
+import { startTransaction } from '@sentry/react';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
@@ -135,10 +136,15 @@ export default async function updateTokensOnSources({
   const mergedTokens = tokens
     ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
     : null;
+
+  const transaction = startTransaction({
+    op: 'transaction',
+    name: 'Update Tokens',
+  });
   AsyncMessageChannel.ReactInstance.message({
     type: AsyncMessageTypes.UPDATE,
     tokenValues,
-    tokens: tokens ? mergedTokens : null,
+    tokens: mergedTokens,
     themes,
     updatedAt,
     settings,
@@ -147,5 +153,7 @@ export default async function updateTokensOnSources({
     activeTheme,
     shouldSwapStyles,
     collapsedTokenSets,
+  }).then(() => {
+    transaction.finish();
   });
 }

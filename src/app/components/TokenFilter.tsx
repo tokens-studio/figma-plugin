@@ -15,6 +15,7 @@ const StyledInput = styled('input', {
   width: '100%',
   padding: '$3 $5',
   paddingLeft: '$6',
+  paddingRight: '$1',
   gap: '$2',
   '&:focus, &:hover': {
     outline: 'none',
@@ -32,9 +33,9 @@ const TokenFilter = () => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = React.useCallback((value) => {
-    setTokenString(value);
-    debounced(value);
+  const handleChange = React.useCallback((e) => {
+    setTokenString(e.target.value);
+    debounced(e.target.value);
   }, [debounced]);
 
   return (
@@ -42,6 +43,8 @@ const TokenFilter = () => {
       css={{
         display: 'flex',
         flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: 0,
         alignItems: 'center',
         gap: '$2',
         position: 'relative',
@@ -52,7 +55,7 @@ const TokenFilter = () => {
         spellCheck={false}
         type="text"
         value={tokenString}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={handleChange}
         placeholder="Search"
       />
     </Box>

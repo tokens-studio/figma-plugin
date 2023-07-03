@@ -26,6 +26,9 @@ import { isCompositeBorderValue } from '@/utils/is/isCompositeBorderValue';
 import { setBorderColorValuesOnTarget } from './setBorderColorValuesOnTarget';
 import removeValuesFromNode from './removeValuesFromNode';
 import { Properties } from '@/constants/Properties';
+import { getVariablesMap } from '@/utils/getVariablesMap';
+import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
+import { tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 
 // @README values typing is wrong
 
@@ -43,10 +46,17 @@ export default async function setValuesOnNode(
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
+  const figmaVariableMaps = getVariablesMap();
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
   const figmaStyleReferences: Record<string, string> = {};
+  const figmaVariableReferences: Record<string, string> = {};
   activeThemes?.forEach((theme) => {
+    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
+      if (!figmaVariableReferences[token]) {
+        figmaVariableReferences[token] = variableId;
+      }
+    });
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
       if (!figmaStyleReferences[token]) {
         figmaStyleReferences[token] = styleId;
@@ -92,12 +102,18 @@ export default async function setValuesOnNode(
         });
       }
 
-      if (typeof values.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
+      // Border Radius
+      if (typeof values.borderRadius !== 'undefined' && typeof data.borderRadius !== 'undefined' && isPrimitiveValue(values.borderRadius)) {
         const individualBorderRadius = String(values.borderRadius).split(' ');
         switch (individualBorderRadius.length) {
           case 1:
             if ('cornerRadius' in node) {
-              node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
+              if (!(await tryApplyVariableId(node, 'topLeftRadius', data.borderRadius, figmaVariableReferences, figmaVariableMaps)
+              && await tryApplyVariableId(node, 'topRightRadius', data.borderRadius, figmaVariableReferences, figmaVariableMaps)
+              && await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadius, figmaVariableReferences, figmaVariableMaps)
+              && await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadius, figmaVariableReferences, figmaVariableMaps))) {
+                node.cornerRadius = transformValue(String(values.borderRadius), 'borderRadius', baseFontSize);
+              }
             }
             break;
           case 2:
@@ -131,30 +147,42 @@ export default async function setValuesOnNode(
       if (
         'topLeftRadius' in node
         && typeof values.borderRadiusTopLeft !== 'undefined'
+        && typeof data.borderRadiusTopLeft !== 'undefined'
         && isPrimitiveValue(values.borderRadiusTopLeft)
       ) {
-        node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'topLeftRadius', data.borderRadiusTopLeft, figmaVariableReferences, figmaVariableMaps))) {
+          node.topLeftRadius = transformValue(String(values.borderRadiusTopLeft), 'borderRadius', baseFontSize);
+        }
       }
       if (
         'topRightRadius' in node
         && typeof values.borderRadiusTopRight !== 'undefined'
+        && typeof data.borderRadiusTopRight !== 'undefined'
         && isPrimitiveValue(values.borderRadiusTopRight)
       ) {
-        node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'topRightRadius', data.borderRadiusTopRight, figmaVariableReferences, figmaVariableMaps))) {
+          node.topRightRadius = transformValue(String(values.borderRadiusTopRight), 'borderRadius', baseFontSize);
+        }
       }
       if (
         'bottomRightRadius' in node
         && typeof values.borderRadiusBottomRight !== 'undefined'
+        && typeof data.borderRadiusBottomRight !== 'undefined'
         && isPrimitiveValue(values.borderRadiusBottomRight)
       ) {
-        node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'bottomRightRadius', data.borderRadiusBottomRight, figmaVariableReferences, figmaVariableMaps))) {
+          node.bottomRightRadius = transformValue(String(values.borderRadiusBottomRight), 'borderRadius', baseFontSize);
+        }
       }
       if (
         'bottomLeftRadius' in node
         && typeof values.borderRadiusBottomLeft !== 'undefined'
+        && typeof data.borderRadiusBottomLeft !== 'undefined'
         && isPrimitiveValue(values.borderRadiusBottomLeft)
       ) {
-        node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'bottomLeftRadius', data.borderRadiusBottomLeft, figmaVariableReferences, figmaVariableMaps))) {
+          node.bottomLeftRadius = transformValue(String(values.borderRadiusBottomLeft), 'borderRadius', baseFontSize);
+        }
       }
 
       // BOX SHADOW
@@ -227,53 +255,62 @@ export default async function setValuesOnNode(
       }
 
       // SIZING: BOTH
-      if ('resize' in node && typeof values.sizing !== 'undefined' && isPrimitiveValue(values.sizing)) {
-        const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
-        node.resize(size, size);
+      if ('resize' in node && typeof values.sizing !== 'undefined' && typeof data.sizing !== 'undefined' && isPrimitiveValue(values.sizing)) {
+        if (!((await tryApplyVariableId(node, 'width', data.sizing, figmaVariableReferences, figmaVariableMaps))
+        && (await tryApplyVariableId(node, 'height', data.sizing, figmaVariableReferences, figmaVariableMaps)))) {
+          const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
+          node.resize(size, size);
+        }
       }
 
       // SIZING: WIDTH
-      if ('resize' in node && typeof values.width !== 'undefined' && isPrimitiveValue(values.width)) {
-        node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+      if ('resize' in node && typeof values.width !== 'undefined' && typeof data.width !== 'undefined' && isPrimitiveValue(values.width)) {
+        if (!(await tryApplyVariableId(node, 'width', data.width, figmaVariableReferences, figmaVariableMaps))) {
+          node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+        }
       }
 
       // SIZING: HEIGHT
-      if ('resize' in node && typeof values.height !== 'undefined' && isPrimitiveValue(values.height)) {
-        node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+      if ('resize' in node && typeof values.height !== 'undefined' && typeof data.height !== 'undefined' && isPrimitiveValue(values.height)) {
+        if (!(await tryApplyVariableId(node, 'height', data.height, figmaVariableReferences, figmaVariableMaps))) {
+          node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+        }
       }
 
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
-          const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
-          let matchingStyleId = matchStyleName(
-            data.fill,
-            pathname,
-            figmaStyleReferences ?? {},
-            figmaStyleMaps.paintStyles,
-          );
+          if (!(await tryApplyColorVariableId(node, data.fill, figmaVariableReferences, figmaVariableMaps))) {
+            const pathname = convertTokenNameToPath(data.fill, stylePathPrefix, stylePathSlice);
+            let matchingStyleId = matchStyleName(
+              data.fill,
+              pathname,
+              figmaStyleReferences ?? {},
+              figmaStyleMaps.paintStyles,
+            );
 
-          if (!matchingStyleId) {
-            // Local style not found - look for matching non-local style:
-            const styleIdBackupKey = 'fillStyleId_original';
-            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
-            if (nonLocalStyle) {
-              if (paintStyleMatchesColorToken(nonLocalStyle, values.fill)) {
-                // Non-local style matches - use this and clear style id backup:
-                matchingStyleId = nonLocalStyle.id;
-                clearStyleIdBackup(node, styleIdBackupKey);
-              } else if (pathname === nonLocalStyle.name) {
-                // Non-local style does NOT match, but style name and token path does,
-                // so we assume selected token value is an override (e.g. dark theme)
-                // Now backup up style id before overwriting with raw token value, so we
-                // can re-link the non-local style, when the token value matches again:
-                setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+            if (!matchingStyleId) {
+              // Local style not found - look for matching non-local style:
+              const styleIdBackupKey = 'fillStyleId_original';
+              const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+              if (nonLocalStyle) {
+                if (paintStyleMatchesColorToken(nonLocalStyle, values.fill)) {
+                  // Non-local style matches - use this and clear style id backup:
+                  matchingStyleId = nonLocalStyle.id;
+                  clearStyleIdBackup(node, styleIdBackupKey);
+                } else if (pathname === nonLocalStyle.name) {
+                  // Non-local style does NOT match, but style name and token path does,
+                  // so we assume selected token value is an override (e.g. dark theme)
+                  // Now backup up style id before overwriting with raw token value, so we
+                  // can re-link the non-local style, when the token value matches again:
+                  setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
+                }
               }
             }
-          }
 
-          if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
-            setColorValuesOnTarget(node, { value: values.fill }, 'fills');
+            if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'fill', matchingStyleId)))) {
+              setColorValuesOnTarget(node, { value: values.fill }, 'fills');
+            }
           }
         }
       }
@@ -352,15 +389,20 @@ export default async function setValuesOnNode(
       }
 
       // SPACING
-      if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
+      if ('paddingLeft' in node && typeof values.spacing !== 'undefined' && typeof data.spacing !== 'undefined' && isPrimitiveValue(values.spacing)) {
         const individualSpacing = String(values.spacing).split(' ');
         const spacing = transformValue(String(values.spacing), 'spacing', baseFontSize);
         switch (individualSpacing.length) {
           case 1:
-            node.paddingLeft = spacing;
-            node.paddingRight = spacing;
-            node.paddingTop = spacing;
-            node.paddingBottom = spacing;
+            if (!(await tryApplyVariableId(node, 'paddingLeft', data.spacing, figmaVariableReferences, figmaVariableMaps)
+            && await tryApplyVariableId(node, 'paddingRight', data.spacing, figmaVariableReferences, figmaVariableMaps)
+            && await tryApplyVariableId(node, 'paddingTop', data.spacing, figmaVariableReferences, figmaVariableMaps)
+            && await tryApplyVariableId(node, 'paddingBottom', data.spacing, figmaVariableReferences, figmaVariableMaps))) {
+              node.paddingLeft = spacing;
+              node.paddingRight = spacing;
+              node.paddingTop = spacing;
+              node.paddingBottom = spacing;
+            }
             break;
           case 2:
             node.paddingTop = transformValue(String(individualSpacing[0]), 'spacing', baseFontSize);
@@ -387,50 +429,70 @@ export default async function setValuesOnNode(
       if (
         'paddingLeft' in node
         && typeof values.horizontalPadding !== 'undefined'
+        && typeof data.horizontalPadding !== 'undefined'
         && isPrimitiveValue(values.horizontalPadding)
       ) {
-        const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing', baseFontSize);
-        node.paddingLeft = horizontalPadding;
-        node.paddingRight = horizontalPadding;
+        if (!(await tryApplyVariableId(node, 'paddingLeft', data.horizontalPadding, figmaVariableReferences, figmaVariableMaps)
+        && await tryApplyVariableId(node, 'paddingRight', data.horizontalPadding, figmaVariableReferences, figmaVariableMaps))) {
+          const horizontalPadding = transformValue(String(values.horizontalPadding), 'spacing', baseFontSize);
+          node.paddingLeft = horizontalPadding;
+          node.paddingRight = horizontalPadding;
+        }
       }
       if (
         'paddingTop' in node
         && typeof values.verticalPadding !== 'undefined'
+        && typeof data.verticalPadding !== 'undefined'
         && isPrimitiveValue(values.verticalPadding)
       ) {
-        const verticalPadding = transformValue(String(values.verticalPadding), 'spacing', baseFontSize);
-        node.paddingTop = verticalPadding;
-        node.paddingBottom = verticalPadding;
+        if (!(await tryApplyVariableId(node, 'paddingTop', data.verticalPadding, figmaVariableReferences, figmaVariableMaps)
+        && await tryApplyVariableId(node, 'paddingBottom', data.verticalPadding, figmaVariableReferences, figmaVariableMaps))) {
+          const verticalPadding = transformValue(String(values.verticalPadding), 'spacing', baseFontSize);
+          node.paddingTop = verticalPadding;
+          node.paddingBottom = verticalPadding;
+        }
       }
 
-      if ('itemSpacing' in node && typeof values.itemSpacing !== 'undefined' && isPrimitiveValue(values.itemSpacing)) {
+      if ('itemSpacing' in node && typeof values.itemSpacing !== 'undefined' && typeof data.itemSpacing !== 'undefined' && isPrimitiveValue(values.itemSpacing)) {
         if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
           node.primaryAxisAlignItems = 'MIN';
         }
-        node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'itemSpacing', data.itemSpacing, figmaVariableReferences, figmaVariableMaps))) {
+          node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing', baseFontSize);
+        }
       }
 
-      if ('paddingTop' in node && typeof values.paddingTop !== 'undefined' && isPrimitiveValue(values.paddingTop)) {
-        node.paddingTop = transformValue(String(values.paddingTop), 'spacing', baseFontSize);
+      if ('paddingTop' in node && typeof values.paddingTop !== 'undefined' && typeof data.paddingTop !== 'undefined' && isPrimitiveValue(values.paddingTop)) {
+        if (!(await tryApplyVariableId(node, 'paddingTop', data.paddingTop, figmaVariableReferences, figmaVariableMaps))) {
+          node.paddingTop = transformValue(String(values.paddingTop), 'spacing', baseFontSize);
+        }
       }
       if (
         'paddingRight' in node
         && typeof values.paddingRight !== 'undefined'
+        && typeof data.paddingRight !== 'undefined'
         && isPrimitiveValue(values.paddingRight)
       ) {
-        node.paddingRight = transformValue(String(values.paddingRight), 'spacing', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'paddingRight', data.paddingRight, figmaVariableReferences, figmaVariableMaps))) {
+          node.paddingRight = transformValue(String(values.paddingRight), 'spacing', baseFontSize);
+        }
       }
 
       if (
         'paddingBottom' in node
         && typeof values.paddingBottom !== 'undefined'
+        && typeof data.paddingBottom !== 'undefined'
         && isPrimitiveValue(values.paddingBottom)
       ) {
-        node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing', baseFontSize);
+        if (!(await tryApplyVariableId(node, 'paddingBottom', data.paddingBottom, figmaVariableReferences, figmaVariableMaps))) {
+          node.paddingBottom = transformValue(String(values.paddingBottom), 'spacing', baseFontSize);
+        }
       }
 
-      if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
-        node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing', baseFontSize);
+      if ('paddingLeft' in node && typeof values.paddingLeft !== 'undefined' && typeof data.paddingLeft !== 'undefined' && isPrimitiveValue(values.paddingLeft)) {
+        if (!(await tryApplyVariableId(node, 'paddingLeft', data.paddingLeft, figmaVariableReferences, figmaVariableMaps))) {
+          node.paddingLeft = transformValue(String(values.paddingLeft), 'spacing', baseFontSize);
+        }
       }
 
       if (values.asset && typeof values.asset === 'string') {
@@ -452,27 +514,64 @@ export default async function setValuesOnNode(
 
       if (
         typeof values.dimension !== 'undefined'
+        && typeof data.dimension !== 'undefined'
         && isPrimitiveValue(values.dimension)
       ) {
         if ('itemSpacing' in node) {
           if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
             node.primaryAxisAlignItems = 'MIN';
           }
-          node.itemSpacing = transformValue(String(values.dimension), 'spacing', baseFontSize);
+
+          if (!(await tryApplyVariableId(node, 'itemSpacing', data.dimension, figmaVariableReferences, figmaVariableMaps))) {
+            node.itemSpacing = transformValue(String(values.dimension), 'spacing', baseFontSize);
+          }
         } else if ('resize' in node) {
-          const size = transformValue(String(values.dimension), 'sizing', baseFontSize);
-          node.resize(size, size);
+          if (!(await tryApplyVariableId(node, 'width', data.dimension, figmaVariableReferences, figmaVariableMaps)
+            && await tryApplyVariableId(node, 'height', data.dimension, figmaVariableReferences, figmaVariableMaps))) {
+            const size = transformValue(String(values.dimension), 'sizing', baseFontSize);
+            node.resize(size, size);
+          }
+        }
+      }
+
+      if (
+        typeof values.number !== 'undefined'
+        && typeof data.number !== 'undefined'
+        && isPrimitiveValue(values.number)
+      ) {
+        if ('itemSpacing' in node) {
+          if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+            node.primaryAxisAlignItems = 'MIN';
+          }
+
+          if (!(await tryApplyVariableId(node, 'itemSpacing', data.number, figmaVariableReferences, figmaVariableMaps))) {
+            node.itemSpacing = transformValue(String(values.number), 'spacing', baseFontSize);
+          }
+        } else if ('resize' in node) {
+          if (!(await tryApplyVariableId(node, 'width', data.number, figmaVariableReferences, figmaVariableMaps)
+            && await tryApplyVariableId(node, 'height', data.number, figmaVariableReferences, figmaVariableMaps))) {
+            const size = transformValue(String(values.number), 'sizing', baseFontSize);
+            node.resize(size, size);
+          }
         }
       }
 
       if ('visible' in node && typeof values.visibility === 'string' && typeof data.visibility !== 'undefined') {
-        if (values.visibility === 'true') {
-          node.visible = true;
-        } else if (values.visibility === 'false') {
-          node.visible = false;
+        if (!(await tryApplyVariableId(node, 'visible', data.visibility, figmaVariableReferences, figmaVariableMaps))) {
+          if (values.visibility === 'true') {
+            node.visible = true;
+          } else if (values.visibility === 'false') {
+            node.visible = false;
+          }
         }
       }
 
+      if ('characters' in node && node.fontName !== figma.mixed && typeof values.text === 'string' && typeof data.text !== 'undefined') {
+        if (!(await tryApplyVariableId(node, 'characters', data.text, figmaVariableReferences, figmaVariableMaps))) {
+          await figma.loadFontAsync(node.fontName);
+          node.characters = values.text;
+        }
+      }
       // Real value for text layers
       if ('value' in values) {
         if ('characters' in node && node.fontName !== figma.mixed) {

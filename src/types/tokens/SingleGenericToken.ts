@@ -10,7 +10,13 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   oldValue?: V;
   internal__Parent?: string;
   inheritTypeLevel?: number;
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      modify?: ColorModifier
+    }
+  }
 } & (Named extends true ? {
   name: string;
 } : {

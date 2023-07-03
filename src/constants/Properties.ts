@@ -43,6 +43,8 @@ export enum Properties {
   textDecoration = 'textDecoration',
   asset = 'asset',
   visibility = 'visibility',
+  text = 'text',
+  number = 'number',
   tokenValue = 'tokenValue',
   value = 'value',
   tokenName = 'tokenName',

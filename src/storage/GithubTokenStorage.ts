@@ -41,6 +41,7 @@ export function getTreeMode(type: 'dir' | 'file' | string) {
 // @README https://github.com/octokit/octokit.js/issues/890
 const octokitClientDefaultHeaders = {
   'If-None-Match': '',
+
 };
 
 export class GithubTokenStorage extends GitTokenStorage {
@@ -159,8 +160,13 @@ export class GithubTokenStorage extends GitTokenStorage {
         owner: this.owner,
         repo: this.repository,
         ref: this.branch,
-        headers: octokitClientDefaultHeaders,
+        headers: {
+          ...octokitClientDefaultHeaders,
+          // Setting this makes github return the raw file instead of a json object.
+          Accept: 'application/vnd.github.raw',
+        },
       });
+
       // read entire directory
       if (Array.isArray(response.data)) {
         const directorySha = await this.getTreeShaForDirectory(normalizedPath);
@@ -183,7 +189,11 @@ export class GithubTokenStorage extends GitTokenStorage {
               repo: this.repository,
               path: treeItem.path.startsWith(normalizedPath) ? treeItem.path : `${normalizedPath}/${treeItem.path}`,
               ref: this.branch,
-              headers: octokitClientDefaultHeaders,
+              headers: {
+                ...octokitClientDefaultHeaders,
+                // Setting this makes github return the raw file instead of a json object.
+                Accept: 'application/vnd.github.raw',
+              },
             }) : Promise.resolve(null)
           )));
           return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
@@ -192,12 +202,11 @@ export class GithubTokenStorage extends GitTokenStorage {
               path
               && fileContent?.data
               && !Array.isArray(fileContent?.data)
-              && 'content' in fileContent.data
             ) {
               const filePath = path.startsWith(normalizedPath) ? path : `${normalizedPath}/${path}`;
               let name = filePath.substring(this.path.length).replace(/^\/+/, '');
               name = name.replace('.json', '');
-              const parsed = JSON.parse(decodeBase64(fileContent.data.content)) as GitMultiFileObject;
+              const parsed = JSON.parse(fileContent.data as unknown as string) as GitMultiFileObject;
               // @README we will need to ensure these reserved names
 
               if (name === SystemFilenames.THEMES) {
@@ -226,8 +235,8 @@ export class GithubTokenStorage extends GitTokenStorage {
             return null;
           }));
         }
-      } else if ('content' in response.data) {
-        const data = decodeBase64(response.data.content);
+      } else if (response.data) {
+        const data = response.data as unknown as string;
         if (IsJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
           return [

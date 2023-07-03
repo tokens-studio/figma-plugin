@@ -22,7 +22,13 @@ type EditSingleTokenData = {
   description?: string;
   oldName?: string;
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      modify?: ColorModifier
+    }
+  }
 };
 
 type CreateSingleTokenData = {
@@ -32,7 +38,12 @@ type CreateSingleTokenData = {
   value: SingleToken['value'];
   description?: string;
   shouldUpdateDocument?: boolean;
-  $extensions?: { 'studio.tokens': { modify: ColorModifier } }
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      modify?: ColorModifier
+    }
+  }
 };
 
 type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
@@ -70,6 +81,7 @@ export default function useManageTokens() {
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
+        dispatch.tokenState.renameVariableNamesToThemes(oldName, name);
       }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
@@ -133,6 +145,7 @@ export default function useManageTokens() {
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
+      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 

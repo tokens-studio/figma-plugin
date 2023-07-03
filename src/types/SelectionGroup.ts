@@ -9,4 +9,5 @@ export interface SelectionGroup {
   value: string;
   nodes: NodeInfo[];
   resolvedValue?: SingleToken['value'] // We save the value of the style
+  appliedType: 'token' | 'variable' | 'style'
 }

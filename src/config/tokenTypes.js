@@ -245,6 +245,26 @@ const tokenTypes = {
     },
     explainer: 'true | false',
   },
+  text: {
+    label: 'Text',
+    property: 'Text',
+    type: 'text',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
+  number: {
+    label: 'Number',
+    property: 'Number',
+    type: 'number',
+    schema: {
+      options: {
+        description: '',
+      },
+    },
+  },
   other: {
     label: 'Other',
     property: 'other',
