@@ -9,12 +9,17 @@ type Props<T extends string> = {
   activeTab?: T
   disabled?: boolean
   onSwitch: (tab: T) => void
+  startEnhancer?: React.ReactNode
+  endEnhancer?: React.ReactNode
 };
 
 const StyledButton = styled('button', {
   padding: '$5 $4',
   fontSize: '$xsmall',
   fontWeight: '$bold',
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '$2',
   cursor: 'pointer',
   color: '$textSubtle',
   '&:not(:disabled):focus, &:not(:disabled):hover': {
@@ -34,7 +39,7 @@ const StyledButton = styled('button', {
 });
 
 export function TabButton<T extends string = Tabs>({
-  name, label, activeTab, disabled, onSwitch,
+  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer,
 }: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
@@ -52,7 +57,9 @@ export function TabButton<T extends string = Tabs>({
       disabled={disabled}
       onClick={onClick}
     >
+      {startEnhancer && startEnhancer}
       {label}
+      {endEnhancer && endEnhancer}
     </StyledButton>
   );
 }

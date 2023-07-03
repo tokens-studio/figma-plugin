@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { LightningBoltIcon } from '@radix-ui/react-icons';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -39,11 +40,12 @@ const Navbar: React.FC = () => {
       }}
     >
       <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
-        <div>
+        <Stack gap={0} direction="row" align="center" justify="start">
           <TabButton name={Tabs.TOKENS} activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
           <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
+          <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} startEnhancer={<LightningBoltIcon />} label="Live Sync" onSwitch={handleSwitch} />
           <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label="Settings" onSwitch={handleSwitch} />
-        </div>
+        </Stack>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" gap={1} css={{ paddingRight: '$2' }}>

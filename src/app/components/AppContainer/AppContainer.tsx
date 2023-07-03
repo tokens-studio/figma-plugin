@@ -40,7 +40,7 @@ const applicationInitStepLabels = {
 export const AppContainer = withLDProviderWrapper((params: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
-  const { secondScreen } = useFlags();
+  const  secondScreen  = true
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
