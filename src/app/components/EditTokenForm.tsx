@@ -326,11 +326,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
-        console.log('old', oldName);
-        console.log('new', newName);
-        console.log('name', name);
-        console.log('intier', internalEditToken);
-        console.log('resolvedValue', resolvedValue);
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
             parent: activeTokenSet,
