@@ -92,6 +92,8 @@ export default function ImportedTokensDialog() {
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
+  const { t } = useTranslation(['tokens']);
+
   const handleIgnoreExistingToken = React.useCallback((token) => {
     setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
   }, [setUpdatedTokens, updatedTokens]);

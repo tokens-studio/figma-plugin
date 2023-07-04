@@ -105,6 +105,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation(['tokens']);
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -206,8 +207,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <TokensContext.Provider value={tokensContextValue}>

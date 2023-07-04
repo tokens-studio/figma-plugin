@@ -59,5 +59,6 @@ For the extension to work, requires these settings:
     "i18n-ally.namespace": true,
     "i18n-ally.pathMatcher": "{locale}/{namespaces}.json",
     "i18n-ally.keystyle": "nested",
+    "i18n-ally.extract.keygenStyle": "camelCase"
 }
 ```
