@@ -76,8 +76,10 @@ export default function SecondScreen() {
       <Stack gap={4} direction="row" align="center">
         <Switch id="syncswitch" checked={isEnabled && !!user} onCheckedChange={onSyncClick}>
           <SwitchThumb />
-          Live Sync
+          {' '}
+
         </Switch>
+        <span>Live Sync</span>
       </Stack>
 
       <Stack
