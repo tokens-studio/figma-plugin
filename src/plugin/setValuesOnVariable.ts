@@ -20,7 +20,6 @@ export default function setValuesOnVariable(
   mode: string,
 ): Record<string, ReferenceVariableType> {
   const variableObj: Record<string, ReferenceVariableType> = {};
-  console.log('tokens', tokens);
   try {
     tokens.forEach((t) => {
     // Find the connected variable
