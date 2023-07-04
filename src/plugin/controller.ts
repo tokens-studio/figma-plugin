@@ -48,6 +48,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INF
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, asyncHandlers.attachLocalVariablesToTheme);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 
 figma.on('close', () => {
   defaultWorker.stop();

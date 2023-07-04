@@ -81,6 +81,7 @@ export default function useManageTokens() {
       } as UpdateTokenPayload);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
+        dispatch.tokenState.renameVariableNamesToThemes(oldName, name);
       }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
@@ -144,6 +145,7 @@ export default function useManageTokens() {
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
       dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
+      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent);
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 

@@ -19,6 +19,7 @@ import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
 import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
+import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -61,6 +62,7 @@ export enum AsyncMessageTypes {
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
+  UPDATE_VARIABLES = 'async/update-variables',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -196,7 +198,7 @@ export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_S
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
-  tokens: Record<string, AnyTokenList> | null;
+  tokens: AnyTokenList | null;
   themes: ThemeObjectsList
   updatedAt: string;
   settings: SettingsState;
@@ -287,6 +289,11 @@ export type RenameVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.R
   renameVariableToken: RenameVariableToken[];
 }>;
 
+export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES, {
+  payload: UpdateTokenVariablePayload
+}>;
+export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
+
 export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES, {
   tokens: Record<string, AnyTokenList>;
   options: Record<SyncVariableOption, boolean>;
@@ -332,7 +339,8 @@ export type AsyncMessages =
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
-  | SyncVariableAsyncMessage;
+  | SyncVariableAsyncMessage
+  | UpdateVariablesAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -372,7 +380,8 @@ export type AsyncMessageResults =
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
-  | SyncVariableAsyncMessageResult;
+  | SyncVariableAsyncMessageResult
+  | UpdateVariablesAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

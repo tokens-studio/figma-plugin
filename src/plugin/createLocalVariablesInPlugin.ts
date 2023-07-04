@@ -13,7 +13,7 @@ export type LocalVariableInfo = {
   modeId: string;
   variableIds: Record<string, string>
 };
-export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, shouldCreate = true) {
+export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
@@ -24,10 +24,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     const collection = existingVariableCollections.find((vr) => vr.name === (theme.group ?? theme.name));
     if (collection) {
       const mode = collection.modes.find((m) => m.name === theme.name);
-      const modeId: string = mode?.modeId ?? (shouldCreate ? createVariableMode(collection, theme.name) : '');
+      const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
       if (modeId) {
         const allVariableObj = updateVariables({
-          collection, mode: modeId, theme, tokens, settings, shouldCreate,
+          collection, mode: modeId, theme, tokens, settings,
         });
         allVariableCollectionIds[theme.id] = {
           collectionId: collection.id,
@@ -36,11 +36,11 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
         };
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
-    } else if (shouldCreate) {
+    } else {
       const newCollection = figma.variables.createVariableCollection(theme.group ?? theme.name);
       newCollection.renameMode(newCollection.modes[0].modeId, theme.name);
       const allVariableObj = updateVariables({
-        collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings, shouldCreate,
+        collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings,
       });
       allVariableCollectionIds[theme.id] = {
         collectionId: newCollection.id,
@@ -52,12 +52,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   });
   const figmaVariables = figma.variables.getLocalVariables();
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
-  if (shouldCreate) {
-    if (figmaVariables.length === 0) {
-      notifyUI('No variables were created');
-    } else {
-      notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
-    }
+  if (figmaVariables.length === 0) {
+    notifyUI('No variables were created');
+  } else {
+    notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
   return allVariableCollectionIds;
 }
