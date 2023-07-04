@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from '@/constants/Tabs';
 import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
+import Box from '../Box';
 
 type Props<T extends string> = {
   name: T
@@ -14,18 +15,44 @@ type Props<T extends string> = {
 };
 
 const StyledButton = styled('button', {
-  padding: '$5 $4',
+  '@initial': {
+    padding: '$5 $4',
+    maxWidth: 'fit-content',
+  },
+  '@xs': {
+    padding: '$5 $3',
+    maxWidth: '64px',
+  },
+  '@sm': {
+    padding: '$5 $4',
+    maxWidth: '96px',
+  },
+  '@md': {
+    padding: '$5 $4',
+    maxWidth: 'fit-content',
+  },
   fontSize: '$xsmall',
   fontWeight: '$bold',
   display: 'flex',
   flexDirection: 'row',
+  alignItems: 'center',
   gap: '$2',
   cursor: 'pointer',
   color: '$textSubtle',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
   '&:not(:disabled):focus, &:not(:disabled):hover': {
     outline: 'none',
     boxShadow: 'none',
     color: '$text',
+  },
+  '@container (width < 64px)': {
+    '> svg': {
+      display: 'none',
+    },
+  },
+  '> svg': {
+    minHeight: '100%',
   },
   '&:disabled': {
     pointerEvents: 'none',
@@ -58,7 +85,14 @@ export function TabButton<T extends string = Tabs>({
       onClick={onClick}
     >
       {startEnhancer && startEnhancer}
-      {label}
+      <Box css={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+      >
+        {label}
+      </Box>
       {endEnhancer && endEnhancer}
     </StyledButton>
   );

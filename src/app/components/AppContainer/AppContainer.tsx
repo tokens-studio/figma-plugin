@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -40,7 +39,6 @@ const applicationInitStepLabels = {
 export const AppContainer = withLDProviderWrapper((params: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
-  const  secondScreen  = true
 
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
 
@@ -95,14 +93,10 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <WindowResizer />
       <OnboardingFlow />
       <Changelog />
-      {secondScreen && (
-        <>
-          <SecondScreenSync />
-          <AuthModal />
-        </>
-      )}
+      <SecondScreenSync />
+      <AuthModal />
     </>
   );
 
-  return secondScreen ? <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider> : appContent;
+  return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;
 });

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { LightningBoltIcon } from '@radix-ui/react-icons';
+import { Link1Icon, LinkBreak1Icon } from '@radix-ui/react-icons';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -12,9 +12,11 @@ import IconButton from './IconButton';
 import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';
+import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 
 const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
+  const secondScreenisEnabled = useSelector(secondScreenSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
 
@@ -39,16 +41,16 @@ const Navbar: React.FC = () => {
         transform: 'translateY(-1px)',
       }}
     >
-      <Stack gap={0} direction="row" align="center" justify="between" css={{ width: '100%' }}>
+      <Stack gap={0} direction="row" align="center" justify="between">
         <Stack gap={0} direction="row" align="center" justify="start">
           <TabButton name={Tabs.TOKENS} activeTab={activeTab} label="Tokens" onSwitch={handleSwitch} />
           <TabButton name={Tabs.INSPECTOR} activeTab={activeTab} label="Inspect" onSwitch={handleSwitch} />
-          <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} startEnhancer={<LightningBoltIcon />} label="Live Sync" onSwitch={handleSwitch} />
           <TabButton name={Tabs.SETTINGS} activeTab={activeTab} label="Settings" onSwitch={handleSwitch} />
         </Stack>
         <NavbarUndoButton />
       </Stack>
-      <Stack direction="row" align="center" gap={1} css={{ paddingRight: '$2' }}>
+      <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
+        <TabButton endEnhancer={<Box css={{ color: secondScreenisEnabled ? '$fgSuccess' : '$dangerFg' }}>{secondScreenisEnabled ? <Link1Icon /> : <LinkBreak1Icon />}</Box>} name={Tabs.SECONDSCREEN} activeTab={activeTab} label="Second Screen" onSwitch={handleSwitch} />
         <TokenFlowButton />
         <IconButton size="large" tooltip="Minimize plugin" onClick={handleResize} icon={<Minimize />} />
       </Stack>
