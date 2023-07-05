@@ -6,6 +6,7 @@ import Tokens from './Tokens';
 import StartScreen from './StartScreen';
 import Navbar from './Navbar';
 import FigmaLoading from './FigmaLoading';
+import SecondSceen from './SecondScreen';
 import Footer from './Footer';
 import Box from './Box';
 import { activeTabSelector } from '@/selectors';
@@ -41,6 +42,7 @@ function App() {
             {activeTab === 'start' && <StartScreen />}
             <Tokens isActive={activeTab === 'tokens'} />
             {activeTab === 'inspector' && <Inspector />}
+            {activeTab === 'secondscreen' && <SecondSceen />}
             {activeTab === 'settings' && <Settings />}
           </Box>
           {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}

@@ -1,15 +1,39 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { LightningBoltIcon } from '@radix-ui/react-icons';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import {
+  Link1Icon, LinkBreak1Icon, ExitIcon,
+} from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
+import Stack from '../Stack';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import { Dispatch } from '@/app/store';
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
-} from '../DropdownMenu';
+import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
+import { Switch, SwitchThumb } from '../Switch';
+import Button from '../Button';
+import { IconSecondScreen } from '@/icons';
+
+export const StyledBetaBadge = styled('span', {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '$xxsmall',
+  padding: '$2',
+  borderRadius: '$badge',
+  backgroundColor: '$bgAccent',
+  lineHeight: 1,
+  color: '$fgDefault',
+  fontWeight: '$bold',
+  textTransform: 'uppercase',
+  border: '1px solid transparent',
+});
+
+const StyledP = styled('p', {
+  fontWeight: '$normal',
+  color: '$text',
+  fontSize: '$xsmall',
+});
 
 export default function SecondScreen() {
   const isEnabled = useSelector(secondScreenSelector);
@@ -25,52 +49,97 @@ export default function SecondScreen() {
     window.open(process.env.SECOND_SCREEN_APP_URL);
   }, []);
 
-  const handleTurnOffSync = useCallback(() => {
-    dispatch.uiState.toggleSecondScreen();
-  }, [dispatch.uiState]);
+  let statusColor;
 
-  const secondScreenButton = (
-    <Box
-      css={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '$3',
-        padding: '$2 $4',
-        background: isEnabled ? '$bgSubtle' : 'transparent',
-        borderRadius: '$button',
-        cursor: 'pointer',
-        marginLeft: '$4',
-      }}
-      onClick={onSyncClick}
-    >
-      <LightningBoltIcon />
-      Live-Sync
-      <Box
-        css={{
-          height: '7px',
-          width: '7px',
-          borderRadius: '50%',
-          background: isEnabled && user ? '$fgSuccess' : '$fgDanger',
-        }}
-      />
-    </Box>
-  );
-
-  if (user && isEnabled) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuPrimitive.Trigger>{secondScreenButton}</DropdownMenuPrimitive.Trigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem disabled>{`Logged in as ${user.email}`}</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={handleTurnOffSync}>Turn off sync</DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleOpenSecondScreen}>Open second screen</DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
+  if (!user) {
+    statusColor = '$fgSubtle';
+  } else if (isEnabled && user) {
+    statusColor = '$fgSuccess';
+  } else {
+    statusColor = '$fgDanger';
   }
 
-  return secondScreenButton;
+  return (
+    <Stack direction="column" justify="between" align="start" gap={4} css={{ padding: '$3 $3', margin: 'auto', maxWidth: 'clamp(40vw, 240px, 80vw)' }}>
+      <Box css={{
+        display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', border: '1px solid $borderMuted',
+      }}
+      >
+        <Stack direction="column" gap={3} justify="between" align="start">
+          <StyledBetaBadge>BETA</StyledBetaBadge>
+          <StyledP>
+            Second Screen is in beta, some features may not work as expected.
+          </StyledP>
+        </Stack>
+      </Box>
+
+      <Stack gap={4} direction="row" align="center">
+        <Switch id="syncswitch" checked={isEnabled && !!user} onCheckedChange={onSyncClick}>
+          <SwitchThumb />
+          {' '}
+
+        </Switch>
+        <span>Live Sync</span>
+      </Stack>
+
+      <Stack
+        direction="column"
+        gap={1}
+        css={{
+          backgroundColor: '$bgSubtle',
+          borderColor: statusColor,
+          borderWidth: '1px',
+          padding: '$3 $5',
+          fontSize: '$xsmall',
+          borderRadius: '6px',
+          color: statusColor,
+          marginBottom: '$3',
+          width: '100%',
+        }}
+      >
+        <Stack direction="row" align="center" gap={3} css={{ fontWeight: '$sansBold' }}>
+          {isEnabled && user ? <Link1Icon /> : <LinkBreak1Icon />}
+          {isEnabled && user ? 'Connected' : 'Not connected'}
+        </Stack>
+        {isEnabled && user ? 'Live sync with second screen active' : 'Live sync inactive'}
+        {user ? (
+          <Box css={{
+            fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}
+          >
+            Signed in as
+            {' '}
+            {user.email}
+          </Box>
+        )
+          : (
+            <Box css={{
+              fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}
+            >
+              <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={onSyncClick}>
+                Sign in to continue
+              </Button>
+            </Box>
+          )}
+      </Stack>
+
+      <Button variant="ghost" size="small" icon={<IconSecondScreen />} onClick={handleOpenSecondScreen}>
+        Open second screen
+      </Button>
+
+      {
+        user ? (
+          <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={handleLogout}>
+            Sign out
+          </Button>
+        ) : (
+          <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={onSyncClick}>
+            Sign in
+          </Button>
+        )
+      }
+
+    </Stack>
+  );
 }
