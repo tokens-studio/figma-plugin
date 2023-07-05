@@ -12,6 +12,6 @@ export const themeObjectSchema = z.object({
   ])),
   $figmaStyleReferences: z.record(z.string()).optional(),
   $figmaVariableReferences: z.record(z.string()).optional(),
-  $figmaCollectionId: z.string(),
-  $figmaModeId: z.string(),
+  $figmaCollectionId: z.string().optional(),
+  $figmaModeId: z.string().optional(),
 });
