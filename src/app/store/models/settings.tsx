@@ -34,7 +34,7 @@ export interface SettingsState {
   /**
    * Whether the user has opted in for session recording in Sentry
    */
-  sessionRecording:boolean;
+  sessionRecording: boolean;
 }
 
 const setUI = (state: SettingsState) => {
