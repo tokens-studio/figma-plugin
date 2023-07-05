@@ -42,7 +42,7 @@ describe('EditTokenForm', () => {
       </Provider>,
     );
 
-    expect(result.getByText('Create')).toBeInTheDocument();
+    expect(result.getByText('create')).toBeInTheDocument();
     result.unmount();
   });
 
@@ -80,7 +80,7 @@ describe('EditTokenForm', () => {
     const valueInputElement = result.getByTestId('mention-input-value');
     fireEvent.change(nameInputElement, { target: { value: 'size-token' } });
     fireEvent.change(valueInputElement, { target: { value: '12' } });
-    const createButton = result.getByText('Create');
+    const createButton = result.getByText('create');
     createButton.click();
     expect(mockCreateSingleToken).toBeCalledTimes(1);
   });
