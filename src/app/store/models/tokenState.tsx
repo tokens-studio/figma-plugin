@@ -35,6 +35,7 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
+import { RenameTokensAcrossSets } from '@/types/payloads/RenameTokensAcrossSets';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -478,6 +479,33 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       remoteData: data,
     }),
+    renameTokenAcrossSets: (state, data: RenameTokensAcrossSets) => {
+      const {
+        oldName, newName, type, tokenSets,
+      } = data;
+      const newTokens: TokenStore['values'] = {};
+      Object.keys(state.tokens).forEach((tokenSet) => {
+        if (tokenSets.includes(tokenSet)) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === oldName && n.type === type);
+          if (existingTokenIndex > -1) {
+            const existingTokens = [...state.tokens[tokenSet]];
+            existingTokens.splice(existingTokenIndex, 1, {
+              ...state.tokens[tokenSet][existingTokenIndex],
+              name: newName,
+            } as SingleToken);
+            newTokens[tokenSet] = existingTokens;
+          }
+        }
+      });
+
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          ...newTokens,
+        },
+      };
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({

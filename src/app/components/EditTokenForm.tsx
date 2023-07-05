@@ -52,7 +52,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
-  const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
+  const {
+    editSingleToken, createSingleToken, duplicateSingleToken, renameTokensAcrossSets,
+  } = useManageTokens();
   const {
     remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken,
   } = useTokens();
@@ -290,7 +292,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     type, value, name, $extensions,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
-      let oldName;
+      let oldName: string | undefined;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
@@ -360,6 +362,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
               key: 'rename-variable', label: 'Rename variable',
             });
           }
+          const tokenSetsContainsSameToken: string[] = [];
+          Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+            if (tokenList.find((token) => token.name === oldName)) {
+              tokenSetsContainsSameToken.push(tokenSet);
+            }
+          });
+          if (tokenSetsContainsSameToken.length > 1) {
+            choices.push({
+              key: 'rename-across-sets', label: 'Rename in other sets',
+            });
+          }
           const confirmData = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
@@ -369,6 +382,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
             if (confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
               remapToken(oldName, newName, confirmData.data[0]);
               dispatch.settings.setUpdateMode(confirmData.data[0]);
+            }
+            if (confirmData.data.includes('rename-across-sets')) {
+              renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
