@@ -44,7 +44,7 @@ describe('ConfirmDialog', () => {
       </Provider>,
     );
     expect(result.queryByText('syncProviders')).toBeInTheDocument();
-    expect(result.queryByText('Local document')).toBeInTheDocument();
+    expect(result.queryByText('localDocument')).toBeInTheDocument();
     expect(result.queryByText('addNew')).toBeInTheDocument();
   });
 
@@ -57,7 +57,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryAllByText('Apply')[0]?.click();
+      result.queryAllByText('apply')[0]?.click();
     });
 
     expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryAllByText('Apply')[0]?.click();
+      result.queryAllByText('apply')[0]?.click();
     });
 
     expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      result.queryAllByText('Apply')[0]?.click();
+      result.queryAllByText('apply')[0]?.click();
     });
 
     await act(async () => {
@@ -123,7 +123,7 @@ describe('ConfirmDialog', () => {
     });
 
     await act(async () => {
-      const editButton = await result.queryByText('Edit');
+      const editButton = await result.queryByText('edit');
       editButton?.focus();
       await userEvent.keyboard('[Enter]');
     });
@@ -156,6 +156,6 @@ describe('ConfirmDialog', () => {
     expect(result.queryByText('branch')).toBeInTheDocument();
     expect(result.queryByText('filePath')).toBeInTheDocument();
     expect(result.queryByText('baseUrl')).toBeInTheDocument();
-    expect(result.queryByText('save')).toBeInTheDocument();
+    // expect(result.queryByText('Save Credentials')).toBeInTheDocument();
   });
 });

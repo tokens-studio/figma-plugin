@@ -30,7 +30,7 @@ export default function GitForm({
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['storage']);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,15 +62,15 @@ export default function GitForm({
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={1}>
           <Heading>
-            {t('storage.addNew')}
+            {t('addNew')}
             {' '}
             {transformProviderName(values.provider)}
             {' '}
-            {t('storage.credentials')}
+            {t('credentials')}
 
           </Heading>
           <Text muted>
-            {t('storage.gitExplained')}
+            {t('gitExplained')}
             {' '}
             <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}>{t('storage.readMore')}</Link>
           </Text>
@@ -79,7 +79,7 @@ export default function GitForm({
         <Box css={{ position: 'relative' }}>
           <Input
             full
-            label={t('storage.pat')}
+            label={t('pat')}
             value={values.secret}
             onChange={onChange}
             inputRef={inputEl}
@@ -91,7 +91,7 @@ export default function GitForm({
         </Box>
         <Input
           full
-          label={t('storage.repo')}
+          label={t('repo')}
           value={values.id}
           onChange={onChange}
           type="text"
@@ -100,7 +100,7 @@ export default function GitForm({
         />
         <Input
           full
-          label={t('storage.branch')}
+          label={t('branch')}
           value={values.branch}
           onChange={onChange}
           type="text"
@@ -109,7 +109,7 @@ export default function GitForm({
         />
         <Input
           full
-          label={t('storage.filePath')}
+          label={t('filePath')}
           defaultValue=""
           value={values.filePath}
           onChange={onChange}
@@ -118,7 +118,7 @@ export default function GitForm({
         />
         <Input
           full
-          label={t('storage.baseUrl')}
+          label={t('baseUrl')}
           value={values.baseUrl}
           placeholder={baseUrlPlaceholder}
           onChange={onChange}
@@ -127,11 +127,11 @@ export default function GitForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            {t('general.cancel')}
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            {t('general.save')}
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

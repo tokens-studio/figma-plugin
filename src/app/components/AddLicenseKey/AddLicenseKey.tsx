@@ -55,7 +55,7 @@ export default function AddLicenseKey() {
       const confirmation = await confirm({
         text: t('confirmRemove') as string,
         description: t('keepLicenseSafe'),
-        confirmAction: t('removeLicenseKey') as string,
+        confirmAction: t('removeKey') as string,
       });
       if (confirmation) {
         dispatch.userState.removeLicenseKey('');
@@ -93,7 +93,7 @@ export default function AddLicenseKey() {
 
   const removeLicenseKeyButton = existingKey && (
     <Button variant="primary" onClick={removeKey}>
-      {t('removeKey')}
+      {t('removeLicenseKey')}
     </Button>
   );
 

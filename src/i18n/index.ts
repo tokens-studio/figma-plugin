@@ -8,6 +8,8 @@ import hiTranslations from './lang/hi';
 import nlTranslations from './lang/nl';
 import zhTranslations from './lang/zh';
 
+export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'];
+
 export const resources = {
   en: {
     ...enTranslations,
@@ -64,7 +66,7 @@ export const i18nInstance = i18n
     fallbackLng: 'en',
     resources,
     defaultNS: 'general',
-    ns: ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'],
+    ns: namespaces,
     lng: 'en',
     interpolation: {
       escapeValue: false, // react already safes from xss

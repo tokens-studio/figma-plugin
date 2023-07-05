@@ -76,7 +76,7 @@ export default function BranchSelector() {
   const apiData = useSelector(apiSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['branch', 'licence']);
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
   const [startBranch, setStartBranch] = useState<string | null>(null);
   const [menuOpened, setMenuOpened] = useState(false);
@@ -104,17 +104,17 @@ export default function BranchSelector() {
 
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
-      text: t('branch.unSavedChanges') as string,
+      text: t('unSavedChanges') as string,
       description: (
         <div>
-          {t('branch.ifYouCreate')}
+          {t('ifYouCreate')}
           <br />
           {' '}
-          {t('branch.toYourRepo')}
+          {t('toYourRepo')}
         </div>
       ),
-      confirmAction: t('branch.discardChanges') as string,
-      cancelAction: t('branch.cancel') as string,
+      confirmAction: t('discardChanges') as string,
+      cancelAction: t('cancel') as string,
     });
     if (confirmResult) {
       return confirmResult.result;
@@ -205,7 +205,7 @@ export default function BranchSelector() {
               <>
                 <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
 
-                  <span>{t('licence.upgradeToPro')}</span>
+                  <span>{t('upgradeToPro', { ns: 'licence' })}</span>
                   <ProBadge compact />
 
                 </BranchSwitchMenuItem>
@@ -218,7 +218,7 @@ export default function BranchSelector() {
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
               <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
-                {t('branch.createNewBranch')}
+                {t('createNewBranch')}
 
                 <ChevronRightIcon />
               </BranchSwitchMenuTrigger>
@@ -226,7 +226,7 @@ export default function BranchSelector() {
                 {hasChanges
                   && (
                     <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
-                      {t('branch.currentChanges')}
+                      {t('currentChanges')}
                     </BranchSwitchMenuItem>
                   )}
                 {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (

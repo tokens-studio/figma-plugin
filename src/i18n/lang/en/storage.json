@@ -53,5 +53,6 @@
   "confirmDelete": "Do you really want to delete this?",
   "active": "Active",
   "edit": "Edit",
-  "delete": "Delete"
+  "delete": "Delete",
+  "save": "Save"
 }

@@ -26,7 +26,7 @@ type Props = {
 export default function URLForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['storage']);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

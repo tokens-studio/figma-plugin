@@ -39,9 +39,9 @@ describe('Add license key', () => {
   it('renders correctly', () => {
     render(<AddLicenseKey />);
 
-    const addKeyButton = screen.getByRole('button', { name: /addLicenseKey/i });
+    const addKeyButton = screen.getByRole('button', { name: 'addLicenseKey' });
     const removeKeyButton = screen.queryByRole('button', {
-      name: /removeKey/i,
+      name: 'removeLicenseKey',
     });
 
     expect(removeKeyButton).not.toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('Add license key', () => {
     render(<AddLicenseKey />);
 
     const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
-    const addKeyButton = screen.getByRole('button', { name: /addLicenseKey/i });
+    const addKeyButton = screen.getByRole('button', { name: 'addLicenseKey' });
 
     await user.type(input, licenseKey);
 
@@ -85,7 +85,7 @@ describe('Add license key', () => {
     );
 
     const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
-    const addLicenseKeyButton = screen.getByRole('button', { name: /addLicenseKey/i });
+    const addLicenseKeyButton = screen.getByRole('button', { name: 'addLicenseKey' });
 
     await user.type(input, LICENSE_FOR_ERROR_RESPONSE);
     await user.click(addLicenseKeyButton);
@@ -158,7 +158,7 @@ describe('Add license key', () => {
       const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
       expect(errorMessage).toBeInTheDocument();
 
-      const removeKeyButton = await result.findByText('removeKey');
+      const removeKeyButton = await result.findByText('removeLicenseKey');
       expect(removeKeyButton).toBeInTheDocument();
       expect(removeKeyButton).not.toBeDisabled();
     });
@@ -187,11 +187,11 @@ describe('Add license key', () => {
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
-      expect(screen.getByText(/confirmRemove/i)).toBeInTheDocument();
+      expect(screen.getByText('confirmRemove')).toBeInTheDocument();
     });
   });
 
@@ -218,7 +218,7 @@ describe('Add license key', () => {
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
@@ -226,14 +226,14 @@ describe('Add license key', () => {
 
     await act(async () => {
       const confirmButton = await result.findByRole('button', {
-        name: /removeLicenceKey/i,
+        name: 'removeKey',
       });
       confirmButton.click();
 
       const input = (await result.getByTestId('settings-license-key-input')) as HTMLInputElement;
 
       const removeKeyButton = await result.findByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
 
       await waitFor(() => {
@@ -266,7 +266,7 @@ describe('Add license key', () => {
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
@@ -274,7 +274,7 @@ describe('Add license key', () => {
 
     await act(async () => {
       const confirmButton = await result.findByRole('button', {
-        name: /removeLicenceKey/i,
+        name: 'removeKey',
       });
       confirmButton.click();
     });
@@ -307,20 +307,20 @@ describe('Add license key', () => {
 
     await act(async () => {
       const removeKeyButton = await result.findByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
       removeKeyButton.click();
     });
 
     await act(async () => {
-      const confirmaModal = result.queryByText(/confirmRemove/i);
+      const confirmaModal = result.queryByText('confirmRemove');
       expect(confirmaModal).toBeNull();
       const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
       expect(input.value).toBe('');
 
       const removeKeyButton = result.queryByRole('button', {
-        name: /removeKey/i,
+        name: 'removeLicenseKey',
       });
       expect(removeKeyButton).toBeNull();
     });

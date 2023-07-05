@@ -30,7 +30,7 @@ export default function SupernovaForm({
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
 
-  const { t } = useTranslation('');
+  const { t } = useTranslation(['storage', 'general']);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,19 +65,19 @@ export default function SupernovaForm({
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={1}>
           <Heading>
-            {t('storage.providers.supernova.addNew')}
+            {t('providers.supernova.addNew')}
           </Heading>
           <Text muted>
-            {t('storage.providers.supernova.description')}
+            {t('providers.supernova.description')}
             {' '}
-            <Link href="https://learn.supernova.io/">{t('general.readMore')}</Link>
+            <Link href="https://learn.supernova.io/">{t('readMore', { ns: 'general' })}</Link>
           </Text>
         </Stack>
         <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
         <Box css={{ position: 'relative' }}>
           <Input
             full
-            label={t('storage.providers.supernova.accessToken')}
+            label={t('providers.supernova.accessToken')}
             value={values.secret}
             onChange={onChange}
             inputRef={inputEl}
@@ -89,7 +89,7 @@ export default function SupernovaForm({
         </Box>
         <Input
           full
-          label={t('storage.providers.supernova.dsUrl')}
+          label={t('providers.supernova.dsUrl')}
           value={values.designSystemUrl}
           onChange={onChange}
           type="text"
@@ -110,10 +110,10 @@ export default function SupernovaForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
-            {t('general.cancel')}
+            {t('cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}>
-            {t('general.save')}
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

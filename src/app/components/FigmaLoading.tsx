@@ -31,7 +31,7 @@ type Props = PropsWithChildren<{
 export default function FigmaLoading({
   isLoading, label, onCancel, children,
 }: Props) {
-  const { t } = useTranslation('startScreen');
+  const { t } = useTranslation(['startScreen']);
 
   if (!isLoading) {
     return (

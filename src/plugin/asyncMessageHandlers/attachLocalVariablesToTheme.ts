@@ -35,7 +35,7 @@ export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessa
     return {
       variableInfo: {
         collectionId: collection.id,
-        modeId: mode.modeID,
+        modeId: mode.modeId,
         variableIds: collectionVariableIds,
       },
     };
