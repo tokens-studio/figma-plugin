@@ -14,13 +14,6 @@ export default async function validateLicense(
     );
 
     if (res.status === 200) {
-      // set as user id in Sentry
-      Sentry.setUser({
-        licenseKey,
-        id: userId || '<UNKNOWN>',
-        username: userName || '<UNKNOWN>',
-      });
-
       return await res.json();
     }
 
