@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { DownloadIcon, UploadIcon, BugIcon } from '@primer/octicons-react';
+import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -32,12 +32,6 @@ import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
 import SecondScreen from './SecondScreen';
 import { useFlags } from './LaunchDarkly';
-import { replay } from '../sentry';
-import { notifyToUI } from '@/plugin/notifiers';
-import Modal from './Modal';
-import { Switch, SwitchThumb } from './Switch';
-import Link from './Link';
-import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -48,49 +42,12 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const activeTheme = useSelector(activeThemeSelector);
-  const debugMode = useSelector(sessionRecordingSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { secondScreen } = useFlags();
 
-  const [debugSession, setDebugSession] = useState('');
-  const [debugModal, setDebugModal] = React.useState(false);
-
-  const showDebugModal = useCallback(async () => {
-    const id = await replay.getReplayId();
-    setDebugSession(id || '');
-    setDebugModal(true);
-  }, []);
-
-  const closeDebugModal = useCallback(() => {
-    setDebugModal(false);
-  }, []);
-
-  const toggleDebugMode = React.useCallback(async (checked: boolean) => {
-    dispatch.settings.setSessionRecording(checked);
-    if (checked) {
-      // Display the info to the user
-      try {
-        // Force start the replay functionality
-        // replay.start();
-      } catch (err) {
-        console.warn('Replay is likely in progress already', err);
-      } finally {
-        const id = await replay.getReplayId();
-        notifyToUI(`Your session is being tracked. Replay ID: ${id}`);
-      }
-    } else {
-      try {
-        replay.stop();
-      } catch (err) {
-        console.warn('Replay is likely stopped already', err);
-      } finally {
-        notifyToUI('Session debug has been turned off');
-      }
-    }
-  }, []);
+  const activeTheme = useSelector(activeThemeSelector);
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -180,38 +137,9 @@ export default function Footer() {
           <ProBadge />
           <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip="Docs" />
           <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
-          <Stack direction="row" gap={1} align="center">
-            <IconButton icon={<BugIcon />} tooltip="Record debug" onClick={showDebugModal} />
-            <Switch checked={debugMode} onCheckedChange={toggleDebugMode}>
-              <SwitchThumb />
-            </Switch>
-          </Stack>
         </Stack>
       </Stack>
-      <Modal title="Debugging" showClose isOpen={debugModal} close={closeDebugModal}>
-        <Stack direction="column" gap={2}>
-          <Text>
-            Session recording is a new feature by Tokens Studio to track user sessions when bugs occur, so we can better understand the issue and fix it. No data will be sent to our telemetry server if you do not experience a bug or if you turn off the debugging.
-          </Text>
-          <Text>
-            Any data collected is anonymized and will not be shared with any third parties and is used purely to address bugs and optimize performance.
-          </Text>
-          {debugSession && (
-          <Text>
-            Your current session id is
-            {' '}
-            <b>{debugSession}</b>
-          </Text>
-          )}
-          <Text>
-            Please see our
-            {' '}
-            <Link href="https://tokens.studio/privacy">Privacy Policy</Link>
-            {' '}
-            for more information.
-          </Text>
-        </Stack>
-      </Modal>
+
     </Box>
   );
 }

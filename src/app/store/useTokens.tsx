@@ -32,6 +32,7 @@ import { Dispatch, RootState } from '../store';
 import { DeleteTokenPayload } from '@/types/payloads';
 import { notifyToUI } from '@/plugin/notifiers';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
+import { wrapTransaction } from '@/profiling/transaction';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -156,7 +157,8 @@ export default function useTokens() {
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
     const settings = settingsStateSelector(store.getState());
     track('remapToken', { fromInspect: true });
-    AsyncMessageChannel.ReactInstance.message({
+
+    wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMAP_TOKENS,
       category: type,
       oldName: name,
@@ -164,29 +166,30 @@ export default function useTokens() {
       updateMode: UpdateMode.SELECTION,
       tokens: resolvedTokens,
       settings,
-    });
+    }));
   }, [confirm]);
 
   const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
-    AsyncMessageChannel.ReactInstance.message({
+
+    wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName,
       newName,
       updateMode,
-    });
+    }));
   }, []);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
   const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
 
-    AsyncMessageChannel.ReactInstance.message({
+    wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMAP_TOKENS,
       oldName,
       newName,
       updateMode: updateMode || settings.updateMode,
-    });
+    }));
   }, [settings.updateMode]);
 
   const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName, type }: { oldGroupName: string, newGroupName: string, type: string }) => {
@@ -276,11 +279,12 @@ export default function useTokens() {
         ].some((isEnabled) => isEnabled)
       ));
 
-      const createStylesResult = await AsyncMessageChannel.ReactInstance.message({
+      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
         settings,
-      });
+      }));
+
       dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
     }
   }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
@@ -298,7 +302,7 @@ export default function useTokens() {
     if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
       track('syncStyles', userConfirmation.data);
 
-      const syncStyleResult = await AsyncMessageChannel.ReactInstance.message({
+      const syncStyleResult = await wrapTransaction({ name: 'syncStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens,
         options: {
@@ -306,7 +310,8 @@ export default function useTokens() {
           removeStyle: userConfirmation.data.includes('removeStyles'),
         },
         settings,
-      });
+      }));
+
       dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
     }
   }, [confirm, tokens, dispatch.tokenState, settings]);
@@ -356,24 +361,25 @@ export default function useTokens() {
 
   const createVariables = useCallback(async () => {
     track('createVariables');
-    const createVariableResult = await AsyncMessageChannel.ReactInstance.message({
+    const createVariableResult = await wrapTransaction({ name: 'createVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
       tokens,
       settings,
-    });
+    }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
   }, [dispatch.tokenState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
     track('renameVariables', { oldName, newName });
 
-    const result = await AsyncMessageChannel.ReactInstance.message({
+    const result = await wrapTransaction({ name: 'renameVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.RENAME_VARIABLES,
       tokens: [{
         oldName,
         newName,
       }],
-    });
+    }));
+
     dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
   }, [dispatch.tokenState]);
 
@@ -390,7 +396,7 @@ export default function useTokens() {
     if (userConfirmation) {
       track('syncVariables', userConfirmation.data);
 
-      await AsyncMessageChannel.ReactInstance.message({
+      await wrapTransaction({ name: 'syncVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SYNC_VARIABLES,
         tokens,
         options: {
@@ -398,16 +404,17 @@ export default function useTokens() {
           removeVariable: userConfirmation.data.includes('removeVariables'),
         },
         settings,
-      });
+      }));
     }
   }, [confirm, tokens, settings]);
 
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
-    await AsyncMessageChannel.ReactInstance.message({
+
+    await wrapTransaction({ name: 'updateVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.UPDATE_VARIABLES,
       payload,
-    });
+    }));
   }, []);
 
   return useMemo(() => ({

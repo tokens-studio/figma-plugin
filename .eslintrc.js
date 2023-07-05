@@ -26,6 +26,7 @@ module.exports = {
     "react/jsx-props-no-spreading": 0,
     "no-prototype-builtins": 0,
     "no-async-promise-executor": 0,
+    "@typescript-eslint/return-await":0,
     "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
     "@typescript-eslint/ban-types": [2, {
       "types": {
