@@ -107,7 +107,7 @@ describe('Generic Versioned Storage', () => {
       ],
       metadata: {
         updatedAt,
-        version: pjs.plugin_version,
+        version: pjs.version,
         tokenSetOrder: [
           'global',
         ],
@@ -223,7 +223,7 @@ describe('Generic Versioned Storage', () => {
         metadata: {
           tokenSetOrder: ['global'],
           updatedAt: '2022-09-20T08:43:03.844Z',
-          version: pjs.plugin_version,
+          version: pjs.version,
         },
       });
 
@@ -283,7 +283,7 @@ describe('Generic Versioned Storage', () => {
         metadata: {
           tokenSetOrder: ['global'],
           updatedAt: '2022-09-20T08:43:03.844Z',
-          version: pjs.plugin_version,
+          version: pjs.version,
         },
       });
 
@@ -327,7 +327,7 @@ describe('Generic Versioned Storage', () => {
         metadata: {
           tokenSetOrder: ['global'],
           updatedAt: '2022-09-20T08:43:03.844Z',
-          version: pjs.plugin_version,
+          version: pjs.version,
         },
       });
 
@@ -361,7 +361,7 @@ describe('Generic Versioned Storage', () => {
         metadata: {
           tokenSetOrder: ['global'],
           updatedAt: '2022-09-20T08:43:03.844Z',
-          version: pjs.plugin_version,
+          version: pjs.version,
         },
       });
 

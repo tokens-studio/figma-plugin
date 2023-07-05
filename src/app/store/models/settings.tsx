@@ -8,6 +8,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
 import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
+import { setupReplay } from '@/app/sentry';
 
 type WindowSettingsType = {
   width: number;
@@ -30,6 +31,10 @@ export interface SettingsState {
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
+  /**
+   * Whether the user has opted in for session recording in Sentry
+   */
+  sessionRecording: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -46,6 +51,7 @@ export const settings = createModel<RootModel>()({
       height: 600,
       isMinimized: false,
     },
+    sessionRecording: false,
     updateMode: UpdateMode.PAGE,
     updateRemote: true,
     updateOnChange: true,
@@ -60,6 +66,17 @@ export const settings = createModel<RootModel>()({
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
+    setSessionRecording(state, payload: boolean) {
+      if (payload) {
+        // Setup the session recording if it's not already setup
+        setupReplay();
+      }
+
+      return {
+        ...state,
+        sessionRecording: payload,
+      };
+    },
     setInspectDeep(state, payload: boolean) {
       return {
         ...state,
@@ -90,6 +107,11 @@ export const settings = createModel<RootModel>()({
     setUISettings(state, payload: SettingsState) {
       // track ui setting to see usage
       track('ignoreFirstPart', { isSet: payload.ignoreFirstPartForStyles });
+
+      if (payload.sessionRecording) {
+        // Setup the initial session recording
+        setupReplay();
+      }
 
       return {
         ...state,
@@ -192,6 +214,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUISettings: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setSessionRecording: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setBaseFontSize: (payload, rootState) => {

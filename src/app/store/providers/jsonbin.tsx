@@ -34,7 +34,7 @@ export async function updateJSONBinTokens({
       metadata: {
         tokenSetOrder: Object.keys(tokens),
         updatedAt: updatedAt ?? new Date().toISOString(),
-        version: pjs.plugin_version,
+        version: pjs.version,
       },
     };
 

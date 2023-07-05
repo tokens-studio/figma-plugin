@@ -626,6 +626,7 @@ describe('Initiator', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: false,
       updateOnChange: false,
+      sessionRecording: false,
       updateStyles: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,

@@ -29,7 +29,7 @@ describe('GenericVersionedStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
+        version: pjs.version,
         updatedAt,
         values: {
           options: {},
@@ -222,7 +222,7 @@ describe('GenericVersionedStorage', () => {
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify({
-        version: pjs.plugin_version,
+        version: pjs.version,
         updatedAt: '2022-06-15T10:00:00.000Z',
         values: {
           global: {

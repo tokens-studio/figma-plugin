@@ -15,7 +15,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
           name: user.name,
         });
       }
-      track('Launched', { version: pjs.plugin_version });
+      track('Launched', { version: pjs.version });
       const {
         width, height, showEmptyGroups, ...rest
       } = params.settings;

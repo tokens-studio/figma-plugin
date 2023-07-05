@@ -35,6 +35,7 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
+import { wrapTransaction } from '@/profiling/transaction';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -552,7 +553,9 @@ export const tokenState = createModel<RootModel>()({
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
       try {
-        updateTokensOnSources({
+        wrapTransaction({
+          name: 'updateDocument',
+        }, () => updateTokensOnSources({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
           tokenValues: rootState.tokenState.tokens,
           usedTokenSet: rootState.tokenState.usedTokenSet,
@@ -570,7 +573,7 @@ export const tokenState = createModel<RootModel>()({
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
           collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
           dispatch,
-        });
+        }));
       } catch (e) {
         console.error('Error updating document', e);
       }

@@ -37,6 +37,7 @@ export type UiSettingsFromPluginMessage = {
       height: number;
       isMinimized: boolean;
     };
+    sessionRecording:boolean;
     updateMode: UpdateMode;
     updateRemote: boolean;
     updateOnChange: boolean;

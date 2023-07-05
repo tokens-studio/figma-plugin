@@ -43,7 +43,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
       body: JSON.stringify({
         values: { options: {} },
         $metadata: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt,
         },
       }, null, 2),
@@ -89,7 +89,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
         type: 'metadata',
         path: `${SystemFilenames.METADATA}.json`,
         data: {
-          version: data.$metadata?.version ?? data.version ?? pjs.plugin_version,
+          version: data.$metadata?.version ?? data.version ?? pjs.version,
           updatedAt: data.$metadata?.updatedAt ?? data.updatedAt ?? new Date().toISOString(),
           ...(data.$metadata?.tokenSetOrder ? {
             tokenSetOrder: data.$metadata.tokenSetOrder,
@@ -141,7 +141,7 @@ export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
     const dataObject: JsonbinData = {
       values: {},
       $metadata: {
-        version: pjs.plugin_version,
+        version: pjs.version,
         updatedAt: (new Date()).toISOString(),
       },
       $themes: [],

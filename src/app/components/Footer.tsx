@@ -40,10 +40,11 @@ export default function Footer() {
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const activeTheme = useSelector(activeThemeSelector);
   const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
+
+  const activeTheme = useSelector(activeThemeSelector);
 
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
@@ -77,6 +78,7 @@ export default function Footer() {
   }, [pullTokens, usedTokenSet, activeTheme]);
 
   return (
+
     <Box
       css={{
         display: 'flex',
@@ -86,6 +88,7 @@ export default function Footer() {
         padding: '$3',
       }}
     >
+
       <Stack direction="row" align="center" gap={2}>
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
@@ -124,7 +127,7 @@ export default function Footer() {
       </Stack>
       <Stack direction="row" gap={4} align="center">
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
-          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.plugin_version}`}</a>
+          <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
@@ -132,6 +135,7 @@ export default function Footer() {
           <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip="Feedback" />
         </Stack>
       </Stack>
+
     </Box>
   );
 }
