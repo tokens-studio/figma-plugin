@@ -19,7 +19,7 @@ type Payload = {
 };
 
 export async function updateLocalTokensData(payload: Payload) {
-  await VersionProperty.write(pjs.plugin_version);
+  await VersionProperty.write(pjs.version);
   await ThemesProperty.write(payload.themes);
   await ValuesProperty.write(payload.tokens);
   await UsedTokenSetProperty.write(payload.usedTokenSets);

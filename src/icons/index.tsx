@@ -67,6 +67,7 @@ import IconExclamationTriangle from './exclamation-triangle.svg';
 import IconSettings from './settings.svg';
 import IconPencil from './pencil.svg';
 import IconVariable from './variable.svg';
+import IconSecondScreen from './second-screen.svg';
 
 export {
   IconAdd,
@@ -138,4 +139,5 @@ export {
   IconSettings,
   IconPencil,
   IconVariable,
+  IconSecondScreen,
 };

@@ -282,7 +282,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
-        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        ? getAliasValue(internalEditToken as SingleToken, resolvedTokens, false)
         : null;
     }
     return null;
@@ -332,10 +332,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
             parent: activeTokenSet,
-            name: newName,
+            name: internalEditToken.initialName ?? name,
             type,
             value: resolvedValue,
             rawValue: internalEditToken.value,
+            ...($extensions ? { $extensions } : {}),
           });
         }
         // When users change token names references are still pointing to the old name, ask user to remap
@@ -410,7 +411,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken, resolvedValue]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

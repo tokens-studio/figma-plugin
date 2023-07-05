@@ -22,7 +22,7 @@ async function autoTranslate() {
     cwd: sourceRoot,
   });
 
-  const targetLanguages = (await fs.readdir(langRoot)).filter((file) => file !== 'en');
+  const targetLanguages = (await fs.readdir(langRoot)).filter((file) => file !== 'en').slice(0,1)
 
   console.log('Found source of truth files: ', sourceOfTruth);
   console.log(`Found ${targetLanguages.length} target languages `);
@@ -83,7 +83,7 @@ async function autoTranslate() {
         } else {
           // @ts-ignore
           const translated = await translate(value, { from: 'en', to: lang });
-
+          
           setProperty(newAcc, key, translated);
         }
         return newAcc

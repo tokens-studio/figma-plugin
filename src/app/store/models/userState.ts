@@ -24,6 +24,7 @@ export interface UserState {
   licenseStatus: LicenseStatus;
   userName: string;
   licenseDetails: LicenseDetails;
+  usedEmail: string | undefined;
 }
 
 interface LicenseDetails {
@@ -39,6 +40,7 @@ export const userState = createModel<RootModel>()({
     licenseKey: undefined,
     licenseError: undefined,
     userName: '',
+    usedEmail: '',
     licenseDetails: {
       plan: '',
       clientEmail: undefined,
@@ -63,6 +65,12 @@ export const userState = createModel<RootModel>()({
       return {
         ...state,
         licenseKey: payload,
+      };
+    },
+    setUsedEmail(state, payload: string | undefined) {
+      return {
+        ...state,
+        usedEmail: payload,
       };
     },
     setLicenseError(state, payload: string | undefined) {

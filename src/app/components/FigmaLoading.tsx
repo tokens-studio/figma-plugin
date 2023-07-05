@@ -51,7 +51,7 @@ export default function FigmaLoading({
         <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted' }}>
           {t('version')}
           {' '}
-          {pjs.plugin_version}
+          {pjs.version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner inverse />

@@ -20,6 +20,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     prefixStylesWithThemeName: msg.prefixStylesWithThemeName,
     inspectDeep: msg.inspectDeep,
     baseFontSize: msg.baseFontSize,
+    sessionRecording: msg.sessionRecording,
     aliasBaseFontSize: msg.aliasBaseFontSize,
     shouldSwapStyles: msg.shouldSwapStyles,
   });

@@ -1,5 +1,7 @@
 # Creating a release
 
+Release generation should be automated in the github workflow, however if a manual release is necessary the steps are outlined below 
+
 ## Prerequisites
 
 In order to release a new version, first make sure you have the correct `.env` variables setup.
@@ -16,10 +18,11 @@ LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e
 
 `.env`
 SENTRY_AUTH_TOKEN=INSERT_SENTRY_TOKEN
+
 ## Bundling the files
 
-Make sure that package.json contains the correct version number in the field `plugin_version`, for example 112.
-Then, to create the necessary bundle, run `yarn build`.
+Make sure that package.json contains the correct version number in the field `version`, for example 1.12.23 .
+Then, to create the necessary bundle, run `npm run build` followed by `npm run bundle` to automatically create the release bundle in `./dist/bundle.zip`
 
 ## Launching in Figma
 
@@ -30,17 +33,12 @@ Click on Tokens Studio and choose `Publish a new release`
 
 ## Creating a Sentry release
 
-In order to provide source maps for Sentry, we need to publish a release everytime we publish a release in Figma.
+Sentry releases should be handled automatically during the build process. Just make sure the following variables are exposed during the build process 
 
-To do that, change the VERSION constant of the `script/release.sh` script to match the version that you're publishing (eg 112). 
-
-Once that is done and the plugin is published, you can run `script/release.sh`. 
-
-If that gives you an error, make sure that the file has the required permissions, e.g. `chmod …`
-
-The script basically does the following:
-
-VERSION=VERSION_NUMBER
-sentry-cli releases new "$VERSION"
-sentry-cli releases -p figma-tokens files "$VERSION" upload-sourcemaps --ext ts --ext tsx --ext map --ext js --ignore-file .sentryignore .
-sentry-cli releases finalize "$VERSION"
+`SENTRY_ORG` - The env var with our sentry organization 
+`SENTRY_PROJECT` - The env var with the sentry project id 
+`SENTRY_AUTH_TOKEN` - The auth token to interact with Sentry
+`SENTRY_DSN` - The DSN to use for Sentry 
+`SENTRY_SAMPLING` - The amount of general error sampling to do
+`SENTRY_PROFILE_SAMPLING` - The amount of profling sampling to do
+`SENTRY_REPLAY_SAMPLING` - The amount of replay sampling to do

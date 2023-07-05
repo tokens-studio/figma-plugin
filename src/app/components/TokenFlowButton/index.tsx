@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
 import IconButton from '../IconButton';
-import { useFlags } from '../LaunchDarkly';
 
 import {
   themeObjectsSelector,
@@ -15,7 +14,6 @@ import {
 import { track } from '@/utils/analytics';
 
 export default function TokenFlowButton() {
-  const { tokenFlowButton } = useFlags();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -43,14 +41,14 @@ export default function TokenFlowButton() {
     setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
-  return tokenFlowButton ? (
+  return (
     <IconButton
       size="large"
-      tooltip="Open visualization"
+      tooltip="Open visualization flow"
       dataCy="token-flow-button"
       loading={loading}
       onClick={handleOpenTokenFlowApp}
       icon={<LightningBoltIcon />}
     />
-  ) : null;
+  );
 }

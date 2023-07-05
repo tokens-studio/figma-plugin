@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
@@ -8,6 +9,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await UiSettingsProperty.read();
     await UiSettingsProperty.write({
+      sessionRecording: uiSettings.sessionRecording ?? data?.sessionRecording,
       width: uiSettings.width ?? data?.width,
       language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
@@ -24,7 +26,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
     });
   } catch (err) {
-    notifyUI('There was an issue saving your credentials. Please try again.');
+    notifyUI("There was an issue saving your credentials. Please try again.");
   }
 }
 
@@ -47,6 +49,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let baseFontSize: string;
     let aliasBaseFontSize: string;
     let language: string;
+    let sessionRecording: boolean;
 
     if (data) {
       width = data.width || 400;
@@ -63,10 +66,12 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
+      sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       settings = {
         language,
         width: Math.max(300, width),
         height: Math.max(200, height),
+        sessionRecording,
         showEmptyGroups,
         updateMode,
         updateOnChange,
@@ -86,7 +91,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     }
   } catch (err) {
     console.error(err);
-    notifyUI('There was an issue saving your credentials. Please try again.');
+    notifyUI("There was an issue saving your credentials. Please try again.");
   }
   return settings;
 }

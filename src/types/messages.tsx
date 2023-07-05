@@ -38,6 +38,7 @@ export type UiSettingsFromPluginMessage = {
       isMinimized: boolean;
     };
     language: string,
+    sessionRecording:boolean;
     updateMode: UpdateMode;
     updateRemote: boolean;
     updateOnChange: boolean;

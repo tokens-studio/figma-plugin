@@ -1,5 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '../tokens';
+import { ColorModifier } from '../Modifier';
 
 export type UpdateTokenVariablePayload = {
   parent: string;
@@ -7,4 +8,11 @@ export type UpdateTokenVariablePayload = {
   type: TokenTypes;
   value: SingleToken['value'] | number | null;
   rawValue?: SingleToken['value'];
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      modify?: ColorModifier
+    }
+  }
 };

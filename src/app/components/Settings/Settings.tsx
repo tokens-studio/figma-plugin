@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,10 @@ import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
+import { replay } from '@/app/sentry';
+import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
+import Text from '../Text';
+import Link from '../Link';
 
 function Settings() {
   const { t } = useTranslation(['settings']);
@@ -33,7 +37,45 @@ function Settings() {
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
+  const debugMode = useSelector(sessionRecordingSelector);
+  const [debugSession, setDebugSession] = useState('');
 
+  const toggleDebugMode = React.useCallback(async (checked: CheckedState) => {
+    dispatch.settings.setSessionRecording(!!checked);
+    if (checked) {
+      // Display the info to the user
+      try {
+        let id = await replay.getReplayId();
+        if (!id) {
+          // Force start the replay functionality
+          replay.start();
+          id = await replay.getReplayId();
+        }
+        setDebugSession(id || '');
+      } catch (err) {
+        console.warn('Replay is likely in progress already', err);
+      }
+    } else {
+      try {
+        replay.stop();
+      } catch (err) {
+        console.warn('Replay is likely stopped already', err);
+      }
+    }
+  }, []);
+
+  // Load once on mount.
+  useEffect(() => {
+    async function getSessionId() {
+      try {
+        const id = replay.getReplayId();
+        setDebugSession(id || '');
+      } catch (err) {
+        // Silently fail
+      }
+    }
+    getSessionId();
+  });
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {
       track('setIgnoreFirstPartForStyles', { value: state });
@@ -124,6 +166,43 @@ function Settings() {
           <Box>
             <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
           </Box>
+        </Stack>
+        <Divider />
+        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+          <Heading size="small">{t('debugging')}</Heading>
+          <Stack direction="row" gap={2} align="center">
+
+            <Checkbox
+              id="enableDebugging"
+              checked={!!debugMode}
+              defaultChecked={debugMode}
+              onCheckedChange={toggleDebugMode}
+            />
+            <Label htmlFor="enableDebugging">
+              {t('enableSessionRecording')}
+            </Label>
+
+          </Stack>
+          <Stack direction="column" gap={2}>
+            <Text muted>
+              {t('sessionRecordingDescription')}
+            </Text>
+            <Text muted>
+              {t('dataCollectedIsAnonymised')}
+            </Text>
+            {debugSession && (
+            <Text>
+              {t('yourCurrentSessionIdIs')}
+              {' '}
+              <b>{debugSession}</b>
+            </Text>
+            )}
+            <Text muted>
+              {t('forMoreInformationPleaseSeeOur')}
+              {' '}
+              <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
+            </Text>
+          </Stack>
         </Stack>
       </Stack>
     </Box>

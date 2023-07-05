@@ -8,7 +8,7 @@ import { SetTokenDataPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 const defaultTokens: TokenStore = {
-  version: pjs.plugin_version,
+  version: pjs.version,
   themes: [],
   activeTheme: {},
   updatedAt: new Date().toString(),

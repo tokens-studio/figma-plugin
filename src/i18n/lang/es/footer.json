@@ -3,5 +3,6 @@
   "docs": "Documentos",
   "feedback": "comentario",
   "pullFrom": "Extraer de {{provider}}",
-  "pushTo": "Empuje a {{provider}}"
+  "pushTo": "Empuje a {{provider}}",
+  "goTo": "Ir a __MARCADOR__"
 }
