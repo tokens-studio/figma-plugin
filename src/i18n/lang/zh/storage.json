@@ -1,50 +1,58 @@
 {
-  "editCredentials": "编辑凭据",
-  "addNew": "添新",
-  "pat": "个人访问令牌",
-  "credentials": "证书",
-  "gitExplained": "访问存储在存储库中的令牌，以双向同步方式推送和拉取令牌。",
-  "readMore": "阅读更多",
-  "cancel": "取消",
-  "repo": "存储库（所有者/存储库）",
-  "branch": "分支",
-  "baseUrl": "基本 URL（可选）",
-  "saveCredentials": "保存凭证",
-  "filePath": "文件路径（例如 tokens.json）或文件夹路径（例如 tokens）",
-  "syncProviders": "同步提供商",
-  "providers": {
-    "generic": {
-      "title": "通用版本",
-      "url": "网址",
-      "addNew": "添加新的通用存储提供商",
-      "description": "访问存储在您自己的存储提供商上的令牌，允许双向同步、创建和只读操作。",
-      "flowType": "流量型",
-      "readOnly": "只读",
-      "readWrite": "读/写",
-      "readWriteCreate": "读/写/创建",
-      "additionalHeaders": "附加标头",
-      "name": "姓名",
-      "value": "价值"
+    "editCredentials": "编辑凭据",
+    "addNew": "添新",
+    "pat": "个人访问令牌",
+    "credentials": "证书",
+    "gitExplained": "访问存储在存储库中的令牌，以双向同步方式推送和拉取令牌。",
+    "readMore": "阅读更多",
+    "cancel": "取消",
+    "repo": "存储库（所有者/存储库）",
+    "branch": "分支",
+    "baseUrl": "基本 URL（可选）",
+    "saveCredentials": "保存凭证",
+    "filePath": "文件路径（例如 tokens.json）或文件夹路径（例如 tokens）",
+    "syncProviders": "同步提供商",
+    "providers": {
+        "generic": {
+            "title": "通用版本",
+            "url": "网址",
+            "addNew": "添加新的通用存储提供商",
+            "description": "访问存储在您自己的存储提供商上的令牌，允许双向同步、创建和只读操作。",
+            "flowType": "流量型",
+            "readOnly": "只读",
+            "readWrite": "读/写",
+            "readWriteCreate": "读/写/创建",
+            "additionalHeaders": "附加标头",
+            "name": "姓名",
+            "value": "价值"
+        },
+        "url": {
+            "title": "网址",
+            "addNew": "添加新的 URL 提供程序",
+            "description": "存储在服务器上的令牌允许您将它们添加为只读提供程序。"
+        },
+        "jsonbin": {
+            "title": "JSONBIN"
+        },
+        "github": {
+            "title": "GitHub"
+        },
+        "gitlab": {
+            "title": "GitLab"
+        },
+        "supernova": {
+            "accessToken": "超新星访问令牌",
+            "addNew": "添加新的 Supernova 凭据",
+            "dsUrl": "设计系统网址",
+            "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。"
+        }
     },
-    "url": {
-      "title": "网址",
-      "addNew": "添加新的 URL 提供程序",
-      "description": "存储在服务器上的令牌允许您将它们添加为只读提供程序。"
-    },
-    "jsonbin": {
-      "title": "JSONBIN"
-    },
-    "github": {
-      "title": "GitHub"
-    },
-    "gitlab": {
-      "title": "GitLab"
-    },
-    "supernova": {
-      "accessToken": "超新星访问令牌",
-      "addNew": "添加新的 Supernova 凭据",
-      "dsUrl": "设计系统网址",
-      "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。"
-    }
-  }
+    "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
+    "localDocument": "本地文件",
+    "apply": "申请",
+    "confirmDelete": "您真的要删除这个吗？",
+    "active": "积极的",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "节省"
 }

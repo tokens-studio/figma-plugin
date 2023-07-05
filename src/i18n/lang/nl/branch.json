@@ -1,9 +1,9 @@
 {
-  "ifYouCreate": "Als u uw branch maakt of verwisselt zonder uw lokale wijzigingen door te voeren",
-  "toYourRepo": "naar uw repository, zullen de wijzigingen verloren gaan.",
-  "discardChanges": "Veranderingen ongedaan maken",
-  "cancel": "Annuleren",
-  "createNewBranch": "Maak een nieuwe tak van",
-  "currentChanges": "Huidige wijzigingen",
-  "unSavedChanges": "U heeft niet-opgeslagen wijzigingen"
+    "ifYouCreate": "Als u uw branch maakt of verwisselt zonder uw lokale wijzigingen door te voeren",
+    "toYourRepo": "naar uw repository, zullen de wijzigingen verloren gaan.",
+    "discardChanges": "Veranderingen ongedaan maken",
+    "cancel": "Annuleren",
+    "createNewBranch": "Maak een nieuwe tak van",
+    "currentChanges": "Huidige wijzigingen",
+    "unSavedChanges": "U heeft niet-opgeslagen wijzigingen"
 }

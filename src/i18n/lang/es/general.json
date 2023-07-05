@@ -1,10 +1,18 @@
 {
-  "readMore": "Leer más",
-  "save": "Ahorrar",
-  "cancel": "Cancelar",
-  "search": "Buscar",
-  "rename": "Rebautizar",
-  "duplicate": "Duplicar",
-  "delete": "Borrar",
-  "set": "Colocar"
+    "readMore": "Leer más",
+    "save": "Ahorrar",
+    "cancel": "Cancelar",
+    "search": "Buscar",
+    "rename": "Rebautizar",
+    "duplicate": "Duplicar",
+    "delete": "Borrar",
+    "set": "Colocar",
+    "unsavedChanges": "Cambios no guardados",
+    "value": "Valor",
+    "description": "Descripción",
+    "removed": "Remoto",
+    "changelog": "registro de cambios",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Cerca"
 }

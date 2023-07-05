@@ -1,5 +1,20 @@
 {
-  "override": "这将覆盖您当前的令牌。如果您想保留更改，请务必复制它们。",
-  "cancel": "取消",
-  "pullTokens": "拉取代币"
+    "override": "这将覆盖您当前的令牌。如果您想保留更改，请务必复制它们。",
+    "cancel": "取消",
+    "pullTokens": "拉取代币",
+    "pullFrom": "从 {{provider}} 中提取",
+    "pushTo": "推至 {{provider}}",
+    "goTo": "转到{{provider}}",
+    "thisWillPushYourLocalChangesToTheBranch": "这会将您的本地更改推送到分支：",
+    "commit": "犯罪",
+    "diff": "差异",
+    "pushChanges": "推送变更",
+    "pushingTo": "推向",
+    "changesPushedTo": "更改推送至",
+    "createPullRequest": "创建拉取请求",
+    "openSupernovaWorkspace": "打开 Supernova 工作区",
+    "pushYourLocalChangesToYourSupernovaIoDesignSystem": "将本地更改推送到 Supernova.io 设计系统。",
+    "designSystem": "设计体系",
+    "pushYourLocalChangesToYourRepository": "将本地更改推送到存储库。",
+    "commitMessage": "提交消息"
 }
