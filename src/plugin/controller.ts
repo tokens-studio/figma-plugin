@@ -14,11 +14,23 @@ figma.skipInvisibleInstanceChildren = true;
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHANGED_TABS, asyncHandlers.changedTabs);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, asyncHandlers.removeSingleCredential);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
+  asyncHandlers.removeSingleCredential,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_STORAGE_TYPE, asyncHandlers.setStorageType);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, asyncHandlers.setOnboardingExplainerSets);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, asyncHandlers.setOnboardingExplainerSyncProviders);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, asyncHandlers.setOnboardingExplainerInspect);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
+  asyncHandlers.setOnboardingExplainerSets,
+);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
+  asyncHandlers.setOnboardingExplainerSyncProviders,
+);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT,
+  asyncHandlers.setOnboardingExplainerInspect,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NODE_DATA, asyncHandlers.setNodeData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, asyncHandlers.removeTokensByValue);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMAP_TOKENS, asyncHandlers.remapTokens);
@@ -38,17 +50,24 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, async
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, asyncHandlers.removeStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, asyncHandlers.attachLocalStylesToTheme);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
+  asyncHandlers.attachLocalStylesToTheme,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, asyncHandlers.setNoneValuesOnNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME, asyncHandlers.attachLocalVariablesToTheme);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
+  asyncHandlers.attachLocalVariablesToTheme,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 
 figma.on('close', () => {
   defaultWorker.stop();
