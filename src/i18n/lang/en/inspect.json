@@ -23,6 +23,7 @@
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
   "tokenNotFound": "Token not found",
   "appliedStyle": "Applied style",
+  "appliedVariable": "Applied variable",
   "changeToAnotherToken": "Change to another token",
   "chooseANewTokenForValue": "Choose a new value for {{value}}",
   "chooseANewToken": "Choose a new token",

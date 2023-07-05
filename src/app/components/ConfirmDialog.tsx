@@ -47,7 +47,11 @@ function ConfirmDialog() {
   const toggleChosen = React.useCallback(
     (id: string, unique?: boolean) => {
       if (unique) {
-        return setChosen([id]);
+        const index = chosen.indexOf(id);
+        if (index === -1) {
+          return setChosen([id]);
+        }
+        return setChosen(chosen.filter((item) => item !== id));
       }
       const index = chosen.indexOf(id);
       if (index === -1) {

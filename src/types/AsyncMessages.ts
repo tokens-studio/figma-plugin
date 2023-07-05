@@ -14,10 +14,12 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption } from '@/app/store/useTokens';
+import { SyncOption, SyncVariableOption } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
+import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
+import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -58,6 +60,9 @@ export enum AsyncMessageTypes {
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
+  RENAME_VARIABLES = 'async/rename-variables',
+  SYNC_VARIABLES = 'async/sync-variables',
+  UPDATE_VARIABLES = 'async/update-variables',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -274,6 +279,28 @@ export type AttachLocalVariablesToThemeResult = AsyncMessage<AsyncMessageTypes.A
   variableInfo: LocalVariableInfo | null
 }>;
 
+export type RenameVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
+  tokens: {
+    oldName: string;
+    newName: string;
+  }[]
+}>;
+export type RenameVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.RENAME_VARIABLES, {
+  renameVariableToken: RenameVariableToken[];
+}>;
+
+export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES, {
+  payload: UpdateTokenVariablePayload
+}>;
+export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
+
+export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES, {
+  tokens: Record<string, AnyTokenList>;
+  options: Record<SyncVariableOption, boolean>;
+  settings: SettingsState;
+}>;
+export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -310,7 +337,10 @@ export type AsyncMessages =
   | SetAuthDataMessage
   | CreateLocalVariablesAsyncMessage
   | ResolveVariableInfo
-  | AttachLocalVariablesToTheme;
+  | AttachLocalVariablesToTheme
+  | RenameVariablesAsyncMessage
+  | SyncVariableAsyncMessage
+  | UpdateVariablesAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -348,7 +378,10 @@ export type AsyncMessageResults =
   | SetAuthDataMessageResult
   | CreateLocalVariablesAsyncMessageResult
   | ResolveVariableInfoResult
-  | AttachLocalVariablesToThemeResult;
+  | AttachLocalVariablesToThemeResult
+  | RenameVariablesAsyncMessageResult
+  | SyncVariableAsyncMessageResult
+  | UpdateVariablesAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

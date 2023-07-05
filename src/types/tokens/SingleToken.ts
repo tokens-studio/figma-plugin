@@ -20,6 +20,8 @@ import { SingleCompositionToken } from './SingleCompositionToken';
 import { SingleDimensionToken } from './SingleDimensionToken';
 import { SingleBorderToken } from './SingleBorderToken';
 import { SingleAssetToken } from './SingleAssetToken';
+import { SingleSizingToken } from './SingleSizingToken';
+import { SingleNumberToken } from './SingleNumberToken';
 
 export type SingleToken<Named extends boolean = true, P = unknown> =
   SingleColorToken<Named, P>
@@ -38,10 +40,12 @@ export type SingleToken<Named extends boolean = true, P = unknown> =
   | SingleTextDecorationToken<Named, P>
   | SingleTextCaseToken<Named, P>
   | SingleSpacingToken<Named, P>
+  | SingleSizingToken<Named, P>
   | SingleOtherToken<Named, P>
   | SingleBorderToken<Named, P>
   | SingleCompositionToken<Named, P>
   | SingleCompositionToken<Named, P>
   | SingleDimensionToken<Named, P>
   | SingleAssetToken<Named, P>
-  | SingleBooleanToken<Named, P>;
+  | SingleBooleanToken<Named, P>
+  | SingleNumberToken<Named, P>;

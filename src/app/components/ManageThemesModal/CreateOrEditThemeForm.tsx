@@ -131,7 +131,7 @@ export const CreateOrEditThemeForm: React.FC<Props> = ({
                       size="small"
                       css={{ display: 'flex', alignItems: 'center', height: '28px' }}
                     >
-                      Add group
+                      Add&nbsp;group
                     </Button>
                   )
                 }

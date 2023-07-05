@@ -21,6 +21,7 @@ import { SingleTextToken } from './SingleTextToken';
 import { SingleBooleanToken } from './SingleBooleanToken';
 import { SingleToken } from './SingleToken';
 import { SingleTypographyToken } from './SingleTypographyToken';
+import { SingleNumberToken } from './SingleNumberToken';
 import type { TokenTypeSchema } from './TokenTypeSchema';
 
 type EditTokenObjectProperties = {
@@ -52,4 +53,5 @@ PartialExceptTypeAndSchema<Named, SingleColorToken<Named, EditTokenObjectPropert
 | PartialExceptTypeAndSchema<Named, SingleCompositionToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleDimensionToken<Named, EditTokenObjectProperties>>
 | PartialExceptTypeAndSchema<Named, SingleBorderToken<Named, EditTokenObjectProperties>>
-| PartialExceptTypeAndSchema<Named, SingleBooleanToken<Named, EditTokenObjectProperties>>;
+| PartialExceptTypeAndSchema<Named, SingleBooleanToken<Named, EditTokenObjectProperties>>
+| PartialExceptTypeAndSchema<Named, SingleNumberToken<Named, EditTokenObjectProperties>>;

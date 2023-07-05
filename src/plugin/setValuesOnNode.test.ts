@@ -22,6 +22,7 @@ describe('setValuesOnNode', () => {
   });
   const data = {
     borderRadius: 'border-radius.3',
+    spacing: 'spacing.10',
   };
   const figmaStyleMaps = {} as ReturnType<typeof getAllFigmaStyleMaps>;
   const themeInfo = {} as Omit<GetThemeInfoMessageResult, 'type'>;

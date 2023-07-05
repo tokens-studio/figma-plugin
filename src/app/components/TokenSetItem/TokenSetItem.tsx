@@ -188,7 +188,7 @@ export function TokenSetItem({
       </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         {item.isLeaf ? (
-          <Tooltip label={getCheckboxTooltip() as unknown as string}>
+          <Tooltip label={getCheckboxTooltip()} side="right">
             <Checkbox
               id={item.path}
               data-testid={`tokensetitem-${item.path}-checkbox`}

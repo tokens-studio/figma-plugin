@@ -72,6 +72,7 @@ describe('pluginData', () => {
 
     expect(selectionValues).toEqual([
       {
+        appliedType: 'token',
         category: 'borderRadius',
         nodes: [{
           id: '5989:3',
@@ -81,6 +82,7 @@ describe('pluginData', () => {
         type: 'borderRadius',
         value: 'border-radius.8',
       }, {
+        appliedType: 'token',
         category: 'fill',
         nodes: [{
           id: '5989:3',
@@ -90,6 +92,7 @@ describe('pluginData', () => {
         type: 'fill',
         value: 'color.red.700',
       }, {
+        appliedType: 'token',
         category: 'opacity',
         nodes: [{
           id: '5989:3',

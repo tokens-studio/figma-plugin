@@ -123,7 +123,7 @@ export const ThemeSelector: React.FC = () => {
   ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
-    <Flex alignItems="center" css={{ flexShrink: 0 }}>
+    <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
       <DropdownMenu>
         <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
@@ -133,7 +133,7 @@ export const ThemeSelector: React.FC = () => {
             </ThemeDropdownLabel>
             <Text size="small">{activeThemeLabel}</Text>
           </Flex>
-          <IconToggleableDisclosure />
+          <IconToggleableDisclosure css={{ flexShrink: 0 }} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           data-testid="themeselector-dropdown-content"
@@ -141,8 +141,8 @@ export const ThemeSelector: React.FC = () => {
           css={{ minWidth: '180px' }}
         >
           {availableThemes.length === 0 && (
-            <ScrollDropdownMenuRadioItem value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text>{t('noThemes')}</Text>
+            <ScrollDropdownMenuRadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+              <Text css={{ color: '$contextMenuForegroundMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
             </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}

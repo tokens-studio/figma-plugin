@@ -18,7 +18,7 @@ import Button from './Button';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';
-import { IconBrokenLink } from '@/icons';
+import { IconBrokenLink, IconVariable } from '@/icons';
 import StyleIcon from '@/icons/style.svg';
 import Tooltip from './Tooltip';
 
@@ -42,9 +42,9 @@ export default function InspectorTokenSingle({
   const { t } = useTranslation(['inspect']);
 
   const tokenToDisplay = React.useMemo(() => {
+    if (token.resolvedValue) return { name: token.value, value: token.resolvedValue, type: property };
     const resolvedToken = getTokenValue(token.value, resolvedTokens);
     if (resolvedToken) return { name: resolvedToken.name, value: resolvedToken.value, type: resolvedToken.type };
-    if (token.resolvedValue) return { name: token.value, value: token.resolvedValue, type: property };
     return null;
   }, [token, property, getTokenValue, resolvedTokens]);
 
@@ -120,7 +120,8 @@ export default function InspectorTokenSingle({
             gap: '$1',
           }}
         >
-          {token.resolvedValue && <Tooltip label={t('appliedStyle')}><StyleIcon /></Tooltip>}
+          {token.appliedType === 'variable' && <Tooltip label={t('appliedVariable')}><IconVariable /></Tooltip>}
+          {token.appliedType === 'style' && <Tooltip label={t('appliedStyle')}><StyleIcon /></Tooltip>}
           <Box css={{ fontSize: '$small' }}>{token.value}</Box>
           {
             !token.resolvedValue && (

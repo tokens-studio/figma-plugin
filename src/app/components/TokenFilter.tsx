@@ -16,6 +16,7 @@ const StyledInput = styled('input', {
   width: '100%',
   padding: '$3 $5',
   paddingLeft: '$6',
+  paddingRight: '$1',
   gap: '$2',
   '&:focus, &:hover': {
     outline: 'none',
@@ -45,6 +46,8 @@ const TokenFilter = () => {
       css={{
         display: 'flex',
         flexGrow: 1,
+        flexShrink: 1,
+        flexBasis: 0,
         alignItems: 'center',
         gap: '$2',
         position: 'relative',

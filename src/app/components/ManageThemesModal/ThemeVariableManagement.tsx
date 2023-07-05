@@ -54,6 +54,8 @@ export const ThemeVariableManagement: React.FC<Props> = ({ id }) => {
         console.error(err);
         Sentry.captureException(err);
       });
+    } else {
+      setResolvedVariableInfo({});
     }
   }, [theme]);
 

@@ -156,9 +156,29 @@ const resetSuite = () => {
 const mockGithubGetContent = () => {
   mockGetContent.mockImplementation(() => (
     Promise.resolve({
-      data: {
-        content: 'ewogICJnbG9iYWwiOiB7CiAgICAicmVkIjogewogICAgICAidHlwZSI6ICJjb2xvciIsCiAgICAgICJuYW1lIjogInJlZCIsCiAgICAgICJ2YWx1ZSI6ICIjZmYwMDAwIgogICAgfSwKICAgICJibGFjayI6IHsKICAgICAgInR5cGUiOiAiY29sb3IiLAogICAgICAibmFtZSI6ICJibGFjayIsCiAgICAgICJ2YWx1ZSI6ICIjMDAwMDAwIgogICAgfQogIH0sCiAgIiR0aGVtZXMiOiBbCiAgICB7CiAgICAgICJpZCI6ICJsaWdodCIsCiAgICAgICJuYW1lIjogIkxpZ2h0IiwKICAgICAgInNlbGVjdGVkVG9rZW5TZXRzIjogewogICAgICAgICJnbG9iYWwiOiAiZW5hYmxlZCIKICAgICAgfQogICAgfQogIF0KfQ==',
-      },
+      data: JSON.stringify({
+        global: {
+          red: {
+            type: 'color',
+            name: 'red',
+            value: '#ff0000',
+          },
+          black: {
+            type: 'color',
+            name: 'black',
+            value: '#000000',
+          },
+        },
+        $themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          },
+        ],
+      }),
     })
   ));
 };
@@ -266,7 +286,7 @@ describe('AppContainer (integration)', () => {
             </Provider>,
           );
 
-          expect(await result.findAllByText('global')).toHaveLength(2);
+          expect(await result.findAllByText('global')).toHaveLength(1);
           result.unmount();
         });
       })
@@ -325,7 +345,7 @@ describe('AppContainer (integration)', () => {
         </Provider>,
       );
 
-      expect(await result.findAllByText('global')).toHaveLength(2);
+      expect(await result.findAllByText('global')).toHaveLength(1);
 
       result.unmount();
     });

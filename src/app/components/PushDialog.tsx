@@ -109,10 +109,10 @@ function PushDialog() {
   }, [showPushDialog, localApiState]);
 
   const handlePushChanges = React.useCallback(() => {
-    if (commitMessage && branch) {
+    if (localApiState.provider === StorageProviderType.SUPERNOVA || (commitMessage && branch)) {
       onConfirm(commitMessage, branch);
     }
-  }, [branch, commitMessage, onConfirm]);
+  }, [branch, commitMessage, onConfirm, localApiState]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
     if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {

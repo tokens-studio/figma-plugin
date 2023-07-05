@@ -37,6 +37,7 @@ import ColorTokenForm from './ColorTokenForm';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -53,7 +54,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const updateMode = useSelector(updateModeSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
-  const { remapToken, renameStylesFromTokens } = useTokens();
+  const {
+    remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken,
+  } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
@@ -233,10 +236,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const removeColorModify = React.useCallback(() => {
-    const newValue = internalEditToken;
-    delete newValue?.$extensions;
+    const newValue = { ...internalEditToken.$extensions?.['studio.tokens'] };
+    delete newValue?.modify;
     setInternalEditToken({
-      ...newValue,
+      ...internalEditToken,
+      $extensions: {
+        ...internalEditToken.$extensions,
+        'studio.tokens': Object.keys(newValue).length > 0 ? newValue : undefined,
+      },
     });
   }, [internalEditToken]);
 
@@ -244,7 +251,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     setInternalEditToken({
       ...internalEditToken,
       $extensions: {
+        ...internalEditToken.$extensions,
         'studio.tokens': {
+          ...internalEditToken.$extensions?.['studio.tokens'],
           modify: newModify,
         },
       },
@@ -269,6 +278,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     },
     [internalEditToken],
   );
+
+  const resolvedValue = React.useMemo(() => {
+    if (internalEditToken) {
+      return typeof internalEditToken?.value === 'string'
+        ? getAliasValue(internalEditToken.value, resolvedTokens)
+        : null;
+    }
+    return null;
+  }, [internalEditToken, resolvedTokens]);
 
   // @TODO update to useCallback
   const submitTokenValue = async ({
@@ -311,6 +329,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
+        if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+          updateVariablesFromToken({
+            parent: activeTokenSet,
+            name: newName,
+            type,
+            value: resolvedValue,
+            rawValue: internalEditToken.value,
+          });
+        }
         // When users change token names references are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
@@ -330,17 +357,26 @@ function EditTokenForm({ resolvedTokens }: Props) {
               key: StyleOptions.RENAME, label: 'Rename styles',
             });
           }
-
-          const shouldRemap = await confirm({
+          if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+            choices.push({
+              key: 'rename-variable', label: 'Rename variable',
+            });
+          }
+          const confirmData = await confirm({
             text: `Remap all tokens that use ${oldName} to ${newName}?`,
             description: 'This will change all layers that used the old token name. This could take a while.',
             choices,
           });
-          if (shouldRemap) {
-            remapToken(oldName, newName, shouldRemap.data[0]);
-            dispatch.settings.setUpdateMode(shouldRemap.data[0]);
-            if (shouldRemap.data.includes(StyleOptions.RENAME)) {
+          if (confirmData && confirmData.result) {
+            if (confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
+              remapToken(oldName, newName, confirmData.data[0]);
+              dispatch.settings.setUpdateMode(confirmData.data[0]);
+            }
+            if (confirmData.data.includes(StyleOptions.RENAME)) {
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+            }
+            if (confirmData.data.includes('rename-variable')) {
+              renameVariablesFromToken({ oldName, newName });
             }
           }
         } else {
@@ -374,7 +410,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
-  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
+  }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken, resolvedValue]);
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -396,15 +432,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
     setSelectedTokenSets(selectedItems);
   }, []);
-
-  const resolvedValue = React.useMemo(() => {
-    if (internalEditToken) {
-      return typeof internalEditToken?.value === 'string'
-        ? getAliasValue(internalEditToken.value, resolvedTokens)
-        : null;
-    }
-    return null;
-  }, [internalEditToken, resolvedTokens]);
 
   const renderTokenForm = () => {
     if (!internalEditToken) return null;

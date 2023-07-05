@@ -4,8 +4,9 @@ import { ThemeObject } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
-import setValuesOnVariable from './setValuesOnVariable';
+import setValuesOnVariable, { ReferenceVariableType } from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
+import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -20,7 +21,7 @@ export type VariableToken = SingleToken<true, { path: string, variableId: string
 export default function updateVariables({
   collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens, [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING, TokenTypes.BOOLEAN, TokenTypes.COLOR]);
+  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
@@ -29,11 +30,24 @@ export default function updateVariables({
   });
   const colorVariables = variablesToCreate.filter((t) => t.type === TokenTypes.COLOR) as Extract<VariableToken, { type: TokenTypes.COLOR }>[];
   const booleanVariables = variablesToCreate.filter((t) => t.type === TokenTypes.BOOLEAN) as Extract<VariableToken, { type: TokenTypes.BOOLEAN }>[];
-  const numberVariables = variablesToCreate.filter((t) => [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING].includes(t.type));
-  const allVariableIds = {
-    ...setValuesOnVariable(figma.variables.getLocalVariables('COLOR'), colorVariables, 'COLOR', collection, mode),
-    ...setValuesOnVariable(figma.variables.getLocalVariables('BOOLEAN'), booleanVariables, 'BOOLEAN', collection, mode),
-    ...setValuesOnVariable(figma.variables.getLocalVariables('FLOAT'), numberVariables, 'FLOAT', collection, mode),
+  const numberVariables = variablesToCreate.filter((t) => [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING, TokenTypes.NUMBER].includes(t.type));
+  const stringVariables = variablesToCreate.filter((t) => t.type === TokenTypes.TEXT) as Extract<VariableToken, { type: TokenTypes.TEXT }>[];
+  const variableObj: Record<string, ReferenceVariableType> = {
+    ...setValuesOnVariable(figma.variables.getLocalVariables('COLOR').filter((v) => v.variableCollectionId === collection.id), colorVariables, 'COLOR', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('BOOLEAN').filter((v) => v.variableCollectionId === collection.id), booleanVariables, 'BOOLEAN', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('FLOAT').filter((v) => v.variableCollectionId === collection.id), numberVariables, 'FLOAT', collection, mode),
+    ...setValuesOnVariable(figma.variables.getLocalVariables('STRING').filter((v) => v.variableCollectionId === collection.id), stringVariables, 'STRING', collection, mode),
   };
-  return allVariableIds;
+  const returnVariableIds: Record<string, string> = {};
+  const referenceVariableCandidate: ReferenceVariableType[] = [];
+  Object.entries(variableObj).forEach(([tokenName, referenceVariable]) => {
+    if (referenceVariable.shouldReferenceToVariable) {
+      referenceVariableCandidate.push(referenceVariable);
+    }
+    returnVariableIds[tokenName] = referenceVariable.variable.key;
+  });
+  return {
+    variableIds: returnVariableIds,
+    referenceVariableCandidate,
+  };
 }

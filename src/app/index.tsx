@@ -14,13 +14,15 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 initializeAnalytics();
 
 if (process.env.ENVIRONMENT === 'production' || process.env.ENVIRONMENT === 'beta') {
+  Sentry.addTracingExtensions();
   Sentry.init({
     dsn: 'https://26bac1a4b1ba4d91bc9420d10d95bb3e@o386310.ingest.sentry.io/5220409',
     release: `figma-tokens@${pjs.plugin_version}`,
     environment: process.env.ENVIRONMENT,
+    // 1% of samples
+    tracesSampleRate: 0.01,
   });
 }
-
 AsyncMessageChannel.ReactInstance.connect();
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, asyncHandlers.startup);

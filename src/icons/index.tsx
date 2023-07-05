@@ -66,6 +66,7 @@ import IconImage from './image.svg';
 import IconExclamationTriangle from './exclamation-triangle.svg';
 import IconSettings from './settings.svg';
 import IconPencil from './pencil.svg';
+import IconVariable from './variable.svg';
 
 export {
   IconAdd,
@@ -136,4 +137,5 @@ export {
   IconExclamationTriangle,
   IconSettings,
   IconPencil,
+  IconVariable,
 };
