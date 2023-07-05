@@ -28,8 +28,8 @@ describe('PushDialog', () => {
         <PushDialog />
       </Provider>,
     );
-    expect(result.getByText('Push changes')).toBeInTheDocument();
-    expect(result.getByText('Commit message')).toBeInTheDocument();
+    expect(result.getByText('pushChanges')).toBeInTheDocument();
+    expect(result.getByText('commitMessage')).toBeInTheDocument();
     result.unmount();
   });
 
@@ -49,8 +49,8 @@ describe('PushDialog', () => {
         <PushDialog />
       </Provider>,
     );
-    expect(result.getByText('Changes pushed to GitHub')).toBeInTheDocument();
-    expect(result.getByText('Create Pull Request')).toBeInTheDocument();
+    expect(result.getByText('changesPushedTo GitHub')).toBeInTheDocument();
+    expect(result.getByText('createPullRequest')).toBeInTheDocument();
 
     result.unmount();
   });
@@ -116,7 +116,7 @@ describe('PushDialog', () => {
       await fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
     });
 
-    expect(result.getByText('Pushing to Supernova.io')).toBeInTheDocument();
+    expect(result.getByText('pushingTo Supernova.io')).toBeInTheDocument();
     expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
 
     result.unmount();
