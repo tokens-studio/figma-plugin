@@ -11,7 +11,7 @@ import { Direction } from '@/constants/Direction';
 import IconButton from './IconButton';
 
 export default function AnnotationBuilder() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['inspect']);
   const uiState = useSelector(uiStateSelector, isEqual);
 
   const createAnnotationLeft = React.useCallback(() => {
@@ -33,7 +33,7 @@ export default function AnnotationBuilder() {
   return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (
     <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
       <Stack direction="row" align="center" justify="between">
-        <Text bold>{t('inspect.addAnnotation')}</Text>
+        <Text bold>{t('addAnnotation')}</Text>
         <Stack direction="row" align="center" gap={0}>
           <IconButton onClick={createAnnotationLeft} icon="←" />
           <Stack direction="column">
