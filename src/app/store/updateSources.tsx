@@ -98,7 +98,7 @@ async function updateRemoteTokens({
       break;
     }
     default:
-      throw new Error('Not implemented');
+      throw new Error(`Unimplemented storage provider for ${provider}`);
   }
 }
 
