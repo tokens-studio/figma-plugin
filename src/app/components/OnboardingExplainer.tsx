@@ -1,5 +1,6 @@
 import React from 'react';
 import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { styled } from '@/stitches.config';
 import Box from './Box';
 import Heading from './Heading';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
+  const { t } = useTranslation(['general']);
   return (
     <Box css={data.title === 'Sets' ? {
       display: 'flex', flexDirection: 'column', gap: '$2', padding: '$4', borderTop: '1px solid $borderMuted', borderBottom: '1px solid $borderMuted',
@@ -49,7 +51,7 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
         {data.text}
       </StyledTextPlan>
       <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
-        Read more
+        {t('general.readMore')}
       </StyledReadMoreLink>
     </Box>
   );

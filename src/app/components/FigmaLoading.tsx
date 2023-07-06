@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from 'react';
+import { useTranslation } from 'react-i18next';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import * as pjs from '../../../package.json';
@@ -30,6 +31,8 @@ type Props = PropsWithChildren<{
 export default function FigmaLoading({
   isLoading, label, onCancel, children,
 }: Props) {
+  const { t } = useTranslation(['startScreen']);
+
   if (!isLoading) {
     return (
       <Box>
@@ -46,18 +49,18 @@ export default function FigmaLoading({
           <FigmaLetter />
         </Stack>
         <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted' }}>
-          Version
+          {t('version')}
           {' '}
           {pjs.version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner inverse />
           <Stack direction="column" gap={4} justify="center" align="center">
-            {label ?? 'Loading, please wait.'}
+            {label ?? t('loadingWait')}
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>
-          <StyledLoadingButton type="button" onClick={onCancel}>Cancel</StyledLoadingButton>
+          <StyledLoadingButton type="button" onClick={onCancel}>{t('cancel')}</StyledLoadingButton>
         </Stack>
       </Stack>
     </StyledLoadingScreen>

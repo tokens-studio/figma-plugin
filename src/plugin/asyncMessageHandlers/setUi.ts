@@ -12,6 +12,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     width,
     height,
     updateMode: msg.updateMode,
+    language: msg.language,
     updateRemote: msg.updateRemote,
     updateOnChange: msg.updateOnChange,
     updateStyles: msg.updateStyles,

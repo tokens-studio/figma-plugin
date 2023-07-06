@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Link1Icon, LinkBreak1Icon, ExitIcon,
 } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -36,6 +37,7 @@ const StyledP = styled('p', {
 });
 
 export default function SecondScreen() {
+  const { t } = useTranslation(['settings']);
   const isEnabled = useSelector(secondScreenSelector);
   const dispatch = useDispatch<Dispatch>();
   const { user, handleLogout } = useAuth();
@@ -68,7 +70,7 @@ export default function SecondScreen() {
         <Stack direction="column" gap={3} justify="between" align="start">
           <StyledBetaBadge>BETA</StyledBetaBadge>
           <StyledP>
-            Second Screen is in beta, some features may not work as expected.
+            {t('secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected')}
           </StyledP>
         </Stack>
       </Box>
@@ -79,7 +81,7 @@ export default function SecondScreen() {
           {' '}
 
         </Switch>
-        <span>Live Sync</span>
+        <span>{t('liveSync')}</span>
       </Stack>
 
       <Stack
@@ -99,15 +101,15 @@ export default function SecondScreen() {
       >
         <Stack direction="row" align="center" gap={3} css={{ fontWeight: '$sansBold' }}>
           {isEnabled && user ? <Link1Icon /> : <LinkBreak1Icon />}
-          {isEnabled && user ? 'Connected' : 'Not connected'}
+          {isEnabled && user ? t('connected') : t('notConnected')}
         </Stack>
-        {isEnabled && user ? 'Live sync with second screen active' : 'Live sync inactive'}
+        {isEnabled && user ? t('liveSyncWithSecondScreenActive') : t('liveSyncInactive')}
         {user ? (
           <Box css={{
             fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
           >
-            Signed in as
+            {t('signedInAs')}
             {' '}
             {user.email}
           </Box>
@@ -118,24 +120,24 @@ export default function SecondScreen() {
             }}
             >
               <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={onSyncClick}>
-                Sign in to continue
+                {t('signInToContinue')}
               </Button>
             </Box>
           )}
       </Stack>
 
       <Button variant="ghost" size="small" icon={<IconSecondScreen />} onClick={handleOpenSecondScreen}>
-        Open second screen
+        {t('openSecondScreen')}
       </Button>
 
       {
         user ? (
           <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={handleLogout}>
-            Sign out
+            {t('signOut')}
           </Button>
         ) : (
           <Button variant="ghost" size="small" icon={<ExitIcon />} onClick={onSyncClick}>
-            Sign in
+            {t('signIn')}
           </Button>
         )
       }

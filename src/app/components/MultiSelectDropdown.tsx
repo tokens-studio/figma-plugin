@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import Box from './Box';
@@ -36,6 +37,8 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
     }
   }, [selectedItems, handleSelectedItemChange]);
 
+  const { t } = useTranslation(['tokens']);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger css={{ width: '100%', padding: '0' }}>
@@ -45,7 +48,7 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
           }}
           className="input"
         >
-          <StyledInput placeholder="Select token sets" value={selectedItemsString} readOnly />
+          <StyledInput placeholder={t('selectTokenSets')} value={selectedItemsString} readOnly />
           <StyledInputSuffix type="button">
             <StyledIconDisclosure />
           </StyledInputSuffix>

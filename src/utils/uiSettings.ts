@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
@@ -10,6 +11,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
     await UiSettingsProperty.write({
       sessionRecording: uiSettings.sessionRecording ?? data?.sessionRecording,
       width: uiSettings.width ?? data?.width,
+      language: uiSettings.language ?? data?.language,
       height: uiSettings.height ?? data?.height,
       showEmptyGroups: uiSettings.showEmptyGroups ?? data?.showEmptyGroups,
       updateMode: uiSettings.updateMode ?? data?.updateMode,
@@ -24,7 +26,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
     });
   } catch (err) {
-    notifyUI('There was an issue saving your credentials. Please try again.');
+    notifyUI("There was an issue saving your credentials. Please try again.");
   }
 }
 
@@ -46,11 +48,13 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let shouldSwapStyles: boolean;
     let baseFontSize: string;
     let aliasBaseFontSize: string;
+    let language: string;
     let sessionRecording: boolean;
 
     if (data) {
       width = data.width || 400;
       height = data.height || 600;
+      language = data.language || 'en';
       showEmptyGroups = typeof data.showEmptyGroups === 'undefined' ? true : data.showEmptyGroups;
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
@@ -64,6 +68,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       settings = {
+        language,
         width: Math.max(300, width),
         height: Math.max(200, height),
         sessionRecording,
@@ -86,7 +91,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     }
   } catch (err) {
     console.error(err);
-    notifyUI('There was an issue saving your credentials. Please try again.');
+    notifyUI("There was an issue saving your credentials. Please try again.");
   }
   return settings;
 }

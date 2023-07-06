@@ -1,5 +1,5 @@
 node_modules
-settings.json
+.vscode/settings.json
 yarn-error.log
 dist
 cypress/screenshots

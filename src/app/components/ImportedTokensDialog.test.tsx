@@ -83,11 +83,12 @@ describe('ImportedTokensDialog', () => {
         <ImportedTokensDialog />
       </Provider>,
     );
-    expect(result.queryByText('Import Styles')).toBeInTheDocument();
-    expect(result.queryByText('New Tokens')).toBeInTheDocument();
-    expect(result.queryByText('Create all')).toBeInTheDocument();
-    expect(result.queryByText('Existing Tokens')).toBeInTheDocument();
-    expect(result.queryByText('Update all')).toBeInTheDocument();
+
+    expect(result.queryByText('importStyles')).toBeInTheDocument();
+    expect(result.queryByText('newTokens')).toBeInTheDocument();
+    expect(result.queryByText('createAll')).toBeInTheDocument();
+    expect(result.queryByText('existingTokens')).toBeInTheDocument();
+    expect(result.queryByText('updateAll')).toBeInTheDocument();
     expect(result.queryByText('#ffffff')).toBeInTheDocument();
     expect(result.queryByText('regular color token')).toBeInTheDocument();
     expect(result.queryByText(JSON.stringify({
@@ -98,8 +99,8 @@ describe('ImportedTokensDialog', () => {
       x: 1,
       y: 1,
     }))).toBeInTheDocument();
-    expect(result.queryByText('Cancel')).toBeInTheDocument();
-    expect(result.queryByText('Import all')).toBeInTheDocument();
+    expect(result.queryByText('cancel')).toBeInTheDocument();
+    expect(result.queryByText('importAll')).toBeInTheDocument();
   });
 
   it('should create single token', async () => {
@@ -207,7 +208,7 @@ describe('ImportedTokensDialog', () => {
     });
 
     await act(async () => {
-      const createButton = result.queryByText('Create all') as HTMLButtonElement;
+      const createButton = result.queryByText('createAll') as HTMLButtonElement;
       createButton.click();
     });
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
@@ -327,7 +328,7 @@ describe('ImportedTokensDialog', () => {
     });
 
     await act(async () => {
-      const updateButton = result.queryByText('Update all') as HTMLButtonElement;
+      const updateButton = result.queryByText('updateAll') as HTMLButtonElement;
       updateButton.click();
     });
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
@@ -359,7 +360,7 @@ describe('ImportedTokensDialog', () => {
     );
 
     await act(async () => {
-      const updateButton = result.queryByText('Import all') as HTMLButtonElement;
+      const updateButton = result.queryByText('importAll') as HTMLButtonElement;
       updateButton.click();
     });
 
@@ -416,11 +417,11 @@ describe('ImportedTokensDialog', () => {
     );
 
     await act(async () => {
-      const closeButton = result.queryByText('Cancel') as HTMLButtonElement;
+      const closeButton = result.queryByText('cancel') as HTMLButtonElement;
       closeButton.click();
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
-    expect(result.queryByText('Import Styles')).not.toBeInTheDocument();
+    expect(result.queryByText('importStyles')).not.toBeInTheDocument();
   });
 });

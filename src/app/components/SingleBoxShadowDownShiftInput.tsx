@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { styled } from '@/stitches.config';
@@ -32,6 +33,7 @@ export default function SingleBoxShadowDownShiftInput({
   handleToggleInputHelper?: () => void;
   onSubmit: () => void
 }) {
+  const { t } = useTranslation(['tokens']);
   const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
   return (
     <DownshiftInput
@@ -43,9 +45,7 @@ export default function SingleBoxShadowDownShiftInput({
       resolvedTokens={resolvedTokens}
       handleChange={handleChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
-      placeholder={
-        name === 'color' ? '#000000, hsla(), rgba() or {alias}' : 'Value or {alias}'
-      }
+      placeholder={name === 'color' ? t('colorOrAlias') : t('valueOrAlias')}
       prefix={
         name === 'color' && value && (
           <StyledButton

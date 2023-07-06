@@ -47,6 +47,6 @@ describe('Typography Input', () => {
       handleTypographyValueDownShiftInputChange={mockHandleTypographyValueDownShiftInputChange}
       handleDownShiftInputChange={mockHandleDownShiftInputChange}
     />);
-    expect(getByText('Typography')).toBeInTheDocument();
+    expect(getByText('types.Typography')).toBeInTheDocument();
   });
 });

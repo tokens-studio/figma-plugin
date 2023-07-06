@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { useTranslation } from 'react-i18next';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import Button from '../Button';
@@ -24,9 +25,11 @@ import Text from '../Text';
 import Link from '../Link';
 
 function Settings() {
+  const { t } = useTranslation(['settings']);
+
   const onboardingData = {
-    title: 'Set up where tokens should be stored',
-    text: 'Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.',
+    title: t('whereTokensStored'),
+    text: t('whereTokensStoredOnboarding'),
     url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
@@ -114,7 +117,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">Settings</Heading>
+          <Heading size="small">{t('settings')}</Heading>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -124,17 +127,17 @@ function Settings() {
             />
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>Ignore first part of token name for styles</Box>
+                <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-                  Useful if you want to ignore
+                  {t('usefulIgnore')}
                   {' '}
                   <code>colors</code>
                   {' '}
-                  in a token called
+                  {t('inAToken')}
                   {' '}
                   <code>colors.blue.500</code>
                   {' '}
-                  for your styles
+                  {t('forYourStyles')}
                 </Box>
               </Stack>
             </Label>
@@ -149,21 +152,24 @@ function Settings() {
 
             <Label htmlFor="prefixStylesWithThemeName">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>Prefix styles with active theme name</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.</Box>
+                <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
               </Stack>
             </Label>
           </Stack>
-          <Heading size="small">Base font size token</Heading>
-          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>Lets you configure the value 1rem represents. You can also set this to a token, to have it change between sets.</Box>
+          <Heading size="small">{t('baseFont')}</Heading>
+          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+            {t('baseFontExplanation')}
+
+          </Box>
           <RemConfiguration />
           <Box>
-            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>Reset onboarding</Button>
+            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
           </Box>
         </Stack>
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">Debugging</Heading>
+          <Heading size="small">{t('debugging')}</Heading>
           <Stack direction="row" gap={2} align="center">
 
             <Checkbox
@@ -173,30 +179,28 @@ function Settings() {
               onCheckedChange={toggleDebugMode}
             />
             <Label htmlFor="enableDebugging">
-              Enable session recording
+              {t('enableSessionRecording')}
             </Label>
 
           </Stack>
           <Stack direction="column" gap={2}>
             <Text muted>
-              Session recording is a new feature by Tokens Studio to track user sessions when bugs occur, so we can better understand the issue and fix it. No data will be sent to our telemetry server if you do not experience a bug or if you turn off the debugging.
+              {t('sessionRecordingDescription')}
             </Text>
             <Text muted>
-              Any data collected is anonymized and will not be shared with any third parties and is used purely to address bugs and optimize performance.
+              {t('dataCollectedIsAnonymised')}
             </Text>
             {debugSession && (
             <Text>
-              Your current session id is
+              {t('yourCurrentSessionIdIs')}
               {' '}
               <b>{debugSession}</b>
             </Text>
             )}
             <Text muted>
-              Please see our
+              {t('forMoreInformationPleaseSeeOur')}
               {' '}
-              <Link href="https://tokens.studio/privacy">Privacy Policy</Link>
-              {' '}
-              for more information.
+              <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
             </Text>
           </Stack>
         </Stack>

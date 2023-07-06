@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -25,6 +26,8 @@ export default function InspectSearchOptionDropdown() {
     dispatch.inspectState.toggleShowResolvedReferences(checked);
   }, [dispatch.inspectState]);
 
+  const { t } = useTranslation(['inspect']);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger css={{ padding: '$2' }} data-testid="inspect-search-option-dropdown">
@@ -40,7 +43,7 @@ export default function InspectSearchOptionDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Show broken references
+          {t('showBrokenReferences')}
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           data-testid="show-resolved-references"
@@ -50,7 +53,7 @@ export default function InspectSearchOptionDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Show resolved references
+          {t('showResolvedReferences')}
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>

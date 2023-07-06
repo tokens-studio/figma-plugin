@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   IconCollapseArrow, IconExpandArrow,
 } from '@/icons';
@@ -48,9 +49,11 @@ export default function ChangeStateListingHeading({
     onCollapse(e, label);
   }, [onCollapse, label]);
 
+  const { t } = useTranslation(['tokens']);
+
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative', marginLeft: '$2' }}>
-      <Tooltip label={`Alt + Click to ${isCollapsed ? 'expand' : 'collapse'} all`}>
+      <Tooltip label={`Alt + Click ${t('toggle')}`}>
         <StyledChangedStateGroupHeadingButton
           isCollapsed={isCollapsed}
           data-cy={`changestatelisting-header-${set}`}

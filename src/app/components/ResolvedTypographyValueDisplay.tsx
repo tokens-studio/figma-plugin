@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
 import { SingleTypographyToken } from '@/types/tokens';
 import { styled } from '@/stitches.config';
@@ -17,20 +18,22 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-const properties = {
-  fontFamily: 'Font',
-  fontWeight: 'Weight',
-  fontSize: 'Size',
-  lineHeight: 'Line height',
-  letterSpacing: 'Letter',
-  paragraphSpacing: 'Paragraph Spacing',
-  paragraphIndent: 'Paragraph Indent',
-  textDecoration: 'Decoration',
-  textCase: 'Text Case',
-};
-
 export const ResolvedTypographyValueDisplay: React.FC<Props> = ({ value }) => {
   const seed = useUIDSeed();
+
+  const { t } = useTranslation(['tokens']);
+
+  const properties = {
+    fontFamily: t('font.fontFamily'),
+    fontWeight: t('font.fontWeight'),
+    fontSize: t('font.fontSize'),
+    lineHeight: t('font.lineHeight'),
+    letterSpacing: t('font.letterSpacing'),
+    paragraphSpacing: t('font.paragraphSpacing'),
+    paragraphIndent: t('font.paragraphIndent'),
+    textDecoration: t('font.textDecoration'),
+    textCase: t('font.textCase'),
+  };
 
   return (
     <Box css={{

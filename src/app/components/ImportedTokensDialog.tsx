@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
@@ -32,6 +33,8 @@ function NewOrExistingToken({
   const onUpdateToken = React.useCallback(() => {
     updateToken(token);
   }, [updateToken, token]);
+
+  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
@@ -75,7 +78,7 @@ function NewOrExistingToken({
       </Stack>
       <Stack direction="row" align="center" gap={1}>
         <IconButton dataCy="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
-        <IconButton dataCy="imported-tokens-dialog-remove-button" tooltip="Ignore" icon={<TrashIcon />} onClick={onRemoveToken} />
+        <IconButton dataCy="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );
@@ -88,6 +91,8 @@ export default function ImportedTokensDialog() {
   const importedTokens = useSelector(importedTokensSelector);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
+
+  const { t } = useTranslation(['tokens']);
 
   const handleIgnoreExistingToken = React.useCallback((token) => {
     setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
@@ -176,7 +181,7 @@ export default function ImportedTokensDialog() {
   return (
     <Modal
       full
-      title="Import Styles"
+      title={t('importStyles')}
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
@@ -191,9 +196,9 @@ export default function ImportedTokensDialog() {
             align="center"
             css={{ padding: '$2 $4' }}
           >
-            <Heading>New Tokens</Heading>
+            <Heading>{t('newTokens')}</Heading>
             <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
-              Create all
+              {t('createAll')}
             </Button>
           </Stack>
           <Stack
@@ -224,9 +229,9 @@ export default function ImportedTokensDialog() {
             align="center"
             css={{ padding: '$2 $4' }}
           >
-            <Heading>Existing Tokens</Heading>
+            <Heading>{t('existingTokens')}</Heading>
             <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
-              Update all
+              {t('updateAll')}
             </Button>
           </Stack>
           <Stack
@@ -258,10 +263,10 @@ export default function ImportedTokensDialog() {
         }}
         >
           <Button variant="secondary" id="button-import-close" onClick={handleClose}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
-            Import all
+            {t('importAll')}
           </Button>
         </Box>
       </Stack>

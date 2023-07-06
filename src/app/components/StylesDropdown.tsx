@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import useTokens from '../store/useTokens';
 import {
@@ -14,12 +15,13 @@ export default function StylesDropdown() {
   const {
     pullStyles, createStylesFromTokens, syncStyles, createVariables, syncVariables,
   } = useTokens();
+  const { t } = useTranslation(['tokens']);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <span>
-          Styles & Variables
+          {t('stylesAndVariables')}
         </span>
         <Box css={{ flexShrink: 0 }}>
           <IconChevronDown />
@@ -27,11 +29,11 @@ export default function StylesDropdown() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top">
-        <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>Sync styles</DropdownMenuItem>
-        <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>Import styles</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>Create styles</DropdownMenuItem>
-        <DropdownMenuItem textValue="Create variables" disabled={availableThemes.length < 1} onSelect={createVariables}>Create variables</DropdownMenuItem>
-        <DropdownMenuItem textValue="Sync variables" disabled={availableThemes.length < 1} onSelect={syncVariables}>Sync variables</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create variables" disabled={availableThemes.length < 1} onSelect={createVariables}>{t('createVariables')}</DropdownMenuItem>
+        <DropdownMenuItem textValue="Sync variables" disabled={availableThemes.length < 1} onSelect={syncVariables}>{t('syncVariables')}</DropdownMenuItem>
+        <DropdownMenuItem textValue="Sync styles" disabled={availableThemes.length < 1} onSelect={syncStyles}>{t('syncStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue="Import styles" disabled={editProhibited} onSelect={pullStyles}>{t('importStyles')}</DropdownMenuItem>
+        <DropdownMenuItem textValue="Create styles" onSelect={createStylesFromTokens}>{t('createStyles')}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

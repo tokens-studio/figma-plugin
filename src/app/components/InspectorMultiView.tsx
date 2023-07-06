@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import Button from './Button';
@@ -21,9 +22,11 @@ import Stack from './Stack';
 import BulkRemapModal from './modals/BulkRemapModal';
 
 export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
+  const { t } = useTranslation(['inspect']);
+
   const onboardingData = {
-    title: 'Inspect',
-    text: 'This is where applied tokens of your selection show up, you can use Deep Inspect to scan the selected layers and all of its children.',
+    title: t('inspect'),
+    text: t('inspectOnboard'),
     url: 'https://docs.figmatokens.com/inspect/multi-inspect?ref=onboarding_explainer_inspect',
   };
 
@@ -108,35 +111,35 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
   return (
     <>
       {uiState.selectionValues.length > 0 && (
-      <Box css={{
-        display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$4',
-      }}
-      >
         <Box css={{
-          display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+          display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$4',
         }}
         >
-          <Checkbox
-            checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
-            id="selectAll"
-            onCheckedChange={handleSelectAll}
-          />
-          <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
-            Select all
-          </Label>
+          <Box css={{
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+          }}
+          >
+            <Checkbox
+              checked={inspectState.selectedTokens.length === uiState.selectionValues.length}
+              id="selectAll"
+              onCheckedChange={handleSelectAll}
+            />
+            <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+              {t('selectAll')}
+            </Label>
+          </Box>
+          <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+            <Button onClick={handleShowBulkRemap} variant="secondary">
+              {t('bulkRemap')}
+            </Button>
+            <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+              {t('setToNone')}
+            </Button>
+            <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+              {t('removeSelected')}
+            </Button>
+          </Box>
         </Box>
-        <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-          <Button onClick={handleShowBulkRemap} variant="secondary">
-            Bulk remap
-          </Button>
-          <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-            Set to none
-          </Button>
-          <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
-            Remove selected
-          </Button>
-        </Box>
-      </Box>
       )}
       <Box
         css={{
@@ -150,7 +153,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
           </Box>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
-            <Blankslate title={uiState.selectedLayers > 0 ? 'No tokens found' : 'No layers selected'} text={uiState.selectedLayers > 0 ? 'None of the selected layers contain any tokens' : 'Select a layer to see applied tokens'} />
+            <Blankslate title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} text={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
             )}

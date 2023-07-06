@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../Modal';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
@@ -16,6 +17,7 @@ type Props = {
 export default function EditStorageItemModal({
   isOpen, initialValue, onClose, onSuccess,
 }: Props) {
+  const { t } = useTranslation(['storage']);
   const [formFields, setFormFields] = React.useState<StorageTypeFormValues<true>>(initialValue);
   const [hasErrored, setHasErrored] = React.useState(false);
   const { addNewProviderItem } = useRemoteTokens();
@@ -36,7 +38,7 @@ export default function EditStorageItemModal({
   }, [addNewProviderItem, onSuccess]);
 
   return (
-    <Modal title="Edit credentials" large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
+    <Modal title={t('editCredentials') as string} large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
         <StorageItemForm
           onChange={handleChange}

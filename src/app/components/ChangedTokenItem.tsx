@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Stack from './Stack';
 import Text from './Text';
 import { ImportToken } from '@/types/tokens';
@@ -9,6 +10,8 @@ export default function ChangedTokenItem({
 }: {
   token: ImportToken;
 }) {
+  const { t } = useTranslation(['general']);
+
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
       <Stack direction={token.importType === 'REMOVE' ? 'row' : 'column'} gap={1} justify="between" css={{ width: '100%' }}>
@@ -16,7 +19,7 @@ export default function ChangedTokenItem({
         {
           ((token.importType === 'UPDATE' && token.oldValue) || token.importType === 'NEW') && (
             <Stack direction="row" align="center" justify="between" gap={3}>
-              <Text size="small">Value</Text>
+              <Text size="small">t('value')</Text>
               <Stack direction="row" align="center" gap={1}>
                 {token.oldValue ? (
                   <StyledDiff size="small" type="danger">
@@ -32,7 +35,7 @@ export default function ChangedTokenItem({
         }
         {((token.importType === 'UPDATE' && token.oldDescription) || (token.importType === 'NEW' && token.description)) && (
         <Stack direction="row" align="start" justify="between" gap={1}>
-          <Text size="small">Description</Text>
+          <Text size="small">{t('description')}</Text>
           <Stack direction="column" align="end" gap={1}>
             {token.oldDescription ? (
               <StyledDiff size="small" type="danger">
@@ -48,7 +51,7 @@ export default function ChangedTokenItem({
         {
           token.importType === 'REMOVE' && (
             <StyledDiff size="small" type="danger">
-              Removed
+              {t('removed')}
             </StyledDiff>
           )
         }

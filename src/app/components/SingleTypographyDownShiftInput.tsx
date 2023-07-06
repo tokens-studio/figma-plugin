@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
@@ -26,6 +27,8 @@ export default function SingleTypographyDownShiftInput({
 
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
 
+  const { t } = useTranslation(['tokens']);
+
   return (
     <DownshiftInput
       name={name}
@@ -37,7 +40,7 @@ export default function SingleTypographyDownShiftInput({
       externalFontFamily={externalFontFamily}
       handleChange={handleChange}
       setInputValue={handleBoxshadowDownShiftInputChange}
-      placeholder={`${name} value or {alias}`}
+      placeholder={`${name} ${t('valueOrAlias')}`}
       suffix
       onSubmit={onSubmit}
     />

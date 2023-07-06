@@ -1,0 +1,16 @@
+{
+    "intro": "Tokens Studio for Figma vous permet d'utiliser des jetons de conception dans Figma et de les synchroniser avec une source de vérité externe, par exemple GitHub.",
+    "gettingStarted": "Commencer",
+    "documentation": "Documentation",
+    "joinSlack": "Rejoignez notre Slack",
+    "loadExample": "Charger l'exemple",
+    "foundIssue": "Vous avez trouvé un problème ? Nous sommes sur GitHub !",
+    "newEmptyFile": "Nouveau fichier vide",
+    "version": "Version",
+    "guides": "Guides",
+    "couldNotLoadTokens": "Impossible de charger les jetons stockés sur {{provider}}",
+    "cancel": "Annuler",
+    "loadingWait": "Chargement, veuillez patienter",
+    "enterCredentials": "Entrez les informations d'identification",
+    "unableToFetchRemote": "Impossible de récupérer les jetons du stockage distant, si vous n'avez pas encore ajouté d'informations d'identification, ajoutez-les à l'étape suivante. Sinon, assurez-vous que le fichier existe et que vous y avez accès."
+}

@@ -57,3 +57,4 @@ export * from './aliasBaseFontSizeSelector';
 export * from './figmaFontsSelector';
 export * from './changedStateSelector';
 export * from './remoteDataSelector';
+export * from './languageSelector';

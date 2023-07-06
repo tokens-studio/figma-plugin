@@ -40,7 +40,7 @@ describe('TokenSetItem', () => {
     />);
 
     await fireEvent.contextMenu(getByText('light'));
-    await fireEvent.click(getByText('Rename'));
+    await fireEvent.click(getByText('rename'));
     expect(mockOnRename).toBeCalled();
   });
 
@@ -67,7 +67,7 @@ describe('TokenSetItem', () => {
     />);
 
     await fireEvent.contextMenu(getByText('light'));
-    await fireEvent.click(getByText('Delete'));
+    await fireEvent.click(getByText('delete'));
     expect(mockOnDelete).toBeCalled();
   });
 
@@ -106,7 +106,7 @@ describe('TokenSetItem', () => {
     );
 
     await fireEvent.contextMenu(getByText('light'));
-    await fireEvent.click(getByText('Duplicate'));
+    await fireEvent.click(getByText('duplicate'));
     expect(mockOnDuplicate).toBeCalled();
   });
 });

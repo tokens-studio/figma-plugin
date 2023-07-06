@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import Checkbox from '../Checkbox';
 import Box from '../Box';
 import {
@@ -92,14 +93,16 @@ export function TokenSetItem({
     [item, onDragStart],
   );
 
+  const { t } = useTranslation(['tokens']);
+
   const getCheckboxTooltip = useCallback(() => {
     if (tokenSetStatus === TokenSetStatus.SOURCE) {
-      return 'Source: This set acts as a source for other sets';
+      return t('sets.sourceDescription') as string;
     }
     if (isChecked) {
-      return 'Active: This set is included in styles and tokens';
+      return t('sets.activeDescription') as string;
     }
-    return 'Inactive: Activate to include for styles or tokens';
+    return t('sets.inactiveDescription') as string;
   }, [isChecked, tokenSetStatus]);
 
   const renderIcon = useCallback(
@@ -158,14 +161,14 @@ export function TokenSetItem({
           </ContextMenuTrigger>
         )}
         <ContextMenuContent>
-          {canEdit && <ContextMenuItem onSelect={handleRename}>Rename</ContextMenuItem>}
+          {canEdit && <ContextMenuItem onSelect={handleRename}>{t('rename')}</ContextMenuItem>}
           {item.isLeaf && (
             <>
               {canEdit && (
                 <>
-                  <ContextMenuItem onSelect={handleDuplicate}>Duplicate</ContextMenuItem>
+                  <ContextMenuItem onSelect={handleDuplicate}>{t('duplicate')}</ContextMenuItem>
                   <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
-                    Delete
+                    {t('delete')}
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                 </>
@@ -177,7 +180,7 @@ export function TokenSetItem({
                 <ContextMenuItemIndicator>
                   <CheckIcon />
                 </ContextMenuItemIndicator>
-                Treat as source
+                {t('sets.treatAsSource')}
               </ContextMenuCheckboxItem>
             </>
           )}

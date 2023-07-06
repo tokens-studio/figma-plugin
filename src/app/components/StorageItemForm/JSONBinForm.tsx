@@ -1,5 +1,6 @@
 import React from 'react';
 import zod from 'zod';
+import { useTranslation } from 'react-i18next';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Button from '../Button';
 import Input from '../Input';
@@ -47,6 +48,8 @@ export default function JSONBinForm({
     }
   }, [values, onSubmit]);
 
+  const { t } = useTranslation(['storage']);
+
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
@@ -79,11 +82,11 @@ export default function JSONBinForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save credentials
+            {t('saveCredentials')}
           </Button>
         </Stack>
         {hasErrored && (

@@ -1,0 +1,20 @@
+{
+    "override": "Cela remplacera vos jetons actuels. Assurez-vous de copier vos modifications si vous souhaitez les conserver.",
+    "cancel": "Annuler",
+    "pullTokens": "Tirer des jetons",
+    "pullFrom": "Tirer de {{provider}}",
+    "pushTo": "Appuyez sur {{provider}}",
+    "goTo": "Aller à {{provider}}",
+    "thisWillPushYourLocalChangesToTheBranch": "Cela poussera vos modifications locales vers la branche :",
+    "commit": "Commettre",
+    "diff": "Différence",
+    "pushChanges": "Pousser les changements",
+    "pushingTo": "Poussant à",
+    "changesPushedTo": "Changements poussés à",
+    "createPullRequest": "Créer une demande d'extraction",
+    "openSupernovaWorkspace": "Ouvrir l'espace de travail Supernova",
+    "pushYourLocalChangesToYourSupernovaIoDesignSystem": "Poussez vos modifications locales vers votre système de conception Supernova.io.",
+    "designSystem": "Système de conception",
+    "pushYourLocalChangesToYourRepository": "Poussez vos modifications locales vers votre référentiel.",
+    "commitMessage": "Message de validation"
+}
