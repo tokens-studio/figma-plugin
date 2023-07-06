@@ -11,11 +11,11 @@ const StyledLink = styled('a', {
 });
 
 export function ErrorFallback({ error }: { error: Error }) {
-  // const { t } = useTranslation(["errors"]);
+  const { t } = useTranslation(['errors']);
 
   return (
     <Stack direction="column" align="center" gap={4} justify="center" css={{ padding: '$4', height: '100%', textAlign: 'center' }}>
-      {/* <Heading>{t('wentWrong')}</Heading>
+      <Heading>{t('wentWrong')}</Heading>
       <Stack direction="column" gap={3}>
         <Text size="xsmall" muted>{error.message}</Text>
         <Text size="xsmall" muted>{t('restart')}</Text>
@@ -25,7 +25,7 @@ export function ErrorFallback({ error }: { error: Error }) {
           <StyledLink href="https://docs.tokens.studio/reset-tokens" target="_blank" rel="noreferrer">{t('readHow')}</StyledLink>
         </Text>
 
-      </Stack> */}
+      </Stack>
     </Stack>
   );
 }
