@@ -11,24 +11,12 @@ import zhTranslations from './lang/zh';
 export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'];
 
 export const resources = {
-  en: {
-    ...enTranslations,
-  },
-  fr: {
-    ...frTranslations,
-  },
-  es: {
-    ...esTranslations,
-  },
-  hi: {
-    ...hiTranslations,
-  },
-  nl: {
-    ...nlTranslations,
-  },
-  zh: {
-    ...zhTranslations,
-  },
+  en: enTranslations,
+  fr: frTranslations,
+  es: esTranslations,
+  hi: hiTranslations,
+  nl: nlTranslations,
+  zh: zhTranslations,
 };
 
 /**

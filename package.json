@@ -19,6 +19,7 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist",
+    "changeset": "changeset",
     "translate": "node  ./scripts/translate.mjs",
     "lint": "eslint . --quiet --fix",
     "storybook": "start-storybook -p 6006",

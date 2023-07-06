@@ -3,6 +3,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { generateTokensToCreate } from '../generateTokensToCreate';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getAttachedVariable } from '@/utils/getAttachedVariable';
+import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
 export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME] = async (msg) => {
   const {
@@ -13,23 +14,31 @@ export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessa
   const mode = collection?.modes.find((m) => m.name === theme.name);
   if (collection && mode) {
     const collectionVariableIds: Record<string, string> = {};
-    const tokensToCreateVariablesFor = generateTokensToCreate(theme, tokens, [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING, TokenTypes.BOOLEAN, TokenTypes.COLOR]);
+    const tokensToCreateVariablesFor = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
     tokensToCreateVariablesFor.forEach((token) => {
-      if (token.type === TokenTypes.COLOR) {
-        const variable = getAttachedVariable(collection.id, 'COLOR', token.name);
-        if (variable) {
-          collectionVariableIds[token.name] = variable.id;
-        }
-      } else if (token.type === TokenTypes.BOOLEAN) {
-        const variable = getAttachedVariable(collection.id, 'BOOLEAN', token.name);
-        if (variable) {
-          collectionVariableIds[token.name] = variable.id;
-        }
-      } else if ([TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING, TokenTypes.SIZING].includes(token.type)) {
-        const variable = getAttachedVariable(collection.id, 'FLOAT', token.name);
-        if (variable) {
-          collectionVariableIds[token.name] = variable.id;
-        }
+      let variable: Variable | undefined;
+      switch (token.type) {
+        case TokenTypes.COLOR:
+          variable = getAttachedVariable(collection.id, 'COLOR', token.name);
+          break;
+        case TokenTypes.BOOLEAN:
+          variable = getAttachedVariable(collection.id, 'BOOLEAN', token.name);
+          break;
+        case TokenTypes.TEXT:
+          variable = getAttachedVariable(collection.id, 'STRING', token.name);
+          break;
+        case TokenTypes.SIZING:
+        case TokenTypes.DIMENSION:
+        case TokenTypes.BORDER_RADIUS:
+        case TokenTypes.BORDER_WIDTH:
+        case TokenTypes.SPACING:
+        case TokenTypes.NUMBER:
+          variable = getAttachedVariable(collection.id, 'FLOAT', token.name);
+          break;
+        default: break;
+      }
+      if (variable) {
+        collectionVariableIds[token.name] = variable.key;
       }
     });
     return {
