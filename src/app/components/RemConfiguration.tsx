@@ -19,6 +19,7 @@ const RemConfiguration = () => {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation(['tokens']);
 
   const resolvedTokens = React.useMemo(() => (
     resolveTokenValues(mergeTokenGroups(tokens, {
@@ -42,8 +43,6 @@ const RemConfiguration = () => {
       dispatch.settings.setBaseFontSize(String(resolvedValue));
     }
   }, [dispatch.settings, resolvedTokens]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Box css={{ maxWidth: '300px' }}>

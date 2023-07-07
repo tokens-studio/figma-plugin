@@ -52,6 +52,7 @@ export default function ColorTokenForm({
   onSubmit: () => void
 }) {
   const seed = useUIDSeed();
+  const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
@@ -209,8 +210,6 @@ export default function ColorTokenForm({
   }, [internalEditToken, handleModifyChange]);
 
   const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || `${t('tokens.amount')}`), [internalEditToken]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <>

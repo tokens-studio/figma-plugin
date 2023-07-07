@@ -46,6 +46,7 @@ export default function SingleCompositionTokenForm({
   const [menuOpened, setMenuOpened] = useState(false);
   const propertyType = useTypeForProperty(property);
   const seed = useUIDSeed();
+  const { t } = useTranslation(['tokens']);
 
   const onPropertySelected = useCallback((newProperty: string) => {
     // keep the order of the properties when select new property
@@ -84,8 +85,6 @@ export default function SingleCompositionTokenForm({
   const handleRemove = useCallback(() => {
     onRemove(property);
   }, [onRemove, property]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Box css={{

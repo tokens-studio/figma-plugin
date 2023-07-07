@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
@@ -26,7 +25,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
     });
   } catch (err) {
-    notifyUI("There was an issue saving your credentials. Please try again.");
+    notifyUI('There was an issue saving your credentials. Please try again.');
   }
 }
 
@@ -91,7 +90,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     }
   } catch (err) {
     console.error(err);
-    notifyUI("There was an issue saving your credentials. Please try again.");
+    notifyUI('There was an issue saving your credentials. Please try again.');
   }
   return settings;
 }

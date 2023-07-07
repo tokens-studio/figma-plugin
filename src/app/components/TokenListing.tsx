@@ -2,7 +2,6 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
-import { useTranslation } from 'react-i18next';
 import { DeepKeyTokenMap, EditTokenObject, TokenTypeSchema } from '@/types/tokens';
 import TokenGroup from './TokenGroup/TokenGroup';
 import { Dispatch } from '../store';
@@ -45,8 +44,6 @@ const TokenListing: React.FC<Props> = ({
     },
     [schema, dispatch],
   );
-
-  const { t } = useTranslation(['tokens']);
 
   const showNewForm = React.useCallback(
     ({ name = '' }: ShowNewFormOptions) => {

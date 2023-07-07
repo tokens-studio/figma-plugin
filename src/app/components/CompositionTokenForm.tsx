@@ -31,6 +31,7 @@ export default function CompositionTokenForm({
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
   const [error, setError] = React.useState(false);
+  const { t } = useTranslation(['tokens']);
 
   const propertiesMenu = React.useMemo(() => (
     filterValidCompositionTokenTypes(Object.keys(Properties)).map((key: string) => (
@@ -84,12 +85,10 @@ export default function CompositionTokenForm({
     setTokenValue(rearrangedTokenValue as NodeTokenRefMap);
   }, [internalEditToken, setTokenValue]);
 
-  const { t } = useTranslation(['tokens']);
-
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Heading size="small">t('tokens')</Heading>
+        <Heading size="small">{t('tokens')}</Heading>
         <IconButton
           tooltip={error ? t('chooseAPropertyFirst') : t('addAnotherStyle')}
           dataCy="button-style-add-multiple"

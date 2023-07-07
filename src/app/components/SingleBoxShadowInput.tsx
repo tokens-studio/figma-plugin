@@ -64,7 +64,7 @@ export default function SingleBoxShadowInput({
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
-
+  const { t } = useTranslation(['tokens']);
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
   const onChange = React.useCallback((property: string, newValue: string) => {
@@ -196,8 +196,6 @@ export default function SingleBoxShadowInput({
   });
 
   drag(drop(ref));
-
-  const { t } = useTranslation(['tokens']);
 
   // TODO: i18n: remove isMultiple logic? - doesn't seem to need a translaton
 

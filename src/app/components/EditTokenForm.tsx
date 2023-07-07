@@ -47,6 +47,7 @@ type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean 
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
+  const { t } = useTranslation(['tokens', 'errors']);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
   const editToken = useSelector(editTokenSelector);
@@ -68,8 +69,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     return true;
   }, [internalEditToken]);
-
-  const { t } = useTranslation(['tokens', 'errors']);
 
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
