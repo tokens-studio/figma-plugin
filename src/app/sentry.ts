@@ -28,15 +28,15 @@ export const setupReplay = () => {
 
 export const initializeSentry = () => {
   switch (process.env.ENVIRONMENT) {
-    case 'production':
+    case 'alpha':
     case 'beta':
+    case 'production':
       Sentry.addTracingExtensions();
       Sentry.init({
         dsn: DSN,
         release: `figma-tokens@${pjs.version}`,
         environment: process.env.ENVIRONMENT,
         tracesSampleRate: SAMPLING,
-        // @ts-expect-error  This is correct, but the types are wrong as of the current version. It states this property does not exist despite it working correctly
         profilesSampleRate: PROFILE_RATE,
         replaysSessionSampleRate: REPLAY_RATE,
         // We always want to replay errors

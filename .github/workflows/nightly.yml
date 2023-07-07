@@ -1,0 +1,103 @@
+name: Nightly beta release 
+on:
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+
+
+# Needed permissions for changesets
+permissions:
+    contents: read
+    id-token: write
+
+
+jobs:
+  # install dependencies and store artifact
+  release:
+    name: Prepare figma plugin
+    environment:
+        name: beta
+    runs-on: ubuntu-latest
+    steps:
+      # 1: Setup node
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      #  Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      # Pull secrets from vault
+      - name: Import Secrets
+        id: secrets
+        uses: hashicorp/vault-action@v2
+        with:
+          url: ${{ vars.VAULT_URL }}
+          role: ${{ vars.VAULT_ROLE }}_beta
+          method: jwt
+          namespace: admin
+          secrets: |
+            ${{ vars.VAULT_PATH }} MIXPANEL_ACCESS_TOKEN | MIXPANEL_ACCESS_TOKEN;
+            ${{ vars.VAULT_PATH }} STORYBLOK_ACCESS_TOKEN | STORYBLOK_ACCESS_TOKEN;
+            ${{ vars.VAULT_PATH }} SUPABASE_ANON_KEY | SUPABASE_ANON_KEY;
+            ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;            
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.cache-name }}-
+      # Install dependencies
+      - name: Install dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
+      # Generate the expected env file
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: .env.production
+          envkey_ENVIRONMENT: beta
+          envkey_LICENSE_API_URL: ${{ vars.LICENSE_API_URL }}
+          envkey_SECOND_SCREEN_APP_URL: ${{ vars.SECOND_SCREEN_APP_URL }}
+          envkey_LAUNCHDARKLY_SDK_CLIENT: ${{ steps.secrets.outputs.LAUNCHDARKLY_SDK_CLIENT }} 
+          envkey_TOKEN_FLOW_APP_URL: ${{ vars.TOKEN_FLOW_APP_URL }}
+          envkey_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          envkey_SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          envkey_SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+          envkey_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          envkey_MIXPANEL_ACCESS_TOKEN: ${{ steps.secrets.outputs.MIXPANEL_ACCESS_TOKEN }} 
+          envkey_STORYBLOK_ACCESS_TOKEN: ${{ steps.secrets.outputs.STORYBLOK_ACCESS_TOKEN }} 
+          envkey_SUPABASE_ANON_KEY: ${{ steps.secrets.outputs.SUPABASE_ANON_KEY }} 
+          envkey_SENTRY_AUTH_TOKEN: ${{ steps.secrets.outputs.SENTRY_AUTH_TOKEN }}
+ 
+      # Build the figma plugin package
+      - name: Build Package
+        run: npm run build
+
+      # Create the bundle for Figma
+      - name: Bundle 
+        run: npm run bundle
+      # Generate the release automatically in Github. This should not result in a publish to npm
+      # We should disable this if doing beta releases   
+      # Store artifact for later use
+      - uses: rickstaa/action-create-tag@v1
+        id: "tag_create"
+        with:
+          tag: "beta"
+          tag_exists_error: false
+          force_push_tag: true
+          message: "Nightly beta"
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/bundle.zip"
+          name: Nightly beta
+          prerelease: true
+          tag: "beta"
+          replacesArtifacts: true
+          body: |
+            The nightly release of the beta plugin. 

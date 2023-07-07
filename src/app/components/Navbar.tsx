@@ -14,6 +14,8 @@ import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 
 const Navbar: React.FC = () => {
   const activeTab = useSelector(activeTabSelector);
@@ -21,6 +23,8 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
   const { t } = useTranslation(['navbar']);
+  const existingKey = useSelector(licenseKeySelector);
+  const licenseKeyError = useSelector(licenseKeyErrorSelector);
 
   const handleSwitch = useCallback(
     (tab: Tabs) => {
@@ -52,7 +56,7 @@ const Navbar: React.FC = () => {
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        <TabButton endEnhancer={<Box css={{ color: secondScreenisEnabled ? '$fgSuccess' : '$dangerFg' }}>{secondScreenisEnabled ? <Link1Icon /> : <LinkBreak1Icon />}</Box>} name={Tabs.SECONDSCREEN} activeTab={activeTab} label={t('secondScreen')} onSwitch={handleSwitch} />
+        { (existingKey && !licenseKeyError) && <TabButton endEnhancer={<Box css={{ color: secondScreenisEnabled ? '$fgSuccess' : '$dangerFg' }}>{secondScreenisEnabled ? <Link1Icon /> : <LinkBreak1Icon />}</Box>} name={Tabs.SECONDSCREEN} activeTab={activeTab} label={t('secondScreen')} onSwitch={handleSwitch} />}
         <TokenFlowButton />
         <IconButton size="large" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
