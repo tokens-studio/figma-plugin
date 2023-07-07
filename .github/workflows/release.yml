@@ -76,7 +76,7 @@ jobs:
           envkey_ENVIRONMENT: ${{ inputs.environment }}
           envkey_LICENSE_API_URL: ${{ vars.LICENSE_API_URL }}
           envkey_SECOND_SCREEN_APP_URL: ${{ vars.SECOND_SCREEN_APP_URL }}
-          envkey_LAUNCHDARKLY_SDK_CLIENT: ${{ steps.secrets.outputs.LAUNCHDARKLY_SDK_CLIENT }} 
+          envkey_LAUNCHDARKLY_SDK_CLIENT: ${{ vars.LAUNCHDARKLY_SDK_CLIENT }} 
           envkey_TOKEN_FLOW_APP_URL: ${{ vars.TOKEN_FLOW_APP_URL }}
           envkey_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
           envkey_SENTRY_ORG: ${{ vars.SENTRY_ORG }}
