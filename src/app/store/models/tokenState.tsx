@@ -35,7 +35,7 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
-import { RenameTokensAcrossSets } from '@/types/payloads/RenameTokensAcrossSets';
+import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -479,7 +479,7 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       remoteData: data,
     }),
-    renameTokenAcrossSets: (state, data: RenameTokensAcrossSets) => {
+    renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
       const {
         oldName, newName, type, tokenSets,
       } = data;

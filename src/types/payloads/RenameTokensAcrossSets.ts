@@ -1,4 +1,4 @@
-export type RenameTokensAcrossSets = {
+export type RenameTokensAcrossSetsPayload = {
   oldName: string;
   newName: string;
   type: string;
