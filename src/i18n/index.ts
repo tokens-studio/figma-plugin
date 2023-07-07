@@ -8,7 +8,7 @@ import hiTranslations from './lang/hi';
 import nlTranslations from './lang/nl';
 import zhTranslations from './lang/zh';
 
-export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onboarding', 'settings', 'storage', 'sync', 'tokens'];
+export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onBoarding', 'settings', 'storage', 'sync', 'tokens'];
 
 export const resources = {
   en: enTranslations,

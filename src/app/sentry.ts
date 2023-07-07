@@ -28,8 +28,9 @@ export const setupReplay = () => {
 
 export const initializeSentry = () => {
   switch (process.env.ENVIRONMENT) {
-    case 'production':
+    case 'alpha':
     case 'beta':
+    case 'production':
       Sentry.addTracingExtensions();
       Sentry.init({
         dsn: DSN,

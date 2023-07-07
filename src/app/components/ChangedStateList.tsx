@@ -88,7 +88,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                 css={{ padding: '$1 $4' }}
               >
                 <StyledDiff size="small" type="danger">
-                  t('configurationChanged')
+                  {t('configurationChanged')}
                 </StyledDiff>
               </Stack>
             )}

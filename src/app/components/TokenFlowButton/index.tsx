@@ -12,6 +12,8 @@ import {
   tokensSelector,
 } from '@/selectors';
 import { track } from '@/utils/analytics';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 
 export default function TokenFlowButton() {
   const activeTheme = useSelector(activeThemeSelector);
@@ -19,6 +21,8 @@ export default function TokenFlowButton() {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const themeObjects = useSelector(themeObjectsSelector);
   const tokens = useSelector(tokensSelector);
+  const existingKey = useSelector(licenseKeySelector);
+  const licenseKeyError = useSelector(licenseKeyErrorSelector);
 
   const [loading, setLoading] = useState(false);
 
@@ -42,13 +46,16 @@ export default function TokenFlowButton() {
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
   return (
-    <IconButton
-      size="large"
-      tooltip="Open visualization flow"
-      dataCy="token-flow-button"
-      loading={loading}
-      onClick={handleOpenTokenFlowApp}
-      icon={<LightningBoltIcon />}
-    />
+    (existingKey && !licenseKeyError)
+      ? (
+        <IconButton
+          size="large"
+          tooltip="Open visualization flow"
+          dataCy="token-flow-button"
+          loading={loading}
+          onClick={handleOpenTokenFlowApp}
+          icon={<LightningBoltIcon />}
+        />
+      ) : null
   );
 }

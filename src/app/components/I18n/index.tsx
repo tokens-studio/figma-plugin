@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import { Trans } from 'react-i18next';
 import { Dispatch } from '@/app/store';
 
 import {

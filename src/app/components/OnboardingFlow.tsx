@@ -38,30 +38,30 @@ function fetchOnboardingImage(idx: number) {
 }
 
 export default function OnboardingFlow() {
-  const { t } = useTranslation(['onboarding']);
+  const { t } = useTranslation(['onBoarding']);
   const onboardingflow = [
     {
-      title: t('welcome'),
-      excerpt: t('welcomeText'),
+      title: 'welcome',
+      excerpt: 'welcomeText',
     },
     {
-      title: t('createTokens'),
-      excerpt: t('createTokensText'),
+      title: 'createTokens',
+      excerpt: 'createTokensText',
       read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
     },
     {
-      title: t('reference'),
-      excerpt: t('referenceText'),
+      title: 'reference',
+      excerpt: 'referenceText',
       read_more_link: 'https://docs.tokens.studio/tokens/aliases',
     },
     {
-      title: t('apply'),
-      excerpt: t('applyText'),
+      title: 'apply',
+      excerpt: 'applyText',
       read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
     },
     {
-      title: t('knowMore'),
-      excerpt: t('knowMoreText'),
+      title: 'knowMore',
+      excerpt: 'knowMoreText',
       read_more_link: 'https://docs.tokens.studio',
     },
   ];
@@ -96,8 +96,8 @@ export default function OnboardingFlow() {
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
             <StyledImage src={fetchOnboardingImage(index)} alt="" />
-            <Heading size="medium">{item.title}</Heading>
-            <Text size="small">{item.excerpt}</Text>
+            <Heading size="medium">{t(item.title)}</Heading>
+            <Text size="small">{t(item.excerpt)}</Text>
             {item.read_more_link && (
               <StyledLink
                 target="_blank"

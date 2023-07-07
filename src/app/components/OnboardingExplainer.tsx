@@ -51,7 +51,7 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
         {data.text}
       </StyledTextPlan>
       <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
-        {t('general.readMore')}
+        {t('readMore')}
       </StyledReadMoreLink>
     </Box>
   );
