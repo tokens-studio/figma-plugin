@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
 import Button from './Button';

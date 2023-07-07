@@ -31,6 +31,7 @@ function PushDialog() {
   const {
     onConfirm, onCancel, showPushDialog,
   } = usePushDialog();
+  const { t } = useTranslation(['sync']);
   const localApiState = useSelector(localApiStateSelector);
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
@@ -125,8 +126,6 @@ function PushDialog() {
   const handleSwitch = React.useCallback((tab: string) => {
     setActiveTab(tab);
   }, []);
-
-  const { t } = useTranslation(['sync']);
 
   switch (showPushDialog) {
     case 'initial': {

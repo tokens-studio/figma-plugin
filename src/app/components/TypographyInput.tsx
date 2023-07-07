@@ -34,6 +34,7 @@ export default function TypographyInput({
   setTypographyValue: (newTypographyValue: SingleTypographyToken['value']) => void;
   onSubmit: () => void
 }) {
+  const { t } = useTranslation(['tokens']);
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
@@ -62,8 +63,6 @@ export default function TypographyInput({
     setMode((mode === 'input') ? 'alias' : 'input');
     setAlias('');
   }, [mode, selectedToken, internalEditToken, setTypographyValue]);
-
-  const { t } = useTranslation(['tokens']);
 
   const properties = {
     fontFamily: t('font.fontFamily'),

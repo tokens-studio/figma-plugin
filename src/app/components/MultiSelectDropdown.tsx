@@ -25,6 +25,7 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
 }) => {
   const seed = useUIDSeed();
 
+  const { t } = useTranslation(['tokens']);
   const selectedItemsString = React.useMemo(() => selectedItems.join(','), [selectedItems]);
 
   const handleSelectedItem = React.useCallback((selectedItem: string) => {
@@ -36,8 +37,6 @@ export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
       handleSelectedItemChange(newSelectedItems);
     }
   }, [selectedItems, handleSelectedItemChange]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <DropdownMenu>

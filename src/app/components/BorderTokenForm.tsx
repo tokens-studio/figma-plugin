@@ -43,6 +43,7 @@ export default function BorderTokenForm({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
+  const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = useState<boolean>(false);
 
   const selectedToken = React.useMemo(() => {
@@ -64,8 +65,6 @@ export default function BorderTokenForm({
     setMode(changeMode);
     setAlias('');
   }, [mode]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="column" gap={2}>

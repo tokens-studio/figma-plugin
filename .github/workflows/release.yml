@@ -45,7 +45,7 @@ jobs:
         uses: hashicorp/vault-action@v2
         with:
           url: ${{ vars.VAULT_URL }}
-          role: ${{ vars.VAULT_ROLE }}
+          role: ${{ vars.VAULT_ROLE }}_${{ inputs.environment  }}
           method: jwt
           namespace: admin
           secrets: |

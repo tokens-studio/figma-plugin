@@ -31,7 +31,6 @@ export default function AddLicenseKey() {
   const { confirm } = useConfirm();
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
-
   const { t } = useTranslation(['licence']);
 
   const addKey = useCallback(async () => {

@@ -27,6 +27,7 @@ type Props = {
 export default function JSONBinForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
+  const { t } = useTranslation(['storage']);
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -47,8 +48,6 @@ export default function JSONBinForm({
       onSubmit(formFields);
     }
   }, [values, onSubmit]);
-
-  const { t } = useTranslation(['storage']);
 
   return (
     <form onSubmit={handleSubmit}>

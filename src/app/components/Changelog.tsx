@@ -22,6 +22,7 @@ const StyledImage = styled('img', {
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
   const changelog = useSelector(changelogSelector);
+  const { t } = useTranslation(['general']);
 
   const [activeIndex, setIndex] = React.useState(0);
 
@@ -36,8 +37,6 @@ export default function Changelog() {
   const handleClose = React.useCallback(() => {
     setChangelogOpen(false);
   }, []);
-
-  const { t } = useTranslation(['general']);
 
   return (
     <Modal title={t('changelog')} showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>

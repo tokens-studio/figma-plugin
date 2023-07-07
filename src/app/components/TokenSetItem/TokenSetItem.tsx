@@ -61,6 +61,7 @@ export function TokenSetItem({
 }: TokenSetItemProps) {
   const statusSelector = useCallback((state: RootState) => tokenSetStatusSelector(state, item.path), [item]);
   const tokenSetStatus = useSelector(statusSelector);
+  const { t } = useTranslation(['tokens']);
 
   const handleClick = useCallback(() => {
     onClick(item);
@@ -92,8 +93,6 @@ export function TokenSetItem({
     },
     [item, onDragStart],
   );
-
-  const { t } = useTranslation(['tokens']);
 
   const getCheckboxTooltip = useCallback(() => {
     if (tokenSetStatus === TokenSetStatus.SOURCE) {

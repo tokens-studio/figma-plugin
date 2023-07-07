@@ -9,6 +9,7 @@ import { StyledDiff } from './StyledDiff';
 
 function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsed, setCollapsed] = React.useState(false);
+  const { t } = useTranslation(['tokens']);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
@@ -26,8 +27,6 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
       setCollapsedChangedStateList([...collapsedChangedStateList, tokenSet]);
     }
   }, [collapsedChangedStateList, changedState.tokens, collapsed]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="column" gap={1}>

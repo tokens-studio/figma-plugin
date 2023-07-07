@@ -28,6 +28,7 @@ export type Props = {
 export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
+  const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
@@ -76,7 +77,6 @@ export function TokenGroupHeading({
 
   const handleShowNewForm = useCallback(() => showNewForm({ name: `${path}.` }), [path, showNewForm]);
 
-  const { t } = useTranslation(['tokens']);
   return (
     <StyledTokenGroupHeading>
       <StyledTokenGroupHeadingCollapsable

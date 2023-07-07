@@ -23,7 +23,7 @@ const StyledCode = styled('code', {
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
   const uiState = useSelector(uiStateSelector, isEqual);
   const { getTokenValue } = useTokens();
-
+  const { t } = useTranslation(['inspect']);
   const getResolvedValue = useCallback((property: string, value: string) => {
     const resolvedToken = getTokenValue(value, resolvedTokens);
     if (resolvedToken) return JSON.stringify(resolvedToken);
@@ -38,8 +38,6 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
     }
     return undefined;
   }, [getTokenValue, resolvedTokens, uiState.selectionValues]);
-
-  const { t } = useTranslation(['inspect']);
 
   function renderBlankslate() {
     if (uiState.selectedLayers > 1) return <Blankslate title={t('moreThan1Layer.title')} text={t('moreThan1Layer.description')} />;

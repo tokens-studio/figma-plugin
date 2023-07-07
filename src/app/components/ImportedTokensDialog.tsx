@@ -26,6 +26,7 @@ function NewOrExistingToken({
   removeToken: (token: ImportToken) => void;
   updateToken: (token: ImportToken) => void;
 }) {
+  const { t } = useTranslation(['tokens']);
   const onRemoveToken = React.useCallback(() => {
     removeToken(token);
   }, [removeToken, token]);
@@ -33,8 +34,6 @@ function NewOrExistingToken({
   const onUpdateToken = React.useCallback(() => {
     updateToken(token);
   }, [updateToken, token]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
