@@ -102,7 +102,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
       if (curr.isLeaf && typeof curr.value === 'object') {
         acc.push({
           ...curr.value,
-          group: currentGroup,
+          ...(currentGroup === INTERNAL_THEMES_NO_GROUP ? {} : { group: currentGroup }),
         });
       }
       return acc;
