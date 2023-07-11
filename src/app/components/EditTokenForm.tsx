@@ -38,6 +38,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
+import { ModalOptions } from '@/constants/ModalOptions';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -361,7 +362,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           }
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
             choices.push({
-              key: 'rename-variable', label: 'Rename variable',
+              key: ModalOptions.RENAME_VARIABLE, label: 'Rename variable',
             });
           }
           const tokenSetsContainsSameToken: string[] = [];
@@ -372,7 +373,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           });
           if (tokenSetsContainsSameToken.length > 1) {
             choices.push({
-              key: 'rename-across-sets', label: 'Rename in other sets',
+              key: ModalOptions.RENAME_ACROSS_SETS, label: 'Rename in other sets',
             });
           }
           const confirmData = await confirm({
@@ -385,13 +386,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
               remapToken(oldName, newName, confirmData.data[0]);
               dispatch.settings.setUpdateMode(confirmData.data[0]);
             }
-            if (confirmData.data.includes('rename-across-sets')) {
+            if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
               renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
             }
-            if (confirmData.data.includes('rename-variable')) {
+            if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {
               renameVariablesFromToken({ oldName, newName });
             }
           }

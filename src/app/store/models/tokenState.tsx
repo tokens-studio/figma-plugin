@@ -576,7 +576,13 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
+    renameTokenAcrossSets(data: RenameTokensAcrossSetsPayload) {
+      const {
+        oldName, newName,
+      } = data;
 
+      dispatch.tokenState.updateAliases({ oldName, newName });
+    },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
