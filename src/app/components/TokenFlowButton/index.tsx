@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { LightningBoltIcon } from '@radix-ui/react-icons';
+import FlowIcon from '@/icons/flow.svg';
 import IconButton from '../IconButton';
 
 import {
@@ -54,7 +54,7 @@ export default function TokenFlowButton() {
           dataCy="token-flow-button"
           loading={loading}
           onClick={handleOpenTokenFlowApp}
-          icon={<LightningBoltIcon />}
+          icon={<FlowIcon />}
         />
       ) : null
   );

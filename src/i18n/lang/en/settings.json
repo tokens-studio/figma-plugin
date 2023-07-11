@@ -29,5 +29,7 @@
   "connected": "Connected",
   "notConnected": "Not connected",
   "liveSyncWithSecondScreenActive": "Live sync with second screen active",
-  "liveSyncInactive": "Live sync inactive"
+  "liveSyncInactive": "Live sync inactive",
+  "language": "Language",
+  "languageExplainer": "Tokens Studio has been machine translated, therefore translations may appear inaccurate. \n Don't see your language? Submit a feature request"
 }
