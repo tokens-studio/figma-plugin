@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Modal from '../Modal';
 import Button from '../Button';
 import Stack from '../Stack';
@@ -24,6 +25,7 @@ export default function DuplicateTokenGroupModal({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const { duplicateGroup } = useManageTokens();
+  const { t } = useTranslation(['tokens']);
 
   const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
     setSelectedTokenSets(selectedItems);
@@ -39,7 +41,7 @@ export default function DuplicateTokenGroupModal({
 
   return (
     <Modal
-      title="Duplicate group"
+      title={t('duplicateGroup') as string}
       isOpen={isOpen}
       close={onClose}
       large
@@ -47,10 +49,10 @@ export default function DuplicateTokenGroupModal({
         <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" variant="primary">
-              Duplicate
+              {t('duplicate')}
             </Button>
           </Stack>
         </form>

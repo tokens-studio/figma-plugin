@@ -1,5 +1,6 @@
 import React from 'react';
 import zod from 'zod';
+import { useTranslation } from 'react-i18next';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Button from '../Button';
 import Input from '../Input';
@@ -26,6 +27,7 @@ type Props = {
 export default function JSONBinForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
+  const { t } = useTranslation(['storage']);
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -79,11 +81,11 @@ export default function JSONBinForm({
         />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save credentials
+            {t('saveCredentials')}
           </Button>
         </Stack>
         {hasErrored && (

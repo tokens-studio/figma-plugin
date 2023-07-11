@@ -47,7 +47,7 @@ export async function updateGenericVersionedTokens({
       metadata: {
         tokenSetOrder,
         updatedAt: updatedAt ?? new Date().toISOString(),
-        version: pjs.plugin_version,
+        version: pjs.version,
       },
     };
 

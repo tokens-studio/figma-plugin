@@ -1,14 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { styled } from '@/stitches.config';
-
-const mapTypeToPlaceHolder = {
-  color: 'Border color',
-  width: 'Border width',
-  style: 'solid | dashed',
-};
 
 const StyledButton = styled('button', {
   display: 'block',
@@ -39,6 +34,14 @@ export default function BorderTokenDownShiftInput({
 }) {
   const handleBorderDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
+
+  const { t } = useTranslation(['tokens']);
+  const mapTypeToPlaceHolder = {
+    color: t('forms.border.color'),
+    width: t('forms.border.width'),
+    style: 'solid | dashed',
+  };
+
   return (
     <DownshiftInput
       name={name}
@@ -49,7 +52,7 @@ export default function BorderTokenDownShiftInput({
       resolvedTokens={resolvedTokens}
       handleChange={handleChange}
       setInputValue={handleBorderDownShiftInputChange}
-      placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder]}
+      placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder] as unknown as string}
       prefix={
         name === 'color' && (
           <StyledButton

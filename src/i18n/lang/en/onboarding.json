@@ -1,0 +1,16 @@
+{
+  "close": "Close",
+  "previous": "Previous",
+  "next": "Next",
+  "readMore": "Read more",
+  "welcome": "Welcome!",
+  "welcomeText": "Hey there, awesome to have you with us. Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.",
+  "createTokens": "Create tokens",
+  "createTokensText": "Start by creating your tokens, a good place to start is your colors. You can even import your existing styles!",
+  "reference": "Reference token values",
+  "referenceText": "Use your token values inside other tokens by writing them inside curly brackets: {colors.red.500} — that way you are able to reuse your tokens.",
+  "apply": "Apply tokens to a layer",
+  "applyText": "Select a layer in Figma and left-click any token to apply that token on it. Depending on the type of token you clicked on, a different action is performed. Right-click tokens for a context menu to choose what you want to apply.",
+  "knowMore": "Want to know more?",
+  "knowMoreText": "Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know on Slack!"
+}

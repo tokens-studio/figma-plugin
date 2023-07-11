@@ -1,6 +1,5 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { decodeBase64 } from '@/utils/string/ui';
 import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
 import IsJSONString from '@/utils/isJSONString';
 import { AnyTokenSet } from '@/types/tokens';
@@ -162,8 +161,8 @@ export class GithubTokenStorage extends GitTokenStorage {
         ref: this.branch,
         headers: {
           ...octokitClientDefaultHeaders,
-          //Setting this makes github return the raw file instead of a json object.
-          'Accept': 'application/vnd.github.raw'
+          // Setting this makes github return the raw file instead of a json object.
+          Accept: 'application/vnd.github.raw',
         },
       });
 
@@ -189,10 +188,10 @@ export class GithubTokenStorage extends GitTokenStorage {
               repo: this.repository,
               path: treeItem.path.startsWith(normalizedPath) ? treeItem.path : `${normalizedPath}/${treeItem.path}`,
               ref: this.branch,
-              headers:  {
+              headers: {
                 ...octokitClientDefaultHeaders,
-                //Setting this makes github return the raw file instead of a json object.
-                'Accept': 'application/vnd.github.raw'
+                // Setting this makes github return the raw file instead of a json object.
+                Accept: 'application/vnd.github.raw',
               },
             }) : Promise.resolve(null)
           )));
@@ -269,7 +268,6 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       return [];
     } catch (e) {
-
       // Raise error (usually this is an auth error)
       console.error('Error', e);
       return [];

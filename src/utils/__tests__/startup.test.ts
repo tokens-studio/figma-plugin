@@ -20,6 +20,7 @@ describe('startup', () => {
       licenseKey: null,
       localTokenData: null,
       user: null,
+      usedEmail: null,
     });
   });
 
@@ -73,6 +74,7 @@ describe('startup', () => {
         },
       },
       user: null,
+      usedEmail: null,
     });
   });
 });

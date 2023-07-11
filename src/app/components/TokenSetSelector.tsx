@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
@@ -33,9 +34,11 @@ const StyledButton = styled('button', {
 });
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
+  const { t } = useTranslation(['tokens']);
+
   const onboardingData = {
-    title: 'Sets',
-    text: 'Sets allow you to split your tokens up into multiple files.\n\nYou can activate different sets to control theming.',
+    title: t('sets.title'),
+    text: t('sets.description'),
     url: 'https://docs.figmatokens.com/themes/token-sets?ref=onboarding_explainer_sets',
   };
 
@@ -75,13 +78,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     track('Deleted token set');
 
     const userConfirmation = await confirm({
-      text: `Delete token set "${tokenSet}"?`,
-      description: 'Are you sure you want to delete this set?',
+      text: t('sets.delete', { tokenSet }) as string,
+      description: t('sets.deleteConfirmation'),
     });
     if (userConfirmation) {
       dispatch.tokenState.deleteTokenSet(tokenSet);
     }
-  }, [confirm, dispatch]);
+  }, [confirm, dispatch, t]);
 
   const handleRenameTokenSet = React.useCallback((tokenSet: string) => {
     track('Renamed token set');
@@ -92,7 +95,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   }, []);
 
   const handleDuplicateTokenSet = React.useCallback((tokenSet: string) => {
-    const newTokenSetName = `${tokenSet}_Copy`;
+    const newTokenSetName = `${tokenSet}_${t('sets.duplicateSetSuffix')}`;
     handleNewTokenSetNameChange(newTokenSetName);
     setOldTokenSetName(tokenSet);
     setIsDuplicate(true);
@@ -165,7 +168,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         saveScrollPositionSet={saveScrollPositionSet}
       />
       <Modal
-        title={`${isDuplicate ? 'Duplicate' : 'Rename'} ${oldTokenSetName}`}
+        title={`${isDuplicate ? t('duplicate') : t('rename')} ${oldTokenSetName}`}
         isOpen={showRenameTokenSetFields}
         close={handleCloseRenameModal}
       >
@@ -183,11 +186,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             />
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
                 {
-                  isDuplicate ? 'Save' : 'Change'
+                  isDuplicate ? t('save') : t('change')
                 }
               </Button>
             </Stack>
@@ -195,7 +198,8 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
         </form>
       </Modal>
       <Modal
-        title="New set"
+        title={t('sets.new') as string}
+        data-testid="new-set-modal"
         isOpen={showNewTokenSetFields}
         close={handleCloseNewTokenSetModal}
       >
@@ -214,17 +218,17 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             />
             <Stack direction="row" gap={4}>
               <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
-                Create
+                {t('create')}
               </Button>
             </Stack>
           </Stack>
         </form>
       </Modal>
       <StyledButton data-cy="button-new-token-set" data-testid="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
-        New set
+        {t('sets.new')}
         <IconAdd />
       </StyledButton>
       {uiState.onboardingExplainerSets && (

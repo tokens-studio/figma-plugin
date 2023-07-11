@@ -18,7 +18,7 @@ describe('TokenGroupHeading', () => {
 
     await fireEvent.contextMenu(getByText('color'));
 
-    expect(getByText('Duplicate')).toBeInTheDocument();
+    expect(getByText('duplicate')).toBeInTheDocument();
   });
 
   it('should render rename token group modal', async () => {
@@ -31,7 +31,7 @@ describe('TokenGroupHeading', () => {
     />);
 
     await fireEvent.contextMenu(getByText('color'));
-    await fireEvent.click(getByText('Rename'));
+    await fireEvent.click(getByText('rename'));
 
     expect(getByText('Rename color.slate')).toBeInTheDocument();
   });
@@ -46,8 +46,8 @@ describe('TokenGroupHeading', () => {
     />);
 
     await fireEvent.contextMenu(getByText('color'));
-    await fireEvent.click(getByText('Duplicate'));
+    await fireEvent.click(getByText('duplicate'));
 
-    expect(getByText('Duplicate group')).toBeInTheDocument();
+    expect(getByText('duplicateGroup')).toBeInTheDocument();
   });
 });

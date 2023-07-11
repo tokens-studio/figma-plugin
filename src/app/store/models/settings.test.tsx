@@ -1,4 +1,5 @@
 import { init, RematchStore } from '@rematch/core';
+import i18next from 'i18next';
 import { RootModel } from '@/types/RootModel';
 import { models } from './index';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -6,10 +7,17 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from './settings';
 
+jest.mock('i18next', () => ({
+  changeLanguage: jest.fn(),
+}));
+
 type Store = RematchStore<RootModel, Record<string, never>>;
+
+const i18nextMocked = i18next.changeLanguage as jest.MockedFunction<typeof i18next.changeLanguage>;
 
 describe('settings', () => {
   const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+
   let store: Store;
   beforeEach(() => {
     store = init<RootModel>({
@@ -21,6 +29,7 @@ describe('settings', () => {
               height: 600,
               isMinimized: false,
             },
+
             updateMode: UpdateMode.PAGE,
             updateRemote: true,
             updateOnChange: true,
@@ -39,6 +48,29 @@ describe('settings', () => {
   it('should be able to set inspectDeep', () => {
     store.dispatch.settings.setInspectDeep(true);
     expect(store.getState().settings.inspectDeep).toBe(true);
+  });
+
+  it('should track language changes correctly', () => {
+    store.dispatch.settings.setLanguage('fr');
+    expect(i18nextMocked).toBeCalledWith('fr');
+
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.SET_UI,
+      uiWindow: {
+        width: 400,
+        height: 600,
+        isMinimized: false,
+      },
+      language: 'fr',
+      updateMode: UpdateMode.PAGE,
+      updateRemote: true,
+      updateOnChange: true,
+      updateStyles: true,
+      tokenType: 'object',
+      ignoreFirstPartForStyles: false,
+      prefixStylesWithThemeName: false,
+      inspectDeep: false,
+    });
   });
 
   it('should be able to set window size', () => {

@@ -1,0 +1,12 @@
+{
+  "pro": "Pro",
+  "getPro": "Devenir pro",
+  "removeKey": "Supprimer la clé",
+  "licenseKey": "Clé de licence",
+  "upgradeToPro": "Passer à Pro",
+  "manageSubscription": "Gérer l'abonnement",
+  "addLicenseKey": "Ajouter une clé de licence",
+  "keepLicenseSafe": "Assurez-vous d'avoir enregistré une copie de la clé de licence quelque part, car elle ne sera pas stockée sur cet appareil après l'avoir supprimée.",
+  "confirmRemove": "Voulez-vous vraiment supprimer votre clé de licence ?",
+  "removeLicenseKey": "Supprimer la clé de licence"
+}

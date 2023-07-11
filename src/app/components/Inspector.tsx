@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
@@ -25,6 +26,7 @@ import Stack from './Stack';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
+  const { t } = useTranslation(['inspect']);
   const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
@@ -86,7 +88,7 @@ function Inspector() {
             onChange={handleSearchInputChange}
             type="text"
             autofocus
-            placeholder="Search..."
+            placeholder={`${t('search')}...`}
           />
         </Box>
         <Stack direction="row" align="center" gap={4}>
@@ -96,9 +98,12 @@ function Inspector() {
               id="inspectDeep"
               onCheckedChange={handleSetInspectDeep}
             />
-            <Tooltip label="Scans selected layer and all of its children" side="bottom">
+            <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>Deep inspect</Box>
+                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>
+                  {t('deepInspect')}
+
+                </Box>
               </Label>
             </Tooltip>
           </Stack>
@@ -109,7 +114,7 @@ function Inspector() {
               onClick={handleSetInspectViewMulti}
               icon={<IconInspect />}
               tooltipSide="bottom"
-              tooltip="Inspect layers"
+              tooltip={t('inspectLayers') as string}
             />
             <IconButton
               variant={inspectView === 'debug' ? 'primary' : 'default'}
@@ -117,7 +122,7 @@ function Inspector() {
               onClick={handleSetInspectViewDebug}
               icon={<IconDebug />}
               tooltipSide="bottom"
-              tooltip="Debug & Annotate"
+              tooltip={t('debugAndAnnotate') as string}
             />
           </Stack>
           <InspectSearchOptionDropdown />

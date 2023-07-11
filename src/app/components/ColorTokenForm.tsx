@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
+import { useTranslation } from 'react-i18next';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -51,6 +52,7 @@ export default function ColorTokenForm({
   onSubmit: () => void
 }) {
   const seed = useUIDSeed();
+  const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
@@ -207,7 +209,7 @@ export default function ColorTokenForm({
     }
   }, [internalEditToken, handleModifyChange]);
 
-  const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Amount'), [internalEditToken]);
+  const getLabel = React.useMemo(() => getLabelForProperty(internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || `${t('tokens.amount')}`), [internalEditToken]);
 
   return (
     <>
@@ -231,13 +233,13 @@ export default function ColorTokenForm({
       )}
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
-          <Heading size="small">Modify</Heading>
+          <Heading size="small">{t('modify')}</Heading>
           <ProBadge compact />
         </Box>
         {
           !modifyVisible ? (
             <IconButton
-              tooltip="Add new modifier"
+              tooltip={t('addNewModifier')}
               dataCy="button-add-new-modify"
               onClick={addModify}
               disabled={!colorModifier}
@@ -245,7 +247,7 @@ export default function ColorTokenForm({
             />
           ) : (
             <IconButton
-              tooltip="Remove modifier"
+              tooltip={t('removeModifier')}
               dataCy="button-remove=modify"
               onClick={removeModify}
               disabled={!colorModifier}
@@ -330,7 +332,7 @@ export default function ColorTokenForm({
               resolvedTokens={resolvedTokens}
               handleChange={handleModifyValueChange}
               setInputValue={handleModifyValueDownShiftInputChange}
-              placeholder="Value (0 to 1) or {alias}"
+              placeholder={t('value0to1OrAlias')}
               suffix
               label={getLabel}
               inlineLabel

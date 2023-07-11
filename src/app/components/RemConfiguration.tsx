@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -18,6 +19,7 @@ const RemConfiguration = () => {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { t } = useTranslation(['tokens']);
 
   const resolvedTokens = React.useMemo(() => (
     resolveTokenValues(mergeTokenGroups(tokens, {
@@ -50,7 +52,7 @@ const RemConfiguration = () => {
         resolvedTokens={resolvedTokens}
         handleChange={handleBaseFontSizeChange}
         setInputValue={handleDownShiftInputChange}
-        placeholder="Choose a new token"
+        placeholder={t('chooseANewToken')}
         suffix
         arrow="top"
       />

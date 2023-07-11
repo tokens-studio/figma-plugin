@@ -36,7 +36,7 @@ describe('StorageItem', () => {
     const result = render(
       <StorageItem item={gitProvider} onEdit={onEdit} />,
     );
-    expect(result.queryByText('Apply')).toBeInTheDocument();
+    expect(result.queryByText('apply')).toBeInTheDocument();
   });
 
   it('should be able delete storageItem', async () => {
@@ -52,7 +52,7 @@ describe('StorageItem', () => {
       await userEvent.keyboard('[Enter]');
     });
     await act(async () => {
-      const deleteButton = await result.getByText('Delete');
+      const deleteButton = await result.getByText('delete');
       deleteButton?.focus();
       await userEvent.keyboard('[Enter]');
     });
@@ -68,7 +68,7 @@ describe('StorageItem', () => {
     const result = render(
       <StorageItem item={gitProvider} onEdit={onEdit} />,
     );
-    await result.queryByText('Apply')?.click();
+    await result.queryByText('apply')?.click();
     expect(mockRestoreStoredProvider).toBeCalledTimes(1);
   });
 });

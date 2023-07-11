@@ -26,10 +26,10 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByText('Tools');
+    const toolsButton = await result.findByText('tools');
     await act(async () => {
       await userEvent.click(toolsButton);
-      const loadButton = await result.findByText('Load from file/folder or preset');
+      const loadButton = await result.findByText('loadFromFileOrPreset');
       await userEvent.click(loadButton, { pointerEventsCheck: 0 });
     });
     expect(result.queryByText('Import')).toBeInTheDocument();
@@ -50,10 +50,10 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByText('Tools');
+    const toolsButton = await result.findByText('tools');
     await act(async () => {
       await userEvent.click(toolsButton);
-      const exportButton = await result.findByText('Export to file/folder');
+      const exportButton = await result.findByText('exportToFile');
       await userEvent.click(exportButton, { pointerEventsCheck: 0 });
     });
     expect(result.queryByText('Export tokens')).toBeInTheDocument();

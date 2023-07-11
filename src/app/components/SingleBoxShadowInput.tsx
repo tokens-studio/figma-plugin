@@ -5,6 +5,7 @@ import {
 import { useUIDSeed } from 'react-uid';
 import { XYCoord } from 'dnd-core';
 import debounce from 'lodash.debounce';
+import { useTranslation } from 'react-i18next';
 import IconMinus from '@/icons/minus.svg';
 import IconGrabber from '@/icons/grabber.svg';
 import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
@@ -63,7 +64,7 @@ export default function SingleBoxShadowInput({
 }) {
   const seed = useUIDSeed();
   const [inputHelperOpen, setInputHelperOpen] = React.useState<boolean>(false);
-
+  const { t } = useTranslation(['tokens']);
   const handleToggleInputHelper = React.useCallback(() => setInputHelperOpen(!inputHelperOpen), [inputHelperOpen]);
 
   const onChange = React.useCallback((property: string, newValue: string) => {
@@ -196,25 +197,28 @@ export default function SingleBoxShadowInput({
 
   drag(drop(ref));
 
+  // TODO: i18n: remove isMultiple logic? - doesn't seem to need a translaton
+
   return (
     <Box css={{
       display: 'flex', flexDirection: 'column', gap: '$2', opacity: isDragging ? 0 : 1,
     }}
     >
+
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} ref={ref}>
         {isMultiple && (
           <Box css={{ display: 'flex', width: '$8' }}>
             <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
           </Box>
         )}
-        <Tooltip label="type"><StyledPrefix isText>Type</StyledPrefix></Tooltip>
+        <Tooltip label="type"><StyledPrefix isText>{t('type')}</StyledPrefix></Tooltip>
         <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onTypeChange}>
-          <option value="innerShadow">Inner Shadow</option>
-          <option value="dropShadow">Drop Shadow</option>
+          <option value="innerShadow">{t('shadow.inner')}</option>
+          <option value="dropShadow">{t('shadow.drop')}</option>
         </Select>
         {isMultiple && (
           <IconButton
-            tooltip="Remove this shadow"
+            tooltip={t('shadow.removeThisShadow')}
             dataCy="button-shadow-remove-multiple"
             onClick={handleRemove}
             icon={<IconMinus />}

@@ -20,6 +20,7 @@ const itemStyles = {
 
 const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
   minWidth: 130,
+  maxWidth: 'min(300px, 80vw)',
   backgroundColor: '$contextMenuBackground',
   color: '$contextMenuForeground',
   borderRadius: '$contextMenu',
@@ -77,7 +78,8 @@ const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, item
 
 const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
 
-const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {});
+const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {
+});
 
 const StyledScrollDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, {
   ...itemStyles,

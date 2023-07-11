@@ -49,7 +49,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
     metadata: { id: string }
   }> {
     let body: string | undefined = JSON.stringify({
-      version: pjs.plugin_version,
+      version: pjs.version,
       updatedAt,
       values: {
         options: {},
@@ -161,7 +161,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
     }
 
     const dataObject: GenericVersionedData = {
-      version: pjs.plugin_version,
+      version: pjs.version,
       updatedAt: (new Date()).toISOString(),
       values: {},
       $themes: [],

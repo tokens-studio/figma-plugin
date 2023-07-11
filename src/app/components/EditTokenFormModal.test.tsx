@@ -26,7 +26,7 @@ describe('EditTokenFormModal', () => {
       </Provider>,
     );
 
-    expect(result.getByText('New Token')).toBeInTheDocument();
+    expect(result.getByText('newToken')).toBeInTheDocument();
     result.unmount();
   });
 });

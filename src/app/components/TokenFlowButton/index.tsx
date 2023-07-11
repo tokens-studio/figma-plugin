@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { LightningBoltIcon } from '@radix-ui/react-icons';
 import IconButton from '../IconButton';
-import { useFlags } from '../LaunchDarkly';
 
 import {
   themeObjectsSelector,
@@ -13,14 +12,17 @@ import {
   tokensSelector,
 } from '@/selectors';
 import { track } from '@/utils/analytics';
+import { licenseKeySelector } from '@/selectors/licenseKeySelector';
+import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 
 export default function TokenFlowButton() {
-  const { tokenFlowButton } = useFlags();
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const themeObjects = useSelector(themeObjectsSelector);
   const tokens = useSelector(tokensSelector);
+  const existingKey = useSelector(licenseKeySelector);
+  const licenseKeyError = useSelector(licenseKeyErrorSelector);
 
   const [loading, setLoading] = useState(false);
 
@@ -43,14 +45,17 @@ export default function TokenFlowButton() {
     setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
-  return tokenFlowButton ? (
-    <IconButton
-      size="large"
-      tooltip="Open visualization"
-      dataCy="token-flow-button"
-      loading={loading}
-      onClick={handleOpenTokenFlowApp}
-      icon={<LightningBoltIcon />}
-    />
-  ) : null;
+  return (
+    (existingKey && !licenseKeyError)
+      ? (
+        <IconButton
+          size="large"
+          tooltip="Open visualization flow"
+          dataCy="token-flow-button"
+          loading={loading}
+          onClick={handleOpenTokenFlowApp}
+          icon={<LightningBoltIcon />}
+        />
+      ) : null
+  );
 }

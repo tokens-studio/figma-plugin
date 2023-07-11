@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Heading from './Heading';
 import Text from './Text';
 import Button from './Button';
@@ -21,6 +22,7 @@ const StyledImage = styled('img', {
 export default function Changelog() {
   const [changelogOpen, setChangelogOpen] = React.useState(true);
   const changelog = useSelector(changelogSelector);
+  const { t } = useTranslation(['general']);
 
   const [activeIndex, setIndex] = React.useState(0);
 
@@ -37,7 +39,7 @@ export default function Changelog() {
   }, []);
 
   return (
-    <Modal title="Changelog" showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
+    <Modal title={t('changelog')} showClose isOpen={changelog.length > 0 && changelogOpen} close={handleClose}>
       <Stack direction="column" gap={4}>
         <div>
           {changelog.map((item, index) => (
@@ -58,7 +60,7 @@ export default function Changelog() {
                   rel="noreferrer"
                   href={item.read_more_link}
                 >
-                  {item.read_more_text ? item.read_more_text : 'Read more'}
+                  {item.read_more_text ? item.read_more_text : t('readMore')}
                 </StyledReadMoreLink>
               )}
             </Stack>
@@ -66,17 +68,17 @@ export default function Changelog() {
         </div>
         <Stack direction="row" gap={2} justify="between">
           <Button id="button-changelog-close" onClick={handleClose} variant="secondary">
-            Close
+            {t('close')}
           </Button>
           <Stack direction="row" justify="between" gap={2}>
             {activeIndex !== 0 && (
               <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
-                Previous
+                {t('previous')}
               </Button>
             )}
             {changelog.length > activeIndex + 1 && (
               <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
-                Next
+                {t('next')}
               </Button>
             )}
           </Stack>

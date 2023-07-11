@@ -50,6 +50,8 @@ export function notifySelection({
 }
 
 export type SavedSettings = {
+  language: string,
+  sessionRecording: boolean;
   width: number;
   height: number;
   showEmptyGroups: boolean
@@ -67,6 +69,8 @@ export type SavedSettings = {
 
 export function notifyUISettings(
   {
+    language,
+    sessionRecording,
     width,
     height,
     updateMode,
@@ -90,6 +94,8 @@ export function notifyUISettings(
         height,
         isMinimized: false,
       },
+      language,
+      sessionRecording,
       updateMode,
       updateRemote,
       updateOnChange,

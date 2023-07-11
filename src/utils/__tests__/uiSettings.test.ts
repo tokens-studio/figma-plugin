@@ -48,6 +48,7 @@ describe('uiSettings', () => {
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,
+      language: 'en',
       showEmptyGroups: true,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
@@ -56,6 +57,7 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      sessionRecording: false,
       shouldSwapStyles: false,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
@@ -81,6 +83,7 @@ describe('uiSettings', () => {
     expect(await getUISettings()).toEqual({
       width: 1000,
       height: 1000,
+      language: 'en',
       showEmptyGroups: true,
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
@@ -89,6 +92,7 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
+      sessionRecording: false,
       shouldSwapStyles: false,
       aliasBaseFontSize: '16',
       baseFontSize: '16',

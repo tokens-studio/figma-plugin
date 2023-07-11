@@ -39,7 +39,7 @@ describe('with mixpanel env', () => {
         USER_ID: '123456',
         FIGMA_USER_ID: 'figma-123',
         NAME: 'John Doe',
-        version: pjs.plugin_version,
+        version: pjs.version,
       });
     });
   });

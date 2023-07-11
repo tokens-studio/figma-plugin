@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useUIDSeed } from 'react-uid';
 import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { EditTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -42,6 +43,7 @@ export default function BorderTokenForm({
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
   const [alias, setAlias] = useState('');
+  const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = useState<boolean>(false);
 
   const selectedToken = React.useMemo(() => {
@@ -67,18 +69,18 @@ export default function BorderTokenForm({
   return (
     <Stack direction="column" gap={2}>
       <Stack direction="row" gap={2} justify="between" align="center">
-        <Heading>Value</Heading>
+        <Heading>{t('value')}</Heading>
         {
           mode === 'input' ? (
             <IconButton
-              tooltip="Reference mode"
+              tooltip={t('reference-mode')}
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
-              tooltip="Input mode"
+              tooltip={t('input-mode')}
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
@@ -118,7 +120,7 @@ export default function BorderTokenForm({
             initialName={internalEditToken.initialName}
             handleChange={handleBorderAliasValueChange}
             setInputValue={handleDownShiftInputChange}
-            placeholder="Value or {alias}"
+            placeholder={t('valueOrAlias')}
             suffix
             onSubmit={onSubmit}
           />
