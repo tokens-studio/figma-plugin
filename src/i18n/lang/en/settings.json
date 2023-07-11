@@ -19,7 +19,7 @@
   "privacyPolicy": "Privacy Policy",
   "debugging": "Debugging",
   "enableSessionRecording": "Enable session recording",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "Second Screen is in beta, some features may not work as expected.",
+  "secondScreenExplainer": "Empower your design workflow, allowing you to manage your design tokens in a second screen.",
   "liveSync": "Live Sync",
   "signInToContinue": "Sign in to continue",
   "signedInAs": "Signed in as",
