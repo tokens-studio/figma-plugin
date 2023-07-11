@@ -2,13 +2,14 @@ import { ItemData } from '@/context';
 import { TreeItem } from '../themeListToTree';
 
 export function findOrderableTargetIndexesInThemeList<T extends TreeItem>(velocity: number, value: T, order: ItemData<T>[]) {
+  if (value.isLeaf) {
+    return Array.from({ length: order.length - 1 }, (_, index) => index + 1);
+  }
   const siblings = order.filter((item) => (
     item.value !== value
     && item.value.parent === value.parent
   ));
-  if (value.isLeaf) {
-    return siblings.map((item) => order.indexOf(item));
-  }
+
   const availableIndexes = siblings.map((item) => {
     if (velocity > 0) {
       const childrenCount = order.reduce((count, v) => (
