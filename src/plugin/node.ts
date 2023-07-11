@@ -161,6 +161,13 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
+  if (values && values.composition) {
+    Object.entries(values.composition).forEach(([property, value]) => {
+      tokensInCompositionToken[property as CompositionTokenProperty] = value;
+    });
+    const { composition, ...objExcludedCompositionToken } = values;
+    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+  }
   if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
   }
@@ -176,17 +183,24 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
   if (values && values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom && values.borderBottom.color) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom.color }) };
   }
-  if (values && values.composition) {
-    Object.entries(values.composition).forEach(([property, value]) => {
-      tokensInCompositionToken[property as CompositionTokenProperty] = value;
-    });
-    const { composition, ...objExcludedCompositionToken } = values;
-    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
-  }
   return values;
 }
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  if (values && values.composition) {
+    const resolvedToken = tokens.get(values.composition);
+    const tokensInCompositionToken: NodeTokenRefMap = {};
+    if (resolvedToken?.rawValue) {
+      Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
+        let tokenName: string = resolvedToken.name;
+        if (String(value).startsWith('$')) tokenName = String(value).slice(1, String(value).length);
+        if (String(value).startsWith('{')) tokenName = String(value).slice(1, String(value).length - 1);
+        tokensInCompositionToken[property as CompositionTokenProperty] = tokenName;
+      });
+      const { composition, ...objExcludedCompositionToken } = values;
+      values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
+    }
+  }
   if (values && values.border) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
@@ -201,20 +215,6 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
   }
   if (values && values.borderBottom) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
-  }
-  if (values && values.composition) {
-    const resolvedToken = tokens.get(values.composition);
-    const tokensInCompositionToken: NodeTokenRefMap = {};
-    if (resolvedToken?.rawValue) {
-      Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
-        let tokenName: string = resolvedToken.name;
-        if (String(value).startsWith('$')) tokenName = String(value).slice(1, String(value).length);
-        if (String(value).startsWith('{')) tokenName = String(value).slice(1, String(value).length - 1);
-        tokensInCompositionToken[property as CompositionTokenProperty] = tokenName;
-      });
-      const { composition, ...objExcludedCompositionToken } = values;
-      values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
-    }
   }
   return values;
 }
