@@ -27,6 +27,7 @@ export default function URLForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { t } = useTranslation(['storage']);
+  const { t: tg } = useTranslation(['general']);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,11 +54,11 @@ export default function URLForm({
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={4}>
         <Stack direction="column" gap={1}>
-          <Heading>{t('storage.providers.url.addNew')}</Heading>
+          <Heading>{t('providers.url.addNew')}</Heading>
           <Text muted>
-            {t('storage.providers.url.description')}
+            {t('providers.url.description')}
             {' '}
-            <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">{t('general.readMore')}</Link>
+            <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">{tg('readMore')}</Link>
           </Text>
         </Stack>
         <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
@@ -65,11 +66,11 @@ export default function URLForm({
         <Input full label="URL" value={values.id} onChange={onChange} type="text" name="id" required />
         <Stack direction="row" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            {t('general.cancel')}
+            {tg('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            {t('general.save')}
+            {tg('save')}
           </Button>
         </Stack>
         {hasErrored && (
