@@ -124,6 +124,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
     velocity: number,
   ) => {
     const availableIndexes = findOrderableTargetIndexesInThemeList(
+      velocity,
       value,
       order,
     );
