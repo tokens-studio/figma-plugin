@@ -72,7 +72,7 @@ export default function GitForm({
           <Text muted>
             {t('gitExplained')}
             {' '}
-            <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}>{t('storage.readMore')}</Link>
+            <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}>{t('readMore')}</Link>
           </Text>
         </Stack>
         <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />

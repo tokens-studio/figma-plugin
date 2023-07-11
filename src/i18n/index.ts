@@ -8,6 +8,8 @@ import hiTranslations from './lang/hi';
 import nlTranslations from './lang/nl';
 import zhTranslations from './lang/zh';
 
+const isSBX = process.env.NODE_ENV === 'sbx';
+
 export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onBoarding', 'settings', 'storage', 'sync', 'tokens'];
 
 export const resources = {
@@ -55,6 +57,8 @@ export const i18nInstance = i18n
     resources,
     defaultNS: 'general',
     ns: namespaces,
+    // Only throw error in SBX
+    parseMissingKeyHandler: isSBX ? (key) => { throw new Error(`Missing translation for ${key}`); } : undefined,
     lng: 'en',
     interpolation: {
       escapeValue: false, // react already safes from xss
