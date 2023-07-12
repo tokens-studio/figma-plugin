@@ -314,7 +314,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
                             <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
                           </StyledItem>
-
                         );
                       }}
                     </StyledList>
