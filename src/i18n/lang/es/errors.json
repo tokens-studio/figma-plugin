@@ -1,10 +1,10 @@
 {
-    "wentWrong": "¡Algo salió mal!",
-    "reset": "Si esto sigue sucediendo, debe restablecer sus tokens.",
-    "restart": "Reinicie el complemento y vuelva a intentarlo.",
-    "readHow": "Lea cómo",
-    "tokenNamesMustBeUnique": "Los nombres de los tokens deben ser únicos",
-    "mustNotUseNameOfAnotherGroup": "No debe usar el nombre de otro grupo",
-    "tokensCantShareNameWithGroup": "Los tokens no pueden compartir el nombre con un grupo",
-    "valueMustIncludePxOrRem": "El valor debe incluir px o rem"
+  "wentWrong": "¡Algo salió mal!",
+  "reset": "Si esto sigue sucediendo, debe restablecer sus tokens.",
+  "restart": "Reinicie el complemento y vuelva a intentarlo.",
+  "readHow": "Lea cómo",
+  "tokenNamesMustBeUnique": "Los nombres de los tokens deben ser únicos",
+  "mustNotUseNameOfAnotherGroup": "No debe usar el nombre de otro grupo",
+  "tokensCantShareNameWithGroup": "Los tokens no pueden compartir el nombre con un grupo",
+  "valueMustIncludePxOrRem": "El valor debe incluir px o rem"
 }

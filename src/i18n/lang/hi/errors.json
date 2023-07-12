@@ -1,10 +1,10 @@
 {
-    "wentWrong": "कुछ गलत हो गया!",
-    "reset": "यदि ऐसा होता रहता है, तो आपको अपने टोकन रीसेट करने होंगे।",
-    "restart": "प्लगइन पुनः आरंभ करें और पुनः प्रयास करें।",
-    "readHow": "पढ़ें कैसे",
-    "tokenNamesMustBeUnique": "टोकन नाम अद्वितीय होने चाहिए",
-    "mustNotUseNameOfAnotherGroup": "किसी अन्य समूह के नाम का उपयोग नहीं करना चाहिए",
-    "tokensCantShareNameWithGroup": "टोकन किसी समूह के साथ नाम साझा नहीं कर सकते",
-    "valueMustIncludePxOrRem": "मान में या तो px या rem शामिल होना चाहिए"
+  "wentWrong": "कुछ गलत हो गया!",
+  "reset": "यदि ऐसा होता रहता है, तो आपको अपने टोकन रीसेट करने होंगे।",
+  "restart": "प्लगइन पुनः आरंभ करें और पुनः प्रयास करें।",
+  "readHow": "पढ़ें कैसे",
+  "tokenNamesMustBeUnique": "टोकन नाम अद्वितीय होने चाहिए",
+  "mustNotUseNameOfAnotherGroup": "किसी अन्य समूह के नाम का उपयोग नहीं करना चाहिए",
+  "tokensCantShareNameWithGroup": "टोकन किसी समूह के साथ नाम साझा नहीं कर सकते",
+  "valueMustIncludePxOrRem": "मान में या तो px या rem शामिल होना चाहिए"
 }

@@ -1,10 +1,10 @@
 {
-    "wentWrong": "出了些问题！",
-    "reset": "如果这种情况持续发生，您需要重置您的令牌。",
-    "restart": "重新启动插件并重试。",
-    "readHow": "阅读如何",
-    "tokenNamesMustBeUnique": "令牌名称必须是唯一的",
-    "mustNotUseNameOfAnotherGroup": "不得使用其他组的名称",
-    "tokensCantShareNameWithGroup": "令牌不能与组共享名称",
-    "valueMustIncludePxOrRem": "值必须包含 px 或 rem"
+  "wentWrong": "出了些问题！",
+  "reset": "如果这种情况持续发生，您需要重置您的令牌。",
+  "restart": "重新启动插件并重试。",
+  "readHow": "阅读如何",
+  "tokenNamesMustBeUnique": "令牌名称必须是唯一的",
+  "mustNotUseNameOfAnotherGroup": "不得使用其他组的名称",
+  "tokensCantShareNameWithGroup": "令牌不能与组共享名称",
+  "valueMustIncludePxOrRem": "值必须包含 px 或 rem"
 }

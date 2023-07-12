@@ -38,6 +38,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
+import { ModalOptions } from '@/constants/ModalOptions';
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -54,7 +55,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const themes = useSelector(themesListSelector);
   const updateMode = useSelector(updateModeSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
-  const { editSingleToken, createSingleToken, duplicateSingleToken } = useManageTokens();
+  const {
+    editSingleToken, createSingleToken, duplicateSingleToken, renameTokensAcrossSets,
+  } = useManageTokens();
   const {
     remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken,
   } = useTokens();
@@ -292,7 +295,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     type, value, name, $extensions,
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
-      let oldName;
+      let oldName: string | undefined;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
@@ -359,7 +362,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
           }
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
             choices.push({
-              key: 'rename-variable', label: 'Rename variable',
+              key: ModalOptions.RENAME_VARIABLE, label: 'Rename variable',
+            });
+          }
+          const tokenSetsContainsSameToken: string[] = [];
+          Object.entries(tokens).forEach(([tokenSet, tokenList]) => {
+            if (tokenList.find((token) => token.name === oldName)) {
+              tokenSetsContainsSameToken.push(tokenSet);
+            }
+          });
+          if (tokenSetsContainsSameToken.length > 1) {
+            choices.push({
+              key: ModalOptions.RENAME_ACROSS_SETS, label: 'Rename in other sets',
             });
           }
           const confirmData = await confirm({
@@ -372,10 +386,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
               remapToken(oldName, newName, confirmData.data[0]);
               dispatch.settings.setUpdateMode(confirmData.data[0]);
             }
+            if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
+              renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
+            }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
             }
-            if (confirmData.data.includes('rename-variable')) {
+            if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {
               renameVariablesFromToken({ oldName, newName });
             }
           }
