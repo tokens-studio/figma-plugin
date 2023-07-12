@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "1.37.3",
+  "version": "1.37.4",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
@@ -54,7 +54,7 @@
     "@types/react-window": "^1.8.5",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "autoprefixer": "^10.2.5",
-    "axios": "^0.21.2",
+    "axios": "^0.21.3",
     "azure-devops-node-api": "^11.1.1",
     "bitbucket": "^2.7.0",
     "buffer": "^6.0.3",

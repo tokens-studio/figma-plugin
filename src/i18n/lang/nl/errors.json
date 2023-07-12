@@ -1,10 +1,10 @@
 {
-    "wentWrong": "Er is iets fout gegaan!",
-    "reset": "Als dit blijft gebeuren, moet u uw tokens opnieuw instellen.",
-    "restart": "Start de plug-in opnieuw en probeer het opnieuw.",
-    "readHow": "Lees hoe",
-    "tokenNamesMustBeUnique": "Tokennamen moeten uniek zijn",
-    "mustNotUseNameOfAnotherGroup": "Mag geen naam van een andere groep gebruiken",
-    "tokensCantShareNameWithGroup": "Tokens kunnen geen naam delen met een groep",
-    "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten"
+  "wentWrong": "Er is iets fout gegaan!",
+  "reset": "Als dit blijft gebeuren, moet u uw tokens opnieuw instellen.",
+  "restart": "Start de plug-in opnieuw en probeer het opnieuw.",
+  "readHow": "Lees hoe",
+  "tokenNamesMustBeUnique": "Tokennamen moeten uniek zijn",
+  "mustNotUseNameOfAnotherGroup": "Mag geen naam van een andere groep gebruiken",
+  "tokensCantShareNameWithGroup": "Tokens kunnen geen naam delen met een groep",
+  "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten"
 }

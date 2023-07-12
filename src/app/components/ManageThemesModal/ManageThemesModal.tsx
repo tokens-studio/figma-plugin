@@ -2,6 +2,7 @@ import React, {
   useCallback, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import omit from 'just-omit';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -101,8 +102,8 @@ export const ManageThemesModal: React.FC<Props> = () => {
       }
       if (curr.isLeaf && typeof curr.value === 'object') {
         acc.push({
-          ...curr.value,
-          group: currentGroup,
+          ...omit(curr.value, 'group'),
+          ...(currentGroup === INTERNAL_THEMES_NO_GROUP ? {} : { group: currentGroup }),
         });
       }
       return acc;
@@ -124,6 +125,7 @@ export const ManageThemesModal: React.FC<Props> = () => {
     velocity: number,
   ) => {
     const availableIndexes = findOrderableTargetIndexesInThemeList(
+      velocity,
       value,
       order,
     );

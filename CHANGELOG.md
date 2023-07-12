@@ -1,5 +1,20 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.4
+
+### Patch Changes
+
+Bugs addressed:
+
+- Fixed two vulnerabilities in dependencies
+- Fixed some translations missing from various screens
+- Fixed an issue where dragging a theme in the Manage themes modal would cause themes to disappear in the theme dropdown
+- Fixed an issue where dragging a theme would under some rare circumstances cause the file to freeze
+- Fixed border tokens not working properly inside composition tokens
+
+Improvements:
+- Introduced an option to rename tokens in other sets when renaming a single token
+
 ## 1.37.3
 
 ### Patch Changes

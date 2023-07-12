@@ -1,12 +1,12 @@
 {
-    "pro": "专业版",
-    "getPro": "获取专业版",
-    "removeKey": "移除钥匙",
-    "licenseKey": "注册码",
-    "upgradeToPro": "升级到专业版",
-    "manageSubscription": "管理订阅",
-    "addLicenseKey": "添加许可证密钥",
-    "keepLicenseSafe": "确保您在某处保存了许可证密钥的副本，因为删除后它不会存储在此设备上。",
-    "confirmRemove": "您确定要删除您的许可证密钥吗？",
-    "removeLicenseKey": "删除许可证密钥"
+  "pro": "专业版",
+  "getPro": "获取专业版",
+  "removeKey": "移除钥匙",
+  "licenseKey": "注册码",
+  "upgradeToPro": "升级到专业版",
+  "manageSubscription": "管理订阅",
+  "addLicenseKey": "添加许可证密钥",
+  "keepLicenseSafe": "确保您在某处保存了许可证密钥的副本，因为删除后它不会存储在此设备上。",
+  "confirmRemove": "您确定要删除您的许可证密钥吗？",
+  "removeLicenseKey": "删除许可证密钥"
 }
