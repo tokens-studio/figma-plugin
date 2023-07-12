@@ -92,6 +92,7 @@ jobs:
           tag_exists_error: false
           force_push_tag: true
           message: "Nightly beta"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/bundle.zip"
