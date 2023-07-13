@@ -4,7 +4,7 @@ module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
 
   entry: {
-    benchmark: './benchmark.ts', // The entry point for your plugin code
+    benchmark: './benchmark/index.ts', // The entry point for your plugin code
   },
 
   module: {
@@ -44,6 +44,6 @@ module.exports = (env, argv) => ({
 
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'benchmark/dist'), // Compile into a folder called "dist"
+    path: path.resolve(__dirname, 'benchmark/build'), // Compile into a folder called "build"
   },
 });
