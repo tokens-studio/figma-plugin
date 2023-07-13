@@ -1,35 +1,12 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import parseTokenValues from '../src/utils/parseTokenValues';
-import { TokenTypes } from '../src/constants/TokenTypes';
-import { resolveTokenValues } from '../src/plugin/tokenHelpers';
-import defaultTokens from './mocks/defaultTokens';
+import {parseDefaultTokens, parseNestedTokens, parseMergeResolveTokens} from "./tests/parseAndResolve";
 
-const createDeepTokens = (depth: number) => {
-  const obj: any = {
-    "referenced": {}
-  };
- 
-
-  obj.referenced = { value: `{${new Array(depth).fill('nest', 0, depth).join('.')}}`, type: 'other' };
- 
-  let currentObject = obj;
-  for (let i = 1; i <= depth; i++) {
-    const key = 'nest';
-    currentObject[key] = {};
-    currentObject = currentObject[key];
-    if (i === depth) {
-      currentObject[key] = { value: '10px', type: 'dimension' };
-    }
-  }
-
-  return obj;
-};
+console.log('Starting benchmark...')
 
 
+parseDefaultTokens()
 
+parseNestedTokens()
 
-const parsedTokens = parseTokenValues(defaultTokens);
+parseMergeResolveTokens()
 
-const resolved = resolveTokenValues(parsedTokens.global, 0)
-
+console.log('All benchmarks ran...')
