@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import isSameCredentials from '@/utils/isSameCredentials';
@@ -34,9 +35,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
   const { confirm } = useConfirm();
 
+  const { t } = useTranslation(['storage']);
+
   const askUserIfDelete = React.useCallback(async () => {
     const shouldDelete = await confirm({
-      text: 'Do you really want to delete this?',
+      text: t('confirmDelete') as string,
     });
     return shouldDelete;
   }, [confirm]);
@@ -110,9 +113,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
         )}
       </Stack>
       <Box css={{ marginRight: '$3' }}>
-        {isActive() ? <Badge text="Active" /> : (
+        {isActive() ? <Badge text={t('active')} /> : (
           <Button id="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
-            Apply
+            {t('apply')}
           </Button>
         )}
       </Box>
@@ -121,8 +124,8 @@ const StorageItem = ({ item, onEdit }: Props) => {
           <DotsVerticalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem textValue="Edit" onSelect={onEdit}>Edit</DropdownMenuItem>
-          <DropdownMenuItem textValue="Delete" onSelect={handleDelete}>Delete</DropdownMenuItem>
+          <DropdownMenuItem textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenuItem>
+          <DropdownMenuItem textValue={t('delete')} onSelect={handleDelete}>{t('delete')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </StyledStorageItem>

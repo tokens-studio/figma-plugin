@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
   localApiStateSelector, remoteDataSelector, storageTypeSelector, themesListSelector, tokensSelector,
@@ -30,6 +31,7 @@ function PushDialog() {
   const {
     onConfirm, onCancel, showPushDialog,
   } = usePushDialog();
+  const { t } = useTranslation(['sync']);
   const localApiState = useSelector(localApiStateSelector);
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
@@ -130,7 +132,7 @@ function PushDialog() {
       return (
         <Modal
           full
-          title={`Push to ${transformProviderName(storageType.provider)}`}
+          title={t('pushTo', { provider: transformProviderName(storageType.provider) })}
           showClose
           large
           isOpen
@@ -138,14 +140,14 @@ function PushDialog() {
         >
           <Stack direction="column" gap={4}>
             <div>
-              <TabButton<string> name="commit" activeTab={activeTab} label="Commit" onSwitch={handleSwitch} />
-              <TabButton<string> name="diff" activeTab={activeTab} label="Diff" onSwitch={handleSwitch} />
+              <TabButton<string> name="commit" activeTab={activeTab} label={t('commit')} onSwitch={handleSwitch} />
+              <TabButton<string> name="diff" activeTab={activeTab} label={t('diff')} onSwitch={handleSwitch} />
               <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
             </div>
             {
               activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
                 <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
-                  This will push your local changes to the
+                  {t('thisWillPushYourLocalChangesToTheBranch')}
                   {' '}
                   <Text
                     bold
@@ -156,8 +158,6 @@ function PushDialog() {
                     {' '}
                     {branch}
                   </Text>
-                  {' '}
-                  branch
                 </Stack>
               )
             }
@@ -184,10 +184,10 @@ function PushDialog() {
             }}
             >
               <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button variant="primary" id="push-dialog-button-push-changes" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)} onClick={handlePushChanges}>
-                Push changes
+                {t('pushChanges')}
               </Button>
             </Box>
           </Stack>
@@ -200,7 +200,7 @@ function PushDialog() {
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">
-              Pushing to
+              {t('pushingTo')}
               {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
               {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
               {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
@@ -218,7 +218,7 @@ function PushDialog() {
             <Stack direction="column" gap={4}>
               <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
               <Text size="small">
-                Changes pushed to
+                {t('changesPushedTo')}
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
                 {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
                 {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
@@ -228,8 +228,8 @@ function PushDialog() {
             </Stack>
             <Button variant="primary" href={redirectHref}>
               {localApiState.provider === StorageProviderType.SUPERNOVA
-                ? <>Open Supernova Workspace</>
-                : <>Create Pull Request</>}
+                ? <>{t('openSupernovaWorkspace')}</>
+                : <>{t('createPullRequest')}</>}
             </Button>
           </Stack>
         </Modal>

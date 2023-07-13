@@ -1,0 +1,16 @@
+{
+  "close": "Dichtbij",
+  "previous": "Vorig",
+  "next": "Volgende",
+  "readMore": "Lees verder",
+  "welcome": "Welkom!",
+  "welcomeText": "Hallo daar, geweldig dat je bij ons bent. Met Tokens Studio voor Figma kunt u ontwerptokens in Figma gebruiken en deze synchroniseren met een externe bron van waarheid, bijvoorbeeld GitHub.",
+  "createTokens": "Tokens maken",
+  "createTokensText": "Begin met het maken van je tokens, een goede plek om te beginnen zijn je kleuren. U kunt zelfs uw bestaande stijlen importeren!",
+  "reference": "Referentietokenwaarden",
+  "referenceText": "Gebruik uw tokenwaarden binnen andere tokens door ze tussen accolades te schrijven: {colors.red.500} — op die manier kunt u uw tokens opnieuw gebruiken.",
+  "apply": "Pas tokens toe op een laag",
+  "applyText": "Selecteer een laag in Figma en klik met de linkermuisknop op een willekeurig token om dat token erop toe te passen. Afhankelijk van het type token waarop je hebt geklikt, wordt er een andere actie uitgevoerd. Klik met de rechtermuisknop op tokens voor een contextmenu om te kiezen wat u wilt toepassen.",
+  "knowMore": "Wil meer weten?",
+  "knowMoreText": "Bekijk de documenten voor nog meer kennis en handleidingen. Als er iets is waar je mee worstelt, laat het ons weten op Slack!"
+}

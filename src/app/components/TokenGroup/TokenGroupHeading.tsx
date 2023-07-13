@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from '../ContextMenu';
@@ -27,6 +28,7 @@ export type Props = {
 export function TokenGroupHeading({
   label, path, id, type, showNewForm,
 }: Props) {
+  const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
@@ -92,13 +94,13 @@ export function TokenGroupHeading({
           </ContextMenuTrigger>
           <ContextMenuContent>
             <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
-              Rename
+              {t('rename')}
             </ContextMenuItem>
             <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
-              Duplicate
+              {t('duplicate')}
             </ContextMenuItem>
             <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
-              Delete
+              {t('delete')}
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
@@ -124,7 +126,7 @@ export function TokenGroupHeading({
 
       <StyledTokenGroupAddIcon
         icon={<IconAdd />}
-        tooltip="Add a new token"
+        tooltip={t('addNew', { ns: 'tokens' })}
         tooltipSide="left"
         onClick={handleShowNewForm}
         disabled={editProhibited}

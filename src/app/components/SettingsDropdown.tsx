@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -12,10 +13,12 @@ import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import Box from './Box';
+
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
+  const { t } = useTranslation(['tokens']);
 
   const {
     updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
@@ -56,9 +59,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Update on change
+          {t('update.onChange.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Applies tokens whenever you make a change (slow!)
+            {t('update.onChange.description')}
           </Box>
         </DropdownMenuCheckboxItem>
         {localApiState?.provider === StorageProviderType.JSONBIN ? (
@@ -70,9 +73,9 @@ export default function SettingsDropdown() {
             <DropdownMenuItemIndicator>
               <CheckIcon />
             </DropdownMenuItemIndicator>
-            Update remote
+            {t('update.remoteJSONBin.title')}
             <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-              Updates JSONBin whenever you make a change
+              {t('update.remoteJSONBin.description')}
             </Box>
           </DropdownMenuCheckboxItem>
         ) : null}
@@ -84,9 +87,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Update styles & variables
+          {t('update.styles.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Updates the value of local styles and variables when names match
+            {t('update.styles.description')}
           </Box>
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
@@ -97,9 +100,9 @@ export default function SettingsDropdown() {
           <DropdownMenuItemIndicator>
             <CheckIcon />
           </DropdownMenuItemIndicator>
-          Swap styles
+          {t('update.swapStyles.title')}
           <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
-            Swap themes by just changing styles, requires Themes
+            {t('update.swapStyles.description')}
           </Box>
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>

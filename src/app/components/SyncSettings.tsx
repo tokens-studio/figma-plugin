@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { track } from '@/utils/analytics';
 import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
@@ -26,39 +27,42 @@ import IconToggleableDisclosure from './IconToggleableDisclosure';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 
-const providers = [
-  {
-    text: 'URL',
-    type: StorageProviderType.URL,
-  },
-  {
-    text: 'JSONBIN',
-    type: StorageProviderType.JSONBIN,
-  },
-  {
-    text: 'GitHub',
-    type: StorageProviderType.GITHUB,
-  },
-  {
-    text: 'GitLab',
-    type: StorageProviderType.GITLAB,
-  },
-  {
-    text: 'Azure DevOps',
-    type: StorageProviderType.ADO,
-  },
-  {
-    text: 'Supernova',
-    type: StorageProviderType.SUPERNOVA,
-  },
-  {
-    text: 'Generic Versioned',
-    type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-  },
-];
-
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
+
+  const { t } = useTranslation(['storage']);
+
+  const providers = useMemo(() => [
+    {
+      text: t('providers.url.title'),
+      type: StorageProviderType.URL,
+    },
+    {
+      text: t('providers.jsonbin.title'),
+      type: StorageProviderType.JSONBIN,
+    },
+    {
+      text: 'GitHub',
+      type: StorageProviderType.GITHUB,
+    },
+    {
+      text: 'GitLab',
+      type: StorageProviderType.GITLAB,
+    },
+    {
+      text: 'Azure DevOps',
+      type: StorageProviderType.ADO,
+    },
+    {
+      text: 'Supernova',
+      type: StorageProviderType.SUPERNOVA,
+    },
+    {
+      text: t('providers.generic.title'),
+      type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+    },
+  ], [t]);
+
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -157,7 +161,7 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={3} direction="column">
-            <Heading size="small">Sync providers</Heading>
+            <Heading size="small">{t('syncProviders')}</Heading>
           </Stack>
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">
@@ -173,7 +177,7 @@ const SyncSettings = () => {
           )}
           <DropdownMenu>
             <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
-              <Text size="small">Add new</Text>
+              <Text size="small">{t('addNew')}</Text>
               <IconToggleableDisclosure />
             </DropdownMenuTrigger>
             <DropdownMenuContent

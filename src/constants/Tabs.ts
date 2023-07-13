@@ -5,4 +5,5 @@ export enum Tabs {
   INSPECTOR = 'inspector',
   SETTINGS = 'settings',
   LOADING = 'loading',
+  SECONDSCREEN = 'secondscreen',
 }

@@ -1,0 +1,58 @@
+{
+  "editCredentials": "Referenties bewerken",
+  "addNew": "Nieuw toevoegen",
+  "pat": "Persoonlijk toegangstoken",
+  "credentials": "referenties",
+  "gitExplained": "Toegang tot tokens die zijn opgeslagen in uw repository, push- en pull-tokens in tweerichtingssynchronisatie.",
+  "readMore": "Lees verder",
+  "cancel": "Annuleren",
+  "repo": "Repository (eigenaar/repo)",
+  "branch": "Tak",
+  "baseUrl": "Basis-URL (optioneel)",
+  "saveCredentials": "Bewaar inloggegevens",
+  "filePath": "Bestandspad (bijv. tokens.json) of mappad (bijv. tokens)",
+  "syncProviders": "Synchroniseer providers",
+  "providers": {
+    "generic": {
+      "title": "Generieke versie",
+      "url": "URL",
+      "addNew": "Voeg een nieuwe generieke opslagprovider toe",
+      "description": "Toegangstokens opgeslagen op uw eigen opslagprovider, waardoor tweerichtingssynchronisatie, maken en alleen-lezen bewerkingen mogelijk zijn.",
+      "flowType": "Type stroom",
+      "readOnly": "Alleen lezen",
+      "readWrite": "Lezen schrijven",
+      "readWriteCreate": "Lezen/Schrijven/Creëren",
+      "additionalHeaders": "Extra koppen",
+      "name": "Naam",
+      "value": "Waarde"
+    },
+    "url": {
+      "title": "URL",
+      "addNew": "Voeg een nieuwe URL-provider toe",
+      "description": "Met tokens die op een server zijn opgeslagen, kunt u ze toevoegen als een alleen-lezen provider."
+    },
+    "jsonbin": {
+      "title": "JSONBIN"
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Supernova-toegangstoken",
+      "addNew": "Voeg nieuwe Supernova-referenties toe",
+      "dsUrl": "Ontwerp systeem-URL",
+      "description": "Hiermee kunt u tokens naar een specifiek merk en thema pushen in een geselecteerd ontwerpsysteem."
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Selecteer een laag om toegepaste tokens te zien",
+  "localDocument": "Lokaal document",
+  "apply": "Toepassen",
+  "confirmDelete": "Wil je dit echt verwijderen?",
+  "active": "Actief",
+  "edit": "Bewerking",
+  "delete": "Verwijderen",
+  "save": "Redden"
+}

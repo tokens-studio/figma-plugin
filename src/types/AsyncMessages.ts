@@ -52,11 +52,12 @@ export enum AsyncMessageTypes {
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
   SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
+  SET_AUTH_DATA = 'async/set-auth-data',
+  SET_USED_EMAIL = 'async/set-used-email',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
-  SET_AUTH_DATA = 'async/set-auth-data',
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
@@ -256,6 +257,12 @@ export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
 }>;
 export type SetAuthDataMessageResult = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA>;
 
+export type SetUsedEmailMessage = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL, {
+  email: string | undefined
+}>;
+
+export type SetUsedEmailMessageResult = AsyncMessage<AsyncMessageTypes.SET_USED_EMAIL>;
+
 export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState
@@ -335,6 +342,7 @@ export type AsyncMessages =
   | SetNoneValuesOnNodeAsyncMessage
   | GetFigmaFontsMessage
   | SetAuthDataMessage
+  | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
@@ -376,6 +384,7 @@ export type AsyncMessageResults =
   | SetNoneValuesOnNodeAsyncMessageResult
   | GetFigmaFontsMessageResult
   | SetAuthDataMessageResult
+  | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult

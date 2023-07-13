@@ -1,0 +1,8 @@
+{
+  "sync": "Synchroniseren",
+  "docs": "Documenten",
+  "feedback": "feedback",
+  "pullFrom": "Trek uit {{provider}}",
+  "pushTo": "Duwen naar {{provider}}",
+  "goTo": "Ga naar {{provider}}"
+}

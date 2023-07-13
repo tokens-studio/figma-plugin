@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Stack from './Stack';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { CompareStateType } from '@/utils/findDifferentState';
@@ -8,6 +9,7 @@ import { StyledDiff } from './StyledDiff';
 
 function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
   const [collapsed, setCollapsed] = React.useState(false);
+  const { t } = useTranslation(['tokens']);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
@@ -57,14 +59,14 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   {
                     theme.importType === 'REMOVE' && (
                     <StyledDiff size="small" type="danger">
-                      Configuration removed
+                      {t('configurationRemoved')}
                     </StyledDiff>
                     )
                   }
                   {
                     (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
                     <StyledDiff size="small" type="success">
-                      {theme.importType === 'NEW' ? 'Configuration added' : 'Configuration changed' }
+                      {theme.importType === 'NEW' ? t('configuration-added') : t('configurationChanged') }
                     </StyledDiff>
                     )
                   }
@@ -86,7 +88,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                 css={{ padding: '$1 $4' }}
               >
                 <StyledDiff size="small" type="danger">
-                  Configuration changed
+                  {t('configurationChanged')}
                 </StyledDiff>
               </Stack>
             )}

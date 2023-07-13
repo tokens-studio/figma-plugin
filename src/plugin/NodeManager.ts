@@ -118,7 +118,7 @@ export class NodeManager {
       return registeredEntry;
     }
 
-    const currentPluginVersion = parseInt(pkg.plugin_version, 10);
+    const currentPluginVersion = parseInt(pkg.version, 10);
     const version = parseIntOrDefault(await VersionProperty.read(node), 0);
     let tokens: NodeTokenRefMap | null = null;
 

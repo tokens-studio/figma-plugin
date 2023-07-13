@@ -1,0 +1,20 @@
+{
+  "override": "Esto anulará sus tokens actuales. Asegúrese de copiar sus cambios si desea conservarlos.",
+  "cancel": "Cancelar",
+  "pullTokens": "Tirar fichas",
+  "pullFrom": "Extraer de {{provider}}",
+  "pushTo": "Empuje a __LUGAR__",
+  "goTo": "Ir a __MARCADOR__",
+  "thisWillPushYourLocalChangesToTheBranch": "Esto impulsará sus cambios locales a la rama:",
+  "commit": "Comprometerse",
+  "diff": "diferencia",
+  "pushChanges": "Empujar cambios",
+  "pushingTo": "empujando a",
+  "changesPushedTo": "Cambios empujados a",
+  "createPullRequest": "Crear solicitud de extracción",
+  "openSupernovaWorkspace": "Abrir espacio de trabajo de supernova",
+  "pushYourLocalChangesToYourSupernovaIoDesignSystem": "Empuje sus cambios locales a su sistema de diseño Supernova.io.",
+  "designSystem": "Sistema de diseño",
+  "pushYourLocalChangesToYourRepository": "Empuje sus cambios locales a su repositorio.",
+  "commitMessage": "Confirmar mensaje"
+}

@@ -1,0 +1,12 @@
+{
+  "pro": "Pro",
+  "getPro": "Wordt professional",
+  "removeKey": "Sleutel verwijderen",
+  "licenseKey": "Licentiesleutel",
+  "upgradeToPro": "Upgraden naar Pro",
+  "manageSubscription": "Abonnement beheren",
+  "addLicenseKey": "Licentiesleutel toevoegen",
+  "keepLicenseSafe": "Zorg ervoor dat je ergens een kopie van de licentiesleutel hebt opgeslagen, want deze wordt niet op dit apparaat opgeslagen nadat je deze hebt verwijderd.",
+  "confirmRemove": "Weet u zeker dat u uw licentiesleutel wilt verwijderen?",
+  "removeLicenseKey": "Licentiesleutel verwijderen"
+}

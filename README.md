@@ -10,6 +10,10 @@ https://docs.tokens.studio/
 # Roadmap
 https://github.com/orgs/tokens-studio/projects/34/views/6
 
+# Translations
+
+Looking to contribute a translation for your language ? See [here](./developer-knowledgebase/translations.md)
+
 # Slack Channel
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. [Want to join](https://tokens.studio/slack).
 

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
@@ -45,6 +46,7 @@ export default function TypographyInput({
   setTypographyValue: (newTypographyValue: SingleTypographyToken['value']) => void;
   onSubmit: () => void
 }) {
+  const { t } = useTranslation(['tokens']);
   const seed = useUIDSeed();
   const isAliasMode = (internalEditToken.value && typeof internalEditToken.value === 'string');
   const [mode, setMode] = useState(isAliasMode ? 'alias' : 'input');
@@ -77,18 +79,18 @@ export default function TypographyInput({
   return (
     <Stack direction="column" gap={2}>
       <Stack direction="row" gap={2} justify="between" align="center">
-        <Heading>Typography</Heading>
+        <Heading>{t('types.Typography')}</Heading>
         {
           mode === 'input' ? (
             <IconButton
-              tooltip="Reference mode"
+              tooltip={t('referenceMode')}
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
-              tooltip="Input mode"
+              tooltip={t('inputMode')}
               dataCy="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
@@ -123,7 +125,7 @@ export default function TypographyInput({
             initialName={internalEditToken.initialName}
             handleChange={handleTypographyAliasValueChange}
             setInputValue={handleDownShiftInputChange}
-            placeholder="Value or {alias}"
+            placeholder={t('valueOrAlias')}
             suffix
             onSubmit={onSubmit}
           />

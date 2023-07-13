@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import ApplySelector from './ApplySelector';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
@@ -25,6 +26,8 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
     handleJSONUpdate(stringTokens);
   }, [handleJSONUpdate, stringTokens]);
 
+  const { t } = useTranslation(['general']);
+
   return (
     <Box css={{
       width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
@@ -41,9 +44,11 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
             justifyContent: 'space-between',
           }}
         >
-          <Box css={{ fontSize: '$xsmall' }}>Unsaved changes</Box>
+          <Box css={{ fontSize: '$xsmall' }}>{t('unsavedChanges')}</Box>
           <Button variant="primary" disabled={hasJSONError} onClick={handleSaveJSON}>
-            Save JSON
+            {t('save')}
+            {' '}
+            JSON
           </Button>
         </Box>
       )

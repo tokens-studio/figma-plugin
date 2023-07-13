@@ -14,7 +14,7 @@ describe('ThemeSelector', () => {
       </Provider>,
     );
 
-    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('Theme:None');
+    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('theme:None');
   });
 
   it('should show the active theme name', () => {
@@ -34,7 +34,7 @@ describe('ThemeSelector', () => {
       </Provider>,
     );
 
-    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('Theme:Light');
+    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('theme:Light');
   });
 
   it('should show the unknown if the active theme is somehow not available anymore', () => {
@@ -51,7 +51,7 @@ describe('ThemeSelector', () => {
       </Provider>,
     );
 
-    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('Theme:Unknown');
+    expect(component.queryByTestId('themeselector-dropdown')?.textContent).toEqual('theme:Unknown');
   });
 
   it('be possible to select a theme', async () => {

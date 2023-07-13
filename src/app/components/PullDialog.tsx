@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   changedStateSelector, storageTypeSelector,
 } from '@/selectors';
@@ -18,6 +19,8 @@ function PullDialog() {
   const storageType = useSelector(storageTypeSelector);
   const changedState = useSelector(changedStateSelector);
 
+  const { t } = useTranslation(['sync']);
+
   const handleOverrideClick = React.useCallback(() => {
     onConfirm();
   }, [onConfirm]);
@@ -30,7 +33,7 @@ function PullDialog() {
     case 'initial': {
       return (
         <Modal
-          title={`Pull from ${transformProviderName(storageType.provider)}`}
+          title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
           showClose
           full
           large
@@ -39,7 +42,7 @@ function PullDialog() {
         >
           <Stack direction="column" gap={4}>
             <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-              This will override your current tokens. Make sure you copy your changes if you want to preserve them.
+              {t('override')}
             </Stack>
             <ChangedStateList changedState={changedState} />
             <Box css={{
@@ -56,10 +59,10 @@ function PullDialog() {
             }}
             >
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
-                Pull tokens
+                {t('pullTokens')}
               </Button>
             </Box>
           </Stack>
@@ -77,9 +80,7 @@ function PullDialog() {
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">
-              Fetching Tokens from
-              {' '}
-              {transformProviderName(storageType.provider)}
+              {t('pullFrom', { provider: transformProviderName(storageType.provider) })}
             </Heading>
           </Stack>
         </Modal>

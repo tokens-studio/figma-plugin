@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
 import { SingleBorderToken } from '@/types/tokens';
 import { styled } from '@/stitches.config';
@@ -17,14 +18,14 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-const properties = {
-  color: 'Border Color',
-  width: 'Border Width',
-  style: 'Border Style',
-};
-
 export const ResolvedBorderValueDisplay: React.FC<Props> = ({ value }) => {
   const seed = useUIDSeed();
+  const { t } = useTranslation(['tokens']);
+  const properties = {
+    color: t('border.color'),
+    width: t('border.width'),
+    style: t('border.style'),
+  };
 
   return (
     <Box css={{

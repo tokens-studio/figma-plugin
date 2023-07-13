@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useUIDSeed } from 'react-uid';
+import { useTranslation } from 'react-i18next';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
 import { EditTokenObject } from '@/types/tokens';
@@ -30,6 +31,7 @@ export default function CompositionTokenForm({
   const seed = useUIDSeed();
   const [orderObj, setOrderObj] = React.useState<NodeTokenRefMap>({});
   const [error, setError] = React.useState(false);
+  const { t } = useTranslation(['tokens']);
 
   const propertiesMenu = React.useMemo(() => (
     filterValidCompositionTokenTypes(Object.keys(Properties)).map((key: string) => (
@@ -86,9 +88,9 @@ export default function CompositionTokenForm({
   return (
     <div>
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Heading size="small">Tokens</Heading>
+        <Heading size="small">{t('tokens')}</Heading>
         <IconButton
-          tooltip={error ? 'Choose a property first' : 'Add another style'}
+          tooltip={error ? t('chooseAPropertyFirst') : t('addAnotherStyle')}
           dataCy="button-style-add-multiple"
           onClick={addToken}
           icon={<IconPlus />}

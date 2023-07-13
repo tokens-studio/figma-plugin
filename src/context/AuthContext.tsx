@@ -42,6 +42,7 @@ const AuthContextProvider = ({
 
   function handleLogout() {
     setAuthData(null);
+    supabase.logout();
     track('Logout second screen');
     // Clear auth data in figma.clientStorage
     AsyncMessageChannel.ReactInstance.message({
@@ -58,6 +59,10 @@ const AuthContextProvider = ({
     } else {
       track('Log in second screen');
       handleLogin(data);
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_USED_EMAIL,
+        email: loginInfo.email,
+      });
     }
 
     setAuthInProgress(false);
@@ -71,6 +76,10 @@ const AuthContextProvider = ({
     } else {
       track('Sign up second screen');
       handleLogin(data);
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_USED_EMAIL,
+        email: signUpInfo.email,
+      });
     }
 
     setAuthInProgress(false);

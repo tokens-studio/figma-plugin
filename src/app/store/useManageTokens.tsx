@@ -54,7 +54,7 @@ export default function useManageTokens() {
   const { confirm } = useConfirm();
   const { removeStylesFromTokens } = useTokens();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, renameTokenAcrossSets,
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -184,7 +184,15 @@ export default function useManageTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
   }, [store, duplicateTokenGroup, dispatch.uiState]);
 
+  const renameTokensAcrossSets = useCallback(async (oldName: string, newName: string, type: string, tokenSets: string[]) => {
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
+    await renameTokenAcrossSets({
+      oldName, newName, type, tokenSets,
+    });
+    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
+  }, [renameTokenAcrossSets, dispatch.uiState]);
+
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup,
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup]);
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets,
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets]);
 }

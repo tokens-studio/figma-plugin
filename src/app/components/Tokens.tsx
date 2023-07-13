@@ -2,6 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -96,6 +97,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation(['tokens']);
 
   React.useEffect(() => {
     if (tokenDiv.current) {
@@ -245,7 +247,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               onClick={handleSetTokensTabToList}
               icon={<IconListing />}
               tooltipSide="bottom"
-              tooltip="Listing"
+              tooltip={t('listing')}
             />
             <IconButton
               variant={activeTokensTab === 'json' ? 'primary' : 'default'}

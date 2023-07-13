@@ -34,6 +34,12 @@ const globalTokens = {
 };
 
 export const stitchesInstance = createStitches({
+  media: {
+    xs: '(min-width: 300px)',
+    sm: '(min-width: 360px)',
+    md: '(min-width: 480px)',
+    lg: '(min-width: 768px)',
+  },
   theme: {
     fonts: {
       sans: 'Inter, sans-serif',

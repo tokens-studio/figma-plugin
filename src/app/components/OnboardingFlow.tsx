@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import Heading from './Heading';
 import Text from './Text';
 import Button from './Button';
@@ -37,29 +38,30 @@ function fetchOnboardingImage(idx: number) {
 }
 
 export default function OnboardingFlow() {
+  const { t } = useTranslation(['onBoarding']);
   const onboardingflow = [
     {
-      title: 'Welcome!',
-      excerpt: 'Hey there, awesome to have you with us. Tokens Studio for Figma allows you to use design tokens in Figma and sync those to an external source of truth, for example GitHub.',
+      title: 'welcome',
+      excerpt: 'welcomeText',
     },
     {
-      title: 'Create tokens',
-      excerpt: 'Start by creating your tokens, a good place to start is your colors. You can even import your existing styles!',
+      title: 'createTokens',
+      excerpt: 'createTokensText',
       read_more_link: 'https://docs.tokens.studio/tokens/creating-tokens',
     },
     {
-      title: 'Reference token values',
-      excerpt: 'Use your token values inside other tokens by writing them inside curly brackets: {colors.red.500} — that way you are able to reuse your tokens.',
+      title: 'reference',
+      excerpt: 'referenceText',
       read_more_link: 'https://docs.tokens.studio/tokens/aliases',
     },
     {
-      title: 'Apply tokens to a layer',
-      excerpt: 'Select a layer in Figma and left-click any token to apply that token on it. Depending on the type of token you clicked on, a different action is performed. Right-click tokens for a context menu to choose what you want to apply.',
+      title: 'apply',
+      excerpt: 'applyText',
       read_more_link: 'https://docs.tokens.studio/tokens/applying-tokens',
     },
     {
-      title: 'Want to know more?',
-      excerpt: 'Check out the Docs to find even more knowledge and guides. If there’s anything you’re struggling with, let us know on Slack!',
+      title: 'knowMore',
+      excerpt: 'knowMoreText',
       read_more_link: 'https://docs.tokens.studio',
     },
   ];
@@ -94,15 +96,15 @@ export default function OnboardingFlow() {
             css={{ textAlign: 'left', display: index === activeIndex ? 'flex' : 'none' }}
           >
             <StyledImage src={fetchOnboardingImage(index)} alt="" />
-            <Heading size="medium">{item.title}</Heading>
-            <Text size="small">{item.excerpt}</Text>
+            <Heading size="medium">{t(item.title)}</Heading>
+            <Text size="small">{t(item.excerpt)}</Text>
             {item.read_more_link && (
               <StyledLink
                 target="_blank"
                 rel="noreferrer"
                 href={item.read_more_link}
               >
-                Read more
+                {t('readMore')}
               </StyledLink>
             )}
           </Stack>
@@ -110,16 +112,16 @@ export default function OnboardingFlow() {
         <Stack direction="row" gap={2} justify={activeIndex > 1 ? 'between' : 'end'}>
           {activeIndex > 1 && (
             <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
-              Previous
+              {t('previous')}
             </Button>
           )}
           {onboardingflow.length > activeIndex + 1 ? (
             <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
-              Next
+              {t('next')}
             </Button>
           ) : (
             <Button id="button-changelog-close" variant="primary" onClick={handleClose}>
-              Close
+              {t('close')}
             </Button>
           )}
         </Stack>

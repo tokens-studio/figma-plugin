@@ -18,7 +18,7 @@ describe('JSONBinTokenStorage', () => {
           options: {},
         },
         $metadata: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt,
         },
       }, null, 2),
@@ -222,7 +222,7 @@ describe('JSONBinTokenStorage', () => {
       type: 'metadata',
       path: '$metadata.json',
       data: {
-        version: pjs.plugin_version,
+        version: pjs.version,
         updatedAt: '2022-06-15T10:00:00.000Z',
       },
     });
@@ -275,7 +275,7 @@ describe('JSONBinTokenStorage', () => {
         type: 'metadata',
         path: 'metadata.json',
         data: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt: '2022-06-15T10:00:00.000Z',
           tokenSetOrder: [],
         },
@@ -299,7 +299,7 @@ describe('JSONBinTokenStorage', () => {
           },
         },
         $metadata: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt: '2022-06-15T10:00:00.000Z',
           tokenSetOrder: [],
         },
@@ -367,7 +367,7 @@ describe('JSONBinTokenStorage', () => {
           },
         },
         $metadata: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt: '2022-06-15T10:00:00.000Z',
         },
         $themes: [
@@ -423,7 +423,7 @@ describe('JSONBinTokenStorage', () => {
           },
         },
         $metadata: {
-          version: pjs.plugin_version,
+          version: pjs.version,
           updatedAt: '2022-06-15T10:00:00.000Z',
         },
         $themes: [],

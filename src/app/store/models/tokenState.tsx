@@ -35,6 +35,8 @@ import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState'
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
+import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
+import { wrapTransaction } from '@/profiling/transaction';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -478,6 +480,33 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       remoteData: data,
     }),
+    renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
+      const {
+        oldName, newName, type, tokenSets,
+      } = data;
+      const newTokens: TokenStore['values'] = {};
+      Object.keys(state.tokens).forEach((tokenSet) => {
+        if (tokenSets.includes(tokenSet)) {
+          const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === oldName && n.type === type);
+          if (existingTokenIndex > -1) {
+            const existingTokens = [...state.tokens[tokenSet]];
+            existingTokens.splice(existingTokenIndex, 1, {
+              ...state.tokens[tokenSet][existingTokenIndex],
+              name: newName,
+            } as SingleToken);
+            newTokens[tokenSet] = existingTokens;
+          }
+        }
+      });
+
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          ...newTokens,
+        },
+      };
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -547,12 +576,20 @@ export const tokenState = createModel<RootModel>()({
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
+    renameTokenAcrossSets(data: RenameTokensAcrossSetsPayload) {
+      const {
+        oldName, newName,
+      } = data;
 
+      dispatch.tokenState.updateAliases({ oldName, newName });
+    },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
       try {
-        updateTokensOnSources({
+        wrapTransaction({
+          name: 'updateDocument',
+        }, () => updateTokensOnSources({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
           tokenValues: rootState.tokenState.tokens,
           usedTokenSet: rootState.tokenState.usedTokenSet,
@@ -570,7 +607,7 @@ export const tokenState = createModel<RootModel>()({
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
           collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
           dispatch,
-        });
+        }));
       } catch (e) {
         console.error('Error updating document', e);
       }
