@@ -15,6 +15,18 @@ import SingleTypographyDownShiftInput from './SingleTypographyDownShiftInput';
 import DownshiftInput from './DownshiftInput';
 import Stack from './Stack';
 
+const properties = {
+  fontSize: 'fontSizes',
+  fontFamily: 'fontFamilies',
+  fontWeight: 'fontWeights',
+  letterSpacing: 'letterSpacing',
+  paragraphSpacing: 'paragraphSpacing',
+  paragraphIndent: 'paragraphIndent',
+  textDecoration: 'textDecoration',
+  lineHeight: 'lineHeights',
+  textCase: 'textCase',
+};
+
 export default function TypographyInput({
   internalEditToken,
   handleTypographyValueChange,
@@ -63,18 +75,6 @@ export default function TypographyInput({
     setMode((mode === 'input') ? 'alias' : 'input');
     setAlias('');
   }, [mode, selectedToken, internalEditToken, setTypographyValue]);
-
-  const properties = {
-    fontFamily: t('font.fontFamily'),
-    fontWeight: t('font.fontWeight'),
-    fontSize: t('font.fontSize'),
-    lineHeight: t('font.lineHeight'),
-    letterSpacing: t('font.letterSpacing'),
-    paragraphSpacing: t('font.paragraphSpacing'),
-    paragraphIndent: t('font.paragraphIndent'),
-    textDecoration: t('font.textDecoration'),
-    textCase: t('font.textCase'),
-  };
 
   return (
     <Stack direction="column" gap={2}>
