@@ -1,8 +1,8 @@
 const path = require('path');
 
 module.exports = (env, argv) => ({
-  mode: argv.mode === 'production' ? 'production' : 'development',
-
+  mode: 'development',
+  devtool: 'source-map',
   entry: {
     benchmark: './benchmark/index.ts', // The entry point for your plugin code
   },

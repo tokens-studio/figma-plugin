@@ -12,3 +12,4 @@ storybook-static
 coverage
 .DS_Store
 benchmark/flamegraphs
+**.0x
