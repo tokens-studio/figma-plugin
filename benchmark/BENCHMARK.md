@@ -5,4 +5,4 @@ To build:
 Watch can cause issues with 0x as it's watching the SIGINT/SIGTERM
 
 To run:
-`npm run benchmark:run`
+`node benchmark/index.mjs`

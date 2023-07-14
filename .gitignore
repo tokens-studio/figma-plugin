@@ -11,6 +11,7 @@ package
 storybook-static
 coverage
 .DS_Store
-benchmark/flamegraphs
+benchmark/output
 benchmark/build
+
 **.0x

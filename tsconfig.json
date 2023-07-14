@@ -41,5 +41,5 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "benchmark/**/*.ts"
-  ]
+, "benchmark/index.js", "benchmark/index.js"  ]
 }

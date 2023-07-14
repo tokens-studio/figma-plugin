@@ -13,9 +13,11 @@ const sourceRoot = path.join(benchRoot, 'tests');
 
 const outputPath = path.join(__dirname, '../benchmark/output')
 
+
 if(!fs.existsSync(outputPath)){
   fs.mkdirSync(outputPath)
 }
+
 
 async function benchmark() {
 const tests = await glob('**/*.js', {
@@ -23,10 +25,6 @@ const tests = await glob('**/*.js', {
 });
 
 tests.forEach((test) => {
-  // const testOutputPath = path.join(outputPath, test) 
-  // if(!fs.existsSync(testOutputPath)){
-  //   fs.mkdirSync(testOutputPath)
-  // }
 
   const capture = async() => {
     
@@ -43,7 +41,7 @@ tests.forEach((test) => {
       console.error(err)
     }
    }
-   capture ()
+   capture()
 })
 
 }
