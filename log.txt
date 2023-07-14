@@ -1,0 +1,8 @@
+
+> @tokens-studio/figma-plugin@1.37.4 benchmark:run
+> 0x -D ./benchmark/flamegraphs/ -o benchmark/build/benchmark.js
+
+🔥  ProfilingStarting benchmark...
+All benchmarks ran...
+[1000D[0K🔥  Process exited, generating flamegraph[1000D[0K🔥  Flamegraph generated in
+file:///Volumes/Work/code/figma-plugin/benchmark/flamegraphs/flamegraph.html

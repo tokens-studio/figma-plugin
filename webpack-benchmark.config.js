@@ -1,10 +1,25 @@
 const path = require('path');
+const fs = require('fs');
 
 module.exports = (env, argv) => ({
   mode: 'development',
   devtool: 'source-map',
-  entry: {
-    benchmark: './benchmark/index.ts', // The entry point for your plugin code
+  entry: () => {
+    const entryPoints = {};
+    const testsPath = path.resolve(__dirname, 'benchmark/tests');
+    const files = fs.readdirSync(testsPath);
+    
+    files.forEach((file) => {
+      const fileName = file.replace('.ts', '');
+      entryPoints[fileName] = path.resolve(testsPath, file);
+    });
+
+    return entryPoints;
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'benchmark/build/tests'), // Compile into a folder called "build"
+    clean: true
   },
 
   module: {
@@ -42,8 +57,5 @@ module.exports = (env, argv) => ({
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
 
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'benchmark/build'), // Compile into a folder called "build"
-  },
+
 });

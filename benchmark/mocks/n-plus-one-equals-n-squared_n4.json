@@ -1,0 +1,22 @@
+{
+  "index_0": {
+    "value": "10px",
+    "type": "dimension"
+  },
+  "index_1": {
+    "value": "{index_0} * {index_0}",
+    "type": "dimension"
+  },
+  "index_2": {
+    "value": "{index_1} * {index_1}",
+    "type": "dimension"
+  },
+  "index_3": {
+    "value": "{index_2} * {index_2}",
+    "type": "dimension"
+  },
+  "index_4": {
+    "value": "{index_3} * {index_3}",
+    "type": "dimension"
+  }
+}
