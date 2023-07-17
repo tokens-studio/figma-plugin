@@ -70,7 +70,7 @@ const Navbar: React.FC = () => {
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { (existingKey && !licenseKeyError) && <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} endEnhancer={<IconSecondScreen />} tooltip={t('secondScreen')} onSwitch={handleSwitch} />}
+        { (existingKey && !licenseKeyError) && <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} endEnhancer={<IconSecondScreen />} tooltip="Second Screen" onSwitch={handleSwitch} />}
         <TokenFlowButton />
         <IconButton size="large" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>

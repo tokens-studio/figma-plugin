@@ -73,7 +73,7 @@ export default function SecondScreen() {
 
         <Stack direction="column" gap={2} css={{ padding: '0 $4' }} justify="between" align="start">
           <Heading>
-            {t('secondScreen', { ns: 'general' })}
+            Second Screen
             {' '}
             <StyledBetaBadge>BETA</StyledBetaBadge>
           </Heading>

@@ -207,7 +207,7 @@ function Settings() {
 
         </Stack>
         <Divider />
-        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+        <Stack direction="column" gap={3} css={{ padding: '0 $4' }} align="start">
           <Heading size="small">{t('language')}</Heading>
           <LanguageSelector />
           <Stack direction="row" gap={2} align="center">
