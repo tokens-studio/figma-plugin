@@ -103,7 +103,6 @@ export default function ApplySelector() {
               <DropdownMenuItemIndicator>
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
-              {t('applyTo.page.description')}
               {t('applyTo.doc.title')}
               <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.doc.description')}
