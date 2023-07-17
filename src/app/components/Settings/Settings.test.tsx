@@ -61,7 +61,7 @@ describe('Settings Component', () => {
     const result = render(<Settings />);
     fireEvent.click(result.getByTestId('reset-onboarding'));
 
-    result.rerender(<Settings />); // I had to add this line for it to work?
+    result.rerender(<Settings />);
 
     expect(result.queryByText('whereTokensStored')).toBeNull();
   });
