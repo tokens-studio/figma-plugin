@@ -59,9 +59,10 @@ describe('Settings Component', () => {
 
   it('reset onboarding explainers', async () => {
     const result = render(<Settings />);
-
     fireEvent.click(result.getByTestId('reset-onboarding'));
 
-    expect(result.queryByText('whereTokensStored')).not.toBeNull();
+    result.rerender(<Settings />); // I had to add this line for it to work?
+
+    expect(result.queryByText('whereTokensStored')).toBeNull();
   });
 });

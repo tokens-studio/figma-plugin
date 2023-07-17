@@ -19,6 +19,11 @@ export const LanguageSelector = () => {
 
   const currentLang = useSelector(languageSelector);
 
+  let langs = [...languages];
+  if (process.env.ENVIRONMENT === 'development') {
+    langs = [...languages, { code: 'debug', title: 'DEBUG' }];
+  }
+
   const handleValueChange = React.useCallback(
     (value: string) => {
       track('setLanguage', { value });
@@ -39,17 +44,13 @@ export const LanguageSelector = () => {
         }}
         data-testid="choose-language"
       >
-        Lang
-        {' '}
-        -
-        {' '}
-        {currentLang}
+        {langs.find((l) => l.code === currentLang)?.title}
         <IconChevronDown />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top">
         <DropdownMenuRadioGroup value={currentLang} onValueChange={handleValueChange}>
-          {languages.map((lang) => (
+          {langs.map((lang) => (
 
             <DropdownMenuRadioItem
               key={lang.code}
