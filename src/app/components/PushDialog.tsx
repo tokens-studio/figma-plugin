@@ -139,11 +139,11 @@ function PushDialog() {
           close={onCancel}
         >
           <Stack direction="column" gap={4}>
-            <div>
+            <Stack direction="row">
               <TabButton<string> name="commit" activeTab={activeTab} label={t('commit')} onSwitch={handleSwitch} />
               <TabButton<string> name="diff" activeTab={activeTab} label={t('diff')} onSwitch={handleSwitch} />
               <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
-            </div>
+            </Stack>
             {
               activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
                 <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
