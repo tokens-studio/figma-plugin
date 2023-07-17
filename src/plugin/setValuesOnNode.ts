@@ -32,6 +32,8 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 
 // @README values typing is wrong
 
+const hasAutoLayout = (node: SceneNode) => 'layoutMode' in node && typeof node.layoutMode !== 'undefined';
+
 export default async function setValuesOnNode(
   node: BaseNode,
   values: MapValuesToTokensResult,
@@ -270,10 +272,41 @@ export default async function setValuesOnNode(
         }
       }
 
-      // SIZING: HEIGHT
-      if ('resize' in node && typeof values.height !== 'undefined' && typeof data.height !== 'undefined' && isPrimitiveValue(values.height)) {
-        if (!(await tryApplyVariableId(node, 'height', data.height, figmaVariableReferences, figmaVariableMaps))) {
-          node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+      // min width, max width, min height, max height only are applicable to autolayout frames or their direct children
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && (hasAutoLayout(node) || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && hasAutoLayout(node.parent)))) {
+        // SIZING: HEIGHT
+        if ('resize' in node && typeof values.height !== 'undefined' && typeof data.height !== 'undefined' && isPrimitiveValue(values.height)) {
+          if (!(await tryApplyVariableId(node, 'height', data.height, figmaVariableReferences, figmaVariableMaps))) {
+            node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+          }
+        }
+
+        // SIZING: MIN WIDTH
+        if ('minWidth' in node && typeof values.minWidth !== 'undefined' && typeof data.minWidth !== 'undefined' && isPrimitiveValue(values.minWidth)) {
+          if (!(await tryApplyVariableId(node, 'minWidth', data.minWidth, figmaVariableReferences, figmaVariableMaps))) {
+            node.minWidth = transformValue(String(values.minWidth), 'sizing', baseFontSize);
+          }
+        }
+
+        // SIZING: MAX WIDTH
+        if ('maxWidth' in node && typeof values.maxWidth !== 'undefined' && typeof data.maxWidth !== 'undefined' && isPrimitiveValue(values.maxWidth)) {
+          if (!(await tryApplyVariableId(node, 'maxWidth', data.maxWidth, figmaVariableReferences, figmaVariableMaps))) {
+            node.maxWidth = transformValue(String(values.maxWidth), 'sizing', baseFontSize);
+          }
+        }
+
+        // SIZING: MIN HEIGHT
+        if ('minHeight' in node && typeof values.minHeight !== 'undefined' && typeof data.minHeight !== 'undefined' && isPrimitiveValue(values.minHeight)) {
+          if (!(await tryApplyVariableId(node, 'minHeight', data.minHeight, figmaVariableReferences, figmaVariableMaps))) {
+            node.minHeight = transformValue(String(values.minHeight), 'sizing', baseFontSize);
+          }
+        }
+
+        // SIZING: MAX HEIGHT
+        if ('maxHeight' in node && typeof values.maxHeight !== 'undefined' && typeof data.maxHeight !== 'undefined' && isPrimitiveValue(values.maxHeight)) {
+          if (!(await tryApplyVariableId(node, 'maxHeight', data.maxHeight, figmaVariableReferences, figmaVariableMaps))) {
+            node.maxHeight = transformValue(String(values.maxHeight), 'sizing', baseFontSize);
+          }
         }
       }
 
@@ -454,11 +487,19 @@ export default async function setValuesOnNode(
       }
 
       if ('itemSpacing' in node && typeof values.itemSpacing !== 'undefined' && typeof data.itemSpacing !== 'undefined' && isPrimitiveValue(values.itemSpacing)) {
-        if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
+        if (String(values.itemSpacing) === 'AUTO') {
+          node.primaryAxisAlignItems = 'SPACE_BETWEEN';
+        } else if (node.primaryAxisAlignItems === 'SPACE_BETWEEN') {
           node.primaryAxisAlignItems = 'MIN';
         }
         if (!(await tryApplyVariableId(node, 'itemSpacing', data.itemSpacing, figmaVariableReferences, figmaVariableMaps))) {
           node.itemSpacing = transformValue(String(values.itemSpacing), 'spacing', baseFontSize);
+        }
+      }
+
+      if ('counterAxisSpacing' in node && typeof values.counterAxisSpacing !== 'undefined' && typeof data.counterAxisSpacing !== 'undefined' && isPrimitiveValue(values.counterAxisSpacing)) {
+        if (!(await tryApplyVariableId(node, 'counterAxisSpacing', data.counterAxisSpacing, figmaVariableReferences, figmaVariableMaps))) {
+          node.counterAxisSpacing = transformValue(String(values.counterAxisSpacing), 'spacing', baseFontSize);
         }
       }
 

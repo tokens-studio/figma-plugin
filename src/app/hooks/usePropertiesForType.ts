@@ -5,6 +5,44 @@ import { PropertyObject } from '@/types/properties';
 import { isPropertyType } from '@/utils/is';
 import { SingleToken } from '@/types/tokens';
 
+const spacingProperties = (value?: SingleToken['value']) => {
+  const disabledForMultiValue = typeof value === 'string' && value.split(' ').length > 1;
+  return [
+    { label: 'Gap', name: Properties.itemSpacing },
+    {
+      label: 'All',
+      name: Properties.spacing,
+      clear: [
+        Properties.counterAxisSpacing,
+        Properties.horizontalPadding,
+        Properties.verticalPadding,
+        Properties.paddingLeft,
+        Properties.paddingRight,
+        Properties.paddingTop,
+        Properties.paddingBottom,
+      ],
+    },
+    { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: disabledForMultiValue },
+    { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: disabledForMultiValue },
+    { label: 'Vertical padding', name: Properties.verticalPadding, disabled: disabledForMultiValue },
+    { label: 'Top', name: Properties.paddingTop, disabled: disabledForMultiValue },
+    { label: 'Right', name: Properties.paddingRight, disabled: disabledForMultiValue },
+    { label: 'Bottom', name: Properties.paddingBottom, disabled: disabledForMultiValue },
+    { label: 'Left', name: Properties.paddingLeft, disabled: disabledForMultiValue }];
+};
+
+const sizingProperties = [{
+  label: 'All',
+  name: Properties.sizing,
+  clear: [Properties.width, Properties.height, Properties.minWidth, Properties.maxWidth, Properties.minHeight, Properties.maxHeight],
+},
+{ label: 'Width', name: Properties.width },
+{ label: 'Height', name: Properties.height },
+{ label: 'Min width', name: Properties.minWidth },
+{ label: 'Max width', name: Properties.maxWidth },
+{ label: 'Min height', name: Properties.minHeight },
+{ label: 'Max height', name: Properties.maxHeight }];
+
 export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken['value']): PropertyObject[] {
   let disabled = false;
   if ((type === TokenTypes.BORDER_RADIUS || type === TokenTypes.SPACING) && typeof value === 'string') {
@@ -68,65 +106,10 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
         );
         break;
       case TokenTypes.SPACING:
-        if (typeof value === 'string' && value.split(' ').length > 1) {
-          properties.push(
-            {
-              label: 'All',
-              icon: 'Spacing',
-              name: Properties.spacing,
-              clear: [
-                Properties.horizontalPadding,
-                Properties.verticalPadding,
-                Properties.paddingLeft,
-                Properties.paddingRight,
-                Properties.paddingTop,
-                Properties.paddingBottom,
-              ],
-            },
-            {
-              label: 'Gap',
-              name: Properties.itemSpacing,
-              icon: 'Gap',
-              disabled,
-            },
-            { label: 'Top', name: Properties.paddingTop, disabled },
-            { label: 'Right', name: Properties.paddingRight, disabled },
-            { label: 'Bottom', name: Properties.paddingBottom, disabled },
-            { label: 'Left', name: Properties.paddingLeft, disabled },
-          );
-        } else {
-          properties.push(
-            { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
-            {
-              label: 'All',
-              icon: 'Spacing',
-              name: Properties.spacing,
-              clear: [
-                Properties.horizontalPadding,
-                Properties.verticalPadding,
-                Properties.paddingLeft,
-                Properties.paddingRight,
-                Properties.paddingTop,
-                Properties.paddingBottom,
-              ],
-            },
-            { label: 'Top', name: Properties.paddingTop },
-            { label: 'Right', name: Properties.paddingRight },
-            { label: 'Bottom', name: Properties.paddingBottom },
-            { label: 'Left', name: Properties.paddingLeft },
-          );
-        }
+        properties.push(...spacingProperties(value));
         break;
       case TokenTypes.SIZING:
-        properties.push(
-          {
-            label: 'All',
-            name: Properties.sizing,
-            clear: [Properties.width, Properties.height],
-          },
-          { label: 'Width', name: Properties.width },
-          { label: 'Height', name: Properties.height },
-        );
+        properties.push(...sizingProperties);
         break;
       case TokenTypes.COLOR:
         properties.push(
@@ -158,38 +141,14 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
             label: 'Spacing',
             name: Properties.spacing,
             childProperties: [
-              { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
-              {
-                label: 'All',
-                icon: 'Spacing',
-                name: Properties.spacing,
-                clear: [
-                  Properties.horizontalPadding,
-                  Properties.verticalPadding,
-                  Properties.itemSpacing,
-                  Properties.paddingLeft,
-                  Properties.paddingRight,
-                  Properties.paddingTop,
-                  Properties.paddingBottom,
-                ],
-              },
-              { label: 'Top', name: Properties.paddingTop },
-              { label: 'Right', name: Properties.paddingRight },
-              { label: 'Bottom', name: Properties.paddingBottom },
-              { label: 'Left', name: Properties.paddingLeft },
+              ...spacingProperties(value),
             ],
           },
           {
             label: 'Sizing',
             name: Properties.sizing,
             childProperties: [
-              {
-                label: 'All',
-                name: Properties.sizing,
-                clear: [Properties.width, Properties.height],
-              },
-              { label: 'Width', name: Properties.width },
-              { label: 'Height', name: Properties.height },
+              ...sizingProperties,
             ],
           },
           {
@@ -253,5 +212,5 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
         break;
     }
     return properties;
-  }, [type]);
+  }, [disabled, type, value]);
 }
