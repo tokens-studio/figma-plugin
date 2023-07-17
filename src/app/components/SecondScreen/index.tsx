@@ -114,7 +114,7 @@ export default function SecondScreen() {
                       {isEnabled && user ? t('connected') : t('notConnected')}
                     </Stack>
                     <Box>
-                      {isEnabled && user ? t('liveSyncWithSecondScreenActive') : t('liveSyncInactive')}
+                      {isEnabled && user ? t('liveSyncActive') : t('liveSyncInactive')}
                     </Box>
 
                   </Stack>
