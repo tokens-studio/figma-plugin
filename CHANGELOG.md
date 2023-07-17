@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.5
+
+### Patch Changes
+
+Bugs addressed:
+
+- Fixed an issue where autocomplete was not working for Typography tokens
+- Fixed an issue where the connection between a variable and token would get lost after pushing and pulling from ADO
+
 ## 1.37.4
 
 ### Patch Changes

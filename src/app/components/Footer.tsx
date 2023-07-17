@@ -66,7 +66,7 @@ export default function Footer() {
       checkRemoteChange().then((response: boolean) => {
         setHasRemoteChange(response);
       });
-    }, 3000);
+    }, 60000);
     return () => clearInterval(interval);
   }, [checkRemoteChange]);
 
