@@ -228,11 +228,12 @@ describe('usePropertiesForTokenType', () => {
           label: 'Spacing',
           name: Properties.spacing,
           childProperties: [
-            { label: 'Gap', name: Properties.itemSpacing },
+            { label: 'Gap', name: Properties.itemSpacing, disabled: false },
             {
               label: 'All',
               name: Properties.spacing,
               clear: [
+                Properties.counterAxisSpacing,
                 Properties.horizontalPadding,
                 Properties.verticalPadding,
                 Properties.itemSpacing,
@@ -242,10 +243,13 @@ describe('usePropertiesForTokenType', () => {
                 Properties.paddingBottom,
               ],
             },
-            { label: 'Top', name: Properties.paddingTop },
-            { label: 'Right', name: Properties.paddingRight },
-            { label: 'Bottom', name: Properties.paddingBottom },
-            { label: 'Left', name: Properties.paddingLeft },
+            { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: false },
+            { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: false },
+            { label: 'Vertical padding', name: Properties.verticalPadding, disabled: false },
+            { label: 'Top', name: Properties.paddingTop, disabled: false },
+            { label: 'Right', name: Properties.paddingRight, disabled: false },
+            { label: 'Bottom', name: Properties.paddingBottom, disabled: false },
+            { label: 'Left', name: Properties.paddingLeft, disabled: false },
           ],
         },
         {
@@ -259,6 +263,10 @@ describe('usePropertiesForTokenType', () => {
             },
             { label: 'Width', name: Properties.width },
             { label: 'Height', name: Properties.height },
+            { label: 'Min width', name: Properties.minWidth },
+            { label: 'Max width', name: Properties.maxWidth },
+            { label: 'Min height', name: Properties.minHeight },
+            { label: 'Max height', name: Properties.maxHeight },
           ],
         },
         {
