@@ -8,8 +8,7 @@ import { SingleToken } from '@/types/tokens';
 const spacingProperties = (value?: SingleToken['value']) => {
   const isMultiValue = typeof value === 'string' && value.split(' ').length > 1;
   const gapIndex = isMultiValue ? 2 : 0;
-  return [
-    { label: 'Gap', name: Properties.itemSpacing },
+  const properties = [
     {
       label: 'All',
       name: Properties.spacing,
@@ -30,7 +29,10 @@ const spacingProperties = (value?: SingleToken['value']) => {
     { label: 'Right', name: Properties.paddingRight, disabled: isMultiValue },
     { label: 'Bottom', name: Properties.paddingBottom, disabled: isMultiValue },
     { label: 'Left', name: Properties.paddingLeft, disabled: isMultiValue },
-  ].splice(gapIndex, 0, { label: 'Gap', name: Properties.itemSpacing });
+  ];
+
+  properties.splice(gapIndex, 0, { label: 'Gap', name: Properties.itemSpacing, disabled: isMultiValue });
+  return properties;
 };
 
 const sizingProperties = [{
