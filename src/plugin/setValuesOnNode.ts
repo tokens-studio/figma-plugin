@@ -3,6 +3,7 @@ import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { isAutoLayout } from '@/utils/isAutoLayout';
 import {
   effectStyleMatchesBoxShadowToken,
   paintStyleMatchesColorToken,
@@ -31,8 +32,6 @@ import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 
 // @README values typing is wrong
-
-const hasAutoLayout = (node: SceneNode) => 'layoutMode' in node && typeof node.layoutMode !== 'undefined';
 
 export default async function setValuesOnNode(
   node: BaseNode,
@@ -272,15 +271,15 @@ export default async function setValuesOnNode(
         }
       }
 
-      // min width, max width, min height, max height only are applicable to autolayout frames or their direct children
-      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && (hasAutoLayout(node) || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && hasAutoLayout(node.parent)))) {
-        // SIZING: HEIGHT
-        if ('resize' in node && typeof values.height !== 'undefined' && typeof data.height !== 'undefined' && isPrimitiveValue(values.height)) {
-          if (!(await tryApplyVariableId(node, 'height', data.height, figmaVariableReferences, figmaVariableMaps))) {
-            node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
-          }
+      // SIZING: HEIGHT
+      if ('resize' in node && typeof values.height !== 'undefined' && typeof data.height !== 'undefined' && isPrimitiveValue(values.height)) {
+        if (!(await tryApplyVariableId(node, 'height', data.height, figmaVariableReferences, figmaVariableMaps))) {
+          node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
         }
+      }
 
+      // min width, max width, min height, max height only are applicable to autolayout frames or their direct children
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && (isAutoLayout(node) || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))) {
         // SIZING: MIN WIDTH
         if ('minWidth' in node && typeof values.minWidth !== 'undefined' && typeof data.minWidth !== 'undefined' && isPrimitiveValue(values.minWidth)) {
           if (!(await tryApplyVariableId(node, 'minWidth', data.minWidth, figmaVariableReferences, figmaVariableMaps))) {
