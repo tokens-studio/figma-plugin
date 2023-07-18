@@ -80,7 +80,7 @@ export default function SecondScreen() {
           <StyledP>
             {t('secondScreenExplainer')}
           </StyledP>
-          <StyledReadMoreLink href="docs.tokens.studio" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
+          <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
         </Stack>
         {
           user ? (
