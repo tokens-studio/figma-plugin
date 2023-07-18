@@ -14,8 +14,9 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
     [key: string]: any;
     'studio.tokens'?: {
       [key: string]: any;
-      modify?: ColorModifier
-    }
+      modify?: ColorModifier;
+    },
+    id: string;
   }
 } & (Named extends true ? {
   name: string;

@@ -1,9 +1,10 @@
 import type { BackgroundJob } from '@/app/store/models/uiState';
 import type { SelectionGroup } from './SelectionGroup';
 import type { SelectionValue } from './SelectionValue';
-import type { AnyTokenList, TokenStore } from './tokens';
+import type { TokenStore } from './tokens';
 import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageTypeCredentials } from './StorageType';
+import { StyleToCreateToken } from './payloads';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -62,7 +63,7 @@ export type ApiProvidersFromPluginMessage = {
 };
 export type StylesFromPluginMessage = {
   type: MessageFromPluginTypes.STYLES;
-  values?: Record<string, AnyTokenList>;
+  values?: Record<string, StyleToCreateToken[]>;
 };
 export type StartJobFromPluginMessage = {
   type: MessageFromPluginTypes.START_JOB;
