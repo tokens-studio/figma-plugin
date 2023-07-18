@@ -60,12 +60,12 @@ describe('usePropertiesForTokenType', () => {
     {
       type: 'spacing',
       properties: [
-        { label: 'Gap', name: Properties.itemSpacing },
+        { label: 'Gap', name: Properties.itemSpacing, disabled: false },
         {
           label: 'All',
-          icon: 'Spacing',
           name: Properties.spacing,
           clear: [
+            Properties.counterAxisSpacing,
             Properties.horizontalPadding,
             Properties.verticalPadding,
             Properties.paddingLeft,
@@ -74,10 +74,13 @@ describe('usePropertiesForTokenType', () => {
             Properties.paddingBottom,
           ],
         },
-        { label: 'Top', name: Properties.paddingTop },
-        { label: 'Right', name: Properties.paddingRight },
-        { label: 'Bottom', name: Properties.paddingBottom },
-        { label: 'Left', name: Properties.paddingLeft },
+        { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: false },
+        { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: false },
+        { label: 'Vertical padding', name: Properties.verticalPadding, disabled: false },
+        { label: 'Top', name: Properties.paddingTop, disabled: false },
+        { label: 'Right', name: Properties.paddingRight, disabled: false },
+        { label: 'Bottom', name: Properties.paddingBottom, disabled: false },
+        { label: 'Left', name: Properties.paddingLeft, disabled: false },
       ],
     },
     {
@@ -225,10 +228,9 @@ describe('usePropertiesForTokenType', () => {
           label: 'Spacing',
           name: Properties.spacing,
           childProperties: [
-            { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
+            { label: 'Gap', name: Properties.itemSpacing },
             {
               label: 'All',
-              icon: 'Spacing',
               name: Properties.spacing,
               clear: [
                 Properties.horizontalPadding,
@@ -449,6 +451,8 @@ describe('usePropertiesForTokenType', () => {
       },
       { label: 'Gap', name: Properties.itemSpacing, disabled: true },
       { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: true },
+      { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: true },
+      { label: 'Vertical padding', name: Properties.verticalPadding, disabled: true },
       { label: 'Top', name: Properties.paddingTop, disabled: true },
       { label: 'Right', name: Properties.paddingRight, disabled: true },
       { label: 'Bottom', name: Properties.paddingBottom, disabled: true },

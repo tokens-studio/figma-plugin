@@ -7,7 +7,7 @@ import { SingleToken } from '@/types/tokens';
 
 const spacingProperties = (value?: SingleToken['value']) => {
   const isMultiValue = typeof value === 'string' && value.split(' ').length > 1;
-  const gapIndex = isMultiValue ? 2 : 0;
+  const gapIndex = isMultiValue ? 1 : 0;
   const properties = [
     {
       label: 'All',
