@@ -51,12 +51,16 @@ describe('usePropertiesForTokenType', () => {
         },
         { label: 'Width', name: Properties.width },
         { label: 'Height', name: Properties.height },
+        { label: 'Min width', name: Properties.minWidth },
+        { label: 'Max width', name: Properties.maxWidth },
+        { label: 'Min height', name: Properties.minHeight },
+        { label: 'Max height', name: Properties.maxHeight },
       ],
     },
     {
       type: 'spacing',
       properties: [
-        { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
+        { label: 'Gap', name: Properties.itemSpacing },
         {
           label: 'All',
           icon: 'Spacing',
@@ -312,10 +316,9 @@ describe('usePropertiesForTokenType', () => {
           label: 'Spacing',
           name: Properties.spacing,
           childProperties: [
-            { label: 'Gap', name: Properties.itemSpacing, icon: 'Gap' },
+            { label: 'Gap', name: Properties.itemSpacing },
             {
               label: 'All',
-              icon: 'Spacing',
               name: Properties.spacing,
               clear: [
                 Properties.horizontalPadding,
@@ -433,9 +436,9 @@ describe('usePropertiesForTokenType', () => {
     expect(result.current).toEqual([
       {
         label: 'All',
-        icon: 'Spacing',
         name: Properties.spacing,
         clear: [
+          Properties.counterAxisSpacing,
           Properties.horizontalPadding,
           Properties.verticalPadding,
           Properties.paddingLeft,
@@ -444,12 +447,8 @@ describe('usePropertiesForTokenType', () => {
           Properties.paddingBottom,
         ],
       },
-      {
-        label: 'Gap',
-        name: Properties.itemSpacing,
-        icon: 'Gap',
-        disabled: true,
-      },
+      { label: 'Gap', name: Properties.itemSpacing, disabled: true },
+      { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: true },
       { label: 'Top', name: Properties.paddingTop, disabled: true },
       { label: 'Right', name: Properties.paddingRight, disabled: true },
       { label: 'Bottom', name: Properties.paddingBottom, disabled: true },

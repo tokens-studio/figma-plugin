@@ -6,7 +6,8 @@ import { isPropertyType } from '@/utils/is';
 import { SingleToken } from '@/types/tokens';
 
 const spacingProperties = (value?: SingleToken['value']) => {
-  const disabledForMultiValue = typeof value === 'string' && value.split(' ').length > 1;
+  const isMultiValue = typeof value === 'string' && value.split(' ').length > 1;
+  const gapIndex = isMultiValue ? 2 : 0;
   return [
     { label: 'Gap', name: Properties.itemSpacing },
     {
@@ -22,19 +23,20 @@ const spacingProperties = (value?: SingleToken['value']) => {
         Properties.paddingBottom,
       ],
     },
-    { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: disabledForMultiValue },
-    { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: disabledForMultiValue },
-    { label: 'Vertical padding', name: Properties.verticalPadding, disabled: disabledForMultiValue },
-    { label: 'Top', name: Properties.paddingTop, disabled: disabledForMultiValue },
-    { label: 'Right', name: Properties.paddingRight, disabled: disabledForMultiValue },
-    { label: 'Bottom', name: Properties.paddingBottom, disabled: disabledForMultiValue },
-    { label: 'Left', name: Properties.paddingLeft, disabled: disabledForMultiValue }];
+    { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: isMultiValue },
+    { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: isMultiValue },
+    { label: 'Vertical padding', name: Properties.verticalPadding, disabled: isMultiValue },
+    { label: 'Top', name: Properties.paddingTop, disabled: isMultiValue },
+    { label: 'Right', name: Properties.paddingRight, disabled: isMultiValue },
+    { label: 'Bottom', name: Properties.paddingBottom, disabled: isMultiValue },
+    { label: 'Left', name: Properties.paddingLeft, disabled: isMultiValue },
+  ].splice(gapIndex, 0, { label: 'Gap', name: Properties.itemSpacing });
 };
 
 const sizingProperties = [{
   label: 'All',
   name: Properties.sizing,
-  clear: [Properties.width, Properties.height, Properties.minWidth, Properties.maxWidth, Properties.minHeight, Properties.maxHeight],
+  clear: [Properties.width, Properties.height],
 },
 { label: 'Width', name: Properties.width },
 { label: 'Height', name: Properties.height },
