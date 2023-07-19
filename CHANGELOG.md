@@ -1,3 +1,4 @@
+foo
 # @tokens-studio/figma-plugin
 
 ## 1.37.5
