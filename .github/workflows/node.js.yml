@@ -84,7 +84,7 @@ jobs:
       # Note that due to the older version of jest along with the amount of logs we produce, we add in --watch to prevent error code 1 when a large amount of console logs are emitted 
       # https://github.com/jestjs/jest/issues/11132
       - name: Run test command
-        run: npm run test -- --verbose 
+        run: npm run test -- --silent 
   coverage:
     name: Test coverage
     continue-on-error: true
