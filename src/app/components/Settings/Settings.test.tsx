@@ -59,7 +59,9 @@ describe('Settings Component', () => {
 
   it('reset onboarding explainers', async () => {
     const result = render(<Settings />);
+
     fireEvent.click(result.getByTestId('reset-onboarding'));
-    expect(result.queryByText('whereTokensStored')).toBeNull();
+
+    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
   });
 });

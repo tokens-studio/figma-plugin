@@ -53,7 +53,7 @@ export const i18nInstance = i18n
   // pass the i18n instance to react-i18next.
   .use(initReactI18next)
   .init({
-    fallbackLng: process.env.ENVIRONMENT === 'production' ? 'en' : '',
+    fallbackLng: 'en',
     resources,
     defaultNS: 'general',
     ns: namespaces,
