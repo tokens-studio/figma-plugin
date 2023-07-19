@@ -236,7 +236,6 @@ describe('usePropertiesForTokenType', () => {
                 Properties.counterAxisSpacing,
                 Properties.horizontalPadding,
                 Properties.verticalPadding,
-                Properties.itemSpacing,
                 Properties.paddingLeft,
                 Properties.paddingRight,
                 Properties.paddingTop,
