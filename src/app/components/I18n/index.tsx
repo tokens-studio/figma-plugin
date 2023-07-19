@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Dispatch } from '@/app/store';
 
 import {
@@ -18,11 +18,7 @@ export const LanguageSelector = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const currentLang = useSelector(languageSelector);
-
-  let langs = [...languages];
-  if (process.env.ENVIRONMENT === 'development') {
-    langs = [...languages, { code: 'debug', title: 'DEBUG' }];
-  }
+  const displayLang = useMemo(() => languages.find((l) => l.code === currentLang)?.title, [currentLang]);
 
   const handleValueChange = React.useCallback(
     (value: string) => {
@@ -44,13 +40,13 @@ export const LanguageSelector = () => {
         }}
         data-testid="choose-language"
       >
-        {langs.find((l) => l.code === currentLang)?.title}
+        {displayLang}
         <IconChevronDown />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="top">
         <DropdownMenuRadioGroup value={currentLang} onValueChange={handleValueChange}>
-          {langs.map((lang) => (
+          {languages.map((lang) => (
 
             <DropdownMenuRadioItem
               key={lang.code}

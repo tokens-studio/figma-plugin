@@ -60,9 +60,6 @@ describe('Settings Component', () => {
   it('reset onboarding explainers', async () => {
     const result = render(<Settings />);
     fireEvent.click(result.getByTestId('reset-onboarding'));
-
-    result.rerender(<Settings />);
-
     expect(result.queryByText('whereTokensStored')).toBeNull();
   });
 });
