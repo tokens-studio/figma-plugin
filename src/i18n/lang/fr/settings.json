@@ -29,5 +29,7 @@
   "connected": "Connecté",
   "notConnected": "Pas connecté",
   "liveSyncWithSecondScreenActive": "Synchronisation en direct avec le deuxième écran actif",
-  "liveSyncInactive": "Synchronisation en direct inactive"
+  "liveSyncInactive": "Synchronisation en direct inactive",
+  "ignoreTokenId": "Stocker les identifiants sur le stockage",
+  "ignoreTokenIdExplanation": "Générez automatiquement des identifiants uniques pour vos jetons pour le suivi."
 }

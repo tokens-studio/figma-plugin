@@ -4,7 +4,7 @@ import { AnyTokenList } from '@/types/tokens';
 export default function addIdPropertyToTokesn(tokens: Record<string, AnyTokenList>) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenList>>((acc, [key, val]) => {
     const newTokenList = val.map((token) => {
-      if (!token.$extensions?.id) {
+      if (typeof token.$extensions?.id === 'undefined') {
         return {
           ...token,
           $extensions: {

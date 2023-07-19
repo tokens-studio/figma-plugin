@@ -11,7 +11,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector, ignoreTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -35,6 +35,7 @@ function Settings() {
 
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
@@ -89,6 +90,15 @@ function Settings() {
       track('setPrefixStylesWithThemeName', { value: state });
 
       dispatch.settings.setPrefixStylesWithThemeName(!!state);
+    },
+    [dispatch.settings],
+  );
+
+  const handleIgnoreTokenIdInJsonEditorChange = React.useCallback(
+    (state: CheckedState) => {
+      track('setIgnoreTokenIdInJsonEditor', { value: state });
+
+      dispatch.settings.setIgnoreTokenIdInJsonEditor(!!state);
     },
     [dispatch.settings],
   );
@@ -154,6 +164,21 @@ function Settings() {
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
+              </Stack>
+            </Label>
+          </Stack>
+          <Stack direction="row" gap={3} align="start">
+            <Checkbox
+              id="ignoreTokenIdInJsonEditor"
+              checked={!!ignoreTokenIdInJsonEditor}
+              defaultChecked={ignoreTokenIdInJsonEditor}
+              onCheckedChange={handleIgnoreTokenIdInJsonEditorChange}
+            />
+
+            <Label htmlFor="ignoreTokenIdInJsonEditor">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>{t('ignoreTokenId')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('ignoreTokenIdExplanation')}</Box>
               </Stack>
             </Label>
           </Stack>

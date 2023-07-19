@@ -13,6 +13,7 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  ignoreTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -59,6 +60,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
+  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -87,8 +89,8 @@ export default function useTokens() {
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet)
-  ), [tokens, activeTokenSet]);
+    stringifyTokens(tokens, activeTokenSet, ignoreTokenIdInJsonEditor)
+  ), [tokens, activeTokenSet, ignoreTokenIdInJsonEditor]);
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {

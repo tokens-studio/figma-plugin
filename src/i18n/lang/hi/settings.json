@@ -29,5 +29,7 @@
   "connected": "जुड़े हुए",
   "notConnected": "जुड़े नहीं हैं",
   "liveSyncWithSecondScreenActive": "दूसरी स्क्रीन सक्रिय के साथ लाइव सिंक",
-  "liveSyncInactive": "लाइव सिंक निष्क्रिय"
+  "liveSyncInactive": "लाइव सिंक निष्क्रिय",
+  "ignoreTokenId": "भंडारण पर स्टोर आईडी",
+  "ignoreTokenIdExplanation": "ट्रैकिंग के लिए आपके टोकन के लिए स्वचालित रूप से अद्वितीय आईडी उत्पन्न करें।"
 }

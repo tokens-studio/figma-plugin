@@ -66,6 +66,7 @@ export type SavedSettings = {
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
+  ignoreTokenIdInJsonEditor: boolean;
 };
 
 export function notifyUISettings(
@@ -85,6 +86,7 @@ export function notifyUISettings(
     shouldSwapStyles,
     baseFontSize,
     aliasBaseFontSize,
+    ignoreTokenIdInJsonEditor,
   }: SavedSettings,
 ) {
   postToUI({
@@ -107,6 +109,7 @@ export function notifyUISettings(
       shouldSwapStyles,
       baseFontSize,
       aliasBaseFontSize,
+      ignoreTokenIdInJsonEditor,
     },
   });
   postToUI({
