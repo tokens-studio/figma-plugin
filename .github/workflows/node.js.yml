@@ -12,11 +12,11 @@ jobs:
   # install dependencies and store artifact
   package:
     name: Create Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -52,11 +52,11 @@ jobs:
   # install dependencies and run test command
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -81,16 +81,18 @@ jobs:
         run: npm ci
 
       # 4: Run tests
+      # Note that due to the older version of jest along with the amount of logs we produce, we add in --watch to prevent error code 1 when a large amount of console logs are emitted 
+      # https://github.com/jestjs/jest/issues/11132
       - name: Run test command
-        run: npm run test
+        run: npm run test --watch
   coverage:
     name: Test coverage
     continue-on-error: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -127,11 +129,11 @@ jobs:
           useSameComment: true
   test-transform:
     name: Transformer Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -168,7 +170,7 @@ jobs:
         run: cd token-transformer && npm run test
   cypress-run:
     name: Cypress
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Checkout repository
       - name: Checkout

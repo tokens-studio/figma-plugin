@@ -17,11 +17,11 @@ jobs:
     name: Prepare figma plugin
     environment:
         name: beta
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       #  Checkout repository
