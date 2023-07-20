@@ -325,7 +325,7 @@ describe('usePropertiesForTokenType', () => {
           label: 'Spacing',
           name: Properties.spacing,
           childProperties: [
-            { label: 'Gap', name: Properties.itemSpacing },
+            { label: 'Gap', name: Properties.itemSpacing, disabled: false },
             {
               label: 'All',
               name: Properties.spacing,
