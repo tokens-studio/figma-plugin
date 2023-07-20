@@ -6,6 +6,9 @@ export function findAll(nodes: readonly BaseNode[], includeSelf = false): BaseNo
     if ('children' in node) {
       allNodes = allNodes.concat(node.findAllWithCriteria({
         types: ValidNodeTypes,
+        sharedPluginData: {
+          namespace: 'tokens',
+        },
       }));
     }
   });
