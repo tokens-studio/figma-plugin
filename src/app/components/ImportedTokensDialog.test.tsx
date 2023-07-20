@@ -8,6 +8,10 @@ import ImportedTokensDialog from './ImportedTokensDialog';
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => { });
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid'),
+}));
+
 describe('ImportedTokensDialog', () => {
   const defaultStore = {
     tokenState: {
@@ -131,6 +135,9 @@ describe('ImportedTokensDialog', () => {
           value: '50%',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'small',
           type: 'sizing',
           value: '12',
@@ -168,18 +175,27 @@ describe('ImportedTokensDialog', () => {
           value: '50%',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'small',
           type: 'sizing',
           value: '12',
           description: 'regular sizing token',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'black',
           type: 'color',
           value: '#ffffff',
           description: 'regular color token',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'headline',
           type: 'boxShadow',
           value: {
@@ -228,12 +244,18 @@ describe('ImportedTokensDialog', () => {
           value: '50%',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'black',
           type: 'color',
           value: '#ffffff',
           description: 'regular color token',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'headline',
           type: 'boxShadow',
           value: {
@@ -265,6 +287,7 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          $extensions: {},
           name: 'light',
           type: 'typography',
           value: {
@@ -298,6 +321,7 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          $extensions: {},
           name: 'light',
           type: 'typography',
           value: {
@@ -307,6 +331,7 @@ describe('ImportedTokensDialog', () => {
           },
         },
         {
+          $extensions: {},
           name: 'opacity.50',
           type: 'opacity',
           value: '30%',
@@ -343,6 +368,7 @@ describe('ImportedTokensDialog', () => {
           },
         },
         {
+          $extensions: {},
           name: 'opacity.50',
           type: 'opacity',
           value: '30%',
@@ -367,6 +393,7 @@ describe('ImportedTokensDialog', () => {
     expect(mockStore.getState().tokenState.tokens.global).toEqual(
       [
         {
+          $extensions: {},
           name: 'light',
           type: 'typography',
           value: {
@@ -376,23 +403,33 @@ describe('ImportedTokensDialog', () => {
           },
         },
         {
+          $extensions: {},
           name: 'opacity.50',
           type: 'opacity',
           value: '30%',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'small',
           type: 'sizing',
           value: '12',
           description: 'regular sizing token',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'black',
           type: 'color',
           value: '#ffffff',
           description: 'regular color token',
         },
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           name: 'headline',
           type: 'boxShadow',
           value: {
