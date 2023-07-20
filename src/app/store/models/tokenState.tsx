@@ -2,6 +2,7 @@
 import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
+import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -131,7 +132,7 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
       themes: data.themes || state.themes,
       activeTheme: data.activeTheme || state.activeTheme,
-      tokens: addIdPropertyToTokens(data.sets || state.tokens),
+      tokens: addIdPropertyToTokens(data.sets ?? {}) || addIdPropertyToTokens(state.tokens),
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -211,7 +212,7 @@ export const tokenState = createModel<RootModel>()({
         newTokens = {
           [data.parent]: [
             ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data),
+            updateTokenPayloadToSingleToken(data, uuidv4()),
           ],
         };
       }
@@ -240,7 +241,7 @@ export const tokenState = createModel<RootModel>()({
                 description: data.description,
                 oldName: data.oldName,
                 $extensions: data.$extensions,
-              } as UpdateTokenPayload),
+              } as UpdateTokenPayload, uuidv4()),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
@@ -253,7 +254,7 @@ export const tokenState = createModel<RootModel>()({
               value: data.value,
               description: data.description,
               $extensions: data.$extensions,
-            } as UpdateTokenPayload);
+            } as UpdateTokenPayload, uuidv4());
             newTokens[tokenSet] = [
               ...state.tokens[tokenSet], newToken as SingleToken,
             ];
