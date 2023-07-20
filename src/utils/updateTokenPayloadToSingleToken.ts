@@ -1,9 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
 import { UpdateTokenPayload } from '@/types/payloads';
 import { SingleToken } from '@/types/tokens';
 
 export function updateTokenPayloadToSingleToken(
   payload: UpdateTokenPayload,
-  id?: string,
+  id: string = uuidv4(),
 ): SingleToken {
   return {
     name: payload.name,

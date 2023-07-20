@@ -2,7 +2,6 @@
 import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
-import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -38,7 +37,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
-import addIdpropertyToTokens from '@/utils/addIdPropertyToTokens';
+import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -132,7 +131,7 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
       themes: data.themes || state.themes,
       activeTheme: data.activeTheme || state.activeTheme,
-      tokens: addIdpropertyToTokens(data.sets ?? {}) || addIdpropertyToTokens(state.tokens),
+      tokens: addIdPropertyToTokens(data.sets || state.tokens),
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -191,7 +190,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          ...addIdpropertyToTokens(values),
+          ...addIdPropertyToTokens(values),
         },
       };
     },
@@ -203,7 +202,7 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
-      tokens: addIdpropertyToTokens(newTokens),
+      tokens: addIdPropertyToTokens(newTokens),
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
@@ -212,7 +211,7 @@ export const tokenState = createModel<RootModel>()({
         newTokens = {
           [data.parent]: [
             ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data, uuidv4()),
+            updateTokenPayloadToSingleToken(data),
           ],
         };
       }
@@ -241,7 +240,7 @@ export const tokenState = createModel<RootModel>()({
                 description: data.description,
                 oldName: data.oldName,
                 $extensions: data.$extensions,
-              } as UpdateTokenPayload, uuidv4()),
+              } as UpdateTokenPayload),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
@@ -254,7 +253,7 @@ export const tokenState = createModel<RootModel>()({
               value: data.value,
               description: data.description,
               $extensions: data.$extensions,
-            } as UpdateTokenPayload, uuidv4());
+            } as UpdateTokenPayload);
             newTokens[tokenSet] = [
               ...state.tokens[tokenSet], newToken as SingleToken,
             ];
