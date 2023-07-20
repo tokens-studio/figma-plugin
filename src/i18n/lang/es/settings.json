@@ -30,6 +30,6 @@
   "notConnected": "No conectado",
   "liveSyncWithSecondScreenActive": "Sincronización en vivo con la segunda pantalla activa",
   "liveSyncInactive": "Sincronización en vivo inactiva",
-  "ignoreTokenId": "Almacenar ID en el almacenamiento",
-  "ignoreTokenIdExplanation": "Genere automáticamente identificaciones únicas para sus tokens para el seguimiento."
+  "storeTokenId": "Almacenar ID en el almacenamiento",
+  "storeTokenIdExplanation": "Genere automáticamente identificaciones únicas para sus tokens para el seguimiento."
 }

@@ -30,6 +30,6 @@
   "notConnected": "Niet verbonden",
   "liveSyncWithSecondScreenActive": "Live synchronisatie met actief tweede scherm",
   "liveSyncInactive": "Live synchronisatie inactief",
-  "ignoreTokenId": "Bewaar ID's op opslag",
-  "ignoreTokenIdExplanation": "Genereer automatisch unieke ID's voor uw tokens voor tracking."
+  "storeTokenId": "Bewaar ID's op opslag",
+  "storeTokenIdExplanation": "Genereer automatisch unieke ID's voor uw tokens voor tracking."
 }

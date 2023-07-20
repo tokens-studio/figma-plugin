@@ -12,7 +12,7 @@ type StorageFlags = {
 };
 
 export type SaveOption = {
-  ignoreTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean
 };
 export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
   private files: FileList;

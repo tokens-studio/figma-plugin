@@ -608,7 +608,7 @@ export const tokenState = createModel<RootModel>()({
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
           collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
-          ignoreTokenIdInJsonEditor: rootState.settings.ignoreTokenIdInJsonEditor,
+          storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
           dispatch,
         }));
       } catch (e) {

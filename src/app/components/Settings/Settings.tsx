@@ -11,7 +11,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, ignoreTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -35,7 +35,7 @@ function Settings() {
 
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
-  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
@@ -94,11 +94,11 @@ function Settings() {
     [dispatch.settings],
   );
 
-  const handleIgnoreTokenIdInJsonEditorChange = React.useCallback(
+  const handleStoreTokenIdInJsonEditorChange = React.useCallback(
     (state: CheckedState) => {
-      track('setIgnoreTokenIdInJsonEditor', { value: state });
+      track('setStoreTokenIdInJsonEditorSelector', { value: state });
 
-      dispatch.settings.setIgnoreTokenIdInJsonEditor(!!state);
+      dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
     },
     [dispatch.settings],
   );
@@ -169,16 +169,16 @@ function Settings() {
           </Stack>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
-              id="ignoreTokenIdInJsonEditor"
-              checked={!!ignoreTokenIdInJsonEditor}
-              defaultChecked={ignoreTokenIdInJsonEditor}
-              onCheckedChange={handleIgnoreTokenIdInJsonEditorChange}
+              id="storeTokenIdInJsonEditor"
+              checked={!!storeTokenIdInJsonEditor}
+              defaultChecked={storeTokenIdInJsonEditor}
+              onCheckedChange={handleStoreTokenIdInJsonEditorChange}
             />
 
-            <Label htmlFor="ignoreTokenIdInJsonEditor">
+            <Label htmlFor="storeTokenIdInJsonEditor">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('ignoreTokenId')}</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('ignoreTokenIdExplanation')}</Box>
+                <Box css={{ fontWeight: '$bold' }}>{t('storeTokenId')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
               </Stack>
             </Label>
           </Stack>

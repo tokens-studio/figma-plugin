@@ -44,9 +44,9 @@ export type RemoteTokenStorageFile<Metadata = unknown> =
   | RemoteTokenStorageMetadataFile<Metadata>;
 
 type RemoteStorageSaveOptions = {
-  ignoreTokenIdInJsonEditor: boolean;
+  storeTokenIdInJsonEditor: boolean;
 };
-export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends RemoteStorageSaveOptions = { ignoreTokenIdInJsonEditor: boolean }> {
+export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends RemoteStorageSaveOptions = { storeTokenIdInJsonEditor: boolean }> {
   public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[] | RemoteTokenstorageErrorMessage>;
 
@@ -55,7 +55,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends
     // First we'll convert the incoming data into files
     // in this generic implementation we will ignore whether multi file is enabled or not (ie for Github)
     // how these "files" are written is up to the read and write implementation
-    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.ignoreTokenIdInJsonEditor);
+    const tokenSetObjects = convertTokensToObject({ ...data.tokens }, saveOptions.storeTokenIdInJsonEditor);
     Object.entries(tokenSetObjects).forEach(([name, tokenSet]) => {
       files.push({
         type: 'tokenSet',

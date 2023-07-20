@@ -13,7 +13,7 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
-  ignoreTokenIdInJsonEditorSelector,
+  storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -60,7 +60,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
-  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -83,14 +83,14 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, ignoreTokenIdInJsonEditor,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
     });
-  }, [tokens, activeTokenSet]);
+  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet, ignoreTokenIdInJsonEditor)
-  ), [tokens, activeTokenSet, ignoreTokenIdInJsonEditor]);
+    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
+  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {

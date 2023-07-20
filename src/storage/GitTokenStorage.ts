@@ -15,7 +15,7 @@ export type GitStorageSaveOptions = {
 
 export type GitStorageSaveOption = {
   commitMessage?: string,
-  ignoreTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean
 };
 
 export type GitSingleFileObject = Record<string, (

@@ -6,7 +6,7 @@ import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, ignoreTokenIdInJsonEditorSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector, storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
@@ -29,7 +29,7 @@ export async function updateGenericVersionedTokens({
   context,
   updatedAt,
   oldUpdatedAt = null,
-  ignoreTokenIdInJsonEditor,
+  storeTokenIdInJsonEditor,
   dispatch,
 }: UpdateRemoteFunctionPayload): Promise<RemoteResponseData<GenericVersionedMeta> | null> {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
@@ -79,7 +79,7 @@ export async function updateGenericVersionedTokens({
 
     // If the oldUpdatedAt doesn't exist, we still save the tokens
     // This happens in createNewGenericVersionedStorage
-    const success = await storage.save(payload, { ignoreTokenIdInJsonEditor });
+    const success = await storage.save(payload, { storeTokenIdInJsonEditor });
 
     if (success) {
       saveLastSyncedState(dispatch, payload.tokens, payload.themes, { tokenSetOrder });
@@ -114,7 +114,7 @@ export function useGenericVersionedStorage() {
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSets = useSelector(usedTokenSetSelector);
-  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
 
   const createNewGenericVersionedStorage = useCallback(
     async (
@@ -135,7 +135,7 @@ export function useGenericVersionedStorage() {
           },
           themes,
           updatedAt,
-          ignoreTokenIdInJsonEditor,
+          storeTokenIdInJsonEditor,
           dispatch,
         });
         AsyncMessageChannel.ReactInstance.message({

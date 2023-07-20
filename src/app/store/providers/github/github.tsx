@@ -7,7 +7,7 @@ import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
-  ignoreTokenIdInJsonEditorSelector,
+  storeTokenIdInJsonEditorSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
@@ -30,7 +30,7 @@ export function useGitHub() {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -100,7 +100,7 @@ export function useGitHub() {
           metadata,
         }, {
           commitMessage,
-          ignoreTokenIdInJsonEditor,
+          storeTokenIdInJsonEditor,
         });
         const commitSha = await storage.getCommitSha();
         saveLastSyncedState(dispatch, tokens, themes, metadata);

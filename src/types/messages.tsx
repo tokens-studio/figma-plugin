@@ -50,7 +50,7 @@ export type UiSettingsFromPluginMessage = {
     shouldSwapStyles: boolean;
     baseFontSize: string;
     aliasBaseFontSize: string;
-    ignoreTokenIdInJsonEditor: boolean;
+    storeTokenIdInJsonEditor: boolean;
   };
 };
 

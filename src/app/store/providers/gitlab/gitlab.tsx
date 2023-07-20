@@ -7,7 +7,7 @@ import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
-  ignoreTokenIdInJsonEditorSelector,
+  storeTokenIdInJsonEditorSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { GitlabTokenStorage } from '@/storage/GitlabTokenStorage';
@@ -45,7 +45,7 @@ export function useGitLab() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
-  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
 
@@ -109,7 +109,7 @@ export function useGitLab() {
           metadata,
         }, {
           commitMessage,
-          ignoreTokenIdInJsonEditor,
+          storeTokenIdInJsonEditor,
         });
         const latestCommitDate = await storage.getLatestCommitDate();
         saveLastSyncedState(dispatch, tokens, themes, metadata);

@@ -14,12 +14,12 @@ export function getGroupTypeName(tokenName: string, groupLevel: number): string 
 export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
-  ignoreTokenIdInJsonEditor: boolean,
+  storeTokenIdInJsonEditor: boolean,
 ): string {
   const tokenObj = {};
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
-    const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, ignoreTokenIdInJsonEditor);
+    const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
       const {
         type, inheritTypeLevel, ...tokenWithoutType

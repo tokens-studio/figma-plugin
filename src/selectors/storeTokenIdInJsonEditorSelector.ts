@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { settingsStateSelector } from './settingsStateSelector';
 
-export const ignoreTokenIdInJsonEditorSelector = createSelector(
+export const storeTokenIdInJsonEditorSelector = createSelector(
   settingsStateSelector,
-  (state) => state.ignoreTokenIdInJsonEditor,
+  (state) => state.storeTokenIdInJsonEditor,
 );

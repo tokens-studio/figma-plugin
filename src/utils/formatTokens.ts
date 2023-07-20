@@ -14,7 +14,7 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  ignoreTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean
 };
 
 export default function formatTokens({
@@ -27,13 +27,13 @@ export default function formatTokens({
   expandShadow = false,
   expandComposition = false,
   expandBorder = false,
-  ignoreTokenIdInJsonEditor = true,
+  storeTokenIdInJsonEditor = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
-      const { name, ...tokenWithoutName } = removeTokenId(token, ignoreTokenIdInJsonEditor);
+      const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
