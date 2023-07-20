@@ -3,6 +3,7 @@ import { isEqual } from './isEqual';
 import { tryParseJson } from './tryParseJson';
 import type { ThemeObjectsList } from '@/types';
 import type { AnyTokenList } from '@/types/tokens';
+import removeIdPropertyFromTokens from './removeIdPropertyFromTokens';
 
 export type LastSyncedState<Metadata = null> =
   [Record<string, AnyTokenList>]
@@ -21,7 +22,7 @@ export function compareLastSyncedState<Metadata = null>(
     return false;
   }
   return isEqual(
-    compact([parsedState[0] ?? defaultSyncedState[0], parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
-    compact([tokens, themes, metadata ?? defaultSyncedState[2]]),
+    compact([removeIdPropertyFromTokens(parsedState[0] ?? defaultSyncedState[0]), parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
+    compact([removeIdPropertyFromTokens(tokens), themes, metadata ?? defaultSyncedState[2]]),
   );
 }

@@ -38,7 +38,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
-import addIdPropertyToTokesn from '@/utils/addIdPropertyToTokens';
+import addIdpropertyToTokens from '@/utils/addIdPropertyToTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -132,7 +132,7 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
       themes: data.themes || state.themes,
       activeTheme: data.activeTheme || state.activeTheme,
-      tokens: addIdPropertyToTokesn(data.sets ?? {}) || addIdPropertyToTokesn(state.tokens),
+      tokens: addIdpropertyToTokens(data.sets ?? {}) || addIdpropertyToTokens(state.tokens),
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -191,7 +191,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          ...addIdPropertyToTokesn(values),
+          ...addIdpropertyToTokens(values),
         },
       };
     },
@@ -203,7 +203,7 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
-      tokens: addIdPropertyToTokesn(newTokens),
+      tokens: addIdpropertyToTokens(newTokens),
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
@@ -608,6 +608,7 @@ export const tokenState = createModel<RootModel>()({
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
           collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+          ignoreTokenIdInJsonEditor: rootState.settings.ignoreTokenIdInJsonEditor,
           dispatch,
         }));
       } catch (e) {

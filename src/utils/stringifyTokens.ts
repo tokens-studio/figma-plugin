@@ -1,7 +1,7 @@
 import set from 'set-value';
-import omit from 'just-omit';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
+import removeTokenId from './removeTokenId';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -18,19 +18,8 @@ export default function stringifyTokens(
 ): string {
   const tokenObj = {};
   tokens[activeTokenSet]?.forEach((token) => {
-    let tokenWithType = appendTypeToToken(token);
-    if (ignoreTokenIdInJsonEditor && tokenWithType.$extensions) {
-      tokenWithType = {
-        ...tokenWithType,
-        $extensions: {
-          ...omit(tokenWithType?.$extensions, 'id'),
-        },
-      };
-      if (Object.keys(tokenWithType.$extensions ?? {}).length < 1) {
-        tokenWithType = omit(tokenWithType, '$extensions') as SingleToken;
-      }
-    }
-    const { name, ...tokenWithoutName } = tokenWithType;
+    const tokenWithType = appendTypeToToken(token);
+    const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, ignoreTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
       const {
         type, inheritTypeLevel, ...tokenWithoutType

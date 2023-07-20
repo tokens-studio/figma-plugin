@@ -10,7 +10,12 @@ type StorageFlags = {
 };
 
 export type GitStorageSaveOptions = {
-  commitMessage?: string
+  commitMessage?: string,
+};
+
+export type GitStorageSaveOption = {
+  commitMessage?: string,
+  ignoreTokenIdInJsonEditor: boolean
 };
 
 export type GitSingleFileObject = Record<string, (
@@ -22,7 +27,7 @@ export type GitSingleFileObject = Record<string, (
 
 export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | RemoteTokenStorageMetadata;
 
-export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveOptions> {
+export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveOptions, GitStorageSaveOption> {
   protected secret: string;
 
   protected owner: string;
@@ -82,7 +87,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     shouldCreateBranch?: boolean
   ): Promise<boolean>;
 
-  public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOptions): Promise<boolean> {
+  public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
 

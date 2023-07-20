@@ -20,6 +20,7 @@ type UpdateRemoteTokensPayload = {
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
+  ignoreTokenIdInJsonEditor: boolean;
   dispatch: Dispatch
 };
 
@@ -40,6 +41,7 @@ type UpdateTokensOnSourcesPayload = {
   checkForChanges: boolean;
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
+  ignoreTokenIdInJsonEditor: boolean
   dispatch: Dispatch
 };
 
@@ -50,6 +52,7 @@ async function updateRemoteTokens({
   context,
   updatedAt,
   oldUpdatedAt,
+  ignoreTokenIdInJsonEditor,
   dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
@@ -64,6 +67,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        ignoreTokenIdInJsonEditor,
         dispatch,
       });
       break;
@@ -77,6 +81,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        ignoreTokenIdInJsonEditor,
         dispatch,
       });
 
@@ -119,6 +124,7 @@ export default async function updateTokensOnSources({
   checkForChanges,
   shouldSwapStyles,
   collapsedTokenSets,
+  ignoreTokenIdInJsonEditor,
   dispatch,
 }: UpdateTokensOnSourcesPayload) {
   if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
@@ -129,6 +135,7 @@ export default async function updateTokensOnSources({
       context: api,
       updatedAt,
       oldUpdatedAt: lastUpdatedAt,
+      ignoreTokenIdInJsonEditor,
       dispatch,
     });
   }

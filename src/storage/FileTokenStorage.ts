@@ -11,7 +11,10 @@ type StorageFlags = {
   multiFileEnabled: boolean
 };
 
-export class FileTokenStorage extends RemoteTokenStorage {
+export type SaveOption = {
+  ignoreTokenIdInJsonEditor: boolean
+};
+export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
   private files: FileList;
 
   protected flags: StorageFlags = {

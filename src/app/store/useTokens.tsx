@@ -83,7 +83,7 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, ignoreTokenIdInJsonEditor,
     });
   }, [tokens, activeTokenSet]);
 

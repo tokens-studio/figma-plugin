@@ -7,7 +7,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  activeThemeSelector, localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector, ignoreTokenIdInJsonEditorSelector, localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { BitbucketTokenStorage } from '@/storage/BitbucketTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -30,6 +30,7 @@ export function useBitbucket() {
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
   const { multiFileSync } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
@@ -105,7 +106,7 @@ export function useBitbucket() {
           themes,
           tokens,
           metadata,
-        }, { commitMessage });
+        }, { commitMessage, ignoreTokenIdInJsonEditor });
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });

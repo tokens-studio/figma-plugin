@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { AnyTokenList } from '@/types/tokens';
 
-export default function addIdPropertyToTokesn(tokens: Record<string, AnyTokenList>) {
+export default function addIdpropertyToTokens(tokens: Record<string, AnyTokenList>) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenList>>((acc, [key, val]) => {
     const newTokenList = val.map((token) => {
       if (typeof token.$extensions?.id === 'undefined') {

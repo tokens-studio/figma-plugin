@@ -6,7 +6,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import {
-  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector,
+  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector, ignoreTokenIdInJsonEditorSelector,
 } from '@/selectors';
 import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -29,6 +29,7 @@ export const useADO = () => {
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const ignoreTokenIdInJsonEditor = useSelector(ignoreTokenIdInJsonEditorSelector);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -97,6 +98,7 @@ export const useADO = () => {
           metadata,
         }, {
           commitMessage,
+          ignoreTokenIdInJsonEditor,
         });
 
         saveLastSyncedState(dispatch, tokens, themes, metadata);
