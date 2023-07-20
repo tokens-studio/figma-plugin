@@ -7,7 +7,7 @@ on:
 
 # Needed permissions for changesets
 permissions:
-    contents: read
+    contents: write 
     id-token: write
 
 
@@ -93,5 +93,6 @@ jobs:
           name: Nightly beta
           prerelease: true
           replacesArtifacts: true
+          tag: beta
           body: |
             The nightly release of the beta plugin. 
