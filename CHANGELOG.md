@@ -1,22 +1,15 @@
 # @tokens-studio/figma-plugin
 
-## 1.37.7
-
-### Patch Changes
-
-- 7c6b0391: Fix: Changes frequency where we check for git updates in the background to once every 60 seconds
-- 2c41a47f: Fix: Fixes sync tabs being displayed malformed
-- fffdd673: Fix: Fixes Apply to document UI description
-
 ## 1.37.6
 
 ### Patch Changes
 
 Bugs addressed:
 
-- Fixed Apply to document text
-- Change the sync frequency to remote providers from 3 seconds to 60 seconds to avoid hitting the rate limit
-- Fixed a bug that was introduced with i18n
+- 7c6b0391: Fix: Changes frequency where we check for git updates in the background to once every 60 seconds
+- 2c41a47f: Fix: Fixes sync tabs being displayed malformed
+- fffdd673: Fix: Fixes Apply to document UI description
+
 
 ## 1.37.5
 
