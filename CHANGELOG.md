@@ -1,5 +1,15 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.6
+
+### Patch Changes
+
+Bugs addressed:
+
+- Fixed Apply to document text 
+- Change the sync frequency to remote providers from 3 seconds to 60 seconds to avoid hitting the rate limit
+- Fixed a bug that was introduced with i18n
+
 ## 1.37.5
 
 ### Patch Changes
