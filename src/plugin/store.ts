@@ -1,11 +1,11 @@
 type State = {
-  inspectDeep: boolean
+  inspectDeep: boolean | null
   shouldSendSelectionValues: boolean
   successfulNodes: Set<BaseNode | SceneNode>;
 };
 
 const store: State = {
-  inspectDeep: false,
+  inspectDeep: null,
   shouldSendSelectionValues: false,
   successfulNodes: new Set(),
 };

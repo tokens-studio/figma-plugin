@@ -219,6 +219,7 @@ export class NodeManager {
       const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_UPDATE);
 
       const promises: Set<Promise<void>> = new Set();
+      const timeNow = Date.now();
       for (let nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += 1) {
         // eslint-disable-next-line
         promises.add(defaultWorker.schedule(async () => {
@@ -234,6 +235,8 @@ export class NodeManager {
         }));
       }
       await Promise.all(promises);
+      const timeThen = Date.now();
+      console.log('update', timeThen - timeNow, nodes.length / (timeThen - timeNow), 'per node');
     })();
     await this.waitForUpdating();
 
@@ -250,6 +253,13 @@ export class NodeManager {
     return this.nodes.get(id);
   }
 
+  public async filterNodesWithData(nodes: readonly BaseNode[]): Promise<NodeManagerNode[]> {
+    await this.waitForUpdating();
+
+    const nodeIds = new Set(nodes.map((node) => node.id));
+    return Array.from(this.nodes.values()).filter((node) => nodeIds.has(node.id));
+  }
+
   public async findNodesWithData(opts: {
     updateMode?: UpdateMode;
     nodes?: readonly BaseNode[];
@@ -263,6 +273,8 @@ export class NodeManager {
 
     // wait for previous update
     await this.waitForUpdating();
+
+    const timeNow = Date.now();
 
     const { updateMode, nodes } = opts;
     let relevantNodes: BaseNode[] = [];
@@ -297,6 +309,9 @@ export class NodeManager {
       type: MessageFromPluginTypes.COMPLETE_JOB,
       name: BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA,
     });
+
+    const timeThen = Date.now();
+    console.log('findNodesWithData', timeThen - timeNow, relevantNodes.length / (timeThen - timeNow), 'per node');
 
     return resultingNodes;
   }

@@ -78,6 +78,11 @@ figma.on('selectionchange', () => {
 });
 
 figma.on('documentchange', (event: DocumentChangeEvent) => {
+  // Filter out anything affecting the root node
+  if (event.documentChanges.length === 1 && event.documentChanges[0].type === 'PROPERTY_CHANGE' && event.documentChanges[0].id === '0:0') {
+    return;
+  }
+
   sendDocumentChange(event);
 });
 

@@ -111,7 +111,7 @@ export type SelectionContent = {
 export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
+  const pluginValues = await defaultNodeManager.filterNodesWithData(nodes);
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(pluginValues) && pluginValues?.length > 0) {

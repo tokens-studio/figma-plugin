@@ -26,7 +26,9 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {
+    const previousValue = store.inspectDeep;
     store.inspectDeep = msg.inspectDeep;
-    sendSelectionChange();
+
+    if (previousValue) sendSelectionChange();
   }
 };
