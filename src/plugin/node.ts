@@ -262,6 +262,8 @@ export async function updateNodes(
     });
   });
 
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
+
   // TODO: Instead of passing in figmaStyleReferences as a whole, can we just pass in the matching variable / style instead of having to do the heavy lifting inside setNodeValue?
 
   entries.forEach((entry) => {
@@ -281,9 +283,8 @@ export async function updateNodes(
               figmaStyleReferences,
               figmaVariableMaps,
               figmaVariableReferences,
-              activeThemes,
+              stylePathPrefix,
               ignoreFirstPartForStyles,
-              prefixStylesWithThemeName,
               baseFontSize,
             );
             store.successfulNodes.add(entry.node);

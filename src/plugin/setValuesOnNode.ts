@@ -1,4 +1,4 @@
-import { MapValuesToTokensResult, ThemeObjectsList } from '@/types';
+import { MapValuesToTokensResult } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
@@ -36,16 +36,14 @@ export default async function setValuesOnNode(
   values: MapValuesToTokensResult,
   data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
-  figmaStyleReferences: Record<string, string>,
-  figmaVariableMaps: ReturnType<typeof getVariablesMap>,
-  figmaVariableReferences: Record<string, string>,
-  activeThemes: ThemeObjectsList,
+  figmaStyleReferences: Record<string, string> = {},
+  figmaVariableMaps: ReturnType<typeof getVariablesMap> = {},
+  figmaVariableReferences: Record<string, string> = {},
+  stylePathPrefix: string | null = null,
   ignoreFirstPartForStyles = false,
-  prefixStylesWithThemeName = false,
   baseFontSize = defaultBaseFontSize,
 ) {
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
 
   try {
     // BORDER RADIUS
