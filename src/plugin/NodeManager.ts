@@ -49,31 +49,31 @@ export class NodeManager {
   constructor() {
     this.updating = new Promise(async (resolve) => {
       if (typeof figma.root !== 'undefined') {
-        // const parsedCache = await PersistentNodesCacheProperty.read(figma.root);
-        // if (parsedCache) {
-        //   // this.persistentNodesCache = new Map(parsedCache);
-        // }
+        const parsedCache = await PersistentNodesCacheProperty.read(figma.root);
+        if (parsedCache) {
+          this.persistentNodesCache = new Map(parsedCache);
+        }
 
-        // // Compare nodes in the document to what we have in the cache
-        // const allNodes = figma.root.findAll();
-        // if (allNodes.length > 0) {
-        //   const nodeIds = new Set(allNodes.map((node) => node.id));
-        //   let hasDeletedNodes = false;
+        // Compare nodes in the document to what we have in the cache
+        const allNodes = figma.root.findAllWithCriteria({ sharedPluginData: { namespace: 'tokens' } });
+        if (allNodes.length > 0) {
+          const nodeIds = new Set(allNodes.map((node) => node.id));
+          let hasDeletedNodes = false;
 
-        //   // Remove any nodes from the cache that no longer exist
-        //   for (const [id] of this.persistentNodesCache) {
-        //     if (!nodeIds.has(id)) {
-        //       this.persistentNodesCache.delete(id);
-        //       hasDeletedNodes = true;
-        //     }
-        //   }
+          // Remove any nodes from the cache that no longer exist
+          for (const [id] of this.persistentNodesCache) {
+            if (!nodeIds.has(id)) {
+              this.persistentNodesCache.delete(id);
+              hasDeletedNodes = true;
+            }
+          }
 
-        //   // Cache update if we removed any nodes
-        //   if (hasDeletedNodes) {
-        //     const remainingEntries = Array.from(this.persistentNodesCache.entries());
-        //     await PersistentNodesCacheProperty.write(remainingEntries);
-        //   }
-        // }
+          // Cache update if we removed any nodes
+          if (hasDeletedNodes) {
+            const remainingEntries = Array.from(this.persistentNodesCache.entries());
+            await PersistentNodesCacheProperty.write(remainingEntries);
+          }
+        }
 
         this.emitter.on('cache-update', debounce(async () => {
           const entries = Array.from(this.persistentNodesCache.entries());
