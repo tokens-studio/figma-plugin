@@ -262,11 +262,14 @@ export async function updateNodes(
     });
   });
 
+  // TODO: Instead of passing in figmaStyleReferences as a whole, can we just pass in the matching variable / style instead of having to do the heavy lifting inside setNodeValue?
+
   entries.forEach((entry) => {
     promises.add(
       defaultWorker.schedule(async () => {
         try {
           if (entry.tokens) {
+            // TODO: This is probably something we can optimize
             const mappedTokens = destructureTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
             mappedValues = destructureToken(mappedValues);
