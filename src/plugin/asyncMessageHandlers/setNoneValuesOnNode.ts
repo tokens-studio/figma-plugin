@@ -28,6 +28,7 @@ export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.
         await updatePluginData({
           entries: [nodeToUpdate], values: newEntries, tokensMap,
         });
+        console.log('setNoneValuesonnode');
         await updateNodes([nodeToUpdate], tokensMap);
       }
     }),

@@ -27,6 +27,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updatePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { getVariablesMap } from '@/utils/getVariablesMap';
 
 // @TODO fix typings
 
@@ -161,33 +162,33 @@ export function destructureToken(values: MapValuesToTokensResult): MapValuesToTo
   Record<TokenTypes, SingleToken['value']>
   & Record<Properties, SingleToken['value']>
   > = {};
-  if (values && values.composition) {
+  if (values.composition) {
     Object.entries(values.composition).forEach(([property, value]) => {
       tokensInCompositionToken[property as CompositionTokenProperty] = value;
     });
     const { composition, ...objExcludedCompositionToken } = values;
     values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
   }
-  if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
+  if (values.border && typeof values.border === 'object' && 'color' in values.border) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
   }
-  if (values && values.borderTop && typeof values.borderTop === 'object' && 'color' in values.borderTop && values.borderTop.color) {
+  if (values.borderTop && typeof values.borderTop === 'object' && 'color' in values.borderTop) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop.color }) };
   }
-  if (values && values.borderRight && typeof values.borderRight === 'object' && 'color' in values.borderRight && values.borderRight.color) {
+  if (values.borderRight && typeof values.borderRight === 'object' && 'color' in values.borderRight) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight.color }) };
   }
-  if (values && values.borderLeft && typeof values.borderLeft === 'object' && 'color' in values.borderLeft && values.borderLeft.color) {
+  if (values.borderLeft && typeof values.borderLeft === 'object' && 'color' in values.borderLeft) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft.color }) };
   }
-  if (values && values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom && values.borderBottom.color) {
+  if (values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom.color }) };
   }
   return values;
 }
 
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
-  if (values && values.composition) {
+  if (values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
     if (resolvedToken?.rawValue) {
@@ -201,19 +202,19 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  if (values && values.border) {
+  if (values.border) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
-  if (values && values.borderTop) {
+  if (values.borderTop) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
   }
-  if (values && values.borderRight) {
+  if (values.borderRight) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight }) };
   }
-  if (values && values.borderLeft) {
+  if (values.borderLeft) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft }) };
   }
-  if (values && values.borderBottom) {
+  if (values.borderBottom) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
   }
   return values;
@@ -239,9 +240,29 @@ export async function updateNodes(
 ) {
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
+  const figmaVariableMaps = getVariablesMap();
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+  // Filter activeThemes e.g light, desktop
+  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
+  const figmaStyleReferences: Record<string, string> = {};
+  const figmaVariableReferences: Record<string, string> = {};
+
+  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
+  activeThemes?.forEach((theme) => {
+    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
+      if (!figmaVariableReferences[token]) {
+        figmaVariableReferences[token] = variableId;
+      }
+    });
+    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
+      if (!figmaStyleReferences[token]) {
+        figmaStyleReferences[token] = styleId;
+      }
+    });
+  });
+
   postToUI({
     type: MessageFromPluginTypes.START_JOB,
     job: {
@@ -269,7 +290,10 @@ export async function updateNodes(
               mappedValues,
               mappedTokens,
               figmaStyleMaps,
-              themeInfo,
+              figmaVariableMaps,
+              figmaStyleReferences,
+              figmaVariableReferences,
+              activeThemes,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
               baseFontSize,
