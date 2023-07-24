@@ -44,7 +44,6 @@ export default async function setValuesOnNode(
   prefixStylesWithThemeName = false,
   baseFontSize = defaultBaseFontSize,
 ) {
-  // Filter activeThemes e.g light, desktop
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
 
