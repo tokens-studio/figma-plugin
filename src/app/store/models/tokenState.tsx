@@ -2,9 +2,9 @@
 import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
+import { v4 as uuidv4 } from 'uuid';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
-
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
@@ -24,6 +24,7 @@ import {
   DuplicateTokenGroupPayload,
   DuplicateTokenPayload,
   DeleteTokenGroupPayload,
+  StyleToCreateToken,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -37,6 +38,7 @@ import tokenTypes from '@/config/tokenType.defs.json';
 import { CompareStateType, findDifferentState } from '@/utils/findDifferentState';
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
+import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -130,7 +132,7 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
       themes: data.themes || state.themes,
       activeTheme: data.activeTheme || state.activeTheme,
-      tokens: data.sets || state.tokens,
+      tokens: addIdPropertyToTokens(data.sets ?? {}) || addIdPropertyToTokens(state.tokens),
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -189,7 +191,7 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          ...values,
+          ...addIdPropertyToTokens(values),
         },
       };
     },
@@ -201,7 +203,7 @@ export const tokenState = createModel<RootModel>()({
     },
     setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
-      tokens: newTokens,
+      tokens: addIdPropertyToTokens(newTokens),
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
@@ -210,7 +212,7 @@ export const tokenState = createModel<RootModel>()({
         newTokens = {
           [data.parent]: [
             ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data),
+            updateTokenPayloadToSingleToken(data, uuidv4()),
           ],
         };
       }
@@ -239,7 +241,7 @@ export const tokenState = createModel<RootModel>()({
                 description: data.description,
                 oldName: data.oldName,
                 $extensions: data.$extensions,
-              } as UpdateTokenPayload),
+              } as UpdateTokenPayload, uuidv4()),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
@@ -252,7 +254,7 @@ export const tokenState = createModel<RootModel>()({
               value: data.value,
               description: data.description,
               $extensions: data.$extensions,
-            } as UpdateTokenPayload);
+            } as UpdateTokenPayload, uuidv4());
             newTokens[tokenSet] = [
               ...state.tokens[tokenSet], newToken as SingleToken,
             ];
@@ -270,9 +272,9 @@ export const tokenState = createModel<RootModel>()({
     },
     // Imports received styles as tokens, if needed
     setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
-      const newTokens: SingleToken[] = [];
-      const existingTokens: SingleToken[] = [];
-      const updatedTokens: SingleToken[] = [];
+      const newTokens: StyleToCreateToken[] = [];
+      const existingTokens: StyleToCreateToken[] = [];
+      const updatedTokens: StyleToCreateToken[] = [];
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -314,7 +316,7 @@ export const tokenState = createModel<RootModel>()({
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
       const newArray = [...state.tokens[data.parent]];
       newArray[index] = {
-        ...omit(newArray[index], 'description', '$extensions'),
+        ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
       return {
@@ -606,6 +608,7 @@ export const tokenState = createModel<RootModel>()({
           checkForChanges: rootState.tokenState.checkForChanges,
           shouldSwapStyles: rootState.settings.shouldSwapStyles,
           collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+          storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
           dispatch,
         }));
       } catch (e) {

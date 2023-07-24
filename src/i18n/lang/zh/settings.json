@@ -29,5 +29,7 @@
   "connected": "连接的",
   "notConnected": "未连接",
   "liveSyncWithSecondScreenActive": "与第二屏幕活动实时同步",
-  "liveSyncInactive": "实时同步未激活"
+  "liveSyncInactive": "实时同步未激活",
+  "storeTokenId": "将 ID 存储在存储器上",
+  "storeTokenIdExplanation": "自动为您的令牌生成唯一 ID 以进行跟踪。"
 }

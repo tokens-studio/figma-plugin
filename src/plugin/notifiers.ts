@@ -2,13 +2,14 @@ import {
   MessageFromPluginTypes,
   PostToUIMessage,
 } from '@/types/messages';
-import { AnyTokenList, TokenStore } from '@/types/tokens';
+import { TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials } from '@/types/StorageType';
+import { StyleToCreateToken } from '@/types/payloads';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -65,6 +66,7 @@ export type SavedSettings = {
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
+  storeTokenIdInJsonEditor: boolean;
 };
 
 export function notifyUISettings(
@@ -84,6 +86,7 @@ export function notifyUISettings(
     shouldSwapStyles,
     baseFontSize,
     aliasBaseFontSize,
+    storeTokenIdInJsonEditor,
   }: SavedSettings,
 ) {
   postToUI({
@@ -106,6 +109,7 @@ export function notifyUISettings(
       shouldSwapStyles,
       baseFontSize,
       aliasBaseFontSize,
+      storeTokenIdInJsonEditor,
     },
   });
   postToUI({
@@ -118,7 +122,7 @@ export function notifyAPIProviders(providers: StorageTypeCredentials[]) {
   postToUI({ type: MessageFromPluginTypes.API_PROVIDERS, providers });
 }
 
-export function notifyStyleValues(values: Record<string, AnyTokenList>) {
+export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) {
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 
