@@ -1,11 +1,10 @@
 import compact from 'just-compact';
-import omit from 'just-omit';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { defaultNodeManager, NodeManagerNode } from './NodeManager';
+import { NodeManagerNode } from './NodeManager';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -24,7 +23,6 @@ import {
 } from '@/figmaStorage';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { updatePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 
@@ -219,19 +217,6 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
   return values;
 }
 
-async function migrateTokens(entry: NodeManagerNode, values: MapValuesToTokensResult, tokens: Partial<Record<TokenTypes, string> & Record<Properties, string>>) {
-  // Older versions had `border` properties that were colors, move these to borderColor
-  if (typeof values.border === 'string' && typeof tokens.border !== 'undefined') {
-    values.borderColor = values.border;
-    await updatePluginData({
-      entries: [entry], values: { [Properties.borderColor]: tokens.border, [Properties.border]: 'delete' }, shouldRemove: false,
-    });
-    await defaultNodeManager.updateNode(entry.node, (t) => (
-      omit(t, [Properties.border])
-    ));
-  }
-}
-
 export async function updateNodes(
   entries: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
@@ -263,7 +248,6 @@ export async function updateNodes(
             const mappedTokens = destructureTokenForAlias(tokens, entry.tokens);
             let mappedValues = mapValuesToTokens(tokens, entry.tokens);
             mappedValues = destructureToken(mappedValues);
-            await migrateTokens(entry, mappedValues, mappedTokens);
             setValuesOnNode(
               entry.node,
               mappedValues,
