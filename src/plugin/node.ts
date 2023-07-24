@@ -25,6 +25,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from '@/app/store/models/settings';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
+import { getVariablesMap } from '@/utils/getVariablesMap';
 
 // @TODO fix typings
 
@@ -224,6 +225,8 @@ export async function updateNodes(
 ) {
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
+  const figmaVariableMaps = getVariablesMap();
+
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
@@ -240,6 +243,25 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
   const returnedValues: Set<NodeTokenRefMap> = new Set();
+
+  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
+  const figmaStyleReferences: Record<string, string> = {};
+  const figmaVariableReferences: Record<string, string> = {};
+  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
+
+  activeThemes?.forEach((theme) => {
+    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
+      if (!figmaVariableReferences[token]) {
+        figmaVariableReferences[token] = variableId;
+      }
+    });
+    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
+      if (!figmaStyleReferences[token]) {
+        figmaStyleReferences[token] = styleId;
+      }
+    });
+  });
+
   entries.forEach((entry) => {
     promises.add(
       defaultWorker.schedule(async () => {
@@ -253,7 +275,10 @@ export async function updateNodes(
               mappedValues,
               mappedTokens,
               figmaStyleMaps,
-              themeInfo,
+              figmaStyleReferences,
+              figmaVariableMaps,
+              figmaVariableReferences,
+              activeThemes,
               ignoreFirstPartForStyles,
               prefixStylesWithThemeName,
               baseFontSize,

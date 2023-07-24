@@ -1,5 +1,4 @@
-import { MapValuesToTokensResult } from '@/types';
-import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
+import { MapValuesToTokensResult, ThemeObjectsList } from '@/types';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
@@ -37,32 +36,17 @@ export default async function setValuesOnNode(
   values: MapValuesToTokensResult,
   data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
-  themeInfo: Omit<GetThemeInfoMessageResult, 'type'>,
+  figmaStyleReferences: Record<string, string>,
+  figmaVariableMaps: ReturnType<typeof getVariablesMap>,
+  figmaVariableReferences: Record<string, string>,
+  activeThemes: ThemeObjectsList,
   ignoreFirstPartForStyles = false,
   prefixStylesWithThemeName = false,
   baseFontSize = defaultBaseFontSize,
 ) {
   // Filter activeThemes e.g light, desktop
-  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
-  const figmaVariableMaps = getVariablesMap();
-
-  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
-  const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: Record<string, string> = {};
-  activeThemes?.forEach((theme) => {
-    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
-      if (!figmaVariableReferences[token]) {
-        figmaVariableReferences[token] = variableId;
-      }
-    });
-    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
-      if (!figmaStyleReferences[token]) {
-        figmaStyleReferences[token] = styleId;
-      }
-    });
-  });
 
   try {
     // BORDER RADIUS
