@@ -23,8 +23,6 @@ const spacingProperties = (value?: SingleToken['value']) => {
       ],
     },
     { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: isMultiValue },
-    { label: 'Horizontal padding', name: Properties.horizontalPadding, disabled: isMultiValue },
-    { label: 'Vertical padding', name: Properties.verticalPadding, disabled: isMultiValue },
     { label: 'Top', name: Properties.paddingTop, disabled: isMultiValue },
     { label: 'Right', name: Properties.paddingRight, disabled: isMultiValue },
     { label: 'Bottom', name: Properties.paddingBottom, disabled: isMultiValue },
