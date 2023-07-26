@@ -19,7 +19,6 @@
   "privacyPolicy": "गोपनीयता नीति",
   "debugging": "डिबगिंग",
   "enableSessionRecording": "सत्र रिकॉर्डिंग सक्षम करें",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "दूसरी स्क्रीन बीटा में है, कुछ सुविधाएं उम्मीद के मुताबिक काम नहीं कर सकती हैं।",
   "liveSync": "लाइव सिंक",
   "signInToContinue": "जारी रखने के लिए साइन इन करें",
   "signedInAs": "इस रूप में साइन इन किया",
@@ -28,6 +27,9 @@
   "signIn": "दाखिल करना",
   "connected": "जुड़े हुए",
   "notConnected": "जुड़े नहीं हैं",
-  "liveSyncWithSecondScreenActive": "दूसरी स्क्रीन सक्रिय के साथ लाइव सिंक",
-  "liveSyncInactive": "लाइव सिंक निष्क्रिय"
+  "liveSyncInactive": "लाइव सिंक निष्क्रिय",
+  "secondScreenExplainer": "अपने डिज़ाइन वर्कफ़्लो को सशक्त बनाएं, जिससे आप दूसरी स्क्रीन में अपने डिज़ाइन टोकन प्रबंधित कर सकें।",
+  "language": "भाषा",
+  "languageExplainer": "टोकन स्टूडियो का मशीनी अनुवाद किया गया है, इसलिए अनुवाद गलत लग सकते हैं।\n अपनी भाषा नहीं देखते? एक सुविधा अनुरोध सबमिट करें",
+  "liveSyncActive": "लाइव सिंक सक्रिय"
 }
