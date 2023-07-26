@@ -60,7 +60,6 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
           entries: updatedNodes, values: { [category]: newName }, shouldOverride: true, tokensMap,
         });
       }
-      console.log('remaptokens');
       await updateNodes(updatedNodes, tokensMap, msg.settings);
     } else {
       await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });
