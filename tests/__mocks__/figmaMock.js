@@ -58,6 +58,7 @@ module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootFindAll = jest.fn(() => []);
+module.exports.mockRootFindAllWithCriteria = jest.fn(() => []);
 module.exports.mockParentPostMessage = jest.fn((data) => {
   figmaUiOnHandlers
     .filter(([eventName]) => eventName === 'message')
@@ -91,6 +92,7 @@ module.exports.figma = {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
     getSharedPluginData: module.exports.mockRootGetSharedPluginData,
     findAll: module.exports.mockRootFindAll,
+    findAllWithCriteria: module.exports.mockRootFindAllWithCriteria,
   },
   variables: {
     getLocalVariables: module.exports.mockGetLocalVariables

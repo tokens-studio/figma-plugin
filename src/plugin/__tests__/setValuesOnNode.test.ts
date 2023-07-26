@@ -1,23 +1,16 @@
 import setValuesOnNode from '../setValuesOnNode';
-import { ThemeObjectsList } from '@/types';
 import * as setTextValuesOnTarget from '../setTextValuesOnTarget';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { mockCreateImage } from '../../../tests/__mocks__/figmaMock';
-import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('Can set values on node', () => {
   const emptyStylesMap = {
     effectStyles: new Map(),
     paintStyles: new Map(),
     textStyles: new Map(),
-  };
-
-  const emptyThemeInfo = {
-    activeTheme: {},
-    themes: [] as ThemeObjectsList,
   };
 
   const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
@@ -101,7 +94,7 @@ describe('Can set values on node', () => {
       borderRadiusBottomLeft: 'border-radius-10',
     };
 
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
 
     expect(solidNodeMock.cornerRadius).toEqual(10);
     expect(solidNodeMock.topLeftRadius).toEqual(10);
@@ -140,7 +133,6 @@ describe('Can set values on node', () => {
       },
       { sizing: 'size.10' },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(mockResize).toBeCalledWith(100, 100);
   });
@@ -159,7 +151,6 @@ describe('Can set values on node', () => {
       },
       { width: 'size.100' },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(mockResize).toBeCalledWith(100, 50);
   });
@@ -178,7 +169,6 @@ describe('Can set values on node', () => {
       },
       { height: 'size.100' },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(mockResize).toBeCalledWith(50, 100);
   });
@@ -195,7 +185,6 @@ describe('Can set values on node', () => {
         boxShadow: 'shadows.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
@@ -212,7 +201,6 @@ describe('Can set values on node', () => {
         boxShadow: 'shadows.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
@@ -232,7 +220,6 @@ describe('Can set values on node', () => {
         boxShadow: 'shadows.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
@@ -255,7 +242,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         textStyles: new Map([['type/heading/h1', { name: 'type/heading/h1', id: '123' } as TextStyle]]),
       },
-      emptyThemeInfo,
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '123' });
@@ -279,7 +265,10 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         textStyles: new Map([['heading/h1', { name: 'heading/h1', id: '456' } as TextStyle]]),
       },
-      emptyThemeInfo,
+      {},
+      {},
+      {},
+      null,
       true,
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
@@ -307,7 +296,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         effectStyles: new Map([['shadows/default', { name: 'shadows/default', id: '123' } as EffectStyle]]),
       },
-      emptyThemeInfo,
     );
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
@@ -334,7 +322,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         effectStyles: new Map([['shadows/other', { name: 'shadows/other', id: '123' } as EffectStyle]]),
       },
-      emptyThemeInfo,
     );
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
   });
@@ -360,14 +347,11 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
       },
-      {
-        activeTheme: {
-          [INTERNAL_THEMES_NO_GROUP]: 'light',
-        },
-        themes: [{ id: 'light', name: 'light', selectedTokenSets: {} }],
-      },
+      {},
+      {},
+      {},
+      'light',
       false,
-      true,
     );
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
@@ -386,7 +370,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
       },
-      emptyThemeInfo,
     );
     expect(setColorValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, fillStyleId: '123' });
@@ -402,7 +385,6 @@ describe('Can set values on node', () => {
         fill: 'colors.red',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'fills');
   });
@@ -420,7 +402,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
       },
-      emptyThemeInfo,
     );
     expect(setColorValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokeStyleId: '123' });
@@ -436,7 +417,6 @@ describe('Can set values on node', () => {
         borderColor: 'colors.red',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'strokes');
   });
@@ -451,7 +431,6 @@ describe('Can set values on node', () => {
         spacing: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
     expect(frameNodeMock.paddingRight).toBe(20);
@@ -469,7 +448,6 @@ describe('Can set values on node', () => {
         horizontalPadding: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
     expect(frameNodeMock.paddingRight).toBe(20);
@@ -485,7 +463,6 @@ describe('Can set values on node', () => {
         verticalPadding: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingTop).toBe(20);
     expect(frameNodeMock.paddingBottom).toBe(20);
@@ -501,7 +478,6 @@ describe('Can set values on node', () => {
         itemSpacing: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.itemSpacing).toBe(20);
   });
@@ -516,7 +492,6 @@ describe('Can set values on node', () => {
         paddingTop: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingTop).toBe(20);
   });
@@ -531,7 +506,6 @@ describe('Can set values on node', () => {
         paddingRight: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingRight).toBe(20);
   });
@@ -546,7 +520,6 @@ describe('Can set values on node', () => {
         paddingBottom: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingBottom).toBe(20);
   });
@@ -561,7 +534,6 @@ describe('Can set values on node', () => {
         paddingLeft: 'spacing.lg',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
   });
@@ -576,7 +548,6 @@ describe('Can set values on node', () => {
         fill: 'fg.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(textNodeMock.fills).toEqual([
       {
@@ -601,7 +572,6 @@ describe('Can set values on node', () => {
         fill: 'default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(textNodeMock.characters).toEqual('My new content');
   });
@@ -616,7 +586,6 @@ describe('Can set values on node', () => {
         fill: 'fg.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(textNodeMock.characters).toEqual('foobar');
   });
@@ -632,7 +601,6 @@ describe('Can set values on node', () => {
         boxShadow: 'shadows.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(figma.loadFontAsync).toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('0');
@@ -647,7 +615,6 @@ describe('Can set values on node', () => {
         boxShadow: 'shadows.default',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(figma.loadFontAsync).not.toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('foobar');
@@ -665,7 +632,7 @@ describe('Can set values on node', () => {
     mockCreateImage.mockImplementation(() => ({
       hash: '1234',
     }));
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
     expect(solidNodeMock.fills).toEqual([
       {
         type: 'IMAGE',
@@ -684,7 +651,7 @@ describe('Can set values on node', () => {
       dimension: '12px',
     };
     const data = { dimension: 'dimension.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
     expect(mockResize).toBeCalledWith(12, 12);
   });
 
@@ -699,7 +666,7 @@ describe('Can set values on node', () => {
       dimension: '12px',
     };
     const data = { dimension: 'dimension.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
     expect(mockResize).toBeCalledTimes(0);
     expect(mockNode.itemSpacing).toEqual(12);
   });
@@ -712,7 +679,7 @@ describe('Can set values on node', () => {
       },
     };
     const data = { border: 'border.regular' };
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
     expect(solidNodeMock.strokeWeight).toEqual(12);
     expect(solidNodeMock.dashPattern).toEqual([0, 0]);
   });
@@ -729,7 +696,6 @@ describe('Can set values on node', () => {
         borderRadius: 'border-radius.none',
       },
       emptyStylesMap,
-      emptyThemeInfo,
     );
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
@@ -739,7 +705,7 @@ describe('Can set values on node', () => {
       visibility: 'false',
     };
     const data = { visibility: 'boolean-false' };
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
     expect(solidNodeMock.visible).toEqual(false);
   });
 
@@ -752,7 +718,7 @@ describe('Can set values on node', () => {
       number: '12px',
     };
     const data = { number: 'number.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
     expect(mockResize).toBeCalledWith(12, 12);
   });
 
@@ -767,7 +733,7 @@ describe('Can set values on node', () => {
       number: '12px',
     };
     const data = { number: 'number.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap, emptyThemeInfo);
+    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
     expect(mockResize).toBeCalledTimes(0);
     expect(mockNode.itemSpacing).toEqual(12);
   });
