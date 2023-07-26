@@ -161,6 +161,7 @@ describe('MoreButton', () => {
     await fireEvent.contextMenu(result.getByText(token.name));
     await fireEvent.click(result.getByText('All'));
     expect(mockSetNodeData).toHaveBeenCalledWith({
+      counterAxisSpacing: 'delete',
       horizontalPadding: 'delete',
       verticalPadding: 'delete',
       spacing: token.name,
