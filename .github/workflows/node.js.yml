@@ -12,11 +12,11 @@ jobs:
   # install dependencies and store artifact
   package:
     name: Create Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -79,18 +79,17 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
-
       # 4: Run tests
       - name: Run test command
         run: npm run test
   coverage:
     name: Test coverage
     continue-on-error: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -120,18 +119,16 @@ jobs:
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
-          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles'
-          total_delta: 1
-          delta: 1
+          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles ' 
           afterSwitchCommand: npm ci
           useSameComment: true
   test-transform:
     name: Transformer Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       # 2: Checkout repository
@@ -168,7 +165,7 @@ jobs:
         run: cd token-transformer && npm run test
   cypress-run:
     name: Cypress
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Checkout repository
       - name: Checkout

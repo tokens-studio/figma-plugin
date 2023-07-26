@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "1.37.5",
+  "version": "1.37.6",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
@@ -127,7 +127,7 @@
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.16",
     "@changesets/cli": "^2.26.2",
-    "@figma/plugin-typings": "github:figma/plugin-typings#vars",
+    "@figma/plugin-typings": "^1.71.1",
     "@sentry/webpack-plugin": "^2.2.0",
     "@storybook/addon-actions": "^6.5.8",
     "@storybook/addon-docs": "^6.5.8",
