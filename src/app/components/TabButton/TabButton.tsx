@@ -3,18 +3,15 @@ import { Tabs } from '@/constants/Tabs';
 import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
 import Box from '../Box';
-import Tooltip from '../Tooltip';
 
 type Props<T extends string> = {
   name: T
-  label?: string
+  label: string
   activeTab?: T
   disabled?: boolean
   onSwitch: (tab: T) => void
   startEnhancer?: React.ReactNode
-  endEnhancer?: React.ReactNode,
-  tooltip?: string;
-  tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
+  endEnhancer?: React.ReactNode
 };
 
 const StyledButton = styled('button', {
@@ -69,7 +66,7 @@ const StyledButton = styled('button', {
 });
 
 export function TabButton<T extends string = Tabs>({
-  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer, tooltip, tooltipSide,
+  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer,
 }: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
@@ -87,22 +84,16 @@ export function TabButton<T extends string = Tabs>({
       disabled={disabled}
       onClick={onClick}
     >
-      <Tooltip side={tooltipSide} label={tooltip ?? ''}>
-        <>
-          {startEnhancer && startEnhancer}
-          {label && (
-          <Box css={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-          >
-            {label}
-          </Box>
-          )}
-          {endEnhancer && endEnhancer}
-        </>
-      </Tooltip>
+      {startEnhancer && startEnhancer}
+      <Box css={{
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+      >
+        {label}
+      </Box>
+      {endEnhancer && endEnhancer}
     </StyledButton>
   );
 }
