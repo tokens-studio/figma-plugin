@@ -62,6 +62,6 @@ describe('Settings Component', () => {
 
     fireEvent.click(result.getByTestId('reset-onboarding'));
 
-    expect(result.queryByText('whereTokensStored')).not.toBeNull();
+    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
   });
 });
