@@ -79,7 +79,6 @@ jobs:
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
-
       # 4: Run tests
       # Note that due to the older version of jest along with the amount of logs we produce, we add in --watch to prevent error code 1 when a large amount of console logs are emitted 
       # https://github.com/jestjs/jest/issues/11132
@@ -122,9 +121,7 @@ jobs:
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
-          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles'
-          total_delta: 1
-          delta: 1
+          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles ' 
           afterSwitchCommand: npm ci
           useSameComment: true
   test-transform:

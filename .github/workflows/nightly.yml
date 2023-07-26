@@ -7,7 +7,7 @@ on:
 
 # Needed permissions for changesets
 permissions:
-    contents: read
+    contents: write 
     id-token: write
 
 
@@ -82,23 +82,17 @@ jobs:
       # Create the bundle for Figma
       - name: Bundle 
         run: npm run bundle
-      # Generate the release automatically in Github. This should not result in a publish to npm
-      # We should disable this if doing beta releases   
-      # Store artifact for later use
-      - uses: rickstaa/action-create-tag@v1
-        id: "tag_create"
-        with:
-          tag: "beta"
-          tag_exists_error: false
-          force_push_tag: true
-          message: "Nightly beta"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/bundle.zip"
+          allowUpdates: true
+          # Protects us from inadvertently releasing a non pre-release version
+          updateOnlyUnreleased: true
+          generateReleaseNotes: true
           name: Nightly beta
           prerelease: true
-          tag: "beta"
           replacesArtifacts: true
+          tag: beta
           body: |
             The nightly release of the beta plugin. 
