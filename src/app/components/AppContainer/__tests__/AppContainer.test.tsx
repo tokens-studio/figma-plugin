@@ -52,7 +52,7 @@ describe('AppContainer', () => {
         </Provider>,
       );
 
-      expect(result.queryByText('Loading, please wait')).not.toBeNull();
+      expect(result.queryByText('loadingWait')).not.toBeNull();
       expect(savePluginDataFactorySpy).toBeCalledTimes(1);
       expect(addLicenseFactorySpy).toBeCalledTimes(1);
       expect(getLdFlagsFactorySpy).toBeCalledTimes(1);
