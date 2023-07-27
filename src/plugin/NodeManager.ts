@@ -55,7 +55,7 @@ export class NodeManager {
         }
 
         // Compare nodes in the document to what we have in the cache
-        const allNodes = figma.root.findAll();
+        const allNodes = figma.root.findAllWithCriteria({ sharedPluginData: { namespace: 'tokens' } });
         if (allNodes.length > 0) {
           const nodeIds = new Set(allNodes.map((node) => node.id));
           let hasDeletedNodes = false;

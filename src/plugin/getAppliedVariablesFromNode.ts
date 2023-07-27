@@ -5,8 +5,8 @@ import convertVariableTypeToProperty from '@/utils/convertVariableTypeToProperty
 
 export type SelectionVariable = {
   name: string;
-  type: Properties
-  value?: string
+  type: Properties;
+  value?: string;
 };
 
 export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVariable[] {
@@ -42,7 +42,7 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
       }
       if (!Array.isArray(value) && key in node) {
         const variableId = value.id;
-        if (variableId) {
+        if (variableId && typeof variableId === 'string') {
           const variable = figma.variables.getVariableById(variableId);
           if (variable) {
             localVariables.push({

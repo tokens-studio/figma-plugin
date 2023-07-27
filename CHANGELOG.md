@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.6
+
+### Patch Changes
+
+Bugs addressed:
+
+- 7c6b0391: Fix: Changes frequency where we check for git updates in the background to once every 60 seconds
+- 2c41a47f: Fix: Fixes sync tabs being displayed malformed
+- fffdd673: Fix: Fixes Apply to document UI description
+
+
 ## 1.37.5
 
 ### Patch Changes
@@ -22,6 +33,7 @@ Bugs addressed:
 - Fixed border tokens not working properly inside composition tokens
 
 Improvements:
+
 - Introduced an option to rename tokens in other sets when renaming a single token
 
 ## 1.37.3
