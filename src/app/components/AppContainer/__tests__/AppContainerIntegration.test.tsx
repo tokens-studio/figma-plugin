@@ -427,8 +427,8 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-      await result.findByText("Couldn't load tokens stored on GitHub");
-      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
+      await result.findByText('couldNotLoadTokens');
+      expect(result.queryByText('couldNotLoadTokens')).toBeInTheDocument();
     });
   }));
 });
