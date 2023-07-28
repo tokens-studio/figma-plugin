@@ -118,7 +118,7 @@ function Settings() {
         <SyncSettings />
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">{t('settings')}</Heading>
+          <Heading size="medium">{t('settings')}</Heading>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="ignoreFirstPartForStyles"
@@ -158,21 +158,33 @@ function Settings() {
               </Stack>
             </Label>
           </Stack>
-          <Heading size="small">{t('baseFont')}</Heading>
-          <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-            {t('baseFontExplanation')}
-
+          <Box>
+            <Heading size="small">{t('baseFont')}</Heading>
+            <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+              {t('baseFontExplanation')}
+            </Box>
           </Box>
           <RemConfiguration />
-          <Box>
-            <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-          </Box>
+          <Stack direction="row" gap={2} align="center">
+            <Heading size="small">{t('language')}</Heading>
+            <LanguageSelector />
+          </Stack>
         </Stack>
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Heading size="small">{t('debugging')}</Heading>
+          <Box>
+            <Heading size="medium">{t('debugging')}</Heading>
+            <Text muted css={{ fontSize: '$xsmall', lineHeight: 1.5 }}>
+              {t('sessionRecordingDescription')}
+              {' '}
+              {t('dataCollectedIsAnonymised')}
+              {' '}
+              {t('forMoreInformationPleaseSeeOur')}
+              {' '}
+              <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
+            </Text>
+          </Box>
           <Stack direction="row" gap={2} align="center">
-
             <Checkbox
               id="enableDebugging"
               checked={!!debugMode}
@@ -182,39 +194,20 @@ function Settings() {
             <Label htmlFor="enableDebugging">
               {t('enableSessionRecording')}
             </Label>
-
           </Stack>
-          <Stack direction="column" gap={2}>
-            <Text muted>
-              {t('sessionRecordingDescription')}
-            </Text>
-            <Text muted>
-              {t('dataCollectedIsAnonymised')}
-            </Text>
-            {debugSession && (
-            <Text>
-              {t('yourCurrentSessionIdIs')}
-              {' '}
-              <b>{debugSession}</b>
-            </Text>
-            )}
-            <Text muted>
-              {t('forMoreInformationPleaseSeeOur')}
-              {' '}
-              <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
-            </Text>
-          </Stack>
-
-        </Stack>
-        <Divider />
-        <Stack direction="column" gap={3} css={{ padding: '0 $4' }} align="start">
-          <Heading size="small">{t('language')}</Heading>
-          <LanguageSelector />
-          <Stack direction="row" gap={2} align="center">
-            {t('languageExplainer')}
-          </Stack>
+          {debugSession && (
+          <Text>
+            {t('yourCurrentSessionIdIs')}
+            {' '}
+            <b>{debugSession}</b>
+          </Text>
+          )}
         </Stack>
       </Stack>
+      <Divider />
+      <Box>
+        <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
+      </Box>
     </Box>
   );
 }
