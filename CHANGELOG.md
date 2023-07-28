@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.7
+
+### Patch Changes
+
+- f8235f7b: Fixed a major performance issue that appeared after 1.37. Times to apply and update nodes should now be down to 10% of what it was before for some files.
+- 4a2253d1: Adds support for minWidth, maxWidth, minHeight, maxHeight, counterAxisSpacing on Auto Layout frames and their direct children
+  Adds support for 'AUTO' in Spacing tokens to indicate space between on Auto Layout frames
+
 ## 1.37.6
 
 ### Patch Changes
@@ -9,7 +17,6 @@ Bugs addressed:
 - 7c6b0391: Fix: Changes frequency where we check for git updates in the background to once every 60 seconds
 - 2c41a47f: Fix: Fixes sync tabs being displayed malformed
 - fffdd673: Fix: Fixes Apply to document UI description
-
 
 ## 1.37.5
 
