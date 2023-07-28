@@ -5,6 +5,7 @@ import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useTranslation } from 'react-i18next';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
+import { LanguageSelector } from '../LanguageSelector';
 import Button from '../Button';
 import Checkbox from '../Checkbox';
 import Heading from '../Heading';
@@ -208,6 +209,7 @@ function Settings() {
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }} align="start">
           <Heading size="small">{t('language')}</Heading>
+          <LanguageSelector />
           <Stack direction="row" gap={2} align="center">
             {t('languageExplainer')}
           </Stack>
