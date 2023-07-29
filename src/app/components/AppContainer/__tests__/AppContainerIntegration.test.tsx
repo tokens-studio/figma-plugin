@@ -239,7 +239,7 @@ describe('AppContainer (integration)', () => {
               <AppContainer {...params} />
             </Provider>,
           );
-          expect(await result.findByText('gettingStarted')).not.toBeUndefined();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
       })
@@ -260,7 +260,7 @@ describe('AppContainer (integration)', () => {
               <AppContainer {...params} />
             </Provider>,
           );
-          expect(await result.findByText('gettingStarted')).not.toBeUndefined();
+          expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
       })
@@ -427,8 +427,8 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-      await result.findByText('couldNotLoadTokens');
-      expect(result.queryByText('couldNotLoadTokens')).toBeInTheDocument();
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
     });
   }));
 });
