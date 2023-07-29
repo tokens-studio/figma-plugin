@@ -31,7 +31,6 @@ import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
-import { LanguageSelector } from './LanguageSelector';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -177,7 +176,6 @@ export default function Footer() {
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <LanguageSelector />
         <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
