@@ -8,6 +8,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { sendSelectionChange } from './sendSelectionChange';
 import { init } from '@/utils/plugin';
 import { sendDocumentChange } from './sendDocumentChange';
+import { performCodeGen } from './performCodeGen';
 
 figma.skipInvisibleInstanceChildren = true;
 
@@ -80,5 +81,7 @@ figma.on('selectionchange', () => {
 figma.on('documentchange', (event: DocumentChangeEvent) => {
   sendDocumentChange(event);
 });
+
+figma.codegen.on('generate', (event: any): CodegenResult[] => performCodeGen(event));
 
 init();
