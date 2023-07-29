@@ -5,8 +5,8 @@ import convertVariableTypeToProperty from '@/utils/convertVariableTypeToProperty
 
 export type SelectionVariable = {
   name: string;
-  type: Properties
-  value?: string
+  type: Properties;
+  value?: string;
 };
 
 export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVariable[] {
