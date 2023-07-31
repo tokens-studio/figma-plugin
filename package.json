@@ -72,6 +72,7 @@
     "downshift": "^6.1.7",
     "eventemitter3": "^4.0.7",
     "expr-eval": "^2.0.2",
+    "figma-api-stub": "^0.0.56",
     "figma-plugin-ds": "^0.1.8",
     "file-saver": "^2.0.5",
     "framer-motion": "^6.3.11",

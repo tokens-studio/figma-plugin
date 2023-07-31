@@ -1,4 +1,5 @@
-export default tokens = [
+import { TokenTypes } from "@/constants/TokenTypes";
+export  const tokens = [
     { name: 'foo', value: 3 },
     { name: 'bar', value: '{foo}' },
     { name: 'boo', value: '{baz}' },

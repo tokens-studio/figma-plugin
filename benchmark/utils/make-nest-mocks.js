@@ -22,20 +22,13 @@ const createDeepTokens = (depth) => {
     return obj;
   };
 
-const depths = [2,5,10,20,50,100,500]
+const depths = [2,10,100]
 
 
 depths.forEach(depth => {
-// Define the relative path and file name
-const relativePath = './nest_' + depth + '.json';
-
-// Construct the absolute path based on the current directory
+const relativePath = './nest_' + depth + '.json';y
 const absolutePath = path.resolve(__dirname, relativePath);
-
-// Content to be written to the file
 const content =  JSON.stringify(createDeepTokens(depth), null, 2);
-
-// Write the file
 fs.writeFileSync(absolutePath, content, (err) => {
   if (err) {
     console.error('Error writing file:', err);
