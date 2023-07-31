@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Box from './Box';
@@ -20,25 +20,15 @@ import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import { useAuth } from '@/context/AuthContext';
 
-const IconSecondScreen = () => {
-  const { user } = useAuth();
-  const secondScreenisEnabled = useSelector(secondScreenSelector);
-  if (user && secondScreenisEnabled) {
-    return <IconSecondScreenOn />;
-  }
-  if (user && !secondScreenisEnabled) {
-    return <IconSecondScreenOff />;
-  }
-  return <IconSecondScreenIndeterminate />;
-};
-
 const Navbar: React.FC = () => {
+  const { user } = useAuth();
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();
   const { handleResize } = useMinimizeWindow();
   const { t } = useTranslation(['navbar']);
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
+  const secondScreenisEnabled = useSelector(secondScreenSelector);
 
   const handleSwitch = useCallback(
     (tab: Tabs) => {
@@ -46,6 +36,12 @@ const Navbar: React.FC = () => {
     },
     [dispatch.uiState],
   );
+
+  const secondScreenIcon = useMemo(() => {
+    if (user && secondScreenisEnabled) return <IconSecondScreenOn />;
+    if (user && secondScreenisEnabled === false) return <IconSecondScreenOff />;
+    return <IconSecondScreenIndeterminate />;
+  }, [secondScreenisEnabled, user]);
 
   return (
     <Box
@@ -70,7 +66,7 @@ const Navbar: React.FC = () => {
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { (existingKey && !licenseKeyError) && <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} endEnhancer={<IconSecondScreen />} tooltip="Second Screen" onSwitch={handleSwitch} />}
+        { (existingKey && !licenseKeyError) && <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} endEnhancer={secondScreenIcon} tooltip="Second Screen" onSwitch={handleSwitch} />}
         <TokenFlowButton />
         <IconButton size="large" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
