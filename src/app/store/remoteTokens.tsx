@@ -243,7 +243,8 @@ export default function useRemoteTokens() {
   ]);
 
   const pushTokens = useCallback(async (context: StorageTypeCredentials = api) => {
-    track('pushTokens', { provider: context.provider });
+    const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
+    track('pushTokens', { provider: context.provider, isFolder });
     switch (context.provider) {
       case StorageProviderType.GITHUB: {
         await pushTokensToGitHub(context);
