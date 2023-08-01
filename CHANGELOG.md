@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.8
+
+### Patch Changes
+
+- 9a9f6e26: Updated Second screen UI to work better on smaller sizes, moved language selector to Settings
+- d7c42f97: Adds support for Figma's DevMode (thanks Thomas Deser)
+
 ## 1.37.7
 
 ### Patch Changes
