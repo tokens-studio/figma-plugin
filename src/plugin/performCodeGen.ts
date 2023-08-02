@@ -5,8 +5,11 @@ export function performCodeGen(event: any): CodegenResult[] {
 
   const code = tokenKeys
     .map((key) => {
-      const value = event.node.getSharedPluginData('tokens', key);
+      let value = event.node.getSharedPluginData('tokens', key);
 
+      if (key === 'fill' && !value && event.node.fillStyleId) {
+        value = figma.getStyleById(event.node.fillStyleId)?.getSharedPluginData('tokens', 'style');
+      }
       return value && `${key}: ${value};`;
     })
     .filter((x) => x)
