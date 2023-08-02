@@ -2,4 +2,4 @@
 '@tokens-studio/figma-plugin': patch
 ---
 
-Fixes order sync when push, then pull from Supernova.
+Fixes a bug that caused token set order to be ignored when syncing with Supernova
