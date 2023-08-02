@@ -21,3 +21,6 @@ export const mockGetNodeById: jest.Mock;
 export const mockScrollAndZoomIntoView: jest.Mock;
 export const mockCreateImage: jest.Mock;
 export const mockGetLocalVariables: jest.Mock;
+export const mockCreateVariable: jest.Mock;
+export const mockGetLocalVariableCollections = jest.Mock;
+export const mockCreateVariableCollection = jest.Mock;
