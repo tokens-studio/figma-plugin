@@ -5,6 +5,7 @@ import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
+  // Big O (n * log(n) * m)
   try {
     const { oldName, newName } = msg;
     const allWithData = await defaultNodeManager.findNodesWithData({ updateMode: msg.updateMode });

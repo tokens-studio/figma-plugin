@@ -14,6 +14,7 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState) {
+  // Big O (n * Big O(resolveTokenValues))
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
