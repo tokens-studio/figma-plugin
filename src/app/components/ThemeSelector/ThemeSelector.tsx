@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { getCurrentHub } from '@sentry/browser';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -41,6 +42,8 @@ export const ThemeSelector: React.FC = () => {
   const activeTheme = useSelector(activeThemeSelector);
   const availableThemes = useSelector(themeOptionsSelector);
   const groupNames = useMemo(() => ([...new Set(availableThemes.map((theme) => theme.group || INTERNAL_THEMES_NO_GROUP))]), [availableThemes]);
+  const transaction = getCurrentHub().getScope().getTransaction();
+  transaction?.setMeasurement('themes', availableThemes.length, '');
 
   const handleClearTheme = useCallback(() => {
     dispatch.tokenState.setActiveTheme({ newActiveTheme: {}, shouldUpdateNodes: true });

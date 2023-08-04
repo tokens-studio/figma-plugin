@@ -1,4 +1,5 @@
 import omit from 'just-omit';
+import { getCurrentHub } from '@sentry/browser';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
@@ -20,6 +21,8 @@ export function findAllAliases(tokens: (SingleToken | string)[]) {
 }
 
 export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
+  const transaction = getCurrentHub().getScope().getTransaction();
+  transaction?.setMeasurement('tokens', tokens.length, '');
   const aliases = findAllAliases(tokens);
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {

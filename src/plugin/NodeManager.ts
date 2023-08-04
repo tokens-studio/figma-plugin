@@ -17,6 +17,7 @@ import pkg from '../../package.json';
 import { ProgressTracker } from './ProgressTracker';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { HashProperty, PersistentNodesCacheProperty, VersionProperty } from '@/figmaStorage';
+import { wrapTransaction } from '@/profiling/transaction';
 
 export type NodemanagerCacheNode = {
   hash: string;
@@ -273,7 +274,12 @@ export class NodeManager {
     } else if (updateMode === UpdateMode.SELECTION) {
       relevantNodes = findAll(figma.currentPage.selection, true);
     } else {
-      relevantNodes = findAll([figma.root], false);
+      relevantNodes = await wrapTransaction({
+        name: 'figma nodes',
+        statExtractor: (result, transaction) => {
+          transaction.setMeasurement('figmaNodes', result.length, '');
+        },
+      }, () => findAll([figma.root], false));
     }
 
     const unregisteredNodes = relevantNodes

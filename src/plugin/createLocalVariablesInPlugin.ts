@@ -7,6 +7,7 @@ import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
 import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
+import { wrapTransaction } from '@/profiling/transaction';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -50,7 +51,12 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
     }
   });
-  const figmaVariables = figma.variables.getLocalVariables();
+  const figmaVariables = await wrapTransaction({
+    name: 'localVariables',
+    statExtractor: (result, transaction) => {
+      transaction.setMeasurement('localVariables', result.length, '');
+    },
+  }, () => figma.variables.getLocalVariables());
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (figmaVariables.length === 0) {
     notifyUI('No variables were created');
