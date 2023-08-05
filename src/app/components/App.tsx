@@ -12,12 +12,15 @@ import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
+import { darkThemeMode, lightThemeMode } from '@/stitches.config';
+import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
+  const { isDarkTheme } = useFigmaTheme();
 
   return (
-    <Box css={{ backgroundColor: '$bgDefault' }}>
+    <Box css={{ backgroundColor: '$bgDefault' }} className={isDarkTheme ? darkThemeMode : lightThemeMode}>
       {activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
