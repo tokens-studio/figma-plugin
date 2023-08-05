@@ -10,7 +10,7 @@ const StyledButton = styled('button', {
   height: '1.5rem',
   borderRadius: '$default',
   border: '1px solid',
-  borderColor: '$border',
+  borderColor: '$borderDefault',
   cursor: 'pointer',
 });
 

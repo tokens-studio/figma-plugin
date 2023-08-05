@@ -10,7 +10,7 @@ const StyledLabel = styled(LabelPrimitive.Root, {
   userSelect: 'none',
   pointerEvents: 'none',
   padding: '$3',
-  borderRight: '1px solid $border',
+  borderRight: '1px solid $borderDefault',
   position: 'absolute',
   left: 0,
   top: 0,
@@ -29,7 +29,7 @@ const Input = styled('input', {
   fontSize: 12,
   lineHeight: 1,
   color: '$text',
-  border: '1px solid $border',
+  border: '1px solid $borderDefault',
   width: '100%',
   '&:focus': { boxShadow: '$focus' },
 });

@@ -55,7 +55,7 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
-    borderColor: '$border',
+    borderColor: '$borderDefault',
   },
 
   variants: {

@@ -29,7 +29,7 @@ export const StyledButton = styled('button', {
       secondary: {
         background: '$bgBtnSecondary',
         color: '$fgBtnSecondary',
-        borderColor: '$border',
+        borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focus',
         },
@@ -48,7 +48,7 @@ export const StyledButton = styled('button', {
       danger: {
         background: '$bgBtnSecondary',
         color: '$fgDanger',
-        borderColor: '$border',
+        borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focusDanger',
         },

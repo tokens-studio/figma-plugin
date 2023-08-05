@@ -6,6 +6,6 @@ export const StyledNameInputBox = styled(Box, {
   marginLeft: '-$4',
   marginTop: '-$5',
   marginRight: '-$4',
-  borderBottomColor: '$border',
+  borderBottomColor: '$borderDefault',
   borderBottomWidth: '1px',
 });

@@ -2,7 +2,7 @@ import { styled } from '@/stitches.config';
 
 export const ModalFooter = styled('footer', {
   padding: '$4',
-  borderTopColor: '$border',
+  borderTopColor: '$borderDefault',
   borderTopWidth: '1px',
   variants: {
     stickyFooter: {

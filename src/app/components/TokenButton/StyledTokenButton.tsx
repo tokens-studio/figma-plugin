@@ -62,7 +62,7 @@ export const StyledTokenButton = styled('button', {
     },
     disabled: {
       true: {
-        borderColor: '$border',
+        borderColor: '$borderDefault',
       },
     },
   },

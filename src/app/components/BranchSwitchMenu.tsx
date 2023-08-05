@@ -77,7 +77,7 @@ const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, 
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$interaction',
-    borderColor: '$border',
+    borderColor: '$borderDefault',
   },
 
   '&[data-state="open"]': {
