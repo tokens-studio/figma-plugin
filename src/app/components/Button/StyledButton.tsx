@@ -28,7 +28,7 @@ export const StyledButton = styled('button', {
       },
       secondary: {
         background: '$btnSecondaryBg',
-        color: '$fgDefault',
+        color: '$btnSecondaryFg',
         borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focus',
