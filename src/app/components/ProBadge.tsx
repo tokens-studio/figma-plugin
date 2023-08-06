@@ -12,15 +12,15 @@ export const StyledProBadge = styled('a', {
   fontSize: '$xxsmall',
   padding: '$2',
   borderRadius: '$medium',
-  backgroundColor: '$bgProSubtle',
+  backgroundColor: '$proBg',
   lineHeight: 1,
-  color: '$fgDefault',
+  color: '$fgPro',
   fontWeight: '$bold',
   textTransform: 'uppercase',
   border: '1px solid transparent',
 
   '&:hover, &:focus': {
-    borderColor: '$borderPro',
+    borderColor: '$proBorder',
   },
 });
 
