@@ -14,8 +14,8 @@ const StyledContent = styled(Tooltip.Content, {
   fontSize: 12,
   maxWidth: '70vw',
   width: 'auto',
-  backgroundColor: '$bgToolTip',
-  color: '$fgToolTip',
+  backgroundColor: '$tooltipBg',
+  color: '$tooltipFg',
   transformOrigin: 'var(--radix-tooltip-content-transform-origin)',
   animation: `${scaleIn} 0.1s ease-out`,
 });
