@@ -38,7 +38,7 @@ const StyledP = styled('p', {
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$fgAccent',
+  color: '$accentFg',
   fontSize: '$xsmall',
 });
 
@@ -62,7 +62,7 @@ export default function SecondScreen() {
   if (!user) {
     statusColor = '$textSubtle';
   } else if (isEnabled && user) {
-    statusColor = '$fgSuccess';
+    statusColor = '$successFg';
   } else {
     statusColor = '$dangerFg';
   }

@@ -20,7 +20,7 @@ export default function Callout({
   heading, description, action, id,
 }: Props) {
   return (
-    <Box css={{ backgroundColor: '$bgDanger', padding: '$4', borderRadius: '$small' }}>
+    <Box css={{ backgroundColor: '$dangerBg', padding: '$4', borderRadius: '$small' }}>
       <Stack direction="row" gap={4}>
         <Box css={{ color: '$dangerFg', marginTop: '$3' }}>
           <ExclamationTriangleIcon />

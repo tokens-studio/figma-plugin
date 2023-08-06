@@ -10,11 +10,11 @@ export const StyledDiff = styled((Text), {
   variants: {
     type: {
       success: {
-        backgroundColor: '$bgSuccess',
-        color: '$fgSuccess',
+        backgroundColor: '$successBg',
+        color: '$successFg',
       },
       danger: {
-        backgroundColor: '$bgDanger',
+        backgroundColor: '$dangerBg',
         color: '$dangerFg',
       },
     },

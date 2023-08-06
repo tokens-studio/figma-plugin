@@ -46,8 +46,8 @@ function NewOrExistingToken({
             fontWeight: '$bold',
             borderRadius: '$small',
             fontSize: '$xsmall',
-            backgroundColor: '$bgSuccess',
-            color: '$fgSuccess',
+            backgroundColor: '$successBg',
+            color: '$successFg',
           }}
           >
             {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
@@ -59,7 +59,7 @@ function NewOrExistingToken({
               fontWeight: '$bold',
               borderRadius: '$small',
               fontSize: '$xsmall',
-              backgroundColor: '$bgDanger',
+              backgroundColor: '$dangerBg',
               color: '$dangerFg',
             }}
             >
