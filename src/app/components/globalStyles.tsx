@@ -74,12 +74,12 @@ export const globalStyles = globalCss({
     width: '100%',
   },
   '.color-picker .react-colorful__saturation': {
-    borderRadius: '$default',
+    borderRadius: '$small',
   },
 
   '.color-picker .react-colorful__hue, .color-picker .react-colorful__alpha': {
     height: '$4',
-    borderRadius: '$default',
+    borderRadius: '$small',
   },
 
   '.color-picker .react-colorful__hue-pointer, .color-picker .react-colorful__alpha-pointer': {

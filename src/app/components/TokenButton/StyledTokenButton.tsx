@@ -38,14 +38,14 @@ export const StyledTokenButton = styled('button', {
     displayType: {
       LIST: {
         width: '100%',
-        borderRadius: '$tokenButton',
+        borderRadius: '$medium',
         backgroundColor: 'transparent',
         [`& ${StyledTokenButtonText}`]: {
           justifyContent: 'flex-start',
         },
       },
       GRID: {
-        borderRadius: '$tokenButton',
+        borderRadius: '$medium',
         [`& ${StyledTokenButtonText}`]: {
           borderRadius: '$full',
         },

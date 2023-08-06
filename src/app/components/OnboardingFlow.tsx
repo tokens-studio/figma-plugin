@@ -17,7 +17,7 @@ const StyledLink = styled('a', {
 });
 
 const StyledImage = styled('img', {
-  borderRadius: '$card',
+  borderRadius: '$medium',
 });
 
 function fetchOnboardingImage(idx: number) {

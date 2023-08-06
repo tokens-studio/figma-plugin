@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
 import Box from '../Box';
@@ -13,10 +13,10 @@ const VISIBLE_VIEWPORT_NODES = 10;
 const CONTAINER_PADDING = 8;
 
 export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
-  function selectAllNodes() {
+  const selectAllNodes = useCallback(() => {
     const nodeIds = nodes.map(({ id }) => id);
     selectNodes(nodeIds);
-  }
+  }, [nodes]);
 
   const dropdownContent = (
     <DropdownMenu.Content sideOffset={4}>
@@ -25,7 +25,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
         css={{
           width: '164px',
           background: '$contextMenuBackground',
-          borderRadius: '$contextMenu',
+          borderRadius: '$medium',
           padding: '$2 0',
           fontSize: '$small',
           maxHeight: `${VISIBLE_VIEWPORT_NODES * NODE_HEIGHT + CONTAINER_PADDING}px`,
@@ -62,7 +62,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '$2 $3',
-                borderRadius: '$default',
+                borderRadius: '$small',
                 cursor: 'pointer',
                 transition: 'background 200ms ease',
                 '&:hover': {

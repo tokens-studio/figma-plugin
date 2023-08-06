@@ -22,7 +22,7 @@ export const StyledBetaBadge = styled('span', {
   justifyContent: 'center',
   fontSize: '$xxsmall',
   padding: '$2',
-  borderRadius: '$badge',
+  borderRadius: '$medium',
   backgroundColor: '$bgAccent',
   lineHeight: 1,
   color: '$fgDefault',
@@ -64,7 +64,7 @@ export default function SecondScreen() {
   } else if (isEnabled && user) {
     statusColor = '$fgSuccess';
   } else {
-    statusColor = '$fgDanger';
+    statusColor = '$dangerFg';
   }
 
   return (

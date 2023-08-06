@@ -74,7 +74,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
             <ResolvingLoader />
           )}
           {(!styleInfo.name && styleInfo.failedToResolve) && (
-            <Stack direction="row" gap={1} css={{ color: '$fgDanger' }}>
+            <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
               <LinkBreak1Icon />
               Reference not found
             </Stack>

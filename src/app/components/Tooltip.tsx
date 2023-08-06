@@ -9,8 +9,8 @@ const scaleIn = keyframes({
 });
 
 const StyledContent = styled(Tooltip.Content, {
-  borderRadius: '$contextMenu',
-  padding: '5px 10px',
+  borderRadius: '$medium',
+  padding: '$2 $3',
   fontSize: 12,
   maxWidth: '70vw',
   width: 'auto',

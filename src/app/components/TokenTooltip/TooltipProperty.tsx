@@ -16,7 +16,7 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
       direction="row"
       align="center"
       css={{
-        borderRadius: '$badge',
+        borderRadius: '$medium',
         backgroundColor: '$bgOnDarkSubtle',
         overflow: 'hidden',
         display: 'inline-flex',

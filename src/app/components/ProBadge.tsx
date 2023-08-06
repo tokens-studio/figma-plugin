@@ -11,7 +11,7 @@ export const StyledProBadge = styled('a', {
   justifyContent: 'center',
   fontSize: '$xxsmall',
   padding: '$2',
-  borderRadius: '$badge',
+  borderRadius: '$medium',
   backgroundColor: '$bgProSubtle',
   lineHeight: 1,
   color: '$fgDefault',

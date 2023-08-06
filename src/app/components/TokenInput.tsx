@@ -23,7 +23,7 @@ const StyledLabel = styled(LabelPrimitive.Root, {
 
 const Input = styled('input', {
   all: 'unset',
-  borderRadius: '$input',
+  borderRadius: '$small',
   padding: '$4 $3',
   paddingLeft: 'calc(80px + $4)',
   fontSize: 12,

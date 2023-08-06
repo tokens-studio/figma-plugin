@@ -50,7 +50,7 @@ const StyledInput = styled('input', {
   backgroundColor: '$bgDefault',
   border: '1px solid $borderMuted',
   fontSize: '$xsmall',
-  borderRadius: '$input',
+  borderRadius: '$small',
   position: 'relative',
 
   '&:focus-within': {

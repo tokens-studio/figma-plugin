@@ -54,14 +54,14 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
           >
             <Box
               css={{
-                background: '$dangerBg',
+                background: '$dangerBgEmphasis',
                 color: '$onDanger',
                 fontSize: '$xsmall',
                 fontWeight: '$bold',
                 padding: '$3 $4',
                 paddingLeft: 0,
                 boxShadow: '$contextMenu',
-                borderRadius: '$contextMenu',
+                borderRadius: '$medium',
                 display: 'flex',
                 gap: '$2',
                 width: '100%',

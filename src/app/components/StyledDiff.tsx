@@ -5,7 +5,7 @@ export const StyledDiff = styled((Text), {
   padding: '$1 $2',
   wordBreak: 'break-all',
   fontWeight: '$bold',
-  borderRadius: '$badge',
+  borderRadius: '$medium',
   fontSize: '$xsmall',
   variants: {
     type: {
@@ -15,7 +15,7 @@ export const StyledDiff = styled((Text), {
       },
       danger: {
         backgroundColor: '$bgDanger',
-        color: '$fgDanger',
+        color: '$dangerFg',
       },
     },
   },

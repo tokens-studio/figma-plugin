@@ -4,7 +4,7 @@ export const StyledButton = styled('button', {
   borderWidth: '1px',
   borderStyle: 'solid',
   borderColor: 'transparent',
-  borderRadius: '$button',
+  borderRadius: '$small',
   fontWeight: '$bold',
   fontSize: '$xsmall',
   padding: '$3',
@@ -47,7 +47,7 @@ export const StyledButton = styled('button', {
       },
       danger: {
         background: '$bgBtnSecondary',
-        color: '$fgDanger',
+        color: '$dangerFg',
         borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focusDanger',

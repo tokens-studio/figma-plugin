@@ -25,16 +25,9 @@ export const fontWeights = {
 };
 
 export const radii = {
-  default: '2px',
-  button: '2px',
-  input: '2px',
-  contextMenu: '4px',
-  contextMenuItem: '2px',
-  card: '4px',
-  badge: '4px',
+  small: '2px',
+  medium: '4px',
   full: '999px',
-  tokenButton: '4px',
-  tree: '4px',
 };
 
 export const sizes = {

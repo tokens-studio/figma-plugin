@@ -8,7 +8,7 @@ export const StyledStorageItem = styled('div', {
   width: '100%',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  borderRadius: '$card',
+  borderRadius: '$medium',
   alignItems: 'center',
   variants: {
     active: {

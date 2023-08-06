@@ -11,7 +11,7 @@ const TokenSetIconWrapper = styled(Box, {
   justifyContent: 'center',
   border: '1px solid',
   borderColor: 'transparent',
-  borderRadius: '$button',
+  borderRadius: '$small',
   flexShrink: 0,
   variants: {
     active: {

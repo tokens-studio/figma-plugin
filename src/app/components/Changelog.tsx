@@ -16,7 +16,7 @@ const StyledReadMoreLink = styled('a', {
 
 const StyledImage = styled('img', {
   marginBottom: '$4',
-  borderRadius: '$card',
+  borderRadius: '$medium',
 });
 
 export default function Changelog() {
