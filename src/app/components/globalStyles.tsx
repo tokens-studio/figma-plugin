@@ -99,7 +99,7 @@ export const globalStyles = globalCss({
   '.ReactModal__Content': {
     backgroundColor: '$bgDefault !important',
     border: '1px solid !important',
-    borderColor: '$borderDefault !important',
+    borderColor: '$borderMuted !important',
     overflowX: 'hidden !important',
   },
 });

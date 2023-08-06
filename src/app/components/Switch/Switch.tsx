@@ -8,7 +8,7 @@ const StyledSwitch = styled(SwitchPrimitive.Root, {
   backgroundColor: 'transparent',
   borderRadius: '$full',
   position: 'relative',
-  border: '1px solid $colors$borderSwitch',
+  border: '1px solid $colors$borderDefault',
   '&[data-state="checked"]': { backgroundColor: '$interaction' },
 });
 
@@ -16,11 +16,11 @@ const StyledThumb = styled(SwitchPrimitive.Thumb, {
   display: 'block',
   width: 13,
   height: 13,
-  backgroundColor: '$fgDefault',
+  backgroundColor: '$onInteraction',
   borderRadius: '$full',
   transition: 'transform 100ms',
   willChange: 'transform',
-  boxShadow: '0 0 0 1px $colors$borderSwitch',
+  boxShadow: '0 0 0 1px $colors$borderDefault',
   '&[data-state="checked"]': { transform: 'translateX(12px)' },
 });
 
