@@ -8,8 +8,8 @@ export const StyledButton = styled('button', {
   fontWeight: '$bold',
   fontSize: '$xsmall',
   padding: '$3',
-  background: '$bgBtnPrimary',
-  color: '$fgBtnPrimary',
+  background: '$btnPrimaryBg',
+  color: '$btnPrimaryFg',
   '&:disabled': {
     opacity: 0.5,
   },
@@ -27,8 +27,8 @@ export const StyledButton = styled('button', {
         },
       },
       secondary: {
-        background: '$bgBtnSecondary',
-        color: '$fgBtnSecondary',
+        background: '$btnSecondaryBg',
+        color: '$fgDefault',
         borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focus',
@@ -43,7 +43,7 @@ export const StyledButton = styled('button', {
         },
       },
       danger: {
-        background: '$bgBtnSecondary',
+        background: '$btnSecondaryBg',
         color: '$dangerFg',
         borderColor: '$borderDefault',
         '&:focus-visible': {
