@@ -19,7 +19,6 @@
   "privacyPolicy": "Privacybeleid",
   "debugging": "Foutopsporing",
   "enableSessionRecording": "Schakel sessie-opname in",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "Second Screen is in bèta, sommige functies werken mogelijk niet zoals verwacht.",
   "liveSync": "Live-synchronisatie",
   "signInToContinue": "Log in om verder te gaan",
   "signedInAs": "Aangemeld als",
@@ -31,5 +30,9 @@
   "liveSyncWithSecondScreenActive": "Live synchronisatie met actief tweede scherm",
   "liveSyncInactive": "Live synchronisatie inactief",
   "storeTokenId": "Bewaar ID's op opslag",
-  "storeTokenIdExplanation": "Genereer automatisch unieke ID's voor uw tokens voor tracking."
+  "storeTokenIdExplanation": "Genereer automatisch unieke ID's voor uw tokens voor tracking.",
+  "secondScreenExplainer": "Versterk uw ontwerpworkflow, zodat u uw ontwerptokens in een tweede scherm kunt beheren.",
+  "language": "Taal",
+  "languageExplainer": "Tokens Studio is automatisch vertaald, daarom kunnen vertalingen onnauwkeurig lijken.\n Zie je je taal niet? Dien een functieverzoek in",
+  "liveSyncActive": "Live synchronisatie actief"
 }

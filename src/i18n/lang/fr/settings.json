@@ -19,7 +19,6 @@
   "privacyPolicy": "politique de confidentialité",
   "debugging": "Débogage",
   "enableSessionRecording": "Activer l'enregistrement de session",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "Second Screen est en version bêta, certaines fonctionnalités peuvent ne pas fonctionner comme prévu.",
   "liveSync": "Synchronisation en direct",
   "signInToContinue": "Connectez-vous pour continuer",
   "signedInAs": "Connecté en tant que",
@@ -31,5 +30,9 @@
   "liveSyncWithSecondScreenActive": "Synchronisation en direct avec le deuxième écran actif",
   "liveSyncInactive": "Synchronisation en direct inactive",
   "storeTokenId": "Stocker les identifiants sur le stockage",
-  "storeTokenIdExplanation": "Générez automatiquement des identifiants uniques pour vos jetons pour le suivi."
+  "storeTokenIdExplanation": "Générez automatiquement des identifiants uniques pour vos jetons pour le suivi.",
+  "secondScreenExplainer": "Renforcez votre flux de travail de conception en vous permettant de gérer vos jetons de conception sur un deuxième écran.",
+  "language": "Langue",
+  "languageExplainer": "Tokens Studio a été traduit automatiquement, donc les traductions peuvent sembler inexactes.\n Vous ne voyez pas votre langue ? Soumettre une demande de fonctionnalité",
+  "liveSyncActive": "Synchronisation en direct active"
 }

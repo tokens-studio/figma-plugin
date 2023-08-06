@@ -101,6 +101,11 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
       } else if (file.type === 'tokenSet') {
         dataObject[file.name] = file.data;
+      } else if (file.type === 'metadata') {
+        dataObject.$metadata = {
+          ...(dataObject.$metadata ?? []),
+          ...file.data,
+        };
       }
     });
 

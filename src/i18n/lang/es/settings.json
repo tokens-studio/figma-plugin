@@ -19,7 +19,6 @@
   "privacyPolicy": "política de privacidad",
   "debugging": "depuración",
   "enableSessionRecording": "Habilitar grabación de sesiones",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "Second Screen está en versión beta, es posible que algunas funciones no funcionen como se esperaba.",
   "liveSync": "sincronización en vivo",
   "signInToContinue": "Inicia sesión para continuar",
   "signedInAs": "Registrado como",
@@ -31,5 +30,9 @@
   "liveSyncWithSecondScreenActive": "Sincronización en vivo con la segunda pantalla activa",
   "liveSyncInactive": "Sincronización en vivo inactiva",
   "storeTokenId": "Almacenar ID en el almacenamiento",
-  "storeTokenIdExplanation": "Genere automáticamente identificaciones únicas para sus tokens para el seguimiento."
+  "storeTokenIdExplanation": "Genere automáticamente identificaciones únicas para sus tokens para el seguimiento.",
+  "secondScreenExplainer": "Potencie su flujo de trabajo de diseño, permitiéndole administrar sus tokens de diseño en una segunda pantalla.",
+  "language": "Idioma",
+  "languageExplainer": "Tokens Studio ha sido traducido automáticamente, por lo tanto, las traducciones pueden parecer inexactas.\n ¿No ves tu idioma? Enviar una solicitud de función",
+  "liveSyncActive": "Sincronización en vivo activa"
 }

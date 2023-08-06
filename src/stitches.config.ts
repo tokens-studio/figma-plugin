@@ -49,7 +49,7 @@ export const stitchesInstance = createStitches({
       xxsmall: '10px',
       xsmall: '11px',
       small: '12px',
-      medium: '14px',
+      medium: '13px',
       large: '16px',
     },
     fontWeights: {

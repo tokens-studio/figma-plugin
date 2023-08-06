@@ -19,7 +19,6 @@
   "privacyPolicy": "隐私政策",
   "debugging": "调试",
   "enableSessionRecording": "启用会话记录",
-  "secondScreenIsInBetaSomeFeaturesMayNotWorkAsExpected": "第二屏幕处于测试阶段，某些功能可能无法按预期工作。",
   "liveSync": "实时同步",
   "signInToContinue": "登录以继续",
   "signedInAs": "登录身份",
@@ -31,5 +30,9 @@
   "liveSyncWithSecondScreenActive": "与第二屏幕活动实时同步",
   "liveSyncInactive": "实时同步未激活",
   "storeTokenId": "将 ID 存储在存储器上",
-  "storeTokenIdExplanation": "自动为您的令牌生成唯一 ID 以进行跟踪。"
+  "storeTokenIdExplanation": "自动为您的令牌生成唯一 ID 以进行跟踪。",
+  "secondScreenExplainer": "增强您的设计工作流程，让您可以在第二个屏幕中管理您的设计令牌。",
+  "language": "语言",
+  "languageExplainer": "Tokens Studio 已经过机器翻译，因此翻译可能会显得不准确。\n 没有看到您的语言？提交功能请求",
+  "liveSyncActive": "实时同步激活"
 }
