@@ -37,7 +37,7 @@ export const StyledButton = styled('button', {
       ghost: {
         background: 'transparent',
         padding: '$2 $3',
-        color: '$fgBtnGhost',
+        color: '$fgDefault',
         '&:focus-visible': {
           boxShadow: '$focus',
         },
