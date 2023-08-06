@@ -11,7 +11,7 @@ const scaleIn = keyframes({
 const StyledContent = styled(Tooltip.Content, {
   borderRadius: '$medium',
   padding: '$2 $3',
-  fontSize: 12,
+  fontSize: '$small',
   maxWidth: '70vw',
   width: 'auto',
   backgroundColor: '$tooltipBg',
