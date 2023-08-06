@@ -17,7 +17,7 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
       align="center"
       css={{
         borderRadius: '$medium',
-        backgroundColor: '$bgOnDarkSubtle',
+        backgroundColor: '$tooltipBgSubtle',
         overflow: 'hidden',
         display: 'inline-flex',
       }}

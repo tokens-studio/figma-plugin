@@ -4,6 +4,7 @@ import { styled } from '@/stitches.config';
 const StyledContent = styled(ContextMenuPrimitive.Content, {
   minWidth: 100,
   backgroundColor: '$contextMenuBackground',
+  border: '1px solid $contextMenuBorder',
   borderRadius: '$medium',
   overflow: 'hidden',
   padding: '$2',
