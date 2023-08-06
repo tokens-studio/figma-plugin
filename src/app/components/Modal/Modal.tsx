@@ -18,6 +18,7 @@ const customStyles = (large = false): ReactModalStyles => ({
     zIndex: 1,
   },
   content: {
+    backgroundColor: '$bgDefault',
     padding: '0',
     position: 'relative',
     top: 'unset',

@@ -5,6 +5,7 @@ export function useFigmaTheme() {
 
   useEffect(() => {
     const htmlClassList = document.documentElement?.classList || [];
+    console.log('useFigmaTheme', isDarkTheme, htmlClassList);
     const isDark = htmlClassList.contains('figma-dark');
     setIsDarkTheme(isDark);
 

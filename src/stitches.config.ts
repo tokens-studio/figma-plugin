@@ -1,8 +1,8 @@
 // stitches.config.ts
 import { createStitches } from '@stitches/react';
-import * as core from './core';
-import * as lightTheme from './light';
-import * as darkTheme from './dark';
+import * as core from './tokens/core';
+import * as lightTheme from './tokens/light';
+import * as darkTheme from './tokens/dark';
 
 export const stitchesInstance = createStitches({
   media: {
