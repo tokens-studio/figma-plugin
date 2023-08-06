@@ -24,7 +24,7 @@ const itemStyles = {
   userSelect: 'none',
 
   '&[data-disabled]': {
-    color: '$interactionDisabled',
+    color: '$contextMenuForegroundDisabled',
     pointerEvents: 'none',
   },
 
