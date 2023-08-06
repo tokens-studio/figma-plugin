@@ -14,7 +14,7 @@ const StyledButton = styled('button', {
   variants: {
     isActive: {
       true: {
-        backgroundColor: '$bgAccent',
+        backgroundColor: '$accentBg',
         borderColor: '$interaction',
       },
       false: {

@@ -18,7 +18,7 @@ export const StyledTokenButton = styled('button', {
   marginRight: '$2',
   backgroundColor: '$bgSubtle',
   '&:hover, &:focus': {
-    backgroundColor: '$bgAccent',
+    backgroundColor: '$accentBg',
   },
   variants: {
     tokenType: {
@@ -53,7 +53,7 @@ export const StyledTokenButton = styled('button', {
     },
     active: {
       true: {
-        backgroundColor: '$bgAccent',
+        backgroundColor: '$accentBg',
         boxShadow: '$focusMuted !important',
         '&:hover, &:focus': {
           boxShadow: '$focusMuted !important',
@@ -73,7 +73,7 @@ export const StyledTokenButton = styled('button', {
       css: {
         width: '100%',
         '&:hover, &:focus': {
-          backgroundColor: '$bgAccent',
+          backgroundColor: '$accentBg',
         },
       },
     },

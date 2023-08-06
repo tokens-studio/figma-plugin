@@ -15,7 +15,7 @@ export const globalStyles = globalCss({
   },
   'button:focus': {
     outline: 'none',
-    boxShadow: '0 0 0 4px $bgAccent',
+    boxShadow: '0 0 0 4px $accentBg',
   },
   'textarea.input, select.input, input.input': {
     outline: 'none',

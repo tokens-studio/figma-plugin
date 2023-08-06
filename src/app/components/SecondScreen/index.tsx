@@ -23,7 +23,7 @@ export const StyledBetaBadge = styled('span', {
   fontSize: '$xxsmall',
   padding: '$2',
   borderRadius: '$medium',
-  backgroundColor: '$bgAccent',
+  backgroundColor: '$accentBg',
   lineHeight: 1,
   color: '$fgDefault',
   fontWeight: '$bold',
