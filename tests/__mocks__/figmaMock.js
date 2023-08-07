@@ -9,6 +9,8 @@ class MessageEvent extends Event {
 const figmaOnHandlers = []
 /** @type {[string, (...args: any[]) => any][]} */
 const figmaUiOnHandlers = []
+/** @type {[string, (...args: any[]) => any][]} */
+const figmaCodegenOnHandlers = []
 
 
 module.exports.dispatchFigmaEvent = jest.fn((name, args) => {
@@ -19,6 +21,9 @@ module.exports.dispatchFigmaEvent = jest.fn((name, args) => {
 module.exports.mockShowUI = jest.fn(() => {});
 module.exports.mockOn = jest.fn((name, handler) => {
   figmaOnHandlers.push([name, handler])
+});
+module.exports.mockCodegenOn = jest.fn((eventName, handler) => {
+  figmaCodegenOnHandlers.push([eventName, handler]);
 });
 module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
@@ -58,6 +63,7 @@ module.exports.mockUiPostMessage = jest.fn((pluginMessage) => {
 module.exports.mockRootSetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootGetSharedPluginData = jest.fn(() => {});
 module.exports.mockRootFindAll = jest.fn(() => []);
+module.exports.mockRootFindAllWithCriteria = jest.fn(() => []);
 module.exports.mockParentPostMessage = jest.fn((data) => {
   figmaUiOnHandlers
     .filter(([eventName]) => eventName === 'message')
@@ -67,6 +73,9 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
+module.exports.mockCreateVariable = jest.fn();
+module.exports.mockGetLocalVariableCollections = jest.fn();
+module.exports.mockCreateVariableCollection = jest.fn();
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -82,6 +91,9 @@ module.exports.figma = {
     setAsync: module.exports.mockSetAsync,
   },
   notify: module.exports.mockNotify,
+  codegen: {
+    on: module.exports.mockCodegenOn,
+  },
   ui: {
     postMessage: module.exports.mockUiPostMessage,
     on: module.exports.mockUiOn,
@@ -91,9 +103,13 @@ module.exports.figma = {
     setSharedPluginData: module.exports.mockRootSetSharedPluginData,
     getSharedPluginData: module.exports.mockRootGetSharedPluginData,
     findAll: module.exports.mockRootFindAll,
+    findAllWithCriteria: module.exports.mockRootFindAllWithCriteria,
   },
   variables: {
-    getLocalVariables: module.exports.mockGetLocalVariables
+    getLocalVariables: module.exports.mockGetLocalVariables,
+    createVariable: module.exports.mockCreateVariable,
+    getLocalVariableCollections: module.exports.mockGetLocalVariableCollections,
+    createVariableCollection: module.exports.mockCreateVariableCollection
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,

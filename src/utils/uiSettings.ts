@@ -23,6 +23,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
       baseFontSize: uiSettings.baseFontSize ?? data?.baseFontSize,
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
+      storeTokenIdInJsonEditor: uiSettings.storeTokenIdInJsonEditor ?? data?.storeTokenIdInJsonEditor,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -49,6 +50,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let aliasBaseFontSize: string;
     let language: string;
     let sessionRecording: boolean;
+    let storeTokenIdInJsonEditor: boolean;
 
     if (data) {
       width = data.width || 400;
@@ -66,6 +68,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
+      storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
       settings = {
         language,
         width: Math.max(300, width),
@@ -82,6 +85,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         shouldSwapStyles,
         baseFontSize,
         aliasBaseFontSize,
+        storeTokenIdInJsonEditor,
       };
 
       if (notify) {

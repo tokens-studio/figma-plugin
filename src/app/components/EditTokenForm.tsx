@@ -245,7 +245,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       $extensions: {
         ...internalEditToken.$extensions,
         'studio.tokens': Object.keys(newValue).length > 0 ? newValue : undefined,
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
@@ -258,7 +258,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken.$extensions?.['studio.tokens'],
           modify: newModify,
         },
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
@@ -306,7 +306,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         .map((n) => n.trim())
         .join('.');
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
-        track('Create token', { type: internalEditToken.type });
+        track('Create token', { type: internalEditToken.type, isModifier: !!$extensions?.['studio.tokens']?.modify });
         createSingleToken({
           description: (
             internalEditToken.description

@@ -1,5 +1,39 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.8
+
+### Patch Changes
+
+- 9a9f6e26: Updated Second screen UI to work better on smaller sizes, moved language selector to Settings
+- d7c42f97: Adds support for Figma's DevMode (thanks Thomas Deser)
+
+## 1.37.7
+
+### Patch Changes
+
+- f8235f7b: Fixed a major performance issue that appeared after 1.37. Times to apply and update nodes should now be down to 10% of what it was before for some files.
+- 4a2253d1: Adds support for minWidth, maxWidth, minHeight, maxHeight, counterAxisSpacing on Auto Layout frames and their direct children
+  Adds support for 'AUTO' in Spacing tokens to indicate space between on Auto Layout frames
+
+## 1.37.6
+
+### Patch Changes
+
+Bugs addressed:
+
+- 7c6b0391: Fix: Changes frequency where we check for git updates in the background to once every 60 seconds
+- 2c41a47f: Fix: Fixes sync tabs being displayed malformed
+- fffdd673: Fix: Fixes Apply to document UI description
+
+## 1.37.5
+
+### Patch Changes
+
+Bugs addressed:
+
+- Fixed an issue where autocomplete was not working for Typography tokens
+- Fixed an issue where the connection between a variable and token would get lost after pushing and pulling from ADO
+
 ## 1.37.4
 
 ### Patch Changes
@@ -13,6 +47,7 @@ Bugs addressed:
 - Fixed border tokens not working properly inside composition tokens
 
 Improvements:
+
 - Introduced an option to rename tokens in other sets when renaming a single token
 
 ## 1.37.3

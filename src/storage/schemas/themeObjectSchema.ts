@@ -11,4 +11,7 @@ export const themeObjectSchema = z.object({
     TokenSetStatus.SOURCE,
   ])),
   $figmaStyleReferences: z.record(z.string()).optional(),
+  $figmaVariableReferences: z.record(z.string()).optional(),
+  $figmaCollectionId: z.string().optional(),
+  $figmaModeId: z.string().optional(),
 });

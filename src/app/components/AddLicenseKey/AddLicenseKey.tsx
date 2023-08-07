@@ -99,7 +99,7 @@ export default function AddLicenseKey() {
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="small">
+        <Heading size="medium">
           {t('licenseKey')}
         </Heading>
         <Stack direction="row" gap={2} align="center">

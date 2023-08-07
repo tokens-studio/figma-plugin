@@ -1,4 +1,3 @@
-import { GetThemeInfoMessageResult } from '@/types/AsyncMessages';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import setValuesOnNode from './setValuesOnNode';
 
@@ -25,13 +24,12 @@ describe('setValuesOnNode', () => {
     spacing: 'spacing.10',
   };
   const figmaStyleMaps = {} as ReturnType<typeof getAllFigmaStyleMaps>;
-  const themeInfo = {} as Omit<GetThemeInfoMessageResult, 'type'>;
 
   it('should apply all border when borderRadius token has one value', async () => {
     const borderRadiusTokenWithOneValue = {
       borderRadius: '10px',
     };
-    await setValuesOnNode(textNodeMock, borderRadiusTokenWithOneValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(textNodeMock, borderRadiusTokenWithOneValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
       cornerRadius: 10,
       bottomLeftRadius: 3,
@@ -45,7 +43,7 @@ describe('setValuesOnNode', () => {
     const borderRadiusTokenWithTwoValue = {
       borderRadius: '10px 20px',
     };
-    await setValuesOnNode(textNodeMock, borderRadiusTokenWithTwoValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(textNodeMock, borderRadiusTokenWithTwoValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
       cornerRadius: 3,
       bottomLeftRadius: 20,
@@ -59,7 +57,7 @@ describe('setValuesOnNode', () => {
     const borderRadiusTokenWithThreeValue = {
       borderRadius: '10px 20px 30px',
     };
-    await setValuesOnNode(textNodeMock, borderRadiusTokenWithThreeValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(textNodeMock, borderRadiusTokenWithThreeValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
       cornerRadius: 3,
       bottomLeftRadius: 20,
@@ -73,7 +71,7 @@ describe('setValuesOnNode', () => {
     const borderRadiusTokenWithFourValue = {
       borderRadius: '10px 20px 30px 40px',
     };
-    await setValuesOnNode(textNodeMock, borderRadiusTokenWithFourValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(textNodeMock, borderRadiusTokenWithFourValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
       cornerRadius: 3,
       bottomLeftRadius: 40,
@@ -87,7 +85,7 @@ describe('setValuesOnNode', () => {
     const borderRadiusTokenWithFiveValue = {
       borderRadius: '10px 20px 30px 40px 50px',
     };
-    await setValuesOnNode(textNodeMock, borderRadiusTokenWithFiveValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(textNodeMock, borderRadiusTokenWithFiveValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
       cornerRadius: 3,
       bottomLeftRadius: 3,
@@ -101,7 +99,7 @@ describe('setValuesOnNode', () => {
     const spacingTokenWithOneValue = {
       spacing: '10px',
     };
-    await setValuesOnNode(frameNodeMock, spacingTokenWithOneValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(frameNodeMock, spacingTokenWithOneValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
       paddingBottom: 10,
       paddingLeft: 10,
@@ -114,7 +112,7 @@ describe('setValuesOnNode', () => {
     const spacingTokenWithTwoValue = {
       spacing: '10px 20px',
     };
-    await setValuesOnNode(frameNodeMock, spacingTokenWithTwoValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(frameNodeMock, spacingTokenWithTwoValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
       paddingBottom: 10,
       paddingLeft: 20,
@@ -127,7 +125,7 @@ describe('setValuesOnNode', () => {
     const spacingTokenWithThreeValue = {
       spacing: '10px 20px 30px',
     };
-    await setValuesOnNode(frameNodeMock, spacingTokenWithThreeValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(frameNodeMock, spacingTokenWithThreeValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
       paddingBottom: 30,
       paddingLeft: 20,
@@ -140,7 +138,7 @@ describe('setValuesOnNode', () => {
     const spacingTokenWithFourValue = {
       spacing: '10px 20px 30px 40px',
     };
-    await setValuesOnNode(frameNodeMock, spacingTokenWithFourValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(frameNodeMock, spacingTokenWithFourValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
       paddingBottom: 30,
       paddingLeft: 40,
@@ -153,7 +151,7 @@ describe('setValuesOnNode', () => {
     const spacingTokenWithFiveValue = {
       spacing: '10px 20px 30px 40px 50px',
     };
-    await setValuesOnNode(frameNodeMock, spacingTokenWithFiveValue, data, figmaStyleMaps, themeInfo);
+    await setValuesOnNode(frameNodeMock, spacingTokenWithFiveValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
       paddingBottom: 3,
       paddingLeft: 3,

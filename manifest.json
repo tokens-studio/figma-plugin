@@ -4,7 +4,14 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/index.html",
-  "editorType": ["figma"],
+  "editorType": ["figma", "dev"],
   "permissions": ["currentuser"],
+  "capabilities": ["codegen"],
+  "codegenLanguages": [
+    {
+      "label": "Tokens",
+      "value": "tokens"
+    }
+  ],
   "relaunchButtons": [{ "command": "edit", "name": "Tokens" }]
 }

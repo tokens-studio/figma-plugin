@@ -13,6 +13,7 @@ import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -33,6 +34,7 @@ import { DeleteTokenPayload } from '@/types/payloads';
 import { notifyToUI } from '@/plugin/notifiers';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { wrapTransaction } from '@/profiling/transaction';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -59,6 +61,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -81,14 +84,14 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
     });
-  }, [tokens, activeTokenSet]);
+  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet)
-  ), [tokens, activeTokenSet]);
+    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
+  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {
@@ -361,13 +364,18 @@ export default function useTokens() {
 
   const createVariables = useCallback(async () => {
     track('createVariables');
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
     const createVariableResult = await wrapTransaction({ name: 'createVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
       tokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
-  }, [dispatch.tokenState, tokens, settings]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
     track('renameVariables', { oldName, newName });

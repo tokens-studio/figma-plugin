@@ -45,7 +45,7 @@ describe('Settings Component', () => {
 
     const result = render(<Settings />);
 
-    expect(result.findByText('whereTokensStored')).not.toBeUndefined();
+    expect(result.findByText('Set up where tokens should be stored')).not.toBeUndefined();
   });
 
   it('hide onboarding explainer syncproviders', async () => {
@@ -54,7 +54,7 @@ describe('Settings Component', () => {
 
     fireEvent.click(result.getByTestId('closeButton'));
 
-    expect(result.queryByText('whereTokensStored')).toBeNull();
+    expect(result.queryByText('Set up where tokens should be stored')).toBeNull();
   });
 
   it('reset onboarding explainers', async () => {
@@ -62,6 +62,6 @@ describe('Settings Component', () => {
 
     fireEvent.click(result.getByTestId('reset-onboarding'));
 
-    expect(result.queryByText('whereTokensStored')).not.toBeNull();
+    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
   });
 });

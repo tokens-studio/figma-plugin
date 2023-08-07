@@ -12,18 +12,22 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
 
     allWithData.forEach((node) => {
       const { tokens } = node;
+      let shouldBeRemapped = false;
       const updatedTokens = Object.entries(tokens).reduce<Record<string, string>>((acc, [key, val]) => {
         if (val.includes(oldName)) {
           acc[key] = val.replace(oldName, newName);
+          shouldBeRemapped = true;
         } else {
           acc[key] = val;
         }
         return acc;
       }, {});
-      updatedNodes.push({
-        ...node,
-        tokens: updatedTokens,
-      });
+      if (shouldBeRemapped) {
+        updatedNodes.push({
+          ...node,
+          tokens: updatedTokens,
+        });
+      }
     });
 
     await updatePluginData({ entries: updatedNodes, values: {}, shouldOverride: true });

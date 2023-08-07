@@ -24,7 +24,7 @@ describe('convertTokensToObject', () => {
       ],
     };
 
-    expect(convertTokensToObject(tokens)).toEqual({
+    expect(convertTokensToObject(tokens, true)).toEqual({
       options: {
         colors: {
           red: {
@@ -49,6 +49,6 @@ describe('convertTokensToObject', () => {
   });
 
   it('keeps input the same', () => {
-    expect(convertTokensToObject(output)).toEqual(input);
+    expect(convertTokensToObject(output, true)).toEqual(input);
   });
 });

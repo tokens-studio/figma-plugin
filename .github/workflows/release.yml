@@ -19,8 +19,9 @@ on:
 
 # Needed permissions for changesets
 permissions:
-    contents: read
+    contents: write
     id-token: write
+    pull-requests: write
 
 
 jobs:
@@ -29,11 +30,11 @@ jobs:
     name: Prepare figma plugin
     environment:
         name: ${{ inputs.environment }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # 1: Setup node
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
       #  Checkout repository

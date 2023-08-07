@@ -161,7 +161,7 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Stack gap={3} direction="column">
-            <Heading size="small">{t('syncProviders')}</Heading>
+            <Heading size="medium">{t('syncProviders')}</Heading>
           </Stack>
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">

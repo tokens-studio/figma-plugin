@@ -11,6 +11,7 @@ import SettingsDropdown from './SettingsDropdown';
 import useTokens from '../store/useTokens';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import ToolsDropdown from './ToolsDropdown';
+import { track } from '@/utils/analytics';
 
 type Props = {
   hasJSONError: boolean;
@@ -23,6 +24,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
   const { handleJSONUpdate } = useTokens();
 
   const handleSaveJSON = useCallback(() => {
+    track('Saved in JSON');
     handleJSONUpdate(stringTokens);
   }, [handleJSONUpdate, stringTokens]);
 
