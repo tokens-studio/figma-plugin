@@ -1,0 +1,15 @@
+site_name: 'docs'
+
+
+# Output to this director
+site_dir: techdocs/
+# Input director
+docs_dir: developer-knowledgebase
+repo_url: https://github.com/tokens-studio/figma-plugin/
+# Should have the same value as the docs-dir
+edit_uri: edit/-/developer-knowledgebase/
+theme:
+    name: readthedocs
+
+plugins:
+    - techdocs-core
