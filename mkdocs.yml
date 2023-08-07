@@ -1,7 +1,5 @@
 site_name: 'docs'
 
-nav:
-    - Home: index.md
 
 # Output to this director
 site_dir: techdocs/
