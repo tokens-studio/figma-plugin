@@ -120,7 +120,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
 }
 
 export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}): SingleToken[] {
-  // Big O(n * m)
+  // Big O(n * m * l)
   const mergedTokens: SingleToken[] = [];
   // @README we will use both ENABLED and SOURCE sets
   // we only need to ignore the SOURCE sets when creating styles
