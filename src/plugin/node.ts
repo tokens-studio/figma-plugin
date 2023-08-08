@@ -1,5 +1,4 @@
 import compact from 'just-compact';
-import { getCurrentHub } from '@sentry/browser';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import store from './store';
 import setValuesOnNode from './setValuesOnNode';
@@ -224,8 +223,6 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: SettingsState,
 ) {
-  const transaction = getCurrentHub().getScope().getTransaction();
-  transaction?.setMeasurement('nodes with token data', entries.length, '');
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const figmaVariableMaps = getVariablesMap();

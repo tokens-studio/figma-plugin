@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import { getCurrentHub } from '@sentry/browser';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -100,9 +99,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const tokenDiv = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation(['tokens']);
 
-  const transaction = getCurrentHub().getScope().getTransaction();
-  transaction?.setMeasurement('tokenSets', Object.keys(tokens).length, '');
-
   React.useEffect(() => {
     if (tokenDiv.current) {
       tokenDiv.current.addEventListener('scroll', () => {}, false);
@@ -122,9 +118,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
     })),
     [tokens, usedTokenSet, activeTokenSet],
   );
-
-  transaction?.setMeasurement('resolvedTokens', resolvedTokens.length, '');
-
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);

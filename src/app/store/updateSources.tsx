@@ -153,7 +153,8 @@ export default async function updateTokensOnSources({
     activeTheme,
     shouldSwapStyles,
     collapsedTokenSets,
-  }).then(() => {
+  }).then((result) => {
+    transaction.setMeasurement('nodes', result.nodes, '');
     transaction.finish();
   });
 }
