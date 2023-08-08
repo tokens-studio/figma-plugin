@@ -29,6 +29,7 @@ import { Properties } from '@/constants/Properties';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
+import { notifyException } from './notifiers';
 
 // @README values typing is wrong
 
@@ -620,6 +621,7 @@ export default async function setValuesOnNode(
       }
     }
   } catch (e) {
+    notifyException('Error setting data on node', { code: e });
     console.log('Error setting data on node', e);
   }
 }

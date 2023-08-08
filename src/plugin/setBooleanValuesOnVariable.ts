@@ -1,3 +1,5 @@
+import { notifyException } from './notifiers';
+
 export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     if (value === 'true') {
@@ -6,6 +8,7 @@ export default function setBooleanValuesOnVariable(variable: Variable, mode: str
       variable.setValueForMode(mode, false);
     }
   } catch (e) {
+    notifyException('Error setting booleanVariable', { code: e });
     console.error('Error setting booleanVariable', e);
   }
 }

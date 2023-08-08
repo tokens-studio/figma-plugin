@@ -1,5 +1,6 @@
 import { SingleDimensionToken } from '@/types/tokens';
 import { transformValue } from './helpers';
+import { notifyException } from './notifiers';
 
 export default function setBackgroundBlurOnTarget(
   target: BaseNode | EffectStyle,
@@ -24,6 +25,7 @@ export default function setBackgroundBlurOnTarget(
       target.effects = newEffects;
     }
   } catch (e) {
+    notifyException('Error setting backgroundBlur on target', { code: e });
     console.error('Error setting color', e);
   }
 }

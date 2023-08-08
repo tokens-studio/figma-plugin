@@ -3,6 +3,7 @@ import { SingleBorderToken } from '@/types/tokens';
 import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
 import getFigmaDashPattern from './getFigmaDashPattern';
+import { notifyException } from './notifiers';
 
 export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>, baseFontSize: string, side?: 'top' | 'right' | 'bottom' | 'left') {
   const { value } = token;
@@ -39,6 +40,7 @@ export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<Si
       target.dashPattern = newDashPattern;
     }
   } catch (e) {
+    notifyException('Error setting border values on target', { code: e });
     console.log('error setting border token', e);
   }
 }

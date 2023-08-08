@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
-import { notifyUI } from './notifiers';
+import { notifyException, notifyUI } from './notifiers';
 
 export default async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
@@ -87,6 +87,7 @@ export default async function setTextValuesOnTarget(
           target.fontSize = transformValue(fontSize, 'fontSizes', baseFontSize);
         }
       } catch (e) {
+        notifyException('Error setting fontSize on target', { target, token, code: e });
         console.log('Error setting fontSize on target', target, token, e);
       }
       try {
@@ -97,6 +98,7 @@ export default async function setTextValuesOnTarget(
           }
         }
       } catch (e) {
+        notifyException('Error setting lineHeight on target', { target, token, code: e });
         console.log('Error setting lineHeight on target', target, token, e);
       }
       try {
@@ -107,6 +109,7 @@ export default async function setTextValuesOnTarget(
           }
         }
       } catch (e) {
+        notifyException('Error setting letterSpacing on target', { target, token, code: e });
         console.log('Error setting letterSpacing on target', target, token, e);
       }
       try {
@@ -114,6 +117,7 @@ export default async function setTextValuesOnTarget(
           target.paragraphSpacing = transformValue(paragraphSpacing, 'paragraphSpacing', baseFontSize);
         }
       } catch (e) {
+        notifyException('Error setting paragraphSpacing on target', { target, token, code: e });
         console.log('Error setting paragraphSpacing on target', target, token, e);
       }
       try {
@@ -121,6 +125,7 @@ export default async function setTextValuesOnTarget(
           target.paragraphIndent = transformValue(paragraphIndent, 'paragraphIndent', baseFontSize);
         }
       } catch (e) {
+        notifyException('Error setting paragraphIndent on target', { target, token, code: e });
         console.log('Error setting paragraphIndent on target', target, token, e);
       }
       try {
@@ -128,6 +133,7 @@ export default async function setTextValuesOnTarget(
           target.textCase = transformValue(textCase, 'textCase', baseFontSize);
         }
       } catch (e) {
+        notifyException('Error setting textCase on target', { target, token, code: e });
         console.log('Error setting textCase on target', target, token, e);
       }
       try {
@@ -135,6 +141,7 @@ export default async function setTextValuesOnTarget(
           target.textDecoration = transformValue(textDecoration, 'textDecoration', baseFontSize);
         }
       } catch (e) {
+        notifyException('Error setting textDecoration on target', { target, token, code: e });
         console.log('Error setting textDecoration on target', target, token, e);
       }
       if (description && 'description' in target) {
@@ -142,6 +149,7 @@ export default async function setTextValuesOnTarget(
       }
     }
   } catch (e) {
+    notifyException('Error setting font on target', { target, token, code: e });
     console.log('Error setting font on target', target, token, e);
   }
 }

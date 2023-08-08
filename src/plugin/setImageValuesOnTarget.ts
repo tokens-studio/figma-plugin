@@ -1,5 +1,5 @@
 import { SingleAssetToken } from '@/types/tokens';
-import { notifyUI } from '@/plugin/notifiers';
+import { notifyException, notifyUI } from '@/plugin/notifiers';
 
 export default async function setImageValuesOnTarget(
   target: BaseNode | PaintStyle,
@@ -29,6 +29,7 @@ export default async function setImageValuesOnTarget(
       target.description = description;
     }
   } catch (e) {
+    notifyException('Error setting image on target', { code: e });
     console.error('Error setting image', e);
   }
 }

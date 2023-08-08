@@ -1,4 +1,4 @@
-import { notifyUI } from './notifiers';
+import { notifyException, notifyUI } from './notifiers';
 
 export default function createVariableMode(collection: VariableCollection, mode: string) {
   try {
@@ -13,6 +13,7 @@ export default function createVariableMode(collection: VariableCollection, mode:
         console.error('Error', e.message, e.stack);
       }
     } else {
+      notifyException('Error creating a new mode in the variable', { code: e });
       console.log(e);
     }
   }

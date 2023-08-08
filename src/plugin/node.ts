@@ -5,7 +5,7 @@ import setValuesOnNode from './setValuesOnNode';
 import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
-import { postToUI } from './notifiers';
+import { notifyException, postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultWorker } from './Worker';
@@ -103,6 +103,7 @@ export async function getTokenData(): Promise<{
       };
     }
   } catch (e) {
+    notifyException('Error reading token from plugin', { code: e });
     console.log('Error reading tokens', e);
   }
   return null;

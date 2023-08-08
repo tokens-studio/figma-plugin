@@ -2,6 +2,7 @@ import { SingleColorToken } from '@/types/tokens';
 import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
+import { notifyException } from './notifiers';
 
 export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, token: Pick<SingleColorToken, 'value' | 'description'>, key: 'paints' | 'fills' | 'strokes' = 'paints') {
   try {
@@ -43,6 +44,7 @@ export default function setColorValuesOnTarget(target: BaseNode | PaintStyle, to
       target.description = description;
     }
   } catch (e) {
+    notifyException('Error setting color values on target', { code: e });
     console.error('Error setting color', e);
   }
 }

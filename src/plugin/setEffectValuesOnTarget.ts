@@ -5,6 +5,7 @@ import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
 import { getShadowBehindNodeFromEffect } from './figmaUtils/getShadowBehindNodeFromEffect';
+import { notifyException } from './notifiers';
 
 export default function setEffectValuesOnTarget(
   // @TODO update this typing
@@ -66,6 +67,7 @@ export default function setEffectValuesOnTarget(
       target.description = description;
     }
   } catch (e) {
+    notifyException('Error setting color', { code: e });
     console.error('Error setting color', e);
   }
 }

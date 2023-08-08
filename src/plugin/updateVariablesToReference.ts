@@ -1,3 +1,4 @@
+import { notifyException } from './notifiers';
 import { ReferenceVariableType } from './setValuesOnVariable';
 
 export default async function updateVariablesToReference(figmaVariables: Variable[], referenceVariableCandidates: ReferenceVariableType[]) {
@@ -8,10 +9,15 @@ export default async function updateVariablesToReference(figmaVariables: Variabl
   referenceVariableCandidates.forEach((aliasVariable) => {
     const referenceVariable = nameToVariableMap[aliasVariable.referenceVariable];
     if (referenceVariable) {
-      aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
-        type: 'VARIABLE_ALIAS',
-        id: referenceVariable.id,
-      });
+      try {
+        aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
+          type: 'VARIABLE_ALIAS',
+          id: referenceVariable.id,
+        });
+      } catch (err) {
+        notifyException('Error setting variable references', { code: err });
+        console.error(err);
+      }
     }
   });
 }
