@@ -14,7 +14,7 @@ export const StyledProBadge = styled('a', {
   borderRadius: '$medium',
   backgroundColor: '$proBg',
   lineHeight: 1,
-  color: '$fgPro',
+  color: '$proFg',
   fontWeight: '$bold',
   textTransform: 'uppercase',
   border: '1px solid transparent',
