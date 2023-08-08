@@ -1,5 +1,5 @@
 import omit from 'just-omit';
-import { startTransaction } from '@sentry/react';
+import { startTransaction } from '@sentry/browser';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
