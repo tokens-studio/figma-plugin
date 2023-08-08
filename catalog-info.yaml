@@ -14,12 +14,9 @@ metadata:
   annotations:
     github.com/project-slug: tokens-studio/figma-plugin
     sentry.io/project-slug: figma-tokens
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: library
   system: tokens-studio
   lifecycle: production
   owner: user:default/jan@hyma.io 
-  dependsOn:
-    - component/default:stripe-keygen-integration
-    - component/default:customer-portal
-    - component/default:token-studio-sdk
