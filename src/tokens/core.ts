@@ -28,7 +28,7 @@ export const sizes = {
   8: '48px',
   10: '28px',
   controlMedium: '28px',
-  dropdownMaxHeight: '50vhpx',
+  dropdownMaxHeight: '50vh',
 };
 
 export const space = {
