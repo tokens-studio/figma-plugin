@@ -223,7 +223,7 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings?: SettingsState,
 ) {
-  // Big O (n * m)
+  // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
   const figmaVariableMaps = getVariablesMap();

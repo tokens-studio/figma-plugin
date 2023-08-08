@@ -109,7 +109,7 @@ export type SelectionContent = {
 };
 
 export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
-  // Big O (n * log(n) * m)
+  // Big O(n ^ 2 * m) (n = amount of nodes, m = amount of applied tokens in the node)
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
   const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
@@ -168,7 +168,7 @@ export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseN
 export async function updatePluginData({
   entries, values, shouldOverride = false, shouldRemove = true, tokensMap,
 }: { entries: readonly NodeManagerNode[], values: NodeTokenRefMap, shouldOverride?: boolean, shouldRemove?: boolean, tokensMap?: Map<string, AnyTokenList[number]> }) {
-  // Big O (n * m)
+  // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
     type: MessageFromPluginTypes.START_JOB,

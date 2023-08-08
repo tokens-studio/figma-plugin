@@ -5,7 +5,7 @@ import { notifyNoSelection } from './notifiers';
 import { UpdateMode } from '@/constants/UpdateMode';
 
 export async function sendSelectionChange(): Promise<SelectionContent | null> {
-  // Big O (n * log(n) * m)      it is same with sendPluginValues
+  // Big O (sendPluginValues)
   const nodes = store.inspectDeep && store.shouldSendSelectionValues
     ? (await defaultNodeManager.findNodesWithData({ updateMode: UpdateMode.SELECTION })).map((node) => node.node)
     : Array.from(figma.currentPage.selection);

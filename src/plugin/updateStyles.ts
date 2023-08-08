@@ -16,7 +16,7 @@ export default async function updateStyles(
   settings: SettingsState,
   shouldCreate = false,
 ): Promise<Record<string, string>> {
-  // Big O (n * m * l)
+  // Big O (n * m * l): (n = amount of tokens, m = amount of active themes, l = amount of tokenSets)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
