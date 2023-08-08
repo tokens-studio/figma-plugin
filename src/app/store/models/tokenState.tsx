@@ -589,6 +589,10 @@ export const tokenState = createModel<RootModel>()({
         wrapTransaction({
           name: 'updateDocument',
           statExtractor: (result, transaction) => {
+            transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, curr) => {
+              acc += curr[1].length;
+              return acc;
+            }, 0), '');
             transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
             transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
           },
