@@ -44,7 +44,7 @@ async function benchmark() {
         const time = performance.now();
         const file = await zeroEks(opts);
         const duration = performance.now() - time;
-        console.log(`Test ${test} - completed`);
+        console.log(`Test ${test} - completed in ${duration}ms`);
         const statsPath = path.join(__dirname, `./stats/${test}.json`);
         try {
           const existing = await fs.readJson(statsPath);
@@ -55,16 +55,13 @@ async function benchmark() {
           }
         }
         catch (err) {
-          console.log(err)
           //Ignore
           console.log('No existing stats');
         }
-
         //Removes the file:// prefix from the path
-        const cleanedPath =
+        const cleanedPath = path.relative(__dirname, file.slice('file://'.length));
 
-        await fs.outputFile(statsPath, JSON.stringify({ duration, input: test, output : file  }));
-
+        await fs.outputFile(statsPath, JSON.stringify({ duration, input: test, output : cleanedPath  }));
 
       } catch (err) {
         console.error(err)
@@ -80,7 +77,7 @@ async function execute() {
   await setup();
   await benchmark();
 }
-execute()
+execute();
 //Glob match all tests, throttle?
 //sort the order so each run is consistent
 //Import 0x - run each test in isolation.
