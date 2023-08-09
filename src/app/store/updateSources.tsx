@@ -1,5 +1,5 @@
 import { startTransaction } from '@sentry/react';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';

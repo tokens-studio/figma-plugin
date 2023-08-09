@@ -6,7 +6,7 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';

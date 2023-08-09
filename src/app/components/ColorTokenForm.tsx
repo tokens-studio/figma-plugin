@@ -8,7 +8,7 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import ColorPicker from './ColorPicker';
 import {

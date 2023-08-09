@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import Box from '../Box';
 import Text from '../Text';

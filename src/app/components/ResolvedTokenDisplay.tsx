@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isSingleBorderToken, isSingleBoxShadowToken, isSingleTypographyToken } from '@/utils/is';
 import { SingleBorderToken, SingleTypographyToken } from '@/types/tokens';
 import Box from './Box';
