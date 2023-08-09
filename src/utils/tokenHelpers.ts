@@ -1,5 +1,4 @@
 import omit from 'just-omit';
-import { startTransaction } from '@sentry/react';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
@@ -21,10 +20,6 @@ export function findAllAliases(tokens: (SingleToken | string)[]) {
 }
 
 export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
-  const transaction = startTransaction({
-    op: 'transaction',
-    name: 'Resolve Tokens',
-  });
   const aliases = findAllAliases(tokens);
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
@@ -118,8 +113,6 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
   if (aliases.length > 0 && (previousCount > aliases.length || !previousCount)) {
     return resolveTokenValues(returnedTokens, aliases.length);
   }
-  transaction.setMeasurement('tokens', tokens.length, '');
-  transaction.finish();
   return returnedTokens;
 }
 
