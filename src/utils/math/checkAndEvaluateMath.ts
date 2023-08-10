@@ -4,6 +4,31 @@ import { Root } from 'postcss-calc-ast-parser/dist/types/ast';
 
 const parser = new Parser();
 
+parser.functions.round = (x: number):number => Math.round(x);
+parser.functions.toPrecision = (x: number, n: number):number => parseFloat(x.toPrecision(n));
+parser.functions.toFixed = (x: number, n: number):number => parseFloat(x.toFixed(n));
+
+parser.functions.quadIn = (t: number): number => t * t;
+parser.functions.quadOut = (t: number): number => t * (2 - t);
+parser.functions.quadInOut = (t: number): number => {
+  t *= 2;
+  return t <= 1 ? t * t : ((t - 2) * (2 - t) + 1) / 2;
+};
+
+parser.functions.cubicIn = (t: number): number => t * t * t;
+parser.functions.cubicOut = (t: number): number => (t - 1) * (t - 1) * (t - 1) + 1;
+parser.functions.cubicInOut = (t: number): number => {
+  t *= 2;
+  return t <= 1 ? t * t * t : ((t - 2) * t * t + 2) / 2;
+};
+
+parser.functions.degToRad = (deg: number): number => deg * (Math.PI / 180);
+parser.functions.radToDeg = (rad: number): number => rad * (180 / Math.PI);
+
+parser.functions.sin = (rad: number): number => Math.sin(rad);
+parser.functions.cos = (rad: number): number => Math.cos(rad);
+parser.functions.tan = (rad: number): number => Math.tan(rad);
+
 /**
  * Clamps the value of x between min and max
  * @param x
