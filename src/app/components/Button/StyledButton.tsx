@@ -38,6 +38,9 @@ export const StyledButton = styled('button', {
         background: 'transparent',
         padding: '$2 $3',
         color: '$fgDefault',
+        '&:hover': {
+          background: '$bgSubtle',
+        },
         '&:focus-visible': {
           boxShadow: '$focus',
         },
