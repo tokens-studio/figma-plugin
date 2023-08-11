@@ -16,5 +16,5 @@
   "pushYourLocalChangesToYourSupernovaIoDesignSystem": "将本地更改推送到 Supernova.io 设计系统。",
   "designSystem": "设计系统",
   "pushYourLocalChangesToYourRepository": "将本地更改推送到存储库。",
-  "commitMessage": "提交消息"
+  "commitMessage": "提交信息"
 }
