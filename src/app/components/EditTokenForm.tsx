@@ -540,7 +540,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 padding: '$3',
                 marginTop: '$3',
                 fontFamily: '$mono',
-                color: '$textMuted',
+                color: '$fgMuted',
                 backgroundColor: '$bgSubtle',
                 borderColor: '$borderSubtle',
                 borderRadius: '$medium',

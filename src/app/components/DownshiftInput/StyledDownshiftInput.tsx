@@ -44,7 +44,7 @@ export const StyledList = styled(List, {
 });
 
 export const StyledItemValue = styled('div', {
-  color: '$textMuted',
+  color: '$fgMuted',
   fontWeight: '$bold',
   textAlign: 'right',
   textTransform: 'uppercase',

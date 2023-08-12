@@ -73,7 +73,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
               <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
                 <IconLayers />
               </Box>
-              <Box css={{ color: '$textMuted' }}>{nodes.length}</Box>
+              <Box css={{ color: '$fgMuted' }}>{nodes.length}</Box>
             </Box>
           </DropdownMenu.Trigger>
           {dropdownContent}

@@ -87,7 +87,7 @@ export function TokenGroupHeading({
       >
         <ContextMenu>
           <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
-            <Stack direction="row" gap={2} align="center" css={{ color: '$textMuted' }}>
+            <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
               <Heading muted size="small">{label}</Heading>
             </Stack>

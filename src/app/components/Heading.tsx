@@ -22,7 +22,7 @@ const StyledHeading = styled('p', {
     },
     muted: {
       true: {
-        color: '$textMuted',
+        color: '$fgMuted',
       },
     },
   },

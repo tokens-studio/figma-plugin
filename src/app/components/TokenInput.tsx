@@ -6,7 +6,7 @@ import { styled } from '@/stitches.config';
 const StyledLabel = styled(LabelPrimitive.Root, {
   fontSize: 12,
   fontWeight: 500,
-  color: '$textMuted',
+  color: '$fgMuted',
   userSelect: 'none',
   pointerEvents: 'none',
   padding: '$3',

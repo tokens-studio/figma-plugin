@@ -348,7 +348,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   {
                     ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
                       <StyledDropdown className="content scroll-container" ref={blankBoxRef}>
-                        <Box css={{ padding: '$3', color: '$textMuted', fontSize: '$small' }}>
+                        <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
                           No suggestions found
                         </Box>
                       </StyledDropdown>

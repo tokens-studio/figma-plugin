@@ -123,7 +123,7 @@ const StyledPrefix = styled('div', {
   display: 'flex',
   alignItems: 'center',
   fontSize: '$xsmall',
-  color: '$textMuted',
+  color: '$fgMuted',
 
   '&:focus': {
     outline: 'none',

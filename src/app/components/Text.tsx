@@ -19,7 +19,7 @@ const StyledText = styled('div', {
     },
     muted: {
       true: {
-        color: '$textMuted',
+        color: '$fgMuted',
       },
       false: {
         color: '$text',
