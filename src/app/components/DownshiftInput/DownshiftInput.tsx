@@ -21,7 +21,7 @@ import { figmaFontsSelector } from '@/selectors';
 import {
   StyledButton,
   StyledDownshiftInput,
-  StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
+  StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
@@ -257,13 +257,23 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               ReactDOM.createPortal(
                 <Box
                   css={{
-                    position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
+                    backgroundColor: '$bgDefault',
+                    border: '1px solid',
+                    borderColor: '$borderDefault',
+                    borderRadius: '$medium',
+                    position: 'absolute',
+                    width: `${inputContainerWith}px`,
+                    top: '$2',
+                    boxShadow: '$contextMenu',
+                    paddingRight: '4px',
+                    zIndex: '10',
+                    transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                   }}
                   ref={portalRef}
                 >
                   <Box
                     css={{
-                      display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
+                      display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3',
                     }}
                     ref={downShiftSearchContainerRef}
                   >
@@ -289,7 +299,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   </Box>
                   {
                     currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
-                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith} itemCount={filteredTokenItems.length} itemSize={30}>
+                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith - 4} itemCount={filteredTokenItems.length} itemSize={30}>
                       {({ index, style }) => {
                         const token = filteredTokenItems[index];
                         return (
@@ -321,7 +331,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
-                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith} itemCount={filteredValues.length} itemSize={30}>
+                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith - 4} itemCount={filteredValues.length} itemSize={30}>
                           {({ index, style }) => {
                             const value = filteredValues[index];
                             return (
@@ -347,11 +357,11 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
-                      <StyledDropdown className="content scroll-container" ref={blankBoxRef}>
+                      <Box ref={blankBoxRef}>
                         <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
                           No suggestions found
                         </Box>
-                      </StyledDropdown>
+                      </Box>
                     )
                   }
                 </Box>,
