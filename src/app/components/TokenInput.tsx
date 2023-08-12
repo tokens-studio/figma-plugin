@@ -28,7 +28,7 @@ const Input = styled('input', {
   paddingLeft: 'calc(80px + $4)',
   fontSize: 12,
   lineHeight: 1,
-  color: '$text',
+  color: '$fgDefault',
   border: '1px solid $borderDefault',
   width: '100%',
   '&:focus': { boxShadow: '$focus' },

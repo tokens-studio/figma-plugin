@@ -22,7 +22,7 @@ const StyledText = styled('div', {
         color: '$fgMuted',
       },
       false: {
-        color: '$text',
+        color: '$fgDefault',
       },
     },
   },

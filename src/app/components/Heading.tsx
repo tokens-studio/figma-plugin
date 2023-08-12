@@ -3,7 +3,7 @@ import { styled } from '@/stitches.config';
 
 const StyledHeading = styled('p', {
   fontWeight: '$bold',
-  color: '$text',
+  color: '$fgDefault',
   letterSpacing: 0,
   variants: {
     size: {

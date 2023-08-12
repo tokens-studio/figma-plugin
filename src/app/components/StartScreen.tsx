@@ -39,7 +39,7 @@ const HelpfulLink = styled('a', {
   padding: '0 $1',
   fontSize: '$xsmall',
   '&:hover, &:focus': {
-    color: '$text',
+    color: '$fgDefault',
   },
 });
 

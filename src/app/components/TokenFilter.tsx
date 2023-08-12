@@ -11,7 +11,7 @@ import { tokenFilterSelector } from '@/selectors';
 const StyledInput = styled('input', {
   background: 'transparent',
   border: 'none',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$small',
   width: '100%',
   padding: '$3 $5',

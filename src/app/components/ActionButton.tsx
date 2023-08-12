@@ -24,7 +24,7 @@ const StyledButton = styled('button', {
       },
       default: {
         backgroundColor: 'transparent',
-        color: '$text',
+        color: '$fgDefault',
         '&:hover, &:focus': {
           backgroundColor: '$bgSubtle',
         },

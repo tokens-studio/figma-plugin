@@ -39,7 +39,7 @@ const commonStyles = {
       default: {
         display: 'block',
         backgroundColor: 'transparent',
-        color: '$text',
+        color: '$fgDefault',
         '&:not(:disabled):hover, &:not(:disabled):focus': {
           backgroundColor: '$bgSubtle',
         },

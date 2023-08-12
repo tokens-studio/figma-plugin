@@ -23,7 +23,7 @@ export default function Label({
           color: '$fgDisabled',
         },
         false: {
-          color: '$text',
+          color: '$fgDefault',
         },
       },
     },

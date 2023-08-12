@@ -13,7 +13,7 @@ const StyledInfoIconButton = styled(InfoCircledIcon, {
 
 const StyledTextPlan = styled('p', {
   fontWeight: '$normal',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 });
 
