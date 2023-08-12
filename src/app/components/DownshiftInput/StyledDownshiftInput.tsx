@@ -107,7 +107,7 @@ export const StyledButton = styled('button', {
   variants: {
     isFocused: {
       false: {
-        color: '$textDisabled',
+        color: '$fgDisabled',
       },
     },
   },
