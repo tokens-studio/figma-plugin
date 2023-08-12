@@ -19,8 +19,8 @@ export default function TokenNode({ id, name, type }: NodeInfo) {
           cursor: 'pointer',
           padding: '$1 $4',
           '&:hover': {
-            backgroundColor: '$interaction',
-            color: '$onInteraction',
+            backgroundColor: '$accentDefault',
+            color: '$fgOnEmphasis',
           },
         }}
       >

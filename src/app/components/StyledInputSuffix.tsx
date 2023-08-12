@@ -21,9 +21,9 @@ export const StyledInputSuffix = styled('button', {
 
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
     boxShadow: 'none',
-    borderColor: '$interaction',
+    borderColor: '$accentDefault',
   },
 });

@@ -16,10 +16,10 @@ const StyledButton = styled('button', {
   variants: {
     buttonVariant: {
       primary: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        color: '$fgOnEmphasis',
         '&:hover, &:focus': {
-          backgroundColor: '$interactionSubtle',
+          backgroundColor: '$accentMuted',
         },
       },
       default: {

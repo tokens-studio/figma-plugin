@@ -30,8 +30,8 @@ const itemStyles = {
   },
 
   '&:focus': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
   '&:disabled': {
     pointerEvents: 'none',
@@ -44,8 +44,8 @@ const StyledCheckboxItem = styled(ContextMenuPrimitive.CheckboxItem, { ...itemSt
 const StyledRadioItem = styled(ContextMenuPrimitive.RadioItem, { ...itemStyles });
 const StyledTriggerItem = styled(ContextMenuPrimitive.TriggerItem, {
   '&[data-state="open"]': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
   ...itemStyles,
 });

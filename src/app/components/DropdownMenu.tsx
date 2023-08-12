@@ -9,8 +9,8 @@ const itemStyles = {
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   '&[data-disabled]': {

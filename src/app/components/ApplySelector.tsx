@@ -57,14 +57,14 @@ export default function ApplySelector() {
           css={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-            backgroundColor: '$interaction',
+            backgroundColor: '$accentDefault',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: '32px',
-            borderLeft: '1px solid $interactionSubtle',
-            color: '$onInteraction',
-            '&:hover, &:focus-visible': { backgroundColor: '$interactionSubtle' },
+            borderLeft: '1px solid $accentMuted',
+            color: '$fgOnEmphasis',
+            '&:hover, &:focus-visible': { backgroundColor: '$accentMuted' },
           }}
           data-testid="apply-selector"
         >

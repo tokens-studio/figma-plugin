@@ -11,8 +11,8 @@ const itemStyles = {
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   '&[data-disabled]': {
@@ -76,13 +76,13 @@ const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, 
   '&:hover:not([disabled]), &:focus:not([disabled])': {
     outline: 'none',
     boxShadow: 'none',
-    backgroundColor: '$interaction',
+    backgroundColor: '$accentDefault',
     borderColor: '$borderDefault',
   },
 
   '&[data-state="open"]': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   variants: {

@@ -30,10 +30,10 @@ const commonStyles = {
     buttonVariant: {
       primary: {
         display: 'block',
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        color: '$fgOnEmphasis',
         '&:not(:disabled):hover, &:not(:disabled):focus': {
-          backgroundColor: '$interactionSubtle',
+          backgroundColor: '$accentMuted',
         },
       },
       default: {

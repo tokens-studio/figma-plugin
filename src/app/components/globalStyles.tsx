@@ -34,7 +34,7 @@ export const globalStyles = globalCss({
     height: '24px',
     top: '0px',
     left: -'4px',
-    backgroundColor: '$interaction',
+    backgroundColor: '$accentDefault',
   },
   '.drag-over-item-list-absolute': {
     position: 'absolute',
@@ -42,7 +42,7 @@ export const globalStyles = globalCss({
     width: '100%',
     height: '4px',
     top: '-4px',
-    backgroundColor: '$interaction',
+    backgroundColor: '$accentDefault',
   },
   '.scroll-container': {
     overflowY: 'scroll',

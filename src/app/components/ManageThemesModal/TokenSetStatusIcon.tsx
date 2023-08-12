@@ -16,9 +16,9 @@ const TokenSetIconWrapper = styled(Box, {
   variants: {
     active: {
       true: {
-        backgroundColor: '$interaction',
-        borderColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        borderColor: '$accentDefault',
+        color: '$fgOnEmphasis',
       },
       false: {
         backgroundColor: '$bgSubtle',

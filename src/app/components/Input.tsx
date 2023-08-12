@@ -93,8 +93,8 @@ const StyledSuffix = styled('button', {
 
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   variants: {

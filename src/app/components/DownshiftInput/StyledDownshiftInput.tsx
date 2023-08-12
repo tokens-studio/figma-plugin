@@ -62,10 +62,10 @@ export const StyledItem = styled('div', {
   variants: {
     isFocused: {
       true: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        color: '$fgOnEmphasis',
         [`& ${StyledItemValue}`]: {
-          color: '$onInteraction',
+          color: '$fgOnEmphasis',
         },
       },
     },

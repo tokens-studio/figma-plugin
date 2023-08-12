@@ -299,7 +299,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             className="dropdown-item"
                             {...getItemProps({ key: token.name, index, item: token.name })}
                             css={{
-                              backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                              backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
                             }}
                             isFocused={highlightedIndex === index}
                             style={style}
@@ -331,7 +331,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                                 className="dropdown-item"
                                 {...getItemProps({ key: value, index, item: value })}
                                 css={{
-                                  backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                                  backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
                                 }}
                                 isFocused={highlightedIndex === index}
                                 style={style}
