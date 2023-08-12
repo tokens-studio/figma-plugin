@@ -21,7 +21,7 @@ const StyledContent = styled(Tooltip.Content, {
 });
 
 const StyledArrow = styled(Tooltip.Arrow, {
-  fill: '$contextMenuBg',
+  fill: '$tooltipBg',
 });
 
 type Props = {
