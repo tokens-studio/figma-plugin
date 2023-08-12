@@ -82,7 +82,7 @@ export default function ApplySelector() {
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
               {t('applyTo.selection.title')}
-              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.selection.description')}
               </Box>
             </DropdownMenuRadioItem>
@@ -91,7 +91,7 @@ export default function ApplySelector() {
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
               {t('applyTo.page.title')}
-              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.page.description')}
               </Box>
             </DropdownMenuRadioItem>
@@ -104,7 +104,7 @@ export default function ApplySelector() {
                 <DotFilledIcon />
               </DropdownMenuItemIndicator>
               {t('applyTo.doc.title')}
-              <Box css={{ color: '$contextMenuForegroundMuted', fontSize: '$xxsmall' }}>
+              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.doc.description')}
               </Box>
             </DropdownMenuRadioItem>

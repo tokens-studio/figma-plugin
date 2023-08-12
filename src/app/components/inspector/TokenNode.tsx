@@ -15,7 +15,7 @@ export default function TokenNode({ id, name, type }: NodeInfo) {
       <Box
         css={{
           display: 'flex',
-          color: '$contextMenuForeground',
+          color: '$contextMenuFg',
           cursor: 'pointer',
           padding: '$1 $4',
           '&:hover': {

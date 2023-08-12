@@ -24,7 +24,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
       <Box
         css={{
           width: '164px',
-          background: '$contextMenuBackground',
+          background: '$contextMenuBg',
           borderRadius: '$medium',
           padding: '$2 0',
           fontSize: '$small',

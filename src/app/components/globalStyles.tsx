@@ -59,8 +59,8 @@ export const globalStyles = globalCss({
     border: '2px solid var(--figma-color-bg)',
   },
   '.content-dark::-webkit-scrollbar-thumb': {
-    backgroundColor: 'var(--colors-contextMenuForegroundMuted, #000) !important',
-    borderColor: 'var(--colors-contextMenuBackground, #333) !important',
+    backgroundColor: 'var(--colors-contextMenuFgMuted, #000) !important',
+    borderColor: 'var(--colors-contextMenuBg, #333) !important',
     borderRadius: '9px',
     border: '2px solid',
   },

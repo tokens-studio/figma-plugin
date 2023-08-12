@@ -3,7 +3,7 @@ import { styled } from '@/stitches.config';
 
 const StyledContent = styled(ContextMenuPrimitive.Content, {
   minWidth: 100,
-  backgroundColor: '$contextMenuBackground',
+  backgroundColor: '$contextMenuBg',
   border: '1px solid $contextMenuBorder',
   borderRadius: '$medium',
   overflow: 'hidden',
@@ -15,7 +15,7 @@ const itemStyles = {
   all: 'unset',
   fontSize: '$xsmall',
   lineHeight: 1,
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
   borderRadius: '$small',
   display: 'flex',
   alignItems: 'center',
@@ -25,7 +25,7 @@ const itemStyles = {
   userSelect: 'none',
 
   '&[data-disabled]': {
-    color: '$contextMenuForegroundDisabled',
+    color: '$contextMenuFgDisabled',
     pointerEvents: 'none',
   },
 
@@ -54,7 +54,7 @@ const StyledLabel = styled(ContextMenuPrimitive.Label, {
   paddingLeft: '$3',
   fontSize: '$xsmall',
   lineHeight: '25px',
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
 });
 
 const StyledSeparator = styled(ContextMenuPrimitive.Separator, {
