@@ -22,7 +22,7 @@ const TokenSetIconWrapper = styled(Box, {
       },
       false: {
         backgroundColor: '$bgSubtle',
-        color: '$textSubtle',
+        color: '$fgSubtle',
         borderColor: '$borderMuted',
       },
     },

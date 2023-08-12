@@ -60,7 +60,7 @@ export default function SecondScreen() {
   let statusColor;
 
   if (!user) {
-    statusColor = '$textSubtle';
+    statusColor = '$fgSubtle';
   } else if (isEnabled && user) {
     statusColor = '$successFg';
   } else {
