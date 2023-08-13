@@ -70,7 +70,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
                 },
               }}
             >
-              <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
+              <Box css={{ color: '$textSubtle', marginRight: '$3' }}>
                 <IconLayers />
               </Box>
               <Box css={{ color: '$fgMuted' }}>{nodes.length}</Box>
