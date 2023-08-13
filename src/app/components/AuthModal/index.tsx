@@ -97,7 +97,7 @@ export default function AuthModal() {
         <Box
           css={{
             display: 'flex',
-            color: '$fgDanger',
+            color: '$dangerFg',
             fontSize: '$xsmall',
             width: '100%',
             justifyContent: 'center',

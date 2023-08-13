@@ -13,7 +13,7 @@ const StyledResolvingLoaderBubble = styled('div', {
   width: '4px',
   height: '4px',
   borderRadius: '$full',
-  background: '$fgSubtle',
+  background: '$textSubtle',
   animation: `${bounceUpDown} 1000ms 0ms infinite linear`,
 });
 
@@ -24,7 +24,7 @@ export const ResolvingLoader: React.FC = () => (
         display: 'grid',
         padding: '$3',
         gap: '$2',
-        borderRadius: '$button',
+        borderRadius: '$small',
         background: '$bgSubtle',
         gridTemplateColumns: 'repeat(3, 1fr)',
       }}

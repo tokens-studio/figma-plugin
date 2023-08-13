@@ -8,7 +8,7 @@ const StyledTextarea = styled('textarea', {
   backgroundColor: '$bgDefault',
   fontSize: '$xsmall',
   padding: '$3',
-  borderRadius: '$default',
+  borderRadius: '$small',
   fontFamily: '$mono',
   resize: 'none',
   '&:focus': {

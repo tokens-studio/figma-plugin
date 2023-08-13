@@ -4,6 +4,6 @@ export const StyledInspectBadge = styled('div', {
   padding: '$2',
   color: '$text',
   background: '$bgSubtle',
-  borderRadius: '$default',
+  borderRadius: '$small',
   fontSize: '$xsmall',
 });

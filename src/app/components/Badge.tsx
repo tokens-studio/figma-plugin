@@ -7,7 +7,7 @@ export const StyledBadge = styled('div', {
   justifyContent: 'center',
   fontSize: '$xsmall',
   padding: '$3',
-  borderRadius: '$badge',
+  borderRadius: '$medium',
   backgroundColor: '$interaction',
   lineHeight: 1,
   color: '$onInteraction',

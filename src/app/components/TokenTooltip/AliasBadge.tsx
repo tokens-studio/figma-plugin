@@ -3,8 +3,8 @@ import { styled } from '@/stitches.config';
 
 const StyledAliasBadge = styled('div', {
   padding: '$1 $2',
-  backgroundColor: '$bgOnDarkAccentSubtle',
-  color: '$fgOnDarkAccent',
+  backgroundColor: '$tooltipBgAccent',
+  color: '$tooltipFgAccent',
   height: '100%',
   wordBreak: 'break-word',
   flexShrink: 1,

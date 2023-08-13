@@ -12,7 +12,7 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   backgroundColor: '$bgDefault',
   flexShrink: 0,
-  borderRadius: '$input',
+  borderRadius: '$small',
   border: '1px solid $interaction',
   display: 'flex',
   alignItems: 'center',
