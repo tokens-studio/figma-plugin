@@ -72,7 +72,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
   const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
   const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
-  const [inputContainerWith, setInputContainerWith] = React.useState(0);
+  const [inputContainerWidth, setInputContainerWidth] = React.useState(0);
   const [searchInput, setSearchInput] = React.useState('');
   const [portalPlaceholder] = React.useState(document.createElement('div'));
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
@@ -108,7 +108,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     if (inputContainerRef.current) {
       const boundingRect = inputContainerRef.current?.getBoundingClientRect();
       setInputContainerPosX(boundingRect.left);
-      setInputContainerWith(boundingRect.width);
+      setInputContainerWidth(boundingRect.width);
       if (arrow === 'down') {
         setInputContainerPosY(boundingRect.bottom);
       } else if (portalRef.current) {
@@ -265,7 +265,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     borderColor: '$borderDefault',
                     borderRadius: '$medium',
                     position: 'absolute',
-                    width: `${inputContainerWith}px`,
+                    width: `${inputContainerWidth}px`,
                     top: '$2',
                     boxShadow: '$contextMenu',
                     zIndex: '10',
@@ -301,7 +301,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   </Box>
                   {
                     currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
-                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
+                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
                       {({ index, style }) => {
                         const token = filteredTokenItems[index];
                         return (
@@ -333,7 +333,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
-                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
+                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
                           {({ index, style }) => {
                             const value = filteredValues[index];
                             return (
