@@ -55,7 +55,7 @@ export default function NodeIcon({ type, width = 12, height = 12 }: NodeIconProp
         display: 'flex',
         alignItems: 'center',
         svg: {
-          fill: '$contextMenuForeground',
+          fill: '$contextMenuFg',
         },
       }}
     >

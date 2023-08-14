@@ -56,7 +56,7 @@ export default function TokenButtonContent({
       case TokenTypes.COLOR: {
         return {
           '--backgroundColor': String(displayValue),
-          '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$colors$border' : '$colors$borderMuted',
+          '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$colors$borderDefault' : '$colors$borderMuted',
         };
       }
       case TokenTypes.BORDER_RADIUS: {

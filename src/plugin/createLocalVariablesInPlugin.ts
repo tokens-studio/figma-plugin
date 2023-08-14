@@ -14,6 +14,7 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState) {
+  // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
@@ -57,5 +58,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   } else {
     notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
-  return allVariableCollectionIds;
+  return {
+    allVariableCollectionIds,
+    totalVariables: figmaVariables.length,
+  };
 }

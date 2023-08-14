@@ -16,3 +16,4 @@ benchmark/build
 # Temporary flamegraphs between builds
 benchmark/flamegraphs
 **.0x
+techdocs/

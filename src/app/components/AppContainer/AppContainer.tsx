@@ -22,6 +22,9 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import SecondScreenSync from '../SecondScreenSync';
 import AuthModal from '../AuthModal';
 import PullDialog from '../PullDialog';
+import { useFigmaTheme } from '@/hooks/useFigmaTheme';
+import Box from '../Box';
+import { darkThemeMode, lightThemeMode } from '@/stitches.config';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -37,6 +40,7 @@ const applicationInitStepLabels = {
 };
 
 export const AppContainer = withLDProviderWrapper((params: Props) => {
+  const { isDarkTheme } = useFigmaTheme();
   const dispatch = useDispatch<Dispatch>();
   const startupProcess = useStartupProcess(params);
 
@@ -75,7 +79,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
   globalStyles();
 
   const appContent = (
-    <>
+    <Box css={{ backgroundColor: '$bgDefault' }} className={isDarkTheme ? darkThemeMode : lightThemeMode}>
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
@@ -95,7 +99,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <Changelog />
       <SecondScreenSync />
       <AuthModal />
-    </>
+    </Box>
   );
 
   return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;

@@ -2,8 +2,8 @@ import { styled } from '@/stitches.config';
 
 export const StyledInspectBadge = styled('div', {
   padding: '$2',
-  color: '$text',
+  color: '$fgDefault',
   background: '$bgSubtle',
-  borderRadius: '$default',
+  borderRadius: '$small',
   fontSize: '$xsmall',
 });

@@ -13,7 +13,7 @@ type Props = {
 
 export const SingleColorValueDisplay: React.FC<Props> = ({ value, resolvedValue, modifier }) => (
   <Stack direction="column" align="start" gap={1}>
-    <Box css={{ color: '$fgToolTipMuted' }}>
+    <Box css={{ color: '$tooltipFgMuted' }}>
       {
       modifier && (
         modifier.type === ColorModifierTypes.MIX ? (

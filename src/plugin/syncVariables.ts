@@ -11,6 +11,7 @@ import updateVariablesToReference from './updateVariablesToReference';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 
 export default async function syncVariables(tokens: Record<string, AnyTokenList>, options: Record<SyncVariableOption, boolean>, settings: SettingsState) {
+  // Big O (n * Big O(resolveTokenValues))
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });

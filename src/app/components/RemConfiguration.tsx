@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';
 import {
   tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,

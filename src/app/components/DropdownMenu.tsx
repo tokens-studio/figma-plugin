@@ -4,26 +4,26 @@ import { styled } from '@/stitches.config';
 const itemStyles = {
   fontSize: '$xsmall',
   padding: '$2 $3 $2 $6',
-  borderRadius: '$contextMenuItem',
+  borderRadius: '$small',
   cursor: 'default',
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   '&[data-disabled]': {
-    color: '$contextMenuForegroundDisabled',
+    color: '$contextMenuFgDisabled',
   },
 };
 
 const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
   minWidth: 130,
   maxWidth: 'min(300px, 80vw)',
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
-  borderRadius: '$contextMenu',
+  backgroundColor: '$contextMenuBg',
+  color: '$contextMenuFg',
+  borderRadius: '$medium',
   padding: '$2',
   boxShadow: '$contextMenu',
 });
@@ -46,16 +46,16 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   alignItems: 'center',
   padding: '$3',
   gap: '$1',
-  borderRadius: '$button',
+  borderRadius: '$small',
   backgroundColor: '$bgDefault',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 
   '&:focus-visible, &:hover': {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
-    borderColor: '$border',
+    borderColor: '$borderDefault',
   },
 
   variants: {
@@ -76,7 +76,7 @@ const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {}
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
 
-const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBg' });
 
 const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {
 });

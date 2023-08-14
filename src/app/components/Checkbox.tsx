@@ -5,15 +5,15 @@ import IconCheck from '@/icons/check.svg';
 import IconIndeterminate from '@/icons/indeterminate.svg';
 
 const StyledIndicator = styled(CheckboxPrimitive.Indicator, {
-  color: '$onInteraction',
+  color: '$fgOnEmphasis',
 });
 
 const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   backgroundColor: '$bgDefault',
   flexShrink: 0,
-  borderRadius: '$input',
-  border: '1px solid $interaction',
+  borderRadius: '$small',
+  border: '1px solid $accentDefault',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -23,12 +23,12 @@ const StyledCheckbox = styled(CheckboxPrimitive.Root, {
   variants: {
     isChecked: {
       true: {
-        backgroundColor: '$interaction',
-        borderColor: '$interaction',
+        backgroundColor: '$accentDefault',
+        borderColor: '$accentDefault',
       },
       indeterminate: {
-        backgroundColor: '$interactionSubtle',
-        borderColor: '$interactionSubtle',
+        backgroundColor: '$accentMuted',
+        borderColor: '$accentMuted',
       },
     },
   },

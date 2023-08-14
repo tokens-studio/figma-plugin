@@ -18,7 +18,7 @@ export const StyledTokenButton = styled('button', {
   marginRight: '$2',
   backgroundColor: '$bgSubtle',
   '&:hover, &:focus': {
-    backgroundColor: '$bgAccent',
+    backgroundColor: '$accentBg',
   },
   variants: {
     tokenType: {
@@ -38,14 +38,14 @@ export const StyledTokenButton = styled('button', {
     displayType: {
       LIST: {
         width: '100%',
-        borderRadius: '$tokenButton',
+        borderRadius: '$medium',
         backgroundColor: 'transparent',
         [`& ${StyledTokenButtonText}`]: {
           justifyContent: 'flex-start',
         },
       },
       GRID: {
-        borderRadius: '$tokenButton',
+        borderRadius: '$medium',
         [`& ${StyledTokenButtonText}`]: {
           borderRadius: '$full',
         },
@@ -53,7 +53,7 @@ export const StyledTokenButton = styled('button', {
     },
     active: {
       true: {
-        backgroundColor: '$bgAccent',
+        backgroundColor: '$accentBg',
         boxShadow: '$focusMuted !important',
         '&:hover, &:focus': {
           boxShadow: '$focusMuted !important',
@@ -62,7 +62,7 @@ export const StyledTokenButton = styled('button', {
     },
     disabled: {
       true: {
-        borderColor: '$border',
+        borderColor: '$borderDefault',
       },
     },
   },
@@ -73,7 +73,7 @@ export const StyledTokenButton = styled('button', {
       css: {
         width: '100%',
         '&:hover, &:focus': {
-          backgroundColor: '$bgAccent',
+          backgroundColor: '$accentBg',
         },
       },
     },

@@ -12,7 +12,7 @@ import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { filterValidCompositionTokenTypes } from '@/utils/filterValidCompositionTokenTypes';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { ReorderGroup } from '@/motion/ReorderGroup';
 import { SingleCompositionTokenContent } from './SingleCompositionTokenContent';
 import { DragItem } from './StyledDragger/DragItem';
