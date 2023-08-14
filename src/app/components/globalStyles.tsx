@@ -48,7 +48,7 @@ export const globalStyles = globalCss({
     overflowY: 'scroll',
   },
   '.content::-webkit-scrollbar, .ReactModal__Content::-webkit-scrollbar,  textarea::-webkit-scrollbar': {
-    width: '9px',
+    width: 'var(--sizes-scrollbarWidth, 9px)',
   },
   '.overflow-x-auto::-webkit-scrollbar': {
     height: '9px',

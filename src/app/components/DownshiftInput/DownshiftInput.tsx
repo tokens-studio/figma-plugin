@@ -26,6 +26,7 @@ import {
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
+import { theme } from '@/stitches.config';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 type Arrow = 'top' | 'down';
@@ -221,6 +222,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(false);
   }, []);
 
+  const scrollbarWidth = useMemo(() => parseInt(theme.sizes.scrollbarWidth.value.toString(), 10) / 2, []);
+
   return (
     <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
       {({
@@ -265,7 +268,6 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                     width: `${inputContainerWith}px`,
                     top: '$2',
                     boxShadow: '$contextMenu',
-                    paddingRight: '4px',
                     zIndex: '10',
                     transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                   }}
@@ -299,7 +301,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   </Box>
                   {
                     currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
-                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith - 4} itemCount={filteredTokenItems.length} itemSize={30}>
+                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
                       {({ index, style }) => {
                         const token = filteredTokenItems[index];
                         return (
@@ -331,7 +333,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
-                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith - 4} itemCount={filteredValues.length} itemSize={30}>
+                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
                           {({ index, style }) => {
                             const value = filteredValues[index];
                             return (

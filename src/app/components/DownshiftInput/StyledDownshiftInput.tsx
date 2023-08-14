@@ -33,7 +33,7 @@ export const StyledDropdown = styled('div', {
 export const StyledList = styled(List, {
   position: 'absolute',
   zIndex: '10',
-  width: 'calc(100% - 4px)',
+  width: 'calc(100% - $scrollbarWidth)',
   maxHeight: '30vh',
   overflowY: 'scroll',
   backgroundColor: '$bgDefault',

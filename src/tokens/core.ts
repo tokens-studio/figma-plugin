@@ -23,6 +23,7 @@ export const sizes = {
   10: '28px',
   controlMedium: '28px',
   dropdownMaxHeight: '50vh',
+  scrollbarWidth: '8px',
 };
 
 export const space = {
