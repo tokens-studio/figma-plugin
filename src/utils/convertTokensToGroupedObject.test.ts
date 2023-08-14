@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import convertTokensToGroupedObject from './convertTokensToGroupedObject';
 
 describe('convertTokensToGroupedObject', () => {

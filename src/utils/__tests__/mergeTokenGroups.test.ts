@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 
 describe('mergeTokenGroups', () => {
