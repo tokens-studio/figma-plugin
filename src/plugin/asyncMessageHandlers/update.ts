@@ -7,7 +7,7 @@ import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
-import { wrapBackendTransaction } from '@/profiling/transaction';
+import { wrapBackendTransaction } from '@/profiling/backendTransaction';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
