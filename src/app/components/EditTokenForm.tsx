@@ -14,7 +14,7 @@ import {
   EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
   activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector, tokensSelector,
 } from '@/selectors';

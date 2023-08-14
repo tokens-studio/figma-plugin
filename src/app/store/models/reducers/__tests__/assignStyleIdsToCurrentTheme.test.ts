@@ -1,4 +1,4 @@
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { TokenState } from '../../tokenState';
 import { assignStyleIdsToCurrentTheme } from '../tokenState';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';

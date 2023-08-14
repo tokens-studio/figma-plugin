@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 
 export type TokensContextValue = {
   resolvedTokens: ResolveTokenValuesResult[];
