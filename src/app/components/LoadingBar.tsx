@@ -69,7 +69,7 @@ export default function LoadingBar() {
         align="center"
         gap={2}
         css={{
-          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$default', margin: '$2',
+          backgroundColor: !windowSize?.isMinimized ? '$bgSubtle' : 'unset', padding: '$2', borderRadius: '$small', margin: '$2',
         }}
       >
         <Spinner />

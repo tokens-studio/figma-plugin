@@ -543,7 +543,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 color: '$textMuted',
                 backgroundColor: '$bgSubtle',
                 borderColor: '$borderSubtle',
-                borderRadius: '$card',
+                borderRadius: '$medium',
                 fontSize: '$xxs',
                 alignItems: 'center',
               }}

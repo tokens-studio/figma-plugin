@@ -110,7 +110,7 @@ export const ThemeSelector: React.FC = () => {
           return (
             filteredThemes.length > 0 && (
               <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-                <Text css={{ color: '$staticTextMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                <Text css={{ color: '$contextMenuForegroundMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
                 {
                   renderThemeOption(filteredThemes)
                 }

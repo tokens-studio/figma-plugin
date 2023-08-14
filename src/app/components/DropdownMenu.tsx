@@ -4,7 +4,7 @@ import { styled } from '@/stitches.config';
 const itemStyles = {
   fontSize: '$xsmall',
   padding: '$2 $3 $2 $6',
-  borderRadius: '$contextMenuItem',
+  borderRadius: '$small',
   cursor: 'default',
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
@@ -23,7 +23,7 @@ const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
   maxWidth: 'min(300px, 80vw)',
   backgroundColor: '$contextMenuBackground',
   color: '$contextMenuForeground',
-  borderRadius: '$contextMenu',
+  borderRadius: '$medium',
   padding: '$2',
   boxShadow: '$contextMenu',
 });
@@ -46,7 +46,7 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   alignItems: 'center',
   padding: '$3',
   gap: '$1',
-  borderRadius: '$button',
+  borderRadius: '$small',
   backgroundColor: '$bgDefault',
   color: '$text',
   fontSize: '$xsmall',
@@ -55,7 +55,7 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
     outline: 'none',
     boxShadow: 'none',
     backgroundColor: '$bgSubtle',
-    borderColor: '$border',
+    borderColor: '$borderDefault',
   },
 
   variants: {

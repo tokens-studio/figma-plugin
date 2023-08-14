@@ -7,7 +7,7 @@ const StyledButton = styled('button', {
   backgroundColor: 'red',
   border: 'none',
   padding: '$3 $3',
-  borderRadius: '$button',
+  borderRadius: '$small',
   fontSize: '$xsmall',
   cursor: 'pointer',
   '&:hover, &:focus': {

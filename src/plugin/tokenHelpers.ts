@@ -14,12 +14,14 @@ export type ResolveTokenValuesResult = SingleToken<true, {
 }>;
 
 export function findAllAliases(tokens: (SingleToken | string)[]) {
+  // Big O(n^2)
   return tokens.filter((token) => (
     checkIfAlias(token, tokens.filter(isSingleToken))
   ));
 }
 
 export function resolveTokenValues(tokens: SingleToken[], previousCount: number = 0): ResolveTokenValuesResult[] {
+  // Big O(n^4): (n = amount of tokens)
   const aliases = findAllAliases(tokens);
   let returnedTokens: ResolveTokenValuesResult[] = tokens;
   returnedTokens = tokens.map((t, _, tokensInProgress) => {
@@ -118,6 +120,7 @@ export function resolveTokenValues(tokens: SingleToken[], previousCount: number 
 }
 
 export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}): SingleToken[] {
+  // Big O(n * m * l): (n = amount of tokenSets, m = amount of tokens in a tokenSet, l = amount of tokens)
   const mergedTokens: SingleToken[] = [];
   // @README we will use both ENABLED and SOURCE sets
   // we only need to ignore the SOURCE sets when creating styles

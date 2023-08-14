@@ -97,7 +97,7 @@ function StartScreen() {
             backgroundColor: '$bgSubtle',
             margin: 'auto',
             maxWidth: '400px',
-            borderRadius: '$card',
+            borderRadius: '$medium',
           }}
         >
           <Stack direction="row" gap={4}>

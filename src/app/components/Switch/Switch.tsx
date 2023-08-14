@@ -6,21 +6,21 @@ const StyledSwitch = styled(SwitchPrimitive.Root, {
   width: 24,
   height: 13,
   backgroundColor: 'transparent',
-  borderRadius: '9999px',
+  borderRadius: '$full',
   position: 'relative',
-  border: '1px solid $colors$borderSwitch',
-  '&[data-state="checked"]': { backgroundColor: '$bgSwitchChecked' },
+  border: '1px solid $colors$borderDefault',
+  '&[data-state="checked"]': { backgroundColor: '$interaction' },
 });
 
 const StyledThumb = styled(SwitchPrimitive.Thumb, {
   display: 'block',
   width: 13,
   height: 13,
-  backgroundColor: '$fgDefault',
-  borderRadius: '9999px',
+  backgroundColor: '$onInteraction',
+  borderRadius: '$full',
   transition: 'transform 100ms',
   willChange: 'transform',
-  boxShadow: '0 0 0 1px $colors$borderSwitch',
+  boxShadow: '0 0 0 1px $colors$borderDefault',
   '&[data-state="checked"]': { transform: 'translateX(12px)' },
 });
 
