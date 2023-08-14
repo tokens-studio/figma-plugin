@@ -10,7 +10,7 @@ type Props = {
 };
 
 const StyledPropertyItem = styled('div', {
-  color: '$textSubtle',
+  color: '$fgSubtle',
   marginBottom: '$2',
 });
 

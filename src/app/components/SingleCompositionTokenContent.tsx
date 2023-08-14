@@ -7,7 +7,7 @@ import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { StyledDragButton } from './StyledDragger/StyledDragButton';
 import { DragGrabber } from './StyledDragger/DragGrabber';
 

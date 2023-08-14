@@ -16,7 +16,7 @@ const StyledSpinner = styled('div', {
   variants: {
     inverse: {
       true: {
-        color: '$onInteraction',
+        color: '$fgOnEmphasis',
       },
       false: {
         color: '$fgDefault',

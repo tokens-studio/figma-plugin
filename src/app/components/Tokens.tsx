@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -55,7 +55,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
             <Box
               css={{
                 background: '$dangerBgEmphasis',
-                color: '$onInteraction',
+                color: '$fgOnEmphasis',
                 fontSize: '$xsmall',
                 fontWeight: '$bold',
                 padding: '$3 $4',

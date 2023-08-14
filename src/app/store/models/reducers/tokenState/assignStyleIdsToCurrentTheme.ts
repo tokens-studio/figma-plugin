@@ -1,6 +1,6 @@
 import type { TokenState } from '../../tokenState';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 
 export function assignStyleIdsToCurrentTheme(state: TokenState, styleIds: Record<string, string>, tokens: ResolveTokenValuesResult[]): TokenState {
   // ignore if there is no active themes

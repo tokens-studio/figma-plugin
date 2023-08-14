@@ -32,14 +32,14 @@ const StyledFigmaTokensLogoMark = styled(FigmaMark, {
 });
 
 const HelpfulLink = styled('a', {
-  color: '$textMuted',
+  color: '$fgMuted',
   display: 'flex',
   alignItems: 'center',
   gap: '$3',
   padding: '0 $1',
   fontSize: '$xsmall',
   '&:hover, &:focus': {
-    color: '$text',
+    color: '$fgDefault',
   },
 });
 
@@ -149,7 +149,7 @@ function StartScreen() {
             <GitHubLogoIcon />
             <a
               href="https://github.com/tokens-studio/figma-plugin"
-              style={{ textDecoration: 'underline', color: '$textMuted', fontSize: '$xsmall' }}
+              style={{ textDecoration: 'underline', color: '$fgMuted', fontSize: '$xsmall' }}
               target="_blank"
               rel="noreferrer"
             >

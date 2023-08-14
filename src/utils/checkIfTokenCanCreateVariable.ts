@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ResolveTokenValuesResult } from '../plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from './tokenHelpers';
 
 export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesResult): boolean {
   // Ignore multi value spacing and multi value borderRadius tokens

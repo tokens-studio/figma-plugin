@@ -7,7 +7,7 @@ export const StyledFolderButtonChevronBox = styled(Box, {
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  color: '$textSubtle',
+  color: '$fgSubtle',
   variants: {
     collapsed: {
       true: {

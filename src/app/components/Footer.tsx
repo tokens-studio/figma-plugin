@@ -176,7 +176,7 @@ export default function Footer() {
           ) : null}
       </Stack>
       <Stack direction="row" gap={4} align="center">
-        <Box css={{ color: '$textMuted', fontSize: '$xsmall' }}>
+        <Box css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>

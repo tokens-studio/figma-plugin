@@ -2,7 +2,7 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObject } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
-import { mergeTokenGroups, resolveTokenValues } from './tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 
 export function generateTokensToCreate(theme: ThemeObject, tokens: Record<string, AnyTokenList>, availableTokenTypes: TokenTypes[]) {
   // Big O(resolveTokenValues * mergeTokenGroups)

@@ -58,5 +58,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   } else {
     notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
-  return allVariableCollectionIds;
+  return {
+    allVariableCollectionIds,
+    totalVariables: figmaVariables.length,
+  };
 }
