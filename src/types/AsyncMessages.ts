@@ -211,6 +211,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
+  nodes: number
 }>;
 
 export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
@@ -269,6 +270,7 @@ export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CR
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>
+  totalVariables: number
 }>;
 
 export type ResolveVariableInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {

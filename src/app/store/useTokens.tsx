@@ -6,7 +6,7 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -361,7 +361,14 @@ export default function useTokens() {
 
   const createVariables = useCallback(async () => {
     track('createVariables');
-    const createVariableResult = await wrapTransaction({ name: 'createVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: (result, transaction) => {
+        result.then((resolve) => {
+          transaction.setMeasurement('variables', resolve.totalVariables, '');
+        });
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
       tokens,
       settings,

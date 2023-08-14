@@ -1,4 +1,4 @@
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
 import { TransformerOptions } from './types';
 import convertTokensToGroupedObject from './convertTokensToGroupedObject';
 import parseTokenValues from './parseTokenValues';
