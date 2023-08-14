@@ -208,5 +208,5 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
       # 4: Build package
-      - name: build:transform
+      - name: Run benchmark
         run: npm run benchmark:build && npm run benchmark:run
