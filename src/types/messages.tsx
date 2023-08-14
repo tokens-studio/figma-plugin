@@ -20,6 +20,7 @@ export enum MessageFromPluginTypes {
   SET_TOKENS = 'set_tokens',
   NOTIFY_EXCEPTION = 'notify_exception',
   TRACK_FROM_PLUGIN = 'track_from_plugin',
+  REPORT_FROM_PLUGIN = 'report_from_plugin',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -105,6 +106,15 @@ export type TrackFromPluginMessage = {
   opts?: Record<string, unknown>;
 };
 
+export type ReportFromPluginMessage = {
+  type: MessageFromPluginTypes.REPORT_FROM_PLUGIN;
+  opts: {
+    name: string;
+    id: string;
+    type: 'start' | 'end';
+  }
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -120,4 +130,5 @@ export type PostToUIMessage =
   | SetTokensFromPluginMessage
   | SetTokensFromPluginMessage
   | NotifyExceptionFromPluginMessage
-  | TrackFromPluginMessage;
+  | TrackFromPluginMessage
+  | ReportFromPluginMessage;

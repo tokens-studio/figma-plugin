@@ -7,6 +7,7 @@ import { defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
+import { wrapBackendTransaction } from '@/profiling/transaction';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -29,7 +30,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     const allWithData = await defaultNodeManager.findNodesWithData({
       updateMode: msg.settings.updateMode,
     });
-    await updateNodes(allWithData, tokensMap, msg.settings);
+    await wrapBackendTransaction('updateNodes', () => updateNodes(allWithData, tokensMap, msg.settings));
     await updatePluginData({ entries: allWithData, values: {} });
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);

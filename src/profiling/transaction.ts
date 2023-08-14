@@ -33,11 +33,48 @@ interface TransactionOptions<U> {
    *  },()=>{...})
    * ```
    */
-  statExtractor?: (val: U, transaction: Transaction) => void
+  statExtractor?: (val: U, transaction: Transaction) => void;
 }
 
+interface BackendTransactionOptions {
+  name: string;
+  /**
+   * String that will be used as transaction's unique id.
+   */
+  id: string;
+  /**
+   * Whether its the start or end of transaction.
+   */
+  type: 'start' | 'end';
+}
+
+export const startTransactionFromPlugin = async (opts: BackendTransactionOptions) => {
+  console.log('Starting trans', opts);
+
+  const transaction = startTransaction({ name: opts.name });
+
+  getCurrentHub().configureScope((scope) => {
+    scope.setTag('transaction_id', opts.id);
+    scope.setSpan(transaction);
+  });
+  Promise.resolve();
+};
+
+export const endTransactionFromPlugin = async (opts: BackendTransactionOptions) => {
+  console.log('Ending trans', opts);
+
+  getCurrentHub().configureScope((scope) => {
+    scope.setTag('transaction_id', opts.id);
+  });
+
+  // TODO: I dont know if this will properly add the transaction to the one from the unique transaction id.
+  const transaction = startTransaction({ name: `${opts.name}-backend` });
+
+  transaction.finish();
+};
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const wrapTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
+export const wrapTransaction = async <U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
   // Do not run profiling if we are not in production
   if (!shouldProfile()) {
     return fn();
@@ -67,7 +104,7 @@ export const wrapTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U
   return result;
 };
 
-export const spanTransaction = async<U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
+export const spanTransaction = async <U>(opts: TransactionOptions<U>, fn: () => U): Promise<U> => {
   // Do not run profiling if we are not in production
   if (!shouldProfile()) {
     return fn();

@@ -1,7 +1,4 @@
-import {
-  MessageFromPluginTypes,
-  PostToUIMessage,
-} from '@/types/messages';
+import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import { AnyTokenList, TokenStore } from '@/types/tokens';
 import { SelectionGroup } from '@/types/SelectionGroup';
 import { SelectionValue } from '@/types/SelectionValue';
@@ -50,11 +47,11 @@ export function notifySelection({
 }
 
 export type SavedSettings = {
-  language: string,
+  language: string;
   sessionRecording: boolean;
   width: number;
   height: number;
-  showEmptyGroups: boolean
+  showEmptyGroups: boolean;
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
@@ -67,25 +64,23 @@ export type SavedSettings = {
   aliasBaseFontSize: string;
 };
 
-export function notifyUISettings(
-  {
-    language,
-    sessionRecording,
-    width,
-    height,
-    updateMode,
-    updateOnChange,
-    updateStyles,
-    showEmptyGroups,
-    ignoreFirstPartForStyles,
-    prefixStylesWithThemeName,
-    updateRemote = true,
-    inspectDeep,
-    shouldSwapStyles,
-    baseFontSize,
-    aliasBaseFontSize,
-  }: SavedSettings,
-) {
+export function notifyUISettings({
+  language,
+  sessionRecording,
+  width,
+  height,
+  updateMode,
+  updateOnChange,
+  updateStyles,
+  showEmptyGroups,
+  ignoreFirstPartForStyles,
+  prefixStylesWithThemeName,
+  updateRemote = true,
+  inspectDeep,
+  shouldSwapStyles,
+  baseFontSize,
+  aliasBaseFontSize,
+}: SavedSettings) {
   postToUI({
     type: MessageFromPluginTypes.UI_SETTINGS,
     settings: {
@@ -138,6 +133,13 @@ export function trackFromPlugin(title: string, opts = {}) {
   postToUI({
     type: MessageFromPluginTypes.TRACK_FROM_PLUGIN,
     title,
+    opts,
+  });
+}
+
+export function reportFromPlugin(opts: { name: string; id: string; type: 'start' | 'end' }) {
+  postToUI({
+    type: MessageFromPluginTypes.REPORT_FROM_PLUGIN,
     opts,
   });
 }

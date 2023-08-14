@@ -11,6 +11,7 @@ import { Properties } from '@/constants/Properties';
 import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
+import { endTransactionFromPlugin, startTransactionFromPlugin } from '@/profiling/transaction';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -131,6 +132,14 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.REPORT_FROM_PLUGIN: {
+            if (pluginMessage.opts.type === 'start') {
+              startTransactionFromPlugin(pluginMessage.opts);
+            } else {
+              endTransactionFromPlugin(pluginMessage.opts);
+            }
             break;
           }
           default:
