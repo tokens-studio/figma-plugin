@@ -3,7 +3,7 @@ import { styled } from '@/stitches.config';
 
 const StyledContent = styled(ContextMenuPrimitive.Content, {
   minWidth: 100,
-  backgroundColor: '$contextMenuBackground',
+  backgroundColor: '$contextMenuBg',
   border: '1px solid $contextMenuBorder',
   borderRadius: '$medium',
   overflow: 'hidden',
@@ -15,7 +15,7 @@ const itemStyles = {
   all: 'unset',
   fontSize: '$xsmall',
   lineHeight: 1,
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
   borderRadius: '$small',
   display: 'flex',
   alignItems: 'center',
@@ -25,13 +25,13 @@ const itemStyles = {
   userSelect: 'none',
 
   '&[data-disabled]': {
-    color: '$contextMenuForegroundDisabled',
+    color: '$contextMenuFgDisabled',
     pointerEvents: 'none',
   },
 
   '&:focus': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
   '&:disabled': {
     pointerEvents: 'none',
@@ -44,8 +44,8 @@ const StyledCheckboxItem = styled(ContextMenuPrimitive.CheckboxItem, { ...itemSt
 const StyledRadioItem = styled(ContextMenuPrimitive.RadioItem, { ...itemStyles });
 const StyledTriggerItem = styled(ContextMenuPrimitive.TriggerItem, {
   '&[data-state="open"]': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
   ...itemStyles,
 });
@@ -54,7 +54,7 @@ const StyledLabel = styled(ContextMenuPrimitive.Label, {
   paddingLeft: '$3',
   fontSize: '$xsmall',
   lineHeight: '25px',
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
 });
 
 const StyledSeparator = styled(ContextMenuPrimitive.Separator, {

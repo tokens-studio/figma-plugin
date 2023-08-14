@@ -9,7 +9,7 @@ const StyledSelect = styled('select', {
   paddingLeft: '$2',
   lineHeight: 1,
   backgroundColor: '$bgDefault',
-  color: '$text',
+  color: '$fgDefault',
   border: '1px solid $borderDefault',
   cursor: 'pointer',
   '&:focus': { boxShadow: '$focus', outline: 'none' },

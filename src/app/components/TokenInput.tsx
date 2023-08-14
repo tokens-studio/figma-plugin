@@ -6,7 +6,7 @@ import { styled } from '@/stitches.config';
 const StyledLabel = styled(LabelPrimitive.Root, {
   fontSize: 12,
   fontWeight: 500,
-  color: '$textMuted',
+  color: '$fgMuted',
   userSelect: 'none',
   pointerEvents: 'none',
   padding: '$3',
@@ -28,7 +28,7 @@ const Input = styled('input', {
   paddingLeft: 'calc(80px + $4)',
   fontSize: 12,
   lineHeight: 1,
-  color: '$text',
+  color: '$fgDefault',
   border: '1px solid $borderDefault',
   width: '100%',
   '&:focus': { boxShadow: '$focus' },

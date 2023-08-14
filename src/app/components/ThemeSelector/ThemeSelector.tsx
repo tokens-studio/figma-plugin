@@ -110,7 +110,7 @@ export const ThemeSelector: React.FC = () => {
           return (
             filteredThemes.length > 0 && (
               <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-                <Text css={{ color: '$contextMenuForegroundMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                <Text css={{ color: '$contextMenuFgMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
                 {
                   renderThemeOption(filteredThemes)
                 }
@@ -142,7 +142,7 @@ export const ThemeSelector: React.FC = () => {
         >
           {availableThemes.length === 0 && (
             <ScrollDropdownMenuRadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text css={{ color: '$contextMenuForegroundMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+              <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
             </ScrollDropdownMenuRadioItem>
           )}
           {availableThemeOptions}

@@ -19,7 +19,7 @@ export const StyledDragButton = styled('button', {
     isActive: {
       true: {
         backgroundColor: '$accentBg',
-        borderColor: '$interaction',
+        borderColor: '$accentDefault',
       },
       false: {
         '&:focus, &:hover': {

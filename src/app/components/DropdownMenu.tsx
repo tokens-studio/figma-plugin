@@ -9,20 +9,20 @@ const itemStyles = {
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   '&[data-disabled]': {
-    color: '$contextMenuForegroundDisabled',
+    color: '$contextMenuFgDisabled',
   },
 };
 
 const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
   minWidth: 130,
   maxWidth: 'min(300px, 80vw)',
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
+  backgroundColor: '$contextMenuBg',
+  color: '$contextMenuFg',
   borderRadius: '$medium',
   padding: '$2',
   boxShadow: '$contextMenu',
@@ -48,7 +48,7 @@ const StyledDropdownMenuTrigger = styled(DropdownMenuPrimitive.Trigger, {
   gap: '$1',
   borderRadius: '$small',
   backgroundColor: '$bgDefault',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 
   '&:focus-visible, &:hover': {
@@ -76,7 +76,7 @@ const StyledDropdownMenuRadioGroup = styled(DropdownMenuPrimitive.RadioGroup, {}
 
 const StyledDropdownMenuRadioItem = styled(DropdownMenuPrimitive.RadioItem, itemStyles);
 
-const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
+const StyledDropdownMenuArrow = styled(DropdownMenuPrimitive.Arrow, { fill: '$contextMenuBg' });
 
 const StyledDropdownMenu = styled(DropdownMenuPrimitive.Root, {
 });

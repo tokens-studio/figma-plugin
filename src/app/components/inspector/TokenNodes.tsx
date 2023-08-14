@@ -24,7 +24,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
       <Box
         css={{
           width: '164px',
-          background: '$contextMenuBackground',
+          background: '$contextMenuBg',
           borderRadius: '$medium',
           padding: '$2 0',
           fontSize: '$small',
@@ -73,7 +73,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
               <Box css={{ color: '$textSubtle', marginRight: '$3' }}>
                 <IconLayers />
               </Box>
-              <Box css={{ color: '$textMuted' }}>{nodes.length}</Box>
+              <Box css={{ color: '$fgMuted' }}>{nodes.length}</Box>
             </Box>
           </DropdownMenu.Trigger>
           {dropdownContent}

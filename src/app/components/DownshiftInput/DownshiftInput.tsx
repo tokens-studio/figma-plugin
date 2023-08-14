@@ -21,11 +21,12 @@ import { figmaFontsSelector } from '@/selectors';
 import {
   StyledButton,
   StyledDownshiftInput,
-  StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledDropdown,
+  StyledList, StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
 } from './StyledDownshiftInput';
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
+import { theme } from '@/stitches.config';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 type Arrow = 'top' | 'down';
@@ -71,7 +72,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
   const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
   const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
   const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
-  const [inputContainerWith, setInputContainerWith] = React.useState(0);
+  const [inputContainerWidth, setInputContainerWidth] = React.useState(0);
   const [searchInput, setSearchInput] = React.useState('');
   const [portalPlaceholder] = React.useState(document.createElement('div'));
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
@@ -107,7 +108,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     if (inputContainerRef.current) {
       const boundingRect = inputContainerRef.current?.getBoundingClientRect();
       setInputContainerPosX(boundingRect.left);
-      setInputContainerWith(boundingRect.width);
+      setInputContainerWidth(boundingRect.width);
       if (arrow === 'down') {
         setInputContainerPosY(boundingRect.bottom);
       } else if (portalRef.current) {
@@ -221,6 +222,8 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     setShowAutoSuggest(false);
   }, []);
 
+  const scrollbarWidth = useMemo(() => parseInt(theme.sizes.scrollbarWidth.value.toString(), 10) / 2, []);
+
   return (
     <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
       {({
@@ -257,13 +260,22 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
               ReactDOM.createPortal(
                 <Box
                   css={{
-                    position: 'absolute', top: '0', width: `${inputContainerWith}px`, zIndex: '10', transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
+                    backgroundColor: '$bgDefault',
+                    border: '1px solid',
+                    borderColor: '$borderDefault',
+                    borderRadius: '$medium',
+                    position: 'absolute',
+                    width: `${inputContainerWidth}px`,
+                    top: '$2',
+                    boxShadow: '$contextMenu',
+                    zIndex: '10',
+                    transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                   }}
                   ref={portalRef}
                 >
                   <Box
                     css={{
-                      display: 'flex', flexDirection: 'column', gap: '$3', backgroundColor: '$bgDefault', boxShadow: '$contextMenu', padding: '$3 $3', borderRadius: '$3 $3 0 0',
+                      display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3',
                     }}
                     ref={downShiftSearchContainerRef}
                   >
@@ -289,7 +301,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   </Box>
                   {
                     currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
-                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWith} itemCount={filteredTokenItems.length} itemSize={30}>
+                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
                       {({ index, style }) => {
                         const token = filteredTokenItems[index];
                         return (
@@ -299,7 +311,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                             className="dropdown-item"
                             {...getItemProps({ key: token.name, index, item: token.name })}
                             css={{
-                              backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                              backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
                             }}
                             isFocused={highlightedIndex === index}
                             style={style}
@@ -321,7 +333,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
-                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWith} itemCount={filteredValues.length} itemSize={30}>
+                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
                           {({ index, style }) => {
                             const value = filteredValues[index];
                             return (
@@ -331,7 +343,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                                 className="dropdown-item"
                                 {...getItemProps({ key: value, index, item: value })}
                                 css={{
-                                  backgroundColor: highlightedIndex === index ? '$interaction' : '$bgDefault',
+                                  backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
                                 }}
                                 isFocused={highlightedIndex === index}
                                 style={style}
@@ -347,11 +359,11 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
                   }
                   {
                     ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
-                      <StyledDropdown className="content scroll-container" ref={blankBoxRef}>
-                        <Box css={{ padding: '$3', color: '$textMuted', fontSize: '$small' }}>
+                      <Box ref={blankBoxRef}>
+                        <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
                           No suggestions found
                         </Box>
-                      </StyledDropdown>
+                      </Box>
                     )
                   }
                 </Box>,
