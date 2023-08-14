@@ -60,7 +60,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
           }}
         >
@@ -76,7 +76,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
           }}
         >
@@ -91,7 +91,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
           }}
         >
@@ -107,7 +107,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
           }}
         >
@@ -123,7 +123,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
           }}
         >
@@ -139,7 +139,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             background: '$bgSubtle',
             fontSize: '$small',
             padding: '$2 $3',
-            borderRadius: '$default',
+            borderRadius: '$small',
             width: '40px',
             fontFamily: '$mono',
             overflow: 'hidden',

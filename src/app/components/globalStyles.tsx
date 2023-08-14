@@ -15,7 +15,7 @@ export const globalStyles = globalCss({
   },
   'button:focus': {
     outline: 'none',
-    boxShadow: '0 0 0 4px $bgAccent',
+    boxShadow: '0 0 0 4px $accentBg',
   },
   'textarea.input, select.input, input.input': {
     outline: 'none',
@@ -74,12 +74,12 @@ export const globalStyles = globalCss({
     width: '100%',
   },
   '.color-picker .react-colorful__saturation': {
-    borderRadius: '$default',
+    borderRadius: '$small',
   },
 
   '.color-picker .react-colorful__hue, .color-picker .react-colorful__alpha': {
     height: '$4',
-    borderRadius: '$default',
+    borderRadius: '$small',
   },
 
   '.color-picker .react-colorful__hue-pointer, .color-picker .react-colorful__alpha-pointer': {
@@ -99,7 +99,7 @@ export const globalStyles = globalCss({
   '.ReactModal__Content': {
     backgroundColor: '$bgDefault !important',
     border: '1px solid !important',
-    borderColor: '$contextMenuBorder !important',
+    borderColor: '$borderMuted !important',
     overflowX: 'hidden !important',
   },
 });

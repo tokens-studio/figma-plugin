@@ -3,14 +3,14 @@ import { styled } from '@/stitches.config';
 import type { StitchesCSS } from '@/types';
 
 const StyledSelect = styled('select', {
-  borderRadius: '$input',
+  borderRadius: '$small',
   fontSize: '$xsmall',
   height: '$controlMedium',
   paddingLeft: '$2',
   lineHeight: 1,
   backgroundColor: '$bgDefault',
   color: '$text',
-  border: '1px solid $border',
+  border: '1px solid $borderDefault',
   cursor: 'pointer',
   '&:focus': { boxShadow: '$focus', outline: 'none' },
 });

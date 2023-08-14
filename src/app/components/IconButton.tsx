@@ -9,7 +9,7 @@ const commonStyles = {
   all: 'unset',
   backgroundColor: 'red',
   border: 'none',
-  borderRadius: '$button',
+  borderRadius: '$small',
   cursor: 'pointer',
   '&:not(:disabled):hover, &:not(:disabled):focus': {
     boxShadow: 'none',

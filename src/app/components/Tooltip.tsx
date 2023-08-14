@@ -9,13 +9,13 @@ const scaleIn = keyframes({
 });
 
 const StyledContent = styled(Tooltip.Content, {
-  borderRadius: '$contextMenu',
-  padding: '5px 10px',
-  fontSize: 12,
+  borderRadius: '$medium',
+  padding: '$2 $3',
+  fontSize: '$small',
   maxWidth: '70vw',
   width: 'auto',
-  backgroundColor: '$bgToolTip',
-  color: '$fgToolTip',
+  backgroundColor: '$tooltipBg',
+  color: '$tooltipFg',
   transformOrigin: 'var(--radix-tooltip-content-transform-origin)',
   animation: `${scaleIn} 0.1s ease-out`,
 });
