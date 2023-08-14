@@ -11,7 +11,7 @@ import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
 import Tooltip from './Tooltip';
-import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
+import { resolveTokenValues, mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
   activeTokenSetSelector,

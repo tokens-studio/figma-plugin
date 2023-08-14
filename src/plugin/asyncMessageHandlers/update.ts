@@ -3,7 +3,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updateLocalTokensData } from '@/utils/figma';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
 import { updateNodes } from '../node';
-import { defaultNodeManager } from '../NodeManager';
+import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import { updatePluginData } from '../pluginData';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
@@ -11,6 +11,7 @@ import { wrapBackendTransaction } from '@/profiling/transaction';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
+  let allWithData: NodeManagerNode[] = [];
   if (msg.tokenValues && msg.updatedAt) {
     await updateLocalTokensData({
       tokens: msg.tokenValues,
@@ -27,7 +28,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);
-    const allWithData = await defaultNodeManager.findNodesWithData({
+    allWithData = await defaultNodeManager.findNodesWithData({
       updateMode: msg.settings.updateMode,
     });
     await wrapBackendTransaction('updateNodes', () => updateNodes(allWithData, tokensMap, msg.settings));
@@ -39,5 +40,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
 
   return {
     styleIds: receivedStyleIds,
+    nodes: allWithData.length,
   };
 };

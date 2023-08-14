@@ -8,7 +8,7 @@ import debounce from 'lodash.debounce';
 import { useTranslation } from 'react-i18next';
 import IconMinus from '@/icons/minus.svg';
 import IconGrabber from '@/icons/grabber.svg';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { TokenBoxshadowValue } from '@/types/values';
 import IconButton from './IconButton';
 import ColorPicker from './ColorPicker';
