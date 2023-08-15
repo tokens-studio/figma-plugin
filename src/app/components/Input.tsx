@@ -93,8 +93,8 @@ const StyledSuffix = styled('button', {
 
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   variants: {
@@ -123,7 +123,7 @@ const StyledPrefix = styled('div', {
   display: 'flex',
   alignItems: 'center',
   fontSize: '$xsmall',
-  color: '$textMuted',
+  color: '$fgMuted',
 
   '&:focus': {
     outline: 'none',

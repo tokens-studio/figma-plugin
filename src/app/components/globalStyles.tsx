@@ -34,7 +34,7 @@ export const globalStyles = globalCss({
     height: '24px',
     top: '0px',
     left: -'4px',
-    backgroundColor: '$interaction',
+    backgroundColor: '$accentDefault',
   },
   '.drag-over-item-list-absolute': {
     position: 'absolute',
@@ -42,13 +42,13 @@ export const globalStyles = globalCss({
     width: '100%',
     height: '4px',
     top: '-4px',
-    backgroundColor: '$interaction',
+    backgroundColor: '$accentDefault',
   },
   '.scroll-container': {
     overflowY: 'scroll',
   },
   '.content::-webkit-scrollbar, .ReactModal__Content::-webkit-scrollbar,  textarea::-webkit-scrollbar': {
-    width: '9px',
+    width: 'var(--sizes-scrollbarWidth, 9px)',
   },
   '.overflow-x-auto::-webkit-scrollbar': {
     height: '9px',
@@ -59,8 +59,8 @@ export const globalStyles = globalCss({
     border: '2px solid var(--figma-color-bg)',
   },
   '.content-dark::-webkit-scrollbar-thumb': {
-    backgroundColor: 'var(--colors-contextMenuForegroundMuted, #000) !important',
-    borderColor: 'var(--colors-contextMenuBackground, #333) !important',
+    backgroundColor: 'var(--colors-contextMenuFgMuted, #000) !important',
+    borderColor: 'var(--colors-contextMenuBg, #333) !important',
     borderRadius: '9px',
     border: '2px solid',
   },

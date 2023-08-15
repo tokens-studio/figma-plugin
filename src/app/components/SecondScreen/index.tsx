@@ -33,7 +33,7 @@ export const StyledBetaBadge = styled('span', {
 
 const StyledP = styled('p', {
   fontWeight: '$normal',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 });
 

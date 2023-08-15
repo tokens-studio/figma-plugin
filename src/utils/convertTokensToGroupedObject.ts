@@ -3,7 +3,7 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { TransformerOptions } from './types';
 import { expand } from '@/utils/expand';
 import { getValueWithReferences } from '@/utils/getValueWithReferences';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 

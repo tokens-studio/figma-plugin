@@ -7,7 +7,7 @@ import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias } from '@/utils/alias';
 import { findReferences } from '@/utils/findReferences';
 import IconPlus from '@/icons/plus.svg';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';

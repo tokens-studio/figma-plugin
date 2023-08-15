@@ -8,9 +8,9 @@ export const StyledBadge = styled('div', {
   fontSize: '$xsmall',
   padding: '$3',
   borderRadius: '$medium',
-  backgroundColor: '$interaction',
+  backgroundColor: '$accentDefault',
   lineHeight: 1,
-  color: '$onInteraction',
+  color: '$fgOnEmphasis',
   fontWeight: '$bold',
 });
 

@@ -4,7 +4,7 @@ import get from 'just-safe-get';
 import { TokensIcon, LinkBreak2Icon } from '@radix-ui/react-icons';
 import { useUIDSeed } from 'react-uid';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import ResolvedTokenDisplay from './ResolvedTokenDisplay';
 import { findReferences } from '@/utils/findReferences';
 import IconButton from './IconButton';

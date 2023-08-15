@@ -9,14 +9,14 @@ const StyledSwitch = styled(SwitchPrimitive.Root, {
   borderRadius: '$full',
   position: 'relative',
   border: '1px solid $colors$borderDefault',
-  '&[data-state="checked"]': { backgroundColor: '$interaction' },
+  '&[data-state="checked"]': { backgroundColor: '$accentDefault' },
 });
 
 const StyledThumb = styled(SwitchPrimitive.Thumb, {
   display: 'block',
   width: 13,
   height: 13,
-  backgroundColor: '$onInteraction',
+  backgroundColor: '$fgOnEmphasis',
   borderRadius: '$full',
   transition: 'transform 100ms',
   willChange: 'transform',

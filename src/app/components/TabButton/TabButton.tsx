@@ -41,13 +41,13 @@ const StyledButton = styled('button', {
   alignItems: 'center',
   gap: '$2',
   cursor: 'pointer',
-  color: '$textSubtle',
+  color: '$fgSubtle',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   '&:not(:disabled):focus, &:not(:disabled):hover': {
     outline: 'none',
     boxShadow: 'none',
-    color: '$text',
+    color: '$fgDefault',
   },
   '@container (width < 64px)': {
     '> svg': {
@@ -59,11 +59,11 @@ const StyledButton = styled('button', {
   },
   '&:disabled': {
     pointerEvents: 'none',
-    color: '$textDisbled',
+    color: '$fgDisabled',
   },
   variants: {
     isActive: {
-      true: { color: '$text' },
+      true: { color: '$fgDefault' },
     },
   },
 });

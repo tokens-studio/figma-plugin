@@ -1,6 +1,6 @@
 import { SettingsState } from '../app/store/models/settings';
 import { transformValue } from '@/plugin/helpers';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { VariableToken } from '@/plugin/updateVariables';
 import { ThemeObject } from '@/types';
 

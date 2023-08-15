@@ -20,10 +20,10 @@ export default function Label({
     variants: {
       isDisabled: {
         true: {
-          color: '$textDisabled',
+          color: '$fgDisabled',
         },
         false: {
-          color: '$text',
+          color: '$fgDefault',
         },
       },
     },

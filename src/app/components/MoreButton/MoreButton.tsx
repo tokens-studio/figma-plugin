@@ -37,7 +37,7 @@ import { getAliasValue } from '@/utils/alias';
 const RightSlot = styled('div', {
   marginLeft: 'auto',
   paddingLeft: 16,
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
   ':focus > &': { color: 'white' },
   '[data-disabled] &': { color: '$disabled' },
 });
