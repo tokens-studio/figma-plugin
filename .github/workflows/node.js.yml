@@ -113,7 +113,7 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: npm ci
       # 4: Run tests
-      - name: Run test command
+      - name: Run lint command
         run: npm run lint
   coverage:
     name: Test coverage
