@@ -557,10 +557,10 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken() {
-      dispatch.tokenState.updateDocument();
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     createToken() {
-      dispatch.tokenState.updateDocument();
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {
