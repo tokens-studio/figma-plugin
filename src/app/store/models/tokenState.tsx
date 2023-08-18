@@ -515,7 +515,7 @@ export const tokenState = createModel<RootModel>()({
       }
 
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
+        dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
       }
     },
     deleteToken() {
