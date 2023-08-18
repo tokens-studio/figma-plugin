@@ -37,6 +37,7 @@ type MapValuesToTokensResult = Record<string, string | number | SingleToken['val
 }[]>;
 
 // TODO: It feels unecessary to do this like that. whats up with the modify? cant we do that upfront before we send tokens to the document?
+// Ideally, we would build this object upfront so we would not have to iterate over this at all, but could just .get a token and then get the property of it
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
@@ -44,7 +45,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
       // We only do this for rawValue as its a documentation and we want to show this to the user
-      // TODO: This should not happen here. We should do this when we build the token object.
       if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
         const modifier = resolvedToken.$extensions?.['studio.tokens']?.modify;
         if (modifier) {
@@ -52,8 +52,14 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
         }
       } else if (key === TokenTypes.COMPOSITION) {
         Object.entries(resolvedToken.value).forEach(([property, value]) => {
+          // Assign the actual value of a composition token property to the applied values
           acc[property as CompositionTokenProperty] = value;
+          // If we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
+          if (typeof value === 'object' && ['border', 'borderTop', 'borderRight', 'borderBottom', 'borderLeft'].includes(property) && 'color' in value && typeof value.color === 'string') {
+            acc.borderColor = value.color;
+          }
         });
+        // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
       } else if (key === Properties.border && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
         acc.borderColor = resolvedToken.value.color;
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
@@ -70,6 +76,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
         acc.borderColor = resolvedToken.value.color;
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       } else {
+        // Otherwise, just apply the value
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       }
     } else {
