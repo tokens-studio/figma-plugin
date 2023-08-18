@@ -89,22 +89,6 @@ export async function updatePluginData({
       }));
       await defaultNodeManager.updateNode(node, newValuesOnNode);
 
-      const nodeHasNoValues = Object.keys(newValuesOnNode).length === 0 && newValuesOnNode.constructor === Object;
-      const editRelaunchData = node.getRelaunchData() as {
-        edit?: string;
-      };
-
-      if (!nodeHasNoValues) {
-        const updatedRelaunchData = Object.keys(newValuesOnNode).join(', ');
-        if (updatedRelaunchData !== editRelaunchData.edit) {
-          node.setRelaunchData({
-            edit: updatedRelaunchData,
-          });
-        }
-      } else {
-        node.setRelaunchData({});
-      }
-
       tracker.next();
       tracker.reportIfNecessary();
     }));
