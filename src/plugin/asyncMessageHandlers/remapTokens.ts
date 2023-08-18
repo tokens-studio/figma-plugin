@@ -2,9 +2,9 @@ import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
-import { updateNodes } from '../node';
+import { updateNodes } from '../updateNodes';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
-import { updatePluginData } from '../pluginData';
+import { updatePluginData } from '../updatePluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 import { TokenTypes } from '@/constants/TokenTypes';
 
