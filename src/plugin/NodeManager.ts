@@ -48,12 +48,9 @@ export class NodeManager {
     nodes?: readonly BaseNode[];
     nodesWithoutPluginData?: boolean;
   }) {
-    postToUI({
-      type: MessageFromPluginTypes.START_JOB,
-      job: {
-        name: BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA,
-      },
-    });
+    const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_UPDATE);
+    const promises: Set<Promise<void>> = new Set();
+    const returnedNodes: NodeManagerNode[] = [];
 
     // wait for previous update
     await this.waitForUpdating();
@@ -70,12 +67,17 @@ export class NodeManager {
       relevantNodes = findAll([figma.root], false, opts.nodesWithoutPluginData);
     }
 
-    const returnedNodes: NodeManagerNode[] = [];
+    postToUI({
+      type: MessageFromPluginTypes.START_JOB,
+      job: {
+        name: BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA,
+        timePerTask: 2,
+        completedTasks: 0,
+        totalTasks: relevantNodes.length,
+      },
+    });
 
     this.updating = (async () => {
-      const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_UPDATE);
-
-      const promises: Set<Promise<void>> = new Set();
       for (let nodeIndex = 0; nodeIndex < relevantNodes.length; nodeIndex += 1) {
         // eslint-disable-next-line
         promises.add(defaultWorker.schedule(async () => {
