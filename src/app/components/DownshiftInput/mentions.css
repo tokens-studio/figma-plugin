@@ -30,7 +30,7 @@
 }
 
 .rc-mentions > textarea::placeholder {
-  color: var(--colors-textSubtle);
+  color: var(--colors-fgSubtle);
 }
 
 .rc-mentions > textarea:focus-within {
@@ -79,11 +79,13 @@
 }
 
 .rc-mentions-dropdown-menu-item:focus {
-  background: var(--colors-interaction);
+  background: var(--colors-accentEmphasis);
+  color: var(--colors-fgOnEmphasis);
 }
 
 .rc-mentions-dropdown-menu-item-active {
-  background: var(--colors-interaction);
+  background: var(--colors-accentEmphasis);
+  color: var(--colors-fgOnEmphasis);
 }
 
 /* width */
@@ -93,7 +95,7 @@
 
 /* Track */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-track {
-  background: var(--canvas-Muted);
+  background: var(--bgSubtle);
 }
 
 /* Handle */

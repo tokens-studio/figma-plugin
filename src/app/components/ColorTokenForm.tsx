@@ -343,7 +343,7 @@ export default function ColorTokenForm({
       }
       {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['studio.tokens']?.modify) && (
         <Box css={{
-          display: 'flex', gap: '$3', background: '$bgSubtle', color: '$textSubtle', padding: '$3', borderRadius: '$2',
+          display: 'flex', gap: '$3', background: '$bgSubtle', color: '$fgSubtle', padding: '$3', borderRadius: '$2',
         }}
         >
           {internalEditToken.type === 'color' ? (
