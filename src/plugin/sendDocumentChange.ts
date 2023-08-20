@@ -1,5 +1,3 @@
-import compact from 'just-compact';
-import { defaultNodeManager } from './NodeManager';
 import { sendSelectionChange } from './sendSelectionChange';
 
 export async function sendDocumentChange(event: DocumentChangeEvent) {
@@ -10,8 +8,5 @@ export async function sendDocumentChange(event: DocumentChangeEvent) {
   if (!changeNodeIds.length) {
     return;
   }
-  const nodeManagers = await Promise.all(changeNodeIds.map((nodeId) => defaultNodeManager.getNode(nodeId)));
-  const nodes = compact(nodeManagers).map((nodeManager) => nodeManager?.node);
-  await defaultNodeManager.update(nodes);
   await sendSelectionChange();
 }

@@ -1,9 +1,6 @@
-import omit from 'just-omit';
 import { Properties } from '@/constants/Properties';
-import store from './store';
 import { postToUI } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
-import { defaultNodeManager } from './NodeManager';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { defaultWorker } from './Worker';
 import { MessageFromPluginTypes } from '@/types/messages';
@@ -27,12 +24,8 @@ export async function removePluginDataByMap({ nodeKeyMap }: { nodeKeyMap: readon
     promises.add(defaultWorker.schedule(async () => {
       node.setPluginData(key, '');
       tokensSharedDataHandler.set(node, key, '');
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, key)
-      ));
       removeValuesFromNode(node, key);
 
-      store.successfulNodes.add(node);
       tracker.next();
       tracker.reportIfNecessary();
     }));

@@ -26,7 +26,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   }
   if (msg.tokens) {
     const tokensMap = tokenArrayGroupToMap(msg.tokens);
-    allWithData = await defaultNodeManager.findNodesWithData({
+    allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
     await updateNodes(allWithData, tokensMap, msg.settings);

@@ -7,8 +7,6 @@ export * from './ActiveThemeProperty';
 export * from './VersionProperty';
 export * from './UpdatedAtProperty';
 export * from './StorageTypeProperty';
-export * from './PersistentNodesCacheProperty';
-export * from './HashProperty';
 export * from './UsedTokenSetProperty';
 export * from './LastOpenedProperty';
 export * from './OnboardingExplainerSetsProperty';

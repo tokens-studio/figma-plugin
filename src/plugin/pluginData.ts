@@ -1,11 +1,9 @@
-import omit from 'just-omit';
 import get from 'just-safe-get';
 import { isEqual } from '@/utils/isEqual';
 import { Properties } from '@/constants/Properties';
-import store from './store';
 import { notifySelection } from './notifiers';
 import removeValuesFromNode from './removeValuesFromNode';
-import { defaultNodeManager, NodeManagerNode } from './NodeManager';
+import { NodeManagerNode } from './NodeManager';
 import { tokensSharedDataHandler } from './SharedDataHandler';
 import { SelectionGroup, SelectionValue } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -100,16 +98,15 @@ export type SelectionContent = {
   selectedNodes: number
 };
 
-export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly BaseNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
+export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { nodes: readonly NodeManagerNode[], shouldSendSelectionValues: boolean }): Promise<SelectionContent> {
   // Big O(n ^ 2 * m) (n = amount of nodes, m = amount of applied tokens in the node)
   let mainNodeSelectionValues: SelectionValue[] = [];
   let selectionValues;
-  const pluginValues = await defaultNodeManager.findNodesWithData({ nodes });
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
-  if (Array.isArray(pluginValues) && pluginValues?.length > 0) {
-    if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(pluginValues);
-    mainNodeSelectionValues = transformPluginDataToMainNodeSelectionValues(pluginValues);
+  if (Array.isArray(nodes) && nodes?.length > 0) {
+    if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(nodes);
+    mainNodeSelectionValues = transformPluginDataToMainNodeSelectionValues(nodes);
   }
   const selectedNodes = figma.currentPage.selection.length;
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });
@@ -119,29 +116,18 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
 export async function removePluginData({ nodes, key, shouldRemoveValues = true }: { nodes: readonly (BaseNode | SceneNode)[], key?: Properties, shouldRemoveValues?: boolean }) {
   return Promise.all(nodes.map(async (node) => {
     if (key) {
-      node.setPluginData(key, '');
       tokensSharedDataHandler.set(node, key, '');
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, key)
-      ));
       if (shouldRemoveValues) {
         removeValuesFromNode(node, key);
       }
     } else {
-      await defaultNodeManager.updateNode(node, (tokens) => (
-        omit(tokens, Object.values(Properties))
-      ));
       Object.values(Properties).forEach((prop) => {
-        node.setPluginData(prop, '');
         tokensSharedDataHandler.set(node, prop, '');
         if (shouldRemoveValues) {
           removeValuesFromNode(node, prop);
         }
       });
     }
-    // @deprecated remove deprecated values key
-    node.setPluginData('values', '');
-    store.successfulNodes.add(node);
   }));
 }
 
@@ -149,10 +135,6 @@ export async function setNonePluginData({ nodes, key }: { nodes: readonly (BaseN
   return Promise.all(nodes.map(async (node) => {
     node.setPluginData(key, 'none');
     tokensSharedDataHandler.set(node, key, 'none');
-    await defaultNodeManager.updateNode(node, (tokens) => (
-      omit(tokens, key)
-    ));
     removeValuesFromNode(node, key);
-    store.successfulNodes.add(node);
   }));
 }

@@ -1,7 +1,4 @@
-import store from './store';
 import setValuesOnNode from './setValuesOnNode';
-import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { NodeManagerNode } from './NodeManager';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -14,6 +11,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from '@/app/store/models/settings';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
+import { NodeManagerNode } from './NodeManager';
 
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
@@ -40,7 +38,6 @@ export async function updateNodes(
 
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
-  const returnedValues: Set<NodeTokenRefMap> = new Set();
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
   const figmaStyleReferences: Record<string, string> = {};
@@ -62,29 +59,24 @@ export async function updateNodes(
 
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
 
-  nodes.forEach((entry) => {
+  nodes.forEach(({ node, tokens: appliedTokens }) => {
     promises.add(
       defaultWorker.schedule(async () => {
         try {
-          if (entry.tokens) {
-            const rawTokenMap = destructureTokenForAlias(tokens, entry.tokens);
-            const tokenValues = mapValuesToTokens(tokens, entry.tokens);
-            setValuesOnNode(
-              entry.node,
-              tokenValues,
-              rawTokenMap,
-              figmaStyleMaps,
-              figmaStyleReferences,
-              figmaVariableMaps,
-              figmaVariableReferences,
-              stylePathPrefix,
-              ignoreFirstPartForStyles,
-              baseFontSize,
-            );
-
-            store.successfulNodes.add(entry.node);
-            returnedValues.add(entry.tokens);
-          }
+          const rawTokenMap = destructureTokenForAlias(tokens, appliedTokens);
+          const tokenValues = mapValuesToTokens(tokens, appliedTokens);
+          setValuesOnNode(
+            node,
+            tokenValues,
+            rawTokenMap,
+            figmaStyleMaps,
+            figmaStyleReferences,
+            figmaVariableMaps,
+            figmaVariableReferences,
+            stylePathPrefix,
+            ignoreFirstPartForStyles,
+            baseFontSize,
+          );
         } catch (e) {
           console.log('got error', e);
         }
@@ -100,10 +92,4 @@ export async function updateNodes(
     type: MessageFromPluginTypes.COMPLETE_JOB,
     name: BackgroundJobs.PLUGIN_UPDATENODES,
   });
-
-  if (returnedValues.size) {
-    return returnedValues.entries().next();
-  }
-
-  return {};
 }

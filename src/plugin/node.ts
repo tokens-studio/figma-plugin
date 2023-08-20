@@ -61,7 +61,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
             acc.borderColor = value.color;
           }
         });
-        // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
+      // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
       } else if (key === Properties.border && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
         acc.borderColor = resolvedToken.value.color;
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;

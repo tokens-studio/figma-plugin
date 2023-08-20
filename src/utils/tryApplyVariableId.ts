@@ -1,6 +1,9 @@
 import { matchVariableName } from './matchVariableName';
 
 export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string, figmaVariableReferences: Record<string, string>, figmaVariableMaps: Record<string, Variable>) {
+  if (Object.keys(figmaVariableReferences).length === 0) {
+    return false;
+  }
   const pathname = token.split('.').join('/');
   const matchVariableId = matchVariableName(
     token,
