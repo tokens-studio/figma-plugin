@@ -58,8 +58,6 @@ export class Worker {
 
   public cancel = () => {
     this.pool.clear();
-    this.emitter.emit('canceled', Date.now());
-    this.emitter.removeAllListeners();
   };
 
   public start = () => {

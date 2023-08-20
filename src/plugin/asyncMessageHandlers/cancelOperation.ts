@@ -5,8 +5,8 @@ import { postToUI } from '../notifiers';
 import { defaultWorker } from '../Worker';
 
 export const cancelOperation: AsyncMessageChannelHandlers[AsyncMessageTypes.CANCEL_OPERATION] = async () => {
-  defaultWorker.cancel();
-  postToUI({
+  await postToUI({
     type: MessageFromPluginTypes.CLEAR_JOBS,
   });
+  defaultWorker.cancel();
 };
