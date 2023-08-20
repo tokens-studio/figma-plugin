@@ -16,7 +16,7 @@ import { NodeManagerNode } from './NodeManager';
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
-  settings?: SettingsState,
+  settings: SettingsState,
 ) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
@@ -79,10 +79,10 @@ export async function updateNodes(
           );
         } catch (e) {
           console.log('got error', e);
+        } finally {
+          tracker.next();
+          tracker.reportIfNecessary();
         }
-
-        tracker.next();
-        tracker.reportIfNecessary();
       }),
     );
   });

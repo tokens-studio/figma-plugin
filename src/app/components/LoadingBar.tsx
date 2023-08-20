@@ -14,8 +14,7 @@ import Box from './Box';
 
 // TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
-  [BackgroundJobs.NODEMANAGER_UPDATE]: 'Finding and caching tokens...',
-  [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Determining nodes to update...',
+  [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Finding nodes...',
   [BackgroundJobs.PLUGIN_UPDATENODES]: 'Updating nodes...',
   [BackgroundJobs.PLUGIN_UPDATEPLUGINDATA]: 'Updating plugin data...',
   [BackgroundJobs.UI_PULLTOKENS]: 'Fetching remote tokens...',
@@ -28,6 +27,15 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
 };
+
+export function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return num.toString();
+  } if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}k`;
+  }
+  return num.toString();
+}
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
@@ -48,6 +56,12 @@ export default function LoadingBar() {
       && !hasInfiniteJobs
     ),
   );
+  const completedTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
+    total + (job.completedTasks ?? 0)
+  ), 0), [backgroundJobs]);
+  const totalTasks = React.useMemo(() => backgroundJobs.reduce((total, job) => (
+    total + (job.totalTasks ?? 0)
+  ), 0), [backgroundJobs]);
 
   const handleCancel = React.useCallback(() => {
     AsyncMessageChannel.ReactInstance.message({
@@ -59,9 +73,11 @@ export default function LoadingBar() {
     return null;
   }
 
+  console.log('backgroundJobs', backgroundJobs, backgroundJobs.map((job) => job.name), expectedWaitTimeInSeconds, completedTasks, totalTasks);
+
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
-  return (
+  return message && (
     <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar" data-cy="loadingBar">
       <Stack
         direction="row"
@@ -76,11 +92,18 @@ export default function LoadingBar() {
           <Stack direction="row" align="center" justify="between" css={{ flexGrow: 1 }}>
             <Text size="xsmall" bold>
               {message || 'Hold on, updating...'}
-              {expectedWaitTimeInSeconds >= 1 && (
-                `(${expectedWaitTimeInSeconds}s remaining)`
+              {completedTasks > 0 && totalTasks > 0 && (
+                ` ${formatNumber(completedTasks)}/${formatNumber(totalTasks)}`
               )}
             </Text>
-            <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+            <Stack direction="row" align="center" gap={1}>
+              <Text size="xsmall" muted>
+                {expectedWaitTimeInSeconds >= 1 && (
+                  `${expectedWaitTimeInSeconds}s`
+                )}
+              </Text>
+              <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+            </Stack>
           </Stack>
         )}
       </Stack>

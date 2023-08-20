@@ -48,7 +48,7 @@ export class NodeManager {
     nodes?: readonly BaseNode[];
     nodesWithoutPluginData?: boolean;
   }) {
-    const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_UPDATE);
+    const tracker = new ProgressTracker(BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA);
     const promises: Set<Promise<void>> = new Set();
     const returnedNodes: NodeManagerNode[] = [];
 
@@ -71,7 +71,7 @@ export class NodeManager {
       type: MessageFromPluginTypes.START_JOB,
       job: {
         name: BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA,
-        timePerTask: 2,
+        timePerTask: 0.5,
         completedTasks: 0,
         totalTasks: relevantNodes.length,
       },
@@ -79,20 +79,15 @@ export class NodeManager {
 
     this.updating = (async () => {
       for (let nodeIndex = 0; nodeIndex < relevantNodes.length; nodeIndex += 1) {
-        // eslint-disable-next-line
         promises.add(defaultWorker.schedule(async () => {
           const node = relevantNodes[nodeIndex];
 
-          try {
-            returnedNodes.push({
-              node: relevantNodes[nodeIndex],
-              tokens: await tokensSharedDataHandler.getAll(node),
-              id: node.id,
-              hash: '123',
-            });
-          } catch (error) {
-            console.warn(`Node ${node.id} no longer exists`);
-          }
+          returnedNodes.push({
+            node: relevantNodes[nodeIndex],
+            tokens: await tokensSharedDataHandler.getAll(node),
+            id: node.id,
+            hash: '123',
+          });
           tracker.next();
           tracker.reportIfNecessary();
         }));
