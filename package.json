@@ -147,6 +147,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^26.0.20",
     "@types/lodash.debounce": "^4.0.7",
+    "@types/memoizee": "^0.4.8",
     "@types/object-hash": "^2.2.1",
     "@types/react": "^17.0.0",
     "@types/react-copy-to-clipboard": "^5.0.4",

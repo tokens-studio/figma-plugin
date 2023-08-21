@@ -13,6 +13,7 @@ import {
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
+import { timeIncrement } from './timingStore';
 
 // @TODO fix typings
 
@@ -41,6 +42,7 @@ type MapValuesToTokensResult = Record<string, string | number | SingleToken['val
 // Tokens: The full tokens map
 // Values: The values applied to the node
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  const timeNow = Date.now();
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
 
@@ -87,6 +89,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
 
     return acc;
   }, {});
+  timeIncrement('mapvalues', Date.now() - timeNow);
   return mappedValues;
 }
 
@@ -177,6 +180,7 @@ export function selectNodes(ids: string[]) {
 // Tokens: The full token object
 // Values: The values applied to the node
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+  const timeNow = Date.now();
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -206,5 +210,6 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
   if (values && values.borderBottom) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
   }
+  timeIncrement('destructure', Date.now() - timeNow);
   return values;
 }
