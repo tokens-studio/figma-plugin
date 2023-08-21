@@ -58,7 +58,8 @@ async function benchmark() {
     return performance.now() - baselineStart
   }));
 
-  const baseline = baseLineTests.reduce((acc, curr) => acc + curr, 0) / baseLineTests.length;
+  //Note in the CI, the first tests seems to be way more expensive than the rest
+  const baseline = baseLineTests.slice(1).reduce((acc, curr) => acc + curr, 0) / (baseLineTests.length - 1);
 
   console.log(`Baseline completed ${baseline}ms `);
 
