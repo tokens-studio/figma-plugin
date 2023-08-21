@@ -267,7 +267,6 @@ describe('Can set values on node', () => {
       },
       {},
       {},
-      {},
       null,
       true,
     );
@@ -347,7 +346,6 @@ describe('Can set values on node', () => {
         ...emptyStylesMap,
         effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
       },
-      {},
       {},
       {},
       'light',
