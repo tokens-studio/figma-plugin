@@ -245,7 +245,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       $extensions: {
         ...internalEditToken.$extensions,
         'studio.tokens': Object.keys(newValue).length > 0 ? newValue : undefined,
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
@@ -258,7 +258,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken.$extensions?.['studio.tokens'],
           modify: newModify,
         },
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 

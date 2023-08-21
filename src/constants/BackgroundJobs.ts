@@ -18,4 +18,5 @@ export enum BackgroundJobs {
   UI_ATTACHING_LOCAL_STYLES = 'ui_attaching_local_styles',
   UI_ATTACHING_LOCAL_VARIABLES = 'ui_attaching_local_variables',
   UI_RENAME_TOKEN_ACROSS_SETS = 'ui_rename_token_across_sets',
+  UI_CREATEVARIABLES = 'ui_create_variables',
 }

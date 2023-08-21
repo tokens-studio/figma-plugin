@@ -59,6 +59,7 @@ describe('uiSettings', () => {
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,
+      storeTokenIdInJsonEditor: false,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     });
@@ -77,6 +78,7 @@ describe('uiSettings', () => {
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
+      storeTokenIdInJsonEditor: false,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     })));
@@ -94,6 +96,7 @@ describe('uiSettings', () => {
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,
+      storeTokenIdInJsonEditor: false,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     });

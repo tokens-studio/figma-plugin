@@ -10,10 +10,7 @@ export function generateTokensToCreate(theme: ThemeObject, tokens: Record<string
     .filter(([, status]) => status === TokenSetStatus.ENABLED)
     .map(([tokenSet]) => tokenSet);
   const resolved = resolveTokenValues(mergeTokenGroups(tokens, theme.selectedTokenSets));
-  const withoutSourceTokens = resolved.filter(
-    (token) => (!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)), // filter out SOURCE tokens
+  return resolved.filter(
+    (token) => ((!token.internal__Parent || enabledTokenSets.includes(token.internal__Parent)) && availableTokenTypes.includes(token.type)), // filter out SOURCE tokens
   );
-
-  const tokensToCreate = withoutSourceTokens.filter((token) => availableTokenTypes.includes(token.type));
-  return tokensToCreate;
 }

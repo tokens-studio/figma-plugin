@@ -23,6 +23,7 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     sessionRecording: msg.sessionRecording,
     aliasBaseFontSize: msg.aliasBaseFontSize,
     shouldSwapStyles: msg.shouldSwapStyles,
+    storeTokenIdInJsonEditor: msg.storeTokenIdInJsonEditor,
   });
   figma.ui.resize(width, height);
   if (store.inspectDeep !== msg.inspectDeep) {

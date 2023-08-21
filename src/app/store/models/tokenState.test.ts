@@ -11,6 +11,10 @@ const mockedUpdateTokensOnSources = updateTokensOnSources as jest.MockedFunction
 
 jest.mock('../updateSources', () => jest.fn());
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid'),
+}));
+
 // Hide errors unless they are expected
 const consoleError = jest.spyOn(console, 'error').mockImplementation(() => { });
 
@@ -555,6 +559,9 @@ describe('editToken', () => {
         name: 'test',
         type: TokenTypes.COLOR,
         value: '#000000',
+        $extensions: {
+          id: 'mock-uuid',
+        },
       },
     ];
     expect(tokens.global).toEqual(expectedTokens);
@@ -651,6 +658,7 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
+          id: 'mock-uuid',
           'studio.tokens': {
             modify: {
               type: 'lighten',
@@ -699,22 +707,34 @@ describe('editToken', () => {
     const { tokens } = store.getState().tokenState;
     expect(tokens.global).toEqual([
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         name: '1',
         type: 'sizing',
         value: 1,
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         name: 'header',
         type: 'borderRadius',
         value: 3,
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         inheritTypeLevel: 2,
         name: 'black.100',
         type: 'color',
         value: '#0b0101',
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         inheritTypeLevel: 2,
         name: 'black.500',
         type: 'color',
@@ -753,6 +773,7 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
+          id: 'mock-uuid',
           'studio.tokens': {
             modify: {
               type: 'lighten',
@@ -827,6 +848,7 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
+          id: 'mock-uuid',
           'studio.tokens': {
             modify: {
               type: 'lighten',
@@ -868,6 +890,9 @@ describe('editToken', () => {
         value: '1',
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         name: 'primary-copy',
         value: '1',
         type: 'sizing',
@@ -1304,16 +1329,25 @@ describe('editToken', () => {
     const { tokens } = store.getState().tokenState;
     const expectedTokens = [
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         type: TokenTypes.COLOR,
         value: '#ff0000',
         name: 'red',
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         type: TokenTypes.COLOR,
         value: '#000000',
         name: 'black',
       },
       {
+        $extensions: {
+          id: 'mock-uuid',
+        },
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',
         name: 'rounded.md',

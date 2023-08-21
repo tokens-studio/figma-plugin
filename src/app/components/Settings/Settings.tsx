@@ -12,7 +12,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -36,6 +36,7 @@ function Settings() {
 
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
@@ -90,6 +91,15 @@ function Settings() {
       track('setPrefixStylesWithThemeName', { value: state });
 
       dispatch.settings.setPrefixStylesWithThemeName(!!state);
+    },
+    [dispatch.settings],
+  );
+
+  const handleStoreTokenIdInJsonEditorChange = React.useCallback(
+    (state: CheckedState) => {
+      track('setStoreTokenIdInJsonEditorSelector', { value: state });
+
+      dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
     },
     [dispatch.settings],
   );
@@ -158,11 +168,28 @@ function Settings() {
               </Stack>
             </Label>
           </Stack>
+          <Stack direction="row" gap={3} align="start">
+            <Checkbox
+              id="storeTokenIdInJsonEditor"
+              checked={!!storeTokenIdInJsonEditor}
+              defaultChecked={storeTokenIdInJsonEditor}
+              onCheckedChange={handleStoreTokenIdInJsonEditorChange}
+            />
+
+            <Label htmlFor="storeTokenIdInJsonEditor">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>{t('storeTokenId')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
+              </Stack>
+            </Label>
+          </Stack>
           <Box>
+
             <Heading size="small">{t('baseFont')}</Heading>
             <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
               {t('baseFontExplanation')}
             </Box>
+
           </Box>
           <RemConfiguration />
           <Stack direction="row" gap={2} align="center">

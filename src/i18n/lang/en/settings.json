@@ -5,6 +5,8 @@
   "ignorePrefix": "Ignore first part of token name for styles",
   "prefixStyles": "Prefix styles with active theme name",
   "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
+  "storeTokenId": "Store IDs on storage",
+  "storeTokenIdExplanation": "Automatically generate unique IDs for your tokens for tracking.",
   "baseFont": "Base font size token",
   "settings": "Settings",
   "usefulIgnore": "Useful if you want to ignore",

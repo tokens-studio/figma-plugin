@@ -35,6 +35,7 @@ describe('Generic Versioned Storage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+  const storeTokenIdInJsonEditor = false;
 
   const tokens = {
     global: [
@@ -82,7 +83,7 @@ describe('Generic Versioned Storage', () => {
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
 
     const response = await updateGenericVersionedTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
     });
 
     expect(response).toEqual({
@@ -130,7 +131,7 @@ describe('Generic Versioned Storage', () => {
     mockSave.mockImplementationOnce(() => Promise.resolve(true));
 
     const response = await updateGenericVersionedTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
     });
 
     expect(response).toEqual({
@@ -152,7 +153,7 @@ describe('Generic Versioned Storage', () => {
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
     }));
     expect(await updateGenericVersionedTokens({
-      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, dispatch: mockStore.dispatch,
+      tokens: tokens as Record<string, SingleToken[]>, themes: themes as ThemeObjectsList, context, updatedAt, oldUpdatedAt, storeTokenIdInJsonEditor, dispatch: mockStore.dispatch,
     })).toEqual({
       status: 'failure',
       errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
@@ -183,6 +184,7 @@ describe('Generic Versioned Storage', () => {
           context: readOnlyContext,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual(null);
@@ -214,6 +216,7 @@ describe('Generic Versioned Storage', () => {
         context: readWriteContext,
         updatedAt,
         oldUpdatedAt,
+        storeTokenIdInJsonEditor,
         dispatch: mockStore.dispatch,
       });
 
@@ -225,6 +228,8 @@ describe('Generic Versioned Storage', () => {
           updatedAt: '2022-09-20T08:43:03.844Z',
           version: pjs.version,
         },
+      }, {
+        storeTokenIdInJsonEditor: false,
       });
 
       expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
@@ -250,6 +255,7 @@ describe('Generic Versioned Storage', () => {
           context: contextMissingId,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual({
@@ -274,6 +280,7 @@ describe('Generic Versioned Storage', () => {
         themes: themes as ThemeObjectsList,
         context: readWriteContext,
         updatedAt,
+        storeTokenIdInJsonEditor,
         dispatch: mockStore.dispatch,
       });
 
@@ -285,6 +292,8 @@ describe('Generic Versioned Storage', () => {
           updatedAt: '2022-09-20T08:43:03.844Z',
           version: pjs.version,
         },
+      }, {
+        storeTokenIdInJsonEditor: false,
       });
 
       expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
@@ -318,6 +327,7 @@ describe('Generic Versioned Storage', () => {
         themes: themes as ThemeObjectsList,
         context,
         updatedAt,
+        storeTokenIdInJsonEditor,
         dispatch: mockStore.dispatch,
       });
 
@@ -329,6 +339,8 @@ describe('Generic Versioned Storage', () => {
           updatedAt: '2022-09-20T08:43:03.844Z',
           version: pjs.version,
         },
+      }, {
+        storeTokenIdInJsonEditor: false,
       });
 
       expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
@@ -352,6 +364,7 @@ describe('Generic Versioned Storage', () => {
         themes: themes as ThemeObjectsList,
         context,
         updatedAt,
+        storeTokenIdInJsonEditor,
         dispatch: mockStore.dispatch,
       });
 
@@ -363,6 +376,8 @@ describe('Generic Versioned Storage', () => {
           updatedAt: '2022-09-20T08:43:03.844Z',
           version: pjs.version,
         },
+      }, {
+        storeTokenIdInJsonEditor: false,
       });
 
       expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
@@ -391,6 +406,7 @@ describe('Generic Versioned Storage', () => {
         context: context as Partial<StorageTypeCredentials>,
         updatedAt,
         oldUpdatedAt,
+        storeTokenIdInJsonEditor,
         dispatch: mockStore.dispatch,
       });
       expect(
@@ -400,6 +416,7 @@ describe('Generic Versioned Storage', () => {
           context: context as Partial<StorageTypeCredentials>,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual({
@@ -424,6 +441,7 @@ describe('Generic Versioned Storage', () => {
           context: context as Partial<StorageTypeCredentials>,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual({
@@ -447,6 +465,7 @@ describe('Generic Versioned Storage', () => {
           context: context as Partial<StorageTypeCredentials>,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual({
@@ -470,6 +489,7 @@ describe('Generic Versioned Storage', () => {
           context: context as Partial<StorageTypeCredentials>,
           updatedAt,
           oldUpdatedAt,
+          storeTokenIdInJsonEditor,
           dispatch: mockStore.dispatch,
         }),
       ).toEqual({
