@@ -1,9 +1,9 @@
 import { styled } from '@/stitches.config';
 
 export const ErrorMessage = styled('div', {
-  backgroundColor: '$bgDanger',
+  backgroundColor: '$dangerBg',
   color: '$dangerFg',
-  borderRadius: '$default',
+  borderRadius: '$small',
   padding: '$4',
   fontSize: '$xs',
   fontWeight: '$bold',

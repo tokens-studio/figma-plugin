@@ -33,7 +33,7 @@ function PushSettingForm({
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Text size="small">{t('pushYourLocalChangesToYourRepository')}</Text>
       <Box css={{
-        padding: '$2', fontFamily: '$mono', color: '$textMuted', background: '$bgSubtle', borderRadius: '$card',
+        padding: '$2', fontFamily: '$mono', color: '$fgMuted', background: '$bgSubtle', borderRadius: '$medium',
       }}
       >
         {'id' in localApiState ? localApiState.id : null}

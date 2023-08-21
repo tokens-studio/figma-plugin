@@ -135,6 +135,12 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     if (url.includes('cloud.dev.supernova.io')) {
       return 'https://dev.api2.supernova.io/api';
     }
+    if (url.includes('cloud.demo.supernova.io')) {
+      return 'https://api.demo.supernova.io/api';
+    }
+    if (url.includes('cloud.staging.supernova.io')) {
+      return 'https://api.staging.supernova.io/api';
+    }
     throw new Error('Unsupported Supernova URL');
   }
 

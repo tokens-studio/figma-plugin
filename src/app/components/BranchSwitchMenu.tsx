@@ -4,27 +4,27 @@ import { styled } from '@/stitches.config';
 const itemStyles = {
   fontSize: '$xsmall',
   padding: '$2 $3 $2 $2',
-  borderRadius: '$contextMenuItem',
+  borderRadius: '$small',
   cursor: 'default',
   userselect: 'none',
   display: 'flex',
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   '&[data-disabled]': {
-    color: '$contextMenuForegroundDisabled',
+    color: '$contextMenuFgDisabled',
   },
 };
 
 const StyledBranchSwitchMenuContent = styled(BranchSwitchMenuPrimitive.Content, {
   minWidth: 180,
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
-  borderRadius: '$contextMenu',
+  backgroundColor: '$contextMenuBg',
+  color: '$contextMenuFg',
+  borderRadius: '$medium',
   padding: '$2',
   boxShadow: '$contextMenu',
 });
@@ -44,7 +44,7 @@ const StyledBranchSwitchMenuMainTrigger = styled(BranchSwitchMenuPrimitive.Trigg
   display: 'flex',
   alignItems: 'center',
   fontSize: '$xsmall',
-  borderRadius: '$button',
+  borderRadius: '$small',
   padding: '$3',
 
   '& > span': {
@@ -68,21 +68,21 @@ const StyledBranchSwitchMenuTrigger = styled(BranchSwitchMenuPrimitive.Trigger, 
   paddingTop: '$2',
   paddingBottom: '$2',
   gap: '$1',
-  borderRadius: '$button',
-  backgroundColor: '$contextMenuBackground',
-  color: '$contextMenuForeground',
+  borderRadius: '$small',
+  backgroundColor: '$contextMenuBg',
+  color: '$contextMenuFg',
   fontSize: '$xsmall',
 
   '&:hover:not([disabled]), &:focus:not([disabled])': {
     outline: 'none',
     boxShadow: 'none',
-    backgroundColor: '$interaction',
-    borderColor: '$border',
+    backgroundColor: '$accentDefault',
+    borderColor: '$borderDefault',
   },
 
   '&[data-state="open"]': {
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   variants: {
@@ -103,7 +103,7 @@ const StyledBranchSwitchMenuRadioGroup = styled(BranchSwitchMenuPrimitive.RadioG
 
 const StyledBranchSwitchMenuRadioItem = styled(BranchSwitchMenuPrimitive.RadioItem, itemStyles);
 
-const StyledBranchSwitchMenuArrow = styled(BranchSwitchMenuPrimitive.Arrow, { fill: '$contextMenuBackground' });
+const StyledBranchSwitchMenuArrow = styled(BranchSwitchMenuPrimitive.Arrow, { fill: '$contextMenuBg' });
 
 const StyledBranchSwitchMenu = styled(BranchSwitchMenuPrimitive.Root, {});
 

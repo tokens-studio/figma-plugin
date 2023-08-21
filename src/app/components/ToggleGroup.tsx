@@ -29,7 +29,7 @@ const StyledToggleItem = styled(ToolbarPrimitive.ToggleItem, {
   backgroundColor: 'white',
   marginLeft: 2,
   '&:first-child': { marginLeft: 0 },
-  '&[data-state=on]': { backgroundColor: '$interaction', color: '$onInteraction' },
+  '&[data-state=on]': { backgroundColor: '$accentDefault', color: '$fgOnEmphasis' },
 });
 
 function ToggleGroup() {

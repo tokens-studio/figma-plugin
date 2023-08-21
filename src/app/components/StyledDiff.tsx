@@ -5,17 +5,17 @@ export const StyledDiff = styled((Text), {
   padding: '$1 $2',
   wordBreak: 'break-all',
   fontWeight: '$bold',
-  borderRadius: '$badge',
+  borderRadius: '$medium',
   fontSize: '$xsmall',
   variants: {
     type: {
       success: {
-        backgroundColor: '$bgSuccess',
-        color: '$fgSuccess',
+        backgroundColor: '$successBg',
+        color: '$successFg',
       },
       danger: {
-        backgroundColor: '$bgDanger',
-        color: '$fgDanger',
+        backgroundColor: '$dangerBg',
+        color: '$dangerFg',
       },
     },
   },

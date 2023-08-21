@@ -6,11 +6,11 @@ import { styled } from '@/stitches.config';
 const StyledLabel = styled(LabelPrimitive.Root, {
   fontSize: 12,
   fontWeight: 500,
-  color: '$textMuted',
+  color: '$fgMuted',
   userSelect: 'none',
   pointerEvents: 'none',
   padding: '$3',
-  borderRight: '1px solid $border',
+  borderRight: '1px solid $borderDefault',
   position: 'absolute',
   left: 0,
   top: 0,
@@ -23,13 +23,13 @@ const StyledLabel = styled(LabelPrimitive.Root, {
 
 const Input = styled('input', {
   all: 'unset',
-  borderRadius: '$input',
+  borderRadius: '$small',
   padding: '$4 $3',
   paddingLeft: 'calc(80px + $4)',
   fontSize: 12,
   lineHeight: 1,
-  color: '$text',
-  border: '1px solid $border',
+  color: '$fgDefault',
+  border: '1px solid $borderDefault',
   width: '100%',
   '&:focus': { boxShadow: '$focus' },
 });

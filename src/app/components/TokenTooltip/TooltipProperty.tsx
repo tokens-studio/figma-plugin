@@ -16,17 +16,17 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
       direction="row"
       align="center"
       css={{
-        borderRadius: '$badge',
-        backgroundColor: '$bgOnDarkSubtle',
+        borderRadius: '$medium',
+        backgroundColor: '$tooltipBgSubtle',
         overflow: 'hidden',
         display: 'inline-flex',
       }}
     >
       {(label || typeof value !== 'undefined') && (
-        <Stack direction="row" align="center" gap={2} css={{ padding: '$1 $2', color: '$fgToolTip' }}>
+        <Stack direction="row" align="center" gap={2} css={{ padding: '$1 $2', color: '$tooltipFg' }}>
           {label}
           {typeof value !== 'undefined' && (
-            <Box css={{ color: '$fgToolTipMuted', flexShrink: 1, wordBreak: 'break-word' }}>
+            <Box css={{ color: '$tooltipFgMuted', flexShrink: 1, wordBreak: 'break-word' }}>
               {value}
             </Box>
           )}

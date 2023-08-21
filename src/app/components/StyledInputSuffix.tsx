@@ -13,17 +13,17 @@ export const StyledInputSuffix = styled('button', {
   backgroundColor: '$bgSubtle',
   border: '1px solid',
   borderColor: '$borderMuted',
-  borderTopRightRadius: '$input',
-  borderBottomRightRadius: '$input',
+  borderTopRightRadius: '$small',
+  borderBottomRightRadius: '$small',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
 
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
     boxShadow: 'none',
-    borderColor: '$interaction',
+    borderColor: '$accentDefault',
   },
 });

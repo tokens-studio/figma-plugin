@@ -6,7 +6,7 @@ export function Count({ count }: { count: number; }) {
     <Box
       css={{
         backgroundColor: '$bgSubtle',
-        color: '$textMuted',
+        color: '$fgMuted',
         borderRadius: '$full',
         padding: '$2 $3',
       }}

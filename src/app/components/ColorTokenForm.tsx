@@ -8,7 +8,7 @@ import Heading from './Heading';
 import IconButton from './IconButton';
 import Box from './Box';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import ColorPicker from './ColorPicker';
 import {
@@ -343,7 +343,7 @@ export default function ColorTokenForm({
       }
       {(checkIfContainsAlias(internalEditToken.value) || internalEditToken?.$extensions?.['studio.tokens']?.modify) && (
         <Box css={{
-          display: 'flex', gap: '$3', background: '$bgSubtle', color: '$fgSubtle', padding: '$3', borderRadius: '$2',
+          display: 'flex', gap: '$3', background: '$bgSubtle', color: '$textSubtle', padding: '$3', borderRadius: '$2',
         }}
         >
           {internalEditToken.type === 'color' ? (

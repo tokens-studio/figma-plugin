@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { styled } from '@/stitches.config';
 
@@ -8,9 +8,9 @@ const StyledButton = styled('button', {
   display: 'block',
   width: '1.5rem',
   height: '1.5rem',
-  borderRadius: '$default',
+  borderRadius: '$small',
   border: '1px solid',
-  borderColor: '$border',
+  borderColor: '$borderDefault',
   cursor: 'pointer',
 });
 

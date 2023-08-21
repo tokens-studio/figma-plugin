@@ -31,7 +31,7 @@ export default function AnnotationBuilder() {
   }, [uiState]);
 
   return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (
-    <Box css={{ borderBottom: '1px solid $border', paddingBottom: '$4', marginBottom: '$4' }}>
+    <Box css={{ borderBottom: '1px solid $borderDefault', paddingBottom: '$4', marginBottom: '$4' }}>
       <Stack direction="row" align="center" justify="between">
         <Text bold>{t('addAnnotation')}</Text>
         <Stack direction="row" align="center" gap={0}>

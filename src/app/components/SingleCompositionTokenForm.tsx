@@ -15,7 +15,7 @@ import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import DownshiftInput from './DownshiftInput';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
 
 export default function SingleCompositionTokenForm({

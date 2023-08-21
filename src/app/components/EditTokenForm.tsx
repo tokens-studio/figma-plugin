@@ -14,7 +14,7 @@ import {
   EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
   activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
@@ -540,10 +540,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 padding: '$3',
                 marginTop: '$3',
                 fontFamily: '$mono',
-                color: '$textMuted',
+                color: '$fgMuted',
                 backgroundColor: '$bgSubtle',
                 borderColor: '$borderSubtle',
-                borderRadius: '$card',
+                borderRadius: '$medium',
                 fontSize: '$xxs',
                 alignItems: 'center',
               }}

@@ -139,7 +139,7 @@ function Settings() {
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+                <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
                   {t('usefulIgnore')}
                   {' '}
                   <code>colors</code>
@@ -164,7 +164,7 @@ function Settings() {
             <Label htmlFor="prefixStylesWithThemeName">
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
+                <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
               </Stack>
             </Label>
           </Stack>
@@ -186,7 +186,7 @@ function Settings() {
           <Box>
 
             <Heading size="small">{t('baseFont')}</Heading>
-            <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+            <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
               {t('baseFontExplanation')}
             </Box>
 

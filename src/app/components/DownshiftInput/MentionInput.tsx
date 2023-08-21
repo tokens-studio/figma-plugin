@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import Mentions from 'rc-mentions';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import { Properties } from '@/constants/Properties';
 import { SingleToken } from '@/types/tokens';
