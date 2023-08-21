@@ -25,7 +25,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
   }
   if (msg.tokens) {
-    const timeNow = Date.now();
     const tokensMap = tokenArrayGroupToMap(msg.tokens);
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
@@ -34,7 +33,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
-    console.log(`Updated ${allWithData.length} nodes in ${Date.now() - timeNow}ms`);
   }
 
   return {

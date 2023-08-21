@@ -11,9 +11,6 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import { NodeManagerNode } from './NodeManager';
-import {
-  timeValues,
-} from './timingStore';
 import { VariableReferenceMap } from '@/types/VariableReferenceMap';
 
 export async function updateNodes(
@@ -21,8 +18,6 @@ export async function updateNodes(
   tokens: Map<string, AnyTokenList[number]>,
   settings: SettingsState,
 ) {
-  console.log('trying to run update');
-
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
@@ -93,8 +88,6 @@ export async function updateNodes(
     );
   });
   await Promise.all(promises);
-
-  console.log('done updating, total time', timeValues);
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,

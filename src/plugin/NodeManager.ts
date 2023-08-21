@@ -11,8 +11,6 @@ import { UpdateMode } from '@/constants/UpdateMode';
 export type NodeManagerNode = {
   id: string;
   node: BaseNode
-  hash: string;
-  mainKey?: string;
   tokens: NodeTokenRefMap;
 };
 
@@ -39,7 +37,6 @@ export class NodeManager {
       node,
       tokens: await tokensSharedDataHandler.getAll(node),
       id: node.id,
-      hash: '123',
     };
   }
 
@@ -86,7 +83,6 @@ export class NodeManager {
             node: relevantNodes[nodeIndex],
             tokens: await tokensSharedDataHandler.getAll(node),
             id: node.id,
-            hash: '123',
           });
           tracker.next();
           tracker.reportIfNecessary();

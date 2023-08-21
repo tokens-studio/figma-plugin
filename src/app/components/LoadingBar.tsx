@@ -11,6 +11,7 @@ import Spinner from './Spinner';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import Box from './Box';
+import { formatNumber } from '@/utils/formatNumber';
 
 // TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
@@ -28,15 +29,6 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
 };
-
-export function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return num.toString();
-  } if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}k`;
-  }
-  return num.toString();
-}
 
 export default function LoadingBar() {
   const backgroundJobs = useSelector(backgroundJobsSelector);
@@ -74,11 +66,9 @@ export default function LoadingBar() {
     return null;
   }
 
-  console.log('backgroundJobs', backgroundJobs, backgroundJobs.map((job) => job.name), expectedWaitTimeInSeconds, completedTasks, totalTasks);
-
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
-  return message && (
+  return (
     <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar" data-cy="loadingBar">
       <Stack
         direction="row"
