@@ -8,12 +8,11 @@ module.exports = (env, argv) => ({
     const entryPoints = {};
     const testsPath = path.resolve(__dirname, 'benchmark/tests');
     const files = fs.readdirSync(testsPath);
-    
+
     files.forEach((file) => {
       const fileName = file.replace('.ts', '');
       entryPoints[fileName] = path.resolve(testsPath, file);
     });
-
     return entryPoints;
   },
   output: {
@@ -56,6 +55,4 @@ module.exports = (env, argv) => ({
     },
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
-
-
 });

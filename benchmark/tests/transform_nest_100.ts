@@ -1,5 +1,5 @@
-import transform from '../../src/utils/transform'
-import tokens from '../mocks/nest_100.json'
+import transform from '../../src/utils/transform';
+import tokens from '../mocks/nest_100.json';
 
 // @ts-ignore
 transform({ core: tokens }, ['core'], [], {
@@ -10,4 +10,4 @@ transform({ core: tokens }, ['core'], [], {
   throwErrorWhenNotResolved: false,
   resolveReferences: true,
   expandBorder: false,
-})
+});

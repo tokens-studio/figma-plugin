@@ -1,5 +1,5 @@
 import transform from '../../src/utils/transform';
-import tokens from '../mocks/n-plus-one-equals-n-squared_n10.json';
+import tokens from '../mocks/linkedRef-5.json';
 
 // @ts-ignore
 transform({ core: tokens }, ['core'], [], {
