@@ -14,7 +14,7 @@ export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.
     }));
   });
 
-  await removePluginDataByMap({ nodeKeyMap: nodesToRemove });
+  if (nodesToRemove.length) await removePluginDataByMap({ nodeKeyMap: nodesToRemove });
 
   sendSelectionChange();
 };
