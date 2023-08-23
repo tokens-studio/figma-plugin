@@ -10,23 +10,16 @@ import { ProgressTracker } from './ProgressTracker';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { removePluginData, setNonePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
-import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import setValuesOnNode from './setValuesOnNode';
 import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { FigmaStyleMaps } from '@/types/FigmaStyleMaps';
 
 export async function updatePluginDataAndNodes({
-  entries: nodes, values: tokenValues, tokensMap, settings,
-}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; settings?: SettingsState }) {
+  entries: nodes, values: tokenValues, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix, settings,
+}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; figmaStyleMaps: FigmaStyleMaps; figmaVariableReferences: VariableReferenceMap; figmaStyleReferences: Record<string, string>; stylePathPrefix?: string; settings?: SettingsState }) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
-  const figmaStyleMaps = getAllFigmaStyleMaps();
-
-  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
-    type: AsyncMessageTypes.GET_THEME_INFO,
-  });
+  const { ignoreFirstPartForStyles, baseFontSize } = settings ?? {};
 
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
@@ -43,25 +36,7 @@ export async function updatePluginDataAndNodes({
   const promises: Set<Promise<void>> = new Set();
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
-  const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: VariableReferenceMap = new Map();
-  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
 
-  activeThemes?.forEach((theme) => {
-    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(async ([token, variableId]) => {
-      const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
-      if (foundVariableId) {
-        figmaVariableReferences.set(token, foundVariableId);
-      }
-    });
-    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
-      if (!figmaStyleReferences[token]) {
-        figmaStyleReferences[token] = styleId;
-      }
-    });
-  });
-
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
   nodes.forEach((node) => {
     promises.add(defaultWorker.schedule(async () => {
       try {

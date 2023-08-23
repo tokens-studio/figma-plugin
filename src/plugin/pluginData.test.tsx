@@ -1,7 +1,6 @@
 import { mockGetNodeById } from '../../tests/__mocks__/figmaMock';
 import { defaultNodeManager, NodeManagerNode } from './NodeManager';
 import { transformPluginDataToSelectionValues } from './pluginData';
-import { updatePluginData } from './updatePluginData';
 
 describe('pluginData', () => {
   const mockSetPluginData = jest.fn();

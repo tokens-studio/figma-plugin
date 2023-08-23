@@ -6,6 +6,7 @@ import { updateNodes } from '../updateNodes';
 import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
+import { getThemeReferences } from './getThemeReferences';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -29,7 +30,10 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
-    await updateNodes(allWithData, tokensMap, msg.settings);
+    const {
+      figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+    } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
+    await updateNodes(allWithData, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, msg.settings, stylePathPrefix);
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
