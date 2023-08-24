@@ -31,6 +31,14 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
+const borderPropertyMap = new Map<Properties, string>([
+  [Properties.border, 'border'],
+  [Properties.borderTop, 'borderTop'],
+  [Properties.borderRight, 'borderRight'],
+  [Properties.borderBottom, 'borderBottom'],
+  [Properties.borderLeft, 'borderLeft'],
+]);
+
 type MapValuesToTokensResult = Record<string, string | number | SingleToken['value'] | {
   property: string
   value?: SingleToken['value'];
@@ -55,26 +63,14 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       } else if (key === TokenTypes.COMPOSITION) {
         Object.entries(resolvedToken.value).forEach(([property, value]) => {
           // Assign the actual value of a composition token property to the applied values
-          acc[property as CompositionTokenProperty] = value;
+          acc[property as Properties] = value;
           // If we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
-          if (typeof value === 'object' && ['border', 'borderTop', 'borderRight', 'borderBottom', 'borderLeft'].includes(property) && 'color' in value && typeof value.color === 'string') {
+          if (typeof value === 'object' && borderPropertyMap.get(property as Properties) && 'color' in value && typeof value.color === 'string') {
             acc.borderColor = value.color;
           }
         });
+      } else if (borderPropertyMap.get(key as Properties) && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
       // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
-      } else if (key === Properties.border && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
-        acc.borderColor = resolvedToken.value.color;
-        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
-      } else if (key === Properties.borderTop && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
-        acc.borderColor = resolvedToken.value.color;
-        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
-      } else if (key === Properties.borderRight && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
-        acc.borderColor = resolvedToken.value.color;
-        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
-      } else if (key === Properties.borderBottom && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
-        acc.borderColor = resolvedToken.value.color;
-        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
-      } else if (key === Properties.borderLeft && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
         acc.borderColor = resolvedToken.value.color;
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       } else {
