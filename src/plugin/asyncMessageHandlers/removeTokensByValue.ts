@@ -1,7 +1,7 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../NodeManager';
-import { updatePluginData } from '../pluginData';
+import { updatePluginData } from '../updatePluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 
 export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE] = async (msg) => {

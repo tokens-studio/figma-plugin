@@ -1,7 +1,7 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager, NodeManagerNode } from '../NodeManager';
-import { updatePluginData } from '../pluginData';
+import { updatePluginData } from '../updatePluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
