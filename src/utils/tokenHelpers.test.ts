@@ -444,3 +444,31 @@ describe('resolveTokenValues', () => {
     expect(resolveTokenValues(tokens)).toEqual(output);
   });
 });
+
+describe('resolveTokenValues deep nested', () => {
+  const deepTokens = [{
+    name: '1',
+    value: '#ff0000',
+    type: 'color',
+  }];
+  for (let i = 2; i < 100; i += 1) {
+    deepTokens.push({
+      name: `${i}`,
+      value: `{${i - 1}}`,
+      type: 'color',
+    });
+  }
+
+  const deepTokenOutput = deepTokens.map((token) => ({
+    ...token,
+    rawValue: token.value,
+    value: '#ff0000',
+  }));
+
+  it('resolves all values it can resolve', () => {
+    const start = performance.now();
+    expect(resolveTokenValues(deepTokens)).toEqual(deepTokenOutput);
+    const end = performance.now();
+    console.log(`Call to doSomething took ${end - start} milliseconds.`);
+  });
+});
