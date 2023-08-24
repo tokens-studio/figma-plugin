@@ -1,17 +1,17 @@
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../../NodeManager';
-import { updatePluginData } from '@/plugin/pluginData';
+import { updatePluginData } from '@/plugin/updatePluginData';
 import { remapTokens } from '../remapTokens';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import { Properties } from '@/constants/Properties';
 
-jest.mock('@/plugin/pluginData', () => ({
+jest.mock('@/plugin/updatePluginData', () => ({
   updatePluginData: jest.fn(),
 }));
 
-jest.mock('@/plugin/node', () => ({
+jest.mock('@/plugin/updateNodes', () => ({
   updateNodes: jest.fn(),
 }));
 
