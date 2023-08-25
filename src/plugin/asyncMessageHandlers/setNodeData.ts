@@ -1,9 +1,10 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
-import { updateNodes } from '../node';
+import { updateNodes } from '../updateNodes';
 import { defaultNodeManager } from '../NodeManager';
-import { sendPluginValues, updatePluginData } from '../pluginData';
+import { sendPluginValues } from '../pluginData';
+import { updatePluginData } from '../updatePluginData';
 
 export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE_DATA] = async (msg) => {
   try {
