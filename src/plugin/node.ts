@@ -249,15 +249,16 @@ export async function updateNodes(
   const figmaVariableReferences: VariableReferenceMap = new Map();
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
 
-  activeThemes?.forEach((theme) => {
-    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(async ([token, variableId]) => {
+  activeThemes?.forEach(async (theme) => {
+    await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
       if (!figmaVariableReferences.get(token)) {
         const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
         if (foundVariableId) {
           figmaVariableReferences.set(token, foundVariableId);
         }
       }
-    });
+      Promise.resolve();
+    }));
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
       if (!figmaStyleReferences[token]) {
         figmaStyleReferences[token] = styleId;
