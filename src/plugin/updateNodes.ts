@@ -12,8 +12,8 @@ import { AnyTokenList } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from '@/app/store/models/settings';
-import { getVariablesMap } from '@/utils/getVariablesMap';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
+import { VariableReferenceMap } from '@/types/VariableReferenceMap';
 
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
@@ -23,7 +23,6 @@ export async function updateNodes(
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
   const figmaStyleMaps = getAllFigmaStyleMaps();
-  const figmaVariableMaps = getVariablesMap();
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -44,15 +43,19 @@ export async function updateNodes(
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
   const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: Record<string, string> = {};
+  const figmaVariableReferences: VariableReferenceMap = new Map();
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
 
-  activeThemes?.forEach((theme) => {
-    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
-      if (!figmaVariableReferences[token]) {
-        figmaVariableReferences[token] = variableId;
+  activeThemes?.forEach(async (theme) => {
+    await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
+      if (!figmaVariableReferences.get(token)) {
+        const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
+        if (foundVariableId) {
+          figmaVariableReferences.set(token, foundVariableId);
+        }
       }
-    });
+      Promise.resolve();
+    }));
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
       if (!figmaStyleReferences[token]) {
         figmaStyleReferences[token] = styleId;
@@ -75,7 +78,6 @@ export async function updateNodes(
               rawTokenMap,
               figmaStyleMaps,
               figmaStyleReferences,
-              figmaVariableMaps,
               figmaVariableReferences,
               stylePathPrefix,
               ignoreFirstPartForStyles,
