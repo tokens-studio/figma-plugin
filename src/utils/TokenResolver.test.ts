@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { resolveTokenValues } from './tokenHelpers';
+import { defaultTokenResolver } from './TokenResolver';
 
 const singleShadowToken = {
   type: TokenTypes.BOX_SHADOW,
@@ -202,6 +202,19 @@ const tokens = [
     },
     description: 'color with alias modifier',
     type: TokenTypes.COLOR,
+  },
+  {
+    name: 'typography.all',
+    value: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    type: TokenTypes.TYPOGRAPHY,
+  },
+  {
+    name: 'deepreference',
+    value: '{typography.all.fontFamily}',
+    type: TokenTypes.FONT_FAMILIES,
   },
 ];
 
@@ -437,21 +450,37 @@ const output = [
     type: 'color',
     value: '#007182',
   },
-
+  {
+    name: 'typography.all',
+    value: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    rawValue: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    type: TokenTypes.TYPOGRAPHY,
+  },
+  {
+    name: 'deepreference',
+    value: 'IBM Plex Sans',
+    rawValue: '{typography.all.fontFamily}',
+    type: TokenTypes.FONT_FAMILIES,
+  },
 ];
-describe('resolveTokenValues', () => {
-  it('resolves all values it can resolve', () => {
-    expect(resolveTokenValues(tokens)).toEqual(output);
-  });
-});
-
 describe('resolveTokenValues deep nested', () => {
+  it('resolves all values it can resolve', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens(tokens);
+    expect(resolvedTokens).toEqual(output);
+  });
+
   const deepTokens = [{
     name: '1',
     value: '#ff0000',
     type: 'color',
   }];
-  for (let i = 2; i < 100; i += 1) {
+  for (let i = 2; i < 1000; i += 1) {
     deepTokens.push({
       name: `${i}`,
       value: `{${i - 1}}`,
@@ -466,9 +495,10 @@ describe('resolveTokenValues deep nested', () => {
   }));
 
   it('resolves all values it can resolve', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens(deepTokens);
     const start = performance.now();
-    expect(resolveTokenValues(deepTokens)).toEqual(deepTokenOutput);
+    expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
-    console.log(`Call to doSomething took ${end - start} milliseconds.`);
+    expect(end - start).toBeLessThan(10);
   });
 });

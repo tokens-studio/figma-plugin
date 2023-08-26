@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';
 import {
   tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
@@ -12,6 +12,7 @@ import {
 import Box from './Box';
 import DownshiftInput from './DownshiftInput';
 import { getAliasValue } from '@/utils/alias';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 const RemConfiguration = () => {
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
@@ -22,7 +23,7 @@ const RemConfiguration = () => {
   const { t } = useTranslation(['tokens']);
 
   const resolvedTokens = React.useMemo(() => (
-    resolveTokenValues(mergeTokenGroups(tokens, {
+    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
       ...usedTokenSet,
       [activeTokenSet]: TokenSetStatus.ENABLED,
     }))

@@ -1,5 +1,5 @@
 import { startTransaction } from '@sentry/react';
-import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -12,6 +12,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -141,7 +142,7 @@ export default async function updateTokensOnSources({
   }
 
   const mergedTokens = tokens
-    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
+    ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
   const transaction = startTransaction({

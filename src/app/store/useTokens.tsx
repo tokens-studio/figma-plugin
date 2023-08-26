@@ -6,7 +6,7 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -35,6 +35,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -269,7 +270,10 @@ export default function useTokens() {
         notifyToUI('No styles created. Make sure token sets are active.', { error: true });
         return;
       }
-      const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
+      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
+        ...usedTokenSet,
+        [activeTokenSet]: TokenSetStatus.ENABLED,
+      }));
       const withoutSourceTokens = resolved.filter((token) => (
         !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
