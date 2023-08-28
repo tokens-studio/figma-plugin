@@ -1,4 +1,6 @@
-export function getAllFigmaStyleMaps() {
+import { FigmaStyleMaps } from '../types/FigmaStyleMaps';
+
+export function getAllFigmaStyleMaps(): FigmaStyleMaps {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
