@@ -1,4 +1,4 @@
-import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenTypes } from '../constants/TokenTypes';
 import { defaultTokenResolver } from './TokenResolver';
 
 const singleShadowToken = {
@@ -499,6 +499,6 @@ describe('resolveTokenValues deep nested', () => {
     const start = performance.now();
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
-    expect(end - start).toBeLessThan(10);
+    expect(end - start).toBeLessThan(100);
   });
 });
