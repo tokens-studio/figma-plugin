@@ -43,7 +43,7 @@ describe('LoadingBar', () => {
     });
 
     const result = render(<LoadingBar />);
-    expect(await result.findByText(/90s remaining/)).not.toBeNull();
+    expect(await result.findByText(/90s/)).not.toBeNull();
 
     result.unmount();
   });

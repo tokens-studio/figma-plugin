@@ -266,8 +266,7 @@ describe('Can set values on node', () => {
         textStyles: new Map([['heading/h1', { name: 'heading/h1', id: '456' } as TextStyle]]),
       },
       {},
-      {},
-      {},
+      new Map(),
       null,
       true,
     );
@@ -348,8 +347,7 @@ describe('Can set values on node', () => {
         effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
       },
       {},
-      {},
-      {},
+      new Map(),
       'light',
       false,
     );

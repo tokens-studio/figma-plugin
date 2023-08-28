@@ -12,6 +12,5 @@
       "label": "Tokens",
       "value": "tokens"
     }
-  ],
-  "relaunchButtons": [{ "command": "edit", "name": "Tokens" }]
+  ]
 }
