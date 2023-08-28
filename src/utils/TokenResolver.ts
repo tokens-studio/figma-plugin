@@ -159,7 +159,7 @@ class TokenResolver {
           }
         } else {
           // If we didn't find a value, we need to check if we have a composite token
-          const tokenValueWithoutProperty = this.tokenMap.get(tokenNameWithoutLastPart);
+          const tokenValueWithoutProperty = this.tokenMap.get(tokenNameWithoutLastPart)?.value;
           if (tokenValueWithoutProperty && tokenValueWithoutProperty.hasOwnProperty(propertyName)) {
             // @ts-ignore // ts error on index signature
             const parsedValue = this.calculateTokenValue({ value: tokenValueWithoutProperty[propertyName] } as SingleToken, resolvedReferences);
