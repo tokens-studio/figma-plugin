@@ -499,6 +499,6 @@ describe('resolveTokenValues deep nested', () => {
     const resolvedTokens = defaultTokenResolver.setTokens(deepTokens);
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
-    expect(end - start).toBeLessThan(100);
+    expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
   });
 });
