@@ -27,7 +27,7 @@ class TokenResolver {
   // Set tokens and populate token map
   private populateTokenMap(): void {
     for (const token of this.tokens) {
-      this.tokenMap.set(token.name, token.value);
+      this.tokenMap.set(token.name, token);
     }
   }
 
@@ -131,14 +131,14 @@ class TokenResolver {
         const propertyPath = path.split('.');
         const propertyName = propertyPath.pop() as string;
         const tokenNameWithoutLastPart = propertyPath.join('.');
-        const tokenValue = this.tokenMap.get(path);
+        const foundToken = this.tokenMap.get(path);
 
-        if (tokenValue) {
+        if (foundToken) {
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
           newResolvedReferences.add(path);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
-          const resolvedTokenValue = this.resolveReferences({ name: path, value: tokenValue } as SingleToken, newResolvedReferences);
+          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (typeof resolvedTokenValue.value === 'undefined' || resolvedTokenValue.value === '') {
