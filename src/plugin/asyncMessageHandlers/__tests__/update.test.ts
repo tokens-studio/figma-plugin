@@ -12,7 +12,7 @@ import * as swapStyles from '../swapStyles';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 describe('update', () => {
-  const findNodesWithDataSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findNodesWithData');
+  const findNodesSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findBaseNodesWithData');
   const ThemesPropertyWriteSpy = jest.spyOn(ThemesProperty, 'write');
   const ValuesPropertyWriteSpy = jest.spyOn(ValuesProperty, 'write');
   const UsedTokenSetPropertyWriteSpy = jest.spyOn(UsedTokenSetProperty, 'write');
@@ -79,7 +79,7 @@ describe('update', () => {
       themes: [],
     }));
 
-    findNodesWithDataSpy.mockResolvedValueOnce([]);
+    findNodesSpy.mockResolvedValueOnce([]);
 
     await update(mockUpdateMessage);
 
