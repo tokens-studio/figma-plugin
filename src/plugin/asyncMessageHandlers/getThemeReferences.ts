@@ -16,7 +16,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
 
-  activeThemes?.forEach(async (theme) => {
+  await Promise.all(activeThemes?.map(async (theme) => {
     await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
       const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
       if (foundVariableId) {
@@ -28,7 +28,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
         figmaStyleReferences[token] = styleId;
       }
     });
-  });
+  }));
 
   return {
     figmaStyleMaps, figmaStyleReferences, figmaVariableReferences, stylePathPrefix,
