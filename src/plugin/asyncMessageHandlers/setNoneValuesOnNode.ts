@@ -1,9 +1,9 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
-import { updateNodes } from '../node';
+import { updateNodes } from '../updateNodes';
 import { defaultNodeManager } from '../NodeManager';
-import { updatePluginData } from '../pluginData';
+import { updatePluginData } from '../updatePluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
 
 export const setNoneValuesOnNode: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NONE_VALUES_ON_NODE] = async (msg) => {

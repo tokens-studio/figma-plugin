@@ -1,11 +1,11 @@
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager, NodeManagerNode } from '../../NodeManager';
-import { updatePluginData } from '@/plugin/pluginData';
+import { updatePluginData } from '@/plugin/updatePluginData';
 import { removeTokensByValue } from '../removeTokensByValue';
 import { Properties } from '@/constants/Properties';
 import { NodeInfo } from '@/types/NodeInfo';
 
-jest.mock('@/plugin/pluginData', () => ({
+jest.mock('@/plugin/updatePluginData', () => ({
   updatePluginData: jest.fn(),
 }));
 

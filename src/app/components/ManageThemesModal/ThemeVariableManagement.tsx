@@ -19,6 +19,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { track } from '@/utils/analytics';
 import { ThemeVariableManagementEntry, VariableInfo } from './ThemeVariableManagementEntry';
 import mapThemeToVariableInfo from '@/utils/mapThemeToVariableInfo';
+import { wrapTransaction } from '@/profiling/transaction';
 
 type Props = {
   id: string
@@ -101,11 +102,11 @@ export const ThemeVariableManagement: React.FC<Props> = ({ id }) => {
         name: BackgroundJobs.UI_ATTACHING_LOCAL_VARIABLES,
         isInfinite: true,
       });
-      const result = await AsyncMessageChannel.ReactInstance.message({
+      const result = await wrapTransaction({ name: 'attachVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
         tokens,
         theme,
-      });
+      }));
       if (result.variableInfo) {
         track('Attach variables to theme', {
           count: Object.values(result.variableInfo.variableIds).length,
