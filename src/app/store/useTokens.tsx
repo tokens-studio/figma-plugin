@@ -365,10 +365,11 @@ export default function useTokens() {
     track('createVariables');
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
-      statExtractor: (result, transaction) => {
-        result.then((resolve) => {
-          transaction.setMeasurement('variables', resolve.totalVariables, '');
-        });
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
