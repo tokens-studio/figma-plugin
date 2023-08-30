@@ -41,6 +41,7 @@ import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
+let lastUsedRenameStyles = false;
 
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
@@ -358,7 +359,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ];
           if (themes.length > 0 && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)) {
             choices.push({
-              key: StyleOptions.RENAME, label: 'Rename styles',
+              key: StyleOptions.RENAME, label: 'Rename styles', enabled: lastUsedRenameStyles,
             });
           }
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
@@ -392,6 +393,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
               renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+              lastUsedRenameStyles = true;
             }
             if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {
               renameVariablesFromToken({ oldName, newName });
