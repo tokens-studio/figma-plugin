@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.10
+
+### Patch Changes
+
+- a493af82: Fixes an issue where when a theme has missing variables we'd not apply variables correctly anymore
+- 51ebfea9: Fixes an issue where renaming a token or token group would cause `Apply to` to be changed
+- 51ebfea9: Fixes an issue where the choice of `Rename styles` was not remembered per session
+- 51ebfea9: Fixes an issue with token edit inputs being focused after a timeout
+
 ## 1.37.9
 
 ### Patch Changes
