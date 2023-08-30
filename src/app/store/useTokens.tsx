@@ -49,6 +49,8 @@ type GetFormattedTokensOptions = {
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
+let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
+
 export type SyncOption = 'removeStyle' | 'renameStyle';
 export type SyncVariableOption = 'removeVariable' | 'renameVariable';
 
@@ -198,13 +200,13 @@ export default function useTokens() {
       description: 'This will change all layers that used the old token name. This could take a while.',
       choices: [
         {
-          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === settings.updateMode,
+          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === lastUsedRenameOption,
         },
         {
-          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === settings.updateMode,
+          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === lastUsedRenameOption,
         },
         {
-          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === settings.updateMode,
+          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
         },
         {
           key: 'rename-variable-token-group', label: 'Rename variable',
@@ -214,7 +216,7 @@ export default function useTokens() {
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
         await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0]);
-        dispatch.settings.setUpdateMode(confirmData.data[0] as UpdateMode);
+        lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
         track('renameVariablesInTokenGroup', { newGroupName, oldGroupName });

@@ -79,16 +79,13 @@ function ConfirmDialog() {
   }, [chosen, inputValue, confirmState, onConfirm]);
 
   React.useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
-      if (firstInput.current) {
-        firstInput.current.focus();
-      } else if (confirmButton.current) {
-        confirmButton.current.focus();
-      }
-    }, 50);
-    return () => clearTimeout(timeoutId);
-  }, [confirmState.show, confirmButton, confirmState.choices]);
+    if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
+    if (firstInput.current) {
+      firstInput.current.focus();
+    } else if (confirmButton.current) {
+      confirmButton.current.focus();
+    }
+  }, [confirmState.show, confirmButton, confirmState.choices, firstInput]);
 
   return confirmState.show ? (
     <Modal isOpen close={onCancel}>
