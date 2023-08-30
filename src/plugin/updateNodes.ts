@@ -49,9 +49,14 @@ export async function updateNodes(
   await Promise.all(activeThemes?.map(async (theme) => {
     await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
       if (!figmaVariableReferences.get(token)) {
-        const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
-        if (foundVariableId) {
-          figmaVariableReferences.set(token, foundVariableId);
+        try {
+          const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
+          if (foundVariableId) {
+            figmaVariableReferences.set(token, foundVariableId);
+          }
+        } catch (e) {
+          console.log('error importing variable', e);
+          Promise.reject();
         }
       }
       Promise.resolve();

@@ -30,7 +30,7 @@
 }
 
 .rc-mentions > textarea::placeholder {
-  color: var(--colors-textSubtle);
+  color: var(--colors-fgSubtle);
 }
 
 .rc-mentions > textarea:focus-within {
