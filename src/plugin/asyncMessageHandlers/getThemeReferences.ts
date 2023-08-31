@@ -18,9 +18,13 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
 
   await Promise.all(activeThemes?.map(async (theme) => {
     await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
-      const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
-      if (foundVariableId) {
-        figmaVariableReferences.set(token, foundVariableId);
+      try {
+        const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
+        if (foundVariableId) {
+          figmaVariableReferences.set(token, foundVariableId);
+        }
+      } catch (e) {
+        console.error(e);
       }
     }));
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
