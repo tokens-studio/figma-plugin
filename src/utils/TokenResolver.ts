@@ -77,7 +77,7 @@ class TokenResolver {
           return convertModifiedColorToHex(rgbColor, {
             ...token.$extensions?.['studio.tokens']?.modify,
             value: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.value } as SingleToken, resolvedReferences)?.value),
-            color: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.color } as SingleToken, resolvedReferences)?.value) ?? '',
+            color: String(this.resolveReferences({ value: token?.$extensions?.['studio.tokens']?.modify?.color } as SingleToken, resolvedReferences)?.value) ?? undefined,
           });
         }
 
@@ -107,10 +107,10 @@ class TokenResolver {
     }
 
     // For strings, we need to check if there are any references, as those can only occur in strings
-    if (typeof token.value === 'string' || typeof token.value === 'number') {
+    if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
 
-      let resolvedValue: SingleToken['value'] = token.value;
+      let finalValue: SingleToken['value'] = token.value;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
@@ -120,7 +120,7 @@ class TokenResolver {
         if (resolvedReferences.has(path)) {
           console.log('Circular reference detected:', path);
           return {
-            ...token, value: '', rawValue: token.value, failedToResolve: true,
+            ...token, rawValue: token.value, failedToResolve: true,
           } as ResolveTokenValuesResult;
         }
 
@@ -141,31 +141,30 @@ class TokenResolver {
           const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
-          if (typeof resolvedTokenValue.value === 'undefined' || resolvedTokenValue.value === '') {
+          if (typeof resolvedTokenValue.value === undefined) {
             return {
               ...token, value: token.value, rawValue: token.value, failedToResolve: true,
             } as ResolveTokenValuesResult;
           }
 
-          // We need to calculate the value of the token, as it might be a color or math transformation
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          const parsedValue = resolvedTokenValue.failedToResolve ? resolvedTokenValue.value : this.calculateTokenValue({ ...resolvedTokenValue } as SingleToken, resolvedReferences);
-
           // We replace the reference with the resolved value if needed
-          if (typeof resolvedValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) {
-            resolvedValue = resolvedValue.replace(reference, parsedValue);
-          } else if (typeof parsedValue !== 'undefined') {
-            resolvedValue = parsedValue;
+          if (typeof finalValue === 'string' && (typeof resolvedTokenValue.value === 'string' || typeof resolvedTokenValue.value === 'number')) {
+            finalValue = finalValue.replace(reference, resolvedTokenValue.value);
+          } else if (typeof resolvedTokenValue.value !== 'undefined') {
+            finalValue = resolvedTokenValue.value;
           }
         } else {
           // If we didn't find a value, we need to check if we have a composite token
           const tokenValueWithoutProperty = this.tokenMap.get(tokenNameWithoutLastPart)?.value;
           if (tokenValueWithoutProperty && tokenValueWithoutProperty.hasOwnProperty(propertyName)) {
-            // @ts-ignore // ts error on index signature
-            const parsedValue = this.calculateTokenValue({ value: tokenValueWithoutProperty[propertyName] } as SingleToken, resolvedReferences);
+            const propertyTokenValue = (tokenValueWithoutProperty as Record<string, unknown>)[propertyName];
+            const parsedValue = this.calculateTokenValue({ value: propertyTokenValue } as SingleToken, resolvedReferences);
 
-            // @ts-ignore // not sure why this is an error. please fix if you stumble upon this.
-            resolvedValue = (typeof resolvedValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? resolvedValue.replace(reference, parsedValue) : parsedValue;
+            if (typeof parsedValue === 'undefined') {
+              finalValue = token.value;
+            } else {
+              finalValue = (typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? finalValue.replace(reference, parsedValue) : parsedValue;
+            }
           } else {
             // Otherwise, we return the token as is, but mark it as failed to resolve
             return {
@@ -177,17 +176,21 @@ class TokenResolver {
 
       let resolvedToken: ResolveTokenValuesResult;
       // When we have a string or number, we need to check if it's a valid token value.
-      if ((typeof resolvedValue === 'string' || typeof resolvedValue === 'number') && !AliasRegex.test(resolvedValue)) {
+      if ((typeof finalValue === 'string' || typeof finalValue === 'number') && !AliasRegex.test(finalValue)) {
+        // We need to calculate the value of the token, as it might be a color or math transformation
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        const calculated = this.calculateTokenValue({ ...token, value: resolvedValue } as SingleToken, resolvedReferences);
-        // @ts-ignore // not sure why this is an error. please fix if you stumble upon this.
-        resolvedToken = { ...token, value: calculated };
+        const calculated = this.calculateTokenValue({ ...token, value: finalValue } as SingleToken, resolvedReferences);
+        if (typeof calculated === 'undefined') {
+          resolvedToken = token;
+        } else {
+          resolvedToken = { ...token, value: calculated } as ResolveTokenValuesResult;
+        }
       } else {
         // If it's not, we mark it as failed to resolve
-        const hasFailingReferences = !AliasRegex.test(JSON.stringify(resolvedValue));
+        const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
 
         resolvedToken = {
-          ...token, value: resolvedValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
+          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
         } as ResolveTokenValuesResult;
       }
 
@@ -216,11 +219,9 @@ class TokenResolver {
       }
 
       // We bring back the resolved array into the token object, and set failedToResolve on the token if needed
-      // There seems to be some error casting type here. Clueless.
-      // @ts-ignore
-      const resolvedToken: ResolveTokenValuesResult = {
+      const resolvedToken = {
         ...token, value: resolvedArray, rawValue: token.value, ...(failedToResolve ? { failedToResolve } : {}),
-      };
+      } as ResolveTokenValuesResult;
       // We save back to cache
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
@@ -236,9 +237,8 @@ class TokenResolver {
       let failedToResolve = false;
       for (const key of Object.keys(token.value)) {
         if (Object.prototype.hasOwnProperty.call(token.value, key)) {
-          // Some error on using key as index signature here
-          // @ts-ignore
-          const resolvedValue = this.resolveReferences({ value: token.value[key] } as SingleToken, resolvedReferences);
+          const propertyTokenValue = (token.value as Record<string, unknown>)[key];
+          const resolvedValue = this.resolveReferences({ value: propertyTokenValue } as SingleToken, resolvedReferences);
 
           if (resolvedValue.failedToResolve) {
             failedToResolve = true;
@@ -247,9 +247,7 @@ class TokenResolver {
         }
       }
 
-      // There seems to be some error casting type here.
-      // @ts-ignore
-      const resolvedToken: ResolveTokenValuesResult = { ...token, value: resolvedObject, ...(failedToResolve ? { failedToResolve } : {}) };
+      const resolvedToken = { ...token, value: resolvedObject, ...(failedToResolve ? { failedToResolve } : {}) } as ResolveTokenValuesResult;
       // If we have a value, we set it back to cache
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
@@ -257,7 +255,6 @@ class TokenResolver {
       return resolvedToken;
     }
 
-    // @ts-ignore
     return token;
   }
 }
