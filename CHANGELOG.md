@@ -1,5 +1,29 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.10
+
+### Patch Changes
+
+- a493af82: Fixes an issue where when a theme has missing variables we'd not apply variables correctly anymore
+- 51ebfea9: Fixes an issue where renaming a token or token group would cause `Apply to` to be changed
+- 51ebfea9: Fixes an issue where the choice of `Rename styles` was not remembered per session
+- 51ebfea9: Fixes an issue with token edit inputs being focused after a timeout
+
+## 1.37.9
+
+### Patch Changes
+
+- b52519ef: Fixes a bug that caused token set order to be ignored when syncing with Supernova
+- b5e7b88b: Improves performance of most operations by utilizing a new findAll function to faster traverse the tree of nodes.
+- 00bf10e2: Adds support for 2 Supernova environments
+- 4aa6e8bb: Changed behavior of editing, duplicating or creating tokens to no longer automatically apply changes. You now need to run `Apply to..` if you want tokens to be updated.
+- 0f5ffa33: Cut down speed of `Apply to..` operations to around 40% of where we were before
+- b3a0e5bc: - Improved performance of applying by removing unnecessary calls to check if we need to apply a variable.
+  - Fixed an issue that caused local variables to be applied if they matched name of an applied token
+- 03aa9d05: Slight change of colors as we've detached from Figma's internal tokens
+- dd608a7f: Improved performance of the bulk remap function
+- dd608a7f: Improves performance of attaching/creating variables for large token sets
+
 ## 1.37.8
 
 ### Patch Changes

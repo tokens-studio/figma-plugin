@@ -13,7 +13,7 @@ const StyledResolvingLoaderBubble = styled('div', {
   width: '4px',
   height: '4px',
   borderRadius: '$full',
-  background: '$textSubtle',
+  background: '$fgSubtle',
   animation: `${bounceUpDown} 1000ms 0ms infinite linear`,
 });
 
