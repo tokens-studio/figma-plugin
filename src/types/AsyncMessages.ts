@@ -1,3 +1,4 @@
+import type { Envelope, TransportMakeRequestResponse } from '@sentry/types';
 import { UpdateMode } from '@/constants/UpdateMode';
 import type { SettingsState } from '@/app/store/models/settings';
 import type { Properties } from '@/constants/Properties';
@@ -64,6 +65,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
+  PROXY_SENTRY = 'async/proxy-sentry',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -310,6 +312,13 @@ export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIA
 }>;
 export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
 
+export type ProxySentryAsyncMessage = AsyncMessage<AsyncMessageTypes.PROXY_SENTRY, {
+  request: Envelope;
+}>;
+export type ProxySentryAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PROXY_SENTRY, {
+  result: TransportMakeRequestResponse | void
+}>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -350,7 +359,8 @@ export type AsyncMessages =
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
   | SyncVariableAsyncMessage
-  | UpdateVariablesAsyncMessage;
+  | UpdateVariablesAsyncMessage
+  | ProxySentryAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -392,7 +402,8 @@ export type AsyncMessageResults =
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
   | SyncVariableAsyncMessageResult
-  | UpdateVariablesAsyncMessageResult;
+  | UpdateVariablesAsyncMessageResult
+  | ProxySentryAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
