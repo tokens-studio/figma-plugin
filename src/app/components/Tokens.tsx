@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
 import ToggleEmptyButton from './ToggleEmptyButton';
@@ -32,6 +32,7 @@ import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -112,7 +113,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
-    () => resolveTokenValues(mergeTokenGroups(tokens, {
+    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
       ...usedTokenSet,
       [activeTokenSet]: TokenSetStatus.ENABLED,
     })),
