@@ -23,7 +23,7 @@ export async function tryApplyColorVariableId(node: SceneNode, token: string, fi
       }
     } catch (e) {
       console.log('error importing variable', e);
-      Promise.reject();
+      Promise.reject(e);
     }
   }
 
