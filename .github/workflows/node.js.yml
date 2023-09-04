@@ -37,7 +37,7 @@ jobs:
       # 3: Install dependencies
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile --prefer-offline
       # 5: Build package
       - name: Build Package
         run: npm run build
@@ -78,7 +78,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile --prefer-offline
       # 4: Run tests
       - name: Run test command
         run: npm run test
@@ -111,7 +111,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile --prefer-offline
 
       # 4: Run test coverage report
       - name: Run test coverage report
@@ -120,7 +120,7 @@ jobs:
         with:
           fullCoverageDiff: false
           runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles ' 
-          afterSwitchCommand: npm ci
+          afterSwitchCommand: yarn  --frozen-lockfile --prefer-offline
           useSameComment: true
   test-transform:
     name: Transformer Tests
@@ -150,7 +150,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile --prefer-offline
 
       # 4: Build package
       - name: build:transform
@@ -158,7 +158,7 @@ jobs:
 
       # 5: Install dependencies
       - name: Install dependencies - transformer
-        run: cd token-transformer && npm ci
+        run: cd token-transformer && yarn  --frozen-lockfile --prefer-offline
 
       # 6: Run tests
       - name: Run test command
@@ -206,7 +206,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile --prefer-offline
       # 4: Build package
       - name: Run benchmark
         run: npm run benchmark:build && npm run benchmark:run
