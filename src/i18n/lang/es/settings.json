@@ -11,7 +11,15 @@
   "inAToken": "en una ficha llamada",
   "forYourStyles": "para tus estilos",
   "resetOnboarding": "Restablecer incorporación",
-  "removeRelaunchData": "Eliminar datos obsoletos",
+  "removeRelaunchData": {
+    "button": "Eliminar datos obsoletos",
+    "title": "¿Eliminar datos obsoletos?",
+    "confirm": "Confirmar",
+    "description": "Esto eliminará los datos obsoletos en el panel de propiedades a la derecha. Esto no afectará sus tokens, estilos o temas.",
+    "selection": "Selección",
+    "page": "Página",
+    "document": "Documento"
+  },
   "issueSavingCredentials": "Hubo un problema al guardar sus credenciales. Inténtalo de nuevo.",
   "sessionRecordingDescription": "La grabación de sesiones es una nueva característica de Tokens Studio para rastrear las sesiones de los usuarios cuando ocurren errores, para que podamos comprender mejor el problema y solucionarlo. No se enviarán datos a nuestro servidor de telemetría si no experimenta un error o si desactiva la depuración.",
   "dataCollectedIsAnonymised": "Todos los datos recopilados se anonimizan y no se compartirán con terceros y se utilizan únicamente para corregir errores y optimizar el rendimiento.",

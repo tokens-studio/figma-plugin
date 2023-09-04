@@ -13,7 +13,15 @@
   "inAToken": "in a token called",
   "forYourStyles": "for your styles",
   "resetOnboarding": "Reset onboarding",
-  "removeRelaunchData": "Remove deprecated data",
+  "removeRelaunchData": {
+    "button": "Remove deprecated data",
+    "title": "Remove deprecated data?",
+    "confirm": "Confirm",
+    "description": "This will remove the deprecated data in the properties panel on the right. This will not affect your tokens, styles or themes.",
+    "selection": "Selection",
+    "page": "Page",
+    "document": "Document"
+  },
   "issueSavingCredentials": "There was an issue saving your credentials. Please try again.",
   "sessionRecordingDescription": "Allow us to record telemetry data for bug fixing and performance.",
   "dataCollectedIsAnonymised": "Any data collected is anonymized and will not be shared with any third parties.",

@@ -33,24 +33,18 @@ export const removeRelaunchData: AsyncMessageChannelHandlers[AsyncMessageTypes.R
   });
 
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_REMOVE_RELAUNCH_DATA);
-  const promises: Set<Promise<void>> = new Set();
 
-  relevantNodes.forEach((node) => {
-    promises.add(
-      defaultWorker.schedule(async () => {
-        try {
-          node.setRelaunchData({});
-        } catch (e) {
-          console.log('got error', e);
-        } finally {
-          tracker.next();
-          tracker.reportIfNecessary();
-          Promise.resolve();
-        }
-      }),
-    );
-  });
-  await Promise.all(promises);
+  await Promise.all(relevantNodes.map((node) => defaultWorker.schedule(async () => {
+    try {
+      node.setRelaunchData({});
+    } catch (e) {
+      console.log('got error', e);
+    } finally {
+      tracker.next();
+      tracker.reportIfNecessary();
+      Promise.resolve();
+    }
+  })));
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,
