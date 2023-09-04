@@ -1,7 +1,26 @@
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { resolvedVariableReferences } from '@/plugin/setValuesOnNode';
 
-export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string, figmaVariableReferences: VariableReferenceMap) {
-  const variable = figmaVariableReferences.get(token);
+export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string, figmaVariableReferences: Map<string, string>) {
+  let variable;
+  const hasCachedVariable = resolvedVariableReferences.has(token);
+  if (hasCachedVariable) {
+    variable = resolvedVariableReferences.get(token);
+  }
+  const variableMapped = figmaVariableReferences.get(token);
+  if (!variableMapped) return false;
+  if (!hasCachedVariable && typeof variableMapped === 'string') {
+    try {
+      const foundVariable = await figma.variables.importVariableByKeyAsync(variableMapped);
+      if (foundVariable) {
+        resolvedVariableReferences.set(token, foundVariable);
+        variable = foundVariable;
+      }
+    } catch (e) {
+      console.log('error importing variable', e);
+      Promise.reject();
+      return false;
+    }
+  }
 
   if (variable === undefined) return false;
 

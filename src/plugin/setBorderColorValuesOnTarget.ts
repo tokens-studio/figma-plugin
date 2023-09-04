@@ -5,7 +5,7 @@ import { paintStyleMatchesColorToken } from './figmaUtils/styleMatchers';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
 type Props = {
   data: string;
@@ -15,7 +15,7 @@ type Props = {
   stylePathSlice: number;
   styleReferences: Record<string, string>;
   paintStyles: Map<string, EffectStyle | PaintStyle | TextStyle>
-  figmaVariableReferences: VariableReferenceMap,
+  figmaVariableReferences: RawVariableReferenceMap,
 };
 
 export async function setBorderColorValuesOnTarget({

@@ -1,9 +1,11 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
+import { resolvedVariableReferences } from '../setValuesOnNode';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
+  resolvedVariableReferences.clear();
   const figmaStyleMaps = getAllFigmaStyleMaps();
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -11,16 +13,15 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: VariableReferenceMap = new Map();
+  const figmaVariableReferences: RawVariableReferenceMap = new Map();
 
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
 
   await Promise.all(activeThemes?.map(async (theme) => {
     await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
-      const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
-      if (foundVariableId) {
-        figmaVariableReferences.set(token, foundVariableId);
+      if (!figmaVariableReferences.has(token)) {
+        figmaVariableReferences.set(token, variableId);
       }
     }));
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {

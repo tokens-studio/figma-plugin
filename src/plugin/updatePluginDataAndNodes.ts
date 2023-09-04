@@ -11,13 +11,13 @@ import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { removePluginData, setNonePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
-import setValuesOnNode from './setValuesOnNode';
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import setValuesOnNode, { resolvedVariableReferences } from './setValuesOnNode';
 import { FigmaStyleMaps } from '@/types/FigmaStyleMaps';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
 export async function updatePluginDataAndNodes({
   entries: nodes, values: tokenValues, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix, settings,
-}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; figmaStyleMaps: FigmaStyleMaps; figmaVariableReferences: VariableReferenceMap; figmaStyleReferences: Record<string, string>; stylePathPrefix?: string; settings?: SettingsState }) {
+}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; figmaStyleMaps: FigmaStyleMaps; figmaVariableReferences: RawVariableReferenceMap; figmaStyleReferences: Record<string, string>; stylePathPrefix?: string; settings?: SettingsState }) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { ignoreFirstPartForStyles, baseFontSize } = settings ?? {};
 
@@ -78,6 +78,7 @@ export async function updatePluginDataAndNodes({
     }));
   });
   await Promise.all(promises);
+  resolvedVariableReferences.clear();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,
