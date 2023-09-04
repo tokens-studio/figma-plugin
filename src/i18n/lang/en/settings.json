@@ -13,6 +13,7 @@
   "inAToken": "in a token called",
   "forYourStyles": "for your styles",
   "resetOnboarding": "Reset onboarding",
+  "removeRelaunchData": "Remove deprecated data",
   "issueSavingCredentials": "There was an issue saving your credentials. Please try again.",
   "sessionRecordingDescription": "Allow us to record telemetry data for bug fixing and performance.",
   "dataCollectedIsAnonymised": "Any data collected is anonymized and will not be shared with any third parties.",

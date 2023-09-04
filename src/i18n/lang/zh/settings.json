@@ -11,6 +11,7 @@
   "inAToken": "在一个名为的令牌中",
   "forYourStyles": "适合您的风格",
   "resetOnboarding": "重置入职",
+  "removeRelaunchData": "删除废弃数据",
   "issueSavingCredentials": "保存您的凭据时出现问题。请再试一次。",
   "sessionRecordingDescription": "会话记录是 Tokens Studio 的一项新功能，用于在出现错误时跟踪用户会话，以便我们更好地了解问题并修复它。如果您没有遇到错误或关闭调试，则不会将任何数据发送到我们的遥测服务器。",
   "dataCollectedIsAnonymised": "收集的任何数据都是匿名的，不会与任何第三方共享，并且纯粹用于解决错误和优化性能。",

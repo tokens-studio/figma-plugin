@@ -11,6 +11,7 @@
   "inAToken": "in een token genoemd",
   "forYourStyles": "voor uw stijlen",
   "resetOnboarding": "Onboarding resetten",
+  "removeRelaunchData": "Verwijder verouderde gegevens",
   "issueSavingCredentials": "Er is een probleem opgetreden bij het opslaan van uw inloggegevens. Probeer het opnieuw.",
   "sessionRecordingDescription": "Sessie-opname is een nieuwe functie van Tokens Studio om gebruikerssessies bij te houden wanneer er bugs optreden, zodat we het probleem beter kunnen begrijpen en oplossen. Er worden geen gegevens naar onze telemetrieserver verzonden als u geen bug ervaart of als u foutopsporing uitschakelt.",
   "dataCollectedIsAnonymised": "Alle verzamelde gegevens zijn geanonimiseerd en worden niet gedeeld met derden en worden uitsluitend gebruikt om bugs aan te pakken en de prestaties te optimaliseren.",

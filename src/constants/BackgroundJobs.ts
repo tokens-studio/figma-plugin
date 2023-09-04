@@ -3,6 +3,7 @@ export enum BackgroundJobs {
   NODEMANAGER_FINDNODESWITHDATA = 'nodemanager_findnodeswithdata',
   PLUGIN_UPDATEPLUGINDATA = 'plugindata_updateplugindata',
   PLUGIN_UPDATENODES = 'plugin_updatenodes',
+  PLUGIN_REMOVE_RELAUNCH_DATA = 'plugin_remove_relaunch_data',
   UI_APPLYNODEVALUE = 'ui_applynodevalue',
   UI_PULLTOKENS = 'ui_pulltokens',
   UI_EDITSINGLETOKEN = 'ui_editsingltoken',
