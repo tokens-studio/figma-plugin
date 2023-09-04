@@ -19,7 +19,7 @@ export async function tryApplyVariableId(node: SceneNode, type: VariableBindable
       }
     } catch (e) {
       console.log('error importing variable', e);
-      Promise.reject();
+      Promise.reject(e);
       return false;
     }
   }
