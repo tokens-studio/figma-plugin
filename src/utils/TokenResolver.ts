@@ -141,7 +141,7 @@ class TokenResolver {
           const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
-          if (typeof resolvedTokenValue.value === undefined) {
+          if (resolvedTokenValue.value === undefined) {
             return {
               ...token, value: token.value, rawValue: token.value, failedToResolve: true,
             } as ResolveTokenValuesResult;
@@ -150,7 +150,7 @@ class TokenResolver {
           // We replace the reference with the resolved value if needed
           if (typeof finalValue === 'string' && (typeof resolvedTokenValue.value === 'string' || typeof resolvedTokenValue.value === 'number')) {
             finalValue = finalValue.replace(reference, resolvedTokenValue.value);
-          } else if (typeof resolvedTokenValue.value !== 'undefined') {
+          } else if (resolvedTokenValue.value !== undefined) {
             finalValue = resolvedTokenValue.value;
           }
         } else {
@@ -160,7 +160,7 @@ class TokenResolver {
             const propertyTokenValue = (tokenValueWithoutProperty as Record<string, unknown>)[propertyName];
             const parsedValue = this.calculateTokenValue({ value: propertyTokenValue } as SingleToken, resolvedReferences);
 
-            if (typeof parsedValue === 'undefined') {
+            if (parsedValue === undefined) {
               finalValue = token.value;
             } else {
               finalValue = (typeof finalValue === 'string' && (typeof parsedValue === 'string' || typeof parsedValue === 'number')) ? finalValue.replace(reference, parsedValue) : parsedValue;
@@ -180,7 +180,7 @@ class TokenResolver {
         // We need to calculate the value of the token, as it might be a color or math transformation
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         const calculated = this.calculateTokenValue({ ...token, value: finalValue } as SingleToken, resolvedReferences);
-        if (typeof calculated === 'undefined') {
+        if (calculated === undefined) {
           resolvedToken = token;
         } else {
           resolvedToken = { ...token, value: calculated } as ResolveTokenValuesResult;
