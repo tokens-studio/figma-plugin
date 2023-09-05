@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 1.37.11
+
+### Patch Changes
+
+- f8066309: Fixes performance when it comes to applying tokens for users who had a large number of variables in their themes
+
 ## 1.37.10
 
 ### Patch Changes
