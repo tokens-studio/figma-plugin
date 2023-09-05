@@ -1,6 +1,5 @@
 /* eslint-disable no-bitwise */
 import * as Sentry from '@sentry/react';
-import type { Transport } from '@sentry/types';
 import * as pjs from '../../package.json';
 
 const DSN = process.env.SENTRY_DSN;
@@ -27,10 +26,6 @@ export const setupReplay = () => {
   }
 };
 
-let transport: Transport;
-
-export const getTransport = () => transport;
-
 export const initializeSentry = () => {
   switch (process.env.ENVIRONMENT) {
     case 'alpha':
@@ -42,16 +37,12 @@ export const initializeSentry = () => {
         release: `figma-tokens@${pjs.version}`,
         environment: process.env.ENVIRONMENT,
         tracesSampleRate: SAMPLING,
+        // @ts-expect-error  This is correct, but the types are wrong as of the current version. It states this property does not exist despite it working correctly
         profilesSampleRate: PROFILE_RATE,
         replaysSessionSampleRate: REPLAY_RATE,
         // We always want to replay errors
         replaysOnErrorSampleRate: 1.0,
         integrations: [],
-        transport: (opts) => {
-          transport = Sentry.makeFetchTransport(opts) as Transport;
-          return transport;
-        },
-
       });
       break;
     default:

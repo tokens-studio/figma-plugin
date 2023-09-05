@@ -30,7 +30,6 @@ function ColorDisplayBubbleComponent({
         ...css,
       }}
       style={{
-        // @ts-expect-error
         '--backgroundColor': color,
         '--borderColor': borderColor,
         ...style,
