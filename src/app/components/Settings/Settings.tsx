@@ -24,6 +24,7 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import Text from '../Text';
 import Link from '../Link';
+import { useDebug } from '@/app/store/useDebug';
 
 function Settings() {
   const { t } = useTranslation(['settings']);
@@ -34,6 +35,7 @@ function Settings() {
     url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
+  const { removeRelaunchData } = useDebug();
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
@@ -114,6 +116,10 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
+
+  const handleRemoveRelaunchData = React.useCallback(() => {
+    removeRelaunchData();
+  }, [removeRelaunchData]);
 
   return (
     <Box className="content scroll-container">
@@ -231,10 +237,10 @@ function Settings() {
           )}
         </Stack>
       </Stack>
-      <Divider />
-      <Box css={{ padding: '$4' }}>
+      <Stack direction="row" gap={2} css={{ padding: '$4' }}>
         <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-      </Box>
+        <Button variant="secondary" size="small" id="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
+      </Stack>
     </Box>
   );
 }

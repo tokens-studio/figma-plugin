@@ -54,6 +54,7 @@ export enum AsyncMessageTypes {
   SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
   SET_AUTH_DATA = 'async/set-auth-data',
   SET_USED_EMAIL = 'async/set-used-email',
+  REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -310,6 +311,20 @@ export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIA
 }>;
 export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
 
+export type RemoveRelaunchDataMessage = AsyncMessage<
+AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+{
+  area: UpdateMode;
+}
+>;
+
+export type RemoveRelaunchDataMessageResult = AsyncMessage<
+AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+{
+  totalNodes: number;
+}
+>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -350,7 +365,8 @@ export type AsyncMessages =
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
   | SyncVariableAsyncMessage
-  | UpdateVariablesAsyncMessage;
+  | UpdateVariablesAsyncMessage
+  | RemoveRelaunchDataMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -392,7 +408,8 @@ export type AsyncMessageResults =
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
   | SyncVariableAsyncMessageResult
-  | UpdateVariablesAsyncMessageResult;
+  | UpdateVariablesAsyncMessageResult
+  | RemoveRelaunchDataMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
