@@ -1,5 +1,5 @@
 import store from './store';
-import setValuesOnNode from './setValuesOnNode';
+import setValuesOnNode, { resolvedVariableReferences } from './setValuesOnNode';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { NodeManagerNode } from './NodeManager';
 import { postToUI } from './notifiers';
@@ -13,7 +13,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
@@ -43,30 +43,21 @@ export async function updateNodes(
 
   // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
   const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: VariableReferenceMap = new Map();
+  const figmaVariableReferences: RawVariableReferenceMap = new Map();
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
 
-  await Promise.all(activeThemes?.map(async (theme) => {
-    await Promise.all(Object.entries(theme.$figmaVariableReferences ?? {}).map(async ([token, variableId]) => {
-      if (!figmaVariableReferences.get(token)) {
-        try {
-          const foundVariableId = await figma.variables.importVariableByKeyAsync(variableId);
-          if (foundVariableId) {
-            figmaVariableReferences.set(token, foundVariableId);
-          }
-        } catch (e) {
-          console.log('error importing variable', e);
-          Promise.reject();
-        }
+  activeThemes?.forEach((theme) => {
+    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
+      if (!figmaVariableReferences.has(token)) {
+        figmaVariableReferences.set(token, variableId);
       }
-      Promise.resolve();
-    }));
+    });
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
       if (!figmaStyleReferences[token]) {
         figmaStyleReferences[token] = styleId;
       }
     });
-  }));
+  });
 
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
 
@@ -102,6 +93,7 @@ export async function updateNodes(
     );
   });
   await Promise.all(promises);
+  resolvedVariableReferences.clear();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,

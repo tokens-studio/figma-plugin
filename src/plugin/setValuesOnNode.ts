@@ -29,8 +29,11 @@ import { Properties } from '@/constants/Properties';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
 // @README values typing is wrong
+
+export const resolvedVariableReferences: VariableReferenceMap = new Map();
 
 export default async function setValuesOnNode(
   node: BaseNode,
@@ -38,7 +41,7 @@ export default async function setValuesOnNode(
   data: NodeTokenRefMap,
   figmaStyleMaps: ReturnType<typeof getAllFigmaStyleMaps>,
   figmaStyleReferences: Record<string, string> = {},
-  figmaVariableReferences: VariableReferenceMap = new Map(),
+  figmaVariableReferences: RawVariableReferenceMap = new Map(),
   stylePathPrefix: string | null = null,
   ignoreFirstPartForStyles = false,
   baseFontSize = defaultBaseFontSize,
