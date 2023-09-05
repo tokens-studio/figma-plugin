@@ -34,6 +34,6 @@ export function useDebug() {
         area: userDecision.data[0],
       }));
     }
-  }, [confirm]);
+  }, [t, confirm]);
   return { removeRelaunchData };
 }
