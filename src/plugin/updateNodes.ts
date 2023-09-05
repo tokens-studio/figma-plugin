@@ -1,4 +1,4 @@
-import setValuesOnNode from './setValuesOnNode';
+import setValuesOnNode, { resolvedVariableReferences } from './setValuesOnNode';
 import { postToUI } from './notifiers';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -8,14 +8,14 @@ import { AnyTokenList } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import { NodeManagerNode } from './NodeManager';
-import { VariableReferenceMap } from '@/types/VariableReferenceMap';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { FigmaStyleMaps } from '@/types/FigmaStyleMaps';
 
 export async function updateNodes(
   nodes: readonly NodeManagerNode[],
   tokens: Map<string, AnyTokenList[number]>,
   figmaStyleMaps: FigmaStyleMaps,
-  figmaVariableReferences: VariableReferenceMap,
+  figmaVariableReferences: RawVariableReferenceMap,
   figmaStyleReferences: Record<string, string>,
   settings: SettingsState,
   stylePathPrefix?: string,
@@ -63,6 +63,7 @@ export async function updateNodes(
     );
   });
   await Promise.all(promises);
+  resolvedVariableReferences.clear();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,

@@ -16,4 +16,3 @@ initializeSentry();
 AsyncMessageChannel.ReactInstance.connect();
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, asyncHandlers.startup);
-AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.PROXY_SENTRY, asyncHandlers.proxySentry);
