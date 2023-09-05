@@ -237,10 +237,9 @@ function Settings() {
           )}
         </Stack>
       </Stack>
-      <Divider />
       <Stack direction="row" gap={2} css={{ padding: '$4' }}>
         <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-        <Button variant="secondary" size="small" id="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData')}</Button>
+        <Button variant="secondary" size="small" id="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
       </Stack>
     </Box>
   );
