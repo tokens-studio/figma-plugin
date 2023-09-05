@@ -6,7 +6,7 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  themesListSelector, tokensSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
@@ -82,8 +82,6 @@ export function useJSONbin() {
   const { setStorageType } = useStorage();
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
@@ -214,8 +212,6 @@ export function useJSONbin() {
       dispatch.tokenState.setTokenData({
         values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
         themes: content.themes,
-        usedTokenSet: usedTokenSets,
-        activeTheme,
       });
       return content;
     }
@@ -224,8 +220,6 @@ export function useJSONbin() {
     dispatch,
     pullTokensFromJSONBin,
     setStorageType,
-    usedTokenSets,
-    activeTheme,
   ]);
 
   return useMemo(() => ({
