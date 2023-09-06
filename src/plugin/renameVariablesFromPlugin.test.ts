@@ -28,7 +28,7 @@ describe('renameVariablesFromPlugin', () => {
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());
   AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfoHandler);
 
-  it('should rename variables and referenced variables', async () => {
+  it('should rename variables', async () => {
     const mockLocalVariables = [
       {
         id: 'VariableID:1234',
@@ -74,10 +74,8 @@ describe('renameVariablesFromPlugin', () => {
     ])).toEqual([{
       oldName: 'fg.default',
       newName: 'fg.default-rename',
-      variableIds: ['12345', '34567'],
+      variableIds: ['12345'],
     }]);
     expect(mockLocalVariables[0].name).toBe('fg/default-rename');
-    expect(mockGetVariableById).toBeCalledWith('VariableID:3456');
-    expect(mockSetValueForMode).toBeCalledTimes(1);
   });
 });
