@@ -46,6 +46,8 @@ type MapValuesToTokensResult = Record<string, string | number | SingleToken['val
 
 // TODO: It feels unecessary to do this like that. whats up with the modify? cant we do that upfront before we send tokens to the document?
 // Ideally, we would build this object upfront so we would not have to iterate over this at all, but could just .get a token and then get the property of it
+// Tokens: The full tokens map
+// Values: The values applied to the node
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
@@ -168,7 +170,8 @@ export function selectNodes(ids: string[]) {
   )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
   figma.currentPage.selection = nodes;
 }
-
+// Tokens: The full token object
+// Values: The values applied to the node
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);

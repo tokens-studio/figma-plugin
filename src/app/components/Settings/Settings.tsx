@@ -12,7 +12,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -24,6 +24,7 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import Text from '../Text';
 import Link from '../Link';
+import { useDebug } from '@/app/store/useDebug';
 
 function Settings() {
   const { t } = useTranslation(['settings']);
@@ -34,8 +35,10 @@ function Settings() {
     url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
+  const { removeRelaunchData } = useDebug();
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
@@ -94,6 +97,15 @@ function Settings() {
     [dispatch.settings],
   );
 
+  const handleStoreTokenIdInJsonEditorChange = React.useCallback(
+    (state: CheckedState) => {
+      track('setStoreTokenIdInJsonEditorSelector', { value: state });
+
+      dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
+    },
+    [dispatch.settings],
+  );
+
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSyncProviders(false);
   }, [dispatch]);
@@ -104,6 +116,10 @@ function Settings() {
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
+
+  const handleRemoveRelaunchData = React.useCallback(() => {
+    removeRelaunchData();
+  }, [removeRelaunchData]);
 
   return (
     <Box className="content scroll-container">
@@ -158,11 +174,28 @@ function Settings() {
               </Stack>
             </Label>
           </Stack>
+          <Stack direction="row" gap={3} align="start">
+            <Checkbox
+              id="storeTokenIdInJsonEditor"
+              checked={!!storeTokenIdInJsonEditor}
+              defaultChecked={storeTokenIdInJsonEditor}
+              onCheckedChange={handleStoreTokenIdInJsonEditorChange}
+            />
+
+            <Label htmlFor="storeTokenIdInJsonEditor">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>{t('storeTokenId')}</Box>
+                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
+              </Stack>
+            </Label>
+          </Stack>
           <Box>
+
             <Heading size="small">{t('baseFont')}</Heading>
             <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
               {t('baseFontExplanation')}
             </Box>
+
           </Box>
           <RemConfiguration />
           <Stack direction="row" gap={2} align="center">
@@ -204,10 +237,10 @@ function Settings() {
           )}
         </Stack>
       </Stack>
-      <Divider />
-      <Box css={{ padding: '$4' }}>
+      <Stack direction="row" gap={2} css={{ padding: '$4' }}>
         <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-      </Box>
+        <Button variant="secondary" size="small" id="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
+      </Stack>
     </Box>
   );
 }

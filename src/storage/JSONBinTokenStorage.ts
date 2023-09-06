@@ -8,6 +8,7 @@ import {
 import { singleFileSchema } from './schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { SaveOption } from './FileTokenStorage';
 
 type JsonBinMetadata = Partial<{
   version: string
@@ -25,7 +26,7 @@ const jsonbinSchema = singleFileSchema.extend({
   updatedAt: z.string().optional(),
 });
 
-export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata> {
+export class JSONBinTokenStorage extends RemoteTokenStorage<JsonBinMetadata, SaveOption> {
   private id: string;
 
   private secret: string;

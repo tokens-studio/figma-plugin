@@ -9,6 +9,7 @@ export type UpdateRemoteFunctionPayload = {
   context: Partial<StorageTypeCredentials>
   updatedAt?: string
   oldUpdatedAt?: string | null
+  storeTokenIdInJsonEditor: boolean
   dispatch: Dispatch
 };
 export type UpdateRemoteFunction = (payload: UpdateRemoteFunctionPayload) => Promise<void>;

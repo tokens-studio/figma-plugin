@@ -1,16 +1,16 @@
+import { mockGetNodeById } from '../../../../tests/__mocks__/figmaMock';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { defaultNodeManager, NodeManagerNode } from '../../NodeManager';
-import { updatePluginData } from '@/plugin/updatePluginData';
+import { NodeManagerNode } from '../../NodeManager';
+import { removePluginDataByMap } from '@/plugin/removePluginDataByMap';
 import { removeTokensByValue } from '../removeTokensByValue';
 import { Properties } from '@/constants/Properties';
 import { NodeInfo } from '@/types/NodeInfo';
 
-jest.mock('@/plugin/updatePluginData', () => ({
-  updatePluginData: jest.fn(),
+jest.mock('@/plugin/removePluginDataByMap', () => ({
+  removePluginDataByMap: jest.fn(),
 }));
 
 describe('removeTokensByValue', () => {
-  const getNodeSpy = jest.spyOn(defaultNodeManager, 'getNode');
   const tokensToRemove = [
     {
       nodes: [
@@ -25,52 +25,31 @@ describe('removeTokensByValue', () => {
   ];
 
   it('should remove tokens by value', async () => {
-    getNodeSpy.mockImplementationOnce(() => Promise.resolve({
-      createdAt: 1665107195149,
-      hash: '2345',
+    mockGetNodeById.mockImplementationOnce(() => ({
       id: '1234',
-      node: {
-        id: '1234',
-      } as BaseNode,
-      tokens: {
-        fill: 'color.red.800',
-        fontFamilies: 'font-family.Inter',
-        fontSizes: 'font-size.6',
-      },
-    } as NodeManagerNode));
+    } as BaseNode));
     await removeTokensByValue({
       type: AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove,
     });
 
-    expect(updatePluginData).toBeCalledWith({
-      entries: [{
-        createdAt: 1665107195149,
-        hash: '2345',
-        id: '1234',
+    expect(removePluginDataByMap).toBeCalledWith({
+      nodeKeyMap: [{
+        key: 'fill',
         node: {
           id: '1234',
-        } as BaseNode,
-        tokens: {
-          fill: 'color.red.800',
-          fontFamilies: 'font-family.Inter',
-          fontSizes: 'font-size.6',
-        },
+        } as NodeManagerNode,
       }],
-      values: {
-        fill: 'delete',
-      },
-      shouldRemove: false,
     });
   });
 
   it('doesn\'t update the plugin when there is no nodes to update', async () => {
-    getNodeSpy.mockImplementationOnce(() => Promise.resolve(undefined));
+    mockGetNodeById.mockImplementationOnce(() => (null));
     await removeTokensByValue({
       type: AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE,
       tokensToRemove,
     });
 
-    expect(updatePluginData).toBeCalledTimes(0);
+    expect(removePluginDataByMap).toBeCalledTimes(0);
   });
 });

@@ -6,7 +6,7 @@ import * as pjs from '../../../../package.json';
 import useStorage from '../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  themesListSelector, tokensSelector,
+  storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
@@ -20,7 +20,7 @@ import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 
 export async function updateJSONBinTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null, dispatch,
+  tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor, dispatch,
 }: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
   try {
@@ -51,7 +51,7 @@ export async function updateJSONBinTokens({
 
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
-        if (await storage.save(payload)) {
+        if (await storage.save(payload, { storeTokenIdInJsonEditor })) {
           saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
             tokenSetOrder: Object.keys(tokens),
           });
@@ -63,7 +63,7 @@ export async function updateJSONBinTokens({
         // B) Overwrite Remote changes
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
-    } else if (await storage.save(payload)) {
+    } else if (await storage.save(payload, { storeTokenIdInJsonEditor })) {
       saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
         tokenSetOrder: Object.keys(tokens),
       });
@@ -82,6 +82,7 @@ export function useJSONbin() {
   const { setStorageType } = useStorage();
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
 
   const createNewJSONBin = useCallback(async (context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>) => {
     const { secret, name, internalId } = context;
@@ -98,6 +99,7 @@ export function useJSONbin() {
           },
           themes,
           updatedAt,
+          storeTokenIdInJsonEditor,
           dispatch,
         });
         AsyncMessageChannel.ReactInstance.message({

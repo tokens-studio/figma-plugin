@@ -8,7 +8,9 @@ import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import { IconFile } from '@/icons';
-import { tokensSelector, themesListSelector } from '@/selectors';
+import {
+  tokensSelector, themesListSelector, storeTokenIdInJsonEditorSelector,
+} from '@/selectors';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
 
@@ -19,11 +21,12 @@ type Props = {
 export default function MultiFilesExport({ onClose }: Props) {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const seed = useUIDSeed();
 
   const filesChangeset = React.useMemo(() => {
     const changeObj: Record<string, string> = {};
-    Object.entries(convertTokensToObject(tokens)).forEach(([key, value]) => {
+    Object.entries(convertTokensToObject(tokens, storeTokenIdInJsonEditor)).forEach(([key, value]) => {
       changeObj[`${key}.json`] = JSON.stringify(value, null, 2);
     });
     changeObj[`${SystemFilenames.THEMES}.json`] = JSON.stringify(themes, null, 2);
