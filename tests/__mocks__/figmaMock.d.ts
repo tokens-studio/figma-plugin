@@ -25,3 +25,4 @@ export const mockGetLocalVariables: jest.Mock;
 export const mockCreateVariable: jest.Mock;
 export const mockGetLocalVariableCollections = jest.Mock;
 export const mockCreateVariableCollection = jest.Mock;
+export const mockImportVariableByKeyAsync = jest.Mock;

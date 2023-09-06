@@ -1,15 +1,11 @@
 import { mockGetLocalVariables, mockGetLocalVariableCollections } from '../../../../tests/__mocks__/figmaMock';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
 import { attachLocalVariablesToTheme } from '../attachLocalVariablesToTheme';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 describe('AttachLocalVariablesToTheme', () => {
-  const runAfter: (() => void)[] = [];
-  runAfter.push(AsyncMessageChannel.PluginInstance.connect());
-
   const theme = {
     id: 'light',
     name: 'light',
@@ -19,7 +15,6 @@ describe('AttachLocalVariablesToTheme', () => {
       light: TokenSetStatus.ENABLED,
     },
   };
-
   const tokens = {
     global: [
       {
@@ -92,13 +87,13 @@ describe('AttachLocalVariablesToTheme', () => {
         name: 'fg/default',
       },
       {
-        id: 'VariableID:365:16876',
+        id: 'VariableID:365:16877',
         key: '23456',
         variableCollectionId: 'VariableCollectionId:23:23456',
         name: 'fg/muted',
       },
       {
-        id: 'VariableID:365:16876',
+        id: 'VariableID:365:16878',
         key: '34567',
         variableCollectionId: 'VariableCollectionId:23:23456',
         name: 'fg/subtle',
@@ -143,13 +138,13 @@ describe('AttachLocalVariablesToTheme', () => {
         name: 'fg/default',
       },
       {
-        id: 'VariableID:365:16876',
+        id: 'VariableID:365:16877',
         key: '23456',
         variableCollectionId: 'VariableCollectionId:23:23456',
         name: 'fg/muted',
       },
       {
-        id: 'VariableID:365:16876',
+        id: 'VariableID:365:16878',
         key: '34567',
         variableCollectionId: 'VariableCollectionId:23:23456',
         name: 'fg/subtle',
