@@ -243,7 +243,7 @@ export default function useTokens() {
         dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
       }
     }
-  }, [activeTokenSet, tokens, settings.updateMode, confirm, handleBulkRemap, dispatch.settings, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
