@@ -6,7 +6,7 @@ import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
@@ -112,8 +112,6 @@ export function useGenericVersionedStorage() {
   const { setStorageType } = useStorage();
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
 
   const createNewGenericVersionedStorage = useCallback(
@@ -266,15 +264,13 @@ export function useGenericVersionedStorage() {
         dispatch.tokenState.setTokenData({
           values: content.tokens,
           themes: content.themes,
-          usedTokenSet: usedTokenSets,
-          activeTheme,
         });
         return content;
       }
 
       return content;
     },
-    [dispatch, pullTokensFromGenericVersionedStorage, setStorageType, usedTokenSets, activeTheme],
+    [dispatch, pullTokensFromGenericVersionedStorage, setStorageType],
   );
 
   return useMemo(

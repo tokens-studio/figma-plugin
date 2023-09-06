@@ -9,9 +9,9 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
     allAvailableTokenSets
-      .map((tokenSet) => ([tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
+      .map((tokenSet) => ([tokenSet, payload?.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
   );
-  const newActiveTheme = payload.activeTheme;
+  const newActiveTheme = payload?.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
     if (!payload.themes?.find((t) => t.id === activeTheme) && newActiveTheme) {
       delete newActiveTheme[group];
