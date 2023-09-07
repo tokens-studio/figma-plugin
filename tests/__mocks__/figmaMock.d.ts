@@ -28,3 +28,4 @@ export const mockCreateVariableCollection = jest.Mock;
 export const mockImportVariableByKeyAsync = jest.Mock;
 export const mockGetVariableById = jest.Mock;
 export const mockSetValueForMode = jest.Mock;
+export const mockSetBoundVariableForPaint = jest.Mock;

@@ -79,6 +79,7 @@ module.exports.mockCreateVariableCollection = jest.fn();
 module.exports.mockImportVariableByKeyAsync = jest.fn();
 module.exports.mockGetVariableById = jest.fn();
 module.exports.mockSetValueForMode = jest.fn();
+module.exports.mockSetBoundVariableForPaint = jest.fn()
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -115,7 +116,8 @@ module.exports.figma = {
     createVariableCollection: module.exports.mockCreateVariableCollection,
     importVariableByKeyAsync: module.exports.mockImportVariableByKeyAsync,
     getVariableById: module.exports.mockGetVariableById,
-    setValueForMode: module.exports.mockSetValueForMode
+    setValueForMode: module.exports.mockSetValueForMode,
+    setBoundVariableForPaint: module.exports.mockSetBoundVariableForPaint
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
