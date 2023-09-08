@@ -36,7 +36,10 @@
     "storybook-static"
   ],
   "include": [
+    "jest.config.ts",
+    "scripts/bundle.ts",
     "css.d.ts",
+    "**.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx"
   ]
