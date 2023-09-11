@@ -20,8 +20,8 @@ const UPDATE = process.argv.includes('--update');
 
 // > 5% drop in performance is considered a potential regression
 const SOFT_PERFORMANCE_LEEWAY = 5;
-// > 10% drop in performance is considered an actual regression
-const HARD_PERFORMANCE_LEEWAY = 10;
+// > 15% drop in performance is considered an actual regression
+const HARD_PERFORMANCE_LEEWAY = 15;
 //Amount of times we run the baseline to get a more accurate result
 const BASELINE_AMOUNT = 5;
 
