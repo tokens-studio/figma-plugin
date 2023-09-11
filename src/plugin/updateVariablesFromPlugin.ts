@@ -7,8 +7,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
-import { checkIfContainsAlias } from '@/utils/alias';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
+import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -24,7 +24,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     if (Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent)) { // Filter themes which contains this token
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
-        if (checkIfContainsAlias(payload.rawValue) && !payload?.$extensions?.['studio.tokens']?.modify) { // If new token reference to another token, we update the variable to reference to another variable
+        if (checkCanReferenceVariable(payload)) { // If new token reference to another token, we update the variable to reference to another variable
           let referenceTokenName: string = '';
           if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
             referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
@@ -61,6 +61,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             case TokenTypes.BORDER_WIDTH:
             case TokenTypes.SPACING:
             case TokenTypes.NUMBER:
+              console.log('spacing');
               setNumberValuesOnVariable(variable, theme.$figmaModeId, Number(payload.value));
               break;
             default: break;
