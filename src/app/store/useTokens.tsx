@@ -161,7 +161,6 @@ export default function useTokens() {
   }, []);
 
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
-    const settings = settingsStateSelector(store.getState());
     track('remapToken', { fromInspect: true });
 
     wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -173,7 +172,7 @@ export default function useTokens() {
       tokens: resolvedTokens,
       settings,
     }));
-  }, [confirm]);
+  }, [settings]);
 
   const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
@@ -243,7 +242,7 @@ export default function useTokens() {
         dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
       }
     }
-  }, [activeTokenSet, tokens, settings.updateMode, confirm, handleBulkRemap, dispatch.settings, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
