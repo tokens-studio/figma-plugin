@@ -1,9 +1,9 @@
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { bulkRemapTokens } from '../bulkRemapTokens';
 import { defaultNodeManager } from '../../NodeManager';
-import { updatePluginData } from '@/plugin/pluginData';
+import { updatePluginData } from '@/plugin/updatePluginData';
 
-jest.mock('@/plugin/pluginData', (() => ({
+jest.mock('@/plugin/updatePluginData', (() => ({
   updatePluginData: jest.fn(),
 })));
 

@@ -253,6 +253,7 @@ export class NodeManager {
   public async findNodesWithData(opts: {
     updateMode?: UpdateMode;
     nodes?: readonly BaseNode[];
+    nodesWithoutPluginData?: boolean;
   }) {
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
@@ -269,11 +270,11 @@ export class NodeManager {
     if (nodes) {
       relevantNodes = Array.from(nodes);
     } else if (updateMode === UpdateMode.PAGE) {
-      relevantNodes = findAll([figma.currentPage], false);
+      relevantNodes = findAll([figma.currentPage], false, opts.nodesWithoutPluginData);
     } else if (updateMode === UpdateMode.SELECTION) {
-      relevantNodes = findAll(figma.currentPage.selection, true);
+      relevantNodes = findAll(figma.currentPage.selection, true, opts.nodesWithoutPluginData);
     } else {
-      relevantNodes = findAll([figma.root], false);
+      relevantNodes = findAll([figma.root], false, opts.nodesWithoutPluginData);
     }
 
     const unregisteredNodes = relevantNodes

@@ -7,6 +7,10 @@
   "editorType": ["figma", "dev"],
   "permissions": ["currentuser"],
   "capabilities": ["codegen"],
+  "networkAccess": {
+    "allowedDomains": ["*"],
+    "reasoning": "We use various external endpoints, read more: https://tokens.studio/figma-plugin-network-access"
+  },
   "codegenLanguages": [
     {
       "label": "Tokens",

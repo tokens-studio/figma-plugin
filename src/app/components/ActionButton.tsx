@@ -7,7 +7,7 @@ const StyledButton = styled('button', {
   backgroundColor: 'red',
   border: 'none',
   padding: '$3 $3',
-  borderRadius: '$button',
+  borderRadius: '$small',
   fontSize: '$xsmall',
   cursor: 'pointer',
   '&:hover, &:focus': {
@@ -16,15 +16,15 @@ const StyledButton = styled('button', {
   variants: {
     buttonVariant: {
       primary: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        color: '$fgOnEmphasis',
         '&:hover, &:focus': {
-          backgroundColor: '$interactionSubtle',
+          backgroundColor: '$accentMuted',
         },
       },
       default: {
         backgroundColor: 'transparent',
-        color: '$text',
+        color: '$fgDefault',
         '&:hover, &:focus': {
           backgroundColor: '$bgSubtle',
         },

@@ -10,7 +10,7 @@ import Box from './Box';
 
 const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
-  height: 'inherit',
+  height: '100vh',
   color: '$loadingScreenFg',
 });
 
@@ -48,7 +48,7 @@ export default function FigmaLoading({
           <FigmaMark />
           <FigmaLetter />
         </Stack>
-        <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScrenFgMuted' }}>
+        <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScreenFgMuted' }}>
           {t('version')}
           {' '}
           {pjs.version}

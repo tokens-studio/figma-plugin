@@ -8,17 +8,17 @@ import Stack from './Stack';
 import IconButton from './IconButton';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
-  color: '$fgAccent',
+  color: '$accentFg',
 });
 
 const StyledTextPlan = styled('p', {
   fontWeight: '$normal',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$fgAccent',
+  color: '$accentFg',
   fontSize: '$xsmall',
 });
 

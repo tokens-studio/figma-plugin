@@ -1,16 +1,6 @@
 import compact from 'just-compact';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
-import store from './store';
-import setValuesOnNode from './setValuesOnNode';
-import { Properties } from '@/constants/Properties';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
-import { NodeManagerNode } from './NodeManager';
-import { postToUI } from './notifiers';
-import { MessageFromPluginTypes } from '@/types/messages';
-import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { defaultWorker } from './Worker';
-import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { ProgressTracker } from './ProgressTracker';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
@@ -21,11 +11,8 @@ import { StorageType } from '@/types/StorageType';
 import {
   ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
 } from '@/figmaStorage';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { SettingsState } from '@/app/store/models/settings';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
-import { getVariablesMap } from '@/utils/getVariablesMap';
+import { Properties } from '@/constants/Properties';
 
 // @TODO fix typings
 
@@ -44,27 +31,54 @@ export function returnValueToLookFor(key: string) {
   }
 }
 
+const borderPropertyMap = new Map<Properties, string>([
+  [Properties.border, 'border'],
+  [Properties.borderTop, 'borderTop'],
+  [Properties.borderRight, 'borderRight'],
+  [Properties.borderBottom, 'borderBottom'],
+  [Properties.borderLeft, 'borderLeft'],
+]);
+
 type MapValuesToTokensResult = Record<string, string | number | SingleToken['value'] | {
   property: string
   value?: SingleToken['value'];
 }[]>;
 
+// TODO: It feels unecessary to do this like that. whats up with the modify? cant we do that upfront before we send tokens to the document?
+// Ideally, we would build this object upfront so we would not have to iterate over this at all, but could just .get a token and then get the property of it
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
+
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
+      // We only do this for rawValue as its a documentation and we want to show this to the user
       if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
         const modifier = resolvedToken.$extensions?.['studio.tokens']?.modify;
         if (modifier) {
           acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
         }
+      } else if (key === TokenTypes.COMPOSITION) {
+        Object.entries(resolvedToken.value).forEach(([property, value]) => {
+          // Assign the actual value of a composition token property to the applied values
+          acc[property as Properties] = value;
+          // If we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
+          if (typeof value === 'object' && borderPropertyMap.get(property as Properties) && 'color' in value && typeof value.color === 'string') {
+            acc.borderColor = value.color;
+          }
+        });
+      } else if (borderPropertyMap.get(key as Properties) && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
+      // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
+        acc.borderColor = resolvedToken.value.color;
+        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       } else {
+        // Otherwise, just apply the value
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       }
     } else {
       acc[key] = resolvedToken;
     }
+
     return acc;
   }, {});
   return mappedValues;
@@ -155,36 +169,6 @@ export function selectNodes(ids: string[]) {
   figma.currentPage.selection = nodes;
 }
 
-export function destructureToken(values: MapValuesToTokensResult): MapValuesToTokensResult {
-  const tokensInCompositionToken: Partial<
-  Record<TokenTypes, SingleToken['value']>
-  & Record<Properties, SingleToken['value']>
-  > = {};
-  if (values && values.composition) {
-    Object.entries(values.composition).forEach(([property, value]) => {
-      tokensInCompositionToken[property as CompositionTokenProperty] = value;
-    });
-    const { composition, ...objExcludedCompositionToken } = values;
-    values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
-  }
-  if (values && values.border && typeof values.border === 'object' && 'color' in values.border && values.border.color) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border.color }) };
-  }
-  if (values && values.borderTop && typeof values.borderTop === 'object' && 'color' in values.borderTop && values.borderTop.color) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop.color }) };
-  }
-  if (values && values.borderRight && typeof values.borderRight === 'object' && 'color' in values.borderRight && values.borderRight.color) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight.color }) };
-  }
-  if (values && values.borderLeft && typeof values.borderLeft === 'object' && 'color' in values.borderLeft && values.borderLeft.color) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft.color }) };
-  }
-  if (values && values.borderBottom && typeof values.borderBottom === 'object' && 'color' in values.borderBottom && values.borderBottom.color) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom.color }) };
-  }
-  return values;
-}
-
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
@@ -216,99 +200,4 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
   }
   return values;
-}
-
-export async function updateNodes(
-  entries: readonly NodeManagerNode[],
-  tokens: Map<string, AnyTokenList[number]>,
-  settings?: SettingsState,
-) {
-  // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
-  const { ignoreFirstPartForStyles, prefixStylesWithThemeName, baseFontSize } = settings ?? {};
-  const figmaStyleMaps = getAllFigmaStyleMaps();
-  const figmaVariableMaps = getVariablesMap();
-
-  const themeInfo = await AsyncMessageChannel.PluginInstance.message({
-    type: AsyncMessageTypes.GET_THEME_INFO,
-  });
-  postToUI({
-    type: MessageFromPluginTypes.START_JOB,
-    job: {
-      name: BackgroundJobs.PLUGIN_UPDATENODES,
-      timePerTask: 2,
-      completedTasks: 0,
-      totalTasks: entries.length,
-    },
-  });
-
-  const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
-  const promises: Set<Promise<void>> = new Set();
-  const returnedValues: Set<NodeTokenRefMap> = new Set();
-
-  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
-  const figmaStyleReferences: Record<string, string> = {};
-  const figmaVariableReferences: Record<string, string> = {};
-  const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
-
-  activeThemes?.forEach((theme) => {
-    Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
-      if (!figmaVariableReferences[token]) {
-        figmaVariableReferences[token] = variableId;
-      }
-    });
-    Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
-      if (!figmaStyleReferences[token]) {
-        figmaStyleReferences[token] = styleId;
-      }
-    });
-  });
-
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : null;
-
-  // TODO: Instead of passing in figmaStyleReferences as a whole, can we just pass in the matching variable / style instead of having to do the heavy lifting inside setNodeValue?
-
-  entries.forEach((entry) => {
-    promises.add(
-      defaultWorker.schedule(async () => {
-        try {
-          if (entry.tokens) {
-            // TODO: This is probably something we can optimize
-            const mappedTokens = destructureTokenForAlias(tokens, entry.tokens);
-            let mappedValues = mapValuesToTokens(tokens, entry.tokens);
-            mappedValues = destructureToken(mappedValues);
-            setValuesOnNode(
-              entry.node,
-              mappedValues,
-              mappedTokens,
-              figmaStyleMaps,
-              figmaStyleReferences,
-              figmaVariableMaps,
-              figmaVariableReferences,
-              stylePathPrefix,
-              ignoreFirstPartForStyles,
-              baseFontSize,
-            );
-            store.successfulNodes.add(entry.node);
-            returnedValues.add(entry.tokens);
-          }
-        } catch (e) {
-          console.log('got error', e);
-        }
-
-        tracker.next();
-        tracker.reportIfNecessary();
-      }),
-    );
-  });
-  await Promise.all(promises);
-
-  postToUI({
-    type: MessageFromPluginTypes.COMPLETE_JOB,
-    name: BackgroundJobs.PLUGIN_UPDATENODES,
-  });
-  if (returnedValues.size) {
-    return returnedValues.entries().next();
-  }
-
-  return {};
 }

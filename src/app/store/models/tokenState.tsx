@@ -4,7 +4,6 @@ import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
-
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import { replaceReferences } from '@/utils/findReferences';
@@ -516,7 +515,7 @@ export const tokenState = createModel<RootModel>()({
       }
 
       if (payload.shouldUpdate && rootState.settings.updateOnChange) {
-        dispatch.tokenState.updateDocument();
+        dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
       }
     },
     deleteToken() {
@@ -558,10 +557,10 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
     duplicateToken() {
-      dispatch.tokenState.updateDocument();
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     createToken() {
-      dispatch.tokenState.updateDocument();
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {
@@ -589,6 +588,14 @@ export const tokenState = createModel<RootModel>()({
       try {
         wrapTransaction({
           name: 'updateDocument',
+          statExtractor: (result, transaction) => {
+            transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
+              acc += tokens.length;
+              return acc;
+            }, 0), '');
+            transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
+            transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+          },
         }, () => updateTokensOnSources({
           tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
           tokenValues: rootState.tokenState.tokens,
