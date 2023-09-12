@@ -2,9 +2,9 @@ import { SingleToken } from '@/types/tokens';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
-import { checkIfContainsAlias } from '@/utils/alias';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
+import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -58,7 +58,7 @@ export default function setValuesOnVariable(
           referenceTokenName = t.rawValue!.toString().substring(1);
         }
         variableKeyMap[t.name] = variable.key;
-        if (checkIfContainsAlias(t.rawValue) && !t.$extensions?.['studio.tokens']?.modify) {
+        if (checkCanReferenceVariable(t)) {
           referenceVariableCandidates.push({
             variable,
             modeId: mode,
