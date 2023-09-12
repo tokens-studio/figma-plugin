@@ -61,7 +61,6 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
             case TokenTypes.BORDER_WIDTH:
             case TokenTypes.SPACING:
             case TokenTypes.NUMBER:
-              console.log('spacing');
               setNumberValuesOnVariable(variable, theme.$figmaModeId, Number(payload.value));
               break;
             default: break;
