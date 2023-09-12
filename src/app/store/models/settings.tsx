@@ -56,7 +56,7 @@ export const settings = createModel<RootModel>()({
     },
     language: 'en',
     sessionRecording: false,
-    updateMode: UpdateMode.PAGE,
+    updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: true,
     updateStyles: true,
