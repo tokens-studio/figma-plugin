@@ -10,8 +10,6 @@ import { init } from '@/utils/plugin';
 import { sendDocumentChange } from './sendDocumentChange';
 import { performCodeGen } from './performCodeGen';
 
-figma.skipInvisibleInstanceChildren = true;
-
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHANGED_TABS, asyncHandlers.changedTabs);
