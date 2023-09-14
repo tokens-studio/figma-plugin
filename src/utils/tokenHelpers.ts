@@ -35,7 +35,9 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
               internal__Parent: tokenGroup[0],
             } as SingleToken);
           }
-          if (mergedTokenIndex > -1 && typeof mergedToken.value === 'object' && typeof token.value === 'object') {
+          if (mergedTokenIndex > -1 && Array.isArray(mergedToken.value) && Array.isArray(token.value)) {
+            mergedTokens.splice(mergedTokenIndex, 1, mergedToken);
+          } else if (mergedTokenIndex > -1 && typeof mergedToken.value === 'object' && typeof token.value === 'object') {
             mergedTokens.splice(mergedTokenIndex, 1, {
               ...mergedToken,
               value: {
