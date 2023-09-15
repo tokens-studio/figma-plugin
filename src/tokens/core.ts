@@ -22,7 +22,7 @@ export const sizes = {
   8: '48px',
   10: '28px',
   controlMedium: '28px',
-  dropdownMaxHeight: '50vh',
+  dropdownMaxHeight: '45vh',
   scrollbarWidth: '8px',
 };
 
