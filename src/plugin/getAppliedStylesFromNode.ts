@@ -22,17 +22,18 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
     const styleIdBackupKey = 'effectStyleId_original';
     const localStyle = getLocalStyle(node, styleIdBackupKey, 'effects');
     if (localStyle) {
-      const effects = localStyle.effects as DropShadowEffect[];
+      const effects = localStyle.effects as Effect[];
       // convert paint to object containg x, y, spread, color
-      const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
+      const shadows: TokenBoxshadowValue[] = effects.filter((effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW').map((effect) => {
+        const rootEffect = effect as DropShadowEffect | InnerShadowEffect;
         const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
 
-        effectObject.color = figmaRGBToHex(effect.color);
-        effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
-        effectObject.x = effect.offset.x;
-        effectObject.y = effect.offset.y;
-        effectObject.blur = effect.radius;
-        effectObject.spread = effect.spread || 0;
+        effectObject.color = figmaRGBToHex(rootEffect.color);
+        effectObject.type = convertBoxShadowTypeFromFigma(rootEffect.type);
+        effectObject.x = rootEffect.offset.x;
+        effectObject.y = rootEffect.offset.y;
+        effectObject.blur = rootEffect.radius;
+        effectObject.spread = rootEffect.spread || 0;
 
         return effectObject;
       });
@@ -43,6 +44,7 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
           .map((section) => section.trim())
           .join('.');
 
+        // TODO: Handle backgroundBlur here. Right now we're skipping it
         const styleObject: SelectionStyle = {
           value: shadows.length > 1 ? shadows : shadows[0],
           type: Properties.boxShadow,
