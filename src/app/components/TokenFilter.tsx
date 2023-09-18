@@ -3,6 +3,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { XCircleFillIcon } from '@primer/octicons-react';
 import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
@@ -41,6 +42,10 @@ const TokenFilter = () => {
     debounced(value);
   }, [debounced]);
 
+  const handleResetSearchString = React.useCallback(() => {
+    setTokenString('');
+  }, []);
+
   return (
     <Box
       css={{
@@ -61,6 +66,7 @@ const TokenFilter = () => {
         onChange={handleChange}
         placeholder={t('search') as string}
       />
+      <Box css={{ position: 'absolute', right: '$2', cursor: 'pointer' }} onClick={handleResetSearchString}><XCircleFillIcon /></Box>
     </Box>
   );
 };
