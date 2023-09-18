@@ -71,7 +71,7 @@ export const ThemeVariableManagementEntry: React.FC<Props> = ({
             <ResolvingLoader />
           )}
           {(!variableInfo.name && variableInfo.isResolved) && (
-            <Stack direction="row" gap={1} css={{ color: '$fgDanger' }}>
+            <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
               <LinkBreak1Icon />
               Reference not found
             </Stack>

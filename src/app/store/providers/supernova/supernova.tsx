@@ -4,6 +4,7 @@ import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   activeThemeSelector,
+  storeTokenIdInJsonEditorSelector,
   localApiStateSelector,
   themesListSelector,
   tokensSelector,
@@ -29,6 +30,7 @@ export function useSupernova() {
   const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const dispatch = useDispatch<Dispatch>();
   const localApiState = useSelector(localApiStateSelector);
   const { pushDialog, closePushDialog } = usePushDialog();
@@ -77,6 +79,9 @@ export function useSupernova() {
               themes,
               tokens,
               metadata,
+            },
+            {
+              storeTokenIdInJsonEditor,
             },
           );
           saveLastSyncedState(dispatch, tokens, themes, metadata);

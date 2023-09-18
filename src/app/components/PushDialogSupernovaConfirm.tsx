@@ -20,9 +20,9 @@ function PushDialogSupernovaConfirm({ designSystemUrl }: Props) {
         css={{
           padding: '$2',
           fontFamily: '$mono',
-          color: '$textMuted',
+          color: '$fgMuted',
           background: '$bgSubtle',
-          borderRadius: '$card',
+          borderRadius: '$medium',
         }}
       >
         {designSystemUrl || t('designSystem')}

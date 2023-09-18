@@ -103,7 +103,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
         {hasErrored && isActive() && (
           <Box
             css={{
-              display: 'flex', flexDirection: 'row', color: '$fgDanger', gap: '$3', marginTop: '$3',
+              display: 'flex', flexDirection: 'row', color: '$dangerFg', gap: '$3', marginTop: '$3',
             }}
             data-testid="error-message"
           >
@@ -120,7 +120,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
         )}
       </Box>
       <DropdownMenu>
-        <DropdownMenuTrigger css={{ padding: '$2', borderRadius: '$button', background: 'none' }} data-testid="storage-item-tools-dropdown">
+        <DropdownMenuTrigger css={{ padding: '$2', borderRadius: '$small', background: 'none' }} data-testid="storage-item-tools-dropdown">
           <DotsVerticalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent>

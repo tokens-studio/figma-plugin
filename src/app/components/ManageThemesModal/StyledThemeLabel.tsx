@@ -12,12 +12,12 @@ export const StyledThemeLabel = styled(Box, {
   variants: {
     ignored: {
       true: {
-        color: '$textDisabled',
+        color: '$fgDisabled',
       },
     },
     variant: {
       folder: {
-        color: '$textMuted',
+        color: '$fgMuted',
         fontWeight: '$bold',
       },
       leaf: {},

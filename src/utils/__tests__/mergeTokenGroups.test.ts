@@ -1,6 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { mergeTokenGroups } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 describe('mergeTokenGroups', () => {
   it('merges all token groups into a single list overriding the previous set from left to right', () => {
@@ -25,6 +26,28 @@ describe('mergeTokenGroups', () => {
             height: 100,
           },
         },
+        {
+          type: TokenTypes.BOX_SHADOW,
+          name: 'shadow.large',
+          value: [
+            {
+              type: BoxShadowTypes.DROP_SHADOW,
+              color: '#000000',
+              x: 0,
+              y: 0,
+              blur: 32,
+              spread: 0,
+            },
+            {
+              type: BoxShadowTypes.INNER_SHADOW,
+              color: '#000000',
+              x: 0,
+              y: 0,
+              blur: 16,
+              spread: 0,
+            },
+          ],
+        },
       ],
       v1: [
         {
@@ -38,6 +61,28 @@ describe('mergeTokenGroups', () => {
           value: {
             fill: '{color.secondary}',
           },
+        },
+        {
+          type: TokenTypes.BOX_SHADOW,
+          name: 'shadow.large',
+          value: [
+            {
+              type: BoxShadowTypes.DROP_SHADOW,
+              color: '#ffffff',
+              x: 0,
+              y: 0,
+              blur: 32,
+              spread: 0,
+            },
+            {
+              type: BoxShadowTypes.INNER_SHADOW,
+              color: '#ffffff',
+              x: 0,
+              y: 0,
+              blur: 16,
+              spread: 0,
+            },
+          ],
         },
       ],
     };
@@ -58,6 +103,29 @@ describe('mergeTokenGroups', () => {
           borderRadius: 32,
           height: 100,
         },
+      },
+      {
+        internal__Parent: 'v1',
+        type: TokenTypes.BOX_SHADOW,
+        name: 'shadow.large',
+        value: [
+          {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#ffffff',
+            x: 0,
+            y: 0,
+            blur: 32,
+            spread: 0,
+          },
+          {
+            type: BoxShadowTypes.INNER_SHADOW,
+            color: '#ffffff',
+            x: 0,
+            y: 0,
+            blur: 16,
+            spread: 0,
+          },
+        ],
       },
       {
         internal__Parent: 'v0',

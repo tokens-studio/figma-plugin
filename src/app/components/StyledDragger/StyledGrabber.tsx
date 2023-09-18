@@ -7,7 +7,7 @@ export const StyledGrabber = styled(Box, {
   alignItems: 'center',
   width: '$4',
   height: '100%',
-  color: '$textSubtle',
+  color: '$fgSubtle',
   opacity: 0,
   '&:hover': {
     opacity: 1,

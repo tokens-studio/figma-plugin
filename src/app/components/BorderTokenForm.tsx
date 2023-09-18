@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { EditTokenObject } from '@/types/tokens';
 import Heading from './Heading';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import Stack from './Stack';
 import BorderTokenDownShiftInput from './BorderTokenDownShiftInput';
 import ColorPicker from './ColorPicker';

@@ -1,5 +1,5 @@
 import { startTransaction } from '@sentry/react';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
 import { updateJSONBinTokens } from './providers/jsonbin';
@@ -12,6 +12,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -20,6 +21,7 @@ type UpdateRemoteTokensPayload = {
   context: StorageTypeCredentials;
   updatedAt: string;
   oldUpdatedAt?: string;
+  storeTokenIdInJsonEditor: boolean;
   dispatch: Dispatch
 };
 
@@ -40,6 +42,7 @@ type UpdateTokensOnSourcesPayload = {
   checkForChanges: boolean;
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
+  storeTokenIdInJsonEditor: boolean
   dispatch: Dispatch
 };
 
@@ -50,6 +53,7 @@ async function updateRemoteTokens({
   context,
   updatedAt,
   oldUpdatedAt,
+  storeTokenIdInJsonEditor,
   dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
@@ -64,6 +68,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        storeTokenIdInJsonEditor,
         dispatch,
       });
       break;
@@ -77,6 +82,7 @@ async function updateRemoteTokens({
         context,
         updatedAt,
         oldUpdatedAt,
+        storeTokenIdInJsonEditor,
         dispatch,
       });
 
@@ -119,6 +125,7 @@ export default async function updateTokensOnSources({
   checkForChanges,
   shouldSwapStyles,
   collapsedTokenSets,
+  storeTokenIdInJsonEditor,
   dispatch,
 }: UpdateTokensOnSourcesPayload) {
   if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
@@ -129,12 +136,13 @@ export default async function updateTokensOnSources({
       context: api,
       updatedAt,
       oldUpdatedAt: lastUpdatedAt,
+      storeTokenIdInJsonEditor,
       dispatch,
     });
   }
 
   const mergedTokens = tokens
-    ? resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet))
+    ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
   const transaction = startTransaction({
@@ -153,7 +161,8 @@ export default async function updateTokensOnSources({
     activeTheme,
     shouldSwapStyles,
     collapsedTokenSets,
-  }).then(() => {
+  }).then((result) => {
+    transaction.setMeasurement('nodes', result.nodes, '');
     transaction.finish();
   });
 }

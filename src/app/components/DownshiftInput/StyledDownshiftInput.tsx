@@ -22,10 +22,10 @@ export const StyledDropdown = styled('div', {
   zIndex: '10',
   width: '100%',
   maxHeight: '30vh',
-  borderRadius: '$contextMenu',
+  borderBottomLeftRadius: '$medium',
+  borderBottomRightRadius: '$medium',
   overflowY: 'scroll',
   backgroundColor: '$bgDefault',
-  marginTop: '1px',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
 });
@@ -33,9 +33,8 @@ export const StyledDropdown = styled('div', {
 export const StyledList = styled(List, {
   position: 'absolute',
   zIndex: '10',
-  width: '100%',
+  width: 'calc(100% - $scrollbarWidth)',
   maxHeight: '30vh',
-  borderRadius: '$contextMenu',
   overflowY: 'scroll',
   backgroundColor: '$bgDefault',
   marginTop: '1px',
@@ -44,10 +43,9 @@ export const StyledList = styled(List, {
 });
 
 export const StyledItemValue = styled('div', {
-  color: '$textMuted',
+  color: '$fgMuted',
   fontWeight: '$bold',
   textAlign: 'right',
-  textTransform: 'uppercase',
   maxWidth: '300px',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -58,14 +56,15 @@ export const StyledItem = styled('div', {
   alignItems: 'center',
   gap: '$2',
   padding: '$2 $3',
+  borderRadius: '$small',
   fontSize: '$xsmall',
   variants: {
     isFocused: {
       true: {
-        backgroundColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        color: '$fgOnEmphasis',
         [`& ${StyledItemValue}`]: {
-          color: '$onInteraction',
+          color: '$fgOnEmphasis',
         },
       },
     },
@@ -107,7 +106,7 @@ export const StyledButton = styled('button', {
   variants: {
     isFocused: {
       false: {
-        color: '$textDisabled',
+        color: '$fgDisabled',
       },
     },
   },

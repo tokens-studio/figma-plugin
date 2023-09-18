@@ -50,7 +50,7 @@ const StyledInput = styled('input', {
   backgroundColor: '$bgDefault',
   border: '1px solid $borderMuted',
   fontSize: '$xsmall',
-  borderRadius: '$input',
+  borderRadius: '$small',
   position: 'relative',
 
   '&:focus-within': {
@@ -93,8 +93,8 @@ const StyledSuffix = styled('button', {
 
   '&:focus': {
     outline: 'none',
-    backgroundColor: '$interaction',
-    color: '$onInteraction',
+    backgroundColor: '$accentDefault',
+    color: '$fgOnEmphasis',
   },
 
   variants: {
@@ -123,7 +123,7 @@ const StyledPrefix = styled('div', {
   display: 'flex',
   alignItems: 'center',
   fontSize: '$xsmall',
-  color: '$textMuted',
+  color: '$fgMuted',
 
   '&:focus': {
     outline: 'none',
@@ -184,9 +184,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
 
   React.useEffect(() => {
     if (autofocus && htmlInputRef && htmlInputRef.current) {
-      setTimeout(() => {
-        htmlInputRef.current?.focus();
-      }, 50);
+      htmlInputRef.current.focus();
     }
   }, [autofocus, htmlInputRef]);
 

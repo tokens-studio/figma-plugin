@@ -18,7 +18,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
   ), [token, tokensContext.resolvedTokens]);
 
   return (
-    <Stack direction="column" gap={1} css={{ background: '$bgToolTip' }}>
+    <Stack direction="column" gap={1} css={{ background: '$tooltipBg' }}>
       <Stack
         direction="row"
         justify="start"
@@ -27,7 +27,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
         css={{
           fontSize: '$0',
           fontWeight: '$bold',
-          color: '$fgToolTip',
+          color: '$tooltipFg',
           position: 'relative',
         }}
       >
@@ -38,7 +38,7 @@ export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
       <Stack direction="column" align="start" gap={2} wrap>
         <TokenTooltipContentValue token={token} />
       </Stack>
-      {token.description && <Box css={{ color: '$fgToolTipMuted', padding: '$1 $2' }}>{token.description}</Box>}
+      {token.description && <Box css={{ color: '$tooltipFgMuted', padding: '$1 $2' }}>{token.description}</Box>}
     </Stack>
   );
 };

@@ -6,7 +6,7 @@ import Stack from '../Stack';
 import Text from '../Text';
 
 const StyledLink = styled('a', {
-  color: '$interaction',
+  color: '$accentDefault',
   textDecoration: 'underline',
 });
 

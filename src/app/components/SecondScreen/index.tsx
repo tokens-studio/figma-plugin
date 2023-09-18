@@ -22,8 +22,8 @@ export const StyledBetaBadge = styled('span', {
   justifyContent: 'center',
   fontSize: '$xxsmall',
   padding: '$2',
-  borderRadius: '$badge',
-  backgroundColor: '$bgAccent',
+  borderRadius: '$medium',
+  backgroundColor: '$accentBg',
   lineHeight: 1,
   color: '$fgDefault',
   fontWeight: '$bold',
@@ -33,12 +33,12 @@ export const StyledBetaBadge = styled('span', {
 
 const StyledP = styled('p', {
   fontWeight: '$normal',
-  color: '$text',
+  color: '$fgDefault',
   fontSize: '$xsmall',
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$fgAccent',
+  color: '$accentFg',
   fontSize: '$xsmall',
 });
 
@@ -62,9 +62,9 @@ export default function SecondScreen() {
   if (!user) {
     statusColor = '$fgSubtle';
   } else if (isEnabled && user) {
-    statusColor = '$fgSuccess';
+    statusColor = '$successFg';
   } else {
-    statusColor = '$fgDanger';
+    statusColor = '$dangerFg';
   }
 
   return (

@@ -11,7 +11,7 @@ type Props = {
 
 export const SingleShadowValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
   <Box>
-    <Box css={{ display: 'flex', color: '$fgToolTip' }}>{resolvedValue?.type}</Box>
+    <Box css={{ display: 'flex', color: '$tooltipFg' }}>{resolvedValue?.type}</Box>
     <Stack direction="row" align="start" gap={2} wrap>
       <TooltipProperty value={value?.x} resolvedValue={resolvedValue?.x} />
       <TooltipProperty value={value?.y} resolvedValue={resolvedValue?.y} />

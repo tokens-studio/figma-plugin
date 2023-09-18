@@ -2,15 +2,16 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import type { SetTokenDataPayload } from '@/types/payloads';
 import parseTokenValues from '@/utils/parseTokenValues';
 import type { TokenState } from '../../tokenState';
+import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   const values = parseTokenValues(payload.values);
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
     allAvailableTokenSets
-      .map((tokenSet) => ([tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
+      .map((tokenSet) => ([tokenSet, payload?.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED])),
   );
-  const newActiveTheme = payload.activeTheme;
+  const newActiveTheme = payload?.activeTheme;
   Object.entries(newActiveTheme ?? {}).forEach(([group, activeTheme]) => {
     if (!payload.themes?.find((t) => t.id === activeTheme) && newActiveTheme) {
       delete newActiveTheme[group];
@@ -21,7 +22,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
   return {
     ...state,
-    tokens: values,
+    tokens: addIdPropertyToTokens(values),
     themes: (payload.themes ?? []).map((theme) => ({
       ...theme,
       selectedTokenSets: Object.fromEntries(

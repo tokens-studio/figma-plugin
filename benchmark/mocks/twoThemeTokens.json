@@ -1,0 +1,2828 @@
+{
+    "Foundations": {
+      "blue010": {
+        "value": "#ecf1ff",
+        "type": "color"
+      },
+      "blue020": {
+        "value": "#d5e0fc",
+        "type": "color"
+      },
+      "blue030": {
+        "value": "#aebfff",
+        "type": "color"
+      },
+      "blue040": {
+        "value": "#8ba6f6",
+        "type": "color"
+      },
+      "blue050": {
+        "value": "#708de9",
+        "type": "color"
+      },
+      "blue060": {
+        "value": "#3358cc",
+        "type": "color"
+      },
+      "blue070": {
+        "value": "#254cac",
+        "type": "color"
+      },
+      "blue080": {
+        "value": "#12387a",
+        "type": "color"
+      },
+      "blue090": {
+        "value": "#03264d",
+        "type": "color"
+      },
+      "blue100": {
+        "value": "#060f2c",
+        "type": "color"
+      },
+      "green010": {
+        "value": "#e5f4ea",
+        "type": "color"
+      },
+      "green020": {
+        "value": "#c8e4d0",
+        "type": "color"
+      },
+      "green030": {
+        "value": "#95caa3",
+        "type": "color"
+      },
+      "green040": {
+        "value": "#6db681",
+        "type": "color"
+      },
+      "green050": {
+        "value": "#41a05b",
+        "type": "color"
+      },
+      "green060": {
+        "value": "#007b22",
+        "type": "color"
+      },
+      "green070": {
+        "value": "#00601a",
+        "type": "color"
+      },
+      "green080": {
+        "value": "#004514",
+        "type": "color"
+      },
+      "green090": {
+        "value": "#002d0d",
+        "type": "color"
+      },
+      "green100": {
+        "value": "#001506",
+        "type": "color"
+      },
+      "red010": {
+        "value": "#feecec",
+        "type": "color"
+      },
+      "red020": {
+        "value": "#fed8d8",
+        "type": "color"
+      },
+      "red030": {
+        "value": "#feb3b3",
+        "type": "color"
+      },
+      "red040": {
+        "value": "#fe8888",
+        "type": "color"
+      },
+      "red050": {
+        "value": "#fb5959",
+        "type": "color"
+      },
+      "red060": {
+        "value": "#d60000",
+        "type": "color"
+      },
+      "red070": {
+        "value": "#a90000",
+        "type": "color"
+      },
+      "red080": {
+        "value": "#7d0000",
+        "type": "color"
+      },
+      "red090": {
+        "value": "#550000",
+        "type": "color"
+      },
+      "red100": {
+        "value": "#2d0000",
+        "type": "color"
+      },
+      "amber010": {
+        "value": "#ffede1",
+        "type": "color"
+      },
+      "amber020": {
+        "value": "#fddcc6",
+        "type": "color"
+      },
+      "amber030": {
+        "value": "#feb788",
+        "type": "color"
+      },
+      "amber040": {
+        "value": "#f79247",
+        "type": "color"
+      },
+      "amber050": {
+        "value": "#cd6900",
+        "type": "color"
+      },
+      "amber060": {
+        "value": "#a75500",
+        "type": "color"
+      },
+      "amber070": {
+        "value": "#804200",
+        "type": "color"
+      },
+      "amber080": {
+        "value": "#5d2f00",
+        "type": "color"
+      },
+      "amber090": {
+        "value": "#3c1f00",
+        "type": "color"
+      },
+      "amber100": {
+        "value": "#1d0d02",
+        "type": "color"
+      },
+      "teal010": {
+        "value": "#e6f4f6",
+        "type": "color"
+      },
+      "teal020": {
+        "value": "#c7e7ea",
+        "type": "color"
+      },
+      "teal030": {
+        "value": "#97d0d6",
+        "type": "color"
+      },
+      "teal040": {
+        "value": "#5eb8c0",
+        "type": "color"
+      },
+      "teal050": {
+        "value": "#289fab",
+        "type": "color"
+      },
+      "teal060": {
+        "value": "#017582",
+        "type": "color"
+      },
+      "teal070": {
+        "value": "#005b65",
+        "type": "color"
+      },
+      "teal080": {
+        "value": "#004249",
+        "type": "color"
+      },
+      "teal090": {
+        "value": "#002b30",
+        "type": "color"
+      },
+      "teal100": {
+        "value": "#001314",
+        "type": "color"
+      },
+      "purple010": {
+        "value": "#eff0ff",
+        "type": "color"
+      },
+      "purple020": {
+        "value": "#dfe0fe",
+        "type": "color"
+      },
+      "purple030": {
+        "value": "#c0c2fc",
+        "type": "color"
+      },
+      "purple040": {
+        "value": "#a3a3fb",
+        "type": "color"
+      },
+      "purple050": {
+        "value": "#8883f6",
+        "type": "color"
+      },
+      "purple060": {
+        "value": "#6454e3",
+        "type": "color"
+      },
+      "purple070": {
+        "value": "#4c33cc",
+        "type": "color"
+      },
+      "purple080": {
+        "value": "#37239c",
+        "type": "color"
+      },
+      "purple090": {
+        "value": "#231668",
+        "type": "color"
+      },
+      "purple100": {
+        "value": "#0f0936",
+        "type": "color"
+      },
+      "neutral010": {
+        "value": "#f1f1f1",
+        "type": "color"
+      },
+      "neutral020": {
+        "value": "#e2e2e2",
+        "type": "color"
+      },
+      "neutral030": {
+        "value": "#c6c6c6",
+        "type": "color"
+      },
+      "neutral040": {
+        "value": "#ababab",
+        "type": "color"
+      },
+      "neutral050": {
+        "value": "#919191",
+        "type": "color"
+      },
+      "neutral060": {
+        "value": "#6a6a6a",
+        "type": "color"
+      },
+      "neutral070": {
+        "value": "#525252",
+        "type": "color"
+      },
+      "neutral080": {
+        "value": "#3b3b3b",
+        "type": "color"
+      },
+      "neutral090": {
+        "value": "#262626",
+        "type": "color"
+      },
+      "neutral100": {
+        "value": "#111111",
+        "type": "color"
+      },
+      "focus010": {
+        "value": "#3768fb",
+        "type": "color"
+      },
+      "blackTint010": {
+        "value": "#0000001a",
+        "type": "color"
+      },
+      "blackTint020": {
+        "value": "#00000033",
+        "type": "color"
+      },
+      "blackTint030": {
+        "value": "#0000004d",
+        "type": "color"
+      },
+      "blackTint040": {
+        "value": "#00000066",
+        "type": "color"
+      },
+      "blackTint050": {
+        "value": "#00000080",
+        "type": "color"
+      },
+      "blackTint060": {
+        "value": "#00000099",
+        "type": "color"
+      },
+      "blackTint070": {
+        "value": "#000000b3",
+        "type": "color"
+      },
+      "blackTint080": {
+        "value": "#000000cc",
+        "type": "color"
+      },
+      "blackTint090": {
+        "value": "#000000e6",
+        "type": "color"
+      },
+      "black": {
+        "value": "#111111",
+        "type": "color"
+      },
+      "whiteTint010": {
+        "value": "#ffffff1a",
+        "type": "color"
+      },
+      "whiteTint020": {
+        "value": "#ffffff33",
+        "type": "color"
+      },
+      "whiteTint030": {
+        "value": "#ffffff4d",
+        "type": "color"
+      },
+      "whiteTint040": {
+        "value": "#ffffff66",
+        "type": "color"
+      },
+      "whiteTint050": {
+        "value": "#ffffff80",
+        "type": "color"
+      },
+      "whiteTint060": {
+        "value": "#ffffff99",
+        "type": "color"
+      },
+      "whiteTint070": {
+        "value": "#ffffffb3",
+        "type": "color"
+      },
+      "whiteTint080": {
+        "value": "#ffffffcc",
+        "type": "color"
+      },
+      "whiteTint090": {
+        "value": "#ffffffe6",
+        "type": "color"
+      },
+      "white": {
+        "value": "#ffffff",
+        "type": "color"
+      },
+      "Reddit": {
+        "value": "#FF4500",
+        "type": "color"
+      },
+      "Whatsapp": {
+        "value": "#25d366",
+        "type": "color"
+      },
+      "Youtube": {
+        "value": "#ff0000",
+        "type": "color"
+      },
+      "Instagram": {
+        "value": "#c32aa3",
+        "type": "color"
+      },
+      "Facebook": {
+        "value": "#1877f2",
+        "type": "color"
+      },
+      "Twitter": {
+        "value": "#1da1f2",
+        "type": "color"
+      },
+      "Github": {
+        "value": "#000000",
+        "type": "color"
+      },
+      "Apple": {
+        "value": "#000000",
+        "type": "color"
+      },
+      "GoogleBlue": {
+        "value": "#4285f4",
+        "type": "color"
+      },
+      "GoogleRed": {
+        "value": "#db4437",
+        "type": "color"
+      },
+      "GoogleYellow": {
+        "value": "#f4b400",
+        "type": "color"
+      },
+      "GoogleGreen": {
+        "value": "#0f9d58",
+        "type": "color"
+      },
+      "transparent": {
+        "value": "transparent",
+        "type": "color"
+      },
+      "opacity000": {
+        "value": "0",
+        "type": "opacity"
+      },
+      "opacity010": {
+        "value": "0.1",
+        "type": "opacity"
+      },
+      "opacity020": {
+        "value": "0.2",
+        "type": "opacity"
+      },
+      "opacity030": {
+        "value": "0.3",
+        "type": "opacity"
+      },
+      "opacity040": {
+        "value": "0.4",
+        "type": "opacity"
+      },
+      "opacity050": {
+        "value": "0.5",
+        "type": "opacity"
+      },
+      "opacity060": {
+        "value": "0.6",
+        "type": "opacity"
+      },
+      "opacity070": {
+        "value": "0.7",
+        "type": "opacity"
+      },
+      "opacity080": {
+        "value": "0.8",
+        "type": "opacity"
+      },
+      "opacity090": {
+        "value": "0.9",
+        "type": "opacity"
+      },
+      "opacity100": {
+        "value": "1",
+        "type": "opacity"
+      },
+      "sizing000": {
+        "value": "0px",
+        "type": "sizing"
+      },
+      "sizing010": {
+        "value": "4px",
+        "type": "sizing"
+      },
+      "sizing020": {
+        "value": "8px",
+        "type": "sizing"
+      },
+      "sizing030": {
+        "value": "12px",
+        "type": "sizing"
+      },
+      "sizing040": {
+        "value": "16px",
+        "type": "sizing"
+      },
+      "sizing045": {
+        "value": "20px",
+        "type": "sizing"
+      },
+      "sizing050": {
+        "value": "24px",
+        "type": "sizing"
+      },
+      "sizing060": {
+        "value": "32px",
+        "type": "sizing"
+      },
+      "sizing070": {
+        "value": "40px",
+        "type": "sizing"
+      },
+      "sizing080": {
+        "value": "48px",
+        "type": "sizing"
+      },
+      "sizing090": {
+        "value": "64px",
+        "type": "sizing"
+      },
+      "sizing100": {
+        "value": "80px",
+        "type": "sizing"
+      },
+      "sizing110": {
+        "value": "120px",
+        "type": "sizing"
+      },
+      "sizing120": {
+        "value": "160px",
+        "type": "sizing"
+      },
+      "iconSize005": {
+        "value": "{sizing020}",
+        "type": "sizing"
+      },
+      "iconSize010": {
+        "value": "{sizing040}",
+        "type": "sizing"
+      },
+      "iconSize020": {
+        "value": "{sizing050}",
+        "type": "sizing"
+      },
+      "iconSize030": {
+        "value": "{sizing060}",
+        "type": "sizing"
+      },
+      "iconSize040": {
+        "value": "{sizing080}",
+        "type": "sizing"
+      },
+      "iconSize050": {
+        "value": "{sizing090}",
+        "type": "sizing"
+      },
+      "space000": {
+        "value": "{sizing000}",
+        "type": "spacing"
+      },
+      "space010": {
+        "value": "{sizing010}",
+        "type": "spacing"
+      },
+      "space020": {
+        "value": "{sizing020}",
+        "type": "spacing"
+      },
+      "space030": {
+        "value": "{sizing030}",
+        "type": "spacing"
+      },
+      "space040": {
+        "value": "{sizing040}",
+        "type": "spacing"
+      },
+      "space045": {
+        "value": "{sizing045}",
+        "type": "spacing"
+      },
+      "space050": {
+        "value": "{sizing050}",
+        "type": "spacing"
+      },
+      "space060": {
+        "value": "{sizing060}",
+        "type": "spacing"
+      },
+      "space070": {
+        "value": "{sizing070}",
+        "type": "spacing"
+      },
+      "space080": {
+        "value": "{sizing080}",
+        "type": "spacing"
+      },
+      "space090": {
+        "value": "{sizing090}",
+        "type": "spacing"
+      },
+      "space100": {
+        "value": "{sizing100}",
+        "type": "spacing"
+      },
+      "space110": {
+        "value": "{sizing110}",
+        "type": "spacing"
+      },
+      "space120": {
+        "value": "{sizing120}",
+        "type": "spacing"
+      },
+      "fontFamily010": {
+        "value": "DM Sans, sans-serif",
+        "type": "fontFamilies"
+      },
+      "fontFamily020": {
+        "value": "Bitter, serif",
+        "type": "fontFamilies"
+      },
+      "fontFamily030": {
+        "value": "Poppins, sans-serif",
+        "type": "fontFamilies"
+      },
+      "fontSize010": {
+        "value": "12px",
+        "type": "fontSizes"
+      },
+      "fontSize020": {
+        "value": "14px",
+        "type": "fontSizes"
+      },
+      "fontSize030": {
+        "value": "16px",
+        "type": "fontSizes"
+      },
+      "fontSize040": {
+        "value": "18px",
+        "type": "fontSizes"
+      },
+      "fontSize050": {
+        "value": "20px",
+        "type": "fontSizes"
+      },
+      "fontSize060": {
+        "value": "22px",
+        "type": "fontSizes"
+      },
+      "fontSize070": {
+        "value": "24px",
+        "type": "fontSizes"
+      },
+      "fontSize080": {
+        "value": "28px",
+        "type": "fontSizes"
+      },
+      "fontSize090": {
+        "value": "32px",
+        "type": "fontSizes"
+      },
+      "fontSize100": {
+        "value": "36px",
+        "type": "fontSizes"
+      },
+      "fontSize110": {
+        "value": "40px",
+        "type": "fontSizes"
+      },
+      "fontSize120": {
+        "value": "44px",
+        "type": "fontSizes"
+      },
+      "fontSize130": {
+        "value": "48px",
+        "type": "fontSizes"
+      },
+      "fontSize140": {
+        "value": "56px",
+        "type": "fontSizes"
+      },
+      "fontSize150": {
+        "value": "64px",
+        "type": "fontSizes"
+      },
+      "fontSize160": {
+        "value": "80px",
+        "type": "fontSizes"
+      },
+      "letterSpacing010": {
+        "value": "-1%",
+        "type": "letterSpacing"
+      },
+      "letterSpacing020": {
+        "value": "-0.5%",
+        "type": "letterSpacing"
+      },
+      "letterSpacing030": {
+        "value": "0%",
+        "type": "letterSpacing"
+      },
+      "letterSpacing040": {
+        "value": "0.5%",
+        "type": "letterSpacing"
+      },
+      "letterSpacing050": {
+        "value": "1%",
+        "type": "letterSpacing"
+      },
+      "fontLineHeight010": {
+        "value": "100%",
+        "type": "lineHeights"
+      },
+      "fontLineHeight020": {
+        "value": "112.5%",
+        "type": "lineHeights"
+      },
+      "fontLineHeight030": {
+        "value": "125%",
+        "type": "lineHeights"
+      },
+      "fontLineHeight040": {
+        "value": "150%",
+        "type": "lineHeights"
+      },
+      "fontLineHeight050": {
+        "value": "175%",
+        "type": "lineHeights"
+      },
+      "fontLineHeight060": {
+        "value": "200%",
+        "type": "lineHeights"
+      },
+      "weight": {
+        "100": {
+          "value": "Thin",
+          "type": "fontWeights",
+          "description": "Thin"
+        },
+        "200": {
+          "value": "ExtraLight",
+          "type": "fontWeights",
+          "description": "Extra Light"
+        },
+        "300": {
+          "value": "Light",
+          "type": "fontWeights",
+          "description": "Light"
+        },
+        "400": {
+          "value": "Regular",
+          "type": "fontWeights",
+          "description": "Regular"
+        },
+        "500": {
+          "value": "Medium",
+          "type": "fontWeights",
+          "description": "Medium"
+        },
+        "600": {
+          "value": "SemiBold",
+          "type": "fontWeights",
+          "description": "Semi Bold"
+        },
+        "700": {
+          "value": "Bold",
+          "type": "fontWeights",
+          "description": "Bold"
+        },
+        "800": {
+          "value": "ExtraBold",
+          "type": "fontWeights",
+          "description": "Extra Bold"
+        },
+        "900": {
+          "value": "Black",
+          "type": "fontWeights",
+          "description": "Black"
+        }
+      },
+      "stretch": {
+        "010": {
+          "value": "Ultra Condensed",
+          "type": "fontWeights",
+          "description": "Ultra condensed"
+        },
+        "020": {
+          "value": "Extra Condensed",
+          "type": "fontWeights",
+          "description": "Extra condensed"
+        },
+        "030": {
+          "value": "Condensed",
+          "type": "fontWeights",
+          "description": "Condensed"
+        },
+        "040": {
+          "value": "Semi Condensed",
+          "type": "fontWeights",
+          "description": "Semi condensed"
+        },
+        "050": {
+          "value": "Normal",
+          "type": "fontWeights",
+          "description": "Normal"
+        },
+        "060": {
+          "value": "Semi Expanded",
+          "type": "fontWeights",
+          "description": "Semi expanded"
+        },
+        "070": {
+          "value": "Expanded",
+          "type": "fontWeights",
+          "description": "Expanded"
+        },
+        "080": {
+          "value": "Extra Expanded",
+          "type": "fontWeights",
+          "description": "Extra expanded"
+        },
+        "090": {
+          "value": "Ultra Expanded",
+          "type": "fontWeights",
+          "description": "Ultra expanded"
+        }
+      },
+      "style": {
+        "Normal": {
+          "value": "Normal",
+          "type": "fontWeights",
+          "description": "Normal"
+        },
+        "Italic": {
+          "value": "Italic",
+          "type": "fontWeights",
+          "description": "Italic"
+        },
+        "Oblique": {
+          "value": "Oblique",
+          "type": "fontWeights",
+          "description": "Oblique"
+        }
+      },
+      "editorial": {
+        "editorialDisplay010": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize140}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for large pieces of text content"
+        },
+        "editorialDisplay020": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize150}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for large pieces of text content"
+        },
+        "editorialDisplay030": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize160}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for large pieces of text content"
+        },
+        "editorialHeadline010": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize040}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline020": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize050}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline030": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize070}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline040": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize080}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline050": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize090}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline060": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize100}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline070": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize110}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialHeadline080": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize130}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for headline text content such as for cards and title bars"
+        },
+        "editorialSubheadline010": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub headline text content such as for cards"
+        },
+        "editorialSubheadline020": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize050}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub headline text content such as for cards"
+        },
+        "editorialSubheadline030": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize070}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub headline text content such as for cards"
+        },
+        "editorialSubheadline040": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize080}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub headline text content such as for cards"
+        },
+        "editorialSubheadline050": {
+          "value": {
+            "fontFamily": "{fontFamily020}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize090}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub headline text content such as for cards"
+        },
+        "editorialParagraph010": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for body text content such as for article text"
+        },
+        "editorialParagraph020": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for body text content such as for article text"
+        },
+        "editorialParagraph030": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize040}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for body text content such as for article text"
+        },
+        "editorialQuote010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight030}",
+            "fontSize": "{fontSize060}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for quotes in body text content"
+        },
+        "editorialQuote020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight030}",
+            "fontSize": "{fontSize080}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for quotes in body text content"
+        },
+        "editorialCaption010": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for captions such as for the image with caption"
+        },
+        "editorialLabel010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize010}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for non-interactive identifiers that are often defined by an editor, for example the author label in a card"
+        },
+        "editorialLabel020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for non-interactive identifiers that are often defined by an editor, for example the author label in a card"
+        },
+        "editorialLabel030": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for non-interactive identifiers that are often defined by an editor, for example the author label in a card"
+        }
+      },
+      "utility": {
+        "utilityHeading010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.700}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for heading utility text such as for modals and drawers"
+        },
+        "utilityHeading020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.700}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize040}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for heading utility text such as for modals and drawers"
+        },
+        "utilityHeading030": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.700}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize050}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for heading utility text such as for modals and drawers"
+        },
+        "utilityHeading040": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.700}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize060}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for heading utility text such as for modals and drawers"
+        },
+        "utilityHeading050": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.700}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize070}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for heading utility text such as for modals and drawers"
+        },
+        "utilitySubheading010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub heading utility text such as for modals and drawers"
+        },
+        "utilitySubheading020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub heading utility text such as for modals and drawers"
+        },
+        "utilitySubheading030": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize040}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub heading utility text such as for modals and drawers"
+        },
+        "utilitySubheading040": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize050}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub heading utility text such as for modals and drawers"
+        },
+        "utilitySubheading050": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight020}",
+            "fontSize": "{fontSize060}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for sub heading utility text such as for modals and drawers"
+        },
+        "utilityBody010": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize010}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text inputs and banners"
+        },
+        "utilityBody020": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text inputs and banners"
+        },
+        "utilityBody030": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.400}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text inputs and banners"
+        },
+        "utilityLabel010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize010}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text labels such as for menus and lists"
+        },
+        "utilityLabel020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text labels such as for menus and lists"
+        },
+        "utilityLabel030": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for text labels such as for menus and lists"
+        },
+        "utilityButton010": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize010}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for button text and standalone links"
+        },
+        "utilityButton020": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for button text and standalone links"
+        },
+        "utilityButton030": {
+          "value": {
+            "fontFamily": "{fontFamily030}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize030}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for button text and standalone links"
+        },
+        "utilityMeta010": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize010}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for bylines and date time"
+        },
+        "utilityMeta020": {
+          "value": {
+            "fontFamily": "{fontFamily010}",
+            "fontWeight": "{weight.500}",
+            "lineHeight": "{fontLineHeight040}",
+            "fontSize": "{fontSize020}",
+            "letterSpacing": "{letterSpacing030}"
+          },
+          "type": "typography",
+          "description": "Used for bylines and date time"
+        }
+      },
+      "borderRadiusDefault": {
+        "value": "{sizing020}",
+        "type": "borderRadius"
+      },
+      "borderRadiusRounded010": {
+        "value": "{sizing010}",
+        "type": "borderRadius"
+      },
+      "borderRadiusRounded020": {
+        "value": "{sizing020}",
+        "type": "borderRadius"
+      },
+      "borderRadiusRounded030": {
+        "value": "{sizing030}",
+        "type": "borderRadius"
+      },
+      "borderRadiusRounded040": {
+        "value": "{sizing040}",
+        "type": "borderRadius"
+      },
+      "borderRadiusRounded050": {
+        "value": "{sizing050}",
+        "type": "borderRadius"
+      },
+      "borderRadiusSharp": {
+        "value": "{sizing000}",
+        "type": "borderRadius"
+      },
+      "borderRadiusCircle": {
+        "value": "50%",
+        "type": "borderRadius"
+      },
+      "borderRadiusPill": {
+        "value": "20rem",
+        "type": "borderRadius"
+      },
+      "borderWidthDefault": {
+        "value": "{borderWidth010}",
+        "type": "borderWidth"
+      },
+      "borderWidth000": {
+        "value": "0px",
+        "type": "borderWidth"
+      },
+      "borderWidth010": {
+        "value": "1px",
+        "type": "borderWidth"
+      },
+      "borderWidth020": {
+        "value": "2px",
+        "type": "borderWidth"
+      },
+      "borderWidth030": {
+        "value": "4px",
+        "type": "borderWidth"
+      },
+      "shadow010": {
+        "value": {
+          "x": "0",
+          "y": "0.5",
+          "blur": "2",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Default states of cards and active states of buttons"
+      },
+      "shadow020": {
+        "value": {
+          "x": "0",
+          "y": "2",
+          "blur": "4",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Notification badges"
+      },
+      "shadow030": {
+        "value": {
+          "x": "0",
+          "y": "4",
+          "blur": "8",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Navigation menu bars"
+      },
+      "shadow040": {
+        "value": {
+          "x": "0",
+          "y": "8",
+          "blur": "16",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Hover states of cards and button hover states"
+      },
+      "shadow050": {
+        "value": {
+          "x": "0",
+          "y": "16",
+          "blur": "24",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Pickers and popovers"
+      },
+      "shadow060": {
+        "value": {
+          "x": "0",
+          "y": "20",
+          "blur": "32",
+          "spread": "0",
+          "color": "rgba({black},0.08)",
+          "type": "dropShadow"
+        },
+        "type": "boxShadow",
+        "description": "Modals and dialogs"
+      },
+      "CORS service": {
+        "value": "https://corsproxy.io/?",
+        "type": "other"
+      }
+    },
+    "Light": {
+      "ink": {
+        "inkBrand020": {
+          "value": "{blue080}",
+          "type": "color",
+          "description": "Brand colour complimentary to inkBrand010"
+        },
+        "inkBrand010": {
+          "value": "{blue060}",
+          "type": "color",
+          "description": "Prominent brand colour applied to text and icons (e.g. icons in outlined buttons)"
+        },
+        "inkInformative": {
+          "value": "{teal060}",
+          "type": "color",
+          "description": "Text and icons for informative messages"
+        },
+        "inkNotice": {
+          "value": "{neutral070}",
+          "type": "color",
+          "description": "Text and icons for notice messages"
+        },
+        "inkNegative": {
+          "value": "{red060}",
+          "type": "color",
+          "description": "Text and icons for error messages. Feedback notifications (invalid) (e.g. assistive text in a text field)"
+        },
+        "inkPositive": {
+          "value": "{green060}",
+          "type": "color",
+          "description": "Text and icons for success messages. Feedback notifications (valid) (e.g. assistive text in a text field)"
+        },
+        "inkDark010": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Used when the same dark colour value is required across all colour themes"
+        },
+        "inkLight010": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Used when the same light colour value is required across all colour themes"
+        },
+        "inkInverse": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Text and icons where the recommended contrast against the background cannot be achieved"
+        },
+        "inkNonEssential": {
+          "value": "{neutral040}",
+          "type": "color",
+          "description": "Text and icons in an inactive (disabled) state"
+        },
+        "inkSubtle": {
+          "value": "{neutral060}",
+          "type": "color",
+          "description": "Subheadlines, labels and secondary text"
+        },
+        "inkBase": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Body and paragraph text"
+        },
+        "inkContrast": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Headlines or copy where emphasis is needed"
+        }
+      },
+      "interface": {
+        "interfaceSkeleton020": {
+          "value": "{neutral020}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) to indicate the skeleton (loading) state of a component"
+        },
+        "interfaceSkeleton010": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) to indicate the skeleton (loading) state of a component"
+        },
+        "interfaceNeutral020": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for neutral messages"
+        },
+        "interfaceNeutral010": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for neutral messages, & feedback notifications (e.g. banner, flag, inline message)"
+        },
+        "interfaceInformative020": {
+          "value": "{teal010}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for informative messages"
+        },
+        "interfaceInformative010": {
+          "value": "{teal060}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for informative messages"
+        },
+        "interfaceNotice020": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for notice or warning messages"
+        },
+        "interfaceNotice010": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for notice or warning messages"
+        },
+        "interfaceNegative020": {
+          "value": "{red010}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for error messages"
+        },
+        "interfaceNegative010": {
+          "value": "{red060}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for error messages"
+        },
+        "interfacePositive020": {
+          "value": "{green010}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for success messages"
+        },
+        "interfacePositive010": {
+          "value": "{green060}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for success messages"
+        },
+        "interfaceBrand020": {
+          "value": "{blue090}",
+          "type": "color",
+          "description": "Brand colour complimentary to interfaceBrand010"
+        },
+        "interfaceBrand010": {
+          "value": "{blue060}",
+          "type": "color",
+          "description": "Prominent brand colour applied to backgrounds e.g. a footer, or header"
+        },
+        "interface060": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Component backgrounds of contrasting colours"
+        },
+        "interface050": {
+          "value": "{neutral040}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface040": {
+          "value": "{neutral030}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface030": {
+          "value": "{neutral020}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface020": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface010": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Component backgrounds (e.g. card)"
+        },
+        "interfaceBackground": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Page background"
+        }
+      },
+      "interactive": {
+        "interactiveInput050": {
+          "value": "{blue070}",
+          "type": "color",
+          "description": "Active state background and border for selection controls, and input components"
+        },
+        "interactiveInput040": {
+          "value": "{blue060}",
+          "type": "color",
+          "description": "Background & border colours applied to the Selected state of the Switch, the checkbox, & radio components"
+        },
+        "interactiveInput030": {
+          "value": "{blue010}",
+          "type": "color",
+          "description": "Background colour applied to the ‘feedback’ of the checkbox, & radio components"
+        },
+        "interactiveInput020": {
+          "value": "{neutral050}",
+          "type": "color",
+          "description": "Background & border colours applied to the unselected state of the switch, the checkbox, & radio components"
+        },
+        "interactiveInput010": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the text field, & the select component button, & the list item"
+        },
+        "interactiveFocus010": {
+          "value": "{focus010}",
+          "type": "color",
+          "description": "Focus tabbing"
+        },
+        "interactiveFocus020": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Inverse focus tabbing "
+        },
+        "interactiveVisited010": {
+          "value": "{purple060}",
+          "type": "color",
+          "description": "Visited state"
+        },
+        "interactiveDisabled010": {
+          "value": "{neutral020}",
+          "type": "color",
+          "description": "Disabled state"
+        },
+        "interactiveLink030": {
+          "value": "{blue080}",
+          "type": "color",
+          "description": "Colour applied to the active state of an inline and standalone link"
+        },
+        "interactiveLink020": {
+          "value": "{blue070}",
+          "type": "color",
+          "description": "Colour applied to the hover state of an inline and standalone link"
+        },
+        "interactiveLink010": {
+          "value": "{blue060}",
+          "type": "color",
+          "description": "Colour applied to the base state of an inline and standalone link"
+        },
+        "interactiveInverse050": {
+          "value": "{whiteTint080}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse040": {
+          "value": "{whiteTint070}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the Solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse030": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse020": {
+          "value": "{whiteTint020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveInverse010": {
+          "value": "{whiteTint010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactiveNegative050": {
+          "value": "{red080}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative040": {
+          "value": "{red070}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative030": {
+          "value": "{red060}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative020": {
+          "value": "{red020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveNegative010": {
+          "value": "{red010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactivePositive050": {
+          "value": "{green080}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive040": {
+          "value": "{green070}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive030": {
+          "value": "{green060}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive020": {
+          "value": "{green020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all button, & the active state of the outlined & minimal button"
+        },
+        "interactivePositive010": {
+          "value": "{green010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactiveSecondary050": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveSecondary040": {
+          "value": "{neutral090}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveSecondary030": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button "
+        },
+        "interactiveSecondary020": {
+          "value": "{neutral020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveSecondary010": {
+          "value": "{neutral010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactivePrimary050": {
+          "value": "{blue080}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary040": {
+          "value": "{blue070}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary030": {
+          "value": "{blue060}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary020": {
+          "value": "{blue020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactivePrimary010": {
+          "value": "{blue010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        }
+      },
+      "overlay": {
+        "overlayTintBase010": {
+          "value": "{blackTint020}",
+          "type": "color",
+          "description": "Overlay to darken the base interface when a modal or drawer is used"
+        },
+        "overlayTintBase020": {
+          "value": "{blackTint040}",
+          "type": "color",
+          "description": "Overlay to darken the base interface when a modal or drawer is used"
+        },
+        "overlayTintBase030": {
+          "value": "{blackTint060}",
+          "type": "color",
+          "description": "Overlay to darken the base interface when a modal or drawer is used"
+        },
+        "overlayTintBase040": {
+          "value": "{blackTint080}",
+          "type": "color",
+          "description": "Overlay to darken the base interface when a modal or drawer is used"
+        },
+        "overlayTintInverse010": {
+          "value": "{whiteTint020}",
+          "type": "color",
+          "description": "Overlay to lighten the base interface when a modal or drawer is used"
+        },
+        "overlayTintInverse020": {
+          "value": "{whiteTint040}",
+          "type": "color",
+          "description": "Overlay to lighten the base interface when a modal or drawer is used"
+        },
+        "overlayTintInverse030": {
+          "value": "{whiteTint060}",
+          "type": "color",
+          "description": "Overlay to lighten the base interface when a modal or drawer is used"
+        },
+        "overlayTintInverse040": {
+          "value": "{whiteTint080}",
+          "type": "color",
+          "description": "Overlay to lighten the base interface when a modal or drawer is used"
+        },
+        "overlayGradientBaseVertical": {
+          "value": "linear-gradient(0deg, rgba({white}, 0) 0%, rgba({white}, 1) 100%)",
+          "type": "color",
+          "description": "Base gradient tokens fade elements into the interface background"
+        },
+        "overlayGradientBaseHorizontal": {
+          "value": "linear-gradient(-90deg, rgba({white}, 0) 0%, rgba({white}, 1) 100%)",
+          "type": "color",
+          "description": "Base gradient tokens fade elements into the interface background"
+        },
+        "overlayGradientInverseVertical": {
+          "value": "linear-gradient(0deg, rgba({black}, 0) 0%, rgba({black}, 1) 100%)",
+          "type": "color",
+          "description": "Inverse gradient tokens fade elements into a dark background in a light theme"
+        },
+        "overlayGradientInverseHorizontal": {
+          "value": "linear-gradient(-90deg, rgba({black}, 0) 0%, rgba({black}, 1) 100%)",
+          "type": "color",
+          "description": "Inverse gradient tokens fade elements into a dark background in a light theme"
+        }
+      }
+    },
+    "Dark": {
+      "ink": {
+        "inkBrand020": {
+          "value": "{blue030}",
+          "type": "color",
+          "description": "Brand colour complimentary to inkBrand010"
+        },
+        "inkBrand010": {
+          "value": "{blue050}",
+          "type": "color",
+          "description": "Prominent brand colour applied to text and icons (e.g. icons in outlined buttons)"
+        },
+        "inkInformative": {
+          "value": "{teal050}",
+          "type": "color",
+          "description": "Text and icons for informative messages"
+        },
+        "inkNotice": {
+          "value": "{neutral040}",
+          "type": "color",
+          "description": "Text and icons for notice messages"
+        },
+        "inkNegative": {
+          "value": "{red050}",
+          "type": "color",
+          "description": "Text and icons for error messages. Feedback notifications (invalid) (e.g. assistive text in a text field)"
+        },
+        "inkPositive": {
+          "value": "{green050}",
+          "type": "color",
+          "description": "Text and icons for success messages. Feedback notifications (valid) (e.g. assistive text in a text field)"
+        },
+        "inkDark010": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Used when the same dark colour value is required across all colour themes"
+        },
+        "inkLight010": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Used when the same light colour value is required across all colour themes"
+        },
+        "inkInverse": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Text and icons where the recommended contrast against the background cannot be achieved"
+        },
+        "inkNonEssential": {
+          "value": "{neutral050}",
+          "type": "color",
+          "description": "Text and icons in an inactive (disabled) state"
+        },
+        "inkSubtle": {
+          "value": "{neutral040}",
+          "type": "color",
+          "description": "Subheadlines, labels and secondary text"
+        },
+        "inkBase": {
+          "value": "{neutral020}",
+          "type": "color",
+          "description": "Body and paragraph text"
+        },
+        "inkContrast": {
+          "value": "{white}",
+          "type": "color",
+          "description": "Headlines or copy where emphasis is needed"
+        }
+      },
+      "interface": {
+        "interfaceSkeleton020": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) to indicate the skeleton (loading) state of a component"
+        },
+        "interfaceSkeleton010": {
+          "value": "{neutral090}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) to indicate the skeleton (loading) state of a component"
+        },
+        "interfaceNeutral020": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for neutral messages"
+        },
+        "interfaceNeutral010": {
+          "value": "{neutral030}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for neutral messages, & feedback notifications (e.g. banner, flag, inline message)"
+        },
+        "interfaceInformative020": {
+          "value": "{teal090}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for informative messages"
+        },
+        "interfaceInformative010": {
+          "value": "{teal050}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for informative messages"
+        },
+        "interfaceNotice020": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for notice or warning messages"
+        },
+        "interfaceNotice010": {
+          "value": "{neutral030}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for notice or warning messages"
+        },
+        "interfaceNegative020": {
+          "value": "{red090}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for error messages"
+        },
+        "interfaceNegative010": {
+          "value": "{red050}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for error messages"
+        },
+        "interfacePositive020": {
+          "value": "{green090}",
+          "type": "color",
+          "description": "Background (low contrast in a light theme, and high contrast in a dark theme) for success messages"
+        },
+        "interfacePositive010": {
+          "value": "{green050}",
+          "type": "color",
+          "description": "Background (high contrast in a light theme, and low contrast in a dark theme) for success messages"
+        },
+        "interfaceBrand020": {
+          "value": "{blue030}",
+          "type": "color",
+          "description": "Brand colour complimentary to interfaceBrand010"
+        },
+        "interfaceBrand010": {
+          "value": "{blue050}",
+          "type": "color",
+          "description": "Prominent brand colour applied to backgrounds e.g. a footer, or header"
+        },
+        "interface060": {
+          "value": "{neutral030}",
+          "type": "color",
+          "description": "Component backgrounds of contrasting colours"
+        },
+        "interface050": {
+          "value": "{neutral050}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface040": {
+          "value": "{neutral060}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface030": {
+          "value": "{neutral070}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface020": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Extended scale of component backgrounds"
+        },
+        "interface010": {
+          "value": "{neutral090}",
+          "type": "color",
+          "description": "Component backgrounds (e.g. card)"
+        },
+        "interfaceBackground": {
+          "value": "{neutral100}",
+          "type": "color",
+          "description": "Page background"
+        }
+      },
+      "interactive": {
+        "interactiveInput050": {
+          "value": "{blue030}",
+          "type": "color",
+          "description": "Active state background and border for selection controls, and input components"
+        },
+        "interactiveInput040": {
+          "value": "{blue050}",
+          "type": "color",
+          "description": "Background & border colours applied to the Selected state of the Switch, the checkbox, & radio components"
+        },
+        "interactiveInput030": {
+          "value": "{blue090}",
+          "type": "color",
+          "description": "Background colour applied to the ‘feedback’ of the checkbox, & radio components"
+        },
+        "interactiveInput020": {
+          "value": "{neutral060}",
+          "type": "color",
+          "description": "Background & border colours applied to the unselected state of the switch, the checkbox, & radio components"
+        },
+        "interactiveInput010": {
+          "value": "{neutral090}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the text field, & the select component button, & the list item"
+        },
+        "interactiveFocus010": {
+          "value": "{focus010}",
+          "type": "color",
+          "description": "Focus tabbing"
+        },
+        "interactiveFocus020": {
+          "value": "{blackTint090}",
+          "type": "color",
+          "description": "Inverse focus tabbing"
+        },
+        "interactiveVisited010": {
+          "value": "{purple050}",
+          "type": "color",
+          "description": "Visited state"
+        },
+        "interactiveDisabled010": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Disabled state"
+        },
+        "interactiveLink030": {
+          "value": "{blue030}",
+          "type": "color",
+          "description": ""
+        },
+        "interactiveLink020": {
+          "value": "{blue040}",
+          "type": "color",
+          "description": ""
+        },
+        "interactiveLink010": {
+          "value": "{blue050}",
+          "type": "color",
+          "description": ""
+        },
+        "interactiveInverse050": {
+          "value": "{blackTint080}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse040": {
+          "value": "{blackTint070}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the Solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse030": {
+          "value": "{blackTint090}",
+          "type": "color",
+          "description": "Background colour applied to the Base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveInverse020": {
+          "value": "{blackTint020}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveInverse010": {
+          "value": "{blackTint010}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactiveNegative050": {
+          "value": "{red030}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative040": {
+          "value": "{red040}",
+          "type": "color",
+          "description": "Background colour applied to the Hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative030": {
+          "value": "{red050}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveNegative020": {
+          "value": "{red080}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveNegative010": {
+          "value": "{red090}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactivePositive050": {
+          "value": "{green030}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive040": {
+          "value": "{green040}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive030": {
+          "value": "{green050}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePositive020": {
+          "value": "{green080}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all button, & the active state of the outlined & minimal button"
+        },
+        "interactivePositive010": {
+          "value": "{green090}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        },
+        "interactiveSecondary050": {
+          "value": "{neutral030}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveSecondary040": {
+          "value": "{neutral040}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactiveSecondary030": {
+          "value": "{neutral050}",
+          "type": "color",
+          "description": "Background colour applied to the Base state of the solid button, & the border colour of the outlined button "
+        },
+        "interactiveSecondary020": {
+          "value": "{neutral080}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactiveSecondary010": {
+          "value": "{neutral090}",
+          "type": "color",
+          "description": "Background colour applied to the Hover state of the outlined & minimal button"
+        },
+        "interactivePrimary050": {
+          "value": "{blue030}",
+          "type": "color",
+          "description": "Background colour applied to the active state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary040": {
+          "value": "{blue040}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary030": {
+          "value": "{blue050}",
+          "type": "color",
+          "description": "Background colour applied to the base state of the solid button, & the border colour of the outlined button"
+        },
+        "interactivePrimary020": {
+          "value": "{blue080}",
+          "type": "color",
+          "description": "Background colour applied to the loading state of all buttons, & the active state of the outlined & minimal button"
+        },
+        "interactivePrimary010": {
+          "value": "{blue090}",
+          "type": "color",
+          "description": "Background colour applied to the hover state of the outlined & minimal button"
+        }
+      },
+      "overlay": {
+        "overlayTintBase010": {
+          "value": "{whiteTint020}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintBase020": {
+          "value": "{whiteTint040}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintBase030": {
+          "value": "{whiteTint060}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintBase040": {
+          "value": "{whiteTint080}",
+          "type": "color",
+          "description": "Internal overlay component that sits behind the panels (used by modals and drawers)"
+        },
+        "overlayTintInverse010": {
+          "value": "{blackTint020}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintInverse020": {
+          "value": "{blackTint040}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintInverse030": {
+          "value": "{blackTint060}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayTintInverse040": {
+          "value": "{blackTint080}",
+          "type": "color",
+          "description": "Creative use case"
+        },
+        "overlayGradientBaseVertical": {
+          "value": "linear-gradient(0deg, rgba({black}, 0) 0%, rgba({black}, 1) 100%)",
+          "type": "color",
+          "description": "Base gradient tokens fade elements into the interface background"
+        },
+        "overlayGradientBaseHorizontal": {
+          "value": "linear-gradient(-90deg, rgba({black}, 0) 0%, rgba({black}, 1) 100%)",
+          "type": "color",
+          "description": "Base gradient tokens fade elements into the interface background"
+        },
+        "overlayGradientInverseVertical": {
+          "value": "linear-gradient(0deg, rgba({neutral030}, 0) 0%, rgba({neutral030}, 1) 100%)",
+          "type": "color",
+          "description": "Inverse gradient tokens fade elements into a light background in a dark theme"
+        },
+        "overlayGradientInverseHorizontal": {
+          "value": "linear-gradient(-90deg, rgba({neutral030}, 0) 0%, rgba({neutral030}, 1) 100%)",
+          "type": "color",
+          "description": "Inverse gradient tokens fade elements into a light background in a dark theme"
+        }
+      }
+    },
+    "$themes": [
+      {
+        "id": "e58f3d507a89146a641d800c5d6d3879d5fdf095",
+        "name": "LightMode",
+        "selectedTokenSets": {
+          "Foundations": "enabled",
+          "Light": "enabled"
+        },
+        "$figmaStyleReferences": {
+          "ink.inkBrand020": "S:233fa43534ecff6bd375f6c64db122cb5dc840ca,",
+          "ink.inkInformative": "S:c359cf844bbb917dd802827b8fb895f7575be4c0,",
+          "ink.inkNotice": "S:ef1ec2eefb95a35c40cddc539e1a401a01e5ea22,",
+          "ink.inkNegative": "S:21f6e1e572718632632f002ef530d8c8028c9a10,",
+          "ink.inkPositive": "S:c87c9b91569f062c792fc288ea7e73b467068391,",
+          "ink.inkDark010": "S:3c6e9332b3bd0f69f3319f5544a8841d9b34d161,",
+          "ink.inkLight010": "S:539cd9a63bda681b224486f1d79d27ae705d58cc,",
+          "ink.inkInverse": "S:4dfc6673b1cd0d25e3cbdd654b8f4b3c7aac8933,",
+          "ink.inkNonEssential": "S:a05fcdfdacd4c038b85258931872ad58bce3f0f9,",
+          "ink.inkSubtle": "S:f590bc22c1dcd0aead2fb2e5ef7674355561c488,",
+          "ink.inkBase": "S:2be40836666597b53f0ed973d453ce3b9f19ceea,",
+          "interface.interfaceSkeleton020": "S:a6cbe2e1c73bd762bb8c857ad1b0d321e98f8cdb,",
+          "interface.interfaceSkeleton010": "S:6fb460c3031fb3655c0bcefb300615181b61f810,",
+          "interface.interfaceNeutral020": "S:94910eed0463338e7f22baf339f6855893c2f71a,",
+          "interface.interfaceNeutral010": "S:60d41aa6cf92ee43a639f52882dcad39337fc353,",
+          "interface.interfaceInformative020": "S:afe1f89e86234a17b6f5d5c1682a714840fccf38,",
+          "interface.interfaceInformative010": "S:caa7aa433ac361f9be5ee6b9104f5998217a885e,",
+          "interface.interfaceNotice020": "S:7b15c4b4b20d8ec2c4e8d78fbf0a27f4758d208d,",
+          "interface.interfaceNotice010": "S:df1515c6fb0a570663b9306130ac705aba1c7d3a,",
+          "interface.interfaceNegative020": "S:1d9913543f0df6a8fa89ecd0cc62b1f5fb0572a1,",
+          "interface.interfaceNegative010": "S:266de1dddacb3c6fbf3cdce80881a188052b23bd,",
+          "interface.interfacePositive020": "S:d50f7f3d64e6b951de5c9c5bc10c208bf6613223,",
+          "interface.interfacePositive010": "S:05e8799c9a483b1165a5826646b873a8316b563d,",
+          "interface.interfaceBrand020": "S:90f00d481491e2b1a07f740490a0c1fe034daef3,",
+          "interface.interfaceBrand010": "S:77cf2f786930ca0981c3f47e86144dc17cabeb17,",
+          "interface.interface060": "S:8df701db2a5e6eeb81a884dcbd184a1750951f13,",
+          "interface.interface050": "S:d3901c2c1fdcf858506c2c83a56d290c821cd24e,",
+          "interface.interface040": "S:a7e6eb5c378d02c60ae99bd2a38d8ab270a1e825,",
+          "interface.interface030": "S:e085df2102109a3dc7df07f1790b0aab0e7b896c,",
+          "interface.interface020": "S:28236ad7a0a7200e99cffc8100e80e6acfea98c4,",
+          "interface.interface010": "S:e6bf048f621316851caffb8cd23f995df6d4fc31,",
+          "interface.interfaceBackground": "S:7f68a5d8f425fc4d18c4a9bdc74f9be70a594329,",
+          "interactive.interactiveInput050": "S:6640bf3861e1d858ba9605ff55d03f80baffeade,",
+          "interactive.interactiveInput040": "S:5ba23e67111f84f36a635bb7f37c5e6861ed2889,",
+          "interactive.interactiveInput030": "S:3289ad2c312f323a4e91e42ce805f6e69962fc8f,",
+          "interactive.interactiveInput020": "S:0e9cb7e2dfe81101245f643f0c85fd77c5c915fe,",
+          "interactive.interactiveInput010": "S:08edd3036bb2eb824124622e8875bb6fe0d11dbf,",
+          "interactive.interactiveFocus010": "S:f0afb0ea4e8d3b79bf82c0d987be3197f7821187,",
+          "interactive.interactiveVisited010": "S:d6a19574dcda950cbbece64bf6270c38f35fd864,",
+          "interactive.interactiveDisabled010": "S:775afe46b0bb20696c773810722b3c083e7ecb86,",
+          "interactive.interactiveLink030": "S:b2d290a75db8040842fbf9e5554eb5bc85e1220c,",
+          "interactive.interactiveLink020": "S:9255e43db6ef4974be7e087bc0cf0e52b02042ce,",
+          "interactive.interactiveLink010": "S:96e98d5972206f99bc924a5ac9c4281696a776cc,",
+          "interactive.interactiveInverse050": "S:dd5e9cf81456805f38ac97b4918b1643784e88b9,",
+          "interactive.interactiveInverse040": "S:e6845cf69e1c62c63266c7996547ac70246ba10d,",
+          "interactive.interactiveInverse030": "S:f01b8678928a21ff63d47c2a3e7f436044354f3d,",
+          "interactive.interactiveInverse020": "S:4155c7b4a21c0ffe8bd2f6eb11b7e4c996ef2520,",
+          "interactive.interactiveInverse010": "S:8a18c58c90ba1adc7920869d231b19b056ac433e,",
+          "interactive.interactiveNegative050": "S:24e88b03be17635af246213e393c5a67e0f8a75a,",
+          "interactive.interactiveNegative040": "S:da8a3f194165bfd2d05f4b8ef79ad56f95991bd3,",
+          "interactive.interactiveNegative030": "S:1f4db4273d157a4714ec2ff18c436b24b784f5f0,",
+          "interactive.interactiveNegative020": "S:c9a1a5def1d7a14fe15fa612e2ba0bb82a69bd5c,",
+          "interactive.interactiveNegative010": "S:969f9d63f01210ab12760f8bdb60345d7a4709fa,",
+          "interactive.interactivePositive050": "S:8c3a528cd550756f3d1b22aa432b85fbe6a54e28,",
+          "interactive.interactivePositive040": "S:82e9c90202f81c4c45e8d9d507367250795726c7,",
+          "interactive.interactivePositive030": "S:48f70e2179a4820132765887e20418109b4b8ec3,",
+          "interactive.interactivePositive020": "S:85bc34182de81ed8185b8ac3f4dcea7ac74b45bc,",
+          "interactive.interactivePositive010": "S:d8ef086da4ba672c7eee00354fcddbaa6f56b92a,",
+          "interactive.interactiveSecondary050": "S:9a6f613ffd9f9554a8a121523b1b2c60b134204c,",
+          "interactive.interactiveSecondary040": "S:35fba243ea705809a3b0bc107f322163c456fc17,",
+          "interactive.interactiveSecondary030": "S:2638457516ca8f47e183e9e8b0f1f0195af84df6,",
+          "interactive.interactiveSecondary020": "S:4ba1252875b4ea8e0479f10c034269d8227ada5f,",
+          "interactive.interactiveSecondary010": "S:844e5482952bb567fed83096fd29eba6eb8bc8a9,",
+          "interactive.interactivePrimary050": "S:cecc4159595a2ab8076be414e46f750163c7d47e,",
+          "interactive.interactivePrimary040": "S:944593208dc84d0e29785b1e5817d940645da607,",
+          "interactive.interactivePrimary030": "S:d420bc65d232de70f326580ec3578120eb582580,",
+          "interactive.interactivePrimary020": "S:02a75c336e799a0ba2ab08a56c39c38d712b9cdf,",
+          "interactive.interactivePrimary010": "S:ba8df69817f5042b37e75cb35e948715d3646e72,",
+          "editorial.editorialLabel030": "S:2607ea98e9293cb0583f6b3ee4ce2694aa758b59,",
+          "editorial.editorialLabel020": "S:c7ecf003e6e0711b683fc95bbb085ec78e0ff108,",
+          "editorial.editorialLabel010": "S:5a036e61b2457701db7fbadf83d7b8c6bce3856b,",
+          "editorial.editorialCaption010": "S:8c3bed69c89240a16ec922097747bad296f6ecc8,",
+          "editorial.editorialQuote020": "S:d24f340dccf391996f5d06aaba780497603db519,",
+          "editorial.editorialQuote010": "S:6e145bab239ef6ec9da43de3fbc5e575911404c1,",
+          "editorial.editorialParagraph030": "S:4b54b1fd755b8082a922e9a0a76c1ae529634958,",
+          "editorial.editorialParagraph020": "S:8ffbfd7c1f74bb2ce82b666d4fc40360e7b2d3cf,",
+          "editorial.editorialParagraph010": "S:820c8391b399b2d4797532355ac5c56858821706,",
+          "editorial.editorialSubheadline050": "S:9f057e7a4b52d4b1deb1891f308b24dbdc05c4f8,",
+          "editorial.editorialSubheadline040": "S:55531fc6b7ffe4b519c25791620cdbd015678322,",
+          "editorial.editorialSubheadline030": "S:3cf548b90ccf0dbebb84f1803d718de8b692987f,",
+          "editorial.editorialSubheadline020": "S:fff362b6aec0366187bf22c6eeba5b6e00de594c,",
+          "editorial.editorialSubheadline010": "S:43cb84eb95940fcd46975dc3084286fd51c39b92,",
+          "editorial.editorialHeadline080": "S:9a32fdc261c0489602ecf8c14b67b97bb657a958,",
+          "editorial.editorialHeadline070": "S:7e4359aa0389578efe1493138fe89ff7d5fc07b5,",
+          "editorial.editorialHeadline060": "S:ff42f099cf40f361d0831e4aaeefc26286fa4f97,",
+          "editorial.editorialHeadline050": "S:9ba5a986df40b8db461f85d0cd96778859c4d777,",
+          "editorial.editorialHeadline040": "S:450d60db1bbce53a13802d57ee17d2df45fe342b,",
+          "editorial.editorialHeadline030": "S:7e70bf9a91d0c35fc33ccce0a83394f16ceff0cc,",
+          "editorial.editorialHeadline020": "S:121336e44b1483a4ef31b2a83d6ab11ee19c8c48,",
+          "editorial.editorialHeadline010": "S:c744f1a709864f756ce8952546ba42e0414b2264,",
+          "editorial.editorialDisplay030": "S:a73e724af42b119291d1619ce914b11e076c0635,",
+          "editorial.editorialDisplay020": "S:578fbdca473abd2aa8f78871957747d4284b271e,",
+          "editorial.editorialDisplay010": "S:8accf4475515a2a5a14fed5fd573eab14446cb85,",
+          "utility.utilityMeta010": "S:6b23fd9516c55a40c1e783753579750289fe5aa2,",
+          "utility.utilityMeta020": "S:299027de48debf7a42482e5cb030a6c87bda47ab,",
+          "utility.utilityButton010": "S:d0126e4bb288b0408c8bc8a56d35fba4c44cd400,",
+          "utility.utilityButton020": "S:109ac49b2f9579302707da5e73e4c8bdc6ed8f9b,",
+          "utility.utilityButton030": "S:38b8ba766f74ba5d9159d9c3cefc734e723c6f8e,",
+          "utility.utilityLabel010": "S:c15c20b674a9f46217f5a954478db80d869a75bf,",
+          "utility.utilityLabel020": "S:9cd74383982596e42110918eed0f5e9c5952e2d1,",
+          "utility.utilityLabel030": "S:7102e2c67cd63b1bda0c8dbbe154c1a53991fafa,",
+          "utility.utilityBody010": "S:6d40023ab17f4f3cc74e8dbcdf0c9a6e5ca8adce,",
+          "utility.utilityBody020": "S:0a77c355f2e1b30108c9a2843f7ad0ac8648cbeb,",
+          "utility.utilityBody030": "S:f7e584c65375171412729d9ee8fc7b91846005d2,",
+          "utility.utilitySubheading010": "S:5b1b7a528878b2bac54e6392e9accc36b9c24e93,",
+          "utility.utilitySubheading020": "S:069e639a2fcec245581f61fd19eb3580f8156526,",
+          "utility.utilitySubheading030": "S:dbfcfa87414281bb0045542cd9bcec6e01525f06,",
+          "utility.utilitySubheading040": "S:474ec6455ce7becda4674039ec81e42ebe339986,",
+          "utility.utilitySubheading050": "S:d8549114c819beef0010e22a9aad6b2402082e72,",
+          "utility.utilityHeading010": "S:2a6ecde3d652bdc8945d038a2b29f8b476f3b7a8,",
+          "utility.utilityHeading020": "S:77b25a72c86fe857c49d7ea3bac5b4f55138608b,",
+          "utility.utilityHeading030": "S:202017e1d16f10dbee234a2e6a9c043bb69b91e1,",
+          "utility.utilityHeading040": "S:7f76326cb9314670b863df9c5223e39f8f9e4fa1,",
+          "utility.utilityHeading050": "S:3590aef56920b309d7cc67db318371dc6089255a,",
+          "shadow010": "S:18a3d13cb98217e579f63879db897a88eb28bc87,",
+          "shadow020": "S:72c312c3fae7a6586d713d437359f4bf946c479d,",
+          "shadow030": "S:c37faf1c1c3a88496f500d8a5dc719f5667a0716,",
+          "shadow040": "S:b9a740d88c3618b85b8c7772a5ceb55b0bad15c3,",
+          "shadow050": "S:bcb753804868698599b4469e69dce8396cf2b489,",
+          "shadow060": "S:ff99b871b215ad9ae2f50924366066708bd1c87c,",
+          "overlay.overlayTintBase010": "S:a26ef44e9e8a39dd7cd398b448edc02de9cea6e3,",
+          "overlay.overlayTintBase020": "S:001ba9d09c4032667e78f3cae4cd0577ab050c8d,",
+          "overlay.overlayTintBase030": "S:d5ad707226946f677569767cc45ec4cac823e4c6,",
+          "overlay.overlayTintBase040": "S:154f84b94684216732096bb15aef51c4ea0a34d6,",
+          "overlay.overlayTintInverse010": "S:48b9e86cbceea4dcec1254efd5da146280f8116a,",
+          "overlay.overlayTintInverse020": "S:d305cf2064701e85e3e0dd957d018eecdf4e256d,",
+          "overlay.overlayTintInverse030": "S:b62d0e7af099d673e4376f9f7badb37b85165458,",
+          "overlay.overlayTintInverse040": "S:ffa70458e718273620c1e5e048a0a12d4717f6bb,",
+          "overlay.overlayGradientBaseVertical": "S:1307bfcc8d96d69c9d594df89b1e83a0540b23ea,",
+          "overlay.overlayGradientBaseHorizontal": "S:63c9b7f19f25c87bc9cad22d5306a60756b4f33b,",
+          "overlay.overlayGradientInverseVertical": "S:d80e7e1e9984d81f35c48c4b53457ae1cd26e9ec,",
+          "overlay.overlayGradientInverseHorizontal": "S:75d995f485a35d3e2bf72094972bcd6a5bb957e9,",
+          "blue010": "S:9038a23d2c76fe827805fab7077cb99fc8f93945,",
+          "blue020": "S:d4525a0a71b8583a40e2b773670e70840703f95b,",
+          "blue030": "S:5395dea612d0d81664b5bfaa01cdc83a359052c9,",
+          "blue040": "S:0f8a5d5492ebfce0958c298ec6c2fabad3a16fec,",
+          "blue050": "S:d88d7d42fc5429d00d3ce70b05d18f0e3cdf4f8d,",
+          "blue060": "S:be1ab7544725439d2dbe1a6bd73ce0aa2fd37fee,",
+          "blue070": "S:fb58be1c1418a01a87ff0cf256befeb1103e231c,",
+          "blue080": "S:6f9782769dc2ab8e7e311b075cb1e15947856685,",
+          "blue090": "S:de5674567e6715e81c7fe99917d3bfcd86b5a2d0,",
+          "blue100": "S:21580af2216495a4e4d823f4d201968ef38a26c4,",
+          "green010": "S:e8ffaf6a57643626e0f4f2174294ecddd704f08e,",
+          "green020": "S:56282e60e8960d087d4c1bf336da40dfc4bfb3a6,",
+          "green030": "S:072eee3a7171fcdfa06761c8b1d4eaf6816dbb4a,",
+          "green040": "S:b6bccf64735e19a59c44620b65fc878ae51f3d7a,",
+          "green050": "S:c263513a2d4199e9ac58ac86376d5ac5f0026edd,",
+          "green060": "S:62ee12269997539cd245430e9546a96050f0c104,",
+          "green070": "S:e9367d2721e8c4e481515874125a59eca5e2dd38,",
+          "green080": "S:585a547372792275f6ce37923b5e2fbd6bea67c8,",
+          "green090": "S:f326444d8e10b07bc053582abe7e1793b695fca8,",
+          "green100": "S:d80bbe8b6930c8126d93ef8e5348e0f8e1d368ae,",
+          "red010": "S:2563eb12be75eb710377dc9f5b2985c0a3ad3f6d,",
+          "red020": "S:0d22b18f47c3208500175fe8ad83d3b6d41b7e1f,",
+          "red030": "S:35709dd4f716f2738cb3022f7c708b73539073f8,",
+          "red040": "S:3e559e74fec6242b8876269bd7c37f035ee8ef81,",
+          "red050": "S:4e0b048ed836324ad2ce8b498ed789eff8594207,",
+          "red060": "S:49a56c4c549aa0f0e47a0e5a0d6dc22a56aee914,",
+          "red070": "S:5ddea3945c77853447156badf81e6a3fda88fe07,",
+          "red080": "S:1b28e42ae9861f30998dacb767185c0262c83ab9,",
+          "red090": "S:6a6eded830500dd70730cf1e5814f54d7d8b584c,",
+          "red100": "S:e1af9bb2de78e36e8fa82a3a626729943c56d246,",
+          "amber010": "S:4e8ea437bf9fa601e8edc62e592299629f3be76a,",
+          "amber020": "S:40437745258726ff7fd15b906204e36a607a2272,",
+          "amber030": "S:29656574019795b92a91140f168c6ee56cc25832,",
+          "amber040": "S:b0c0e098f9bba6cdf794ba0c38d28698f4503bc8,",
+          "amber050": "S:5ee4ff2698909dfe44fa46e6178f38e6896f1a80,",
+          "amber060": "S:38ce7a1373e0f4ced88dfd096ff0bbb36d479a66,",
+          "amber070": "S:7c19d43a984d3a3ef3a5014d948186c32e5bf7bf,",
+          "amber080": "S:ff99a1f817683e59eb97f97b4f38940d3c2af737,",
+          "amber090": "S:1a46082f85e13e475a827e1860b464d8c8395da8,",
+          "amber100": "S:6d407a96be078cc84c62084b22e0510dca263f5f,",
+          "teal010": "S:99bdf0941ab4028df4d31145921a8d9788973dbc,",
+          "teal020": "S:88f793727ffbc85f8bc223e5863f696625051072,",
+          "teal030": "S:5ab7851bb2891074900c46dce7273456f6944076,",
+          "teal040": "S:64c78d55790a0ddbd2cbbc31bbf9c1a39305f9d4,",
+          "teal050": "S:96560e902fb6ec25512dd9ec8b3f822b7cf33c33,",
+          "teal060": "S:3fe39dbfab098fa402ee60a029fdaad2241c22b2,",
+          "teal070": "S:0bfff2f24a03ba743ac93563031ac2aaa7ffc1bf,",
+          "teal080": "S:14c43cf12ca21dc40c31d15eb72bf6b25f45fbd2,",
+          "teal090": "S:c144ed8d2ad427d9e7d67dd3e0fe857a80146771,",
+          "teal100": "S:5167bfd3d20a3f73427982f043566174761e4fdb,",
+          "purple010": "S:b6c543a30be09b0e525e2efd7b4903ba2b0cb880,",
+          "purple020": "S:6ebcfc6099ffc6dfc572c8d8559b6e215cb9f38e,",
+          "purple030": "S:dd8f089f51c5cdd6250cdf58a503a7d383dbde6a,",
+          "purple040": "S:d664b7bdb29c206c43a099577bc518102a88a440,",
+          "purple050": "S:5f93b200c3774c607c4af35dcbcc80dc452dc7a4,",
+          "purple060": "S:f0bb0f6897cbc81b3e051a9f691e60fd6e14c4fc,",
+          "purple070": "S:c0f069ef81653eee5f7ab408b27e5eb4c2cd6aa1,",
+          "purple080": "S:c86fef4ed68e81a2502bc9629751777600cf12d9,",
+          "purple090": "S:98ff85cae68c29216ad8880e6348e916f322b1b2,",
+          "purple100": "S:2668c8f46f07169556604e8c51d24537394baa0b,",
+          "neutral010": "S:a67af927b3c1187b9808d3bc20dad46e86b317a9,",
+          "neutral020": "S:727101ea003d45d56d0c7c2ba672f366168285a5,",
+          "neutral030": "S:794f2dd8af4178a2c90556eb4b17ea3b9f52e2d6,",
+          "neutral040": "S:9c0cb0a9c4d907f7255cea3e6d75e993f46eca78,",
+          "neutral050": "S:8402071d4c7fb7c1d36363b9f653bf4f878cec66,",
+          "neutral060": "S:08023aa91f1d8814425d87b4e94c186c4c9cbd6b,",
+          "neutral070": "S:a74e5b7fbe8e6e62f9c5d7bb0126d892525eb257,",
+          "neutral080": "S:0e925734ce6e45fca4592df29ffac2705fb96024,",
+          "neutral090": "S:9cd031a7cac309afb1017515f6a752f539be2ca0,",
+          "neutral100": "S:5410e7f8c78d6015be2da8c50a9bb8f944d8c54c,",
+          "focus010": "S:5e49baf86d2d747330b858674a2cdd7ea6010264,",
+          "blackTint010": "S:6b15a5a9969166831c23779b1f03a027d61117fe,",
+          "blackTint020": "S:d786365ed8ef0942b8ac434fc79ad5c70a41a6be,",
+          "blackTint030": "S:68186e768245eb69a69cde31b08b27886f6d5518,",
+          "blackTint040": "S:b7a25f6c31c9d7b479ad397a4d2867465ae3cd11,",
+          "blackTint050": "S:8af16ea5d7ae9379f4f7ee3a9823f1d1c6d13c08,",
+          "blackTint060": "S:24d9ca605e8eb57ee0a4875c649d2f04701eefbe,",
+          "blackTint070": "S:c164b0bfc900bd315625172014c5e09d81ab12b5,",
+          "blackTint080": "S:58e7cd21f6d14f6425ec5bff656432786d998a76,",
+          "blackTint090": "S:68576f6389f3a22a227e8b28f947e526c17922e4,",
+          "black": "S:7b8cd41db4d5300b1c340b4bffaa4d656ef4fd0e,",
+          "whiteTint010": "S:0d9011434ad6664eae5804128be604aac149c0d1,",
+          "whiteTint020": "S:c179699ba29aca532c197b717afd747ebe29f9ff,",
+          "whiteTint030": "S:4331211e452a6ce2295feaf34d01e799cc84b81c,",
+          "whiteTint040": "S:cde16a7e8a116dc45679c918273b88d798695485,",
+          "whiteTint050": "S:82408c81973e819064497be7b8ddce2cd79fa4f2,",
+          "whiteTint060": "S:0bfec72e65d8a0a3903bbdc9bdfc6fc675604660,",
+          "whiteTint070": "S:00a39f5c3c7d34a3aa260e20940490cc7d0680a4,",
+          "whiteTint080": "S:093e260b3b467044e663cac90a8d9e12b002f98f,",
+          "whiteTint090": "S:d8b83d208aeb4db08ff101b3db003cc113b718f1,",
+          "white": "S:92247bf2258345dfb916f507f2745e32badfaf1e,",
+          "Reddit": "S:6205422d8482cb0d8ef8d4e8750269b571754bd4,",
+          "Whatsapp": "S:f00a1a6768fcb797a1359fc38307370025caa112,",
+          "Youtube": "S:2016817db038f98d5a1eba8149466103c011faa0,",
+          "Instagram": "S:ed777eb1bb99199bedd1ca1b4c8937a386984fc1,",
+          "Facebook": "S:0407f9c4df392d4efef5e5473d5aa52eccaf2963,",
+          "Twitter": "S:cd3dfbd130acac1c3e617b3d6e7d6bcfbe90a6d3,",
+          "Github": "S:21ac712499b7f0a659961ae70847c8f3381f2ec6,",
+          "Apple": "S:e65c6b432c774cdc6bddc9002c1a1ca99e11b04d,",
+          "GoogleBlue": "S:95ace415373f1b77223f9336bd3cf42c4b29ae5a,",
+          "GoogleRed": "S:ea698b75c38f1e2088b9192112c5622175de64fd,",
+          "GoogleYellow": "S:8229fb6a6385a2c2e48a11428777e3ffa8745b77,",
+          "GoogleGreen": "S:8ce4af833f651283bef9dffadc45a0bbd07100e8,",
+          "transparent": "S:8ea5fdda0d8f17fa3267acd185a89250f5903abb,",
+          "ink.inkBrand010": "S:1d7b6c810eb4fa3054b84064d9a5bcc80fad381b,",
+          "ink.inkContrast": "S:21bc6af60ca152d1ee0c70af96b02f8ba47462b9,"
+        }
+      },
+      {
+        "id": "9421816dcb557abb47ccea1e29bce5547d92a339",
+        "name": "DarkMode",
+        "selectedTokenSets": {
+          "Foundations": "enabled",
+          "Dark": "enabled"
+        },
+        "$figmaStyleReferences": {
+          "ink.inkBrand020": "S:91e838b5d6a7d4bb810ed282f216122756c89de5,",
+          "ink.inkInformative": "S:1c0844575e294573c09ae7f712905ee1f707c311,",
+          "ink.inkNotice": "S:bbf157c6a33d70b09b56f2664b681643aacb8b56,",
+          "ink.inkNegative": "S:a3d3de527fb4b1e953a5238c56023b7b76dc6e5c,",
+          "ink.inkPositive": "S:0f2ecc5225e4089b687d13453c02476eb8d27030,",
+          "ink.inkDark010": "S:bc804931e98530f92c399b89eb6042f7099148b6,",
+          "ink.inkLight010": "S:1f6b63d6c6d9bcdb726922d73a6ef85ec399ce68,",
+          "ink.inkInverse": "S:824400ace7c448098558d9291cb8fc4b5235be90,",
+          "ink.inkNonEssential": "S:f5c89d26c7c4140a8393854c63ec04a649ae8c32,",
+          "ink.inkSubtle": "S:f493667b2040a54021b9abf7eceec33ff7de90ee,",
+          "ink.inkBase": "S:3ff3d984378f866312615da9678660ea9d638882,",
+          "interface.interfaceSkeleton020": "S:04ea8d137ec785a40c292933e59bf0e036568f70,",
+          "interface.interfaceSkeleton010": "S:8f666ed01edb322c0234d4059b2b1ea5550ba9a4,",
+          "interface.interfaceNeutral020": "S:9cd3d885fd5ab5cb60a286b2d7376d1a3b9521f2,",
+          "interface.interfaceNeutral010": "S:50dcb6881152be663fbb05462b0e54e5dcdd1c7a,",
+          "interface.interfaceInformative020": "S:5a8b4a52184e35268b32e2a47c701780adcf26cc,",
+          "interface.interfaceInformative010": "S:608f179b3f5fe14c1fea2b919be9eddaa546a983,",
+          "interface.interfaceNotice020": "S:95597390f6e916a57d42ea4062a8ed6cacca873c,",
+          "interface.interfaceNotice010": "S:cb7e4928fd585ab8936e12c2050ab025a4ff5a59,",
+          "interface.interfaceNegative020": "S:d6d9c6ca4f8e0ec265d345c370dd1afb8c667bdf,",
+          "interface.interfaceNegative010": "S:a9e37635e3a07506ca67c4bc5ed0f52d74fa7e98,",
+          "interface.interfacePositive020": "S:44f2249a44c9b4804af3ed8b7540d32a29c44b1e,",
+          "interface.interfacePositive010": "S:0a3b0c5edfb3fecf32e770f0cb6ca1e03df3c58c,",
+          "interface.interfaceBrand020": "S:9c45ea898fc0c227e460f02a15cc2b4aa5977beb,",
+          "interface.interfaceBrand010": "S:cc027b6025b0477d378c21526ae8f65582b96ce6,",
+          "interface.interface060": "S:35e57eed6e4cd080adb78fe3c12f42f7ebd855eb,",
+          "interface.interface050": "S:6dcfc7a54838e8650ebfd1801af4efc4c133c05f,",
+          "interface.interface040": "S:726fd413d1a2190023d037c6b6a3f9f489d61fb5,",
+          "interface.interface030": "S:cf52a0228c21c532963ef1a2d061a6ef2d86f189,",
+          "interface.interface020": "S:559c792038eb28704d074966a04539fcd41e4678,",
+          "interface.interface010": "S:d4c28755609eef2606c6677d9386393280d29bbd,",
+          "interface.interfaceBackground": "S:cd5cdace1cabfb6b4dcfc2f55a9f8ebe3f2bde00,",
+          "interactive.interactiveInput050": "S:04d3f13448e84550353a8e49dd3e485a45fc9a28,",
+          "interactive.interactiveInput040": "S:76b1c9c9b7ae1bd7f585cddcfde31ce3cbea2411,",
+          "interactive.interactiveInput030": "S:d7ca03cd72cd720fb7ce62fbdf769bc55e77dace,",
+          "interactive.interactiveInput020": "S:a17a3a3dd262db4820b784de1a8f157fe9932f09,",
+          "interactive.interactiveInput010": "S:3962f61afa8aef025b97fc409e71b338c30a08c5,",
+          "interactive.interactiveFocus010": "S:a4cb8fbb3f4fc2af19cd008ec767e9f3997ed983,",
+          "interactive.interactiveVisited010": "S:d7776fcade5d838e825124711bd65a9005300efa,",
+          "interactive.interactiveDisabled010": "S:7b1e504d8774794edc15cd68cab5ac9d3af2ec5d,",
+          "interactive.interactiveLink030": "S:9f2fa66dcdc26f53c0fb4f9e4b484ac4adfb25d6,",
+          "interactive.interactiveLink020": "S:c9351bf53cab63d3bbd1eb8278dba32fba2fa3e3,",
+          "interactive.interactiveLink010": "S:7a9ad3b82f6d17b96b3252f4a47cdc12d600352e,",
+          "interactive.interactiveInverse050": "S:63bf25375f0076d46befe9fe640de4238695c8ce,",
+          "interactive.interactiveInverse040": "S:43fc709f645fc2bffa8ee942ab20cb58d87532c6,",
+          "interactive.interactiveInverse030": "S:6c9ef47895a8352e741c25567b64c9a3abdef193,",
+          "interactive.interactiveInverse020": "S:3d2a8b89e6341165ebb082c13bb77201ce7560e1,",
+          "interactive.interactiveInverse010": "S:701a633423dd76df170147e1de062e341f37c36a,",
+          "interactive.interactiveNegative050": "S:76b1b4627957193c73f97a19696e99ccce5ff045,",
+          "interactive.interactiveNegative040": "S:6506cfbb1fb17111090d767ca93b195f5edf39de,",
+          "interactive.interactiveNegative030": "S:e2dbdf8db573605d60f7a9de41e2fdd0557fb000,",
+          "interactive.interactiveNegative020": "S:c0c0f76d02e042433df765b3bc9dd0aba6f1a514,",
+          "interactive.interactiveNegative010": "S:b17aa005f7f7b77cdc79266c2b71b494bba01a52,",
+          "interactive.interactivePositive050": "S:e98a2796343386486a3d992021633e53d4ca2706,",
+          "interactive.interactivePositive040": "S:1313c40d17419e021296666d7f21f9ced1031953,",
+          "interactive.interactivePositive030": "S:22efe190b60726c2775fe56c2e4cc572e41a7956,",
+          "interactive.interactivePositive020": "S:ce48b7accf28c3327b7a51e7ff24130f80bdf83e,",
+          "interactive.interactivePositive010": "S:f34e122df0f70e0655c95a69604f4d5c67969ea8,",
+          "interactive.interactiveSecondary050": "S:0c333cc10f32893bf47565302a2bed6bc73cf98f,",
+          "interactive.interactiveSecondary040": "S:c1d50b6e3d82e0d053681d7316e3f760b74bed5f,",
+          "interactive.interactiveSecondary030": "S:0760eac06fb73ccf87cd44146065c7008697a3a3,",
+          "interactive.interactiveSecondary020": "S:61c88660049c2765e2e791affd2b13ec3e17002b,",
+          "interactive.interactiveSecondary010": "S:4f966ee781c21a1e7a6b65d7d3d57baa86819b7b,",
+          "interactive.interactivePrimary050": "S:897cc16e2cb620f8afa83976622a8f98e3d8343c,",
+          "interactive.interactivePrimary040": "S:253e57bdbb62fd32c383d09c7f45de0559dcda85,",
+          "interactive.interactivePrimary030": "S:335cac2ebea9d9a2cd1de3ac0bc019b974808443,",
+          "interactive.interactivePrimary020": "S:d67b68638ffa3b8ff5f0709007c7271d40346580,",
+          "interactive.interactivePrimary010": "S:bd208fb83dd40939cdca5a9d5b774b48657c10cb,",
+          "overlay.overlayTintBase010": "S:44e9ca833ca01f2a1c368d3db9ce740407e8eb0a,",
+          "overlay.overlayTintBase020": "S:6261edcc5e2ab7f69d8a4df552b9cbc74033a1e5,",
+          "overlay.overlayTintBase030": "S:9c2f268618b0e826d6c090c82e4a41c9eaf5e279,",
+          "overlay.overlayTintBase040": "S:c79dec66c3b30f29ea6025e7426858b74c40ebc2,",
+          "overlay.overlayTintInverse010": "S:3516bd11a567c747d15619cd524581a2cbe57e95,",
+          "overlay.overlayTintInverse020": "S:2dafa361793c9169344fd1d72db4b4722cb61190,",
+          "overlay.overlayTintInverse030": "S:302ed47ac46bb1b223bdfeb2a4acbf65a854bac0,",
+          "overlay.overlayTintInverse040": "S:5b0379043095b48eb566bf8b78d95db084edbb6b,",
+          "overlay.overlayGradientBaseVertical": "S:0e6d1caeadc192a3c1d39cc6044e0891b12d30f9,",
+          "overlay.overlayGradientBaseHorizontal": "S:dc93f2902fe454eb3a33d76a7bb311abbb8fc318,",
+          "overlay.overlayGradientInverseVertical": "S:d29faf8cc83cc871fea03920b6bc0d3be1f24dee,",
+          "overlay.overlayGradientInverseHorizontal": "S:90b072b9b251d3898fe1f3022eca272387d94ce9,",
+          "ink.inkBrand010": "S:021b1cd54db0cc7faed5b6109cc282f40a1f3674,",
+          "editorial.editorialDisplay010": "S:8accf4475515a2a5a14fed5fd573eab14446cb85,",
+          "editorial.editorialDisplay020": "S:578fbdca473abd2aa8f78871957747d4284b271e,",
+          "editorial.editorialDisplay030": "S:a73e724af42b119291d1619ce914b11e076c0635,",
+          "editorial.editorialHeadline010": "S:c744f1a709864f756ce8952546ba42e0414b2264,",
+          "editorial.editorialHeadline020": "S:121336e44b1483a4ef31b2a83d6ab11ee19c8c48,",
+          "editorial.editorialHeadline030": "S:7e70bf9a91d0c35fc33ccce0a83394f16ceff0cc,",
+          "editorial.editorialHeadline040": "S:450d60db1bbce53a13802d57ee17d2df45fe342b,",
+          "editorial.editorialHeadline050": "S:9ba5a986df40b8db461f85d0cd96778859c4d777,",
+          "editorial.editorialHeadline060": "S:ff42f099cf40f361d0831e4aaeefc26286fa4f97,",
+          "editorial.editorialHeadline070": "S:7e4359aa0389578efe1493138fe89ff7d5fc07b5,",
+          "editorial.editorialHeadline080": "S:9a32fdc261c0489602ecf8c14b67b97bb657a958,",
+          "editorial.editorialSubheadline010": "S:43cb84eb95940fcd46975dc3084286fd51c39b92,",
+          "editorial.editorialSubheadline020": "S:fff362b6aec0366187bf22c6eeba5b6e00de594c,",
+          "editorial.editorialSubheadline030": "S:3cf548b90ccf0dbebb84f1803d718de8b692987f,",
+          "editorial.editorialSubheadline040": "S:55531fc6b7ffe4b519c25791620cdbd015678322,",
+          "editorial.editorialSubheadline050": "S:9f057e7a4b52d4b1deb1891f308b24dbdc05c4f8,",
+          "editorial.editorialParagraph010": "S:820c8391b399b2d4797532355ac5c56858821706,",
+          "editorial.editorialParagraph020": "S:8ffbfd7c1f74bb2ce82b666d4fc40360e7b2d3cf,",
+          "editorial.editorialParagraph030": "S:4b54b1fd755b8082a922e9a0a76c1ae529634958,",
+          "editorial.editorialQuote010": "S:6e145bab239ef6ec9da43de3fbc5e575911404c1,",
+          "editorial.editorialQuote020": "S:d24f340dccf391996f5d06aaba780497603db519,",
+          "editorial.editorialCaption010": "S:8c3bed69c89240a16ec922097747bad296f6ecc8,",
+          "editorial.editorialLabel010": "S:5a036e61b2457701db7fbadf83d7b8c6bce3856b,",
+          "editorial.editorialLabel020": "S:c7ecf003e6e0711b683fc95bbb085ec78e0ff108,",
+          "editorial.editorialLabel030": "S:2607ea98e9293cb0583f6b3ee4ce2694aa758b59,",
+          "utility.utilityHeading010": "S:2a6ecde3d652bdc8945d038a2b29f8b476f3b7a8,",
+          "utility.utilityHeading020": "S:77b25a72c86fe857c49d7ea3bac5b4f55138608b,",
+          "utility.utilityHeading030": "S:202017e1d16f10dbee234a2e6a9c043bb69b91e1,",
+          "utility.utilityHeading040": "S:7f76326cb9314670b863df9c5223e39f8f9e4fa1,",
+          "utility.utilityHeading050": "S:3590aef56920b309d7cc67db318371dc6089255a,",
+          "utility.utilitySubheading010": "S:5b1b7a528878b2bac54e6392e9accc36b9c24e93,",
+          "utility.utilitySubheading020": "S:069e639a2fcec245581f61fd19eb3580f8156526,",
+          "utility.utilitySubheading030": "S:dbfcfa87414281bb0045542cd9bcec6e01525f06,",
+          "utility.utilitySubheading040": "S:474ec6455ce7becda4674039ec81e42ebe339986,",
+          "utility.utilitySubheading050": "S:d8549114c819beef0010e22a9aad6b2402082e72,",
+          "utility.utilityBody010": "S:6d40023ab17f4f3cc74e8dbcdf0c9a6e5ca8adce,",
+          "utility.utilityBody020": "S:0a77c355f2e1b30108c9a2843f7ad0ac8648cbeb,",
+          "utility.utilityBody030": "S:f7e584c65375171412729d9ee8fc7b91846005d2,",
+          "utility.utilityLabel010": "S:c15c20b674a9f46217f5a954478db80d869a75bf,",
+          "utility.utilityLabel020": "S:9cd74383982596e42110918eed0f5e9c5952e2d1,",
+          "utility.utilityLabel030": "S:7102e2c67cd63b1bda0c8dbbe154c1a53991fafa,",
+          "utility.utilityButton010": "S:d0126e4bb288b0408c8bc8a56d35fba4c44cd400,",
+          "utility.utilityButton020": "S:109ac49b2f9579302707da5e73e4c8bdc6ed8f9b,",
+          "utility.utilityButton030": "S:38b8ba766f74ba5d9159d9c3cefc734e723c6f8e,",
+          "utility.utilityMeta010": "S:6b23fd9516c55a40c1e783753579750289fe5aa2,",
+          "utility.utilityMeta020": "S:299027de48debf7a42482e5cb030a6c87bda47ab,",
+          "shadow010": "S:18a3d13cb98217e579f63879db897a88eb28bc87,",
+          "shadow020": "S:72c312c3fae7a6586d713d437359f4bf946c479d,",
+          "shadow030": "S:c37faf1c1c3a88496f500d8a5dc719f5667a0716,",
+          "shadow040": "S:b9a740d88c3618b85b8c7772a5ceb55b0bad15c3,",
+          "shadow050": "S:bcb753804868698599b4469e69dce8396cf2b489,",
+          "shadow060": "S:ff99b871b215ad9ae2f50924366066708bd1c87c,",
+          "ink.inkContrast": "S:f8dcb58bc0d6d76dfbcefb462e5e5f6c67ef6625,",
+          "blue010": "S:9038a23d2c76fe827805fab7077cb99fc8f93945,",
+          "blue020": "S:d4525a0a71b8583a40e2b773670e70840703f95b,",
+          "blue030": "S:5395dea612d0d81664b5bfaa01cdc83a359052c9,",
+          "blue040": "S:0f8a5d5492ebfce0958c298ec6c2fabad3a16fec,",
+          "blue050": "S:d88d7d42fc5429d00d3ce70b05d18f0e3cdf4f8d,",
+          "blue060": "S:be1ab7544725439d2dbe1a6bd73ce0aa2fd37fee,",
+          "blue070": "S:fb58be1c1418a01a87ff0cf256befeb1103e231c,",
+          "blue080": "S:6f9782769dc2ab8e7e311b075cb1e15947856685,",
+          "blue090": "S:de5674567e6715e81c7fe99917d3bfcd86b5a2d0,",
+          "blue100": "S:21580af2216495a4e4d823f4d201968ef38a26c4,",
+          "green010": "S:e8ffaf6a57643626e0f4f2174294ecddd704f08e,",
+          "green020": "S:56282e60e8960d087d4c1bf336da40dfc4bfb3a6,",
+          "green030": "S:072eee3a7171fcdfa06761c8b1d4eaf6816dbb4a,",
+          "green040": "S:b6bccf64735e19a59c44620b65fc878ae51f3d7a,",
+          "green050": "S:c263513a2d4199e9ac58ac86376d5ac5f0026edd,",
+          "green060": "S:62ee12269997539cd245430e9546a96050f0c104,",
+          "green070": "S:e9367d2721e8c4e481515874125a59eca5e2dd38,",
+          "green080": "S:585a547372792275f6ce37923b5e2fbd6bea67c8,",
+          "green090": "S:f326444d8e10b07bc053582abe7e1793b695fca8,",
+          "green100": "S:d80bbe8b6930c8126d93ef8e5348e0f8e1d368ae,",
+          "red010": "S:2563eb12be75eb710377dc9f5b2985c0a3ad3f6d,",
+          "red020": "S:0d22b18f47c3208500175fe8ad83d3b6d41b7e1f,",
+          "red030": "S:35709dd4f716f2738cb3022f7c708b73539073f8,",
+          "red040": "S:3e559e74fec6242b8876269bd7c37f035ee8ef81,",
+          "red050": "S:4e0b048ed836324ad2ce8b498ed789eff8594207,",
+          "red060": "S:49a56c4c549aa0f0e47a0e5a0d6dc22a56aee914,",
+          "red070": "S:5ddea3945c77853447156badf81e6a3fda88fe07,",
+          "red080": "S:1b28e42ae9861f30998dacb767185c0262c83ab9,",
+          "red090": "S:6a6eded830500dd70730cf1e5814f54d7d8b584c,",
+          "red100": "S:e1af9bb2de78e36e8fa82a3a626729943c56d246,",
+          "amber010": "S:4e8ea437bf9fa601e8edc62e592299629f3be76a,",
+          "amber020": "S:40437745258726ff7fd15b906204e36a607a2272,",
+          "amber030": "S:29656574019795b92a91140f168c6ee56cc25832,",
+          "amber040": "S:b0c0e098f9bba6cdf794ba0c38d28698f4503bc8,",
+          "amber050": "S:5ee4ff2698909dfe44fa46e6178f38e6896f1a80,",
+          "amber060": "S:38ce7a1373e0f4ced88dfd096ff0bbb36d479a66,",
+          "amber070": "S:7c19d43a984d3a3ef3a5014d948186c32e5bf7bf,",
+          "amber080": "S:ff99a1f817683e59eb97f97b4f38940d3c2af737,",
+          "amber090": "S:1a46082f85e13e475a827e1860b464d8c8395da8,",
+          "amber100": "S:6d407a96be078cc84c62084b22e0510dca263f5f,",
+          "teal010": "S:99bdf0941ab4028df4d31145921a8d9788973dbc,",
+          "teal020": "S:88f793727ffbc85f8bc223e5863f696625051072,",
+          "teal030": "S:5ab7851bb2891074900c46dce7273456f6944076,",
+          "teal040": "S:64c78d55790a0ddbd2cbbc31bbf9c1a39305f9d4,",
+          "teal050": "S:96560e902fb6ec25512dd9ec8b3f822b7cf33c33,",
+          "teal060": "S:3fe39dbfab098fa402ee60a029fdaad2241c22b2,",
+          "teal070": "S:0bfff2f24a03ba743ac93563031ac2aaa7ffc1bf,",
+          "teal080": "S:14c43cf12ca21dc40c31d15eb72bf6b25f45fbd2,",
+          "teal090": "S:c144ed8d2ad427d9e7d67dd3e0fe857a80146771,",
+          "teal100": "S:5167bfd3d20a3f73427982f043566174761e4fdb,",
+          "purple010": "S:b6c543a30be09b0e525e2efd7b4903ba2b0cb880,",
+          "purple020": "S:6ebcfc6099ffc6dfc572c8d8559b6e215cb9f38e,",
+          "purple030": "S:dd8f089f51c5cdd6250cdf58a503a7d383dbde6a,",
+          "purple040": "S:d664b7bdb29c206c43a099577bc518102a88a440,",
+          "purple050": "S:5f93b200c3774c607c4af35dcbcc80dc452dc7a4,",
+          "purple060": "S:f0bb0f6897cbc81b3e051a9f691e60fd6e14c4fc,",
+          "purple070": "S:c0f069ef81653eee5f7ab408b27e5eb4c2cd6aa1,",
+          "purple080": "S:c86fef4ed68e81a2502bc9629751777600cf12d9,",
+          "purple090": "S:98ff85cae68c29216ad8880e6348e916f322b1b2,",
+          "purple100": "S:2668c8f46f07169556604e8c51d24537394baa0b,",
+          "neutral010": "S:a67af927b3c1187b9808d3bc20dad46e86b317a9,",
+          "neutral020": "S:727101ea003d45d56d0c7c2ba672f366168285a5,",
+          "neutral030": "S:794f2dd8af4178a2c90556eb4b17ea3b9f52e2d6,",
+          "neutral040": "S:9c0cb0a9c4d907f7255cea3e6d75e993f46eca78,",
+          "neutral050": "S:8402071d4c7fb7c1d36363b9f653bf4f878cec66,",
+          "neutral060": "S:08023aa91f1d8814425d87b4e94c186c4c9cbd6b,",
+          "neutral070": "S:a74e5b7fbe8e6e62f9c5d7bb0126d892525eb257,",
+          "neutral080": "S:0e925734ce6e45fca4592df29ffac2705fb96024,",
+          "neutral090": "S:9cd031a7cac309afb1017515f6a752f539be2ca0,",
+          "neutral100": "S:5410e7f8c78d6015be2da8c50a9bb8f944d8c54c,",
+          "focus010": "S:5e49baf86d2d747330b858674a2cdd7ea6010264,",
+          "blackTint010": "S:6b15a5a9969166831c23779b1f03a027d61117fe,",
+          "blackTint020": "S:d786365ed8ef0942b8ac434fc79ad5c70a41a6be,",
+          "blackTint030": "S:68186e768245eb69a69cde31b08b27886f6d5518,",
+          "blackTint040": "S:b7a25f6c31c9d7b479ad397a4d2867465ae3cd11,",
+          "blackTint050": "S:8af16ea5d7ae9379f4f7ee3a9823f1d1c6d13c08,",
+          "blackTint060": "S:24d9ca605e8eb57ee0a4875c649d2f04701eefbe,",
+          "blackTint070": "S:c164b0bfc900bd315625172014c5e09d81ab12b5,",
+          "blackTint080": "S:58e7cd21f6d14f6425ec5bff656432786d998a76,",
+          "blackTint090": "S:68576f6389f3a22a227e8b28f947e526c17922e4,",
+          "black": "S:7b8cd41db4d5300b1c340b4bffaa4d656ef4fd0e,",
+          "whiteTint010": "S:0d9011434ad6664eae5804128be604aac149c0d1,",
+          "whiteTint020": "S:c179699ba29aca532c197b717afd747ebe29f9ff,",
+          "whiteTint030": "S:4331211e452a6ce2295feaf34d01e799cc84b81c,",
+          "whiteTint040": "S:cde16a7e8a116dc45679c918273b88d798695485,",
+          "whiteTint050": "S:82408c81973e819064497be7b8ddce2cd79fa4f2,",
+          "whiteTint060": "S:0bfec72e65d8a0a3903bbdc9bdfc6fc675604660,",
+          "whiteTint070": "S:00a39f5c3c7d34a3aa260e20940490cc7d0680a4,",
+          "whiteTint080": "S:093e260b3b467044e663cac90a8d9e12b002f98f,",
+          "whiteTint090": "S:d8b83d208aeb4db08ff101b3db003cc113b718f1,",
+          "white": "S:92247bf2258345dfb916f507f2745e32badfaf1e,",
+          "Reddit": "S:6205422d8482cb0d8ef8d4e8750269b571754bd4,",
+          "Whatsapp": "S:f00a1a6768fcb797a1359fc38307370025caa112,",
+          "Youtube": "S:2016817db038f98d5a1eba8149466103c011faa0,",
+          "Instagram": "S:ed777eb1bb99199bedd1ca1b4c8937a386984fc1,",
+          "Facebook": "S:0407f9c4df392d4efef5e5473d5aa52eccaf2963,",
+          "Twitter": "S:cd3dfbd130acac1c3e617b3d6e7d6bcfbe90a6d3,",
+          "Github": "S:21ac712499b7f0a659961ae70847c8f3381f2ec6,",
+          "Apple": "S:e65c6b432c774cdc6bddc9002c1a1ca99e11b04d,",
+          "GoogleBlue": "S:95ace415373f1b77223f9336bd3cf42c4b29ae5a,",
+          "GoogleRed": "S:ea698b75c38f1e2088b9192112c5622175de64fd,",
+          "GoogleYellow": "S:8229fb6a6385a2c2e48a11428777e3ffa8745b77,",
+          "GoogleGreen": "S:8ce4af833f651283bef9dffadc45a0bbd07100e8,",
+          "transparent": "S:8ea5fdda0d8f17fa3267acd185a89250f5903abb,"
+        }
+      }
+    ],
+    "$metadata": {
+      "tokenSetOrder": [
+        "Foundations",
+        "Light",
+        "Dark"
+      ]
+    }
+  }

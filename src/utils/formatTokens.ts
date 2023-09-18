@@ -2,6 +2,7 @@ import set from 'set-value';
 import { expand } from '@/utils/expand';
 import { AnyTokenList } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
+import removeTokenId from './removeTokenId';
 
 type Options = {
   tokens: Record<string, AnyTokenList>;
@@ -13,6 +14,7 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
+  storeTokenIdInJsonEditor: boolean
 };
 
 export default function formatTokens({
@@ -25,12 +27,13 @@ export default function formatTokens({
   expandShadow = false,
   expandComposition = false,
   expandBorder = false,
+  storeTokenIdInJsonEditor = false,
 }: Options) {
   const nestUnderParent = includeAllTokens ? true : includeParent;
   const tokenObj = {};
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
-      const { name, ...tokenWithoutName } = token;
+      const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)

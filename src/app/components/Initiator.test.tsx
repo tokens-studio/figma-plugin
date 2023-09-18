@@ -11,6 +11,10 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import { UpdateMode } from '@/constants/UpdateMode';
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid'),
+}));
+
 describe('Initiator', () => {
   beforeEach(() => {
     resetStore();
@@ -231,6 +235,9 @@ describe('Initiator', () => {
     expect(state.tokenState.tokens).toEqual({
       global: [
         {
+          $extensions: {
+            id: 'mock-uuid',
+          },
           type: TokenTypes.COLOR,
           name: 'colors.red',
           value: '#ff0000',
@@ -607,6 +614,7 @@ describe('Initiator', () => {
               updateStyles: false,
               ignoreFirstPartForStyles: false,
               prefixStylesWithThemeName: false,
+              storeTokenIdInJsonEditor: false,
               inspectDeep: false,
             },
           },
@@ -623,6 +631,7 @@ describe('Initiator', () => {
       },
       language: 'en',
       shouldSwapStyles: false,
+      storeTokenIdInJsonEditor: false,
       tokenType: 'object',
       updateMode: UpdateMode.PAGE,
       updateRemote: false,

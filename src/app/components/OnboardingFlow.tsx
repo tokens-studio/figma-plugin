@@ -13,11 +13,11 @@ import { styled } from '@/stitches.config';
 const StyledLink = styled('a', {
   display: 'inline-flex',
   fontSize: '$1',
-  color: '$fgAccent',
+  color: '$accentFg',
 });
 
 const StyledImage = styled('img', {
-  borderRadius: '$card',
+  borderRadius: '$medium',
 });
 
 function fetchOnboardingImage(idx: number) {

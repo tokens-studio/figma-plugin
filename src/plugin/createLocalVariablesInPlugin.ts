@@ -21,8 +21,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   themeInfo.themes.forEach((theme) => {
-    const existingVariableCollections = figma.variables.getLocalVariableCollections();
-    const collection = existingVariableCollections.find((vr) => vr.name === (theme.group ?? theme.name));
+    const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
     if (collection) {
       const mode = collection.modes.find((m) => m.name === theme.name);
       const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
@@ -58,5 +57,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   } else {
     notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
-  return allVariableCollectionIds;
+  return {
+    allVariableCollectionIds,
+    totalVariables: figmaVariables.length,
+  };
 }

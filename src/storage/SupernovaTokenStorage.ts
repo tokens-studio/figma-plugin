@@ -4,12 +4,13 @@ import { AnyTokenSet } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
 import { SystemFilenames } from '../constants/SystemFilenames';
+import { SaveOption } from './FileTokenStorage';
 
 export type SupernovaStorageSaveOptions = {
   commitMessage?: string;
 };
 
-export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSaveOptions> {
+export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSaveOptions, SaveOption> {
   private workspaceHandle: string;
 
   private designSystemId: string;

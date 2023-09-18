@@ -15,7 +15,7 @@ function ColorDisplayBubbleComponent({
   css, color, style, ...props
 }: Props, ref: ForwardedRef<HTMLDivElement>) {
   const borderColor = useMemo(() => (
-    lightOrDark(String(color)) === 'light' ? String(theme.colors.border) : String(theme.colors.borderMuted)
+    lightOrDark(String(color)) === 'light' ? String(theme.colors.borderDefault) : String(theme.colors.borderMuted)
   ), [color]);
 
   return (

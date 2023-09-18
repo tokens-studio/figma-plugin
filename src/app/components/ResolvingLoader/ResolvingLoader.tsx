@@ -24,7 +24,7 @@ export const ResolvingLoader: React.FC = () => (
         display: 'grid',
         padding: '$3',
         gap: '$2',
-        borderRadius: '$button',
+        borderRadius: '$small',
         background: '$bgSubtle',
         gridTemplateColumns: 'repeat(3, 1fr)',
       }}

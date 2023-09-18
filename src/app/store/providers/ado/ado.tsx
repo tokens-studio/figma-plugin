@@ -6,7 +6,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import {
-  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector,
+  localApiStateSelector, tokensSelector, themesListSelector, activeThemeSelector, usedTokenSetSelector, storeTokenIdInJsonEditorSelector,
 } from '@/selectors';
 import { ADOTokenStorage } from '@/storage/ADOTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -29,6 +29,7 @@ export const useADO = () => {
   const localApiState = useSelector(localApiStateSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
   const { confirm } = useConfirm();
@@ -97,6 +98,7 @@ export const useADO = () => {
           metadata,
         }, {
           commitMessage,
+          storeTokenIdInJsonEditor,
         });
 
         saveLastSyncedState(dispatch, tokens, themes, metadata);
@@ -226,8 +228,6 @@ export const useADO = () => {
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
-              usedTokenSet,
-              activeTheme,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
@@ -251,8 +251,6 @@ export const useADO = () => {
     storageClientFactory,
     themes,
     tokens,
-    activeTheme,
-    usedTokenSet,
     checkAndSetAccess,
   ]);
 
