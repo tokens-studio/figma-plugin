@@ -2,6 +2,7 @@ import React, {
   useCallback, useMemo,
 } from 'react';
 import { useSelector } from 'react-redux';
+import debounce from 'lodash.debounce';
 import {
   activeTokenSetSelector,
   collapsedTokenSetsSelector,
@@ -52,14 +53,17 @@ export default function TokenSetTree({
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const collapsed = useSelector(collapsedTokenSetsSelector);
-  const items = tokenSetListToTree(tokenSets);
+  const externalItems = useMemo(() => tokenSetListToTree(tokenSets), [tokenSets]);
+  const [items, setItems] = React.useState<TreeItem[]>(externalItems);
+
+  const debouncedOnReorder = React.useMemo(() => debounce(onReorder, 500), [onReorder]);
 
   React.useEffect(() => {
     // Compare saved tokenSet order with GUI tokenSet order and update the tokenSet if there is a difference
-    if (!isEqual(Object.keys(tokens), items.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
-      onReorder(items.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
+    if (!isEqual(Object.keys(tokens), externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
+      debouncedOnReorder(externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
     }
-  }, [items, tokens, onReorder]);
+  }, [externalItems, tokens, debouncedOnReorder]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {
@@ -134,10 +138,12 @@ export default function TokenSetTree({
       return acc;
     }, []);
 
-    onReorder(nextItems
+    setItems(nextItems);
+
+    debouncedOnReorder(nextItems
       .filter(({ isLeaf }) => isLeaf)
       .map(({ path }) => path));
-  }, [items, collapsed, onReorder]);
+  }, [items, collapsed, debouncedOnReorder]);
 
   const handleCheckReorder = React.useCallback((
     order: ItemData<typeof mappedItems[number]>[],
