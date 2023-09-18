@@ -25,6 +25,7 @@ import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import Text from '../Text';
 import Link from '../Link';
 import { useDebug } from '@/app/store/useDebug';
+import { useFlags } from '../LaunchDarkly';
 
 function Settings() {
   const { t } = useTranslation(['settings']);
@@ -43,6 +44,7 @@ function Settings() {
   const dispatch = useDispatch<Dispatch>();
   const debugMode = useSelector(sessionRecordingSelector);
   const [debugSession, setDebugSession] = useState('');
+  const { idStorage } = useFlags();
 
   const toggleDebugMode = React.useCallback(async (checked: CheckedState) => {
     dispatch.settings.setSessionRecording(!!checked);
@@ -174,6 +176,8 @@ function Settings() {
               </Stack>
             </Label>
           </Stack>
+          {idStorage
+          && (
           <Stack direction="row" gap={3} align="start">
             <Checkbox
               id="storeTokenIdInJsonEditor"
@@ -189,6 +193,7 @@ function Settings() {
               </Stack>
             </Label>
           </Stack>
+          )}
           <Box>
 
             <Heading size="small">{t('baseFont')}</Heading>
