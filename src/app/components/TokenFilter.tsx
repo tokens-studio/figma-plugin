@@ -8,6 +8,7 @@ import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import { tokenFilterSelector } from '@/selectors';
+import IconButton from './IconButton';
 
 const StyledInput = styled('input', {
   background: 'transparent',
@@ -66,7 +67,12 @@ const TokenFilter = () => {
         onChange={handleChange}
         placeholder={t('search') as string}
       />
-      <Box css={{ position: 'absolute', right: '$2', cursor: 'pointer' }} onClick={handleResetSearchString}><XCircleFillIcon /></Box>
+      <Box css={{ position: 'absolute', right: '$2' }}>
+        <IconButton
+          onClick={handleResetSearchString}
+          icon={<XCircleFillIcon />}
+        />
+      </Box>
     </Box>
   );
 };
