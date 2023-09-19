@@ -45,7 +45,8 @@ const TokenFilter = () => {
 
   const handleResetSearchString = React.useCallback(() => {
     setTokenString('');
-  }, []);
+    dispatch.uiState.setTokenFilter('');
+  }, [dispatch.uiState]);
 
   return (
     <Box
