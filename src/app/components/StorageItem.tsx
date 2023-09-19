@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
-import type { StorageTypeCredentials } from '@/types/StorageType';
+import { StorageProviderType, type StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 import Box from './Box';
 import useConfirm from '../hooks/useConfirm';
@@ -20,6 +20,8 @@ import {
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import Stack from './Stack';
 import Badge from './Badge';
+import useStorage from '../store/useStorage';
+import { Dispatch } from '../store';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -34,6 +36,8 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const branch = isGitProvider(item) ? item.branch : null;
   const { restoreStoredProvider, deleteProvider } = useRemoteTokens();
   const { confirm } = useConfirm();
+  const { setStorageType } = useStorage();
+  const dispatch = useDispatch<Dispatch>();
 
   const { t } = useTranslation(['storage']);
 
@@ -47,8 +51,15 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const handleDelete = React.useCallback(async () => {
-    if (await askUserIfDelete()) deleteProvider(item);
-  }, [deleteProvider, item, askUserIfDelete]);
+    if (await askUserIfDelete()) {
+      deleteProvider(item);
+      dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
+      setStorageType({
+        provider: { provider: StorageProviderType.LOCAL },
+        shouldSetInDocument: true,
+      });
+    }
+  }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState]);
 
   const handleRestore = React.useCallback(async () => {
     const response = await restoreStoredProvider(item);
