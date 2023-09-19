@@ -63,6 +63,7 @@ export default function TokenSetTree({
     if (!isEqual(Object.keys(tokens), externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
       debouncedOnReorder(externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
     }
+    setItems(externalItems);
   }, [externalItems, tokens, debouncedOnReorder]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
