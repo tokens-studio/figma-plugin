@@ -43,7 +43,7 @@ export const StyledList = styled(List, {
 });
 
 export const StyledItemValue = styled('div', {
-  color: '$fgMuted',
+  color: 'var(--mentions-color-muted, var(--colors-fgMuted))',
   fontWeight: '$bold',
   textAlign: 'right',
   maxWidth: '300px',
