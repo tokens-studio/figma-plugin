@@ -79,6 +79,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
         node.effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
       }
       break;
+    case 'backgroundBlur':
+      if ('effects' in node && typeof node.effects !== 'undefined') {
+        node.effects = node.effects.filter((effect) => effect.type !== 'BACKGROUND_BLUR');
+      }
+      break;
     case 'opacity':
       if (
         'opacity' in node
