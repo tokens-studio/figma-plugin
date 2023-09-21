@@ -23,7 +23,6 @@ export function renameStyleIdsToCurrentTheme(state: TokenState, styleIds: string
     };
   });
 
-  console.log('updatedThemes', updatedThemes);
   return {
     ...state,
     themes: updatedThemes,

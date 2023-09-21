@@ -1,14 +1,19 @@
+import { TokensToRenamePayload } from '@/app/store/useTokens';
 import type { TokenState } from '../../tokenState';
 
-export function renameStyleNamesToCurrentTheme(state: TokenState, oldName: string, newName: string): TokenState {
+export function renameStyleNamesToCurrentTheme(state: TokenState, tokensToRename: TokensToRenamePayload[]): TokenState {
   const updatedThemes = [...state.themes];
+  const oldNameMapNewName = tokensToRename.reduce<Record<string, string>>((acc, curr) => {
+    acc[curr.oldName] = curr.newName;
+    return acc;
+  }, {});
   updatedThemes.forEach((theme) => {
     const updatedTokens = theme.$figmaStyleReferences;
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([key]) => {
-        if (key === oldName) {
-          updatedTokens[newName] = updatedTokens[oldName];
-          delete updatedTokens[oldName];
+        if (oldNameMapNewName[key]) {
+          updatedTokens[oldNameMapNewName[key]] = updatedTokens[key];
+          delete updatedTokens[key];
         }
       });
     }
@@ -17,6 +22,7 @@ export function renameStyleNamesToCurrentTheme(state: TokenState, oldName: strin
       $figmaStyleReferences: updatedTokens,
     };
   });
+  console.log('updatedThemes', updatedThemes);
   return {
     ...state,
     themes: updatedThemes,
