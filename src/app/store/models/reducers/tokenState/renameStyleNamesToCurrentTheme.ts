@@ -22,7 +22,7 @@ export function renameStyleNamesToCurrentTheme(state: TokenState, tokensToRename
       $figmaStyleReferences: updatedTokens,
     };
   });
-  console.log('updatedThemes', updatedThemes);
+
   return {
     ...state,
     themes: updatedThemes,
