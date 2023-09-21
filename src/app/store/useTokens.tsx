@@ -57,6 +57,11 @@ let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 export type SyncOption = 'removeStyle' | 'renameStyle';
 export type SyncVariableOption = 'removeVariable' | 'renameVariable';
 
+export type TokensToRenamePayload = {
+  oldName: string,
+  newName: string,
+};
+
 export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -212,7 +217,10 @@ export default function useTokens() {
           key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
         },
         {
-          key: 'rename-variable-token-group', label: 'Rename variable',
+          key: 'rename-variable-token-group', label: 'Rename variables',
+        },
+        {
+          key: 'rename-style-token-group', label: 'Rename styles',
         },
       ],
     });
@@ -241,8 +249,25 @@ export default function useTokens() {
         });
         dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
       }
+
+      if (confirmData.data.includes('rename-style-token-group')) {
+        track('renameStylesInTokenGroup', { newGroupName, oldGroupName });
+        const tokensInParent = tokens[activeTokenSet] ?? [];
+        const tokensToRename = tokensInParent.filter((token) => token.name.startsWith(oldGroupName) && token.type === type).map((filteredToken) => ({
+          oldName: filteredToken.name,
+          newName: filteredToken.name.replace(oldGroupName, newGroupName),
+        }));
+
+        const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.RENAME_STYLES,
+          tokensToRename,
+          parent: activeTokenSet,
+          settings,
+        });
+        dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
+      }
     }
-  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -324,17 +349,16 @@ export default function useTokens() {
     }
   }, [confirm, tokens, dispatch.tokenState, settings]);
 
-  const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
-    track('renameStyles', { oldName, newName, parent });
+  const renameStylesFromTokens = useCallback(async (tokensToRename: TokensToRenamePayload[], parent: string) => {
+    track('renameStyles', { tokensToRename, parent });
 
     const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.RENAME_STYLES,
-      oldName,
-      newName,
+      tokensToRename,
       parent,
       settings,
     });
-    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, newName);
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
   }, [settings, dispatch.tokenState]);
 
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {

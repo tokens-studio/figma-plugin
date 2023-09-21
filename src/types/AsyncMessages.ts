@@ -14,7 +14,7 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption, SyncVariableOption } from '@/app/store/useTokens';
+import { SyncOption, SyncVariableOption, TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
@@ -172,8 +172,7 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 }>;
 
 export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
-  oldName: string;
-  newName: string;
+  tokensToRename: TokensToRenamePayload[]
   parent: string;
   settings: Partial<SettingsState>;
 }>;
