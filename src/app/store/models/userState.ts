@@ -137,7 +137,7 @@ export const userState = createModel<RootModel>()({
       // clear license key related state
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_LICENSE_KEY,
-        licenseKey: null,
+        licenseKey: payload,
       });
 
       dispatch.userState.setLicenseKey(undefined);

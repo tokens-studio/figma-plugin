@@ -49,7 +49,7 @@ export default function AddLicenseKey() {
 
   const removeKey = useCallback(async () => {
     if (licenseKeyError) {
-      dispatch.userState.removeLicenseKey('');
+      dispatch.userState.removeLicenseKey('empty');
     } else {
       const confirmation = await confirm({
         text: t('confirmRemove') as string,
@@ -57,7 +57,7 @@ export default function AddLicenseKey() {
         confirmAction: t('removeKey') as string,
       });
       if (confirmation) {
-        dispatch.userState.removeLicenseKey('');
+        dispatch.userState.removeLicenseKey('empty');
         removeAccessToFeatures();
       }
     }
