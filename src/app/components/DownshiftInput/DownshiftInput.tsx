@@ -235,7 +235,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
-            {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
+            {!!inlineLabel && !prefix && <Tooltip label={name} side="top"><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <MentionsInput
               name={name}
