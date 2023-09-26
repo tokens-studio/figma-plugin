@@ -23,6 +23,7 @@ const ldClientPromise = new Promise<LDClient>((resolve) => {
 });
 
 export function useStartupProcess(params: StartupMessage) {
+  console.log('params in useStartupProcess: ', params);
   const ldClient = useLDClient();
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();

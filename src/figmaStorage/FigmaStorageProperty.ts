@@ -27,12 +27,14 @@ export class FigmaStorageProperty<V = string> {
   public async read(node: BaseNode = figma.root): Promise<V | null> {
     if (this.storageType === FigmaStorageType.CLIENT_STORAGE) {
       const value = await figma.clientStorage.getAsync(this.key);
+      console.log('key in client storage: ', value);
       return value ? this.parse(value) : null;
     } if (this.storageType === FigmaStorageType.SHARED_PLUGIN_DATA) {
       const keyParts = this.key.split('/');
       const namespace = keyParts[0];
       const key = keyParts.slice(1).join('/');
       const value = node?.getSharedPluginData(namespace, key);
+      console.log('key in shared plugin data: ', value);
       return value ? this.parse(value) : null;
     }
 

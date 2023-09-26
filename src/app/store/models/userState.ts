@@ -93,9 +93,12 @@ export const userState = createModel<RootModel>()({
 
       const { userId, userName } = rootState.userState;
       const { key, source } = payload;
+      console.log('key: ', key);
       const {
         error, plan, email: clientEmail, entitlements,
       } = await validateLicense(key, userId, userName);
+
+      console.log('error: ', error);
 
       if (error) {
         dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);
