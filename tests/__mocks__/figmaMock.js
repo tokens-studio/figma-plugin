@@ -73,6 +73,13 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
+module.exports.mockCreateVariable = jest.fn();
+module.exports.mockGetLocalVariableCollections = jest.fn();
+module.exports.mockCreateVariableCollection = jest.fn();
+module.exports.mockImportVariableByKeyAsync = jest.fn();
+module.exports.mockGetVariableById = jest.fn();
+module.exports.mockSetValueForMode = jest.fn();
+module.exports.mockSetBoundVariableForPaint = jest.fn()
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -103,7 +110,14 @@ module.exports.figma = {
     findAllWithCriteria: module.exports.mockRootFindAllWithCriteria,
   },
   variables: {
-    getLocalVariables: module.exports.mockGetLocalVariables
+    getLocalVariables: module.exports.mockGetLocalVariables,
+    createVariable: module.exports.mockCreateVariable,
+    getLocalVariableCollections: module.exports.mockGetLocalVariableCollections,
+    createVariableCollection: module.exports.mockCreateVariableCollection,
+    importVariableByKeyAsync: module.exports.mockImportVariableByKeyAsync,
+    getVariableById: module.exports.mockGetVariableById,
+    setValueForMode: module.exports.mockSetValueForMode,
+    setBoundVariableForPaint: module.exports.mockSetBoundVariableForPaint
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,

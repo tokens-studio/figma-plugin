@@ -7,6 +7,7 @@ import IsJSONString from '@/utils/isJSONString';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { complexSingleFileSchema } from './schemas';
+import { SaveOption } from './FileTokenStorage';
 
 type UrlData = {
   values: Record<string, RemoteTokenStorageSingleTokenSetFile['data']>
@@ -14,7 +15,7 @@ type UrlData = {
   $metadata?: RemoteTokenStorageMetadata
 };
 
-export class UrlTokenStorage extends RemoteTokenStorage {
+export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
   private url: string;
 
   private secret: string;

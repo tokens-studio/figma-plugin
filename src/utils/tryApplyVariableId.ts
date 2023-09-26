@@ -8,11 +8,9 @@ export async function tryApplyVariableId(node: SceneNode, type: VariableBindable
   }
   const variableMapped = figmaVariableReferences.get(token);
   if (!variableMapped) return false;
-
   if (!hasCachedVariable && typeof variableMapped === 'string') {
     try {
       const foundVariable = await figma.variables.importVariableByKeyAsync(variableMapped);
-
       if (foundVariable) {
         resolvedVariableReferences.set(token, foundVariable);
         variable = foundVariable;

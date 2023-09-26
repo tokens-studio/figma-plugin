@@ -21,18 +21,19 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
   if ('effects' in node) {
     const styleIdBackupKey = 'effectStyleId_original';
     const localStyle = getLocalStyle(node, styleIdBackupKey, 'effects');
-    if (localStyle) {
-      const effects = localStyle.effects as DropShadowEffect[];
+    if (localStyle && localStyle.effects.every((effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')) {
+      const effects = localStyle.effects as Effect[];
       // convert paint to object containg x, y, spread, color
       const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
+        const rootEffect = effect as DropShadowEffect | InnerShadowEffect;
         const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
 
-        effectObject.color = figmaRGBToHex(effect.color);
-        effectObject.type = convertBoxShadowTypeFromFigma(effect.type);
-        effectObject.x = effect.offset.x;
-        effectObject.y = effect.offset.y;
-        effectObject.blur = effect.radius;
-        effectObject.spread = effect.spread || 0;
+        effectObject.color = figmaRGBToHex(rootEffect.color);
+        effectObject.type = convertBoxShadowTypeFromFigma(rootEffect.type);
+        effectObject.x = rootEffect.offset.x;
+        effectObject.y = rootEffect.offset.y;
+        effectObject.blur = rootEffect.radius;
+        effectObject.spread = rootEffect.spread || 0;
 
         return effectObject;
       });

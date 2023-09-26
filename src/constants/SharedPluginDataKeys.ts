@@ -7,7 +7,6 @@ export const SharedPluginDataKeys = Object.freeze({
     values: 'values',
     updatedAt: 'updatedAt',
     storageType: 'storageType',
-    hash: 'hash',
     persistentNodesCache: 'persistentNodesCache',
     usedTokenSet: 'usedTokenSet',
     checkForChanges: 'checkForChanges',

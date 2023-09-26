@@ -10,8 +10,6 @@ import { init } from '@/utils/plugin';
 import { sendDocumentChange } from './sendDocumentChange';
 import { performCodeGen } from './performCodeGen';
 
-figma.skipInvisibleInstanceChildren = true;
-
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHANGED_TABS, asyncHandlers.changedTabs);
@@ -69,6 +67,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, as
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_RELAUNCH_DATA, asyncHandlers.removeRelaunchData);
 
 figma.on('close', () => {
   defaultWorker.stop();

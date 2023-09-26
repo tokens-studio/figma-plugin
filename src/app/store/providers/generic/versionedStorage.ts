@@ -6,7 +6,7 @@ import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
@@ -29,6 +29,7 @@ export async function updateGenericVersionedTokens({
   context,
   updatedAt,
   oldUpdatedAt = null,
+  storeTokenIdInJsonEditor,
   dispatch,
 }: UpdateRemoteFunctionPayload): Promise<RemoteResponseData<GenericVersionedMeta> | null> {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
@@ -78,7 +79,7 @@ export async function updateGenericVersionedTokens({
 
     // If the oldUpdatedAt doesn't exist, we still save the tokens
     // This happens in createNewGenericVersionedStorage
-    const success = await storage.save(payload);
+    const success = await storage.save(payload, { storeTokenIdInJsonEditor });
 
     if (success) {
       saveLastSyncedState(dispatch, payload.tokens, payload.themes, { tokenSetOrder });
@@ -111,8 +112,7 @@ export function useGenericVersionedStorage() {
   const { setStorageType } = useStorage();
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const activeTheme = useSelector(activeThemeSelector);
-  const usedTokenSets = useSelector(usedTokenSetSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
 
   const createNewGenericVersionedStorage = useCallback(
     async (
@@ -133,6 +133,7 @@ export function useGenericVersionedStorage() {
           },
           themes,
           updatedAt,
+          storeTokenIdInJsonEditor,
           dispatch,
         });
         AsyncMessageChannel.ReactInstance.message({
@@ -263,15 +264,13 @@ export function useGenericVersionedStorage() {
         dispatch.tokenState.setTokenData({
           values: content.tokens,
           themes: content.themes,
-          usedTokenSet: usedTokenSets,
-          activeTheme,
         });
         return content;
       }
 
       return content;
     },
-    [dispatch, pullTokensFromGenericVersionedStorage, setStorageType, usedTokenSets, activeTheme],
+    [dispatch, pullTokensFromGenericVersionedStorage, setStorageType],
   );
 
   return useMemo(

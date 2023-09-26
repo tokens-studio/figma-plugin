@@ -6,13 +6,14 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues } from '@/utils/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -33,6 +34,8 @@ import { DeleteTokenPayload } from '@/types/payloads';
 import { notifyToUI } from '@/plugin/notifiers';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { wrapTransaction } from '@/profiling/transaction';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -61,6 +64,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -83,14 +87,14 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
     });
-  }, [tokens, activeTokenSet]);
+  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet)
-  ), [tokens, activeTokenSet]);
+    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
+  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {
@@ -157,7 +161,6 @@ export default function useTokens() {
   }, []);
 
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
-    const settings = settingsStateSelector(store.getState());
     track('remapToken', { fromInspect: true });
 
     wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -169,7 +172,7 @@ export default function useTokens() {
       tokens: resolvedTokens,
       settings,
     }));
-  }, [confirm]);
+  }, [settings]);
 
   const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
@@ -239,7 +242,7 @@ export default function useTokens() {
         dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
       }
     }
-  }, [activeTokenSet, tokens, settings.updateMode, confirm, handleBulkRemap, dispatch.settings, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -268,7 +271,10 @@ export default function useTokens() {
         notifyToUI('No styles created. Make sure token sets are active.', { error: true });
         return;
       }
-      const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
+      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
+        ...usedTokenSet,
+        [activeTokenSet]: TokenSetStatus.ENABLED,
+      }));
       const withoutSourceTokens = resolved.filter((token) => (
         !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
@@ -363,6 +369,10 @@ export default function useTokens() {
 
   const createVariables = useCallback(async () => {
     track('createVariables');
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -377,7 +387,8 @@ export default function useTokens() {
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
-  }, [dispatch.tokenState, tokens, settings]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
     track('renameVariables', { oldName, newName });

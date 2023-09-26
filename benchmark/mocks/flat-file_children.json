@@ -1,0 +1,1247 @@
+[
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:2",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkBrand020"
+      }
+    },
+    "name": "ink.inkBrand020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:3",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkBrand010"
+      }
+    },
+    "name": "ink.inkBrand010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:4",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkInformative"
+      }
+    },
+    "name": "ink.inkInformative"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:5",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkNotice"
+      }
+    },
+    "name": "ink.inkNotice"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:6",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkNegative"
+      }
+    },
+    "name": "ink.inkNegative"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:7",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkPositive"
+      }
+    },
+    "name": "ink.inkPositive"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:8",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkDark010"
+      }
+    },
+    "name": "ink.inkDark010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:9",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkLight010"
+      }
+    },
+    "name": "ink.inkLight010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:10",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkInverse"
+      }
+    },
+    "name": "ink.inkInverse"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:11",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkNonEssential"
+      }
+    },
+    "name": "ink.inkNonEssential"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:12",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkSubtle"
+      }
+    },
+    "name": "ink.inkSubtle"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:13",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkBase"
+      }
+    },
+    "name": "ink.inkBase"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:14",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "ink.inkContrast"
+      }
+    },
+    "name": "ink.inkContrast"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:15",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceSkeleton020"
+      }
+    },
+    "name": "interface.interfaceSkeleton020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:16",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceSkeleton010"
+      }
+    },
+    "name": "interface.interfaceSkeleton010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:17",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNeutral020"
+      }
+    },
+    "name": "interface.interfaceNeutral020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:18",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNeutral010"
+      }
+    },
+    "name": "interface.interfaceNeutral010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:19",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceInformative020"
+      }
+    },
+    "name": "interface.interfaceInformative020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:20",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceInformative010"
+      }
+    },
+    "name": "interface.interfaceInformative010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:21",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNotice020"
+      }
+    },
+    "name": "interface.interfaceNotice020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:22",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNotice010"
+      }
+    },
+    "name": "interface.interfaceNotice010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:23",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNegative020"
+      }
+    },
+    "name": "interface.interfaceNegative020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:24",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceNegative010"
+      }
+    },
+    "name": "interface.interfaceNegative010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:25",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfacePositive020"
+      }
+    },
+    "name": "interface.interfacePositive020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:26",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfacePositive010"
+      }
+    },
+    "name": "interface.interfacePositive010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:27",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceBrand020"
+      }
+    },
+    "name": "interface.interfaceBrand020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:28",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceBrand010"
+      }
+    },
+    "name": "interface.interfaceBrand010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:29",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface060"
+      }
+    },
+    "name": "interface.interface060"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:30",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface050"
+      }
+    },
+    "name": "interface.interface050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:31",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface040"
+      }
+    },
+    "name": "interface.interface040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:32",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface030"
+      }
+    },
+    "name": "interface.interface030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:33",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface020"
+      }
+    },
+    "name": "interface.interface020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:34",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interface010"
+      }
+    },
+    "name": "interface.interface010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:35",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interface.interfaceBackground"
+      }
+    },
+    "name": "interface.interfaceBackground"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:36",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInput050"
+      }
+    },
+    "name": "interactive.interactiveInput050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:37",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInput040"
+      }
+    },
+    "name": "interactive.interactiveInput040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:38",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInput030"
+      }
+    },
+    "name": "interactive.interactiveInput030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:39",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInput020"
+      }
+    },
+    "name": "interactive.interactiveInput020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:40",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInput010"
+      }
+    },
+    "name": "interactive.interactiveInput010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:41",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveFocus010"
+      }
+    },
+    "name": "interactive.interactiveFocus010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:42",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveFocus020"
+      }
+    },
+    "name": "interactive.interactiveFocus020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:43",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveVisited010"
+      }
+    },
+    "name": "interactive.interactiveVisited010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:44",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveDisabled010"
+      }
+    },
+    "name": "interactive.interactiveDisabled010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:45",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveLink030"
+      }
+    },
+    "name": "interactive.interactiveLink030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:46",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveLink020"
+      }
+    },
+    "name": "interactive.interactiveLink020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:47",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveLink010"
+      }
+    },
+    "name": "interactive.interactiveLink010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:48",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInverse050"
+      }
+    },
+    "name": "interactive.interactiveInverse050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:49",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInverse040"
+      }
+    },
+    "name": "interactive.interactiveInverse040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:50",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInverse030"
+      }
+    },
+    "name": "interactive.interactiveInverse030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:51",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInverse020"
+      }
+    },
+    "name": "interactive.interactiveInverse020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:52",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveInverse010"
+      }
+    },
+    "name": "interactive.interactiveInverse010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:53",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveNegative050"
+      }
+    },
+    "name": "interactive.interactiveNegative050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:54",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveNegative040"
+      }
+    },
+    "name": "interactive.interactiveNegative040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:55",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveNegative030"
+      }
+    },
+    "name": "interactive.interactiveNegative030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:56",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveNegative020"
+      }
+    },
+    "name": "interactive.interactiveNegative020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:57",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveNegative010"
+      }
+    },
+    "name": "interactive.interactiveNegative010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:58",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePositive050"
+      }
+    },
+    "name": "interactive.interactivePositive050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:59",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePositive040"
+      }
+    },
+    "name": "interactive.interactivePositive040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:60",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePositive030"
+      }
+    },
+    "name": "interactive.interactivePositive030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:61",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePositive020"
+      }
+    },
+    "name": "interactive.interactivePositive020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:62",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePositive010"
+      }
+    },
+    "name": "interactive.interactivePositive010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:63",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveSecondary050"
+      }
+    },
+    "name": "interactive.interactiveSecondary050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:64",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveSecondary040"
+      }
+    },
+    "name": "interactive.interactiveSecondary040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:65",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveSecondary030"
+      }
+    },
+    "name": "interactive.interactiveSecondary030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:66",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveSecondary020"
+      }
+    },
+    "name": "interactive.interactiveSecondary020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:67",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactiveSecondary010"
+      }
+    },
+    "name": "interactive.interactiveSecondary010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:68",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePrimary050"
+      }
+    },
+    "name": "interactive.interactivePrimary050"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:69",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePrimary040"
+      }
+    },
+    "name": "interactive.interactivePrimary040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:70",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePrimary030"
+      }
+    },
+    "name": "interactive.interactivePrimary030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:71",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePrimary020"
+      }
+    },
+    "name": "interactive.interactivePrimary020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:72",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "interactive.interactivePrimary010"
+      }
+    },
+    "name": "interactive.interactivePrimary010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:73",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintBase010"
+      }
+    },
+    "name": "overlay.overlayTintBase010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:74",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintBase020"
+      }
+    },
+    "name": "overlay.overlayTintBase020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:75",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintBase030"
+      }
+    },
+    "name": "overlay.overlayTintBase030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:76",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintBase040"
+      }
+    },
+    "name": "overlay.overlayTintBase040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:77",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintInverse010"
+      }
+    },
+    "name": "overlay.overlayTintInverse010"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:78",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintInverse020"
+      }
+    },
+    "name": "overlay.overlayTintInverse020"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:79",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintInverse030"
+      }
+    },
+    "name": "overlay.overlayTintInverse030"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:80",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayTintInverse040"
+      }
+    },
+    "name": "overlay.overlayTintInverse040"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:81",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayGradientBaseVertical"
+      }
+    },
+    "name": "overlay.overlayGradientBaseVertical"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:82",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayGradientBaseHorizontal"
+      }
+    },
+    "name": "overlay.overlayGradientBaseHorizontal"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:83",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayGradientInverseVertical"
+      }
+    },
+    "name": "overlay.overlayGradientInverseVertical"
+  },
+  {
+    "config": {
+      "simulateErrors": true,
+      "isWithoutTimeout": false
+    },
+    "type": "RECTANGLE",
+    "id": "1:84",
+    "parent": "undefined",
+    "sharedPluginData": {
+      "tokens": {
+        "fill": "overlay.overlayGradientInverseHorizontal"
+      }
+    },
+    "name": "overlay.overlayGradientInverseHorizontal"
+  }
+]

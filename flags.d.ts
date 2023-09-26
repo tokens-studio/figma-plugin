@@ -8,5 +8,6 @@ declare module 'launchdarkly-js-sdk-common' {
     tokenFlowButton?: boolean;
     secondScreen?: boolean;
     colorModifier?: boolean;
+    idStorage?: boolean;
   }
 }
