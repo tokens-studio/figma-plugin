@@ -23,7 +23,6 @@ const ldClientPromise = new Promise<LDClient>((resolve) => {
 });
 
 export function useStartupProcess(params: StartupMessage) {
-  console.log('params in useStartupProcess: ', params);
   const ldClient = useLDClient();
   const store = useStore<RootState>();
   const dispatch = useDispatch<Dispatch>();
@@ -31,6 +30,7 @@ export function useStartupProcess(params: StartupMessage) {
   const useConfirmResult = useConfirm();
   const useRemoteTokensResult = useRemoteTokens();
   const flags = useFlags();
+  console.log('params in useStartupProcess: ', params);
 
   const startupProcess = useProcess<ApplicationInitSteps>(useMemo(() => ([
     {

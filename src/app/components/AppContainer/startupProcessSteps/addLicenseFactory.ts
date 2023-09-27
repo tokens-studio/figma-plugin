@@ -8,18 +8,20 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
   return async () => {
     const { user } = params;
     let { licenseKey } = params;
-    console.log('licensekey: ', licenseKey);
+    console.log('licenseKey: ', licenseKey);
     const isFirstLoading = licenseKey !== 'empty';
-    console.log('isFirstLoading: ', isFirstLoading);
+    console.log('isFirstLoading: ', !licenseKey && !isFirstLoading);
 
-    if (!licenseKey || !isFirstLoading) {
+    if (!licenseKey && !isFirstLoading) {
+      console.log('fetch licenseKey');
       const result = await getLicenseKey(user!.figmaId);
       if ('key' in result && result.key) {
         licenseKey = result.key;
       }
+      console.log('licenseKey from fetch: ', licenseKey);
     }
 
-    if (licenseKey) {
+    if (licenseKey && isFirstLoading) {
       await dispatch.userState.addLicenseKey({
         key: licenseKey,
         source: AddLicenseSource.INITAL_LOAD,

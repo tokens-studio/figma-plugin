@@ -3,5 +3,6 @@ import { LicenseKeyProperty } from '@/figmaStorage/LicenseKeyProperty';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export const setLicenseKey: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_LICENSE_KEY] = async (msg) => {
+  console.log('msg.licenseKey', msg.licenseKey);
   await LicenseKeyProperty.write(msg.licenseKey);
 };
