@@ -30,7 +30,6 @@ export function useStartupProcess(params: StartupMessage) {
   const useConfirmResult = useConfirm();
   const useRemoteTokensResult = useRemoteTokens();
   const flags = useFlags();
-  console.log('params in useStartupProcess: ', params);
 
   const startupProcess = useProcess<ApplicationInitSteps>(useMemo(() => ([
     {

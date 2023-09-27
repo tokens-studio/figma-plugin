@@ -27,17 +27,12 @@ export class FigmaStorageProperty<V = string> {
   public async read(node: BaseNode = figma.root): Promise<V | null> {
     if (this.storageType === FigmaStorageType.CLIENT_STORAGE) {
       const value = await figma.clientStorage.getAsync(this.key);
-      console.log('this key and value in client storage', this.key, !(this.key === 'licenseKey' && value === 'empty') && value ? this.parse(value) : null);
-      // console.log('typeof value: ', typeof value);
-      // console.log('licenseKey in client storage: ', !(this.key === 'licenseKey' && value === 'empty') && value ? this.parse(value) : null);
       return value ? this.parse(value) : null;
-      // return value ? this.parse(value) : null;
     } if (this.storageType === FigmaStorageType.SHARED_PLUGIN_DATA) {
       const keyParts = this.key.split('/');
       const namespace = keyParts[0];
       const key = keyParts.slice(1).join('/');
       const value = node?.getSharedPluginData(namespace, key);
-      // console.log('this key and value in shared plugin', key, value);
       return value ? this.parse(value) : null;
     }
 
@@ -46,10 +41,8 @@ export class FigmaStorageProperty<V = string> {
 
   public async write(value: V | null, node: BaseNode = figma.root) {
     if (this.storageType === FigmaStorageType.CLIENT_STORAGE) {
-      console.log('if', this.key, value ? this.stringify(value) : null);
       await figma.clientStorage.setAsync(this.key, value ? this.stringify(value) : null);
     } else if (this.storageType === FigmaStorageType.SHARED_PLUGIN_DATA) {
-      console.log('else');
       const keyParts = this.key.split('/');
       const namespace = keyParts[0];
       const key = keyParts.slice(1).join('/');

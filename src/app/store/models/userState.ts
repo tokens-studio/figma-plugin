@@ -96,7 +96,6 @@ export const userState = createModel<RootModel>()({
       const {
         error, plan, email: clientEmail, entitlements,
       } = await validateLicense(key, userId, userName);
-      console.log('error in validation licenseKey: ', error);
 
       if (error) {
         dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);

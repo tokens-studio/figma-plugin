@@ -12,7 +12,6 @@ export default async function getLicenseKey(userId: string | null): Promise<GetL
     }
 
     const { message } = await res.json();
-    console.log('message: ', message);
     return {
       error: message,
     };

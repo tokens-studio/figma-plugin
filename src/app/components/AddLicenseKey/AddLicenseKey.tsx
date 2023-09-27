@@ -129,7 +129,7 @@ export default function AddLicenseKey() {
             type="password"
             inputRef={inputEl}
             isMasked
-            value={newKey || ''}
+            value={(newKey !== 'empty' && newKey) || ''}
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />
