@@ -1,5 +1,27 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.0
+
+### Minor Changes
+
+- cbfc5cd7: Added an 'id' field to internal token usage containing a unique id per token, which helps with trackined token updates and performance.
+
+### Patch Changes
+
+- cbfc5cd7: Changed default `Apply to` setting to `Selection`, this should not change any already stored `Apply to` setting
+- cbfc5cd7: You can now "unset" dimension tokens by either removing their token on Inspect or on Tokens view.
+- cbfc5cd7: Fixes slow performance of rearranging token sets in the left token set navigation
+- cbfc5cd7: Fixed a bug where Inspect would become unresponsive if you had a shadow and a background blur applied on the same node
+- cbfc5cd7: Fixes an issue where the token picker didn't show an active state when highlighted
+- cbfc5cd7: We now no longer ignore invisible instance children from updating, as we're no longer relying on a Cache. This means you can start using `boolean` tokens in instances.
+- cbfc5cd7: Improves performance of internal token resolution logic. This should especially be visible on token sets that have deep nesting of references.
+- cbfc5cd7: Fixes a bug that caused nodes to not get updates when min/max width tokens were applied on instances, which caused any subsequent updates to this node to fail. We now ignore instances for min/max width tokens, as they are unsupported by Figma.
+- cbfc5cd7: Fixed a bug that caused Composition token's scroll menu to behave weird when scrolling down
+- cbfc5cd7: Fixes a bug that caused shadow tokens that were using array values to not get a value if they were redefined in another token set
+- cbfc5cd7: Fixed issue that caused theme groups to not play nice with branches, where we'd previously disable the theme groups after branch switching
+- cbfc5cd7: Fixed an issue that caused the plugin to crash when typing `[` in the search input.
+- cbfc5cd7: Fixed an issue that caused Variable collections to be created twice
+
 ## 1.37.11
 
 ### Patch Changes

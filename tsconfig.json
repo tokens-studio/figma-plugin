@@ -44,6 +44,7 @@
     "src/**/*.tsx",
     "benchmark/**/*.ts",
     "benchmark/index.js",
-    "benchmark/tests/baseline.ts"
+    "benchmark/tests/baseline.ts",
+    "scripts/bundle.ts",
   ]
 }
