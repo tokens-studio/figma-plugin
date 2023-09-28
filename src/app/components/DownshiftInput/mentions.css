@@ -66,7 +66,7 @@
   list-style-type: none;
   font-size: var(--fontSizes-small);
   padding: var(--space-2);
-  border: '1px solid var(--colors-borderMuted)';
+  border: '1px solid var(--colors-contextMenuBorder)';
   border-radius: var(--radii-medium);
   box-shadow: var(--shadows-contextMenu);
   background: var(--colors-contextMenuBg);
@@ -79,6 +79,7 @@
   min-width: 150px;
   position: relative;
   border-radius: var(--radii-small);
+  color: var(--colors-contextMenuFg);
 }
 
 .rc-mentions-dropdown-menu-item:focus {
@@ -98,11 +99,11 @@
 
 /* Track */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-track {
-  background: var(--bgSubtle);
+  background: var(--contextMenuFgMuted);
 }
 
 /* Handle */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--colors-borderMuted);
+  background: var(--colors-contextMenuFgMuted);
   border-radius: 10px;
 }
