@@ -600,7 +600,6 @@ export const tokenState = createModel<RootModel>()({
             transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
           },
         }, () => {
-          console.log('activeTheme in updateDocument: ', rootState.tokenState.activeTheme);
           updateTokensOnSources({
             tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
             tokenValues: rootState.tokenState.tokens,
