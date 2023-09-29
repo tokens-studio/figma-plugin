@@ -239,6 +239,8 @@ export function useGitHub() {
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
+              activeTheme,
+              usedTokenSet,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
@@ -261,6 +263,8 @@ export function useGitHub() {
     dispatch,
     pushTokensToGitHub,
     storageClientFactory,
+    usedTokenSet,
+    activeTheme,
     themes,
     tokens,
     checkAndSetAccess,

@@ -240,6 +240,8 @@ export function useBitbucket() {
               dispatch.tokenState.setTokenData({
                 values: content.tokens,
                 themes: content.themes,
+                activeTheme,
+                usedTokenSet,
               });
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');
@@ -262,6 +264,8 @@ export function useBitbucket() {
       dispatch,
       pushTokensToBitbucket,
       storageClientFactory,
+      usedTokenSet,
+      activeTheme,
       themes,
       tokens,
       checkAndSetAccess,

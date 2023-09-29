@@ -228,6 +228,8 @@ export const useADO = () => {
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
+              usedTokenSet,
+              activeTheme,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');

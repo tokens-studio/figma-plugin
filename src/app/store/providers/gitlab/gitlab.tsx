@@ -244,6 +244,8 @@ export function useGitLab() {
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
+              usedTokenSet,
+              activeTheme,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
@@ -269,6 +271,8 @@ export function useGitLab() {
     tokens,
     themes,
     askUserIfPull,
+    usedTokenSet,
+    activeTheme,
     checkAndSetAccess,
     multiFileSync,
   ]);
