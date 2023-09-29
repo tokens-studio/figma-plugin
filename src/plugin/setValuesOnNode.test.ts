@@ -11,12 +11,14 @@ describe('setValuesOnNode', () => {
       bottomRightRadius: 3,
       topLeftRadius: 3,
       topRightRadius: 3,
+      id: '123:456',
     } as RectangleNode;
     frameNodeMock = {
       paddingBottom: 3,
       paddingLeft: 3,
       paddingRight: 3,
       paddingTop: 3,
+      id: '123:457',
     } as FrameNode;
   });
   const data = {
@@ -31,6 +33,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(textNodeMock, borderRadiusTokenWithOneValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
+      ...textNodeMock,
       cornerRadius: 10,
       bottomLeftRadius: 3,
       bottomRightRadius: 3,
@@ -45,6 +48,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(textNodeMock, borderRadiusTokenWithTwoValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
+      ...textNodeMock,
       cornerRadius: 3,
       bottomLeftRadius: 20,
       bottomRightRadius: 10,
@@ -59,6 +63,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(textNodeMock, borderRadiusTokenWithThreeValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
+      ...textNodeMock,
       cornerRadius: 3,
       bottomLeftRadius: 20,
       bottomRightRadius: 30,
@@ -73,6 +78,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(textNodeMock, borderRadiusTokenWithFourValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
+      ...textNodeMock,
       cornerRadius: 3,
       bottomLeftRadius: 40,
       bottomRightRadius: 30,
@@ -87,6 +93,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(textNodeMock, borderRadiusTokenWithFiveValue, data, figmaStyleMaps);
     expect(textNodeMock).toEqual({
+      ...textNodeMock,
       cornerRadius: 3,
       bottomLeftRadius: 3,
       bottomRightRadius: 3,
@@ -101,6 +108,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(frameNodeMock, spacingTokenWithOneValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
+      ...frameNodeMock,
       paddingBottom: 10,
       paddingLeft: 10,
       paddingRight: 10,
@@ -114,6 +122,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(frameNodeMock, spacingTokenWithTwoValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
+      ...frameNodeMock,
       paddingBottom: 10,
       paddingLeft: 20,
       paddingRight: 20,
@@ -127,6 +136,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(frameNodeMock, spacingTokenWithThreeValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
+      ...frameNodeMock,
       paddingBottom: 30,
       paddingLeft: 20,
       paddingRight: 20,
@@ -140,6 +150,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(frameNodeMock, spacingTokenWithFourValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
+      ...frameNodeMock,
       paddingBottom: 30,
       paddingLeft: 40,
       paddingRight: 20,
@@ -153,6 +164,7 @@ describe('setValuesOnNode', () => {
     };
     await setValuesOnNode(frameNodeMock, spacingTokenWithFiveValue, data, figmaStyleMaps);
     expect(frameNodeMock).toEqual({
+      ...frameNodeMock,
       paddingBottom: 3,
       paddingLeft: 3,
       paddingRight: 3,

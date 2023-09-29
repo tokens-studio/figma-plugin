@@ -23,6 +23,7 @@ describe('Can set values on node', () => {
 
   beforeEach(() => {
     textNodeMock = ({
+      id: '123:456',
       type: 'TEXT',
       characters: 'foobar',
       fontName: {
@@ -36,6 +37,7 @@ describe('Can set values on node', () => {
     } as unknown) as TextNode;
 
     solidNodeMock = ({
+      id: '123:457',
       type: 'RECTANGLE',
       cornerRadius: 0,
       topLeftRadius: 0,
@@ -57,6 +59,7 @@ describe('Can set values on node', () => {
     } as unknown) as RectangleNode;
 
     frameNodeMock = ({
+      id: '123:458',
       type: 'FRAME',
       paddingLeft: 0,
       paddingTop: 0,
@@ -643,6 +646,7 @@ describe('Can set values on node', () => {
   it('should resize when dimension token applied to the node which has no itemSpacing property', async () => {
     const mockResize = jest.fn();
     const mockNode = {
+      id: '123:521',
       resize: mockResize,
     } as unknown as RectangleNode;
     const values = {
@@ -656,6 +660,7 @@ describe('Can set values on node', () => {
   it('should set itemSpacing when dimension token applied to the node which has itemSpacing property', async () => {
     const mockResize = jest.fn();
     const mockNode = {
+      id: '123:521',
       resize: mockResize,
       itemSpacing: 0,
       primaryAxisAlignItems: 'SPACE_BETWEEN',
@@ -710,6 +715,7 @@ describe('Can set values on node', () => {
   it('should resize when number token applied to the node which has no itemSpacing property', async () => {
     const mockResize = jest.fn();
     const mockNode = {
+      id: '123:522',
       resize: mockResize,
     } as unknown as RectangleNode;
     const values = {
@@ -723,6 +729,7 @@ describe('Can set values on node', () => {
   it('should set itemSpacing when number token applied to the node which has itemSpacing property', async () => {
     const mockResize = jest.fn();
     const mockNode = {
+      id: '123:521',
       resize: mockResize,
       itemSpacing: 0,
       primaryAxisAlignItems: 'SPACE_BETWEEN',
