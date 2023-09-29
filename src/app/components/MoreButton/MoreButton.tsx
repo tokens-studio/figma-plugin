@@ -122,7 +122,8 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   );
 
   const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (event.metaKey || event.ctrlKey) {
+    const isMacBrowser = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
       handleEditClick();
     } else {
       handleClick(properties[0]);
