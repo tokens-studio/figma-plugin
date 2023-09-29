@@ -34,7 +34,8 @@ function JSONEditor({
   }, [handleChange]);
 
   const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey) {
+    const isMacBrowser = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
       handleJSONUpdate(stringTokens);
     }
   }, [handleJSONUpdate, stringTokens]);
