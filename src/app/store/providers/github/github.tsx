@@ -106,6 +106,7 @@ export function useGitHub() {
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
+        console.log('active theme when push tokens to github: ', activeTheme);
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,
@@ -239,6 +240,8 @@ export function useGitHub() {
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
+              activeTheme,
+              usedTokenSet,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
@@ -261,6 +264,8 @@ export function useGitHub() {
     dispatch,
     pushTokensToGitHub,
     storageClientFactory,
+    usedTokenSet,
+    activeTheme,
     themes,
     tokens,
     checkAndSetAccess,

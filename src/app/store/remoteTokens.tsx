@@ -70,7 +70,7 @@ export default function useRemoteTokens() {
   const { readTokensFromFileOrDirectory } = useFile();
 
   const pullTokens = useCallback(async ({
-    context = api, featureFlags, collapsedTokenSets,
+    context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
   }: PullTokensOptions) => {
     track('pullTokens', { provider: context.provider });
     showPullDialog('loading');
@@ -150,9 +150,12 @@ export default function useRemoteTokens() {
               break;
           }
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
+          console.log('remote data after saved last synced state: ', remoteData);
           dispatch.tokenState.setTokenData({
             values: remoteData.tokens,
             themes: remoteData.themes,
+            activeTheme: activeTheme ?? {},
+            usedTokenSet: usedTokenSet ?? {},
           });
           dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
           track('Launched with token sets', {
@@ -419,7 +422,7 @@ export default function useRemoteTokens() {
   }, []);
 
   const fetchTokensFromFileOrDirectory = useCallback(async ({
-    files,
+    files, usedTokenSet, activeTheme,
   } : { files: FileList | null, usedTokenSet?: UsedTokenSetsMap, activeTheme?: Record<string, string> }) => {
     track('fetchTokensFromFileOrDirectory');
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_FETCHTOKENSFROMFILE });
@@ -431,6 +434,8 @@ export default function useRemoteTokens() {
         dispatch.tokenState.setTokenData({
           values: sortedTokens,
           themes: remoteData.themes,
+          activeTheme: activeTheme ?? {},
+          usedTokenSet: usedTokenSet ?? {},
         });
         track('Launched with token sets', {
           count: Object.keys(remoteData.tokens).length,

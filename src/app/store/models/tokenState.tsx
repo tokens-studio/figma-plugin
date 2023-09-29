@@ -586,8 +586,10 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateAliases({ oldName, newName });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
+      console.log('update document');
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
+      console.log('params: ', params);
       try {
         wrapTransaction({
           name: 'updateDocument',
@@ -599,26 +601,29 @@ export const tokenState = createModel<RootModel>()({
             transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
             transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
           },
-        }, () => updateTokensOnSources({
-          tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-          tokenValues: rootState.tokenState.tokens,
-          usedTokenSet: rootState.tokenState.usedTokenSet,
-          themes: rootState.tokenState.themes,
-          activeTheme: rootState.tokenState.activeTheme,
-          settings: rootState.settings,
-          updatedAt: new Date().toISOString(),
-          lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
-          isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-          editProhibited: rootState.tokenState.editProhibited,
-          api: rootState.uiState.api,
-          storageType: rootState.uiState.storageType,
-          shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-          checkForChanges: rootState.tokenState.checkForChanges,
-          shouldSwapStyles: rootState.settings.shouldSwapStyles,
-          collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
-          storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
-          dispatch,
-        }));
+        }, () => {
+          console.log('activeTheme in updateDocument: ', rootState.tokenState.activeTheme);
+          updateTokensOnSources({
+            tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
+            tokenValues: rootState.tokenState.tokens,
+            usedTokenSet: rootState.tokenState.usedTokenSet,
+            themes: rootState.tokenState.themes,
+            activeTheme: rootState.tokenState.activeTheme,
+            settings: rootState.settings,
+            updatedAt: new Date().toISOString(),
+            lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
+            isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+            editProhibited: rootState.tokenState.editProhibited,
+            api: rootState.uiState.api,
+            storageType: rootState.uiState.storageType,
+            shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+            checkForChanges: rootState.tokenState.checkForChanges,
+            shouldSwapStyles: rootState.settings.shouldSwapStyles,
+            collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+            storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
+            dispatch,
+          });
+        });
       } catch (e) {
         console.error('Error updating document', e);
       }
