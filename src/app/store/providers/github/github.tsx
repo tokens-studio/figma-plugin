@@ -106,7 +106,6 @@ export function useGitHub() {
         saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
-        console.log('active theme when push tokens to github: ', activeTheme);
         dispatch.tokenState.setTokenData({
           values: tokens,
           themes,

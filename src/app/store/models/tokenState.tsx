@@ -586,10 +586,8 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateAliases({ oldName, newName });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
-      console.log('update document');
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
-      console.log('params: ', params);
       try {
         wrapTransaction({
           name: 'updateDocument',

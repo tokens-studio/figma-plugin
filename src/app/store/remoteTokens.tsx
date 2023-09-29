@@ -150,7 +150,6 @@ export default function useRemoteTokens() {
               break;
           }
           saveLastSyncedState(dispatch, remoteData.tokens, remoteData.themes, remoteData.metadata);
-          console.log('remote data after saved last synced state: ', remoteData);
           dispatch.tokenState.setTokenData({
             values: remoteData.tokens,
             themes: remoteData.themes,
