@@ -17,3 +17,4 @@ benchmark/build
 benchmark/flamegraphs
 **.0x
 techdocs/
+.turbo
