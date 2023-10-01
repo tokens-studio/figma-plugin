@@ -55,7 +55,7 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
     if (!resolvedToken) return acc;
     if (isSingleToken(resolvedToken)) {
       // We only do this for rawValue as its a documentation and we want to show this to the user
-      if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions) {
+      if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions?.['studio.tokens']?.modify) {
         const modifier = resolvedToken.$extensions?.['studio.tokens']?.modify;
         if (modifier) {
           acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
@@ -69,12 +69,16 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
             acc.borderColor = value.color;
           }
         });
+      } else if (returnValueToLookFor(key) === 'description') {
+        // Not all tokens have a description, so we need to treat it special
+        acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
       } else if (borderPropertyMap.get(key as Properties) && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
-      // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
+        // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
         acc.borderColor = resolvedToken.value.color;
-        acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
+        // We return the value because the token holds its values in the 'value' prop
+        acc[key] = resolvedToken.value;
       } else {
-        // Otherwise, just apply the value
+        // Otherwise, try to apply the key, if we dont have it, apply the value
         acc[key] = resolvedToken[returnValueToLookFor(key)] || resolvedToken.value;
       }
     } else {
