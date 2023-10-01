@@ -1,27 +1,27 @@
-const getCenterOfNode = (node: SceneNode) => {
-  if (node.absoluteBoundingBox !== null) {
-    const {
-      x, y, width, height,
-    } = node.absoluteBoundingBox;
-
-    // Get x,y of parent
-    let px = 0;
-    let py = 0;
-
-    if (node.parent && 'absoluteBoundingBox' in node.parent && node.parent.absoluteBoundingBox !== null) {
-      px = node.parent.absoluteBoundingBox.x;
-      py = node.parent.absoluteBoundingBox.y;
-    }
-    // Get diff of parent and child
-    const dx = x - px;
-    const dy = y - py;
-
-    const cx = dx + width / 2;
-    const cy = dy + height / 2;
-
-    return { x: cx, y: cy };
+export const getCenterOfNode = (node: SceneNode) => {
+  if (!node.absoluteBoundingBox) {
+    return undefined;
   }
-  return undefined;
+  const {
+    x, y, width, height,
+  } = node.absoluteBoundingBox;
+
+  // Get x,y of parent
+  let px = 0;
+  let py = 0;
+
+  if (node.parent && 'absoluteBoundingBox' in node.parent && node.parent.absoluteBoundingBox !== null) {
+    px = node.parent.absoluteBoundingBox.x;
+    py = node.parent.absoluteBoundingBox.y;
+  }
+  // Get diff of parent and child
+  const dx = x - px;
+  const dy = y - py;
+
+  const cx = dx + width / 2;
+  const cy = dy + height / 2;
+
+  return { x: cx, y: cy };
 };
 
 export const resetNodeRotation = (node: SceneNode) => {
