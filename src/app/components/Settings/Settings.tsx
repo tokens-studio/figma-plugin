@@ -33,7 +33,7 @@ function Settings() {
   const onboardingData = {
     title: t('whereTokensStored'),
     text: t('whereTokensStoredOnboarding'),
-    url: 'https://docs.figmatokens.com/sync/sync?ref=onboarding_explainer_syncproviders',
+    url: 'https://docs.tokens.studio/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
   const { removeRelaunchData } = useDebug();

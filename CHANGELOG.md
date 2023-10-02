@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.1
+
+### Patch Changes
+
+- a4f87c0d: Fixes an issue with suggestions showing up in light theme
+- c39ed48b: Fixes a bug that caused raw value documentation tokens to stop working
+- c9aa3687: Fixes an issue where min width tokens would stop tokens from being applied if part of an instance
+- 0247885c: Fixed a bug that caused themes to be unset after branch switch and reopen of plugin
+- 6135aed7: Changes quick-edit shortcut on Windows to ctrl+click
+- 76ae4b95: Fixed some of the onboarding links pointing to a 404
+
 ## 1.38.0
 
 ### Minor Changes
