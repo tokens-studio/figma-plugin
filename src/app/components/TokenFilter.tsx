@@ -68,12 +68,15 @@ const TokenFilter = () => {
         onChange={handleChange}
         placeholder={t('search') as string}
       />
-      <Box css={{ position: 'absolute', right: '$2' }}>
-        <IconButton
-          onClick={handleResetSearchString}
-          icon={<XCircleFillIcon />}
-        />
-      </Box>
+      {tokenString && (
+        <Box css={{ position: 'absolute', right: '$2' }}>
+          <IconButton
+            onClick={handleResetSearchString}
+            icon={<XCircleFillIcon />}
+            css={{ color: '$fgSubtle' }}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
