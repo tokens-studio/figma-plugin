@@ -470,13 +470,12 @@ describe('useToken test', () => {
     });
     it('rename styles from current theme', async () => {
       await act(async () => {
-        await result.current.renameStylesFromTokens({ oldName: 'old', newName: 'new', parent: 'global' });
+        await result.current.renameStylesFromTokens([{ oldName: 'old', newName: 'new' }], 'global');
       });
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.RENAME_STYLES,
-        oldName: 'old',
-        newName: 'new',
+        tokensToRename: [{ oldName: 'old', newName: 'new' }],
         parent: 'global',
         settings: store.getState().settings,
       });
