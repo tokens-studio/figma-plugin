@@ -47,6 +47,27 @@ describe('addLicenseFactory', () => {
     expect(mockStore.getState().userState.licenseStatus).toEqual(LicenseStatus.NO_LICENSE);
   });
 
+  it('should set the remote license if available at first loading', async () => {
+    const mockStore = createMockStore({});
+    const mockParams = {
+      user: { figmaId: 'figma:1234' },
+    } as unknown as StartupMessage;
+
+    const addLicenseKeySpy = jest.spyOn(mockStore.dispatch.userState, 'addLicenseKey');
+    getLicenseKeySpy.mockResolvedValueOnce({
+      key: 'FIGMA-TOKENS',
+    });
+
+    const fn = addLicenseFactory(mockStore.dispatch, mockParams);
+    await fn();
+
+    expect(addLicenseKeySpy).toBeCalledTimes(1);
+    expect(addLicenseKeySpy).toBeCalledWith({
+      key: 'FIGMA-TOKENS',
+      source: AddLicenseSource.INITAL_LOAD,
+    });
+  });
+
   it('should set the remote license if available', async () => {
     const mockStore = createMockStore({});
     const mockParams = {
