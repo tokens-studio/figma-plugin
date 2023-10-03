@@ -69,7 +69,7 @@
   border: 1px solid var(--colors-borderDefault);
   border-radius: var(--radii-medium);
   box-shadow: var(--shadows-contextMenu);
-  background: var(--colors-contextMenuBg);
+  background: var(--colors-bgDefault);
   cursor: pointer;
   z-index: 10;
 }

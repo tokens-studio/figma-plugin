@@ -3,7 +3,7 @@ import type { TokenState } from '../../tokenState';
 
 export function renameStyleIdsToCurrentTheme(state: TokenState, styleIds: string[], tokensToRename: TokensToRenamePayload[]): TokenState {
   const updatedThemes = [...state.themes];
-  const oldNameMapNewName = tokensToRename.reduce<Record<string, string>>((acc, curr) => {
+  const oldToNewNameMap = tokensToRename.reduce<Record<string, string>>((acc, curr) => {
     acc[curr.oldName] = curr.newName;
     return acc;
   }, {});
@@ -11,8 +11,8 @@ export function renameStyleIdsToCurrentTheme(state: TokenState, styleIds: string
     const updatedTokens = theme.$figmaStyleReferences;
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([oldName, styleId]) => {
-        if (styleIds.includes(styleId) && oldNameMapNewName[oldName]) {
-          updatedTokens[oldNameMapNewName[oldName]] = updatedTokens[oldName];
+        if (styleIds.includes(styleId) && oldToNewNameMap[oldName]) {
+          updatedTokens[oldToNewNameMap[oldName]] = updatedTokens[oldName];
           delete updatedTokens[oldName];
         }
       });
