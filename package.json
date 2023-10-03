@@ -3,8 +3,10 @@
   "scripts": {
     "bundle": "ts-node ./scripts/bundle.ts",
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "start": "turbo run start",
     "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
