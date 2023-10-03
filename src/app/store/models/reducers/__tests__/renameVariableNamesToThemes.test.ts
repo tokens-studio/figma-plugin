@@ -24,7 +24,7 @@ describe('renameVariableNamesToThemes', () => {
         }],
       },
     });
-    await mockStore.dispatch.tokenState.renameVariableNamesToThemes('fg.default', 'fg.default-rename');
+    await mockStore.dispatch.tokenState.renameVariableNamesToThemes([{ oldName: 'fg.default', newName: 'fg.default-rename' }]);
     const { themes } = mockStore.getState().tokenState;
     expect(themes).toEqual([{
       id: 'light',
