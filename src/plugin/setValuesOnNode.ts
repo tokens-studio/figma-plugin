@@ -295,7 +295,7 @@ export default async function setValuesOnNode(
       }
 
       // ROTATION
-      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && typeof values.rotation !== 'undefined' && isPrimitiveValue(values.rotation)) {
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && typeof values.rotation !== 'undefined' && !isPartOfInstance(node.id) && isPrimitiveValue(values.rotation)) {
         const rotation = transformValue(String(values.rotation), 'rotation', baseFontSize);
         rotateNode(node, rotation);
       }

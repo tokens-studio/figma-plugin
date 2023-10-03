@@ -82,7 +82,7 @@ describe('rotateNode', () => {
 
   it('should parse string angle', () => {
     // @ts-ignore next-line
-    rotateNode(node, '45px');
+    rotateNode(node, '45');
     expect(node.rotation).toBe(45);
   });
 });
