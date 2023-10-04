@@ -1,13 +1,18 @@
+import { TokensToRenamePayload } from '@/app/store/useTokens';
 import type { TokenState } from '../../tokenState';
 
-export function renameVariableNamesToThemes(state: TokenState, oldName: string, newName: string): TokenState {
+export function renameVariableNamesToThemes(state: TokenState, tokensToRename: TokensToRenamePayload[]): TokenState {
+  const oldToNewNameMap = tokensToRename.reduce<Record<string, string>>((acc, curr) => {
+    acc[curr.oldName] = curr.newName;
+    return acc;
+  }, {});
   const newThemes = state.themes.map((theme) => {
     const updatedTokens = theme.$figmaVariableReferences;
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([key]) => {
-        if (key === oldName) {
-          updatedTokens[newName] = updatedTokens[oldName];
-          delete updatedTokens[oldName];
+        if (oldToNewNameMap[key]) {
+          updatedTokens[oldToNewNameMap[key]] = updatedTokens[key];
+          delete updatedTokens[key];
         }
       });
     }

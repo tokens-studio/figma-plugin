@@ -5,7 +5,7 @@ import renameStylesFromPlugin from '../renameStylesFromPlugin';
 export const renameStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.RENAME_STYLES] = async (msg) => {
   try {
     return {
-      styleIds: await renameStylesFromPlugin(msg.oldName, msg.newName, msg.parent),
+      styleIds: await renameStylesFromPlugin(msg.tokensToRename, msg.parent),
     };
   } catch (e) {
     console.error(e);

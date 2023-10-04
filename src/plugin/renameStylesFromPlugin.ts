@@ -1,12 +1,12 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { TokensToRenamePayload } from '@/app/store/useTokens';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
 import { isMatchingStyle } from '@/utils/is';
 
 export default async function renameStylesFromPlugin(
-  oldName: string,
-  newName: string,
+  tokensToRename: TokensToRenamePayload[],
   parent: string,
 ) {
   const effectStyles = figma.getLocalEffectStyles();
@@ -19,8 +19,19 @@ export default async function renameStylesFromPlugin(
   });
 
   const themesToContainToken = themeInfo.themes.filter((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, value]) => tokenSet === parent && value === TokenSetStatus.ENABLED)).map((filteredTheme) => filteredTheme.name);
-  const oldPathNames = themesToContainToken.map((theme) => convertTokenNameToPath(oldName, theme)).concat(themesToContainToken.map(() => convertTokenNameToPath(oldName, null, 1))).concat(convertTokenNameToPath(oldName));
-  const newPathNames = themesToContainToken.map((theme) => convertTokenNameToPath(newName, theme)).concat(themesToContainToken.map(() => convertTokenNameToPath(newName, null, 1))).concat(convertTokenNameToPath(newName));
+  let oldPathNames: string[] = [];
+  let newPathNames: string[] = [];
+
+  tokensToRename.forEach((token) => {
+    oldPathNames = oldPathNames
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.oldName, theme))
+        .concat(themesToContainToken.map(() => convertTokenNameToPath(token.oldName, null, 1)))
+        .concat(convertTokenNameToPath(token.oldName)));
+    newPathNames = newPathNames
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.newName, theme))
+        .concat(themesToContainToken.map(() => convertTokenNameToPath(token.newName, null, 1)))
+        .concat(convertTokenNameToPath(token.newName)));
+  });
   const allStyleIds = allStyles.filter((style) => oldPathNames.some((oldPathName) => {
     if (isMatchingStyle(oldPathName, style)) {
       const index = oldPathNames.findIndex((item) => item === oldPathName);

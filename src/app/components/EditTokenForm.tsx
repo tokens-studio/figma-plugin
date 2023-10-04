@@ -392,7 +392,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
-              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+              renameStylesFromTokens([{ oldName, newName }], activeTokenSet);
               lastUsedRenameStyles = true;
             }
             if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {

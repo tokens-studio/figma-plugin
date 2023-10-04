@@ -27,7 +27,7 @@ describe('renameStyleIdsToCurrentTheme', () => {
         },
       },
     });
-    await mockStore.dispatch.tokenState.renameStyleIdsToCurrentTheme(['S:1234', 'S:2345'], 'new');
+    await mockStore.dispatch.tokenState.renameStyleIdsToCurrentTheme(['S:1234', 'S:2345'], [{ oldName: 'old', newName: 'new' }, { oldName: 'color.blue', newName: 'new' }]);
     const { themes } = mockStore.getState().tokenState;
     expect(themes).toEqual([{
       id: 'light',
