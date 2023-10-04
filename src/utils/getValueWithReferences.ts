@@ -44,12 +44,15 @@ function getComplexValue<T extends SingleToken['value']>(
   options: TransformerOptions,
 ) {
   type IndexedValueType = Record<string, string | number>;
-  return Object.entries(resolvedValue).reduce((acc, [key, val]) => {
-    const rawVal = (rawValue as IndexedValueType)[key];
-    // TODO: Remove as SingleToken["value"]
-    acc[key] = getSimpleValue(val as SingleToken['value'], rawVal as SingleToken['value'], options);
-    return acc;
-  }, {} as IndexedValueType) as T;
+  if (typeof resolvedValue === 'object') {
+    return Object.entries(resolvedValue).reduce((acc, [key, val]) => {
+      const rawVal = (rawValue as IndexedValueType)[key];
+      // TODO: Remove as SingleToken["value"]
+      acc[key] = getSimpleValue(val as SingleToken['value'], rawVal as SingleToken['value'], options);
+      return acc;
+    }, {} as IndexedValueType) as T;
+  }
+  return getSimpleValue(resolvedValue as SingleToken['value'], rawValue as SingleToken['value'], options) as T;
 }
 
 export function getValueWithReferences(token: SingleToken, options: TransformerOptions) {
