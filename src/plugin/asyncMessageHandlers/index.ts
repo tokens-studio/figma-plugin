@@ -37,4 +37,4 @@ export * from './renameVariables';
 export * from './syncVariables';
 export * from './updateVariables';
 export * from './removeRelaunchData';
-export * from './setLicenseKeyRemoved';
+export * from './setInitialLoad';

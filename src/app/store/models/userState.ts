@@ -19,7 +19,7 @@ export enum Entitlements {
 }
 export interface UserState {
   userId: string | null;
-  isLicenseKeyRemoved: boolean;
+  initialLoad: boolean;
   licenseKey: string | undefined;
   licenseError: string | undefined;
   licenseStatus: LicenseStatus;
@@ -37,7 +37,7 @@ interface LicenseDetails {
 export const userState = createModel<RootModel>()({
   state: {
     userId: null,
-    isLicenseKeyRemoved: false,
+    initialLoad: false,
     licenseStatus: LicenseStatus.UNKNOWN,
     licenseKey: undefined,
     licenseError: undefined,
@@ -87,10 +87,10 @@ export const userState = createModel<RootModel>()({
         licenseDetails: payload,
       };
     },
-    setLicenseKeyRemoved(state, payload: boolean) {
+    setInitialLoad(state, payload: boolean) {
       return {
         ...state,
-        isLicenseKeyRemoved: payload,
+        initialLoad: payload,
       };
     },
     ...userStateReducers,
@@ -150,11 +150,11 @@ export const userState = createModel<RootModel>()({
       });
 
       AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_LICENSE_KEY_REMOVED,
-        isLicenseKeyRemoved: true,
+        type: AsyncMessageTypes.SET_INITIAL_LOAD,
+        initialLoad: true,
       });
 
-      dispatch.userState.setLicenseKeyRemoved(true);
+      dispatch.userState.setInitialLoad(true);
       dispatch.userState.setLicenseKey(undefined);
       dispatch.userState.setLicenseError(undefined);
       dispatch.userState.setLicenseDetails({

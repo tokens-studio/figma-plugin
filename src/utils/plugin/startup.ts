@@ -22,7 +22,7 @@ export async function startup() {
     storageType,
     localApiProviders,
     licenseKey,
-    islicenseKeyRemoved,
+    initialLoad,
     localTokenData,
     authData,
     usedEmail,
@@ -50,7 +50,7 @@ export async function startup() {
     storageType,
     localApiProviders,
     licenseKey,
-    islicenseKeyRemoved: islicenseKeyRemoved ?? false,
+    initialLoad: initialLoad ?? false,
     localTokenData: localTokenData ? {
       ...localTokenData,
       usedTokenSet,

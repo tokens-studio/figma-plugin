@@ -49,7 +49,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, async
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, asyncHandlers.removeStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY_REMOVED, asyncHandlers.setLicenseKeyRemoved);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_INITIAL_LOAD, asyncHandlers.setInitialLoad);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
   asyncHandlers.attachLocalStylesToTheme,
