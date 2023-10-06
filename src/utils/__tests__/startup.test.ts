@@ -18,6 +18,7 @@ describe('startup', () => {
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,
+      initialLoad: false,
       localTokenData: null,
       user: null,
       usedEmail: null,
@@ -55,6 +56,7 @@ describe('startup', () => {
       storageType: { provider: 'local' },
       localApiProviders: null,
       licenseKey: null,
+      initialLoad: false,
       localTokenData: {
         activeTheme: {},
         checkForChanges: null,
