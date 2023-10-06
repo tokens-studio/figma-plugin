@@ -1,5 +1,5 @@
 import {
-  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, LicenseKeyRemovedProperty,
+  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
@@ -36,7 +36,7 @@ export async function startup() {
     getSavedStorageType(),
     ApiProvidersProperty.read(),
     LicenseKeyProperty.read(),
-    LicenseKeyRemovedProperty.read(),
+    InitialLoadProperty.read(),
     getTokenData(),
     AuthDataProperty.read(),
     UsedEmailProperty.read(),

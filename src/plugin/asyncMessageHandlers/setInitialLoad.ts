@@ -1,7 +1,7 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
-import { LicenseKeyRemovedProperty } from '@/figmaStorage/LicenseKeyRemovedProperty';
+import { InitialLoadProperty } from '@/figmaStorage/InitialLoadProperty';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 export const setInitialLoad: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_INITIAL_LOAD] = async (msg) => {
-  await LicenseKeyRemovedProperty.write(msg.initialLoad);
+  await InitialLoadProperty.write(msg.initialLoad);
 };
