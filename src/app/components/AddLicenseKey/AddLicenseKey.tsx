@@ -49,7 +49,7 @@ export default function AddLicenseKey() {
 
   const removeKey = useCallback(async () => {
     if (licenseKeyError) {
-      dispatch.userState.removeLicenseKey('empty');
+      dispatch.userState.removeLicenseKey(undefined);
     } else {
       const confirmation = await confirm({
         text: t('confirmRemove') as string,
@@ -57,7 +57,7 @@ export default function AddLicenseKey() {
         confirmAction: t('removeKey') as string,
       });
       if (confirmation) {
-        dispatch.userState.removeLicenseKey('empty');
+        dispatch.userState.removeLicenseKey(undefined);
         removeAccessToFeatures();
       }
     }
@@ -129,11 +129,7 @@ export default function AddLicenseKey() {
             type="password"
             inputRef={inputEl}
             isMasked
-            value={
-              newKey === 'empty'
-                ? ''
-                : newKey || ''
-            }
+            value={newKey || ''}
             onChange={onLicenseKeyChange}
             error={licenseKeyError}
           />

@@ -19,6 +19,7 @@ export enum Entitlements {
 }
 export interface UserState {
   userId: string | null;
+  isLicenseKeyRemoved: boolean;
   licenseKey: string | undefined;
   licenseError: string | undefined;
   licenseStatus: LicenseStatus;
@@ -36,6 +37,7 @@ interface LicenseDetails {
 export const userState = createModel<RootModel>()({
   state: {
     userId: null,
+    isLicenseKeyRemoved: false,
     licenseStatus: LicenseStatus.UNKNOWN,
     licenseKey: undefined,
     licenseError: undefined,
@@ -85,6 +87,12 @@ export const userState = createModel<RootModel>()({
         licenseDetails: payload,
       };
     },
+    setLicenseKeyRemoved(state, payload: boolean) {
+      return {
+        ...state,
+        isLicenseKeyRemoved: payload,
+      };
+    },
     ...userStateReducers,
   },
   effects: (dispatch) => ({
@@ -93,6 +101,7 @@ export const userState = createModel<RootModel>()({
 
       const { userId, userName } = rootState.userState;
       const { key, source } = payload;
+
       const {
         error, plan, email: clientEmail, entitlements,
       } = await validateLicense(key, userId, userName);
@@ -140,6 +149,12 @@ export const userState = createModel<RootModel>()({
         licenseKey: payload,
       });
 
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_LICENSE_KEY_REMOVED,
+        isLicenseKeyRemoved: true,
+      });
+
+      dispatch.userState.setLicenseKeyRemoved(true);
       dispatch.userState.setLicenseKey(undefined);
       dispatch.userState.setLicenseError(undefined);
       dispatch.userState.setLicenseDetails({

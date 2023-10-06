@@ -65,6 +65,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
+  SET_LICENSE_KEY_REMOVED = 'async/set-license-key-removed',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -220,6 +221,11 @@ export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KE
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
+export type SetLicenseKeyRemovedMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY_REMOVED, {
+  isLicenseKeyRemoved: boolean | null
+}>;
+export type SetLicenseKeyRemovedMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY_REMOVED>;
+
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
   tokens: Record<string, AnyTokenList>
@@ -353,6 +359,7 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
+  | SetLicenseKeyRemovedMessage
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
@@ -396,6 +403,7 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
+  | SetLicenseKeyRemovedMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult
