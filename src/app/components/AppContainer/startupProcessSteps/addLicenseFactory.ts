@@ -10,9 +10,6 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
     let { licenseKey } = params;
     const { initialLoad } = JSON.parse(JSON.stringify(params));
 
-    console.log('initialLoad: ', initialLoad);
-    console.log('typeof initialLoad: ', typeof initialLoad);
-
     if ((licenseKey === null || licenseKey === undefined) && initialLoad.toString() !== 'true') {
       const result = await getLicenseKey(user!.figmaId);
       if ('key' in result && result.key) {
