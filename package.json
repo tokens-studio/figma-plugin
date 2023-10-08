@@ -2,11 +2,11 @@
     "private": true,
     "scripts": {
       "bundle": "ts-node ./scripts/bundle.ts",
-      "build": "turbo run build",
-      "start": "turbo run start",
-      "lint": "turbo run lint",
-      "test": "turbo run test",
-      "test:watch": "turbo run test:watch",
+      "build": "npx turbo run build",
+      "start": "npx turbo run start",
+      "lint": "npx turbo run lint",
+      "test": "npx turbo run test",
+      "test:watch": "npx turbo run test:watch",
       "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "devDependencies": {
