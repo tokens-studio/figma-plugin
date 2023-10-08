@@ -37,7 +37,7 @@ jobs:
       # 3: Install dependencies
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci -w
+        run: npm ci --workspaces
       # 5: Build package
       - name: Build Package
         run: npm run build
@@ -78,7 +78,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci -w
+        run: npm ci --workspaces
       # 4: Run tests
       - name: Run test command
         run: npm run test
@@ -111,7 +111,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci -w
+        run: npm ci --workspaces
 
       # 4: Run test coverage report
       - name: Run test coverage report
@@ -150,7 +150,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci -w
+        run: npm ci --workspaces
 
       # 4: Build package
       - name: build:transform
@@ -209,7 +209,7 @@ jobs:
       # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci -w
+        run: npm ci --workspaces
       # 4: Build package
       - name: Run benchmark
         working-directory: packages/tokens-studio-for-figma
