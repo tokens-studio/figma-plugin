@@ -65,6 +65,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
+  SET_INITIAL_LOAD = 'async/set-initial-load',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -219,6 +220,11 @@ export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KE
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
 
+export type SetInitialLoadMessage = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD, {
+  initialLoad: boolean | null
+}>;
+export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD>;
+
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
   tokens: Record<string, AnyTokenList>
@@ -352,6 +358,7 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
+  | SetInitialLoadMessage
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
@@ -395,6 +402,7 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
+  | SetInitialLoadMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult

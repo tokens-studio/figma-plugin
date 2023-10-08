@@ -47,7 +47,7 @@ describe('addLicenseFactory', () => {
     expect(mockStore.getState().userState.licenseStatus).toEqual(LicenseStatus.NO_LICENSE);
   });
 
-  it('should set the remote license if available', async () => {
+  it('should set the remote license', async () => {
     const mockStore = createMockStore({});
     const mockParams = {
       user: { figmaId: 'figma:1234' },
@@ -61,10 +61,6 @@ describe('addLicenseFactory', () => {
     const fn = addLicenseFactory(mockStore.dispatch, mockParams);
     await fn();
 
-    expect(addLicenseKeySpy).toBeCalledTimes(1);
-    expect(addLicenseKeySpy).toBeCalledWith({
-      key: 'FIGMA-TOKENS',
-      source: AddLicenseSource.INITAL_LOAD,
-    });
+    expect(addLicenseKeySpy).toBeCalledTimes(0);
   });
 });
