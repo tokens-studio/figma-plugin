@@ -1,0 +1,29 @@
+{
+    "private": true,
+    "scripts": {
+      "bundle": "ts-node ./scripts/bundle.ts",
+      "build": "turbo run build",
+      "start": "turbo run start",
+      "lint": "turbo run lint",
+      "test": "turbo run test",
+      "test:watch": "turbo run test:watch",
+      "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    },
+    "devDependencies": {
+      "@types/glob": "^8.1.0",
+      "eslint": "^8.48.0",
+      "glob": "^10.3.1",
+      "prettier": "^3.0.3",
+      "ts-node": "^10.8.1",
+      "turbo": "latest"
+    },
+    "name": "my-turborepo",
+    "packageManager": "npm@9.5.1",
+    "workspaces": [
+      "apps/*",
+      "packages/*"
+    ],
+    "dependencies": {
+      "jszip": "^3.10.1"
+    }
+  }

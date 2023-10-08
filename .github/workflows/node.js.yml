@@ -47,8 +47,8 @@ jobs:
         with:
           name: package
           path: |
-            dist
-            manifest.json
+            packages/tokens-studio-for-figma/dist
+            packages/tokens-studio-for-figma/manifest.json
   # install dependencies and run test command
   test:
     name: Tests
@@ -154,15 +154,18 @@ jobs:
 
       # 4: Build package
       - name: build:transform
+        working-directory: packages/tokens-studio-for-figma
         run: npm run build-transform
 
       # 5: Install dependencies
       - name: Install dependencies - transformer
-        run: cd token-transformer && npm ci
+        working-directory: packages/tokens-studio-for-figma/token-transformer
+        run: npm ci
 
       # 6: Run tests
       - name: Run test command
-        run: cd token-transformer && npm run test
+        working-directory: packages/tokens-studio-for-figma/token-transformer
+        run: npm run test
   cypress-run:
     name: Cypress
     runs-on: ubuntu-22.04
@@ -174,6 +177,7 @@ jobs:
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
+        working-directory: packages/tokens-studio-for-figma
         with:
           build: npm run build:cy
           start: npm run serve
@@ -209,4 +213,5 @@ jobs:
         run: npm ci
       # 4: Build package
       - name: Run benchmark
+        working-directory: packages/tokens-studio-for-figma
         run: npm run benchmark:build && npm run benchmark:run
