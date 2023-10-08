@@ -177,10 +177,9 @@ jobs:
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
-        working-directory: packages/tokens-studio-for-figma
         with:
-          build: npm run build:cy
-          start: npm run serve
+          build: cd packages/tokens-studio-for-figma && npm run build:cy
+          start: cd cd packages/tokens-studio-for-figma && npm run serve
 
   performance:
     name: Performance
