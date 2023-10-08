@@ -48,14 +48,14 @@ jobs:
           cache-name: cache-node-modules
         with:
           # caching node_modules
-          path: node_modules
+          path: '**/node_modules'
           key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-${{ env.cache-name }}-
       # Install dependencies
       - name: Install dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci -w
       # Generate the expected env file
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
