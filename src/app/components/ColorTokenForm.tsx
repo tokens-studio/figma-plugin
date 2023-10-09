@@ -21,7 +21,9 @@ import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import IconToggleableDisclosure from './IconToggleableDisclosure';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
-import { ColorModifier, MixModifier } from '@/types/Modifier';
+import {
+  ColorModifier, isTwoColorModifier,
+} from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { ColorSpaceTypes } from '@/constants/ColorSpaceTypes';
 import { modifyColor } from '@/utils/modifyColor';
@@ -196,7 +198,7 @@ export default function ColorTokenForm({
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         color: mixColor,
-      } as MixModifier);
+      } as TwoColorModifier);
     }
   }, [internalEditToken, handleModifyChange]);
 
@@ -205,7 +207,7 @@ export default function ColorTokenForm({
       handleModifyChange({
         ...internalEditToken?.$extensions?.['studio.tokens']?.modify,
         color: value,
-      } as MixModifier);
+      } as TwoColorModifier);
     }
   }, [internalEditToken, handleModifyChange]);
 
@@ -304,8 +306,7 @@ export default function ColorTokenForm({
                 </DropdownMenuContent>
               </DropdownMenu>
             </Box>
-            {
-              internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && (
+              {internalEditToken.$extensions?.['studio.tokens']?.modify && isTwoColorModifier(internalEditToken.$extensions?.['studio.tokens']?.modify) && (
                 <>
                   <DownshiftInput
                     value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color}
@@ -324,8 +325,7 @@ export default function ColorTokenForm({
                     <ColorPicker value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.color} onChange={handleMixColorChange} />
                   )}
                 </>
-              )
-            }
+              )}
             <DownshiftInput
               value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.value}
               type={TokenTypes.OTHER}
