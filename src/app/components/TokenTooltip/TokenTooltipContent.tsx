@@ -11,7 +11,6 @@ type Props = {
 };
 
 export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
-  console.log('token in TokenToolTipContent: ', token);
   const tokensContext = React.useContext(TokensContext);
 
   const failedToResolve = React.useMemo(() => (
