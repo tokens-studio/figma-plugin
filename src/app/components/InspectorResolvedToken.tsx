@@ -9,11 +9,12 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
 import { TokenTooltip } from './TokenTooltip';
+import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
 
 type Props = {
   name: string;
   value: SingleToken['value']
-  rawValue?: Record<string, string>
+  rawValue?: Partial<Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenBoxshadowValue[]>>
   type: string;
 };
 
