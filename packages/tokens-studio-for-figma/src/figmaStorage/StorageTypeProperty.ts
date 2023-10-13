@@ -8,6 +8,6 @@ import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespac
 export const StorageTypeProperty = new FigmaStorageProperty<StorageType>(
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.storageType}`,
-  (value) => JSON.stringify(omit(value, 'secret')),
+  (value) => JSON.stringify(omit(value, 'secret' as keyof StorageType)),
   (value) => tryParseJson<StorageType>(value),
 );

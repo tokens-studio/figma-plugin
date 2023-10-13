@@ -43,7 +43,7 @@ export function getAliasValue(token: SingleToken | string | number, tokens: Sing
   // Big O((n ^ 3) (n = amount of tokens)
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {
-    const tokenReferences = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
+    const tokenReferences: string[] | null = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ComponentType} from 'react';
 import type { GetInputPropsOptions } from 'downshift';
 import { FixedSizeList as List } from 'react-window';
 import { styled } from '@/stitches.config';
@@ -30,7 +30,7 @@ export const StyledDropdown = styled('div', {
   boxShadow: '$contextMenu',
 });
 
-export const StyledList = styled(List, {
+export const StyledList = styled(List as ComponentType<any>, {
   position: 'absolute',
   zIndex: '10',
   width: 'calc(100% - $scrollbarWidth)',

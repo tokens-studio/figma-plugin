@@ -10,7 +10,7 @@
     "noUnusedParameters": false,
     "experimentalDecorators": true,
     "removeComments": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "strict": true,
@@ -20,9 +20,12 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
+    "types": [
+      "jest"
+    ],
     "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
+      "node_modules/@types",
+      "node_modules/@figma"
     ],
     "paths": {
       "@emotion/core": [

@@ -12,10 +12,10 @@ export function modifyColor(baseColor: string, modifier: ColorModifier) {
   try {
     switch (modifier.type) {
       case ColorModifierTypes.LIGHTEN:
-        returnedColor = lighten(color, modifier.space, Number(modifier.value));
+        returnedColor = lighten(color, modifier.space, Number(modifier.value)) as Color;
         break;
       case ColorModifierTypes.DARKEN:
-        returnedColor = darken(color, modifier.space, Number(modifier.value));
+        returnedColor = darken(color, modifier.space, Number(modifier.value)) as Color;
         break;
       case ColorModifierTypes.MIX:
         returnedColor = mix(color, modifier.space, Number(modifier.value), new Color(modifier.color));

@@ -4,7 +4,7 @@ import { StyleIdMap, StyleThemeMap } from '@/types/StyleIdMap';
 import { applySiblingStyleId } from './applySiblingStyle';
 
 function getRootNode(updateMode: UpdateMode) {
-  const rootNode = [];
+  const rootNode: SceneNode[]= [];
   switch (updateMode) {
     case UpdateMode.PAGE:
       if (figma.currentPage.children) rootNode.push(...figma.currentPage.children);

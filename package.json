@@ -1,29 +1,41 @@
 {
-    "private": true,
-    "scripts": {
-      "bundle": "ts-node ./scripts/bundle.ts",
-      "build": "npx turbo run build",
-      "start": "npx turbo run start",
-      "lint": "npx turbo run lint",
-      "test": "npx turbo run test",
-      "test:watch": "npx turbo run test:watch",
-      "format": "prettier --write \"**/*.{ts,tsx,md}\""
-    },
-    "devDependencies": {
-      "@types/glob": "^8.1.0",
-      "eslint": "^8.48.0",
-      "glob": "^10.3.1",
-      "prettier": "^3.0.3",
-      "ts-node": "^10.8.1",
-      "turbo": "latest"
-    },
-    "name": "my-turborepo",
-    "packageManager": "npm@9.5.1",
-    "workspaces": [
+  "private": true,
+  "scripts": {
+    "bundle": "ts-node ./scripts/bundle.ts",
+    "build": "npx turbo run build",
+    "start": "npx turbo run start",
+    "lint": "npx turbo run lint",
+    "test": "npx turbo run test",
+    "test:watch": "npx turbo run test:watch",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "changeset": "changeset"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.2",
+    "@types/glob": "^8.1.0",
+    "eslint": "^8.48.0",
+    "glob": "^10.3.1",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.8.1",
+    "turbo": "latest"
+  },
+  "name": "tokens-studio-plugin-monorepo",
+  "packageManager": "yarn@1.22.19",
+  "workspaces": {
+    "packages": [
       "apps/*",
       "packages/*"
     ],
-    "dependencies": {
-      "jszip": "^3.10.1"
-    }
+    "nohoist": [
+      "**/@figma/plugin-typings",
+      "**/plugin-typings",
+      "**/types",
+      "**/jest"
+    ]
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.26.2",
+    "fs-extra": "^11.1.1",
+    "jszip": "^3.10.1"
   }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import * as Sentry from '@sentry/react';
+import {ErrorBoundary} from '@sentry/react';
 import { Provider } from 'react-redux';
 import i18next from 'i18next';
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
@@ -18,11 +18,11 @@ export const startup: AsyncMessageChannelHandlers[AsyncMessageTypes.STARTUP] = a
   if (app) {
     ReactDOM.unmountComponentAtNode(app);
     ReactDOM.render(
-      <Sentry.ErrorBoundary fallback={ErrorFallback}>
+      <ErrorBoundary fallback={ErrorFallback}>
         <Provider store={store}>
           <AppContainer {...params} />
         </Provider>
-      </Sentry.ErrorBoundary>,
+      </ErrorBoundary>,
       app,
     );
   }

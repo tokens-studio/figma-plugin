@@ -1,26 +1,36 @@
-npm WARN ignoring workspace config at /Users/six7/development/figma-plugin/packages/tokens-studio-for-figma/.npmrc 
+yarn run v1.22.19
+$ cross-env NODE_ENV=production webpack --mode=production
+[sentry-webpack-plugin] Debug: No `sourcemaps.assets` option provided, falling back to uploading detected build artifacts.
+> Found 4 files
+> Analyzing 4 sources
+> Adding source map references
+All files deleted.
+> Bundled 4 files for upload
+> Bundle ID: 307dd30d-1af1-5cc8-afce-2c5d26432002
+> Uploaded files to Sentry
+> File upload complete (processing pending on server)
+> Organization: figma-tokens
+> Project: figma-tokens
+> Release: figma-tokens@1.38.1
+> Dist: None
+> Upload type: artifact bundle
 
-> @tokens-studio/figma-plugin@1.38.0 build
-> cross-env NODE_ENV=production webpack --mode=production
-
-asset index.html 3.93 MiB [emitted] [big]
-asset ui.js 3.93 MiB [emitted] [minimized] [big] (name: ui) 2 related assets
-asset code.js 700 KiB [compared for emit] [minimized] [big] (name: code) 2 related assets
-orphan modules 10.5 MiB [orphan] 2140 modules
+Source Map Upload Report
+  Minified Scripts
+    ~/27efb4ae-96a2-4e35-9f8b-60ac3878b9f7-1.js (sourcemap at ui.js.map, debug id 27efb4ae-96a2-4e35-9f8b-60ac3878b9f7)
+    ~/e2d96da0-e4ac-4e65-9090-6cdb6ec69b1f-0.js (sourcemap at code.js.map, debug id e2d96da0-e4ac-4e65-9090-6cdb6ec69b1f)
+  Source Maps
+    ~/27efb4ae-96a2-4e35-9f8b-60ac3878b9f7-1.js.map (debug id 27efb4ae-96a2-4e35-9f8b-60ac3878b9f7)
+    ~/e2d96da0-e4ac-4e65-9090-6cdb6ec69b1f-0.js.map (debug id e2d96da0-e4ac-4e65-9090-6cdb6ec69b1f)
+[sentry-webpack-plugin] Info: Successfully uploaded source maps to Sentry
+[sentry-webpack-plugin] Debug: Deleting asset after upload: D:\Figma-Studio\plugin\figma-tokens\packages\tokens-studio-for-figma\dist\ui.js.map
+[sentry-webpack-plugin] Debug: Deleting asset after upload: D:\Figma-Studio\plugin\figma-tokens\packages\tokens-studio-for-figma\dist\code.js.map
+asset index.html 4 MiB [emitted] [big]
+asset ui.js 4 MiB [emitted] [minimized] [big] (name: ui) 2 related assets
+asset code.js 755 KiB [emitted] [minimized] [big] (name: code) 2 related assets
+orphan modules 9.22 MiB [orphan] 2080 modules
 runtime modules 3.72 KiB 14 modules
-cacheable modules 13.3 MiB
-  modules by path ./node_modules/ 4.41 MiB
-    javascript modules 4.41 MiB 815 modules
-    json modules 4.78 KiB 3 modules
-  modules by path ./src/ 8.85 MiB
-    modules by path ./src/app/assets/ 179 KiB
-      ./node_modules/css-loader/dist/cjs.js!./src/app/assets/fonts/jetbrainsmono.css 660 bytes [built] [code generated]
-      + 5 modules
-    + 4 modules
-  modules by path ../../node_modules/ 2 KiB
-    ../../node_modules/once/once.js 1.02 KiB [built] [code generated]
-    ../../node_modules/wrappy/wrappy.js 1010 bytes [built] [code generated]
-  ./util.inspect (ignored) 15 bytes [built] [code generated]
+cacheable modules 13.4 MiB 980 modules
 
 WARNING in ./src/app/components/AppContainer/startupProcessSteps/savePluginDataFactory.ts 197:29-40
 Should not import the named export 'version' (imported as 'pjs') from default-exporting module (only default export is available soon)
@@ -59,8 +69,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 143:0-58 733:45-62
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/app/store/providers/generic/versionedStorage.ts 224:37-48
@@ -69,8 +79,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/app/store/providers/jsonbin.tsx 218:37-48
@@ -79,8 +89,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/storage/GenericVersionedStorage.ts 470:45-56
@@ -91,8 +101,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/storage/GenericVersionedStorage.ts 526:45-56
@@ -103,8 +113,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/storage/JSONBinTokenStorage.ts 366:308-319
@@ -115,8 +125,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/storage/JSONBinTokenStorage.ts 465:49-60
@@ -127,8 +137,8 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
 
 WARNING in ./src/storage/JSONBinTokenStorage.ts 533:57-68
@@ -139,33 +149,38 @@ Should not import the named export 'version' (imported as 'pjs') from default-ex
  @ ./src/app/store/models/tokenState.tsx 148:0-53 708:24-45
  @ ./src/app/store/models/index.tsx 3:0-42 10:16-26
  @ ./src/app/store.ts 2:0-40 5:12-18
- @ ./src/app/asyncMessageHandlers/startup.tsx 131:0-33 145:27-32
- @ ./src/app/asyncMessageHandlers/index.ts 2:0-26 2:0-26
+ @ ./src/app/asyncMessageHandlers/getThemeInfo.ts 125:0-36 131:20-34
+ @ ./src/app/asyncMessageHandlers/index.ts 1:0-31 1:0-31
  @ ./src/app/index.tsx 6:0-56 14:75-101 15:68-89
+
+WARNING in ./src/utils/analytics.tsx 17:21-32
+Should not import the named export 'version' (imported as 'pjs') from default-exporting module (only default export is available soon)
+ @ ./src/app/index.tsx 7:0-57 11:0-19
 
 WARNING in ./src/utils/figma/updateLocalTokensData.ts 138:46-57
 Should not import the named export 'version' (imported as 'pjs') from default-exporting module (only default export is available soon)
  @ ./src/utils/figma/index.ts 3:0-40 3:0-40
  @ ./src/plugin/asyncMessageHandlers/update.ts 125:0-54 146:24-45
  @ ./src/plugin/asyncMessageHandlers/index.ts 22:0-25 22:0-25
- @ ./src/plugin/controller.ts 3:0-56 12:73-98 13:74-99 14:86-122 15:78-106 16:89-129 17:98-147 18:92-135 19:75-100 20:84-117 21:74-99 22:79-108 23:71-93 24:74-99 25:73-97 26:73-97 27:68-88 28:75-101 29:78-107 30:83-115 31:68-87 32:79-109 33:75-101 34:75-101 35:75-101 36:68-88 37:77-104 38:90-128 39:80-110 40:85-118 41:77-104 42:75-100 43:84-118 44:83-116 45:93-134 46:78-107 47:76-103 48:78-107 49:76-102 50:82-114
+ @ ./src/plugin/controller.ts 3:0-56 12:73-98 13:74-99 14:86-122 15:78-106 16:89-129 17:98-147 18:92-135 19:75-100 20:84-117 21:74-99 22:79-108 23:71-93 24:74-99 25:73-97 26:73-97 27:68-88 28:75-101 29:78-107 30:83-115 31:68-87 32:79-109 33:75-101 34:75-101 35:75-101 36:68-88 37:77-104 38:78-106 39:90-128 40:80-110 41:85-118 42:77-104 43:75-100 44:84-118 45:83-116 46:93-134 47:78-107 48:76-103 49:78-107 50:76-102 51:82-114
 
 WARNING in asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
 This can impact web performance.
 Assets: 
-  ui.js (3.93 MiB)
-  code.js (700 KiB)
-  index.html (3.93 MiB)
+  ui.js (4 MiB)
+  code.js (755 KiB)
+  index.html (4 MiB)
 
 WARNING in entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
 Entrypoints:
-  ui (3.93 MiB)
+  ui (4 MiB)
       ui.js
-  code (700 KiB)
+  code (755 KiB)
       code.js
 
 WARNING in webpack performance recommendations: 
 You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
 For more info visit https://webpack.js.org/guides/code-splitting/
 
-webpack 5.72.1 compiled with 16 warnings in 25083 ms
+webpack 5.88.2 compiled with 17 warnings in 61036 ms
+Done in 64.95s.
