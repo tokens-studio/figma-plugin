@@ -34,6 +34,9 @@
       "**/jest"
     ]
   },
+  "resolutions": {
+    "react":"^17"
+  },
   "dependencies": {
     "@changesets/cli": "^2.26.2",
     "fs-extra": "^11.1.1",
