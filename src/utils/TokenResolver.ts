@@ -8,6 +8,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { convertModifiedColorToHex } from './convertModifiedColorToHex';
 import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 class TokenResolver {
   private tokens: SingleToken[];
@@ -45,7 +46,7 @@ class TokenResolver {
     const resolvedTokens: ResolveTokenValuesResult[] = [];
 
     for (const token of this.tokens) {
-      const resolvedValue = this.resolveReferences(token);
+      const resolvedValue = token.type === TokenTypes.TEXT ? token : this.resolveReferences(token);
 
       resolvedTokens.push({
         ...resolvedValue,
