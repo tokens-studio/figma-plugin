@@ -1,3 +1,4 @@
+//@ts-ignore This is due to weird @types/node issues based on hoistng
 require('dotenv').config();
 
 /*
