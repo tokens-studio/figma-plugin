@@ -55,6 +55,7 @@ export const ThemeSelector: React.FC = () => {
     } else {
       nextTheme[groupOfTheme] = themeId;
     }
+    console.log('next theme: ', nextTheme);
     if (nextTheme) {
       track('Apply theme', { id: nextTheme });
     } else {
