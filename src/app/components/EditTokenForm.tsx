@@ -321,6 +321,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
+        console.log('edit token');
+        console.log('internalEditToken: ', internalEditToken);
         editSingleToken({
           description: (
             internalEditToken.description
@@ -434,6 +436,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('save button click');
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 

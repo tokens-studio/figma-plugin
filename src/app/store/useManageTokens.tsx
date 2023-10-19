@@ -79,6 +79,8 @@ export default function useManageTokens() {
         shouldUpdate: shouldUpdateDocument,
         $extensions,
       } as UpdateTokenPayload);
+      console.log('oldName in useManageTokens: ', oldName);
+      console.log('name in useManageTokens: ', name);
       if (oldName) {
         dispatch.tokenState.renameStyleNamesToCurrentTheme([{ oldName, newName: name }]);
         dispatch.tokenState.renameVariableNamesToThemes([{ oldName, newName: name }]);
