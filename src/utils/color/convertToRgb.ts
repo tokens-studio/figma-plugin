@@ -2,7 +2,7 @@ import { parseToRgba, toHex } from 'color2k';
 import convertOpacityToFigma from '@/plugin/figmaTransforms/opacity';
 
 // Convert non-conform colors to RGB value that can be used throughout the plugin
-export function convertToRgb(color: string): string | null {
+export function convertToRgb(color: string): string {
   try {
     if (typeof color !== 'string') {
       return color;
@@ -47,5 +47,5 @@ export function convertToRgb(color: string): string | null {
     console.error(e);
   }
 
-  return null;
+  return color;
 }

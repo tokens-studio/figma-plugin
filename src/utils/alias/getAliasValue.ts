@@ -39,15 +39,11 @@ function replaceAliasWithResolvedReference(
   return token;
 }
 
-// @TODO This function logic needs to be explained to improve it. It is unclear at this time which cases it needs to handle and how
-// when isResolved is true, we don't calculate the modifiers because it has been already resolved. previousCount prevents the multiple calculation of modifier
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = [], isResolved: boolean = true, previousCount: number = 0): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
-  // @TODO not sure how this will handle typography and boxShadow values. I don't believe it works.
-  // The logic was copied from the original function in aliases.tsx
+  // Big O((n ^ 3) (n = amount of tokens)
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
   try {
     const tokenReferences = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
-
     if (tokenReferences?.length) {
       const resolvedReferences = Array.from(tokenReferences).map((ref) => {
         if (ref.length > 1) {

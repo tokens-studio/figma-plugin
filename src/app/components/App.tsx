@@ -17,7 +17,7 @@ function App() {
   const activeTab = useSelector(activeTabSelector);
 
   return (
-    <Box css={{ backgroundColor: '$bgDefault' }}>
+    <Box>
       {activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box

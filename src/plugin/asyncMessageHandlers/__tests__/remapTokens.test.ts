@@ -1,21 +1,13 @@
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../../NodeManager';
-import { updatePluginData } from '@/plugin/pluginData';
 import { remapTokens } from '../remapTokens';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import { Properties } from '@/constants/Properties';
 
-jest.mock('@/plugin/pluginData', () => ({
-  updatePluginData: jest.fn(),
-}));
-
-jest.mock('@/plugin/node', () => ({
-  updateNodes: jest.fn(),
-}));
-
 describe('remapTokens', () => {
+  const mockSetSharedPluginData = jest.fn();
   const tokens = [
     {
       internal__Parent: 'global',
@@ -79,16 +71,15 @@ describe('remapTokens', () => {
       },
     },
   ] as AnyTokenList;
-  const tokensMap = new Map(tokens.map((token) => [token.name, token]));
-  const findNodesSpy = jest.spyOn(defaultNodeManager, 'findNodesWithData');
+  const findNodesSpy = jest.spyOn(defaultNodeManager, 'findBaseNodesWithData');
   it('should update plugin data', async () => {
     findNodesSpy.mockImplementationOnce(() => Promise.resolve([
       {
-        hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
         id: '295:3',
         node: {
           id: '295:3',
-        } as RectangleNode,
+          setSharedPluginData: mockSetSharedPluginData,
+        } as unknown as BaseNode,
         tokens: {
           borderRadius: 'border-radius.7',
           borderWidth: 'border-width.4',
@@ -107,36 +98,17 @@ describe('remapTokens', () => {
       tokens,
     });
 
-    expect(updatePluginData).toBeCalledWith({
-      entries: [
-        {
-          hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
-          id: '295:3',
-          node: {
-            id: '295:3',
-          } as RectangleNode,
-          tokens: {
-            borderRadius: 'border-radius.7',
-            borderWidth: 'border-width.4',
-            fill: 'color.amber.800',
-            opacity: 'opacity.80',
-          },
-        },
-      ],
-      values: { fill: 'color.amber.800' },
-      shouldOverride: true,
-      tokensMap,
-    });
+    expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'fill', '"color.amber.800"');
   });
 
   it('should update plugin data with old tokens when remapping composition token', async () => {
     findNodesSpy.mockImplementationOnce(() => Promise.resolve([
       {
-        hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
         id: '295:3',
         node: {
           id: '295:3',
-        } as RectangleNode,
+          setSharedPluginData: mockSetSharedPluginData,
+        } as unknown as BaseNode,
         tokens: {
           borderRadius: 'border-radius.7',
           borderWidth: 'border-width.4',
@@ -156,37 +128,17 @@ describe('remapTokens', () => {
       tokens,
     });
 
-    expect(updatePluginData).toBeCalledWith({
-      entries: [
-        {
-          hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
-          id: '295:3',
-          node: {
-            id: '295:3',
-          } as RectangleNode,
-          tokens: {
-            borderRadius: 'border-radius.7',
-            borderWidth: 'border-width.4',
-            composition: 'composition.old',
-            fill: 'color.red.400',
-            opacity: 'opacity.80',
-          },
-        },
-      ],
-      values: { composition: 'composition.new' },
-      shouldOverride: true,
-      tokensMap,
-    });
+    expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'composition', '"composition.new"');
   });
 
   it('should update plugin data with empty values when updateMode is not selection', async () => {
     findNodesSpy.mockImplementationOnce(() => Promise.resolve([
       {
-        hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
         id: '295:3',
         node: {
           id: '295:3',
-        } as RectangleNode,
+          setSharedPluginData: mockSetSharedPluginData,
+        } as unknown as BaseNode,
         tokens: {
           borderRadius: 'border-radius.7',
           borderWidth: 'border-width.4',
@@ -206,25 +158,6 @@ describe('remapTokens', () => {
       tokens,
     });
 
-    expect(updatePluginData).toBeCalledWith({
-      entries: [
-        {
-          hash: '9c7e97584a40179e12c9e2c75d34f80e66fe6f64',
-          id: '295:3',
-          node: {
-            id: '295:3',
-          } as RectangleNode,
-          tokens: {
-            borderRadius: 'border-radius.7',
-            borderWidth: 'border-width.4',
-            composition: 'composition.new',
-            fill: 'color.red.400',
-            opacity: 'opacity.80',
-          },
-        },
-      ],
-      values: {},
-      shouldOverride: true,
-    });
+    expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'composition', '"composition.new"');
   });
 });

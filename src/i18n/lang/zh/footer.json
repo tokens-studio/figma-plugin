@@ -4,5 +4,5 @@
   "feedback": "反馈",
   "pullFrom": "从 {{provider}} 中提取",
   "pushTo": "推至 {{provider}}",
-  "goTo": "转到{{provider}}"
+  "goTo": "跳转到{{provider}}"
 }

@@ -2,27 +2,28 @@ import { SingleToken } from '@/types/tokens';
 import setBooleanValuesOnVariable from './setBooleanValuesOnVariable';
 import setColorValuesOnVariable from './setColorValuesOnVariable';
 import setNumberValuesOnVariable from './setNumberValuesOnVariable';
-import { checkIfContainsAlias } from '@/utils/alias';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
+import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
+import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export type ReferenceVariableType = {
   variable: Variable;
   modeId: string;
   referenceVariable: string;
-  shouldReferenceToVariable: boolean;
 };
 
 export default function setValuesOnVariable(
   variablesInFigma: Variable[],
   tokens: SingleToken<true, { path: string, variableId: string }>[],
-  variableType: VariableResolvedDataType,
   collection: VariableCollection,
   mode: string,
-): Record<string, ReferenceVariableType> {
-  const variableObj: Record<string, ReferenceVariableType> = {};
+) {
+  const variableKeyMap: Record<string, string> = {};
+  const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
     tokens.forEach((t) => {
-    // Find the connected variable
+      const variableType = convertTokenTypeToVariableType(t.type);
+      // Find the connected variable
       let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
       if (!variable) {
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
@@ -56,16 +57,21 @@ export default function setValuesOnVariable(
         } else {
           referenceTokenName = t.rawValue!.toString().substring(1);
         }
-        variableObj[t.name] = {
-          variable,
-          modeId: mode,
-          referenceVariable: referenceTokenName.split('.').join('/'),
-          shouldReferenceToVariable: checkIfContainsAlias(t.rawValue) && !t.$extensions?.['studio.tokens']?.modify,
-        };
+        variableKeyMap[t.name] = variable.key;
+        if (checkCanReferenceVariable(t)) {
+          referenceVariableCandidates.push({
+            variable,
+            modeId: mode,
+            referenceVariable: referenceTokenName.split('.').join('/'),
+          });
+        }
       }
     });
   } catch (e) {
     console.error('Setting values on variable is failed', e);
   }
-  return variableObj;
+  return {
+    variableKeyMap,
+    referenceVariableCandidates,
+  };
 }

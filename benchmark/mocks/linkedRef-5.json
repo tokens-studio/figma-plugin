@@ -1,0 +1,22 @@
+{
+    "a": {
+        "value": "{b}",
+        "type": "dimension"
+    },
+    "b": {
+        "value": "{c}",
+        "type": "dimension"
+    },
+    "c": {
+        "value": "{d}",
+        "type": "dimension"
+    },
+    "d": {
+        "value": "{e}",
+        "type": "dimension"
+    },
+    "e": {
+        "value": "10",
+        "type": "dimension"
+    }
+}

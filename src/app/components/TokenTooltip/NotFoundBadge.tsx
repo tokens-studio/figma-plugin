@@ -3,7 +3,7 @@ import { LinkBreak2Icon } from '@radix-ui/react-icons';
 import { styled } from '@/stitches.config';
 
 const StyledAliasBadge = styled('div', {
-  color: '$fgOnDarkDanger',
+  color: '$tooltipFgDanger',
 });
 
 export default function NotFoundBadge() {

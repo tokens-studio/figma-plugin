@@ -8,6 +8,10 @@ import type useRemoteTokens from '@/app/store/remoteTokens';
 import { Tabs } from '@/constants/Tabs';
 import type { StorageType } from '@/types/StorageType';
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid'),
+}));
+
 describe('pullTokensFactory', () => {
   const mockConfirm = jest.fn();
   const mockFetchBranches = jest.fn();
@@ -48,6 +52,9 @@ describe('pullTokensFactory', () => {
               type: TokenTypes.COLOR,
               name: 'colors.red',
               value: '#ff0000',
+              $extensions: {
+                id: 'mock-uuid',
+              },
             },
           ],
         },
@@ -251,6 +258,9 @@ describe('pullTokensFactory', () => {
               type: TokenTypes.COLOR,
               name: 'colors.red',
               value: '#ff0000',
+              $extensions: {
+                id: 'mock-uuid',
+              },
             },
           ],
         },

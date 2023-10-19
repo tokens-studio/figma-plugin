@@ -14,7 +14,7 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption, SyncVariableOption } from '@/app/store/useTokens';
+import { SyncOption, SyncVariableOption, TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
@@ -54,6 +54,7 @@ export enum AsyncMessageTypes {
   SET_NONE_VALUES_ON_NODE = 'async/set-none-values-on-node',
   SET_AUTH_DATA = 'async/set-auth-data',
   SET_USED_EMAIL = 'async/set-used-email',
+  REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -64,6 +65,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
+  SET_INITIAL_LOAD = 'async/set-initial-load',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -171,8 +173,7 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 }>;
 
 export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
-  oldName: string;
-  newName: string;
+  tokensToRename: TokensToRenamePayload[];
   parent: string;
   settings: Partial<SettingsState>;
 }>;
@@ -211,12 +212,18 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
+  nodes: number
 }>;
 
 export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
   licenseKey: string | null
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
+
+export type SetInitialLoadMessage = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD, {
+  initialLoad: boolean | null
+}>;
+export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD>;
 
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
@@ -269,6 +276,7 @@ export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CR
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>
+  totalVariables: number
 }>;
 
 export type ResolveVariableInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
@@ -308,6 +316,20 @@ export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIA
 }>;
 export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
 
+export type RemoveRelaunchDataMessage = AsyncMessage<
+AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+{
+  area: UpdateMode;
+}
+>;
+
+export type RemoveRelaunchDataMessageResult = AsyncMessage<
+AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
+{
+  totalNodes: number;
+}
+>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -336,6 +358,7 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
+  | SetInitialLoadMessage
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
@@ -348,7 +371,8 @@ export type AsyncMessages =
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
   | SyncVariableAsyncMessage
-  | UpdateVariablesAsyncMessage;
+  | UpdateVariablesAsyncMessage
+  | RemoveRelaunchDataMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -378,6 +402,7 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
+  | SetInitialLoadMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult
@@ -390,7 +415,8 @@ export type AsyncMessageResults =
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
   | SyncVariableAsyncMessageResult
-  | UpdateVariablesAsyncMessageResult;
+  | UpdateVariablesAsyncMessageResult
+  | RemoveRelaunchDataMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

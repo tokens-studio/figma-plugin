@@ -4,12 +4,12 @@ export const StyledButton = styled('button', {
   borderWidth: '1px',
   borderStyle: 'solid',
   borderColor: 'transparent',
-  borderRadius: '$button',
+  borderRadius: '$small',
   fontWeight: '$bold',
   fontSize: '$xsmall',
   padding: '$3',
-  background: '$bgBtnPrimary',
-  color: '$fgBtnPrimary',
+  background: '$btnPrimaryBg',
+  color: '$btnPrimaryFg',
   '&:disabled': {
     opacity: 0.5,
   },
@@ -27,9 +27,9 @@ export const StyledButton = styled('button', {
         },
       },
       secondary: {
-        background: '$bgBtnSecondary',
-        color: '$fgBtnSecondary',
-        borderColor: '$border',
+        background: '$btnSecondaryBg',
+        color: '$btnSecondaryFg',
+        borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focus',
         },
@@ -37,18 +37,18 @@ export const StyledButton = styled('button', {
       ghost: {
         background: 'transparent',
         padding: '$2 $3',
-        color: '$fgBtnGhost',
+        color: '$fgDefault',
         '&:hover': {
-          background: '$bgHoverBtnGhost',
+          background: '$bgSubtle',
         },
         '&:focus-visible': {
           boxShadow: '$focus',
         },
       },
       danger: {
-        background: '$bgBtnSecondary',
-        color: '$fgDanger',
-        borderColor: '$border',
+        background: '$btnSecondaryBg',
+        color: '$dangerFg',
+        borderColor: '$borderDefault',
         '&:focus-visible': {
           boxShadow: '$focusDanger',
         },

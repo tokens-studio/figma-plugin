@@ -1,30 +1,20 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import { defaultNodeManager } from '../NodeManager';
-import { updatePluginData } from '../pluginData';
 import { sendSelectionChange } from '../sendSelectionChange';
+import { removePluginDataByMap } from '../removePluginDataByMap';
+import { Properties } from '@/constants/Properties';
 
 export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE] = async (msg) => {
-  const nodesToRemove: { [key: string]: string[] } = {};
+  const nodesToRemove: { node: BaseNode, key: Properties }[] = [];
 
   msg.tokensToRemove.forEach((token) => {
-    token.nodes.forEach(({ id }) => {
-      nodesToRemove[id] = nodesToRemove[id] ? [...nodesToRemove[id], token.property] : [token.property];
-    });
+    token.nodes.forEach(((node) => {
+      const figmaNode = figma.getNodeById(node.id);
+      if (figmaNode) nodesToRemove.push({ node: figmaNode, key: token.property });
+    }));
   });
 
-  await Promise.all(
-    Object.entries(nodesToRemove).map(async (node) => {
-      const newEntries = node[1].reduce<Record<string, string>>((acc, curr) => {
-        acc[curr] = 'delete';
-        return acc;
-      }, {});
+  if (nodesToRemove.length) await removePluginDataByMap({ nodeKeyMap: nodesToRemove });
 
-      const nodeToUpdate = await defaultNodeManager.getNode(node[0]);
-      if (nodeToUpdate) {
-        await updatePluginData({ entries: [nodeToUpdate], values: newEntries, shouldRemove: false });
-      }
-    }),
-  );
   sendSelectionChange();
 };

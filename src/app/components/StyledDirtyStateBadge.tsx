@@ -7,5 +7,5 @@ export const StyledDirtyStateBadge = styled('div', {
   width: '$3',
   height: '$3',
   borderRadius: '100px',
-  backgroundColor: '$interaction',
+  backgroundColor: '$accentDefault',
 });

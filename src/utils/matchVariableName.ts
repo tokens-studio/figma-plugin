@@ -1,13 +1,9 @@
 export function matchVariableName(
   tokenName: string,
   tokenPath: string,
-  figmaVariableReferences: Record<string, string>,
-  variableMap?: Record<string, Variable>,
+  figmaVariableReferences: Map<string, string>,
 ) {
   return (
-    figmaVariableReferences[tokenName]
-    || variableMap?.[tokenName]?.id
-    || figmaVariableReferences[tokenPath]
-    || variableMap?.[tokenPath]?.id
+    figmaVariableReferences.get(tokenName)
   );
 }

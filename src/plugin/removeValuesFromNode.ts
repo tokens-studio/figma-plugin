@@ -3,6 +3,22 @@ import { Properties } from '@/constants/Properties';
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
   switch (prop) {
+    case 'width':
+      if ('resize' in node) {
+        const oldWidth = node.width;
+        const oldHeight = node.height;
+        node.resize(0.1, oldHeight);
+        node.resize(oldWidth, oldHeight);
+      }
+      break;
+    case 'height':
+      if ('resize' in node) {
+        const oldWidth = node.width;
+        const oldHeight = node.height;
+        node.resize(oldWidth, 0.1);
+        node.resize(oldWidth, oldHeight);
+      }
+      break;
     case 'borderRadius':
       if (
         'cornerRadius' in node
@@ -61,6 +77,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'boxShadow':
       if ('effects' in node && typeof node.effects !== 'undefined') {
         node.effects = node.effects.filter((effect) => effect.type !== 'DROP_SHADOW');
+      }
+      break;
+    case 'backgroundBlur':
+      if ('effects' in node && typeof node.effects !== 'undefined') {
+        node.effects = node.effects.filter((effect) => effect.type !== 'BACKGROUND_BLUR');
       }
       break;
     case 'opacity':
@@ -199,6 +220,19 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'textDecoration':
       if ('textDecoration' in node && typeof node.textDecoration !== 'undefined') {
         node.textDecoration = 'NONE';
+      }
+      break;
+    case 'dimension':
+      if ('itemSpacing' in node) {
+        node.itemSpacing = 0;
+      }
+      if ('resize' in node) {
+        if ('resize' in node) {
+          const oldWidth = node.width;
+          const oldHeight = node.height;
+          node.resize(0.1, 0.1);
+          node.resize(oldWidth, oldHeight);
+        }
       }
       break;
     default:

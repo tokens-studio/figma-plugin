@@ -11,18 +11,17 @@ import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
 import Tooltip from './Tooltip';
-import { resolveTokenValues, mergeTokenGroups } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
-  activeTokenSetSelector,
   inspectDeepSelector,
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Input from './Input';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 import Stack from './Stack';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 function Inspector() {
   const [inspectView, setInspectView] = React.useState('multi');
@@ -30,16 +29,12 @@ function Inspector() {
   const [searchInputValue, setSearchInputValue] = React.useState<string>('');
   const dispatch = useDispatch<Dispatch>();
   const tokens = useSelector(tokensSelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const inspectDeep = useSelector(inspectDeepSelector);
   // TODO: Put this into state in a performant way
   const resolvedTokens = React.useMemo(() => (
-    resolveTokenValues(mergeTokenGroups(tokens, {
-      ...usedTokenSet,
-      [activeTokenSet]: TokenSetStatus.ENABLED,
-    }))
-  ), [tokens, usedTokenSet, activeTokenSet]);
+    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
+  ), [tokens, usedTokenSet]);
 
   const handleSetInspectViewMulti = React.useCallback(() => {
     setInspectView('multi');

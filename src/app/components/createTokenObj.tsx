@@ -64,7 +64,13 @@ export function appendTypeToToken(token: Omit<SingleToken, 'type'> & { type?: To
 export function createTokensObject(tokens: (Omit<SingleToken, 'type'> & { type?: TokenTypes; })[], tokenFilter = '') {
   if (tokens.length > 0) {
     const obj = tokens.reduce<CreateTokensObjectResult>((acc, cur) => {
-      if (tokenFilter === '' || cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0) {
+      let hasSubstring:boolean = false;
+      try {
+        hasSubstring = cur.name?.toLowerCase().search(tokenFilter?.toLowerCase()) >= 0;
+      } catch {
+        hasSubstring = cur.name?.indexOf(tokenFilter) >= 0;
+      }
+      if (tokenFilter === '' || hasSubstring) {
         const propToSet = cur.type ? cur.type : transformName(cur.name.split('.').slice(0, 1).toString());
 
         if (!acc[propToSet]?.values) {

@@ -1,6 +1,7 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList } from '@/types/tokens';
+import removeTokenId from './removeTokenId';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -13,11 +14,12 @@ export function getGroupTypeName(tokenName: string, groupLevel: number): string 
 export default function stringifyTokens(
   tokens: Record<string, AnyTokenList>,
   activeTokenSet: string,
+  storeTokenIdInJsonEditor: boolean,
 ): string {
   const tokenObj = {};
   tokens[activeTokenSet]?.forEach((token) => {
     const tokenWithType = appendTypeToToken(token);
-    const { name, ...tokenWithoutName } = tokenWithType;
+    const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
       const {
         type, inheritTypeLevel, ...tokenWithoutType

@@ -1,0 +1,30 @@
+{
+  "referenced": {
+    "value": "{nest.nest.nest.nest.nest.nest.nest.nest.nest.nest}",
+    "type": "dimension"
+  },
+  "nest": {
+    "nest": {
+      "nest": {
+        "nest": {
+          "nest": {
+            "nest": {
+              "nest": {
+                "nest": {
+                  "nest": {
+                    "nest": {
+                      "nest": {
+                        "value": "10px",
+                        "type": "dimension"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

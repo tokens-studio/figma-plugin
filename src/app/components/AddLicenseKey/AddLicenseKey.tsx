@@ -49,7 +49,7 @@ export default function AddLicenseKey() {
 
   const removeKey = useCallback(async () => {
     if (licenseKeyError) {
-      dispatch.userState.removeLicenseKey('');
+      dispatch.userState.removeLicenseKey(undefined);
     } else {
       const confirmation = await confirm({
         text: t('confirmRemove') as string,
@@ -57,14 +57,14 @@ export default function AddLicenseKey() {
         confirmAction: t('removeKey') as string,
       });
       if (confirmation) {
-        dispatch.userState.removeLicenseKey('');
+        dispatch.userState.removeLicenseKey(undefined);
         removeAccessToFeatures();
       }
     }
   }, [t, dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
-    color: '$fgAccent',
+    color: '$accentFg',
     fontSize: '$xsmall',
   });
 

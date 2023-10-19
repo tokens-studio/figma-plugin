@@ -7,6 +7,7 @@ import { singleFileSchema } from './schemas/singleFileSchema';
 import { GenericVersionedStorageFlow } from '@/types/StorageType';
 import { tokensMapSchema } from './schemas/tokensMapSchema';
 import { themeObjectSchema } from './schemas/themeObjectSchema';
+import { SaveOption } from './FileTokenStorage';
 
 const genericVersionedSchema = singleFileSchema.extend({
   values: z.record(tokensMapSchema),
@@ -38,7 +39,7 @@ const flattenHeaders = (headers: GenericVersionedAdditionalHeaders): Array<[key:
 // Get - Retrieve tokens
 // PUT - Push tokens to endpoint
 
-export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersionedMeta> {
+export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersionedMeta, SaveOption> {
   private url: string;
 
   private defaultHeaders: Headers;

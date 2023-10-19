@@ -10,13 +10,13 @@ import Stack from './Stack';
 import { styled } from '@/stitches.config';
 
 const StyledReadMoreLink = styled('a', {
-  color: '$fgAccent',
+  color: '$accentFg',
   fontSize: '$xsmall',
 });
 
 const StyledImage = styled('img', {
   marginBottom: '$4',
-  borderRadius: '$card',
+  borderRadius: '$medium',
 });
 
 export default function Changelog() {

@@ -6,13 +6,14 @@ import {
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups, resolveTokenValues } from '@/plugin/tokenHelpers';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
+  storeTokenIdInJsonEditorSelector,
   inspectStateSelector,
   settingsStateSelector,
   tokensSelector,
@@ -33,6 +34,8 @@ import { DeleteTokenPayload } from '@/types/payloads';
 import { notifyToUI } from '@/plugin/notifiers';
 import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariablePayload';
 import { wrapTransaction } from '@/profiling/transaction';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type ConfirmResult =
   ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
@@ -49,8 +52,15 @@ type GetFormattedTokensOptions = {
 
 type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
+let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
+
 export type SyncOption = 'removeStyle' | 'renameStyle';
 export type SyncVariableOption = 'removeVariable' | 'renameVariable';
+
+export type TokensToRenamePayload = {
+  oldName: string,
+  newName: string
+};
 
 export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
@@ -59,6 +69,7 @@ export default function useTokens() {
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
@@ -81,14 +92,14 @@ export default function useTokens() {
     } = opts;
     const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
     return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,
+      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
     });
-  }, [tokens, activeTokenSet]);
+  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
 
   // Returns stringified tokens for the JSON editor
   const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet)
-  ), [tokens, activeTokenSet]);
+    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
+  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {
@@ -155,7 +166,6 @@ export default function useTokens() {
   }, []);
 
   const handleRemap = useCallback(async (type: Properties | TokenTypes, name: string, newTokenName: string, resolvedTokens: SingleToken[]) => {
-    const settings = settingsStateSelector(store.getState());
     track('remapToken', { fromInspect: true });
 
     wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -167,7 +177,7 @@ export default function useTokens() {
       tokens: resolvedTokens,
       settings,
     }));
-  }, [confirm]);
+  }, [settings]);
 
   const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
@@ -198,23 +208,26 @@ export default function useTokens() {
       description: 'This will change all layers that used the old token name. This could take a while.',
       choices: [
         {
-          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === settings.updateMode,
+          key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === lastUsedRenameOption,
         },
         {
-          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === settings.updateMode,
+          key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === lastUsedRenameOption,
         },
         {
-          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === settings.updateMode,
+          key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
         },
         {
-          key: 'rename-variable-token-group', label: 'Rename variable',
+          key: 'rename-variable-token-group', label: 'Rename variables',
+        },
+        {
+          key: 'rename-style-token-group', label: 'Rename styles',
         },
       ],
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
         await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0]);
-        dispatch.settings.setUpdateMode(confirmData.data[0] as UpdateMode);
+        lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
         track('renameVariablesInTokenGroup', { newGroupName, oldGroupName });
@@ -236,8 +249,27 @@ export default function useTokens() {
         });
         dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
       }
+
+      if (confirmData.data.includes('rename-style-token-group')) {
+        track('renameStylesInTokenGroup', { newGroupName, oldGroupName });
+        const tokensInParent = tokens[activeTokenSet] ?? [];
+        const tokensToRename = tokensInParent
+          .filter((token) => token.name.startsWith(oldGroupName) && token.type === type)
+          .map((filteredToken) => ({
+            oldName: filteredToken.name,
+            newName: filteredToken.name.replace(oldGroupName, newGroupName),
+          }));
+
+        const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.RENAME_STYLES,
+          tokensToRename,
+          parent: activeTokenSet,
+          settings,
+        });
+        dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
+      }
     }
-  }, [activeTokenSet, tokens, settings.updateMode, confirm, handleBulkRemap, dispatch.settings, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -266,7 +298,10 @@ export default function useTokens() {
         notifyToUI('No styles created. Make sure token sets are active.', { error: true });
         return;
       }
-      const resolved = resolveTokenValues(mergeTokenGroups(tokens, usedTokenSet));
+      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
+        ...usedTokenSet,
+        [activeTokenSet]: TokenSetStatus.ENABLED,
+      }));
       const withoutSourceTokens = resolved.filter((token) => (
         !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
@@ -316,17 +351,16 @@ export default function useTokens() {
     }
   }, [confirm, tokens, dispatch.tokenState, settings]);
 
-  const renameStylesFromTokens = useCallback(async ({ oldName, newName, parent }: { oldName: string, newName: string, parent: string }) => {
-    track('renameStyles', { oldName, newName, parent });
+  const renameStylesFromTokens = useCallback(async (tokensToRename: TokensToRenamePayload[], parent: string) => {
+    track('renameStyles', { tokensToRename, parent });
 
     const renameStylesResult = await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.RENAME_STYLES,
-      oldName,
-      newName,
+      tokensToRename,
       parent,
       settings,
     });
-    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, newName);
+    dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
   }, [settings, dispatch.tokenState]);
 
   const removeStylesFromTokens = useCallback(async (token: DeleteTokenPayload) => {
@@ -361,13 +395,26 @@ export default function useTokens() {
 
   const createVariables = useCallback(async () => {
     track('createVariables');
-    const createVariableResult = await wrapTransaction({ name: 'createVariables' }, async () => await AsyncMessageChannel.ReactInstance.message({
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
       tokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
-  }, [dispatch.tokenState, tokens, settings]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
     track('renameVariables', { oldName, newName });

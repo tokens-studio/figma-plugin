@@ -11,18 +11,18 @@ const TokenSetIconWrapper = styled(Box, {
   justifyContent: 'center',
   border: '1px solid',
   borderColor: 'transparent',
-  borderRadius: '$button',
+  borderRadius: '$small',
   flexShrink: 0,
   variants: {
     active: {
       true: {
-        backgroundColor: '$interaction',
-        borderColor: '$interaction',
-        color: '$onInteraction',
+        backgroundColor: '$accentDefault',
+        borderColor: '$accentDefault',
+        color: '$fgOnEmphasis',
       },
       false: {
         backgroundColor: '$bgSubtle',
-        color: '$textSubtle',
+        color: '$fgSubtle',
         borderColor: '$borderMuted',
       },
     },

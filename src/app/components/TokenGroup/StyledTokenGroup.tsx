@@ -31,7 +31,7 @@ export const StyledTokenGroupItems = styled('div', {
       left: 0,
       position: 'absolute',
       width: '4px',
-      borderBottomLeftRadius: '$tree',
+      borderBottomLeftRadius: '$medium',
       borderLeft: '1px solid $borderMuted',
       borderBottom: '1px solid $borderMuted',
     },

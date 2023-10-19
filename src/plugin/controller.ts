@@ -10,8 +10,6 @@ import { init } from '@/utils/plugin';
 import { sendDocumentChange } from './sendDocumentChange';
 import { performCodeGen } from './performCodeGen';
 
-figma.skipInvisibleInstanceChildren = true;
-
 AsyncMessageChannel.PluginInstance.connect();
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREDENTIALS, asyncHandlers.credentials);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHANGED_TABS, asyncHandlers.changedTabs);
@@ -51,6 +49,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, async
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, asyncHandlers.removeStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE, asyncHandlers.update);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_LICENSE_KEY, asyncHandlers.setLicenseKey);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_INITIAL_LOAD, asyncHandlers.setInitialLoad);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME,
   asyncHandlers.attachLocalStylesToTheme,
@@ -69,6 +68,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, as
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_RELAUNCH_DATA, asyncHandlers.removeRelaunchData);
 
 figma.on('close', () => {
   defaultWorker.stop();

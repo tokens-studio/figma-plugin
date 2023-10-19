@@ -6,7 +6,7 @@ const StyledButton = styled('button', {
   fontSize: '$xsmall',
   display: 'flex',
   padding: '$3 $4',
-  borderRadius: '$default',
+  borderRadius: '$small',
   border: '1px solid transparent',
   '&:focus': {
     outline: 'none',
@@ -14,8 +14,8 @@ const StyledButton = styled('button', {
   variants: {
     isActive: {
       true: {
-        backgroundColor: '$bgAccent',
-        borderColor: '$interaction',
+        backgroundColor: '$accentBg',
+        borderColor: '$accentDefault',
       },
       false: {
         backgroundColor: '$bgSubtle',

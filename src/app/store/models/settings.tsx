@@ -37,6 +37,7 @@ export interface SettingsState {
    * Whether the user has opted in for session recording in Sentry
    */
   sessionRecording: boolean;
+  storeTokenIdInJsonEditor: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -55,7 +56,7 @@ export const settings = createModel<RootModel>()({
     },
     language: 'en',
     sessionRecording: false,
-    updateMode: UpdateMode.PAGE,
+    updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: true,
     updateStyles: true,
@@ -66,6 +67,7 @@ export const settings = createModel<RootModel>()({
     shouldSwapStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
+    storeTokenIdInJsonEditor: false,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -185,6 +187,12 @@ export const settings = createModel<RootModel>()({
         ignoreFirstPartForStyles: payload,
       };
     },
+    setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
+      return {
+        ...state,
+        storeTokenIdInJsonEditor: payload,
+      };
+    },
   },
   effects: (dispatch) => ({
     setLanguage: (payload: string, rootState) => {
@@ -237,6 +245,9 @@ export const settings = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
       setUI(rootState.settings);
     },
     ...Object.fromEntries(

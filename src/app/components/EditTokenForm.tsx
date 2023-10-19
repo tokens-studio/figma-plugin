@@ -14,9 +14,9 @@ import {
   EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
-import { ResolveTokenValuesResult } from '@/plugin/tokenHelpers';
+import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import {
-  activeTokenSetSelector, updateModeSelector, editTokenSelector, themesListSelector, tokensSelector,
+  activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
@@ -40,6 +40,9 @@ import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
 
+let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
+let lastUsedRenameStyles = false;
+
 type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
@@ -53,7 +56,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const tokens = useSelector(tokensSelector);
   const editToken = useSelector(editTokenSelector);
   const themes = useSelector(themesListSelector);
-  const updateMode = useSelector(updateModeSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   const {
     editSingleToken, createSingleToken, duplicateSingleToken, renameTokensAcrossSets,
@@ -245,7 +247,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       $extensions: {
         ...internalEditToken.$extensions,
         'studio.tokens': Object.keys(newValue).length > 0 ? newValue : undefined,
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
@@ -258,7 +260,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...internalEditToken.$extensions?.['studio.tokens'],
           modify: newModify,
         },
-      },
+      } as SingleToken['$extensions'],
     });
   }, [internalEditToken]);
 
@@ -341,23 +343,23 @@ function EditTokenForm({ resolvedTokens }: Props) {
             ...($extensions ? { $extensions } : {}),
           });
         }
-        // When users change token names references are still pointing to the old name, ask user to remap
+        // When users change token names the applied tokens on layers are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
           const choices: Choice[] = [
             {
-              key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === updateMode,
+              key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === lastUsedRenameOption,
             },
             {
-              key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === updateMode,
+              key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === lastUsedRenameOption,
             },
             {
-              key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === updateMode,
+              key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
             },
           ];
           if (themes.length > 0 && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)) {
             choices.push({
-              key: StyleOptions.RENAME, label: 'Rename styles',
+              key: StyleOptions.RENAME, label: 'Rename styles', enabled: lastUsedRenameStyles,
             });
           }
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
@@ -384,13 +386,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
           if (confirmData && confirmData.result) {
             if (confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
               remapToken(oldName, newName, confirmData.data[0]);
-              dispatch.settings.setUpdateMode(confirmData.data[0]);
+              lastUsedRenameOption = confirmData.data[0] as UpdateMode;
             }
             if (confirmData.data.includes(ModalOptions.RENAME_ACROSS_SETS)) {
               renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
-              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+              renameStylesFromTokens([{ oldName, newName }], activeTokenSet);
+              lastUsedRenameStyles = true;
             }
             if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {
               renameVariablesFromToken({ oldName, newName });
@@ -540,10 +543,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
                 padding: '$3',
                 marginTop: '$3',
                 fontFamily: '$mono',
-                color: '$textMuted',
+                color: '$fgMuted',
                 backgroundColor: '$bgSubtle',
                 borderColor: '$borderSubtle',
-                borderRadius: '$card',
+                borderRadius: '$medium',
                 fontSize: '$xxs',
                 alignItems: 'center',
               }}

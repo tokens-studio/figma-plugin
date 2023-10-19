@@ -37,7 +37,7 @@ import { getAliasValue } from '@/utils/alias';
 const RightSlot = styled('div', {
   marginLeft: 'auto',
   paddingLeft: 16,
-  color: '$contextMenuForeground',
+  color: '$contextMenuFg',
   ':focus > &': { color: 'white' },
   '[data-disabled] &': { color: '$disabled' },
 });
@@ -122,7 +122,8 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   );
 
   const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (event.metaKey || (event.ctrlKey && event.altKey)) {
+    const isMacBrowser = /Mac/.test(navigator.platform);
+    if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
       handleEditClick();
     } else {
       handleClick(properties[0]);

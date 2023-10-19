@@ -11,10 +11,11 @@ import updateVariablesToReference from './updateVariablesToReference';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 
 export default async function syncVariables(tokens: Record<string, AnyTokenList>, options: Record<SyncVariableOption, boolean>, settings: SettingsState) {
+  // Big O (n * Big O(resolveTokenValues))
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const connectedVariableIds: string[] = [];
+  const connectedVariablesMap: Record<string, Variable> = {};
   const variableMap = getVariablesMap();
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   themeInfo.themes.forEach((theme) => {
@@ -22,11 +23,11 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
       const variable = variableMap[variableId];
       const path = tokenName.split('.').join('/');
       // rename
-      if (options.renameVariable && variable && variable.name !== path) {
-        variable.name = path;
-      }
       if (variable) {
-        connectedVariableIds.push(variableId);
+        connectedVariablesMap[variableId] = variable;
+        if (options.renameVariable && variable.name !== path) {
+          variable.name = path;
+        }
       }
     });
     if (theme.$figmaCollectionId && theme.$figmaModeId) {
@@ -46,7 +47,7 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
   // remove
   if (options.removeVariable) {
     figmaVariables.forEach((localVariable) => {
-      if (!connectedVariableIds.includes(localVariable.key)) {
+      if (!connectedVariablesMap[localVariable.key]) {
         localVariable.remove();
       }
     });

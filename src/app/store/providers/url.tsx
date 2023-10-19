@@ -7,8 +7,8 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 
@@ -81,8 +81,8 @@ export default function useURL() {
   }, [
     dispatch,
     storageClientFactory,
-    usedTokenSets,
     activeTheme,
+    usedTokenSets,
   ]);
 
   return useMemo(() => ({
