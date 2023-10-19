@@ -11,7 +11,6 @@ export default function updateColorStyles(colorTokens: SingleColorToken<true, { 
   const tokenToStyleMap: Record<string, string> = {};
 
   colorTokens.forEach((token) => {
-    console.log(token.name);
     if (paintToIdMap.has(token.styleId)) {
       const paint = paintToIdMap.get(token.styleId)!;
       tokenToStyleMap[token.name] = paint.id;
@@ -24,9 +23,13 @@ export default function updateColorStyles(colorTokens: SingleColorToken<true, { 
       const style = figma.createPaintStyle();
       style.name = token.path;
       tokenToStyleMap[token.name] = style.id;
-      style.setSharedPluginData('tokens', 'style', token.name);
       setColorValuesOnTarget(style, token);
     }
+  });
+  // Set shared plugin-data so we can map styles back to tokens
+  Object.entries(tokenToStyleMap).forEach((style) => {
+    const [tokenName, styleId] = style;
+    figma.getStyleById(styleId)?.setSharedPluginData('tokens', 'tokenName', tokenName);
   });
   return tokenToStyleMap;
 }

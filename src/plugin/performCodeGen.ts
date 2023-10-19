@@ -6,10 +6,16 @@ export function performCodeGen(event: any): CodegenResult[] {
   const code = tokenKeys
     .map((key) => {
       let value = event.node.getSharedPluginData('tokens', key);
-
-      if (key === 'fill' && !value && event.node.fillStyleId) {
-        value = figma.getStyleById(event.node.fillStyleId)?.getSharedPluginData('tokens', 'style');
+      if (key === 'fill' && !value) {
+        if (event.node.fillStyleId) {
+          value = figma.getStyleById(event.node.fillStyleId)?.getSharedPluginData('tokens', 'style');
+        }
+        if (event.node.boundVariables.fills) {
+          // @ts-ignore next-line - waiting on the Figma plugin API to update
+          value = figma.variables.getVariableById(event.node.boundVariables.fills[0].id)?.getSharedPluginData('tokens', 'tokenName');
+        }
       }
+
       return value && `${key}: ${value};`;
     })
     .filter((x) => x)
