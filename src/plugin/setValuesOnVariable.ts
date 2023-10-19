@@ -29,6 +29,8 @@ export default function setValuesOnVariable(
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
       }
       if (variable) {
+        // @ts-ignore next-line (waiting on the Figma plugin API to update)
+        variable.setSharedPluginData('tokens', 'tokenName', t.name);
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof t.value === 'string') {

@@ -26,5 +26,10 @@ export default function updateColorStyles(colorTokens: SingleColorToken<true, { 
       setColorValuesOnTarget(style, token);
     }
   });
+  // Set shared plugin-data so we can map styles back to tokens
+  Object.entries(tokenToStyleMap).forEach((style) => {
+    const [tokenName, styleId] = style;
+    figma.getStyleById(styleId)?.setSharedPluginData('tokens', 'tokenName', tokenName);
+  });
   return tokenToStyleMap;
 }
