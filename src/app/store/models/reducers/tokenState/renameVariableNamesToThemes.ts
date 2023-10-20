@@ -6,7 +6,6 @@ export function renameVariableNamesToThemes(state: TokenState, tokensToRename: T
     acc[curr.oldName] = curr.newName;
     return acc;
   }, {});
-  console.log('oldToNewNameMap in renameVariableNamesToThemes: ', oldToNewNameMap);
   const newThemes = state.themes.map((theme) => {
     const updatedTokens = theme.$figmaVariableReferences;
     if (updatedTokens) {

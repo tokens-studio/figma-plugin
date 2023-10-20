@@ -298,7 +298,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
-      console.log('name in EditTokenForm: ', name);
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
@@ -322,9 +321,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
-        console.log('edit token');
-        console.log('internalEditToken: ', internalEditToken);
-        console.log('oldName in EditTokenForm: ', oldName);
         editSingleToken({
           description: (
             internalEditToken.description
@@ -338,9 +334,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
-          console.log('1111111111111');
-          console.log('internalEditToken in condition: ', internalEditToken);
-          console.log('activeTokenSet in condition: ', activeTokenSet);
           updateVariablesFromToken({
             parent: activeTokenSet,
             name: internalEditToken.initialName ?? name,
@@ -441,7 +434,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('save button click');
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
