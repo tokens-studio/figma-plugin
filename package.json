@@ -98,7 +98,7 @@
     "octokit-commit-multiple-files": "^3.2.1",
     "polished": "^4.1.3",
     "popmotion": "^11.0.0",
-    "postcss": "^8.2.13",
+    "postcss": "^8.4.31",
     "postcss-calc-ast-parser": "^0.1.4",
     "rc-mentions": "^2.2.0",
     "react": "17.0.0",
@@ -122,7 +122,7 @@
     "storyblok-js-client": "^3.3.1",
     "use-debounce": "^6.0.1",
     "uuid": "^9.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -198,7 +198,7 @@
     "npm-run-all": "^4.1.5",
     "postcss-cli": "^8.3.1",
     "prettier": "^2.0.5",
-    "react-devtools": "^4.24.3",
+    "react-devtools": "^4.28.4",
     "react-svg-loader": "^3.0.3",
     "react-test-renderer": "17.0.0",
     "round-to": "^6.0.0",
