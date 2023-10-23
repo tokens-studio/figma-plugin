@@ -8,10 +8,13 @@ import IconComposition from '@/icons/composition.svg';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { IconBorder, IconImage } from '@/icons';
 import { SingleToken } from '@/types/tokens';
+import { TokenTooltip } from './TokenTooltip';
+import { TokenTypographyValue, TokenBoxshadowValue, TokenBorderValue } from '@/types/values';
 
 type Props = {
   name: string;
   value: SingleToken['value']
+  rawValue?: Partial<Record<TokenTypes, string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | TokenBoxshadowValue[]>>
   type: string;
 };
 
@@ -85,18 +88,29 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
       );
     }
     case TokenTypes.COMPOSITION: {
+      let compositionToken: SingleToken = {} as SingleToken;
+      if (token.rawValue) {
+        compositionToken = {
+          name: token.name,
+          type: token.type,
+          value: token.rawValue,
+        };
+      }
+
       return (
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            width: '40px',
-          }}
-        >
-          <IconComposition />
-        </Box>
+        <TokenTooltip token={compositionToken}>
+          <Box
+            css={{
+              background: '$bgSubtle',
+              fontSize: '$small',
+              padding: '$2 $3',
+              borderRadius: '$small',
+              width: '40px',
+            }}
+          >
+            <IconComposition />
+          </Box>
+        </TokenTooltip>
       );
     }
 
