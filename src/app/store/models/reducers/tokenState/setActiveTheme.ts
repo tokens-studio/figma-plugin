@@ -6,6 +6,7 @@ import type { TokenState } from '../../tokenState';
 export function setActiveTheme(state: TokenState, { newActiveTheme }: { newActiveTheme: Record<string, string>, shouldUpdateNodes?: boolean }): TokenState {
   // Filter activeThemes
   const activeThemeObjectList = state.themes.filter((theme) => Object.values(newActiveTheme).some((v) => v === theme.id));
+  console.log('activeThemeObjectList: ', activeThemeObjectList);
   // Store all activeTokenSets through all activeThemes
   const selectedTokenSets: Record<string, TokenSetStatus> = {};
   activeThemeObjectList.forEach((theme) => {
@@ -27,6 +28,8 @@ export function setActiveTheme(state: TokenState, { newActiveTheme }: { newActiv
       )),
     );
 
+  console.log('usedTokenSet: ', usedTokenSetsMap);
+  console.log('activeTheme: ', newActiveTheme);
   return {
     ...state,
     usedTokenSet: usedTokenSetsMap,

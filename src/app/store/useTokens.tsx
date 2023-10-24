@@ -110,7 +110,9 @@ export default function useTokens() {
   // Handles the update operation
   const handleUpdate = useCallback(() => {
     track('Update Tokens');
+    console.log('handleUpdate in useTokens');
     if (shouldConfirm) {
+      console.log('shouldConfirm in condition: ', shouldConfirm);
       confirm({
         text: 'Are you sure?',
         description:
@@ -121,6 +123,7 @@ export default function useTokens() {
         }
       });
     } else {
+      console.log('shouldConfirm in else condition: ', shouldConfirm);
       dispatch.tokenState.updateDocument();
     }
   }, [confirm, dispatch.tokenState, shouldConfirm]);
