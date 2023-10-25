@@ -49,7 +49,6 @@ export const ThemeSelector: React.FC = () => {
   const handleSelectTheme = useCallback((themeId: string) => {
     const groupOfTheme = availableThemes.find((theme) => theme.value === themeId)?.group ?? INTERNAL_THEMES_NO_GROUP;
     const nextTheme = activeTheme;
-    console.log('nextTheme: ', nextTheme);
     if (typeof nextTheme[groupOfTheme] !== 'undefined' && nextTheme[groupOfTheme] === themeId) {
       delete nextTheme[groupOfTheme];
     } else {

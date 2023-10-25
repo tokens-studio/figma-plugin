@@ -122,6 +122,16 @@ export class AsyncMessageChannel {
       this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
         if (msg.id === messageId) {
           if ('message' in msg) {
+            if (msg.message.type === 'async/get-theme-info') {
+              if ('activeTheme' in msg.message && 'themes' in msg.message) {
+                const { activeTheme } = msg.message;
+                const { themes } = msg.message;
+                const activeMode = themes.filter((theme) => theme.id === Object.values(activeTheme)[0])[0];
+                figma.currentPage.children.forEach((frame) => {
+                  frame.setExplicitVariableModeForCollection(activeMode.$figmaCollectionId ?? '', activeMode.$figmaModeId ?? '');
+                });
+              }
+            }
             resolve(msg.message);
           } else {
             reject(msg.error);
