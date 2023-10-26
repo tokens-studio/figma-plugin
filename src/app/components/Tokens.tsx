@@ -164,6 +164,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch.uiState]);
 
   const handleSetTokensTabToJSON = React.useCallback(() => {
+    console.log('show tokens in json');
     dispatch.uiState.setActiveTokensTab('json');
   }, [dispatch.uiState]);
 
