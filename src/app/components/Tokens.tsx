@@ -119,6 +119,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     })),
     [tokens, usedTokenSet, activeTokenSet],
   );
+
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
@@ -164,7 +165,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch.uiState]);
 
   const handleSetTokensTabToJSON = React.useCallback(() => {
-    console.log('show tokens in json');
     dispatch.uiState.setActiveTokensTab('json');
   }, [dispatch.uiState]);
 

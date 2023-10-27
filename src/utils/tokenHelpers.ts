@@ -49,5 +49,6 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
         });
       }
     });
+
   return mergedTokens;
 }

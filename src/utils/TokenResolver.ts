@@ -37,6 +37,7 @@ class TokenResolver {
     this.tokenMap = new Map();
     this.memo = new Map();
     this.populateTokenMap();
+
     return this.resolveTokenValues();
   }
 
@@ -187,10 +188,10 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-        const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
+        // const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
 
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
+          ...token, value: finalValue, rawValue: token.value, ...{},
         } as ResolveTokenValuesResult;
       }
 
