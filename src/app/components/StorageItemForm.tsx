@@ -28,6 +28,8 @@ export default function StorageItemForm({
 }: Props) {
   const { bitBucketSync } = useFlags();
 
+  console.log('bitBucketSync: ', bitBucketSync);
+
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
