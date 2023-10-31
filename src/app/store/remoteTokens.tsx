@@ -289,6 +289,7 @@ export default function useRemoteTokens() {
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
     let content: RemoteResponseData | null = null;
+    console.log('addNewProviderItem in remoteTokens');
     switch (credentials.provider) {
       case StorageProviderType.JSONBIN: {
         if (credentials.id) {
@@ -327,7 +328,9 @@ export default function useRemoteTokens() {
         break;
       }
       case StorageProviderType.GITLAB: {
+        console.log('add new gitlab credentials in remoteTokens: ', credentials);
         content = await addNewGitLabCredentials(credentials);
+        console.log('content: ', content);
         break;
       }
       case StorageProviderType.BITBUCKET: {
