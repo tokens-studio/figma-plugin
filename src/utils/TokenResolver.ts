@@ -131,7 +131,7 @@ class TokenResolver {
         // As long as we have matches, we need to resolve them. This is needed for multiple levels of nesting. Performance will suffer, but that's the user's choice.
         while (matches !== false) {
           const match = resolvedPath.match(AliasRegex);
-          matches = false;
+          matches = Boolean(match?.length);
           if (!match?.length) {
             matches = false;
             break;
