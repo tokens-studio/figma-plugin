@@ -132,20 +132,19 @@ class TokenResolver {
         while (matches !== false) {
           const match = resolvedPath.match(AliasRegex);
           matches = Boolean(match?.length);
-          if (!match?.length) {
-            matches = false;
-            break;
-          }
+          if (!match?.length) break;
 
           const nestedTokenName = getPathName(match[0]);
-          const nestedTokenValue = this.tokenMap.get(nestedTokenName);
+          const nestedToken = this.tokenMap.get(nestedTokenName);
 
-          if (nestedTokenValue) {
-            const resolvedNestedToken = this.resolveReferences({ ...nestedTokenValue, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
+          if (nestedToken && nestedToken.value) {
+            const resolvedNestedToken = this.resolveReferences({ ...nestedToken, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
 
-            if (typeof resolvedNestedToken.value === 'string') {
+            if (typeof resolvedNestedToken.value === 'string' || typeof resolvedNestedToken.value === 'number') {
               resolvedPath = resolvedPath.replace(match[0], resolvedNestedToken.value);
             }
+          } else {
+            break;
           }
         }
 
@@ -161,9 +160,9 @@ class TokenResolver {
         if (foundToken) {
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
-          newResolvedReferences.add(path);
+          newResolvedReferences.add(resolvedPath);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
-          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
+          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {
