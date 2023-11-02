@@ -28,8 +28,6 @@ export default function EditStorageItemModal({
   }, [formFields]);
 
   const handleSubmit = React.useCallback(async (values: StorageTypeFormValues<false>) => {
-    console.log('handleSubmit in StorageItemForm');
-    console.log('submit value: ', values);
     const response = await addNewProviderItem(values);
     if (response.status === 'success') {
       onSuccess();

@@ -210,11 +210,8 @@ export function useGitLab() {
 
   const syncTokensWithGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
     try {
-      console.log('sync tokens with gitlab');
       const storage = await storageClientFactory(context, multiFileSync);
-      console.log('storage in syncTokensWithGitLabb: ', storage);
       const hasBranches = await storage.fetchBranches();
-      console.log('hasBranches in syncTokensWithGitLab: ', hasBranches);
       dispatch.branchState.setBranches(hasBranches);
 
       if (!hasBranches || !hasBranches.length) {
@@ -226,9 +223,7 @@ export function useGitLab() {
 
       await checkAndSetAccess({ context });
 
-      console.log('before get content');
       const content = await storage.retrieve();
-      console.log('content in syncTokensWithGitLab: ', content);
       if (content?.status === 'failure') {
         return {
           status: 'failure',
@@ -243,9 +238,7 @@ export function useGitLab() {
         ) {
           const userDecision = await askUserIfPull();
           if (userDecision) {
-            console.log('Before get lastest commit date from storage in gitlab');
             const latestCommitDate = await storage.getLatestCommitDate();
-            console.log('After get lastest commit date from storage in gitlab');
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
             saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
@@ -285,7 +278,6 @@ export function useGitLab() {
   ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
-    console.log('add new git lab credentials in gitlab: ', context);
     const data = await syncTokensWithGitLab(context);
     if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({

@@ -36,13 +36,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     repoPathWithNamespace: string,
     baseUrl?: string,
   ) {
-    console.log('starting constructor');
     super(secret, '', repository, baseUrl);
-
-    console.log('secret in constructor: ', secret);
-    console.log('repository in constructor: ', repository);
-    console.log('repoPathWithNamespace in constructor: ', repoPathWithNamespace);
-    console.log('baseUrl in constructor: ', baseUrl);
 
     this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
@@ -52,12 +46,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    // const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
-    console.log('starting assignProjectId');
-    // const projects = await this.gitlabClient.Projects.search(this.repository);
-    console.log('repository: ', this.repository);
-    const projects = await this.gitlabClient.Projects.search(this.repository);
-    console.log('projects in assignProjectId: ', projects);
+    const projects = await this.gitlabClient.Projects.all({
+      membership: true,
+      search: this.repository,
+      simple: true,
+    });
     if (projects) {
       const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
@@ -73,16 +66,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async fetchBranches() {
-    console.log('starting fetchBranches');
     if (!this.projectId) throw new Error('Project ID not assigned');
-    console.log('project id has been assigned');
     const branches = await this.gitlabClient.Branches.all(this.projectId);
-    console.log('branches: ', branches);
     return branches.map((branch) => branch.name);
   }
 
   public async createBranch(branch: string, source?: string) {
-    console.log('starting createBranch');
     if (!this.projectId) throw new Error('Project ID not assigned');
     try {
       const response = await this.gitlabClient.Branches.create(
@@ -98,11 +87,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async canWrite(): Promise<boolean> {
-    console.log('starting canWrite');
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     if (!this.projectId) throw new Error('Project ID not assigned');
 
-    // const currentUser = await this.gitlabClient.Users.current();
     const currentUser = await this.gitlabClient.Users.showCurrentUser();
     try {
       if (!currentUser || currentUser.state !== 'active') return false;
@@ -117,22 +104,14 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    console.log('starting read');
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
-      console.log('path in read: ', this.path);
       const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
         path: this.path,
         ref: this.branch,
         recursive: true,
       });
-      console.log('trees in read function: ', trees);
-      // const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
-      //   path: this.path,
-      //   ref: this.branch,
-      //   recursive: true,
-      // });
 
       if (!this.path.endsWith('.json')) {
         const jsonFiles = trees.filter((file) => (
@@ -142,19 +121,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ));
 
         const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-          // this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
-          this.gitlabClient.Repositories.showBlobRaw(this.projectId!, treeItem.path)
+          this.gitlabClient.RepositoryFiles.showRaw(this.projectId ?? 0, treeItem.path, this.branch)
         )));
 
-        console.log('jsonFileContent in read: ', jsonFileContents);
-
-        const jsonFileContentsString = await Promise.all(jsonFileContents.map((fileContent) => (
-          fileContent.text()
-        )));
-
-        return compact(jsonFileContentsString.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
-          if (IsJSONString(fileContent)) {
+          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
@@ -184,43 +156,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
           return null;
         }));
-
-        // return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
-        //   const { path } = jsonFiles[index];
-        //   if (IsJSONString(fileContent)) {
-        //     const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
-        //     const parsed = JSON.parse(fileContent) as GitMultiFileObject;
-
-        //     if (name === SystemFilenames.THEMES) {
-        //       return {
-        //         path,
-        //         type: 'themes',
-        //         data: parsed as ThemeObjectsList,
-        //       };
-        //     }
-
-        //     if (name === SystemFilenames.METADATA) {
-        //       return {
-        //         path,
-        //         type: 'metadata',
-        //         data: parsed as RemoteTokenStorageMetadata,
-        //       };
-        //     }
-
-        //     return {
-        //       path,
-        //       name,
-        //       type: 'tokenSet',
-        //       data: parsed as AnyTokenSet<false>,
-        //     };
-        //   }
-
-        //   return null;
-        // }));
       }
 
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
-      // if (IsJSONString(data)) {
       if (typeof data === 'string' && IsJSONString(data)) {
         const parsed = JSON.parse(data) as GitSingleFileObject;
         return [
@@ -257,7 +195,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
-    console.log('starting writeChangeset');
     if (!this.projectId) throw new Error('Missing Project ID');
 
     const branches = await this.fetchBranches();
@@ -270,11 +207,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
       ref: branch,
       recursive: true,
     });
-    // const tree = await this.gitlabClient.Repositories.tree(this.projectId, {
-    //   path: rootPath,
-    //   ref: branch,
-    //   recursive: true,
-    // });
     const jsonFiles = tree.filter((file) => (
       file.path.endsWith('.json')
     )).sort((a, b) => (
@@ -308,7 +240,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async getLatestCommitDate(): Promise<Date | null> {
-    console.log('starting getLatestCommitDate');
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
@@ -318,11 +249,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
           ref: this.branch,
           recursive: true,
         });
-        // const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
-        //   path: this.path,
-        //   ref: this.branch,
-        //   recursive: true,
-        // });
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -330,13 +256,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ));
 
         const file = await this.gitlabClient.RepositoryFiles.show(this.projectId!, jsonFiles[0].path, this.branch);
-        // const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
         const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id.toString());
         const committedDate = new Date(commit.committed_date?.toString() ?? '');
         return committedDate ?? null;
       }
       const file = await this.gitlabClient.RepositoryFiles.show(this.projectId, this.path, this.branch);
-      // const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
       const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id.toString());
       const committedDate = new Date(commit.committed_date?.toString() ?? '');
       return committedDate ?? null;
