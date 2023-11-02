@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.2
+
+### Patch Changes
+
+- 1e5beacb: We now carry over token descriptions when creating variables
+- abf1cb0b: Fixed an issue that caused the active theme to be reset when you were editing it in Manage themes
+- 20189a39: Changing a token group's name now lets you also rename attached styles and variables
+- e5de5250: Reintroduces support for nested references for 1 level deep (use at your own risk, this affects performance). For example, you can use `{colors.{primary}.500}` but not `{colors.{brand.{primary}}}`.
+- 02ac59b5: We now show token values in the inspect tab using tooltips to preview the value
+- 572840bd: Fixed a bug where expired license keys could not be removed
+
 ## 1.38.1
 
 ### Patch Changes
