@@ -107,13 +107,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
-      const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
-        path: this.path,
-        ref: this.branch,
-        recursive: true,
-      });
-
       if (!this.path.endsWith('.json')) {
+        const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+          path: this.path,
+          ref: this.branch,
+          recursive: true,
+        });
+
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
