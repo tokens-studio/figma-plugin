@@ -39,6 +39,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
     console.log('starting constructor');
     super(secret, '', repository, baseUrl);
 
+    console.log('secret in constructor: ', secret);
+    console.log('repository in constructor: ', repository);
+    console.log('repoPathWithNamespace in constructor: ', repoPathWithNamespace);
+    console.log('baseUrl in constructor: ', baseUrl);
+
     this.repoPathWithNamespace = repoPathWithNamespace;
     this.gitlabClient = new Gitlab({
       token: this.secret,
@@ -49,7 +54,10 @@ export class GitlabTokenStorage extends GitTokenStorage {
   public async assignProjectId() {
     // const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
     console.log('starting assignProjectId');
+    // const projects = await this.gitlabClient.Projects.search(this.repository);
+    console.log('repository: ', this.repository);
     const projects = await this.gitlabClient.Projects.search(this.repository);
+    console.log('projects in assignProjectId: ', projects);
     if (projects) {
       const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
@@ -67,7 +75,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
   public async fetchBranches() {
     console.log('starting fetchBranches');
     if (!this.projectId) throw new Error('Project ID not assigned');
+    console.log('project id has been assigned');
     const branches = await this.gitlabClient.Branches.all(this.projectId);
+    console.log('branches: ', branches);
     return branches.map((branch) => branch.name);
   }
 
@@ -111,11 +121,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
+      console.log('path in read: ', this.path);
       const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
         path: this.path,
         ref: this.branch,
         recursive: true,
       });
+      console.log('trees in read function: ', trees);
       // const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
       //   path: this.path,
       //   ref: this.branch,
@@ -133,6 +145,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
           // this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
           this.gitlabClient.Repositories.showBlobRaw(this.projectId!, treeItem.path)
         )));
+
+        console.log('jsonFileContent in read: ', jsonFileContents);
 
         const jsonFileContentsString = await Promise.all(jsonFileContents.map((fileContent) => (
           fileContent.text()
