@@ -69,6 +69,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const visibleProperties = React.useMemo(() => properties.filter((p) => p.label), [properties]);
 
   const handleEditClick = React.useCallback(() => {
+    console.log('handleEditClick in MoreButton');
     showForm({ name: token.name, token, status: EditTokenFormStatus.EDIT });
   }, [token, showForm]);
 
