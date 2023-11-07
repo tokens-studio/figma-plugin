@@ -124,9 +124,9 @@ export class AsyncMessageChannel {
           if ('message' in msg) {
             if (msg.message.type === 'async/get-theme-info') {
               if ('activeTheme' in msg.message && 'themes' in msg.message) {
-                const { activeTheme } = msg.message;
-                const { themes } = msg.message;
-                const activeMode = themes.filter((theme) => theme.id === Object.values(activeTheme)[0])[0];
+                const { activeTheme, themes } = msg.message;
+                const themeToFind = Object.values(activeTheme)[0];
+                const activeMode = themes.filter((theme) => theme.id === themeToFind)[0];
                 figma.currentPage.children.forEach((frame) => {
                   frame.setExplicitVariableModeForCollection(activeMode.$figmaCollectionId ?? '', activeMode.$figmaModeId ?? '');
                 });
