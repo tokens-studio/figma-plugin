@@ -96,7 +96,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const projectPermission = await this.gitlabClient.ProjectMembers.show(this.projectId, currentUser.id, {
         includeInherited: true,
       });
-      return Number(projectPermission.access_level) >= GitLabAccessLevel.Developer;
+      return Number(projectPermission.access_level.toString()) >= GitLabAccessLevel.Developer;
     } catch (e) {
       console.error(e);
     }

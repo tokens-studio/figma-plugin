@@ -20,10 +20,10 @@ jest.mock('@gitbeaker/rest', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
     Users: {
       username: mockGetUserName,
-      current: mockGetCurrentUser,
+      showCurrentUser: mockGetCurrentUser,
     },
     Projects: {
-      search: mockGetProjects,
+      all: mockGetProjects,
     },
     Branches: {
       all: mockGetBranches,
@@ -36,7 +36,7 @@ jest.mock('@gitbeaker/rest', () => ({
       show: mockGetProjectMembers,
     },
     Repositories: {
-      tree: mockGetRepositories,
+      allRepositoryTrees: mockGetRepositories,
     },
     RepositoryFiles: {
       showRaw: mockGetRepositoryFiles,
@@ -88,7 +88,7 @@ describe('GitlabTokenStorage', () => {
       await storageProvider.assignProjectId(),
     ).toHaveProperty('groupId', 51634506);
 
-    expect(mockGetProjects).toHaveBeenCalledWith(repoName, { membership: true });
+    expect(mockGetProjects).toHaveBeenCalledWith({ membership: true, search: repoName, simple: true });
   });
 
   it('should throw an error if no project is found', async () => {
@@ -270,12 +270,10 @@ describe('GitlabTokenStorage', () => {
         },
       },
     ]);
-    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', { ref: 'main' });
+    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', 'main');
   });
 
   it('can read from Git in a multifile format', async () => {
-    storageProvider.changePath('data');
-
     mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([
         {
@@ -391,7 +389,7 @@ describe('GitlabTokenStorage', () => {
     expect(await storageProvider.read()).toEqual({
       errorMessage: ErrorMessages.VALIDATION_ERROR,
     });
-    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', { ref: 'main' });
+    expect(mockGetRepositoryFiles).toBeCalledWith(35102363, 'data/tokens.json', 'main');
   });
 
   it('should return an empty array when reading results in an error', async () => {
@@ -454,6 +452,7 @@ describe('GitlabTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: true,
     });
 
     expect(mockCreateCommits).toBeCalledWith(
@@ -582,6 +581,7 @@ describe('GitlabTokenStorage', () => {
       },
     ], {
       commitMessage: 'Initial commit',
+      storeTokenIdInJsonEditor: true,
     });
 
     expect(mockCreateCommits).toBeCalledTimes(1);
@@ -598,7 +598,7 @@ describe('GitlabTokenStorage', () => {
           filePath: 'data/$metadata.json',
         },
         {
-          action: 'update',
+          action: 'create',
           content: JSON.stringify([{
             id: 'light',
             name: 'Light',
@@ -609,7 +609,7 @@ describe('GitlabTokenStorage', () => {
           filePath: 'data/$themes.json',
         },
         {
-          action: 'update',
+          action: 'create',
           content: JSON.stringify({
             red: {
               type: TokenTypes.COLOR,
@@ -660,11 +660,10 @@ describe('GitlabTokenStorage', () => {
         committed_date: '2022-01-31T12:34:56Z',
       })
     ));
-    expect(await storageProvider.getLatestCommitDate()).toEqual('2022-01-31T12:34:56Z');
+    expect(await storageProvider.getLatestCommitDate()).toEqual(new Date('2022-01-31T12:34:56Z'));
   });
 
   it('should return the committed date of the latest JSON file in a directory (recursive)', async () => {
-    storageProvider.changePath('data');
     mockGetRepositories.mockImplementationOnce(() => (
       Promise.resolve([
         {
@@ -707,6 +706,6 @@ describe('GitlabTokenStorage', () => {
         committed_date: '2022-01-31T12:34:56Z',
       })
     ));
-    expect(await storageProvider.getLatestCommitDate()).toEqual('2022-01-31T12:34:56Z');
+    expect(await storageProvider.getLatestCommitDate()).toEqual(new Date('2022-01-31T12:34:56Z'));
   });
 });
