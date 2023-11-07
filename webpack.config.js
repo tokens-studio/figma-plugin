@@ -89,6 +89,9 @@ module.exports = (env, argv) => {
         'react-redux': 'react-redux/dist/react-redux.js',
       },
       fallback: {
+        process:false,
+        "http": false,
+        https:false,
         buffer: require.resolve('buffer/'),
       },
       extensions: ['.tsx', '.ts', '.jsx', '.js'],
@@ -101,12 +104,16 @@ module.exports = (env, argv) => {
       concatenateModules: true
     },
     output: {
+      publicPath: '',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
       path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
       new Dotenv({
         path: argv.mode === 'production' ? '.env.production' : '.env',
       }),
