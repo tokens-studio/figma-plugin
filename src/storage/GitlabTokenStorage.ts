@@ -121,7 +121,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ));
 
         const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-          this.gitlabClient.RepositoryFiles.showRaw(this.projectId ?? 0, treeItem.path, this.branch)
+          this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
         )));
 
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
@@ -159,8 +159,10 @@ export class GitlabTokenStorage extends GitTokenStorage {
       }
 
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
-      if (typeof data === 'string' && IsJSONString(data)) {
-        const parsed = JSON.parse(data) as GitSingleFileObject;
+      const stringData = typeof data === 'string' ? data : await data.text();
+
+      if (IsJSONString(stringData)) {
+        const parsed = JSON.parse(stringData) as GitSingleFileObject;
         return [
           {
             type: 'themes',

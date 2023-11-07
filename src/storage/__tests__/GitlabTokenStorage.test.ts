@@ -16,7 +16,7 @@ const mockCreateCommits = jest.fn();
 const mockShowCommits = jest.fn();
 const mockShowRepositoryFiles = jest.fn();
 
-jest.mock('@gitbeaker/browser', () => ({
+jest.mock('@gitbeaker/rest', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
     Users: {
       username: mockGetUserName,
