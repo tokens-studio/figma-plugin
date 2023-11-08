@@ -8,7 +8,6 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { convertModifiedColorToHex } from './convertModifiedColorToHex';
 import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
-import { TokenTypes } from '@/constants/TokenTypes';
 
 class TokenResolver {
   private tokens: SingleToken[];
@@ -46,7 +45,8 @@ class TokenResolver {
     const resolvedTokens: ResolveTokenValuesResult[] = [];
 
     for (const token of this.tokens) {
-      const resolvedValue = token.type === TokenTypes.TEXT ? token : this.resolveReferences(token);
+      const resolvedValue = this.resolveReferences(token);
+      // const resolvedValue = token.type === TokenTypes.TEXT ? token : this.resolveReferences(token);
 
       resolvedTokens.push({
         ...resolvedValue,
@@ -110,6 +110,10 @@ class TokenResolver {
     // For strings, we need to check if there are any references, as those can only occur in strings
     if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
+
+      if (references.length === 0) {
+        return token;
+      }
 
       let finalValue: SingleToken['value'] = token.value;
 
