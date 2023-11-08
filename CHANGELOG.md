@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.3
+
+### Patch Changes
+
+- 23ff7080: Fixes an issue that causes a crash when interacting with a numeric token, such as duplicating
+
 ## 1.38.2
 
 ### Patch Changes
