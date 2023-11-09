@@ -458,6 +458,8 @@ export default function useTokens() {
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
 
+    console.log('payload in updateVariablesFromToken(shadow): ', payload);
+
     await wrapTransaction({ name: 'updateVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.UPDATE_VARIABLES,
       payload,

@@ -3,6 +3,8 @@ import { convertToFigmaColor } from './figmaTransforms/colors';
 export default function setColorValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     const { color, opacity } = convertToFigmaColor(value);
+    console.log('color in setColorValuesOnVariable: ', color);
+    console.log('opacity in setColorValuesOnVariable: ', opacity);
     variable.setValueForMode(mode, {
       ...color,
       a: opacity,

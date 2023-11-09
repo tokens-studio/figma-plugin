@@ -51,6 +51,7 @@ export default function ColorTokenForm({
   handleRemoveColorModify: () => void;
   onSubmit: () => void
 }) {
+  console.log('internalEditToken in ColorTokenForm: ', internalEditToken);
   const seed = useUIDSeed();
   const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
@@ -100,6 +101,9 @@ export default function ColorTokenForm({
       return null;
     }
   }, [internalEditToken, resolvedValue, resolvedMixValue, resolvedModifyAmountValue]);
+  console.log('internalEditToken in ColorTokenForm: ', internalEditToken);
+  console.log('resolvedValue in ColorTokenForm: ', resolvedValue);
+  console.log('modifiedCOlor in ColorTokenForm: ', modifiedColor);
 
   const displayColor = useMemo(() => {
     if (resolvedValue) {

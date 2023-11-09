@@ -18,6 +18,8 @@ const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
   const showAutoSuggest = useSelector(showAutoSuggestSelector);
   const dispatch = useDispatch<Dispatch>();
 
+  console.log('editToken in EditTOkenFormModal: ', editToken);
+
   const { t } = useTranslation(['tokens']);
 
   const handleReset = React.useCallback(() => {
