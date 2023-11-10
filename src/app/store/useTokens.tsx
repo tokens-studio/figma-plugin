@@ -399,6 +399,7 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
+    console.log('tokens in createVariables: ', tokens);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {

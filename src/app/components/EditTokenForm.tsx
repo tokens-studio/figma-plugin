@@ -350,6 +350,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+          console.log('resolvedValue in EditTokenForm: ', resolvedValue);
+          console.log('resolvedTokens in EditTokenForm: ', resolvedTokens);
           updateVariablesFromToken({
             parent: activeTokenSet,
             name: internalEditToken.initialName ?? name,
