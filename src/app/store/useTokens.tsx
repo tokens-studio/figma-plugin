@@ -400,7 +400,8 @@ export default function useTokens() {
       isInfinite: true,
     });
 
-    Object.values(tokens).forEach((tokenItem) => {
+    const tempTokens = tokens;
+    Object.values(tempTokens).forEach((tokenItem) => {
       for (let i = 0; i < tokenItem.length; i += 1) {
         const resolvedValue = getAliasValue(tokenItem[i], tokensContext.resolvedTokens);
         if (typeof resolvedValue === 'string') {
@@ -419,7 +420,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens,
+      tokens: tempTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);

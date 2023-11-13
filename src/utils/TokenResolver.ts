@@ -118,6 +118,7 @@ class TokenResolver {
 
         // We need to avoid circular references, so we check if we already resolved this reference
         if (resolvedReferences.has(path)) {
+          console.log('Circular reference detected:', path);
           return {
             ...token, rawValue: token.value, failedToResolve: true,
           } as ResolveTokenValuesResult;
