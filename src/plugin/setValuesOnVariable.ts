@@ -18,7 +18,6 @@ export default function setValuesOnVariable(
   collection: VariableCollection,
   mode: string,
 ) {
-  console.log('tokens in setValuesOnVariable: ', tokens);
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
@@ -39,11 +38,6 @@ export default function setValuesOnVariable(
             break;
           case 'COLOR':
             if (typeof t.value === 'string') {
-              console.log('setColorValuesOnVariable: in setValuesOnVariable');
-              console.log('variable in setValuesOnVariable: ', variable);
-              console.log('mode in setValuesOnVariable: ', variable);
-              console.log('t.value in setValuesOnVariable: ', t.value);
-              console.log('variable, mode, and t in setValuesOnVariable: ', variable, mode, t);
               setColorValuesOnVariable(variable, mode, t.value);
             }
             break;

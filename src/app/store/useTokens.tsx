@@ -10,7 +10,7 @@ import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { checkIfAlias } from '@/utils/alias';
+import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   storeTokenIdInJsonEditorSelector,
@@ -399,7 +399,16 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-    console.log('tokens in createVariables: ', tokens);
+
+    Object.values(tokens).forEach((tokenItem) => {
+      for (let i = 0; i < tokenItem.length; i += 1) {
+        const resolvedValue = getAliasValue(tokenItem[i], tokensContext.resolvedTokens);
+        if (typeof resolvedValue === 'string') {
+          tokenItem[i].value = resolvedValue;
+        }
+      }
+    });
+
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -458,8 +467,6 @@ export default function useTokens() {
 
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
-
-    console.log('payload in updateVariablesFromToken(shadow): ', payload);
 
     await wrapTransaction({ name: 'updateVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.UPDATE_VARIABLES,

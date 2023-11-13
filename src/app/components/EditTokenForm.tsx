@@ -51,7 +51,6 @@ type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean 
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
-  console.log('EditTokenForm Rendered');
   const { t } = useTranslation(['tokens', 'errors']);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const tokens = useSelector(tokensSelector);
@@ -305,7 +304,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const submitTokenValue = async ({
     type, value, name, $extensions,
   }: EditTokenObject) => {
-    console.log('internalEditToken in submitTokenValue: ', internalEditToken);
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -313,14 +311,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
       }
 
       const trimmedValue = trimValue(value);
-      console.log('trimmedValue in submitTokenValue: ', trimmedValue);
       const newName = name
         .split('/')
         .map((n) => n.trim())
         .join('.');
-      console.log('newName in submitTokenValue: ', newName);
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
-        console.log('token create in submitTokenValue');
         track('Create token', { type: internalEditToken.type, isModifier: !!$extensions?.['studio.tokens']?.modify });
         createSingleToken({
           description: (
@@ -334,9 +329,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
-        console.log('token edit in submitTokenValue: ', internalEditToken);
-        console.log('oldName in submitTokenValue: ', oldName);
-        console.log('type in submitTokenValue: ', type);
         editSingleToken({
           description: (
             internalEditToken.description
@@ -350,8 +342,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
-          console.log('resolvedValue in EditTokenForm: ', resolvedValue);
-          console.log('resolvedTokens in EditTokenForm: ', resolvedTokens);
           updateVariablesFromToken({
             parent: activeTokenSet,
             name: internalEditToken.initialName ?? name,
@@ -421,7 +411,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           track('Edit token', { renamed: false });
         }
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
-        console.log('token duplicate in submitTokenValue');
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({
           description: (
@@ -446,15 +435,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return;
     }
     if (isValid && internalEditToken) {
-      console.log('checkAndSubmitTokenValue');
-      console.log('internalEditToken in EditTOkenForm: ', internalEditToken);
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }
   }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
   const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    console.log('save button clicked in EditTokenForm');
     e.preventDefault();
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
@@ -468,7 +454,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   useShortcut(['Enter'], handleSaveShortcut);
 
   const handleReset = React.useCallback(() => {
-    console.log('cancel clicked in EditTokenForm');
     dispatch.uiState.setShowEditForm(false);
   }, [dispatch]);
 

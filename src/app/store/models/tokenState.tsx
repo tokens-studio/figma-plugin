@@ -319,7 +319,6 @@ export const tokenState = createModel<RootModel>()({
         ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),
       } as SingleToken;
-      console.log('newArray[index] in tokenState(shadow): ', newArray[index]);
       return {
         ...state,
         tokens: {

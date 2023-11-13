@@ -25,13 +25,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     if (collection) {
       const mode = collection.modes.find((m) => m.name === theme.name);
       const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
-      console.log('tokens in createLocalVariablesInPlugin: ', tokens);
       if (modeId) {
-        console.log('111111111111111111(shadow)');
         const allVariableObj = updateVariables({
           collection, mode: modeId, theme, tokens, settings,
         });
-        console.log('allVariableObj in createlocalVariablesInPlugin: ', allVariableObj);
         allVariableCollectionIds[theme.id] = {
           collectionId: collection.id,
           modeId,
@@ -40,7 +37,6 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
     } else {
-      console.log('2222222222222222222222222(shadow)');
       const newCollection = figma.variables.createVariableCollection(theme.group ?? theme.name);
       newCollection.renameMode(newCollection.modes[0].modeId, theme.name);
       const allVariableObj = updateVariables({

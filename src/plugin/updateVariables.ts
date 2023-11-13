@@ -21,14 +21,12 @@ export default function updateVariables({
   collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
-  console.log('tokensToCreate in updateVariables: ', tokensToCreate);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
       variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
     }
   });
-  console.log('variablesToCreate in updateVariables: ', variablesToCreate);
   const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
   return {
     variableIds: variableObj.variableKeyMap,

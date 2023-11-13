@@ -96,8 +96,6 @@ export function Modal({
     close();
   }, [close]);
 
-  console.log('title in Modal: ', title);
-
   return (
     <ReactModal
       isOpen={isOpen}
