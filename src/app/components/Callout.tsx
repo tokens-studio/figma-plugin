@@ -1,10 +1,10 @@
 import React from 'react';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { Button } from '@tokens-studio/ui';
 import Heading from './Heading';
 import Stack from './Stack';
 import Text from './Text';
 import Box from './Box';
-import Button from './Button';
 
 type Props = {
   id: string

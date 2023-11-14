@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from './Button';
+import { Button } from '@tokens-studio/ui';
 import Box from './Box';
 import { IconFile } from '@/icons';
 import { StyledStorageItem } from './StyledStorageItem';

@@ -1,6 +1,6 @@
 import React from 'react';
+import { Button } from '@tokens-studio/ui';
 import { render } from '../../../tests/config/setupTest';
-import Button from './Button';
 
 describe('Button', () => {
   it('displays text', () => {

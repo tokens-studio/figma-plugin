@@ -4,11 +4,11 @@ import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import Heading from './Heading';
 import Text from './Text';
-import Button from './Button';
 import Callout from './Callout';
 import { Dispatch } from '../store';
 import { apiProvidersSelector, storageTypeSelector } from '@/selectors';
@@ -140,7 +140,7 @@ function StartScreen() {
               <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
                 {t('newEmptyFile')}
               </Button>
-              <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
+              <Button id="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
                 {t('loadExample')}
               </Button>
             </Stack>

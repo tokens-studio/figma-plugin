@@ -1,9 +1,9 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
-import Button from './Button';
 import Box from './Box';
 import Checkbox from './Checkbox';
 import Label from './Label';

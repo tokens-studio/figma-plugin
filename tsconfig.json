@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "outDir": "dist",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
