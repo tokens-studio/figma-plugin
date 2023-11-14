@@ -109,7 +109,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           const filteredThemes = groupName === INTERNAL_THEMES_NO_GROUP ? availableThemes.filter((theme) => (typeof theme?.group === 'undefined')) : availableThemes.filter((theme) => (theme?.group === groupName));
           return (
             filteredThemes.length > 0 && (
-              <DropdownMenuRadioGroup value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
+              <DropdownMenuRadioGroup key={groupName} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
                 <Text css={{ color: '$contextMenuFgMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
                 {
                   renderThemeOption(filteredThemes)
