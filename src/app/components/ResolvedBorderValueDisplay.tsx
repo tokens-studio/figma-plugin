@@ -18,7 +18,7 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedBorderValueDisplay: React.FC<Props> = ({ value }) => {
+export const ResolvedBorderValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value }) => {
   const seed = useUIDSeed();
   const { t } = useTranslation(['tokens']);
   const properties = {
@@ -33,8 +33,8 @@ export const ResolvedBorderValueDisplay: React.FC<Props> = ({ value }) => {
     }}
     >
       <Box css={{ display: 'grid', marginRight: '$6' }}>
-        {Object.values(properties).map((value) => (
-          <StyledPropertyItem key={seed(value)}>{value}</StyledPropertyItem>
+        {Object.values(properties).map((v) => (
+          <StyledPropertyItem key={seed(v)}>{v}</StyledPropertyItem>
         ))}
 
       </Box>

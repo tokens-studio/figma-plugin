@@ -53,8 +53,8 @@ export default function SingleCompositionTokenForm({
     const newOrderObj: NodeTokenRefMap = {};
     const keysInTokenValue = Object.keys(tokenValue);
     keysInTokenValue.splice(index, 1, newProperty);
-    keysInTokenValue.forEach((key, index) => {
-      newOrderObj[key as keyof typeof Properties] = String(index);
+    keysInTokenValue.forEach((key, idx) => {
+      newOrderObj[key as keyof typeof Properties] = String(idx);
     });
     setOrderObj(newOrderObj);
 
@@ -63,20 +63,20 @@ export default function SingleCompositionTokenForm({
     tokenValue[newProperty as keyof typeof Properties] = propertyValue;
     setTokenValue(tokenValue);
     setError(false);
-  }, [tokenValue]);
+  }, [index, property, propertyValue, setError, setOrderObj, setTokenValue, tokenValue]);
 
   const onPropertyValueChanged = React.useCallback(
     (type: string, value: string) => {
       tokenValue[property as CompositionTokenProperty] = value;
       setTokenValue(tokenValue);
     },
-    [tokenValue],
+    [property, setTokenValue, tokenValue],
   );
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     tokenValue[property as CompositionTokenProperty] = newInputValue;
     setTokenValue(tokenValue);
-  }, [tokenValue]);
+  }, [property, setTokenValue, tokenValue]);
 
   const handleToggleMenu = useCallback(() => {
     setMenuOpened(!menuOpened);
@@ -112,7 +112,7 @@ export default function SingleCompositionTokenForm({
           {' '}
           <DropdownMenuRadioGroup value={property}>
             {properties.length > 0
-                && properties.map((property, index) => <DropdownMenuRadioElement key={`property-${seed(index)}`} item={property} index={index} itemSelected={onPropertySelected} />)}
+                && properties.map((prop, idx) => <DropdownMenuRadioElement key={`property-${seed(idx)}`} item={prop} index={idx} itemSelected={onPropertySelected} />)}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>

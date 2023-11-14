@@ -19,7 +19,7 @@ export interface ButtonProps {
   css?: StitchesCSS
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<React.PropsWithChildren<React.PropsWithChildren<ButtonProps>>> = ({
   size = 'small',
   type = 'button',
   variant = 'primary',
@@ -75,25 +75,27 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     // eslint-disable-next-line react/button-has-type
-    <StyledButton
-      data-cy={id}
-      data-testid={id}
-      ref={buttonRef}
-      disabled={disabled}
-      type={type === 'button' ? 'button' : 'submit'}
-      size={size}
-      variant={variant}
-      form={form}
-      onClick={handleClick}
-      css={css}
-    >
-      {(!!icon) && (
+    (
+      <StyledButton
+        data-cy={id}
+        data-testid={id}
+        ref={buttonRef}
+        disabled={disabled}
+        type={type === 'button' ? 'button' : 'submit'}
+        size={size}
+        variant={variant}
+        form={form}
+        onClick={handleClick}
+        css={css}
+      >
+        {(!!icon) && (
         <StyledButtonIconContainer>
           {icon}
         </StyledButtonIconContainer>
-      )}
-      {children}
-    </StyledButton>
+        )}
+        {children}
+      </StyledButton>
+    )
   );
 };
 

@@ -34,7 +34,7 @@ type AvailableTheme = {
   group?: string
 };
 
-export const ThemeSelector: React.FC = () => {
+export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
   const { tokenThemes } = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['tokens']);

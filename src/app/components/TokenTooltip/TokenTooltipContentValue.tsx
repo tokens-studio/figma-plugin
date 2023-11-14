@@ -23,7 +23,7 @@ type Props = {
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<Props> = ({ token }) => {
+export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();

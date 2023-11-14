@@ -75,7 +75,7 @@ const hexToHslaColor = (value: string) => {
   }
 };
 
-const ColorPicker: React.FC<Props> = ({ value = '#000000', onChange }) => {
+const ColorPicker: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value = '#000000', onChange }) => {
   const [inputMode, setInputMode] = React.useState(InputMode.RGBA);
   const [internalValue, setInternalValue] = React.useState(value);
   const [rgba, setRgba] = React.useState<Rgba>(hexToRgbaColor(value));

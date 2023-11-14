@@ -50,7 +50,11 @@ type Props = {
   showForm: (options: ShowFormOptions) => void;
 };
 
-export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
+export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+  token,
+  type,
+  showForm,
+}) => {
   const tokensContext = React.useContext(TokensContext);
   const setNodeData = useSetNodeData();
   const dispatch = useDispatch<Dispatch>();
@@ -58,10 +62,10 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
 
-  const resolvedValue = useMemo(() => getAliasValue(token, tokensContext.resolvedTokens), [
-    token,
-    tokensContext.resolvedTokens,
-  ]);
+  const resolvedValue = useMemo(
+    () => getAliasValue(token, tokensContext.resolvedTokens),
+    [token, tokensContext.resolvedTokens],
+  );
 
   const properties = usePropertiesForTokenType(type, resolvedValue?.toString());
 
@@ -78,7 +82,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
 
   const handleDeleteClick = React.useCallback(() => {
     deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
-  }, [activeTokenSet, deleteSingleToken, token.name]);
+  }, [activeTokenSet, deleteSingleToken, token.name, token.type]);
 
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
@@ -121,21 +125,24 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
     [active, token.name, setPluginValue],
   );
 
-  const handleTokenClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    const isMacBrowser = /Mac/.test(navigator.platform);
-    if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
-      handleEditClick();
-    } else {
-      handleClick(properties[0]);
-    }
-  }, [properties, handleClick, handleEditClick]);
+  const handleTokenClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const isMacBrowser = /Mac/.test(navigator.platform);
+      if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
+        handleEditClick();
+      } else {
+        handleClick(properties[0]);
+      }
+    },
+    [properties, handleClick, handleEditClick],
+  );
 
   return (
     <ContextMenu>
       <ContextMenuTrigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenuTrigger>
-      <ContextMenuContent sideOffset={5} collisionTolerance={30}>
+      <ContextMenuContent alignOffset={5} collisionPadding={30}>
         {visibleProperties.map((property) => (property.childProperties ? (
           <ContextMenu>
             <ContextMenuTriggerItem>
@@ -144,7 +151,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
                 <ChevronRightIcon />
               </RightSlot>
             </ContextMenuTriggerItem>
-            <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
+            <ContextMenuContent alignOffset={-5} collisionPadding={30}>
               {property.childProperties.map((childProperty) => (
                 <MoreButtonProperty
                   key={childProperty.name}
@@ -171,7 +178,7 @@ export const MoreButton: React.FC<Props> = ({ token, type, showForm }) => {
               <ChevronRightIcon />
             </RightSlot>
           </ContextMenuTriggerItem>
-          <ContextMenuContent sideOffset={2} alignOffset={-5} collisionTolerance={30}>
+          <ContextMenuContent alignOffset={-5} collisionPadding={30}>
             {DocumentationProperties.map((property) => (
               <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
             ))}

@@ -22,7 +22,7 @@ type Props = {
   onDisconnectSelectedStyle: (names: string[]) => void
 };
 
-export const ThemeStyleManagementCategory: React.FC<Props> = ({
+export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   label,
   icon,
   styles,

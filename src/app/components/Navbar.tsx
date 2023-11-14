@@ -20,7 +20,7 @@ import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import { useAuth } from '@/context/AuthContext';
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
   const { user } = useAuth();
   const activeTab = useSelector(activeTabSelector);
   const dispatch = useDispatch<Dispatch>();

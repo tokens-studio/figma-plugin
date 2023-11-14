@@ -23,7 +23,7 @@ const actionLabels: Partial<Record<AnyAction<true>['type'], string>> = {
   'tokenState/createToken': 'Create token',
 };
 
-export const NavbarUndoButton: React.FC = () => {
+export const NavbarUndoButton: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
   const canUndo = useCanUndo();
   const actionsHistory = useActionsHistory();
 

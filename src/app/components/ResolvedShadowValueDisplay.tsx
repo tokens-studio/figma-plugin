@@ -17,7 +17,7 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedShadowValueDisplay: React.FC<Props> = ({ shadows }) => {
+export const ResolvedShadowValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ shadows }) => {
   const seed = useUIDSeed();
 
   return (

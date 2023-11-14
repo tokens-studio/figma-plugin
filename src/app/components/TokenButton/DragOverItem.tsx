@@ -11,7 +11,7 @@ type Props = {
   dragOverToken: SingleToken | null;
 };
 
-export const DragOverItem: React.FC<Props> = ({
+export const DragOverItem: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token,
   draggedToken,
   dragOverToken,

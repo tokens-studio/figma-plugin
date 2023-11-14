@@ -8,7 +8,7 @@ type Props = {
   children: React.ReactElement;
 };
 
-const PluginResizerWrapper: React.FC<Props> = ({ children }) => {
+const PluginResizerWrapper: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ children }) => {
   const { isPluginminimized, handleResize } = useMinimizeWindow();
 
   return isPluginminimized ? (

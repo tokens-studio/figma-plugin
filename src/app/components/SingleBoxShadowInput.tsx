@@ -137,7 +137,7 @@ export default function SingleBoxShadowInput({
     exchangeBoxshadowValue(values ?? []);
   }, [value, exchangeBoxshadowValue]);
 
-  const onMove = React.useCallback(debounce(onMoveDebounce, 300), [onMoveDebounce]);
+  const onMove = debounce(onMoveDebounce, 300);
 
   const handleRemove = React.useCallback(() => {
     onRemove(index);
@@ -145,13 +145,15 @@ export default function SingleBoxShadowInput({
 
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const [{ handlerId }, drop] = useDrop({
+  interface DropCollectedProps {
+    handlerId: string;
+  }
+
+  const [{ handlerId }, drop] = useDrop<DragItem, DropTargetMonitor, DropCollectedProps>({
     accept: ItemTypes.CARD,
-    collect(monitor) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      };
-    },
+    collect: (monitor: DropTargetMonitor) => ({
+      handlerId: monitor.getHandlerId()?.toString() ?? 'default-dnd-handler-id',
+    }),
     hover(item: DragItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
         return;
@@ -184,10 +186,12 @@ export default function SingleBoxShadowInput({
     },
   });
 
+  // TODO: Check this... AI fixed it..
   const [{ isDragging }, drag] = useDrag({
+    type: ItemTypes.CARD,
     item: {
       type: ItemTypes.CARD,
-      item: () => ({ id, index }),
+      id,
       index,
     },
     collect: (monitor: any) => ({

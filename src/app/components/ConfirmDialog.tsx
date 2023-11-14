@@ -10,11 +10,11 @@ import Label from './Label';
 import Input from './Input';
 import Stack from './Stack';
 
-const ChoiceCheckbox: React.FC<{
+const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
   checked?: boolean
   choice: { key: string; unique?: boolean; enabled?: boolean }
   onCheckedChange: (key: string, unique?: boolean) => void
-}> = ({
+}>>> = ({
   checked,
   choice,
   onCheckedChange,

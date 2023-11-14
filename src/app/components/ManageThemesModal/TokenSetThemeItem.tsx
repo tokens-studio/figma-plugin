@@ -30,7 +30,7 @@ const tokenSetSatusLabels = {
   [TokenSetStatus.ENABLED]: 'Enabled',
 };
 
-export const TokenSetThemeItem: React.FC<Props> = ({
+export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   item, value, children, onChange,
 }) => {
   const tokenSetStatus = useMemo(() => (
@@ -61,56 +61,58 @@ export const TokenSetThemeItem: React.FC<Props> = ({
   }, [tokenSetStatus]);
 
   return (
-    <Stack direction="row" align="center" css={{ width: '100%' }}>
-      {item.level > 0 && (
+    (
+      <Stack direction="row" align="center" css={{ width: '100%' }}>
+        {item.level > 0 && (
         // repeat the box n times according to item.level
-        Array.from({ length: item.level }).map((_, index) => (
-          <Box
+          (Array.from({ length: item.level }).map((_, index) => (
+            <Box
             // eslint-disable-next-line react/no-array-index-key
-            key={`${item.path}-indicator-${index}`}
-            css={{
-              marginLeft: '$3',
-              height: '$7',
-              width: '$4',
-              borderLeft: '1px solid $borderMuted',
-            }}
-          />
-        ))
-      )}
-      {children}
-      {item.isLeaf && (
-      <Stack
-        direction="row"
-        justify="between"
-        align="center"
-        css={{ width: '100%' }}
-      >
-        <Button size="small" variant="ghost" onClick={handleCycleValue}>
-          <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
-            <TokenSetStatusIcon status={mapStatus} />
-            {item.label}
-          </StyledThemeLabel>
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger data-cy={`tokensettheme-item--dropdown-trigger--${item.key}`}>
-            <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
-            <IconChevronDown />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom">
-            <DropdownMenuRadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
-              {tokenSetStatusValues.map((status) => (
-                <DropdownMenuRadioItem key={status} value={status} data-cy={`tokensettheme-item--dropdown-content--${status}`}>
-                  <DropdownMenuItemIndicator>
-                    <CheckIcon />
-                  </DropdownMenuItemIndicator>
-                  {tokenSetSatusLabels[status]}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              key={`${item.path}-indicator-${index}`}
+              css={{
+                marginLeft: '$3',
+                height: '$7',
+                width: '$4',
+                borderLeft: '1px solid $borderMuted',
+              }}
+            />
+          )))
+        )}
+        {children}
+        {item.isLeaf && (
+        <Stack
+          direction="row"
+          justify="between"
+          align="center"
+          css={{ width: '100%' }}
+        >
+          <Button size="small" variant="ghost" onClick={handleCycleValue}>
+            <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
+              <TokenSetStatusIcon status={mapStatus} />
+              {item.label}
+            </StyledThemeLabel>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger data-cy={`tokensettheme-item--dropdown-trigger--${item.key}`}>
+              <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
+              <IconChevronDown />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom">
+              <DropdownMenuRadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
+                {tokenSetStatusValues.map((status) => (
+                  <DropdownMenuRadioItem key={status} value={status} data-cy={`tokensettheme-item--dropdown-content--${status}`}>
+                    <DropdownMenuItemIndicator>
+                      <CheckIcon />
+                    </DropdownMenuItemIndicator>
+                    {tokenSetSatusLabels[status]}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Stack>
+        )}
       </Stack>
-      )}
-    </Stack>
+    )
   );
 };

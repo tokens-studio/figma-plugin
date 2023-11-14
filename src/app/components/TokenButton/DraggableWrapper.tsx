@@ -12,7 +12,7 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-export const DraggableWrapper: React.FC<Props> = ({
+export const DraggableWrapper: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token, draggedToken, setDraggedToken, setDragOverToken, children,
 }) => {
   const store = useStore<RootState>();

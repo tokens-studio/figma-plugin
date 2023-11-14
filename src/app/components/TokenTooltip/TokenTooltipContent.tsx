@@ -10,7 +10,7 @@ type Props = {
   token: SingleToken;
 };
 
-export const TokenTooltipContent: React.FC<Props> = ({ token }) => {
+export const TokenTooltipContent: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token }) => {
   const tokensContext = React.useContext(TokensContext);
 
   const failedToResolve = React.useMemo(() => (

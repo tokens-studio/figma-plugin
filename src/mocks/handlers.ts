@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { rest } from 'msw';
 
 export const LICENSE_FOR_VALID_RESPONSE = 'validate-c421c421-c421c421c-4c21c421-c421c42';

@@ -1,6 +1,7 @@
 import { AliasRegex } from '@/constants/AliasRegex';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
+// eslint-disable-next-line import/no-cycle
 import { getAliasValue } from './getAliasValue';
 
 // @TODO -- removed string type logic for now

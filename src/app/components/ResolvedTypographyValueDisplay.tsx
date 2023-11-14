@@ -18,7 +18,7 @@ const StyledValueItem = styled('div', {
   marginBottom: '$2',
 });
 
-export const ResolvedTypographyValueDisplay: React.FC<Props> = ({ value }) => {
+export const ResolvedTypographyValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value }) => {
   const seed = useUIDSeed();
 
   const { t } = useTranslation(['tokens']);

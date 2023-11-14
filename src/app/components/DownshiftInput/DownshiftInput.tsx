@@ -50,7 +50,7 @@ interface DownShiftProps {
   onSubmit?: () => void
 }
 
-export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
+export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<React.PropsWithChildren<DownShiftProps>>> = ({
   name,
   type,
   label,
@@ -101,26 +101,49 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     }
   }, []);
 
+  type RectsType = {
+    inputContainerRect?: DOMRect;
+    portalRect?: DOMRect;
+    blankBoxRect?: DOMRect;
+  };
+
+  const [rects, setRects] = React.useState<RectsType>({});
+  const updateRects = React.useCallback(() => {
+    setRects({
+      inputContainerRect: inputContainerRef.current?.getBoundingClientRect(),
+      portalRect: portalRef.current?.getBoundingClientRect(),
+      blankBoxRect: blankBoxRef.current?.getBoundingClientRect(),
+    });
+  }, []);
+
+  React.useEffect(() => {
+    updateRects();
+    window.addEventListener('resize', updateRects);
+    window.addEventListener('scroll', updateRects);
+    return () => {
+      window.removeEventListener('resize', updateRects);
+      window.removeEventListener('scroll', updateRects);
+    };
+  }, [updateRects]);
+
   React.useEffect(() => {
     if (portalContainer) {
       portalContainer.appendChild(portalPlaceholder);
     }
-    if (inputContainerRef.current) {
-      const boundingRect = inputContainerRef.current?.getBoundingClientRect();
-      setInputContainerPosX(boundingRect.left);
-      setInputContainerWidth(boundingRect.width);
+    if (rects.inputContainerRect) {
+      setInputContainerPosX(rects.inputContainerRect.left);
+      setInputContainerWidth(rects.inputContainerRect.width);
       if (arrow === 'down') {
-        setInputContainerPosY(boundingRect.bottom);
-      } else if (portalRef.current) {
-        const suggestionHeight = blankBoxRef.current ? boundingRect.top - portalRef.current.getBoundingClientRect().height - blankBoxRef.current.getBoundingClientRect().height - 10
-          : boundingRect.top - portalRef.current.getBoundingClientRect().height - 10;
+        setInputContainerPosY(rects.inputContainerRect.bottom);
+      } else if (rects.portalRect && rects.blankBoxRect) {
+        const suggestionHeight = rects.blankBoxRect.top - rects.portalRect.height - 10;
         setInputContainerPosY(suggestionHeight);
       }
     }
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
-  }, [inputContainerRef.current?.getBoundingClientRect(), portalRef.current?.getBoundingClientRect(), blankBoxRef.current?.getBoundingClientRect()]);
+  }, [arrow, portalContainer, portalPlaceholder, rects]);
 
   React.useEffect(() => {
     if (externalSearchField === 'Fonts') {
@@ -173,7 +196,7 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
       initialFilteredValues = figmaFonts.filter((font) => font.fontName.family === externalFontFamily).map((selectedFont) => selectedFont.fontName.style);
     }
     if (searchInput) {
-      return initialFilteredValues.filter((value: string) => fuzzySearch(searchInput, value));
+      return initialFilteredValues.filter((filteredValue: string) => fuzzySearch(searchInput, filteredValue));
     }
     return initialFilteredValues;
   }, [figmaFonts, currentSearchField, externalFontFamily, searchInput]);
@@ -182,18 +205,22 @@ export const DownshiftInput: React.FunctionComponent<DownShiftProps> = ({
     // Split on highlight term and include term into parts, ignore case
     const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
-      <span>
-        {parts.map((part, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <StyledPart key={i} matches={part === highlight}>
-            {part}
-          </StyledPart>
-        ))}
-        {' '}
-      </span>
+      (
+        <span>
+          {parts.map((part, i) => {
+            const key = `${part}-${i}`;
+            return (
+              <StyledPart key={key} matches={part === highlight}>
+                {part}
+              </StyledPart>
+            );
+          })}
+          {' '}
+        </span>
+      )
     );
   }, []);
-
+    // eslint-enable react/no-array-index-key
   const handleSelect = useCallback((selectedItem: any) => {
     if (selectedItem) {
       if (currentSearchField === 'Tokens') {

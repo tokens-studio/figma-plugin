@@ -23,7 +23,7 @@ type Props = {
 
 const StyledDropdownMenuTrigger = styled(DropdownMenuTrigger, {});
 
-export const ThemeGroupDropDownMenu: React.FC<Props> = ({
+export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   availableGroups, selectedGroup, onChange, addGroup,
 }) => {
   const handleSelectGroup = useCallback((groupName: string) => {

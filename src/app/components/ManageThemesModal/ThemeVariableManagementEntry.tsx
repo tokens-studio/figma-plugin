@@ -23,7 +23,7 @@ type Props = {
   handleToggleSelectedVariable: (token: string) => void
 };
 
-export const ThemeVariableManagementEntry: React.FC<Props> = ({
+export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token,
   variableInfo,
   isChecked,

@@ -39,7 +39,7 @@ type Props = {
   onCancel: () => void
 };
 
-export const CreateOrEditThemeForm: React.FC<Props> = ({
+export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   id, defaultValues, onSubmit, onCancel,
 }) => {
   const store = useStore<RootState>();

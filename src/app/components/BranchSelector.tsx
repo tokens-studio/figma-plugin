@@ -41,10 +41,10 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
 
-const BranchSwitchMenuItemElement: React.FC<{
+const BranchSwitchMenuItemElement: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
   branch: string
   createNewBranchFrom: (branch: string) => void
-}> = ({ branch, createNewBranchFrom }) => {
+}>>> = ({ branch, createNewBranchFrom }) => {
   const onSelect = React.useCallback(() => (
     createNewBranchFrom(branch)
   ), [branch, createNewBranchFrom]);
@@ -134,7 +134,7 @@ export default function BranchSelector() {
     track('Create new branch from specific branch');
     setMenuOpened(false);
 
-    if (hasChanges && await askUserIfPushChanges()) {
+    if (hasChanges && (await askUserIfPushChanges())) {
       await pushTokens();
     }
 

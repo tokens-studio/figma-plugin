@@ -11,7 +11,7 @@ type Props = {
   modifier: ColorModifier | undefined;
 };
 
-export const SingleColorValueDisplay: React.FC<Props> = ({ value, resolvedValue, modifier }) => (
+export const SingleColorValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue, modifier }) => (
   <Stack direction="column" align="start" gap={1}>
     <Box css={{ color: '$tooltipFgMuted' }}>
       {

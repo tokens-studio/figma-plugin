@@ -112,7 +112,7 @@ export const StyledButton = styled('button', {
   },
 });
 
-export const StyledDownshiftInput: React.FC<Props> = ({
+export const StyledDownshiftInput: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   type,
   name,
   value,

@@ -23,7 +23,7 @@ type Props = {
   id: string
 };
 
-export const ThemeStyleManagementForm: React.FC<Props> = ({ id }) => {
+export const ThemeStyleManagementForm: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ id }) => {
   const [rawStyleInfo, setRawStyleInfo] = useState<StyleInfoPerCategory>({});
   const [resolvedStyleInfo, setResolvedStyleInfo] = useState<StyleInfoPerCategory>({});
   const dispatch = useDispatch<Dispatch>();

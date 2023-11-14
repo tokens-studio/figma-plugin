@@ -93,11 +93,11 @@ export default function ImportedTokensDialog() {
 
   const { t } = useTranslation(['tokens']);
 
-  const handleIgnoreExistingToken = React.useCallback((token) => {
+  const handleIgnoreExistingToken = React.useCallback((token: any) => {
     setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
   }, [setUpdatedTokens, updatedTokens]);
 
-  const handleIgnoreNewToken = React.useCallback((token) => {
+  const handleIgnoreNewToken = React.useCallback((token: any) => {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [setNewTokens, newTokens]);
 
@@ -140,7 +140,7 @@ export default function ImportedTokensDialog() {
     handleCreateNewClick();
   }, [handleCreateNewClick, handleUpdateClick]);
 
-  const handleCreateSingleClick = React.useCallback((token) => {
+  const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
     createSingleToken({
       parent: activeTokenSet,
@@ -153,7 +153,7 @@ export default function ImportedTokensDialog() {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
-  const handleUpdateSingleClick = React.useCallback((token) => {
+  const handleUpdateSingleClick = React.useCallback((token: any) => {
     // Go through each token that needs to be updated
     editSingleToken({
       parent: activeTokenSet,

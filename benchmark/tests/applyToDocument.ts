@@ -11,8 +11,8 @@ global.figma = createFigma({
   simulateErrors: true,
 });
 
-documentChildren.forEach((child) => child.parent = figma.currentPage);
+documentChildren.forEach((child) => { child.parent = figma.currentPage; });
 
-global.figma._currentPage.children = documentChildren;
+global.figma._currentPage.children = documentChildren; // eslint-disable-line no-underscore-dangle
 
 swapStyles(mock.activeTheme, mock.themes, UpdateMode.DOCUMENT);

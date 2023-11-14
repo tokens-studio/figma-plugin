@@ -36,9 +36,11 @@
   "exclude": [
     "**/node_modules",
     "./storybook",
-    "storybook-static"
+    "storybook-static",
   ],
   "include": [
+    "flags.d.ts",
+    "jest.config.ts",
     "css.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",

@@ -159,7 +159,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             overflow: 'hidden',
           }}
         >
-          {token.value}
+          {String(token.value)}
         </Box>
       );
     }

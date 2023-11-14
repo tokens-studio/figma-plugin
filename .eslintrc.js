@@ -44,5 +44,12 @@ module.exports = {
       allowBind: false,
     }],
     "@typescript-eslint/no-shadow": 1
+  },
+  overrides: [{
+    "files": ['**/benchmark/**', "**/mocks/**"],
+    "rules": {
+      "import/no-extraneous-dependencies": 0,
+    }
   }
+]
 };
