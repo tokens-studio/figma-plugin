@@ -186,6 +186,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.4.0",
+    "eslint-plugin-validate-jsx-nesting": "^0.1.1",
     "figma-api-stub": "^0.0.56",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^7.2.11",
