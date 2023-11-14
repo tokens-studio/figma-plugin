@@ -1,8 +1,8 @@
 // stitches.config.ts
 import { createStitches } from '@stitches/react';
-import * as core from './tokens/core';
-import * as lightTheme from './tokens/light';
-import * as darkTheme from './tokens/dark';
+import { lightTheme, darkTheme, core } from '@tokens-studio/tokens';
+// @ts-ignore next-line
+core.sizes.scrollbarWidth = '8px';
 
 export const stitchesInstance = createStitches({
   media: {
