@@ -10,7 +10,7 @@ import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { checkIfAlias } from '@/utils/alias';
+import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   storeTokenIdInJsonEditorSelector,
@@ -399,6 +399,19 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
+
+    const tempTokens: Record<string, AnyTokenList> = {};
+    Object.keys(tokens).forEach((tokenSetKey) => {
+      const tokenList = tokens[tokenSetKey].filter((tokenItem) => {
+        if ((typeof tokenItem.value === 'string')) {
+          const resolvedValue = getAliasValue(tokenItem.value, tokensContext.resolvedTokens) || '';
+          return !resolvedValue.toString().trim().includes(' ');
+        }
+        return true;
+      });
+      tempTokens[tokenSetKey] = tokenList;
+    });
+
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -409,7 +422,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens,
+      tokens: tempTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
