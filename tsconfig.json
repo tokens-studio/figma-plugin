@@ -41,6 +41,7 @@
   "include": [
     "flags.d.ts",
     "jest.config.ts",
+    "src/app/components/custom.d.ts",
     "css.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",

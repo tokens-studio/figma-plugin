@@ -1,5 +1,3 @@
-const { plugins  } = require("@swc/core");
-
 module.exports = {
   extends: ['airbnb', 'airbnb-typescript', 'plugin:react-hooks/recommended'],
   plugins: ["validate-jsx-nesting"],
