@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { Tooltip } from '@tokens-studio/ui';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
@@ -22,11 +23,10 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
-import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;
-  isCollapsed?: boolean;
+  isCollapsed?: boolean; // eslint-disable-line react/no-unused-prop-types
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
   canEdit: boolean;
@@ -34,7 +34,7 @@ export type TokenSetItemProps = {
   canReorder?: boolean;
   extraBefore?: React.ReactNode;
   onClick: (item: TreeItem) => void;
-  onCollapse?: (itemPath: string) => void;
+  onCollapse?: (itemPath: string) => void; // eslint-disable-line react/no-unused-prop-types
   onCheck: (checked: boolean, item: TreeItem) => void;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
@@ -102,7 +102,7 @@ export function TokenSetItem({
       return t('sets.activeDescription') as string;
     }
     return t('sets.inactiveDescription') as string;
-  }, [isChecked, tokenSetStatus]);
+  }, [isChecked, tokenSetStatus, t]);
 
   const renderIcon = useCallback(
     (checked: typeof isChecked, fallbackIcon: React.ReactNode) => {
@@ -187,7 +187,7 @@ export function TokenSetItem({
       </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         {item.isLeaf ? (
-          <Tooltip label={getCheckboxTooltip()} side="right">
+          <Tooltip label={getCheckboxTooltip()} side="bottom">
             <Checkbox
               id={item.path}
               data-testid={`tokensetitem-${item.path}-checkbox`}

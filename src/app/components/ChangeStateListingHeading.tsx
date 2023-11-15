@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@tokens-studio/ui';
 import {
   IconCollapseArrow, IconExpandArrow,
 } from '@/icons';
 import Heading from './Heading';
-import Tooltip from './Tooltip';
 import Box from './Box';
 import Stack from './Stack';
 import { Count } from './Count';
