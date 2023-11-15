@@ -400,17 +400,17 @@ export default function useTokens() {
       isInfinite: true,
     });
 
-    const tempTokens: Record<string, AnyTokenList> = {};
-    Object.keys(tokens).forEach((tokenSetKey) => {
-      const tokenList = tokens[tokenSetKey].filter((tokenItem) => {
-        if ((typeof tokenItem.value === 'string')) {
+    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      const filteredTokenList = tokenList.filter((tokenItem) => {
+        if (typeof tokenItem.value === 'string') {
           const resolvedValue = getAliasValue(tokenItem.value, tokensContext.resolvedTokens) || '';
           return !resolvedValue.toString().trim().includes(' ');
         }
         return true;
       });
-      tempTokens[tokenSetKey] = tokenList;
-    });
+      tempTokens[tokenSetKey] = filteredTokenList;
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
 
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
