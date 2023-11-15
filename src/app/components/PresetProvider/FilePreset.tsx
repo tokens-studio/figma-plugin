@@ -13,6 +13,14 @@ import Heading from '../Heading';
 import Text from '../Text';
 import { track } from '@/utils/analytics';
 
+declare module 'react' {
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    // extends React's HTMLAttributes
+    directory?: string;
+    webkitdirectory?: string;
+  }
+}
+
 export type SingleFileObject = Record<string, (
   Record<string, SingleToken<false> | DeepTokensMap<false>>
 )> & {
@@ -45,7 +53,7 @@ export default function FilePreset({ onCancel }: Props) {
 
     await fetchTokensFromFileOrDirectory({ files, usedTokenSet, activeTheme });
     onCancel();
-  }, [fetchTokensFromFileOrDirectory, onCancel]);
+  }, [fetchTokensFromFileOrDirectory, onCancel, activeTheme, usedTokenSet]);
 
   return (
     <Stack direction="column" gap={4}>
