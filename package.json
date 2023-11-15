@@ -51,7 +51,7 @@
     "@supabase/realtime-js": "^2.1.0",
     "@supabase/storage-js": "^2.0.0",
     "@supabase/supabase-js": "^2.0.5",
-    "@supernovaio/supernova-sdk": "^1.8.74",
+    "@supernovaio/supernova-sdk": "^1.9.3",
     "@types/chroma-js": "^2.1.4",
     "@types/color": "^3.0.3",
     "@types/file-saver": "^2.0.5",
