@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.4
+
+### Patch Changes
+
+- 6015f46f: Fixed an issue with Update on change. It's now working again, but disabled for new users as intended.
+
 ## 1.38.3
 
 ### Patch Changes
