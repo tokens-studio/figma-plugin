@@ -1,5 +1,5 @@
 const MockEnv = () => {
-  cy.intercept('GET', 'http://localhost:61968/six7/user', {
+  cy.intercept('GET', 'http://localhost:5000/six7/user', {
     type: 'User',
     id: 1000,
     login: 'six7',
@@ -7,12 +7,12 @@ const MockEnv = () => {
     email: 'example@domain.com',
   }).as('getUser');
 
-  cy.intercept('GET', 'http://localhost:61968/six7/repos/122/figma-tokens/collaborators/six7/permission', {
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/collaborators/six7/permission', {
     permission: 'admin',
     role_name: 'admin'
   }).as('getPermissions')
 
-  cy.intercept('GET', 'http://localhost:61968/six7/repos/122/figma-tokens/contents/tokens.json?ref=main', JSON.stringify({
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/contents/tokens.json?ref=main', JSON.stringify({
     "global": {
       "red": {
         "type": "color",
@@ -36,7 +36,7 @@ const MockEnv = () => {
     ]
   })).as('getContent');
 
-  cy.intercept('GET', 'http://localhost:61968/six7six7/repos/122/figma-tokens/branches?per_page=30', [
+  cy.intercept('GET', 'http://localhost:5000/six7six7/repos/122/figma-tokens/branches?per_page=30', [
     {
       name: 'main',
     },
@@ -45,43 +45,43 @@ const MockEnv = () => {
     },
   ]).as('getBranch');
 
-  cy.intercept('GET', 'http://localhost:61968/six7/repos/122/figma-tokens/git/ref/heads%2Fmain', {
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/git/ref/heads%2Fmain', {
     object: {
       sha: 'main-sha',
     },
   }).as('getMainRef');
 
-  cy.intercept('POST', 'http://localhost:61968/six7/repos/122/figma-tokens/git/refs', {
+  cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/refs', {
     ref: 'new-branch',
   }).as('createRef');
 
-  cy.intercept('GET', 'http://localhost:61968/six7/repos/122/figma-tokens/contents/tokens.json?ref=new-branch', {}).as(
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/contents/tokens.json?ref=new-branch', {}).as(
     'getContent'
   );
 
-  cy.intercept('GET', 'http://localhost:61968/six7/repos/122/figma-tokens/git/ref/heads%2Fnew-branch', {
+  cy.intercept('GET', 'http://localhost:5000/six7/repos/122/figma-tokens/git/ref/heads%2Fnew-branch', {
     object: {
       sha: 'new-branch-sha',
     },
   }).as('getNewBranchRef');
 
-  cy.intercept('POST', 'http://localhost:61968/six7/repos/122/figma-tokens/git/blobs', {
+  cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/blobs', {
     content: {},
   }).as('blob');
 
-  cy.intercept('POST', 'http://localhost:61968/six7/repos/122/figma-tokens/git/trees', {
+  cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/trees', {
     content: {},
   }).as('trees');
 
-  cy.intercept('POST', 'http://localhost:61968/six7/repos/122/figma-tokens/git/commits', {
+  cy.intercept('POST', 'http://localhost:5000/six7/repos/122/figma-tokens/git/commits', {
     content: {},
   }).as('commit');
 
-  cy.intercept('PATCH', 'http://localhost:61968/six7/repos/122/figma-tokens/git/refs/heads%2Fnew-branch', {
+  cy.intercept('PATCH', 'http://localhost:5000/six7/repos/122/figma-tokens/git/refs/heads%2Fnew-branch', {
     content: {},
   }).as('newBranchPatch');
 
-  cy.intercept('PATCH', 'http://localhost:61968/six7/repos/122/figma-tokens/git/refs/heads%2Fmain', {
+  cy.intercept('PATCH', 'http://localhost:5000/six7/repos/122/figma-tokens/git/refs/heads%2Fmain', {
     content: {},
   }).as('mainPatch');
 };
