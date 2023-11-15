@@ -362,7 +362,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
                       <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
                           {({ index, style }) => {
-                            const value = filteredValues[index];
+                            const filteredValue = filteredValues[index];
                             return (
                               <StyledItem
                                 data-cy="downshift-input-item"
@@ -377,7 +377,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                                 // eslint-disable-next-line react/jsx-no-bind
                                 onMouseDown={() => handleSelect(value)}
                               >
-                                <StyledItemName>{getHighlightedText(value, searchInput || '')}</StyledItemName>
+                                <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
                               </StyledItem>
                             );
                           }}
