@@ -184,7 +184,7 @@ export default async function setValuesOnNode(
           // Local style not found - look for matching non-local style:
           if (isSingleBoxShadowValue(values.boxShadow)) {
             const styleIdBackupKey = 'effectStyleId_original';
-            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'effects');
+            const nonLocalStyle = await getNonLocalStyle(node, styleIdBackupKey, 'effects');
             if (nonLocalStyle) {
               if (effectStyleMatchesBoxShadowToken(nonLocalStyle, values.boxShadow, baseFontSize)) {
                 // Non-local style matches - use this and clear style id backup:
@@ -308,7 +308,7 @@ export default async function setValuesOnNode(
             if (!matchingStyleId) {
               // Local style not found - look for matching non-local style:
               const styleIdBackupKey = 'fillStyleId_original';
-              const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'fills');
+              const nonLocalStyle = await getNonLocalStyle(node, styleIdBackupKey, 'fills');
               if (nonLocalStyle) {
                 if (paintStyleMatchesColorToken(nonLocalStyle, values.fill)) {
                   // Non-local style matches - use this and clear style id backup:
@@ -346,7 +346,7 @@ export default async function setValuesOnNode(
           if (!matchingStyleId && isSingleTypographyValue(values.typography)) {
             // Local style not found - look for matching non-local style:
             const styleIdBackupKey = 'textStyleId_original';
-            const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
+            const nonLocalStyle = await getNonLocalStyle(node, styleIdBackupKey, 'typography');
             if (nonLocalStyle) {
               if (textStyleMatchesTypographyToken(nonLocalStyle, values.typography, baseFontSize)) {
                 // Non-local style matches - use this and clear style id backup:

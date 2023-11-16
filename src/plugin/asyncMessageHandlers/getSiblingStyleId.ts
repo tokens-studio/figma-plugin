@@ -48,7 +48,7 @@ export async function getNewStyleId(styleId: string, styleIds: StyleIdMap, style
       }
     }
 
-    const figmaStyle = figma.getStyleById(actualStyleId);
+    const figmaStyle = await figma.getStyleByIdAsync(actualStyleId);
 
     // If there is no figmaStyle for that token, we can't do anything
     if (!figmaStyle) {

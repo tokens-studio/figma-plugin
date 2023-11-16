@@ -12,18 +12,21 @@ import getAppliedVariablesFromNode from './getAppliedVariablesFromNode';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
-export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): SelectionGroup[] {
-  const selectionValues = pluginData.reduce<SelectionGroup[]>((acc, curr) => {
+export async function transformPluginDataToSelectionValues(pluginData: NodeManagerNode[]): Promise<SelectionGroup[]> {
+  const selectionValues: SelectionGroup[] = [];
+
+  for (const curr of pluginData) {
     const { tokens, id, node: { name, type } } = curr;
+
     // First we add plugin tokens
     Object.entries(tokens).forEach(([key, value]) => {
-      const existing = acc.find((item) => item.type === key && item.value === value);
+      const existing = selectionValues.find((item) => item.type === key && item.value === value);
       if (existing) {
         existing.nodes.push({ id, name, type });
       } else {
         const category = get(Properties, key) as Properties | TokenTypes;
 
-        acc.push({
+        selectionValues.push({
           value, type: key, category, nodes: [{ id, name, type }], appliedType: 'token',
         });
       }
@@ -32,11 +35,10 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     // Second we add variables
     const localVariables = getAppliedVariablesFromNode(curr.node);
     localVariables.forEach((variable) => {
-      // Check if the token has been applied. If the token has been applied then we don't add variable.
-      const isTokenApplied = acc.find((item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      const isTokenApplied = selectionValues.find((item) => item.type === variable.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
       if (!isTokenApplied) {
         const category = get(Properties, variable.type) as Properties | TokenTypes;
-        acc.push({
+        selectionValues.push({
           value: variable.name,
           type: variable.type,
           category,
@@ -48,13 +50,12 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     });
 
     // Third we add styles
-    const localStyles = getAppliedStylesFromNode(curr.node);
+    const localStyles = await getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
-      // Check if the token or variable has been applied. If the token has been applied then we don't add style.
-      const isTokenApplied = acc.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
+      const isTokenApplied = selectionValues.find((item) => item.type === style.type && item.nodes.find((node) => isEqual(node, { id, name, type })));
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
-        acc.push({
+        selectionValues.push({
           value: style.name,
           type: style.type,
           category,
@@ -64,17 +65,19 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
         });
       }
     });
-    return acc;
-  }, []);
+  }
+
   return selectionValues;
 }
 
-export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): SelectionValue[] {
-  const mainNodeSelectionValues = pluginData.reduce<SelectionValue[]>((acc, curr) => {
+export async function transformPluginDataToMainNodeSelectionValues(pluginData: NodeManagerNode[]): Promise<SelectionValue[]> {
+  const mainNodeSelectionValues: SelectionValue[] = [];
+
+  for (const curr of pluginData) {
     // Fist we add styles. And then variables. This way, styles will be override by the variables
-    const localStyles = getAppliedStylesFromNode(curr.node);
+    const localStyles = await getAppliedStylesFromNode(curr.node);
     localStyles.forEach((style) => {
-      acc.push({
+      mainNodeSelectionValues.push({
         [style.type]: style.name,
       });
     });
@@ -82,13 +85,12 @@ export function transformPluginDataToMainNodeSelectionValues(pluginData: NodeMan
     // Second we add variables. And then tokens. This way, variables will be override by the tokens
     const localVariables = getAppliedVariablesFromNode(curr.node);
     localVariables.forEach((style) => {
-      acc.push({
+      mainNodeSelectionValues.push({
         [style.type]: style.name,
       });
     });
-    acc.push(curr.tokens);
-    return acc;
-  }, []);
+    mainNodeSelectionValues.push(curr.tokens);
+  }
   return mainNodeSelectionValues;
 }
 
@@ -105,8 +107,8 @@ export async function sendPluginValues({ nodes, shouldSendSelectionValues }: { n
   // TODO: Handle all selected nodes share the same properties
   // TODO: Handle many selected and mixed (for Tokens tab)
   if (Array.isArray(nodes) && nodes?.length > 0) {
-    if (shouldSendSelectionValues) selectionValues = transformPluginDataToSelectionValues(nodes);
-    mainNodeSelectionValues = transformPluginDataToMainNodeSelectionValues(nodes);
+    if (shouldSendSelectionValues) selectionValues = await transformPluginDataToSelectionValues(nodes);
+    mainNodeSelectionValues = await transformPluginDataToMainNodeSelectionValues(nodes);
   }
   const selectedNodes = figma.currentPage.selection.length;
   notifySelection({ selectionValues: selectionValues ?? [], mainNodeSelectionValues, selectedNodes });

@@ -8,8 +8,8 @@ export const removeTokensByValue: AsyncMessageChannelHandlers[AsyncMessageTypes.
   const nodesToRemove: { node: BaseNode, key: Properties }[] = [];
 
   msg.tokensToRemove.forEach((token) => {
-    token.nodes.forEach(((node) => {
-      const figmaNode = figma.getNodeById(node.id);
+    token.nodes.forEach((async (node) => {
+      const figmaNode = await figma.getNodeByIdAsync(node.id);
       if (figmaNode) nodesToRemove.push({ node: figmaNode, key: token.property });
     }));
   });

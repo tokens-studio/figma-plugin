@@ -133,7 +133,7 @@
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.12.16",
     "@changesets/cli": "^2.26.2",
-    "@figma/plugin-typings": "^1.71.1",
+    "@figma/plugin-typings": "https://github.com/figma/plugin-typings.git#dynamic-page-plugin-types",
     "@sentry/webpack-plugin": "^2.2.0",
     "@storybook/addon-actions": "^6.5.8",
     "@storybook/addon-docs": "^6.5.8",

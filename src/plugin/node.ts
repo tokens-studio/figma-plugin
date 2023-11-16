@@ -156,24 +156,36 @@ export async function getSavedStorageType(): Promise<StorageType> {
   return { provider: StorageProviderType.LOCAL };
 }
 
-export function goToNode(id: string) {
-  const node = figma.getNodeById(id);
-  if (
-    node
-    && node.type !== 'PAGE'
-    && node.type !== 'DOCUMENT'
-  ) {
-    figma.currentPage.selection = [node];
-    figma.viewport.scrollAndZoomIntoView([node]);
-  }
-}
+export const goToNode = async (id: string) => {
+  await figma.getNodeByIdAsync(id).then(
+    (node) => {
+      if (
+        node
+        && node.type !== 'PAGE'
+        && node.type !== 'DOCUMENT'
+      ) {
+        figma.currentPage.selection = [node];
+        figma.viewport.scrollAndZoomIntoView([node]);
+      }
+    },
+  );
+};
 
-export function selectNodes(ids: string[]) {
-  const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
-    node.type !== 'PAGE' && node.type !== 'DOCUMENT'
-  )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
-  figma.currentPage.selection = nodes;
-}
+export const selectNodes = async (ids: string[]) => {
+  Promise.all(ids.map(async (id) => {
+    const node = await figma.getNodeByIdAsync(id);
+    if (
+      node
+      && node.type !== 'PAGE'
+      && node.type !== 'DOCUMENT'
+    ) {
+      return node;
+    }
+    return null;
+  })).then((nodes) => {
+    figma.currentPage.selection = compact(nodes);
+  });
+};
 // Tokens: The full token object
 // Values: The values applied to the node
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {

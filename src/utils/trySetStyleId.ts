@@ -6,8 +6,8 @@ export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: st
   // @README we need to try and import the style just in case it's a library provided one
   const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
   if (styleKeyMatch) {
-    actualStyleId = await new Promise<string>((resolve) => {
-      const localStyle = figma.getStyleById(styleId);
+    actualStyleId = await new Promise<string>(async (resolve) => {
+      const localStyle = await figma.getStyleByIdAsync(styleId);
       if (localStyle) {
         resolve(localStyle.id);
       } else {

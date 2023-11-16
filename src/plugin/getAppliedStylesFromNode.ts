@@ -16,11 +16,11 @@ export type SelectionStyle = {
   type: Properties
 };
 
-export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle[] {
+export default async function getAppliedStylesFromNode(node: BaseNode): Promise<SelectionStyle[]> {
   const localStyles: SelectionStyle[] = [];
   if ('effects' in node) {
     const styleIdBackupKey = 'effectStyleId_original';
-    const localStyle = getLocalStyle(node, styleIdBackupKey, 'effects');
+    const localStyle = await getLocalStyle(node, styleIdBackupKey, 'effects');
     if (localStyle && localStyle.effects.every((effect) => effect.type === 'DROP_SHADOW' || effect.type === 'INNER_SHADOW')) {
       const effects = localStyle.effects as Effect[];
       // convert paint to object containg x, y, spread, color
@@ -57,7 +57,7 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
 
   if ('fills' in node) {
     const styleIdBackupKey = 'fillStyleId_original';
-    const localStyle = getLocalStyle(node, styleIdBackupKey, 'fills');
+    const localStyle = await getLocalStyle(node, styleIdBackupKey, 'fills');
     if (localStyle) {
       const paint = localStyle.paints[0];
       let styleObject: SingleColorToken | null = {} as SingleColorToken;
@@ -91,7 +91,7 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
 
   if (node.type === 'TEXT') {
     const styleIdBackupKey = 'textStyleId_original';
-    const localStyle = getLocalStyle(node, styleIdBackupKey, 'typography');
+    const localStyle = await getLocalStyle(node, styleIdBackupKey, 'typography');
 
     if (localStyle) {
       const fontFamily = localStyle.fontName.family;

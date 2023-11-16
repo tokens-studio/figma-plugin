@@ -34,7 +34,7 @@ export async function setBorderColorValuesOnTarget({
       if (!matchingStyleId) {
         // Local style not found - look for matching non-local style:
         const styleIdBackupKey = 'strokeStyleId_original';
-        const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'strokes');
+        const nonLocalStyle = await getNonLocalStyle(node, styleIdBackupKey, 'strokes');
         if (nonLocalStyle) {
           if (paintStyleMatchesColorToken(nonLocalStyle, value)) {
             // Non-local style matches - use this and clear style id backup:

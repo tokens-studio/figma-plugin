@@ -37,30 +37,30 @@ function getStyleIdFromBackup(node: BaseNode, backupKey: string) {
   });
 }
 
-export function getNonLocalStyle<T extends StyleTypeName>(
+export const getNonLocalStyle = async <T extends StyleTypeName>(
   node: BaseNode,
   backupKey: string,
   key: T,
-): StyleType<T> | undefined {
+): Promise<StyleType<T> | undefined> => {
   let nonLocalStyle: BaseStyle | undefined;
   const styleId = getStyleId(node, key) || getStyleIdFromBackup(node, backupKey);
   if (styleId) {
-    const style = figma.getStyleById(styleId);
+    const style = await figma.getStyleByIdAsync(styleId);
     if (style?.remote) {
       nonLocalStyle = style;
     }
   }
   return nonLocalStyle as StyleType<T>;
-}
+};
 
-export function getLocalStyle<T extends StyleTypeName>(
+export const getLocalStyle = async <T extends StyleTypeName>(
   node: BaseNode,
   backupKey: string,
   key: T,
-): StyleType<T> | undefined {
+): Promise<StyleType<T> | undefined> => {
   const styleId = getStyleId(node, key) || getStyleIdFromBackup(node, backupKey);
-  return figma.getStyleById(styleId) as StyleType<T>;
-}
+  return await figma.getStyleByIdAsync(styleId) as StyleType<T>;
+};
 
 export function setStyleIdBackup(node: BaseNode, backupKey: string, styleId: string) {
   // Setting to empty string will delete the plugin data key if the style id doesn't exist:
