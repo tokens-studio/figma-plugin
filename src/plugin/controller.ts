@@ -78,8 +78,11 @@ figma.on('selectionchange', () => {
   sendSelectionChange();
 });
 
-figma.on('documentchange', (event: DocumentChangeEvent) => {
-  sendDocumentChange(event);
+// we need to load all the pages before listening to document changes..
+figma.loadAllPagesAsync().then(() => {
+  figma.on('documentchange', (event: DocumentChangeEvent) => {
+    sendDocumentChange(event);
+  });
 });
 
 figma.codegen.on('generate', (event: any): CodegenResult[] => performCodeGen(event));
