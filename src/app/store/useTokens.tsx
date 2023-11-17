@@ -10,7 +10,7 @@ import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { checkIfAlias, getAliasValue } from '@/utils/alias';
+import { checkIfAlias } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   storeTokenIdInJsonEditorSelector,
@@ -400,16 +400,6 @@ export default function useTokens() {
       isInfinite: true,
     });
 
-    const tempTokens = tokens;
-    Object.values(tempTokens).forEach((tokenItem) => {
-      for (let i = 0; i < tokenItem.length; i += 1) {
-        const resolvedValue = getAliasValue(tokenItem[i], tokensContext.resolvedTokens);
-        if (typeof resolvedValue === 'string') {
-          tokenItem[i].value = resolvedValue;
-        }
-      }
-    });
-
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -420,7 +410,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: tempTokens,
+      tokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
