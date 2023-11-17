@@ -393,13 +393,7 @@ export default function useTokens() {
     });
   }, []);
 
-  const createVariables = useCallback(async () => {
-    track('createVariables');
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_CREATEVARIABLES,
-      isInfinite: true,
-    });
-
+  const filterMultiValueTokens = useCallback(() => {
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       const filteredTokenList = tokenList.filter((tokenItem) => {
         if (typeof tokenItem.value === 'string') {
@@ -412,6 +406,18 @@ export default function useTokens() {
       return tempTokens;
     }, {} as Record<string, AnyTokenList>);
 
+    return tempTokens;
+  }, [tokens]);
+
+  const createVariables = useCallback(async () => {
+    track('createVariables');
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+
+    const multiValueFilteredTokens = filterMultiValueTokens();
+
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -422,7 +428,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: tempTokens,
+      tokens: multiValueFilteredTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
@@ -499,6 +505,7 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   }), [
     isAlias,
     getTokenValue,
@@ -521,5 +528,6 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   ]);
 }
