@@ -308,22 +308,22 @@ describe('useToken test', () => {
     });
   });
 
-  // it('handleRemap test', async () => {
-  //   const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-  //   await act(async () => {
-  //     await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }]);
-  //   });
+  it('handleRemap test', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    await act(async () => {
+      await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }]);
+    });
 
-  //   expect(messageSpy).toBeCalledWith({
-  //     type: AsyncMessageTypes.REMAP_TOKENS,
-  //     category: TokenTypes.SIZING,
-  //     oldName: 'sizing.small',
-  //     newName: 'sizing.sm',
-  //     updateMode: UpdateMode.SELECTION,
-  //     tokens: [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }],
-  //     settings: store.getState().settings,
-  //   });
-  // });
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.REMAP_TOKENS,
+      category: TokenTypes.SIZING,
+      oldName: 'sizing.small',
+      newName: 'sizing.sm',
+      updateMode: UpdateMode.SELECTION,
+      tokens: [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }],
+      settings: store.getState().settings,
+    });
+  });
 
   it('remapToken test', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
@@ -339,19 +339,19 @@ describe('useToken test', () => {
     });
   });
 
-  // it('remapTokensInGroup', async () => {
-  //   const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-  //   mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection'], result: true }));
-  //   await act(async () => {
-  //     await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
-  //   });
-  //   expect(messageSpy).toBeCalledWith({
-  //     type: AsyncMessageTypes.BULK_REMAP_TOKENS,
-  //     oldName: 'old.',
-  //     newName: 'new.',
-  //     updateMode: UpdateMode.SELECTION,
-  //   });
-  // });
+  it('remapTokensInGroup', async () => {
+    const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
+    mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection'], result: true }));
+    await act(async () => {
+      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+    });
+    expect(messageSpy).toBeCalledWith({
+      type: AsyncMessageTypes.BULK_REMAP_TOKENS,
+      oldName: 'old.',
+      newName: 'new.',
+      updateMode: UpdateMode.SELECTION,
+    });
+  });
 
   describe('createStylesFromTokens', () => {
     const tokenMockStore = createMockStore({
