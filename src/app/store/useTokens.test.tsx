@@ -544,10 +544,10 @@ describe('useToken test', () => {
           global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
           light: [
             { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
-            { name: 'sizing-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.SIZING },
-            { name: 'sizing-2', value: '{base.base-50} {base.base-150}', type: TokenTypes.SIZING },
-            { name: 'sizing-3', value: '{base.base-125} {base.base-50}', type: TokenTypes.SIZING },
-            { name: 'sizing-4', value: '{base.base-50}', type: TokenTypes.SIZING },
+            { name: 'spacing-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.SPACING },
+            { name: 'spacing-2', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
+            { name: 'spacing-3', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
+            { name: 'spacing-4', value: '{base.base-50}', type: TokenTypes.SPACING },
           ],
         },
       },
@@ -560,7 +560,7 @@ describe('useToken test', () => {
       }).result;
     });
 
-    it('creates all variables', async () => {
+    it('skip multi value tokens', async () => {
       const multiValueFilteredTokens = result.current.filterMultiValueTokens();
 
       expect(multiValueFilteredTokens).toStrictEqual({
@@ -570,7 +570,7 @@ describe('useToken test', () => {
           { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
         light: [
           { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
-          { name: 'sizing-4', value: '{base.base-50}', type: TokenTypes.SIZING },
+          { name: 'spacing-4', value: '{base.base-50}', type: TokenTypes.SPACING },
         ],
       });
     });

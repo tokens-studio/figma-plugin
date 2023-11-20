@@ -394,9 +394,11 @@ export default function useTokens() {
   }, []);
 
   const filterMultiValueTokens = useCallback(() => {
+    console.log('temp tokens:', tokens);
+    const validTokenTypes = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       const filteredTokenList = tokenList.filter((tokenItem) => {
-        if (typeof tokenItem.value === 'string') {
+        if (typeof tokenItem.value === 'string' && validTokenTypes.includes(tokenItem.type)) {
           const resolvedValue = getAliasValue(tokenItem.value, tokensContext.resolvedTokens) || '';
           return !resolvedValue.toString().trim().includes(' ');
         }
