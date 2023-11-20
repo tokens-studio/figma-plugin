@@ -191,7 +191,7 @@ class TokenResolver {
         // const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
 
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value, ...{},
+          ...token, value: finalValue, rawValue: token.value,
         } as ResolveTokenValuesResult;
       }
 

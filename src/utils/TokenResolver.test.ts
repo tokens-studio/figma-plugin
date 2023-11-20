@@ -241,7 +241,6 @@ const output = [
     value: 6,
   },
   {
-    failedToResolve: true,
     name: 'mathWrong',
     rawValue: '{foo} * {boo}',
     value: '3 * {baz}',
@@ -277,7 +276,6 @@ const output = [
     value: '#ff0000',
   },
   {
-    failedToResolve: true,
     name: 'spacing.xs',
     rawValue: '{spacing.xs}',
     value: '{spacing.xs}',
