@@ -1,13 +1,10 @@
-import { useDispatch } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { Dispatch } from '@/app/store';
 import { useFlags } from '@/app/components/LaunchDarkly';
 import { FileTokenStorage } from '@/storage/FileTokenStorage';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 
 export default function useFile() {
-  const dispatch = useDispatch<Dispatch>();
   const { multiFileSync } = useFlags();
 
   const storageClientFactory = useCallback((files: FileList) => {
@@ -33,7 +30,6 @@ export default function useFile() {
     }
     return null;
   }, [
-    dispatch,
     storageClientFactory,
   ]);
 
