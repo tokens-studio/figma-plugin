@@ -6,7 +6,7 @@ async function bundle() {
   const zip = new JSZip();
 
   fs.ensureDirSync('dist');
-  const files = await glob(['dist/*.js', 'dist/*.html'], { nodir: true });
+  const files = await glob(['packages/tokens-studio-for-figma/dist/*.js', 'packages/tokens-studio-for-figma/dist/*.html'], { nodir: true });
 
   await Promise.all(files.map(async (file) => {
     await zip.file(file, fs.readFileSync(file, 'utf8'));

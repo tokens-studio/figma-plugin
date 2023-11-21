@@ -37,7 +37,7 @@ export const initializeSentry = () => {
         release: `figma-tokens@${pjs.version}`,
         environment: process.env.ENVIRONMENT,
         tracesSampleRate: SAMPLING,
-        // @ts-expect-error Note: This gives an error. No clue why 🤷
+        // @ts-ignore Note: This gives an error. No clue why 🤷
         profilesSampleRate: PROFILE_RATE,
         replaysSessionSampleRate: REPLAY_RATE,
         // We always want to replay errors
