@@ -1,6 +1,6 @@
 import React from 'react';
 import { init, RematchStore } from '@rematch/core';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { AllTheProviders } from '../../../tests/config/setupTest';
 import useManageTokens from './useManageTokens';

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import 'whatwg-fetch';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/';
 import React, { FC, ReactElement } from 'react';
 import dotenv from 'dotenv';
 import { render, RenderOptions } from '@testing-library/react';
