@@ -121,7 +121,7 @@ jobs:
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v6
         with:
           working-directory: ./packages/tokens-studio-for-figma
           build: npm run build:cy

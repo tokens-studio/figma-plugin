@@ -130,6 +130,7 @@ export default {
     './tests/__mocks__/octokitRestMock.js',
     './tests/__mocks__/figmaMock.js',
     './tests/__mocks__/mixpanelMock.js',
+    './tests/__mocks__/supernovaMock.js',
     './tests/__mocks__/domRect.js',
   ],
 
@@ -177,7 +178,7 @@ export default {
   // transform: null,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-colorful)/)', '\\.pnp\\.[^\\/]+$'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

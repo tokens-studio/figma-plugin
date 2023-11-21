@@ -29,6 +29,7 @@ export default function setValuesOnVariable(
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
       }
       if (variable) {
+        variable.description = t.description ?? '';
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof t.value === 'string') {
@@ -70,6 +71,7 @@ export default function setValuesOnVariable(
   } catch (e) {
     console.error('Setting values on variable is failed', e);
   }
+
   return {
     variableKeyMap,
     referenceVariableCandidates,
