@@ -62,7 +62,11 @@ export default {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  // globals: {},
+  globals: {
+    "ts-jest": {
+      isolatedModules: true,
+    }
+  },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -130,6 +134,7 @@ export default {
     './tests/__mocks__/figmaMock.js',
     './tests/__mocks__/mixpanelMock.js',
     './tests/__mocks__/domRect.js',
+    './tests/__mocks__/i18nMock.js',
   ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
@@ -176,7 +181,7 @@ export default {
   // transform: null,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin)/)', 'node_modules/(?!(react-dnd|dnd-core|react-dnd-html5-backend)/)', '\\.pnp\\.[^\\/]+$'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

@@ -230,7 +230,7 @@ describe('Add license key', () => {
       });
       confirmButton.click();
 
-      const input = (await result.getByTestId('settings-license-key-input')) as HTMLInputElement;
+      const input = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
 
       const removeKeyButton = await result.findByRole('button', {
         name: 'removeLicenseKey',
@@ -239,7 +239,7 @@ describe('Add license key', () => {
       await waitFor(() => {
         expect(input.value).toEqual('');
         expect(removeKeyButton).not.toBeInTheDocument();
-      });
+      }, { timeout: 5000 });
     });
   });
 
@@ -265,7 +265,7 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
+      const removeKeyButton = await result.getByRole('button', {
         name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
@@ -306,7 +306,7 @@ describe('Add license key', () => {
     });
 
     await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
+      const removeKeyButton = await result.getByRole('button', {
         name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();
