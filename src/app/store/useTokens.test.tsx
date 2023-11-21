@@ -553,7 +553,6 @@ describe('useToken test', () => {
             { name: 'borderWidth-1', value: '{base.base-350} {base.base-187} {base.base-50}', type: TokenTypes.BORDER_WIDTH },
             { name: 'borderWidth-2', value: '{base.base-50} {base.base-187} {base.base-150}', type: TokenTypes.BORDER_WIDTH },
             { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
-            { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
             { name: 'text', value: 'text value', type: TokenTypes.TEXT },
             { name: 'color', value: 'rgba(20, 80, 200, 1)', type: TokenTypes.COLOR },
           ],
