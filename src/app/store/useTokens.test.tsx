@@ -544,10 +544,15 @@ describe('useToken test', () => {
           global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
           light: [
             { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
-            { name: 'spacing-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.SPACING },
-            { name: 'spacing-2', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
-            { name: 'spacing-3', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
-            { name: 'spacing-4', value: '{base.base-50}', type: TokenTypes.SPACING },
+            { name: 'borderRadius-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-2', value: '{base.base-50} {base.base-125}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'spacing-1', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
+            { name: 'spacing-2', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
+            { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+            { name: 'borderWidth-1', value: '{base.base-350} {base.base-187} {base.base-50}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-2', value: '{base.base-50} {base.base-187} {base.base-150}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
           ],
         },
       },
@@ -570,7 +575,9 @@ describe('useToken test', () => {
           { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
         light: [
           { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
-          { name: 'spacing-4', value: '{base.base-50}', type: TokenTypes.SPACING },
+          { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+          { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+          { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
         ],
       });
     });
