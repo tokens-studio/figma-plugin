@@ -36,7 +36,7 @@ const Toolip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> 
   side = 'left',
 }) => (
   label ? (
-    <Tooltip.TooltipProvider>
+    <Tooltip.Provider>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>{children}</Tooltip.Trigger>
         <StyledContent side={side}>
@@ -44,7 +44,7 @@ const Toolip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> 
           {label}
         </StyledContent>
       </Tooltip.Root>
-    </Tooltip.TooltipProvider>
+    </Tooltip.Provider>
   ) : children
 );
 
