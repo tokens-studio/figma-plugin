@@ -1,7 +1,12 @@
-{
-    plugins: [
-      {
-        removeViewBox: true
-      },
-    ]
-  }
+module.exports = {
+  plugins: [
+    {
+      name: 'preset-default',
+      params: {
+        overrides: {
+          removeViewBox: false,
+        }
+      }
+    }
+  ]
+};
