@@ -111,10 +111,6 @@ class TokenResolver {
     if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
 
-      if (references.length === 0) {
-        return token;
-      }
-
       let finalValue: SingleToken['value'] = token.value;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"

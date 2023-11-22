@@ -23,15 +23,15 @@ Object {
     },
     "medium": Object {
       "type": "sizing",
-      "value": 3,
+      "value": "1 * 2 * 1.5",
     },
     "scale": Object {
       "type": "sizing",
-      "value": 1.5,
+      "value": "1.5",
     },
     "small": Object {
       "type": "sizing",
-      "value": 2,
+      "value": "1 * 2",
     },
   },
 }
@@ -206,7 +206,7 @@ Object {
   "opacity": Object {
     "medium": Object {
       "type": "opacity",
-      "value": 0.5,
+      "value": "0.5",
     },
   },
   "radii": Object {
@@ -247,7 +247,7 @@ Object {
     },
     "scale": Object {
       "type": "sizing",
-      "value": 1.5,
+      "value": "1.5",
     },
     "small": Object {
       "description": "Should NOT be resolved",
@@ -370,7 +370,7 @@ Object {
   "opacity": Object {
     "medium": Object {
       "type": "opacity",
-      "value": 0.5,
+      "value": "0.5",
     },
   },
   "radii": Object {
@@ -392,12 +392,12 @@ Object {
     "large": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 4.5,
+      "value": "2 * 1.5 * 1.5",
     },
     "medium": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 3,
+      "value": "2 * 1.5",
     },
     "responsive25": Object {
       "description": "Should be resolved",
@@ -407,11 +407,11 @@ Object {
     "responsive50": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "calc(50vw - 4.5px)",
+      "value": "calc(50vw - 2 * 1.5 * 1.5px)",
     },
     "scale": Object {
       "type": "sizing",
-      "value": 1.5,
+      "value": "1.5",
     },
     "small": Object {
       "description": "Should be resolved",
@@ -421,7 +421,7 @@ Object {
     "xsmall": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 2,
+      "value": "1 * 2",
     },
   },
   "text": Object {
@@ -470,8 +470,8 @@ Object {
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": 700,
+        "fontSize": "3.75 * 16",
+        "fontWeight": "7 * 100",
       },
     },
     "h3": Object {
@@ -479,8 +479,8 @@ Object {
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
-        "fontSize": 48,
-        "fontWeight": 500,
+        "fontSize": "3 * 16",
+        "fontWeight": "5 * 100",
       },
     },
   },
@@ -512,7 +512,7 @@ Object {
   "opacity": Object {
     "medium": Object {
       "type": "opacity",
-      "value": 0.5,
+      "value": "0.5",
     },
   },
   "radii": Object {
@@ -534,12 +534,12 @@ Object {
     "large": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 4.5,
+      "value": "$sizing.medium * $sizing.scale",
     },
     "medium": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 3,
+      "value": "{sizing.small} * {sizing.scale}",
     },
     "responsive25": Object {
       "description": "Should NOT be resolved",
@@ -553,7 +553,7 @@ Object {
     },
     "scale": Object {
       "type": "sizing",
-      "value": 1.5,
+      "value": "1.5",
     },
     "small": Object {
       "description": "Should NOT be resolved",
@@ -563,7 +563,7 @@ Object {
     "xsmall": Object {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": 2,
+      "value": "1 * {sizing.base}",
     },
   },
   "text": Object {
@@ -612,8 +612,8 @@ Object {
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
-        "fontSize": 60,
-        "fontWeight": 700,
+        "fontSize": "3.75 * {text.size.base}",
+        "fontWeight": "7 * {text.fontWeight.base}",
       },
     },
     "h3": Object {
@@ -621,8 +621,8 @@ Object {
       "type": "typography",
       "value": Object {
         "fontFamily": "Roboto",
-        "fontSize": 48,
-        "fontWeight": 500,
+        "fontSize": "3 * {text.size.base}",
+        "fontWeight": "5 * 100",
       },
     },
   },
