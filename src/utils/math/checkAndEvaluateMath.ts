@@ -53,18 +53,7 @@ parser.functions.sample = (func: Function, ...args: any[]) => {
   return func(...args);
 };
 
-function isExponentialAndZero(str: string): boolean {
-  const regex = /^[+-]?\d*\.?\d+([eE][+-]?\d+)?$/;
-  const numericRegex = /^[+-]?\d*\.?\d+$/;
-
-  const allZerosRegex = /^0+$/;
-  const leadingZerosRegex = /^0+[1-9]\d*$/;
-
-  return (regex.test(str) && !numericRegex.test(str)) || (allZerosRegex.test(str) || leadingZerosRegex.test(str));
-}
-
 export function checkAndEvaluateMath(expr: string) {
-  if (isExponentialAndZero(expr)) return expr;
   let calcParsed: Root;
 
   try {

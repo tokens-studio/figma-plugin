@@ -23,15 +23,15 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
     },
     "medium": {
       "type": "sizing",
-      "value": "1 * 2 * 1.5",
+      "value": 3,
     },
     "scale": {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": {
       "type": "sizing",
-      "value": "1 * 2",
+      "value": 2,
     },
   },
 }
@@ -206,7 +206,7 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
   "opacity": {
     "medium": {
       "type": "opacity",
-      "value": "0.5",
+      "value": 0.5,
     },
   },
   "radii": {
@@ -247,7 +247,7 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
     },
     "scale": {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": {
       "description": "Should NOT be resolved",
@@ -370,7 +370,7 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
   "opacity": {
     "medium": {
       "type": "opacity",
-      "value": "0.5",
+      "value": 0.5,
     },
   },
   "radii": {
@@ -392,12 +392,12 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     "large": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "2 * 1.5 * 1.5",
+      "value": 4.5,
     },
     "medium": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "2 * 1.5",
+      "value": 3,
     },
     "responsive25": {
       "description": "Should be resolved",
@@ -407,11 +407,11 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     "responsive50": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "calc(50vw - 2 * 1.5 * 1.5px)",
+      "value": "calc(50vw - 4.5px)",
     },
     "scale": {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": {
       "description": "Should be resolved",
@@ -421,7 +421,7 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     "xsmall": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "1 * 2",
+      "value": 2,
     },
   },
   "text": {
@@ -470,8 +470,8 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
       "type": "typography",
       "value": {
         "fontFamily": "Roboto",
-        "fontSize": "3.75 * 16",
-        "fontWeight": "7 * 100",
+        "fontSize": 60,
+        "fontWeight": 700,
       },
     },
     "h3": {
@@ -479,8 +479,8 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
       "type": "typography",
       "value": {
         "fontFamily": "Roboto",
-        "fontSize": "3 * 16",
-        "fontWeight": "5 * 100",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },
@@ -512,7 +512,7 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
   "opacity": {
     "medium": {
       "type": "opacity",
-      "value": "0.5",
+      "value": 0.5,
     },
   },
   "radii": {
@@ -534,12 +534,12 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     "large": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "$sizing.medium * $sizing.scale",
+      "value": 4.5,
     },
     "medium": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "{sizing.small} * {sizing.scale}",
+      "value": 3,
     },
     "responsive25": {
       "description": "Should NOT be resolved",
@@ -553,7 +553,7 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     },
     "scale": {
       "type": "sizing",
-      "value": "1.5",
+      "value": 1.5,
     },
     "small": {
       "description": "Should NOT be resolved",
@@ -563,7 +563,7 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     "xsmall": {
       "description": "Should be resolved",
       "type": "sizing",
-      "value": "1 * {sizing.base}",
+      "value": 2,
     },
   },
   "text": {
@@ -612,8 +612,8 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
       "type": "typography",
       "value": {
         "fontFamily": "Roboto",
-        "fontSize": "3.75 * {text.size.base}",
-        "fontWeight": "7 * {text.fontWeight.base}",
+        "fontSize": 60,
+        "fontWeight": 700,
       },
     },
     "h3": {
@@ -621,8 +621,8 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
       "type": "typography",
       "value": {
         "fontFamily": "Roboto",
-        "fontSize": "3 * {text.size.base}",
-        "fontWeight": "5 * 100",
+        "fontSize": 48,
+        "fontWeight": 500,
       },
     },
   },

@@ -57,11 +57,21 @@ class TokenResolver {
     return resolvedTokens;
   }
 
+  private isExponentialAndZero(str: string): boolean {
+    const regex = /^[+-]?\d*\.?\d+([eE][+-]?\d+)?$/;
+    const numericRegex = /^[+-]?\d*\.?\d+$/;
+
+    const allZerosRegex = /^0+$/;
+    const leadingZerosRegex = /^0+[1-9]\d*$/;
+
+    return (regex.test(str) && !numericRegex.test(str)) || (allZerosRegex.test(str) || leadingZerosRegex.test(str));
+  }
+
   // When we resolve references, we also need to calculate the value of the token, meaning color and math transformations
   private calculateTokenValue(token: SingleToken, resolvedReferences: Set<string> = new Set()): SingleToken['value'] | undefined {
     // Calculations only happen on strings.
     if (typeof token.value === 'string') {
-      const couldBeNumberValue = checkAndEvaluateMath(token.value);
+      const couldBeNumberValue = !this.isExponentialAndZero(token.value) ? checkAndEvaluateMath(token.value) : token.value;
 
       // if it's a number, we don't need to do anything else and can return it
       if (typeof couldBeNumberValue === 'number') {
