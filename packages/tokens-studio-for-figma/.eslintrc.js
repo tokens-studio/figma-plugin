@@ -1,7 +1,8 @@
 module.exports = {
   extends: ['airbnb', 'airbnb-typescript', 'plugin:react-hooks/recommended'],
   parserOptions: {
-    project: './tsconfig.json'
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
   ignorePatterns: ['**/*.js'],
   globals: {
