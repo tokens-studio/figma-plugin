@@ -530,6 +530,63 @@ describe('useToken test', () => {
     });
   });
 
+  describe('createVariables', () => {
+    const tokenMockStore = createMockStore({
+      tokenState: {
+        usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
+        themes: [{
+          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
+        }],
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [
+            { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
+            { name: 'borderRadius-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-2', value: '{base.base-50} {base.base-125}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'spacing-1', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
+            { name: 'spacing-2', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
+            { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+            { name: 'borderWidth-1', value: '{base.base-350} {base.base-187} {base.base-50}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-2', value: '{base.base-50} {base.base-187} {base.base-150}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'text', value: 'text value', type: TokenTypes.TEXT },
+            { name: 'color', value: 'rgba(20, 80, 200, 1)', type: TokenTypes.COLOR },
+          ],
+        },
+      },
+    });
+
+    beforeEach(() => {
+      resetStore();
+      result = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={tokenMockStore}>{children}</Provider>,
+      }).result;
+    });
+
+    it('skip multi value tokens and respect values ', async () => {
+      const multiValueFilteredTokens = result.current.filterMultiValueTokens();
+
+      expect(multiValueFilteredTokens).toStrictEqual({
+        global: [
+          { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
+          { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
+          { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+        light: [
+          { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
+          { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+          { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+          { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
+          { name: 'text', value: 'text value', type: TokenTypes.TEXT },
+          { name: 'color', value: '#1450c8', type: TokenTypes.COLOR },
+        ],
+      });
+    });
+  });
+
   describe('setNoneValuesOnNode', () => {
     const mockStore = createMockStore({
       uiState: {

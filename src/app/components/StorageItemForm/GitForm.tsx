@@ -45,6 +45,7 @@ export default function GitForm({
       secret: zod.string(),
       internalId: zod.string().optional(),
     });
+
     const validationResult = zodSchema.safeParse(values);
     if (validationResult.success) {
       const formFields = {

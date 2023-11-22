@@ -74,6 +74,7 @@ export default function useTokens() {
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+  const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -393,16 +394,22 @@ export default function useTokens() {
     });
   }, []);
 
-  const getResolvedTokens = useCallback(() => {
-    const tempTokens = tokens;
-    Object.values(tempTokens).forEach((tokenItem) => {
-      for (let i = 0; i < tokenItem.length; i += 1) {
-        const resolvedValue = getAliasValue(tokenItem[i], tokensContext.resolvedTokens);
+  const filterMultiValueTokens = useCallback(() => {
+    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      const filteredTokenList = tokenList.filter((tokenItem) => {
+        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
         if (typeof resolvedValue === 'string') {
-          tokenItem[i].value = resolvedValue;
+          tokenItem.value = resolvedValue;
         }
-      }
-    });
+        if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
+          return !resolvedValue.toString().trim().includes(' ');
+        }
+        return true;
+      });
+      tempTokens[tokenSetKey] = filteredTokenList;
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+
     return tempTokens;
   }, [tokens]);
 
@@ -412,9 +419,9 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-
-    const tempTokens = getResolvedTokens();
-
+    console.log('token value:', tokens);
+    const multiValueFilteredTokens = filterMultiValueTokens();
+    console.log('multiValueFilteredTokens', multiValueFilteredTokens);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -425,7 +432,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: tempTokens,
+      tokens: multiValueFilteredTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
@@ -502,6 +509,7 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   }), [
     isAlias,
     getTokenValue,
@@ -524,5 +532,6 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   ]);
 }

@@ -1,6 +1,6 @@
-import { Gitlab } from '@gitbeaker/browser';
+import { Gitlab } from '@gitbeaker/rest';
 import compact from 'just-compact';
-import type { CommitAction } from '@gitbeaker/core/dist/types/resources/Commits';
+import type { CommitAction } from '@gitbeaker/rest';
 import IsJSONString from '@/utils/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
@@ -46,7 +46,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
   }
 
   public async assignProjectId() {
-    const projects = await this.gitlabClient.Projects.search(this.repository, { membership: true });
+    const projects = await this.gitlabClient.Projects.all({
+      membership: true,
+      search: this.repository,
+      simple: true,
+    });
     if (projects) {
       const project = projects.filter((p) => p.path_with_namespace === this.repoPathWithNamespace)[0];
       if (project) {
@@ -86,13 +90,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.path.endsWith('.json') && !this.flags.multiFileEnabled) return false;
     if (!this.projectId) throw new Error('Project ID not assigned');
 
-    const currentUser = await this.gitlabClient.Users.current();
+    const currentUser = await this.gitlabClient.Users.showCurrentUser();
     try {
       if (!currentUser || currentUser.state !== 'active') return false;
       const projectPermission = await this.gitlabClient.ProjectMembers.show(this.projectId, currentUser.id, {
         includeInherited: true,
       });
-      return projectPermission.access_level >= GitLabAccessLevel.Developer;
+      return Number(projectPermission.access_level.toString()) >= GitLabAccessLevel.Developer;
     } catch (e) {
       console.error(e);
     }
@@ -103,13 +107,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
-      const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
-        path: this.path,
-        ref: this.branch,
-        recursive: true,
-      });
-
       if (!this.path.endsWith('.json')) {
+        const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+          path: this.path,
+          ref: this.branch,
+          recursive: true,
+        });
+
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
         )).sort((a, b) => (
@@ -117,12 +121,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ));
 
         const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-          this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, { ref: this.branch })
+          this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
         )));
 
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
-          if (IsJSONString(fileContent)) {
+          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
@@ -154,9 +158,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
         }));
       }
 
-      const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, { ref: this.branch });
-      if (IsJSONString(data)) {
-        const parsed = JSON.parse(data) as GitSingleFileObject;
+      const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
+      const stringData = typeof data === 'string' ? data : await data.text();
+
+      if (IsJSONString(stringData)) {
+        const parsed = JSON.parse(stringData) as GitSingleFileObject;
         return [
           {
             type: 'themes',
@@ -198,7 +204,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const rootPath = this.path.endsWith('.json')
       ? this.path.split('/').slice(0, -1).join('/')
       : this.path;
-    const tree = await this.gitlabClient.Repositories.tree(this.projectId, {
+    const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
       path: rootPath,
       ref: branch,
       recursive: true,
@@ -240,7 +246,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
     try {
       if (!this.path.endsWith('.json')) {
-        const trees = await this.gitlabClient.Repositories.tree(this.projectId, {
+        const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
           path: this.path,
           ref: this.branch,
           recursive: true,
@@ -252,12 +258,14 @@ export class GitlabTokenStorage extends GitTokenStorage {
         ));
 
         const file = await this.gitlabClient.RepositoryFiles.show(this.projectId!, jsonFiles[0].path, this.branch);
-        const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
-        return commit.committed_date ?? null;
+        const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id.toString());
+        const committedDate = new Date(commit.committed_date?.toString() ?? '');
+        return committedDate ?? null;
       }
       const file = await this.gitlabClient.RepositoryFiles.show(this.projectId, this.path, this.branch);
-      const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id);
-      return commit.committed_date ?? null;
+      const commit = await this.gitlabClient.Commits.show(this.projectId, file.commit_id.toString());
+      const committedDate = new Date(commit.committed_date?.toString() ?? '');
+      return committedDate ?? null;
     } catch (e) {
       console.error('Error', e);
       return null;
