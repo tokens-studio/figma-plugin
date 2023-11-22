@@ -27,9 +27,11 @@ export default function setValuesOnVariable(
     tokens.forEach((t) => {
       const variableType = convertTokenTypeToVariableType(t.type);
       // Find the connected variable
-      let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
+      const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
+      const tokenPath = convertTokenNameToPath(t.name, null, slice);
+      let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === tokenPath);
       if (!variable) {
-        variable = figma.variables.createVariable(t.path, collection.id, variableType);
+        variable = figma.variables.createVariable(tokenPath, collection.id, variableType);
       }
       if (variable) {
         variable.description = t.description ?? '';
@@ -63,7 +65,6 @@ export default function setValuesOnVariable(
         }
         variableKeyMap[t.name] = variable.key;
 
-        const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
         const referenceVariable = convertTokenNameToPath(referenceTokenName, null, slice);
 
         if (checkCanReferenceVariable(t)) {
