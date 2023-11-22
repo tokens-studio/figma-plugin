@@ -1,35 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`convertTokensObjectToResolved converts object-like unresolved tokens to resolved object 1`] = `
-Object {
-  "colors": Object {
-    "blue": Object {
+{
+  "colors": {
+    "blue": {
       "type": "color",
       "value": "#0000ff",
     },
-    "primary": Object {
+    "primary": {
       "type": "color",
       "value": "#ff0000",
     },
-    "red": Object {
+    "red": {
       "type": "color",
       "value": "#ff0000",
     },
   },
-  "sizing": Object {
-    "base": Object {
+  "sizing": {
+    "base": {
       "type": "sizing",
       "value": 2,
     },
-    "medium": Object {
+    "medium": {
       "type": "sizing",
       "value": "1 * 2 * 1.5",
     },
-    "scale": Object {
+    "scale": {
       "type": "sizing",
       "value": "1.5",
     },
-    "small": Object {
+    "small": {
       "type": "sizing",
       "value": "1 * 2",
     },
@@ -38,45 +38,45 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved does not expand composition when not needed 1`] = `
-Object {
-  "composition": Object {
-    "body": Object {
-      "rawValue": Object {
+{
+  "composition": {
+    "body": {
+      "rawValue": {
         "sizing": "{size.12}",
         "spacing": "{space.24}",
       },
       "type": "composition",
-      "value": Object {
+      "value": {
         "sizing": 12,
         "spacing": 24,
       },
     },
-    "heading": Object {
-      "rawValue": Object {
+    "heading": {
+      "rawValue": {
         "opacity": "{opacity.50}",
       },
       "type": "composition",
-      "value": Object {
+      "value": {
         "opacity": "50%",
       },
     },
   },
-  "opacity": Object {
-    "50": Object {
+  "opacity": {
+    "50": {
       "rawValue": "50%",
       "type": "opacity",
       "value": "50%",
     },
   },
-  "size": Object {
-    "12": Object {
+  "size": {
+    "12": {
       "rawValue": "12",
       "type": "sizing",
       "value": 12,
     },
   },
-  "space": Object {
-    "24": Object {
+  "space": {
+    "24": {
       "rawValue": "24",
       "type": "spacing",
       "value": 24,
@@ -86,10 +86,10 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved does not expand shadows when not needed 1`] = `
-Object {
-  "shadow": Object {
-    "1": Object {
-      "rawValue": Object {
+{
+  "shadow": {
+    "1": {
+      "rawValue": {
         "blur": "4",
         "color": "#000000",
         "spread": "5",
@@ -98,7 +98,7 @@ Object {
         "y": "3",
       },
       "type": "boxShadow",
-      "value": Object {
+      "value": {
         "blur": 4,
         "color": "#000000",
         "spread": 5,
@@ -107,9 +107,9 @@ Object {
         "y": 3,
       },
     },
-    "2": Object {
-      "rawValue": Array [
-        Object {
+    "2": {
+      "rawValue": [
+        {
           "blur": "4",
           "color": "#000000",
           "spread": "5",
@@ -117,7 +117,7 @@ Object {
           "x": "2",
           "y": "3",
         },
-        Object {
+        {
           "blur": "5",
           "color": "#000000",
           "spread": "6",
@@ -127,8 +127,8 @@ Object {
         },
       ],
       "type": "boxShadow",
-      "value": Array [
-        Object {
+      "value": [
+        {
           "blur": 4,
           "color": "#000000",
           "spread": 5,
@@ -136,7 +136,7 @@ Object {
           "x": 2,
           "y": 3,
         },
-        Object {
+        {
           "blur": 5,
           "color": "#000000",
           "spread": 6,
@@ -151,27 +151,27 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved does not expand typography when not needed 1`] = `
-Object {
-  "typography": Object {
-    "h1": Object {
+{
+  "typography": {
+    "h1": {
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": 96,
         "fontWeight": "Light",
       },
     },
-    "h2": Object {
+    "h2": {
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": 60,
         "fontWeight": "Light",
       },
     },
-    "h3": Object {
+    "h3": {
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": 48,
         "fontWeight": "Light",
@@ -182,138 +182,138 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved preserves all references when requested 1`] = `
-Object {
-  "colors": Object {
-    "blue": Object {
+{
+  "colors": {
+    "blue": {
       "type": "color",
       "value": "#0000ff",
     },
-    "opaqueRed": Object {
+    "opaqueRed": {
       "description": "Should NOT be resolved",
       "type": "color",
       "value": "rgba(255, 0, 0, {opacity.medium})",
     },
-    "primary": Object {
+    "primary": {
       "description": "Should NOT be resolved",
       "type": "color",
       "value": "$colors.red",
     },
-    "red": Object {
+    "red": {
       "type": "color",
       "value": "#ff0000",
     },
   },
-  "opacity": Object {
-    "medium": Object {
+  "opacity": {
+    "medium": {
       "type": "opacity",
       "value": "0.5",
     },
   },
-  "radii": Object {
-    "full": Object {
+  "radii": {
+    "full": {
       "type": "borderRadius",
       "value": "100%",
     },
-    "leaf": Object {
+    "leaf": {
       "description": "Should NOT be resolved",
       "type": "borderRadius",
       "value": "{radii.full} 0%",
     },
   },
-  "sizing": Object {
-    "base": Object {
+  "sizing": {
+    "base": {
       "type": "sizing",
       "value": 2,
     },
-    "large": Object {
+    "large": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "$sizing.medium * $sizing.scale",
     },
-    "medium": Object {
+    "medium": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "{sizing.small} * {sizing.scale}",
     },
-    "responsive25": Object {
+    "responsive25": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "calc(25vw * $sizing.small)",
     },
-    "responsive50": Object {
+    "responsive50": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "calc(50vw - {sizing.large}px)",
     },
-    "scale": Object {
+    "scale": {
       "type": "sizing",
       "value": "1.5",
     },
-    "small": Object {
+    "small": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "{sizing.base}",
     },
-    "xsmall": Object {
+    "xsmall": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "1 * {sizing.base}",
     },
   },
-  "text": Object {
-    "fontWeight": Object {
-      "base": Object {
+  "text": {
+    "fontWeight": {
+      "base": {
         "type": "fontWeight",
         "value": 100,
       },
-      "light": Object {
+      "light": {
         "type": "fontWeight",
         "value": "Light",
       },
     },
-    "size": Object {
-      "base": Object {
+    "size": {
+      "base": {
         "type": "fontSize",
         "value": 16,
       },
-      "default": Object {
+      "default": {
         "description": "Should NOT be resolved",
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
-      "h1": Object {
+      "h1": {
         "type": "fontSize",
         "value": 96,
       },
-      "unit": Object {
+      "unit": {
         "type": "fontSize",
         "value": "px",
       },
     },
   },
-  "typography": Object {
-    "h1": Object {
+  "typography": {
+    "h1": {
       "description": "Should NOT be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "{text.size.h1}",
         "fontWeight": "{text.fontWeight.light}",
       },
     },
-    "h2": Object {
+    "h2": {
       "description": "Should NOT be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3.75 * {text.size.base}",
         "fontWeight": "7 * {text.fontWeight.base}",
       },
     },
-    "h3": Object {
+    "h3": {
       "description": "Should NOT be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3 * {text.size.base}",
         "fontWeight": "5 * 100",
@@ -324,19 +324,19 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
-Object {
-  "colors": Object {
-    "background": Object {
+{
+  "colors": {
+    "background": {
       "rawValue": "$colors.black",
       "type": "color",
       "value": "#000000",
     },
-    "black": Object {
+    "black": {
       "rawValue": "#000000",
       "type": "color",
       "value": "#000000",
     },
-    "white": Object {
+    "white": {
       "rawValue": "#ffffff",
       "type": "color",
       "value": "#ffffff",
@@ -346,138 +346,138 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved resolves all references when requested 1`] = `
-Object {
-  "colors": Object {
-    "blue": Object {
+{
+  "colors": {
+    "blue": {
       "type": "color",
       "value": "#0000ff",
     },
-    "opaqueRed": Object {
+    "opaqueRed": {
       "description": "Should be resolved",
       "type": "color",
       "value": "#ff000080",
     },
-    "primary": Object {
+    "primary": {
       "description": "Should be resolved",
       "type": "color",
       "value": "#ff0000",
     },
-    "red": Object {
+    "red": {
       "type": "color",
       "value": "#ff0000",
     },
   },
-  "opacity": Object {
-    "medium": Object {
+  "opacity": {
+    "medium": {
       "type": "opacity",
       "value": "0.5",
     },
   },
-  "radii": Object {
-    "full": Object {
+  "radii": {
+    "full": {
       "type": "borderRadius",
       "value": "100%",
     },
-    "leaf": Object {
+    "leaf": {
       "description": "Should be resolved",
       "type": "borderRadius",
       "value": "100% 0%",
     },
   },
-  "sizing": Object {
-    "base": Object {
+  "sizing": {
+    "base": {
       "type": "sizing",
       "value": 2,
     },
-    "large": Object {
+    "large": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "2 * 1.5 * 1.5",
     },
-    "medium": Object {
+    "medium": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "2 * 1.5",
     },
-    "responsive25": Object {
+    "responsive25": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "calc(25vw * 2)",
     },
-    "responsive50": Object {
+    "responsive50": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "calc(50vw - 2 * 1.5 * 1.5px)",
     },
-    "scale": Object {
+    "scale": {
       "type": "sizing",
       "value": "1.5",
     },
-    "small": Object {
+    "small": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": 2,
     },
-    "xsmall": Object {
+    "xsmall": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "1 * 2",
     },
   },
-  "text": Object {
-    "fontWeight": Object {
-      "base": Object {
+  "text": {
+    "fontWeight": {
+      "base": {
         "type": "fontWeight",
         "value": 100,
       },
-      "light": Object {
+      "light": {
         "type": "fontWeight",
         "value": "Light",
       },
     },
-    "size": Object {
-      "base": Object {
+    "size": {
+      "base": {
         "type": "fontSize",
         "value": 16,
       },
-      "default": Object {
+      "default": {
         "description": "Should be resolved",
         "type": "fontSize",
         "value": "16px",
       },
-      "h1": Object {
+      "h1": {
         "type": "fontSize",
         "value": 96,
       },
-      "unit": Object {
+      "unit": {
         "type": "fontSize",
         "value": "px",
       },
     },
   },
-  "typography": Object {
-    "h1": Object {
+  "typography": {
+    "h1": {
       "description": "Should be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": 96,
         "fontWeight": "Light",
       },
     },
-    "h2": Object {
+    "h2": {
       "description": "Should be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3.75 * 16",
         "fontWeight": "7 * 100",
       },
     },
-    "h3": Object {
+    "h3": {
       "description": "Should be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3 * 16",
         "fontWeight": "5 * 100",
@@ -488,138 +488,138 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved resolves only math expressions when requested 1`] = `
-Object {
-  "colors": Object {
-    "blue": Object {
+{
+  "colors": {
+    "blue": {
       "type": "color",
       "value": "#0000ff",
     },
-    "opaqueRed": Object {
+    "opaqueRed": {
       "description": "Should NOT be resolved",
       "type": "color",
       "value": "rgba(255, 0, 0, {opacity.medium})",
     },
-    "primary": Object {
+    "primary": {
       "description": "Should NOT be resolved",
       "type": "color",
       "value": "$colors.red",
     },
-    "red": Object {
+    "red": {
       "type": "color",
       "value": "#ff0000",
     },
   },
-  "opacity": Object {
-    "medium": Object {
+  "opacity": {
+    "medium": {
       "type": "opacity",
       "value": "0.5",
     },
   },
-  "radii": Object {
-    "full": Object {
+  "radii": {
+    "full": {
       "type": "borderRadius",
       "value": "100%",
     },
-    "leaf": Object {
+    "leaf": {
       "description": "Should NOT be resolved",
       "type": "borderRadius",
       "value": "{radii.full} 0%",
     },
   },
-  "sizing": Object {
-    "base": Object {
+  "sizing": {
+    "base": {
       "type": "sizing",
       "value": 2,
     },
-    "large": Object {
+    "large": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "$sizing.medium * $sizing.scale",
     },
-    "medium": Object {
+    "medium": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "{sizing.small} * {sizing.scale}",
     },
-    "responsive25": Object {
+    "responsive25": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "calc(25vw * $sizing.small)",
     },
-    "responsive50": Object {
+    "responsive50": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "calc(50vw - {sizing.large}px)",
     },
-    "scale": Object {
+    "scale": {
       "type": "sizing",
       "value": "1.5",
     },
-    "small": Object {
+    "small": {
       "description": "Should NOT be resolved",
       "type": "sizing",
       "value": "{sizing.base}",
     },
-    "xsmall": Object {
+    "xsmall": {
       "description": "Should be resolved",
       "type": "sizing",
       "value": "1 * {sizing.base}",
     },
   },
-  "text": Object {
-    "fontWeight": Object {
-      "base": Object {
+  "text": {
+    "fontWeight": {
+      "base": {
         "type": "fontWeight",
         "value": 100,
       },
-      "light": Object {
+      "light": {
         "type": "fontWeight",
         "value": "Light",
       },
     },
-    "size": Object {
-      "base": Object {
+    "size": {
+      "base": {
         "type": "fontSize",
         "value": 16,
       },
-      "default": Object {
+      "default": {
         "description": "Should NOT be resolved",
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
-      "h1": Object {
+      "h1": {
         "type": "fontSize",
         "value": 96,
       },
-      "unit": Object {
+      "unit": {
         "type": "fontSize",
         "value": "px",
       },
     },
   },
-  "typography": Object {
-    "h1": Object {
+  "typography": {
+    "h1": {
       "description": "Should NOT be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "{text.size.base}",
         "fontWeight": "{text.fontWeight.light}",
       },
     },
-    "h2": Object {
+    "h2": {
       "description": "Should be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3.75 * {text.size.base}",
         "fontWeight": "7 * {text.fontWeight.base}",
       },
     },
-    "h3": Object {
+    "h3": {
       "description": "Should be resolved",
       "type": "typography",
-      "value": Object {
+      "value": {
         "fontFamily": "Roboto",
         "fontSize": "3 * {text.size.base}",
         "fontWeight": "5 * 100",
@@ -630,17 +630,17 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved respects used sets 1`] = `
-Object {
-  "colors": Object {
-    "background": Object {
+{
+  "colors": {
+    "background": {
       "type": "color",
       "value": "#ffffff",
     },
-    "black": Object {
+    "black": {
       "type": "color",
       "value": "#000000",
     },
-    "white": Object {
+    "white": {
       "type": "color",
       "value": "#ffffff",
     },
@@ -649,41 +649,41 @@ Object {
 `;
 
 exports[`convertTokensObjectToResolved should expand composition when needed 1`] = `
-Object {
-  "composition": Object {
-    "body": Object {
-      "sizing": Object {
+{
+  "composition": {
+    "body": {
+      "sizing": {
         "type": "dimension",
         "value": 12,
       },
-      "spacing": Object {
+      "spacing": {
         "type": "spacing",
         "value": 24,
       },
     },
-    "heading": Object {
-      "opacity": Object {
+    "heading": {
+      "opacity": {
         "type": "opacity",
         "value": "50%",
       },
     },
   },
-  "opacity": Object {
-    "50": Object {
+  "opacity": {
+    "50": {
       "rawValue": "50%",
       "type": "opacity",
       "value": "50%",
     },
   },
-  "size": Object {
-    "12": Object {
+  "size": {
+    "12": {
       "rawValue": "12",
       "type": "sizing",
       "value": 12,
     },
   },
-  "space": Object {
-    "24": Object {
+  "space": {
+    "24": {
       "rawValue": "24",
       "type": "spacing",
       "value": 24,
