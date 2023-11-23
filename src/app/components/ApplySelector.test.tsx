@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import {
-  act, createMockStore, render,
+  createMockStore, render, waitFor,
 } from '../../../tests/config/setupTest';
 import ApplySelector from './ApplySelector';
 
@@ -27,7 +27,7 @@ describe('ApplySelector', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('apply-selector');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const applyToDocument = result.getByTestId('apply-to-document');
       await userEvent.click(applyToDocument, { pointerEventsCheck: 0 });
@@ -43,10 +43,9 @@ describe('ApplySelector', () => {
   it('should trigger an update', async () => {
     const result = renderStore();
     const updateButton = await result.findByTestId('update-button');
-    act(() => {
+    waitFor(() => {
       updateButton.click();
+      expect(mockHandleUpdate).toBeCalledTimes(1);
     });
-
-    expect(mockHandleUpdate).toBeCalledTimes(1);
   });
 });

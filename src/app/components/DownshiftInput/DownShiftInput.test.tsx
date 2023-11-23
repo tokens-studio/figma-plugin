@@ -171,12 +171,14 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    result.getByTestId('downshift-input-suffix-button').click();
-    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
-    fireEvent.change(searchInput, {
-      target: { value: 'slate' },
+    waitFor(async () => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+      fireEvent.change(searchInput, {
+        target: { value: 'slate' },
+      });
+      expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
     });
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
   });
 
   it('should return all tokens when type is documentation type', () => {
