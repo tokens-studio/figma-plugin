@@ -241,6 +241,36 @@ const tokens = [
     value: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    type: TokenTypes.TEXT,
+  },
 ];
 
 const output = [
@@ -522,6 +552,42 @@ const output = [
     value: '#ff0000',
     rawValue: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
+  },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    rawValue: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    rawValue: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    rawValue: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    rawValue: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    rawValue: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    rawValue: '000001',
+    type: TokenTypes.TEXT,
   },
 ];
 describe('resolveTokenValues deep nested', () => {
