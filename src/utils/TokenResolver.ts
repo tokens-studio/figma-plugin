@@ -47,7 +47,9 @@ class TokenResolver {
 
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
-
+      if (typeof resolvedValue.value === 'string' && AliasRegex.test(resolvedValue.value)) {
+        resolvedValue.failedToResolve = true;
+      }
       resolvedTokens.push({
         ...resolvedValue,
         rawValue: token.value,
@@ -188,10 +190,14 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-        // const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
+
+        const stringifiedValue = JSON.stringify(finalValue);
+        const convertedValue = stringifiedValue.substring(1, stringifiedValue.length - 1);
+
+        const hasFailingReferences = typeof finalValue === 'object' ? AliasRegex.test(convertedValue) : AliasRegex.test(stringifiedValue);
 
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value,
+          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
         } as ResolveTokenValuesResult;
       }
 
