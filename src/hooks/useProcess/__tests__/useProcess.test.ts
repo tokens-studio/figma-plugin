@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
 import { CanceledError } from '../CanceledError';
 import { ProcessStepStatus } from '../ProcessStepStatus';
@@ -101,7 +101,7 @@ describe('useProcess', () => {
         }, 1000);
       });
     } catch (err) {
-      console.log('errr', err);
+      console.log('errr', err); // eslint-disable-line no-console
       expect(err instanceof CanceledError).toBe(true);
     }
 
