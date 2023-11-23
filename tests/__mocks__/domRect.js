@@ -10,5 +10,6 @@ global.ResizeObserver = class ResizeObserver {
   observe() {
     this.cb([{ borderBoxSize: { inlineSize: 0, blockSize: 0 } }]);
   }
-  disconnect() { }
+ unobserve() { }
+ disconnect() { }
 };

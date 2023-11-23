@@ -232,13 +232,13 @@ describe('AppContainer (integration)', () => {
         localTokenData: null,
         lastOpened: 1,
       }, async (params) => {
-        await act(async () => {
-          const mockStore = createMockStore({});
-          const result = render(
-            <Provider store={mockStore}>
-              <AppContainer {...params} />
-            </Provider>,
-          );
+        const mockStore = createMockStore({});
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
           expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
@@ -253,13 +253,13 @@ describe('AppContainer (integration)', () => {
         localTokenData: null,
         lastOpened: 0,
       }, async (params) => {
-        await act(async () => {
-          const mockStore = createMockStore({});
-          const result = render(
-            <Provider store={mockStore}>
-              <AppContainer {...params} />
-            </Provider>,
-          );
+        const mockStore = createMockStore({});
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
           expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
         });
@@ -279,13 +279,12 @@ describe('AppContainer (integration)', () => {
       }, async (params) => {
         const mockStore = createMockStore({});
 
-        await act(async () => {
-          const result = render(
-            <Provider store={mockStore}>
-              <AppContainer {...params} />
-            </Provider>,
-          );
-
+        const result = render(
+          <Provider store={mockStore}>
+            <AppContainer {...params} />
+          </Provider>,
+        );
+        waitFor(async () => {
           expect(await result.findAllByText('global')).toHaveLength(1);
           result.unmount();
         });
@@ -305,19 +304,14 @@ describe('AppContainer (integration)', () => {
   }, async (params) => {
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
-      await waitFor(async () => {
-        expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
-      }, {
-        timeout: 5000,
-      });
-
+    waitFor(async () => {
+      expect(screen.queryByText(/Recover local changes\?/i)).not.toBeNull();
       result.unmount();
     });
   }));
@@ -338,15 +332,14 @@ describe('AppContainer (integration)', () => {
 
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
+    waitFor(async () => {
       expect(await result.findAllByText('global')).toHaveLength(1);
-
       result.unmount();
     });
   }));
@@ -362,13 +355,13 @@ describe('AppContainer (integration)', () => {
   }, async (params) => {
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
+    waitFor(async () => {
       (await result.findByTestId('tokensetitem-playground'))?.click();
       expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
       result.unmount();
@@ -385,13 +378,13 @@ describe('AppContainer (integration)', () => {
   }, async (params) => {
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
 
+    waitFor(async () => {
       const checkbox = await result.findByTestId('tokensetitem-playground-checkbox');
       fireEvent.click(checkbox);
 
@@ -399,9 +392,9 @@ describe('AppContainer (integration)', () => {
         global: TokenSetStatus.DISABLED,
         playground: TokenSetStatus.ENABLED,
       });
-
-      result.unmount();
     });
+
+    result.unmount();
   }));
 
   it('shows the remote storage callout', withOrWithoutLicense({
@@ -427,8 +420,10 @@ describe('AppContainer (integration)', () => {
           <AppContainer {...params} />
         </Provider>,
       );
-      await result.findByText("Couldn't load tokens stored on GitHub");
-      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
+      waitFor(async () => {
+        await result.findByText("Couldn't load tokens stored on GitHub");
+        expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
+      });
     });
   }));
 });

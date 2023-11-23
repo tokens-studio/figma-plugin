@@ -4,6 +4,7 @@
     "outDir": "dist",
     "jsx": "react",
     "noEmit": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noUnusedLocals": false,

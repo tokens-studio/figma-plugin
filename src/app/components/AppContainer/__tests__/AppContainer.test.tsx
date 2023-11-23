@@ -1,7 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import type { StartupMessage } from '@/types/AsyncMessages';
-import { act, createMockStore, render } from '../../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render, waitFor,
+} from '../../../../../tests/config/setupTest';
 import { AppContainer } from '../AppContainer';
 import * as savePluginDataFactoryModule from '../startupProcessSteps/savePluginDataFactory';
 import * as addLicenseFactoryModule from '../startupProcessSteps/addLicenseFactory';
@@ -51,13 +53,14 @@ describe('AppContainer', () => {
           <AppContainer {...({} as unknown as StartupMessage)} />
         </Provider>,
       );
-
-      expect(result.queryByText('Loading, please wait')).not.toBeNull();
-      expect(savePluginDataFactorySpy).toBeCalledTimes(1);
-      expect(addLicenseFactorySpy).toBeCalledTimes(1);
-      expect(getLdFlagsFactorySpy).toBeCalledTimes(1);
-      expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
-      expect(pullTokensFactorySpy).toBeCalledTimes(1);
+      waitFor(() => {
+        expect(result.queryByText('Loading, please wait')).not.toBeNull();
+        expect(savePluginDataFactorySpy).toBeCalledTimes(1);
+        expect(addLicenseFactorySpy).toBeCalledTimes(1);
+        expect(getLdFlagsFactorySpy).toBeCalledTimes(1);
+        expect(saveStorageInformationFactorySpy).toBeCalledTimes(1);
+        expect(pullTokensFactorySpy).toBeCalledTimes(1);
+      });
     });
   });
 });
