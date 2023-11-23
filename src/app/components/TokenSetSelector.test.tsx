@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from '../../../tests/config/setupTest';
+import { fireEvent, render, waitFor } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 
@@ -33,9 +33,11 @@ describe('TokenSetSelector Component', () => {
     });
 
     fireEvent.click(createButton);
-    expect(store.getState().tokenState.tokens).toEqual({
-      'Folder/newSetCreated': [],
-      global: [],
+    waitFor(() => {
+      expect(store.getState().tokenState.tokens).toEqual({
+        'Folder/newSetCreated': [],
+        global: [],
+      });
     });
 
     // rename token set
@@ -49,9 +51,11 @@ describe('TokenSetSelector Component', () => {
       name: /change/i,
     });
     fireEvent.click(changeButton);
-    expect(store.getState().tokenState.tokens).toEqual({
-      'Folder/renameSet': [],
-      global: [],
+    waitFor(() => {
+      expect(store.getState().tokenState.tokens).toEqual({
+        'Folder/renameSet': [],
+        global: [],
+      });
     });
 
     // rename sublevel
@@ -65,9 +69,11 @@ describe('TokenSetSelector Component', () => {
       name: /change/i,
     });
     fireEvent.click(changeButton);
-    expect(store.getState().tokenState.tokens).toEqual({
-      'renameFolder/renameSet': [],
-      global: [],
+    waitFor(() => {
+      expect(store.getState().tokenState.tokens).toEqual({
+        'renameFolder/renameSet': [],
+        global: [],
+      });
     });
 
     // duplicate token set
@@ -79,10 +85,12 @@ describe('TokenSetSelector Component', () => {
       name: /Save/i,
     });
     fireEvent.click(saveButton);
-    expect(store.getState().tokenState.tokens).toEqual({
-      'renameFolder/renameSet': [],
-      'renameFolder/renameSet_sets.duplicateSetSuffix': [],
-      global: [],
+    waitFor(() => {
+      expect(store.getState().tokenState.tokens).toEqual({
+        'renameFolder/renameSet': [],
+        'renameFolder/renameSet_sets.duplicateSetSuffix': [],
+        global: [],
+      });
     });
   });
 });
