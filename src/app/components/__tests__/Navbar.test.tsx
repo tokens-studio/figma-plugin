@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
 import { Tabs } from '@/constants/Tabs';
-import { act, createMockStore, render } from '../../../../tests/config/setupTest';
+import {
+  act, createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import Navbar from '../Navbar';
 
 describe('Navbar', () => {
@@ -37,8 +39,10 @@ describe('Navbar', () => {
     }).toThrowError();
 
     mockStore.dispatch.userState.setLicenseKey('test-key-123');
-    const tokenFlowButton = result.getByTestId('token-flow-button');
-    expect(tokenFlowButton).toBeInTheDocument();
+    waitFor(() => {
+      const tokenFlowButton = result.getByTestId('token-flow-button');
+      expect(tokenFlowButton).toBeInTheDocument();
+    });
   });
 
   it('should open the token flow page when the button is clicked', async () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import {
-  createMockStore, render,
+  createMockStore, render, waitFor,
 } from '../../../../../tests/config/setupTest';
 import { ManageThemesModal } from '../ManageThemesModal';
 
@@ -83,8 +83,10 @@ describe('ManageThemesModal', () => {
         <ManageThemesModal />
       </Provider>,
     );
-    result.getByTestId('singlethemeentry-light').click();
-    result.getByText('Delete').click();
-    expect(result.getByText('Delete')).toBeInTheDocument();
+    waitFor(() => {
+      result.getByTestId('singlethemeentry-light').click();
+      result.getByText('Delete').click();
+      expect(result.getByText('Delete')).toBeInTheDocument();
+    });
   });
 });

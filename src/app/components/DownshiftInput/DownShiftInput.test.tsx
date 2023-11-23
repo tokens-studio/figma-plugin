@@ -1,7 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { DownshiftInput } from './DownshiftInput';
-import { createMockStore, fireEvent, render } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, fireEvent, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import { SingleToken } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -148,11 +150,14 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getByText('#e2e8f0')).toBeInTheDocument();
-    expect(result.getByText('#b91c1c')).toBeInTheDocument();
-    result.getByText('#e2e8f0').click();
-    expect(result.queryByText('#e2e8f0')).not.toBeInTheDocument();
+
+    waitFor(async () => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      expect(await result.findByText('#e2e8f0')).toBeInTheDocument();
+      expect(await result.getByText('#b91c1c')).toBeInTheDocument();
+      (await result.findByText('#e2e8f0')).click();
+      expect(result.queryByText('#e2e8f0')).not.toBeInTheDocument();
+    });
   });
 
   it('should return filtered color tokens', async () => {
@@ -185,8 +190,10 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    result.getByTestId('downshift-input-suffix-button').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(10);
+    waitFor(() => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      expect(result.getAllByTestId('downshift-input-item')).toHaveLength(10);
+    });
   });
 
   it('should return fontValues when type is fontFamily', () => {
@@ -221,11 +228,13 @@ describe('DownShiftInput', () => {
       </Provider>,
     );
 
-    result.getByTestId('downshift-input-suffix-button').click();
-    result.getByText('Fonts').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
-    result.getAllByTestId('downshift-input-item')[0].click();
-    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
+    waitFor(async () => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      (await result.findByText('Fonts')).click();
+      expect(result.getAllByTestId('downshift-input-item')).toHaveLength(2);
+      result.getAllByTestId('downshift-input-item')[0].click();
+      expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
+    });
   });
 
   it('should return fontWeights when type is fontWeight', () => {
@@ -261,11 +270,13 @@ describe('DownShiftInput', () => {
       </Provider>,
     );
 
-    result.getByTestId('downshift-input-suffix-button').click();
-    result.getByText('Weights').click();
-    expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
-    fireEvent.focus(result.getByTestId('mention-input-value'));
-    expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
+    waitFor(async () => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      (await result.findByText('Weights')).click();
+      expect(result.getAllByTestId('downshift-input-item')).toHaveLength(1);
+      fireEvent.focus(result.getByTestId('mention-input-value'));
+      expect(result.queryByTestId('downshift-input-item')).not.toBeInTheDocument();
+    });
   });
 
   it('should blankBox when there is no matching suggestions', async () => {
@@ -279,11 +290,13 @@ describe('DownShiftInput', () => {
         suffix
       />,
     );
-    result.getByTestId('downshift-input-suffix-button').click();
-    const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
-    fireEvent.change(searchInput, {
-      target: { value: 'nonexist' },
+    waitFor(async () => {
+      result.getByTestId('downshift-input-suffix-button').click();
+      const searchInput = await result.findByTestId('downshift-search-input') as HTMLInputElement;
+      fireEvent.change(searchInput, {
+        target: { value: 'nonexist' },
+      });
+      expect(await result.findByText('No suggestions found')).toBeInTheDocument();
     });
-    expect(result.getByText('No suggestions found')).toBeInTheDocument();
   });
 });

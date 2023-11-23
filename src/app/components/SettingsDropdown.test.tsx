@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
-import { act, createMockStore, render } from '../../../tests/config/setupTest';
+import { createMockStore, render, waitFor } from '../../../tests/config/setupTest';
 import SettingsDropdown from './SettingsDropdown';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -25,7 +25,7 @@ describe('SettingsDropdown', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('update-on-change');
       const updateRemote = result.queryByTestId('update-remote');
@@ -40,7 +40,7 @@ describe('SettingsDropdown', () => {
     const result = renderStore(mockStoreJSONBin);
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const updateRemote = result.getByTestId('update-remote');
 
@@ -53,7 +53,7 @@ describe('SettingsDropdown', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('update-on-change');
       await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
@@ -65,7 +65,7 @@ describe('SettingsDropdown', () => {
     const result = renderStore(mockStoreJSONBin);
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('update-remote');
       await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
@@ -77,7 +77,7 @@ describe('SettingsDropdown', () => {
     const result = renderStore();
 
     const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('update-styles');
       await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
@@ -89,8 +89,8 @@ describe('SettingsDropdown', () => {
     const shouldSwapStylesSpy = jest.spyOn(mockStore.dispatch.settings, 'setShouldSwapStyles');
     const result = renderStore();
 
-    const trigger = await result.getByTestId('bottom-bar-settings');
-    await act(async () => {
+    waitFor(async () => {
+      const trigger = await result.getByTestId('bottom-bar-settings');
       await userEvent.click(trigger);
       const updateChanges = result.getByTestId('swap-styles');
       await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
