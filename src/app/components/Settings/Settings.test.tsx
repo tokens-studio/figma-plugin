@@ -1,7 +1,7 @@
 import React from 'react';
 import Settings from './Settings';
 import {
-  render, screen, resetStore, fireEvent,
+  render, screen, resetStore, fireEvent, waitFor,
 } from '../../../../tests/config/setupTest';
 import { store } from '../../store';
 
@@ -61,7 +61,8 @@ describe('Settings Component', () => {
     const result = render(<Settings />);
 
     fireEvent.click(result.getByTestId('reset-onboarding'));
-
-    expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
+    waitFor(() => {
+      expect(result.queryByText('Set up where tokens should be stored')).not.toBeNull();
+    });
   });
 });

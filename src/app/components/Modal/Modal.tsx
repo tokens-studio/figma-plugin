@@ -86,11 +86,11 @@ export function Modal({
   showClose = false,
   compact = false,
 }: ModalProps) {
-  React.useEffect(() => {
-    if (typeof document !== 'undefined' && document.getElementById('app')) {
-      ReactModal.setAppElement('#app');
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   if (typeof document !== 'undefined' && document.getElementById('app')) {
+  //     ReactModal.setAppElement('#app');
+  //   }
+  // }, []);
 
   const handleClose = React.useCallback(() => {
     close();
@@ -99,6 +99,7 @@ export function Modal({
   return (
     <ReactModal
       isOpen={isOpen}
+      appElement={document.getElementById('app')!}
       onRequestClose={close}
       style={customStyles(large)}
       contentLabel={title || ''}

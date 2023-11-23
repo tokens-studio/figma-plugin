@@ -531,6 +531,7 @@ describe('useToken test', () => {
   });
 
   describe('setNoneValuesOnNode', () => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const mockStore = createMockStore({
       uiState: {
         selectionValues: [{
