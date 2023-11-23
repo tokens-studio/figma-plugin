@@ -1,9 +1,8 @@
 import React from 'react';
-import { act } from 'react-dom/test-utils';
 import { Provider } from 'react-redux';
 import { mockFetch } from '../../../../tests/__mocks__/fetchMock';
 import {
-  createMockStore, fireEvent, render, resetStore, screen,
+  createMockStore, fireEvent, render, resetStore, screen, waitFor,
 } from '../../../../tests/config/setupTest';
 import AuthModal from '.';
 import { AuthContextProvider } from '@/context/AuthContext';
@@ -146,65 +145,63 @@ describe('Add license key', () => {
     });
 
     expect(emailInput).toHaveValue(email);
-    await act(async () => {
-      loginButton.click();
-
+    loginButton.click();
+    waitFor(async () => {
       const errorMsg = await screen.findByText(new RegExp(loginError, 'i'));
       expect(errorMsg).toBeInTheDocument();
     });
   });
+});
 
-  it('Displays signup error', async () => {
-    const email = 'test@email.com';
-    const pass = 'pass';
-    const signupError = 'Error signing up';
+it('Displays signup error', async () => {
+  const email = 'test@email.com';
+  const pass = 'pass';
+  const signupError = 'Error signing up';
 
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      json: () => Promise.resolve({ code: 422, msg: signupError }),
-    }));
+  mockFetch.mockImplementationOnce(() => Promise.resolve({
+    json: () => Promise.resolve({ code: 422, msg: signupError }),
+  }));
 
-    const mockStore = createMockStore({
-      uiState: {
-        secondScreenEnabled: true,
-      },
-    });
-    render(
-      <Provider store={mockStore}>
-        <AuthContextProvider authData={null}>
-          <AuthModal />
-        </AuthContextProvider>
-      </Provider>,
-    );
+  const mockStore = createMockStore({
+    uiState: {
+      secondScreenEnabled: true,
+    },
+  });
+  render(
+    <Provider store={mockStore}>
+      <AuthContextProvider authData={null}>
+        <AuthModal />
+      </AuthContextProvider>
+    </Provider>,
+  );
 
-    const message = screen.getByText(/do not have an account \?/i);
-    const signupLink = screen.getByText(/sign up here/i);
+  const message = screen.getByText(/do not have an account \?/i);
+  const signupLink = screen.getByText(/sign up here/i);
 
-    expect(message).toBeInTheDocument();
-    expect(signupLink).toBeInTheDocument();
+  expect(message).toBeInTheDocument();
+  expect(signupLink).toBeInTheDocument();
 
-    fireEvent.click(signupLink);
+  fireEvent.click(signupLink);
 
-    const signupButton = screen.getByRole('button', { name: /sign up/i });
-    const emailInput = screen.getByTestId('input-email');
-    const passInput = screen.getByTestId('input-password');
+  const signupButton = screen.getByRole('button', { name: /sign up/i });
+  const emailInput = screen.getByTestId('input-email');
+  const passInput = screen.getByTestId('input-password');
 
-    expect(signupButton).toBeInTheDocument();
-    expect(emailInput).toBeInTheDocument();
-    expect(passInput).toBeInTheDocument();
+  expect(signupButton).toBeInTheDocument();
+  expect(emailInput).toBeInTheDocument();
+  expect(passInput).toBeInTheDocument();
 
-    fireEvent.change(emailInput, {
-      target: { value: email },
-    });
-    fireEvent.change(passInput, {
-      target: { value: pass },
-    });
+  fireEvent.change(emailInput, {
+    target: { value: email },
+  });
+  fireEvent.change(passInput, {
+    target: { value: pass },
+  });
 
-    expect(emailInput).toHaveValue(email);
-    await act(async () => {
-      signupButton.click();
-
-      const errorMsg = await screen.findByText(new RegExp(signupError, 'i'));
-      expect(errorMsg).toBeInTheDocument();
-    });
+  expect(emailInput).toHaveValue(email);
+  signupButton.click();
+  waitFor(async () => {
+    const errorMsg = await screen.findByText(new RegExp(signupError, 'i'));
+    expect(errorMsg).toBeInTheDocument();
   });
 });
