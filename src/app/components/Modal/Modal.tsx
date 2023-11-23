@@ -86,6 +86,7 @@ export function Modal({
   showClose = false,
   compact = false,
 }: ModalProps) {
+  // TODO: Check if this is needed
   // React.useEffect(() => {
   //   if (typeof document !== 'undefined' && document.getElementById('app')) {
   //     ReactModal.setAppElement('#app');
