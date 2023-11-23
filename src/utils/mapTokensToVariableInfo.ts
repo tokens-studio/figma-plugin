@@ -6,7 +6,7 @@ import { ThemeObject } from '@/types';
 import { convertTokenNameToPath } from './convertTokenNameToPath';
 
 export function mapTokensToVariableInfo(token: ResolveTokenValuesResult, theme: ThemeObject, settings: SettingsState) {
-  const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
+  const slice = settings?.ignoreFirstPartForVariables ? 1 : 0;
   const path = convertTokenNameToPath(token.name, null, slice);
 
   return {

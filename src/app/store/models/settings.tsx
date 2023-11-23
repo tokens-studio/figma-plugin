@@ -20,7 +20,7 @@ type WindowSettingsType = {
 type TokenModeType = 'object' | 'array';
 
 export interface SettingsState {
-  language: string,
+  language: string;
   uiWindow?: WindowSettingsType;
   updateMode: UpdateMode;
   updateRemote: boolean;
@@ -28,6 +28,7 @@ export interface SettingsState {
   updateStyles?: boolean;
   tokenType?: TokenModeType;
   ignoreFirstPartForStyles?: boolean;
+  ignoreFirstPartForVariables?: boolean;
   prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -187,6 +188,12 @@ export const settings = createModel<RootModel>()({
         ignoreFirstPartForStyles: payload,
       };
     },
+    setIgnoreFirstPartForVariables(state, payload: boolean) {
+      return {
+        ...state,
+        ignoreFirstPartForVariables: payload,
+      };
+    },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
       return {
         ...state,
@@ -250,10 +257,6 @@ export const settings = createModel<RootModel>()({
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
       setUI(rootState.settings);
     },
-    ...Object.fromEntries(
-      (Object.entries(settingsStateEffects).map(([key, factory]) => (
-        [key, factory()]
-      ))),
-    ),
+    ...Object.fromEntries(Object.entries(settingsStateEffects).map(([key, factory]) => [key, factory()])),
   }),
 });

@@ -34,7 +34,7 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.BORDER_RADIUS,
         variableId: '123',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode, {} as SettingsState);
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
   });
@@ -48,12 +48,12 @@ describe('SetValuesOnVariable', () => {
         value: '16',
         type: TokenTypes.SIZING,
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
+    ] as SingleToken<true, { path: string; variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode, {} as SettingsState);
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', 'VariableCollectionId:309:16430', 'FLOAT');
   });
 
-  describe('ignoreFirstPartForStyles=true', () => {
+  describe('ignoreFirstPartForVariables=true', () => {
     const variablesInFigma2 = [
       {
         id: 'VariableID:309:16431',
@@ -68,7 +68,7 @@ describe('SetValuesOnVariable', () => {
         setValueForMode: mockSetValueForMode,
       } as unknown as Variable,
     ] as Variable[];
-    const settings = { ignoreFirstPartForStyles: true } as SettingsState;
+    const settings = { ignoreFirstPartForVariables: true } as SettingsState;
     it('when there is a variable which is connected to the token, we just update the value', () => {
       const tokens = [
         {
@@ -79,7 +79,7 @@ describe('SetValuesOnVariable', () => {
           type: TokenTypes.BORDER_RADIUS,
           variableId: '123',
         },
-      ] as SingleToken<true, { path: string, variableId: string }>[];
+      ] as SingleToken<true, { path: string; variableId: string }>[];
       setValuesOnVariable(variablesInFigma2, tokens, collection, mode, settings);
       expect(mockSetValueForMode).toBeCalledWith(mode, 8);
     });
@@ -93,7 +93,7 @@ describe('SetValuesOnVariable', () => {
           value: '16',
           type: TokenTypes.SIZING,
         },
-      ] as SingleToken<true, { path: string, variableId: string }>[];
+      ] as SingleToken<true, { path: string; variableId: string }>[];
       setValuesOnVariable(variablesInFigma2, tokens, collection, mode, settings);
       expect(mockCreateVariable).toBeCalledWith('primary/width', 'VariableCollectionId:309:16430', 'FLOAT');
     });

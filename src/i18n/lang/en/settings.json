@@ -2,7 +2,8 @@
   "whereTokensStored": "Set up where tokens should be stored",
   "whereTokensStoredOnboarding": "Connect your tokens to an external source of truth that you can push and pull to. This allows you to use tokens across files.",
   "baseFontExplanation": "Lets you configure the value 1rem represents. You can also set this to a token, to have it change between sets.",
-  "ignorePrefix": "Ignore first part of token name for styles and variables",
+  "ignorePrefix": "Ignore first part of token name for styles",
+  "ignoreVariablesPrefix": "Ignore first part of token name for variables",
   "prefixStyles": "Prefix styles with active theme name",
   "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
   "storeTokenId": "Store IDs on storage",
@@ -12,6 +13,7 @@
   "usefulIgnore": "Useful if you want to ignore",
   "inAToken": "in a token called",
   "forYourStyles": "for your styles",
+  "forYourVariables": "for your variables",
   "resetOnboarding": "Reset onboarding",
   "removeRelaunchData": {
     "button": "Remove deprecated data",

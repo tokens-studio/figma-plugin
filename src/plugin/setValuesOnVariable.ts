@@ -16,7 +16,7 @@ export type ReferenceVariableType = {
 
 export default function setValuesOnVariable(
   variablesInFigma: Variable[],
-  tokens: SingleToken<true, { path: string, variableId: string }>[],
+  tokens: SingleToken<true, { path: string; variableId: string }>[],
   collection: VariableCollection,
   mode: string,
   settings: SettingsState,
@@ -27,7 +27,7 @@ export default function setValuesOnVariable(
     tokens.forEach((t) => {
       const variableType = convertTokenTypeToVariableType(t.type);
       // Find the connected variable
-      const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
+      const slice = settings?.ignoreFirstPartForVariables ? 1 : 0;
       const tokenPath = convertTokenNameToPath(t.name, null, slice);
       let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === tokenPath);
       if (!variable) {

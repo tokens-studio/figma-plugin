@@ -43,5 +43,7 @@
   "secondScreenExplainer": "Versterk uw ontwerpworkflow, zodat u uw ontwerptokens in een tweede scherm kunt beheren.",
   "language": "Taal",
   "languageExplainer": "Tokens Studio is automatisch vertaald, daarom kunnen vertalingen onnauwkeurig lijken.\n Zie je je taal niet? Dien een functieverzoek in",
-  "liveSyncActive": "Live synchronisatie actief"
+  "liveSyncActive": "Live synchronisatie actief",
+  "ignoreVariablesPrefix": "Negeer het eerste deel van de tokennaam voor variabelen",
+  "forYourVariables": "voor uw variabelen"
 }
