@@ -46,7 +46,6 @@ class TokenResolver {
 
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
-      // const resolvedValue = token.type === TokenTypes.TEXT ? token : this.resolveReferences(token);
 
       resolvedTokens.push({
         ...resolvedValue,
