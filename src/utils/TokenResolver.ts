@@ -1,3 +1,4 @@
+import { dump } from 'js-yaml';
 import { SingleToken } from '@/types/tokens';
 import { TokenMap } from '../types/TokenMap';
 
@@ -191,10 +192,9 @@ class TokenResolver {
       } else {
         // If it's not, we mark it as failed to resolve
 
-        const stringifiedValue = JSON.stringify(finalValue);
-        const convertedValue = stringifiedValue.substring(1, stringifiedValue.length - 1);
+        const yamlString = dump(finalValue);
 
-        const hasFailingReferences = typeof finalValue === 'object' ? AliasRegex.test(convertedValue) : AliasRegex.test(stringifiedValue);
+        const hasFailingReferences = AliasRegex.test(yamlString);
 
         resolvedToken = {
           ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
