@@ -152,7 +152,6 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^26.0.20",
-    "@types/js-yaml": "^4.0.9",
     "@types/lodash.debounce": "^4.0.7",
     "@types/object-hash": "^2.2.1",
     "@types/react": "^17.0.0",
