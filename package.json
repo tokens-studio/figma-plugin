@@ -80,7 +80,6 @@
     "glob": "^10.3.1",
     "i18next": "^23.2.3",
     "ignore-styles": "^5.0.1",
-    "js-yaml": "^4.1.0",
     "jszip": "^3.10.0",
     "just-compact": "^3.0.1",
     "just-extend": "^6.0.1",
