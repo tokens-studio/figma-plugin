@@ -49,6 +49,7 @@ const mockSettings: SavedSettings = {
   width: 800,
   height: 500,
   ignoreFirstPartForStyles: false,
+  ignoreFirstPartForVariables: false,
   inspectDeep: false,
   prefixStylesWithThemeName: false,
   showEmptyGroups: true,

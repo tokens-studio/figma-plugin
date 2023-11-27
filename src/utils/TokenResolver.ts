@@ -128,21 +128,45 @@ class TokenResolver {
           } as ResolveTokenValuesResult;
         }
 
+        // Users can nest references, so we need to make sure to resolve any nested references first.
+        let resolvedPath = path;
+        let matches: boolean = true;
+
+        // As long as we have matches, we need to resolve them. This is needed for multiple levels of nesting. Performance will suffer, but that's the user's choice.
+        while (matches !== false) {
+          const match = resolvedPath.match(AliasRegex);
+          matches = Boolean(match?.length);
+          if (!match?.length) break;
+
+          const nestedTokenName = getPathName(match[0]);
+          const nestedToken = this.tokenMap.get(nestedTokenName);
+
+          if (nestedToken && nestedToken.value) {
+            const resolvedNestedToken = this.resolveReferences({ ...nestedToken, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
+
+            if (typeof resolvedNestedToken.value === 'string' || typeof resolvedNestedToken.value === 'number') {
+              resolvedPath = resolvedPath.replace(match[0], resolvedNestedToken.value);
+            }
+          } else {
+            break;
+          }
+        }
+
         // We have the special case of deep references where we can reference the .fontFamily property of a typography token.
         // For that case, we need to split the path and get the last part, which might be the property name.
         // However, it might not be. If we have a token called "color.primary" and we reference "color.primary.fontFamily", we need to check if "color.primary" exists. If it does, we prefer to return that one.
         // If it doesn't it might be a composite token where we want to return the atomic property
-        const propertyPath = path.split('.');
+        const propertyPath = resolvedPath.split('.');
         const propertyName = propertyPath.pop() as string;
         const tokenNameWithoutLastPart = propertyPath.join('.');
-        const foundToken = this.tokenMap.get(path);
+        const foundToken = this.tokenMap.get(resolvedPath);
 
         if (foundToken) {
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
-          newResolvedReferences.add(path);
+          newResolvedReferences.add(resolvedPath);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
-          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
+          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {

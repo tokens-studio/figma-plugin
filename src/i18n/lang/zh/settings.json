@@ -43,5 +43,7 @@
   "secondScreenExplainer": "增强您的设计工作流程，让您可以在第二个屏幕中管理您的 Token。",
   "language": "语言",
   "languageExplainer": "Tokens Studio 已经过 Mr. Biscuit 手动翻译，因此翻译较为准确。\n 没有看到您的语言？提交功能请求",
-  "liveSyncActive": "实时同步激活"
+  "liveSyncActive": "实时同步激活",
+  "ignoreVariablesPrefix": "忽略变量的令牌名称的第一部分",
+  "forYourVariables": "为你的变量"
 }

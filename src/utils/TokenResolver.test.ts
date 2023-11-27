@@ -216,6 +216,31 @@ const tokens = [
     value: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
   },
+  {
+    name: 'colors.lilac.500',
+    value: '#ff0000',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'primary',
+    value: 'lilac',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'nestedprimary',
+    value: '{primary}',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'thatprimarycolor',
+    value: '{colors.{primary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'thatnestedprimarycolor',
+    value: '{colors.{nestedprimary}.500}',
+    type: TokenTypes.COLOR,
+  },
 ];
 
 const output = [
@@ -467,6 +492,36 @@ const output = [
     value: 'IBM Plex Sans',
     rawValue: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
+  },
+  {
+    name: 'colors.lilac.500',
+    value: '#ff0000',
+    rawValue: '#ff0000',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'primary',
+    value: 'lilac',
+    rawValue: 'lilac',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'nestedprimary',
+    value: 'lilac',
+    rawValue: '{primary}',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'thatprimarycolor',
+    value: '#ff0000',
+    rawValue: '{colors.{primary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'thatnestedprimarycolor',
+    value: '#ff0000',
+    rawValue: '{colors.{nestedprimary}.500}',
+    type: TokenTypes.COLOR,
   },
 ];
 describe('resolveTokenValues deep nested', () => {
