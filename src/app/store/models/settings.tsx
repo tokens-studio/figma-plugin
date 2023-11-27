@@ -238,6 +238,9 @@ export const settings = createModel<RootModel>()({
     setIgnoreFirstPartForStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    setIgnoreFirstPartForVariables: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
