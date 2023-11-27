@@ -29,6 +29,17 @@ describe('Settings Component', () => {
     expect(store.getState().settings.ignoreFirstPartForStyles).toBe(true);
   });
 
+  it('can toggle ignoreFirstPartForVariables', () => {
+    render(<Settings />);
+
+    const checkbox = screen.getByTestId('ignoreFirstPartForVariables');
+    fireEvent.click(checkbox, {
+      target: checkbox,
+    });
+
+    expect(store.getState().settings.ignoreFirstPartForVariables).toBe(true);
+  });
+
   it('can toggle prefixStylesWithThemeName', () => {
     render(<Settings />);
 

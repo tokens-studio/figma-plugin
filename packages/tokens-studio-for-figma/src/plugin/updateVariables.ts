@@ -27,7 +27,7 @@ export default function updateVariables({
       variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
     }
   });
-  const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
+  const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode, settings);
   return {
     variableIds: variableObj.variableKeyMap,
     referenceVariableCandidate: variableObj.referenceVariableCandidates,
