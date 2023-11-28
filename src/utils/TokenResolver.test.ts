@@ -271,6 +271,11 @@ const tokens = [
     value: '000001',
     type: TokenTypes.TEXT,
   },
+  {
+    name: 'pure-numeric',
+    value: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 
 const output = [
@@ -589,6 +594,12 @@ const output = [
     rawValue: '000001',
     type: TokenTypes.TEXT,
   },
+  {
+    name: 'pure-numeric',
+    value: 0,
+    rawValue: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
@@ -621,5 +632,21 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
     expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
+  });
+
+  it('resolves zeros correctly', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens([{
+      name: 'pure-zero',
+      value: '0',
+      type: TokenTypes.DIMENSION,
+    }]);
+    expect(resolvedTokens).toEqual([
+      {
+        name: 'pure-zero',
+        rawValue: '0',
+        value: 0,
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
   });
 });

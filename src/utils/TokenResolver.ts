@@ -60,7 +60,8 @@ class TokenResolver {
     const regex = /^[+-]?\d*\.?\d+([eE][+-]?\d+)?$/;
     const numericRegex = /^[+-]?\d*\.?\d+$/;
 
-    const allZerosRegex = /^0+$/;
+    // Needs to be more than a single zero otherwise "0" will get evaluated incorrectly
+    const allZerosRegex = /^00+$/;
     const leadingZerosRegex = /^0+[1-9]\d*$/;
 
     return (regex.test(str) && !numericRegex.test(str)) || (allZerosRegex.test(str) || leadingZerosRegex.test(str));
