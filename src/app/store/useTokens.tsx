@@ -397,8 +397,11 @@ export default function useTokens() {
   const filterMultiValueTokens = useCallback(() => {
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       const filteredTokenList = tokenList.filter((tokenItem) => {
+        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
+        if (typeof resolvedValue === 'string') {
+          tokenItem.value = resolvedValue;
+        }
         if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
-          const resolvedValue = getAliasValue(tokenItem.value, tokensContext.resolvedTokens) || '';
           return !resolvedValue.toString().trim().includes(' ');
         }
         return true;
@@ -416,9 +419,7 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-
     const multiValueFilteredTokens = filterMultiValueTokens();
-
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
