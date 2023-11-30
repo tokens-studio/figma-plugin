@@ -1,6 +1,6 @@
 # @tokens-studio/figma-plugin
 
-## 1.39.0
+## 1.38.5
 
 ### Minor Changes
 
