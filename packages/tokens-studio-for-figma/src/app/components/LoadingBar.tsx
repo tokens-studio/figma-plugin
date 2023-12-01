@@ -93,7 +93,7 @@ export default function LoadingBar() {
                   `${expectedWaitTimeInSeconds}s`
                 )}
               </Text>
-              <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+              <Button variant="invisible" size="small" onClick={handleCancel}>Cancel</Button>
             </Stack>
           </Stack>
         )}

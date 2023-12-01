@@ -140,7 +140,7 @@ function StartScreen() {
               <Button id="button-configure" size="small" variant="primary" onClick={onSetEmptyTokens}>
                 {t('newEmptyFile')}
               </Button>
-              <Button id="button-configure-preset" size="small" variant="ghost" onClick={onSetDefaultTokens}>
+              <Button id="button-configure-preset" size="small" variant="invisible" onClick={onSetDefaultTokens}>
                 {t('loadExample')}
               </Button>
             </Stack>

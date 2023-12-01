@@ -20,6 +20,7 @@ import Heading from '../Heading';
 import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
 import Link from '../Link';
+import IconButton from '../IconButton';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -198,14 +199,13 @@ export default function GenericVersionedForm({
                 name="value"
                 data-index={i}
               />
-              <StyledButton
+              <IconButton
                 onClick={handleClose}
                 data-index={i}
                 size="small"
-                variant="ghost"
-              >
-                <XIcon />
-              </StyledButton>
+                variant="invisible"
+                icon={<XIcon />}
+              />
             </Box>
           ))}
         </Stack>
