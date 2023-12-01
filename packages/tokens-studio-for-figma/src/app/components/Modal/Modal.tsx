@@ -98,40 +98,43 @@ export function Modal({
   }, [close]);
 
   return (
-    <ReactModal
-      isOpen={isOpen}
-      appElement={document.getElementById('app')!}
-      onRequestClose={close}
-      style={customStyles(large)}
-      contentLabel={title || ''}
-    >
-      {(showClose || title) && (
-        <ModalHeader>
-          <Stack direction="row" justify="between" align="center">
-            {title && (
-              <Box css={{ paddingLeft: '$4' }}>
-                <Heading size="small">{title}</Heading>
-              </Box>
-            )}
-            <StyledButton
-              type="button"
-              onClick={handleClose}
-              data-cy="close-button"
-              data-testid="close-button"
-            >
-              <XIcon />
-            </StyledButton>
-          </Stack>
-        </ModalHeader>
-      )}
-      <StyledBody compact={compact} full={full} data-cy={id}>
-        {children}
-      </StyledBody>
-      {(!!footer) && (
-        <ModalFooter stickyFooter={stickyFooter}>
-          {footer}
-        </ModalFooter>
-      )}
-    </ReactModal>
+    <>
+      {/* @ts-ignore */}
+      <ReactModal
+        isOpen={isOpen}
+        appElement={document.getElementById('app')!}
+        onRequestClose={close}
+        style={customStyles(large)}
+        contentLabel={title || ''}
+      >
+        {(showClose || title) && (
+          <ModalHeader>
+            <Stack direction="row" justify="between" align="center">
+              {title && (
+                <Box css={{ paddingLeft: '$4' }}>
+                  <Heading size="small">{title}</Heading>
+                </Box>
+              )}
+              <StyledButton
+                type="button"
+                onClick={handleClose}
+                data-cy="close-button"
+                data-testid="close-button"
+              >
+                <XIcon />
+              </StyledButton>
+            </Stack>
+          </ModalHeader>
+        )}
+        <StyledBody compact={compact} full={full} data-cy={id}>
+          {children}
+        </StyledBody>
+        {(!!footer) && (
+          <ModalFooter stickyFooter={stickyFooter}>
+            {footer}
+          </ModalFooter>
+        )}
+      </ReactModal>
+    </>
   );
 }

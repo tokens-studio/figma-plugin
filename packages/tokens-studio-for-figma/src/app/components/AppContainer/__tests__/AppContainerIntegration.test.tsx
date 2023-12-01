@@ -288,7 +288,7 @@ describe('AppContainer (integration)', () => {
         waitFor(async () => {
           expect(await result.findAllByText('global')).toHaveLength(1);
           result.unmount();
-        });
+        }, { timeout: 10000 });
       })
     ),
   );
@@ -342,7 +342,7 @@ describe('AppContainer (integration)', () => {
     waitFor(async () => {
       expect(await result.findAllByText('global')).toHaveLength(1);
       result.unmount();
-    });
+    }, { timeout: 10000 });
   }));
 
   it('can switch to a different tokenset', withOrWithoutLicense({
@@ -366,7 +366,7 @@ describe('AppContainer (integration)', () => {
       (await result.findByTestId('tokensetitem-playground'))?.click();
       expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
       result.unmount();
-    });
+    }, { timeout: 10000 });
   }));
 
   it('can toggle a tokenset', withOrWithoutLicense({

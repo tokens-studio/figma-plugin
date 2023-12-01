@@ -284,118 +284,121 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
           </Box>
           {selectedItem?.name !== searchInput
             && isOpen ? (
-              ReactDOM.createPortal(
-                <Box
-                  css={{
-                    backgroundColor: '$bgDefault',
-                    border: '1px solid',
-                    borderColor: '$borderDefault',
-                    borderRadius: '$medium',
-                    position: 'absolute',
-                    width: `${inputContainerWidth}px`,
-                    top: '$2',
-                    boxShadow: '$contextMenu',
-                    zIndex: '10',
-                    transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
-                  }}
-                  ref={portalRef}
-                >
+              <>
+                {ReactDOM.createPortal(
                   <Box
                     css={{
-                      display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3',
+                      backgroundColor: '$bgDefault',
+                      border: '1px solid',
+                      borderColor: '$borderDefault',
+                      borderRadius: '$medium',
+                      position: 'absolute',
+                      width: `${inputContainerWidth}px`,
+                      top: '$2',
+                      boxShadow: '$contextMenu',
+                      zIndex: '10',
+                      transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
                     }}
-                    ref={downShiftSearchContainerRef}
+                    ref={portalRef}
                   >
+                    <Box
+                      css={{
+                        display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3',
+                      }}
+                      ref={downShiftSearchContainerRef}
+                    >
+                      {
+                        externalSearchField && (
+                          <Box css={{ display: 'flex', gap: '$3' }}>
+                            <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
+                              Tokens
+                            </StyledButton>
+                            <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
+                              {externalSearchField}
+                            </StyledButton>
+                          </Box>
+                        )
+                      }
+                      <StyledDownshiftInput
+                        inputRef={searchInputRef}
+                        value={searchInput}
+                        onChange={handleSearchInputChange}
+                        getInputProps={getInputProps}
+                        dataCy="downshift-search-input"
+                      />
+                    </Box>
                     {
-                      externalSearchField && (
-                        <Box css={{ display: 'flex', gap: '$3' }}>
-                          <StyledButton isFocused={currentSearchField === 'Tokens'} onClick={handleChangeSearchField}>
-                            Tokens
-                          </StyledButton>
-                          <StyledButton isFocused={currentSearchField !== 'Tokens'} onClick={handleChangeSearchField}>
-                            {externalSearchField}
-                          </StyledButton>
+                      currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
+                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
+                        {({ index, style }) => {
+                          const token = filteredTokenItems[index];
+                          return (
+                            <StyledItem
+                              data-cy="downshift-input-item"
+                              data-testid="downshift-input-item"
+                              className="dropdown-item"
+                              {...getItemProps({ key: token.name, index, item: token.name })}
+                              css={{
+                                backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
+                              }}
+                              isFocused={highlightedIndex === index}
+                              style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                              onMouseDown={() => handleSelect(token.name)}
+                            >
+                              {type === 'color' && (
+                              <StyledItemColorDiv>
+                                <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                              </StyledItemColorDiv>
+                              )}
+                              <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
+                              <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
+                            </StyledItem>
+                          );
+                        }}
+                      </StyledList>
+                      )
+                    }
+                    {
+                      currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
+                        <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
+                            {({ index, style }) => {
+                              const filteredValue = filteredValues[index];
+                              return (
+                                <StyledItem
+                                  data-cy="downshift-input-item"
+                                  data-testid="downshift-input-item"
+                                  className="dropdown-item"
+                                  {...getItemProps({ key: value, index, item: value })}
+                                  css={{
+                                    backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
+                                  }}
+                                  isFocused={highlightedIndex === index}
+                                  style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                  onMouseDown={() => handleSelect(value)}
+                                >
+                                  <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
+                                </StyledItem>
+                              );
+                            }}
+                        </StyledList>
+                      )
+                    }
+                    {
+                      ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
+                        <Box ref={blankBoxRef}>
+                          <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                            No suggestions found
+                          </Box>
                         </Box>
                       )
                     }
-                    <StyledDownshiftInput
-                      inputRef={searchInputRef}
-                      value={searchInput}
-                      onChange={handleSearchInputChange}
-                      getInputProps={getInputProps}
-                      dataCy="downshift-search-input"
-                    />
-                  </Box>
-                  {
-                    currentSearchField === 'Tokens' && filteredTokenItems.length > 0 && (
-                    <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredTokenItems.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredTokenItems.length} itemSize={30}>
-                      {({ index, style }) => {
-                        const token = filteredTokenItems[index];
-                        return (
-                          <StyledItem
-                            data-cy="downshift-input-item"
-                            data-testid="downshift-input-item"
-                            className="dropdown-item"
-                            {...getItemProps({ key: token.name, index, item: token.name })}
-                            css={{
-                              backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
-                            }}
-                            isFocused={highlightedIndex === index}
-                            style={style}
-                                // eslint-disable-next-line react/jsx-no-bind
-                            onMouseDown={() => handleSelect(token.name)}
-                          >
-                            {type === 'color' && (
-                            <StyledItemColorDiv>
-                              <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                            </StyledItemColorDiv>
-                            )}
-                            <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                            <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
-                          </StyledItem>
-                        );
-                      }}
-                    </StyledList>
-                    )
-                  }
-                  {
-                    currentSearchField !== 'Tokens' && filteredValues.length > 0 && (
-                      <StyledList className="content scroll-container" height={Math.min(downShiftContainerHeight, 30 * filteredValues.length)} width={inputContainerWidth - scrollbarWidth} itemCount={filteredValues.length} itemSize={30}>
-                          {({ index, style }) => {
-                            const filteredValue = filteredValues[index];
-                            return (
-                              <StyledItem
-                                data-cy="downshift-input-item"
-                                data-testid="downshift-input-item"
-                                className="dropdown-item"
-                                {...getItemProps({ key: value, index, item: value })}
-                                css={{
-                                  backgroundColor: highlightedIndex === index ? '$accentDefault' : '$bgDefault',
-                                }}
-                                isFocused={highlightedIndex === index}
-                                style={style}
-                                // eslint-disable-next-line react/jsx-no-bind
-                                onMouseDown={() => handleSelect(value)}
-                              >
-                                <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
-                              </StyledItem>
-                            );
-                          }}
-                      </StyledList>
-                    )
-                  }
-                  {
-                    ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
-                      <Box ref={blankBoxRef}>
-                        <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
-                          No suggestions found
-                        </Box>
-                      </Box>
-                    )
-                  }
-                </Box>,
-                portalPlaceholder,
-              )
+                  </Box>,
+                  portalPlaceholder,
+                )
+                }
+              </>
             ) : null}
         </div>
       )}

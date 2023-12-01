@@ -5,7 +5,6 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { StitchesCSS } from '@/types';
 import { StyledContainer } from './StyledContainer';
 import { StyledHeader } from './StyledHeader';
-import { StyledContent } from './StyledContent';
 import { StyledCollapseHandle } from './StyledCollapseHandle';
 import { IconChevronDown } from '@/icons';
 import Box from '../Box';
@@ -19,8 +18,6 @@ type Props = PropsWithChildren<{
   disabled?: boolean
   isOpenByDefault?: boolean
 }>;
-
-const MotionStyledContent = motion(StyledContent);
 
 export function Accordion({
   css, label, extra, disabled, isOpenByDefault, children,
@@ -51,7 +48,12 @@ export function Accordion({
       </StyledHeader>
       <AnimatePresence>
         {isOpen && (
-          <MotionStyledContent
+          <motion.div
+            style={{
+              overflow: 'hidden',
+              gridColumn: '2',
+              gridRow: '2',
+            }}
             key="content"
             data-testid="accordion-content"
             data-cy="accordion-content"
@@ -62,10 +64,8 @@ export function Accordion({
             exit={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
           >
-            <Box css={{ paddingTop: '$4' }}>
               {children}
-            </Box>
-          </MotionStyledContent>
+          </motion.div>
         )}
       </AnimatePresence>
     </StyledContainer>

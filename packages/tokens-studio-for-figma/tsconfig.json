@@ -4,6 +4,7 @@
     "outDir": "dist",
     "jsx": "react",
     "noEmit": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noUnusedLocals": false,
@@ -39,9 +40,12 @@
   "exclude": [
     "**/node_modules",
     "./storybook",
-    "storybook-static"
+    "storybook-static",
   ],
   "include": [
+    "flags.d.ts",
+    "jest.config.ts",
+    "src/app/components/custom.d.ts",
     "css.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
