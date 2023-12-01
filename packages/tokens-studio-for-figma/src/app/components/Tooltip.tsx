@@ -36,7 +36,7 @@ const Toolip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> 
   side = 'left',
 }) => (
   label ? (
-    <Tooltip.Provider>
+    <Tooltip.Provider disableHoverableContent>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>{children}</Tooltip.Trigger>
         <Tooltip.Portal>
