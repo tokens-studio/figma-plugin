@@ -39,10 +39,12 @@ const Toolip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> 
     <Tooltip.Provider>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>{children}</Tooltip.Trigger>
-        <StyledContent side={side}>
-          <StyledArrow offset={10} />
-          {label}
-        </StyledContent>
+        <Tooltip.Portal>
+          <StyledContent side={side}>
+            <StyledArrow offset={10} />
+            {label}
+          </StyledContent>
+        </Tooltip.Portal>
       </Tooltip.Root>
     </Tooltip.Provider>
   ) : children

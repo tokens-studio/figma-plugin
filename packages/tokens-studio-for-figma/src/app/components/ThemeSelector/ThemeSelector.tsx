@@ -23,6 +23,7 @@ import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
@@ -135,30 +136,32 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           </Flex>
           <IconToggleableDisclosure css={{ flexShrink: 0 }} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          data-testid="themeselector-dropdown-content"
-          side="bottom"
-          css={{ minWidth: '180px' }}
-        >
-          {availableThemes.length === 0 && (
-            <ScrollDropdownMenuRadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-              <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
-            </ScrollDropdownMenuRadioItem>
-          )}
-          {availableThemeOptions}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            data-cy="themeselector-managethemes"
-            css={{
-              paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
-            }}
-            disabled={!tokenThemes}
-            onSelect={handleManageThemes}
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            data-testid="themeselector-dropdown-content"
+            side="bottom"
+            css={{ minWidth: '180px' }}
           >
-            <span>{t('manageThemes')}</span>
-            {!tokenThemes && <ProBadge compact />}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+            {availableThemes.length === 0 && (
+              <ScrollDropdownMenuRadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+                <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+              </ScrollDropdownMenuRadioItem>
+            )}
+            {availableThemeOptions}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              data-cy="themeselector-managethemes"
+              css={{
+                paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
+              }}
+              disabled={!tokenThemes}
+              onSelect={handleManageThemes}
+            >
+              <span>{t('manageThemes')}</span>
+              {!tokenThemes && <ProBadge compact />}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
       </DropdownMenu>
     </Flex>
   );
