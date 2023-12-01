@@ -16,6 +16,7 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 
 export type Props = {
   id: string
@@ -92,17 +93,19 @@ export function TokenGroupHeading({
               <Heading muted size="small">{label}</Heading>
             </Stack>
           </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
-              {t('rename')}
-            </ContextMenuItem>
-            <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
-              {t('duplicate')}
-            </ContextMenuItem>
-            <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
-              {t('delete')}
-            </ContextMenuItem>
-          </ContextMenuContent>
+          <ContextMenuPortal>
+            <ContextMenuContent>
+              <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
+                {t('rename')}
+              </ContextMenuItem>
+              <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
+                {t('duplicate')}
+              </ContextMenuItem>
+              <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
+                {t('delete')}
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenuPortal>
         </ContextMenu>
       </StyledTokenGroupHeadingCollapsable>
 

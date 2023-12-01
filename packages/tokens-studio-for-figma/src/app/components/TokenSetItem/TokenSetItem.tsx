@@ -23,6 +23,7 @@ import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import Tooltip from '../Tooltip';
+import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -159,31 +160,33 @@ export function TokenSetItem({
             </StyledDragButton>
           </ContextMenuTrigger>
         )}
-        <ContextMenuContent>
-          {canEdit && <ContextMenuItem onSelect={handleRename}>{t('rename')}</ContextMenuItem>}
-          {item.isLeaf && (
-            <>
-              {canEdit && (
-                <>
-                  <ContextMenuItem onSelect={handleDuplicate}>{t('duplicate')}</ContextMenuItem>
-                  <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
-                    {t('delete')}
-                  </ContextMenuItem>
-                  <ContextMenuSeparator />
-                </>
-              )}
-              <ContextMenuCheckboxItem
-                checked={tokenSetStatus === TokenSetStatus.SOURCE}
-                onSelect={handleTreatAsSource}
-              >
-                <ContextMenuItemIndicator>
-                  <CheckIcon />
-                </ContextMenuItemIndicator>
-                {t('sets.treatAsSource')}
-              </ContextMenuCheckboxItem>
-            </>
-          )}
-        </ContextMenuContent>
+        <ContextMenuPortal>
+          <ContextMenuContent>
+            {canEdit && <ContextMenuItem onSelect={handleRename}>{t('rename')}</ContextMenuItem>}
+            {item.isLeaf && (
+              <>
+                {canEdit && (
+                  <>
+                    <ContextMenuItem onSelect={handleDuplicate}>{t('duplicate')}</ContextMenuItem>
+                    <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
+                      {t('delete')}
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                  </>
+                )}
+                <ContextMenuCheckboxItem
+                  checked={tokenSetStatus === TokenSetStatus.SOURCE}
+                  onSelect={handleTreatAsSource}
+                >
+                  <ContextMenuItemIndicator>
+                    <CheckIcon />
+                  </ContextMenuItemIndicator>
+                  {t('sets.treatAsSource')}
+                </ContextMenuCheckboxItem>
+              </>
+            )}
+          </ContextMenuContent>
+        </ContextMenuPortal>
       </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         {item.isLeaf ? (
