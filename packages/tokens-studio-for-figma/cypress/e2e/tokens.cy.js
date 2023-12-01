@@ -124,7 +124,7 @@ describe('TokenListing', () => {
       name: 'sizing.sm',
       value: '4',
     });
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
     cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({
       timeout: 1000
     });
@@ -181,7 +181,7 @@ describe('TokenListing', () => {
       submit: true,
     });
 
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
   });
 
   it('can add multiple shadow tokens', () => {
@@ -243,7 +243,7 @@ describe('TokenListing', () => {
       nth: 1,
       submit: true,
     });
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
   });
 
   it('can add a new typography token', () => {
@@ -296,7 +296,7 @@ describe('TokenListing', () => {
       value: '0',
       submit: true,
     });
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
   });
 
 
@@ -327,7 +327,7 @@ describe('TokenListing', () => {
       name: 'lg',
       value: '8',
     });
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
   });
 
   it('token listing stays collapsed after creating a new token', () => {
@@ -410,6 +410,6 @@ describe('TokenListing', () => {
       nth: 1,
       submit: true,
     });
-    cy.get('@postMessage').should('be.calledTwice');
+    cy.get('@postMessage').should('be.calledThrice');
   });
 });
