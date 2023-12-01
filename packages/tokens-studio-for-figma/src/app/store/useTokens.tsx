@@ -118,10 +118,12 @@ export default function useTokens() {
             'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
       }).then((result) => {
         if (result && result.result) {
+          // @ts-ignore
           dispatch.tokenState.updateDocument();
         }
       });
     } else {
+      // @ts-ignore
       dispatch.tokenState.updateDocument();
     }
   }, [confirm, dispatch.tokenState, shouldConfirm]);
@@ -180,26 +182,26 @@ export default function useTokens() {
     }));
   }, [settings]);
 
-  const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
+  const handleBulkRemap = useCallback(async (newName: string, oldName: string, bulkUpdateMode = UpdateMode.SELECTION) => {
     track('bulkRemapToken', { fromInspect: true });
 
     wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName,
       newName,
-      updateMode,
+      updateMode: bulkUpdateMode,
     }));
   }, []);
 
   // Calls Figma with an old name and new name and asks it to update all tokens that use the old name
-  const remapToken = useCallback(async (oldName: string, newName: string, updateMode?: UpdateMode) => {
+  const remapToken = useCallback(async (oldName: string, newName: string, remapUpdateMode?: UpdateMode) => {
     track('remapToken', { fromRename: true });
 
     wrapTransaction({ name: 'remapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMAP_TOKENS,
       oldName,
       newName,
-      updateMode: updateMode || settings.updateMode,
+      updateMode: remapUpdateMode || settings.updateMode,
     }));
   }, [settings.updateMode]);
 
@@ -227,7 +229,7 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0]);
+        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0] as UpdateMode);
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
@@ -270,7 +272,7 @@ export default function useTokens() {
         dispatch.tokenState.renameStyleIdsToCurrentTheme(renameStylesResult.styleIds, tokensToRename);
       }
     }
-  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
+  }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -323,7 +325,7 @@ export default function useTokens() {
 
       dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
     }
-  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState]);
+  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
@@ -392,7 +394,7 @@ export default function useTokens() {
       tokensToSet,
       tokens: resolvedTokens,
     });
-  }, []);
+  }, [store]);
 
   const filterMultiValueTokens = useCallback(() => {
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {

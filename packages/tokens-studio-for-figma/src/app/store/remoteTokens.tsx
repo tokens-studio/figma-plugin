@@ -119,7 +119,7 @@ export default function useRemoteTokens() {
             tokens: remoteData.tokens,
             themes: remoteData.themes,
           });
-          shouldOverride = !!await showPullDialog();
+          shouldOverride = !!(await showPullDialog());
         }
         if (shouldOverride || activeTab === Tabs.LOADING) {
           switch (context.provider) {
@@ -422,7 +422,7 @@ export default function useRemoteTokens() {
     }
   }, [fetchGithubBranches, fetchGitLabBranches, fetchBitbucketBranches, fetchADOBranches]);
 
-  const deleteProvider = useCallback((provider) => {
+  const deleteProvider = useCallback((provider: any) => {
     AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL,
       context: provider,

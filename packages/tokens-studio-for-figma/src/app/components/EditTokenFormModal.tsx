@@ -13,7 +13,7 @@ type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
-const EditTokenFormModal: React.FC<Props> = ({ resolvedTokens }) => {
+const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ resolvedTokens }) => {
   const editToken = useSelector(editTokenSelector);
   const showAutoSuggest = useSelector(showAutoSuggestSelector);
   const dispatch = useDispatch<Dispatch>();

@@ -9,7 +9,7 @@ type Props = {
   token: SingleToken;
 };
 
-export const TokenTooltip: React.FC<Props> = ({
+export const TokenTooltip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   children,
   token,
 }) => {

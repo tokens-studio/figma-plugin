@@ -8,7 +8,7 @@ type Props = {
   resolvedValue: TokenTypographyValue;
 };
 
-export const SingleTypographyValueDisplay: React.FC<Props> = ({ value, resolvedValue }) => (
+export const SingleTypographyValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue }) => (
   <Stack direction="column" align="start" gap={1}>
     {typeof value === 'string' ? (
       <TooltipProperty

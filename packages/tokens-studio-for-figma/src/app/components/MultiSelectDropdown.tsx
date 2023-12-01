@@ -18,7 +18,7 @@ type Props = {
   handleSelectedItemChange: (selectedItems: string[]) => void
 };
 
-export const MultiSelectDropdown: React.FunctionComponent<Props> = ({
+export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   menuItems,
   selectedItems,
   handleSelectedItemChange,

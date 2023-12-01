@@ -18,7 +18,7 @@ type Props = {
   onOpen: (theme: ThemeObject) => void
 };
 
-export const SingleThemeEntry: React.FC<Props> = ({
+export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   theme, isActive, groupName, onOpen,
 }) => {
   const activeTheme = useSelector(activeThemeSelector);

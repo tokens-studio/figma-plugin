@@ -13,7 +13,7 @@ type Props = {
   disabled?: boolean
 };
 
-export const BranchSwitchMenuRadioElement: React.FC<Props> = ({ disabled, branch, branchSelected }) => {
+export const BranchSwitchMenuRadioElement: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ disabled, branch, branchSelected }) => {
   const onSelect = React.useCallback(() => branchSelected(branch), [branch, branchSelected]);
 
   return (

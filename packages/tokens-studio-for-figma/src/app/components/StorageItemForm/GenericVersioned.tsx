@@ -59,6 +59,7 @@ export default function GenericVersionedForm({
       } as ValidatedFormValues;
       onSubmit(formFields);
     } else {
+      // eslint-disable-next-line no-console
       console.log(validationResult, values);
     }
   }, [values, onSubmit]);
@@ -83,7 +84,7 @@ export default function GenericVersionedForm({
   // Always leave headers at the end
   const headers = useMemo(() => [...(values.additionalHeaders || []), { name: '', value: '' }], [values.additionalHeaders]);
 
-  const headerChange = useCallback((changedHeaders) => {
+  const headerChange = useCallback((changedHeaders: any) => {
     onChange({
       target: {
         name: 'additionalHeaders',
@@ -113,7 +114,7 @@ export default function GenericVersionedForm({
     headerChange(newHeaders);
   }, [headerChange, headers]);
 
-  const handleClose = useCallback((e) => {
+  const handleClose = useCallback((e: any) => {
     const index = Number(e.target.dataset.index);
 
     const removedHeaders = [...headers];

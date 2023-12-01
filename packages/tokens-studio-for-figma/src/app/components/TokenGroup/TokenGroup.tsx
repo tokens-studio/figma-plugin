@@ -19,7 +19,7 @@ type Props = {
   showForm: (opts: ShowFormOptions) => void;
 };
 
-const TokenGroup: React.FC<Props> = ({
+const TokenGroup: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   tokenValues, showNewForm, showForm, schema, path = null, tokenKey,
 }) => {
   const collapsed = useSelector(collapsedTokensSelector);
@@ -44,8 +44,8 @@ const TokenGroup: React.FC<Props> = ({
   const mappedItems = useMemo(() => (
     tokenValuesEntries.filter((item) => (
       // remove items which are in a collapsed parent
-      !collapsed.some((parentKey) => (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.')
-      || item.parent === parentKey)
+      (!collapsed.some((parentKey) => (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '.')
+      || item.parent === parentKey))
     )).map((item) => ({
       item,
     }))
@@ -58,36 +58,40 @@ const TokenGroup: React.FC<Props> = ({
     return null;
   }
   return (
-    <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
-      {mappedItems.map(({ item }) => (
-        <React.Fragment key={item.stringPath}>
-          {typeof item.value === 'object' && !isSingleToken(item.value) ? (
+    (
+      <StyledTokenGroup displayType={schema.type === TokenTypes.COLOR ? displayType : 'GRID'}>
+        {mappedItems.map(({ item }) => (
+          <React.Fragment key={item.stringPath}>
+            {typeof item.value === 'object' && !isSingleToken(item.value) ? (
             // Need to add class to self-reference in css traversal
-            <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
-              <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type || tokenKey} />
-              <TokenGroup
-                tokenValues={item.value}
-                showNewForm={showNewForm}
+              (
+                <StyledTokenGroupItems className="property-wrapper" data-cy={`token-group-${item.stringPath}`}>
+                  <TokenGroupHeading showNewForm={showNewForm} label={item.name} path={item.stringPath} id="listing" type={schema.type || tokenKey} />
+                  <TokenGroup
+                    tokenValues={item.value}
+                    showNewForm={showNewForm}
+                    showForm={showForm}
+                    schema={schema}
+                    path={item.stringPath}
+                    tokenKey={tokenKey}
+                  />
+                </StyledTokenGroupItems>
+              )
+            ) : (
+              <TokenButton
+                type={schema.type}
+                token={item.value}
                 showForm={showForm}
-                schema={schema}
-                path={item.stringPath}
-                tokenKey={tokenKey}
+                draggedToken={draggedToken}
+                dragOverToken={dragOverToken}
+                setDraggedToken={setDraggedToken}
+                setDragOverToken={setDragOverToken}
               />
-            </StyledTokenGroupItems>
-          ) : (
-            <TokenButton
-              type={schema.type}
-              token={item.value}
-              showForm={showForm}
-              draggedToken={draggedToken}
-              dragOverToken={dragOverToken}
-              setDraggedToken={setDraggedToken}
-              setDragOverToken={setDragOverToken}
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </StyledTokenGroup>
+            )}
+          </React.Fragment>
+        ))}
+      </StyledTokenGroup>
+    )
   );
 };
 

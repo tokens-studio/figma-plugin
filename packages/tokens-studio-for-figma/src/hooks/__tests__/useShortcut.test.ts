@@ -1,5 +1,5 @@
 import * as rooks from 'rooks';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import { useShortcut, activeShortcuts } from '../useShortcut';
 
 const useKeysSpy = jest.spyOn(rooks, 'useKeys');

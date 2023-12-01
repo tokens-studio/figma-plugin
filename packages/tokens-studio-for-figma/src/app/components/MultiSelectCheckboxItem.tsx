@@ -14,7 +14,7 @@ type Props = {
   onItemSelected: (selectedItem: string) => void;
 };
 
-export const MultiSelectCheckboxItem: React.FunctionComponent<Props> = ({
+export const MultiSelectCheckboxItem: React.FunctionComponent<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   item,
   isSelected,
   onItemSelected,

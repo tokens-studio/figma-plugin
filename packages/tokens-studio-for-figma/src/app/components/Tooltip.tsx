@@ -30,19 +30,21 @@ type Props = {
   side?: 'left' | 'bottom' | 'top' | 'right';
 };
 
-const Toolip: React.FC<Props> = ({
+const Toolip: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   label,
   children,
   side = 'left',
 }) => (
   label ? (
-    <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger as="div">{children}</Tooltip.Trigger>
-      <StyledContent side={side}>
-        <StyledArrow offset={10} />
-        {label}
-      </StyledContent>
-    </Tooltip.Root>
+    <Tooltip.Provider>
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>{children}</Tooltip.Trigger>
+        <StyledContent side={side}>
+          <StyledArrow offset={10} />
+          {label}
+        </StyledContent>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   ) : children
 );
 

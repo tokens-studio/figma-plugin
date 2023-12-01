@@ -1,6 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { Selector } from 'reselect';
-import { waitFor } from '@testing-library/react';
 import useRemoteTokens from './remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import {

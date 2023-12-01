@@ -19,7 +19,7 @@ type Props = {
   setDragOverToken: (token: SingleToken | null) => void;
 };
 
-export const TokenButton: React.FC<Props> = ({
+export const TokenButton: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   type,
   token,
   showForm,

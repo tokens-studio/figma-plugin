@@ -25,7 +25,7 @@ type Props = {
   id: string
 };
 
-export const ThemeVariableManagement: React.FC<Props> = ({ id }) => {
+export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ id }) => {
   const theme = useSelector(useCallback((state: RootState) => (
     themeByIdSelector(state, id)
   ), [id]));

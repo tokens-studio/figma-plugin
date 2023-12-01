@@ -15,14 +15,14 @@ type Props = {
   disabled?: boolean;
 };
 
-export const MoreButtonProperty: React.FC<Props> = ({
+export const MoreButtonProperty: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   value, property, onClick, disabled = false,
 }) => {
   const mainNodeSelectionValues = useSelector(mainNodeSelectionValuesSelector);
   const isActive = React.useMemo(() => (
     mainNodeSelectionValues[property.name] === value
   ), [value, property, mainNodeSelectionValues]);
-  const handleClick = React.useCallback((e) => {
+  const handleClick = React.useCallback((e: any) => {
     e.preventDefault();
     onClick(property, isActive);
   }, [property, isActive, onClick]);

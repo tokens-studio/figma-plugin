@@ -53,7 +53,7 @@ export default function FilePreset({ onCancel }: Props) {
 
     await fetchTokensFromFileOrDirectory({ files, usedTokenSet, activeTheme });
     onCancel();
-  }, [fetchTokensFromFileOrDirectory, onCancel]);
+  }, [fetchTokensFromFileOrDirectory, onCancel, activeTheme, usedTokenSet]);
 
   return (
     <Stack direction="column" gap={4}>
@@ -86,9 +86,9 @@ export default function FilePreset({ onCancel }: Props) {
           type="file"
           ref={hiddenDirectoryInput}
           style={{ display: 'none' }}
-          webkitdirectory=""
-          directory=""
           onChange={handleFileOrDirectoryChange}
+          directory=""
+          webkitdirectory=""
         />
       </Stack>
     </Stack>

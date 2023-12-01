@@ -1,9 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
-import {
-  act, createMockStore, render,
-} from '../../../../tests/config/setupTest';
+import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
 import TokensBottomBar from '../TokensBottomBar';
 
 describe('TokenBottomBar', () => {
@@ -27,18 +25,16 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('tools');
-    await act(async () => {
-      await userEvent.click(toolsButton);
-      const loadButton = await result.findByText('loadFromFileOrPreset');
-      await userEvent.click(loadButton, { pointerEventsCheck: 0 });
-    });
+    await userEvent.click(toolsButton);
+    const loadButton = await result.findByText('loadFromFileOrPreset');
+    await userEvent.click(loadButton, { pointerEventsCheck: 0 });
     expect(result.queryByText('Import')).toBeInTheDocument();
 
     const closeButton = await result.findByTestId('close-button');
-    act(() => {
-      closeButton.click();
+    closeButton.click();
+    waitFor(() => {
+      expect(result.queryByText('Import')).toBeNull();
     });
-    expect(result.queryByText('Import')).toBeNull();
   });
 
   it('should show the export modal', async () => {
@@ -51,11 +47,9 @@ describe('TokenBottomBar', () => {
     );
 
     const toolsButton = await result.findByText('tools');
-    await act(async () => {
-      await userEvent.click(toolsButton);
-      const exportButton = await result.findByText('exportToFile');
-      await userEvent.click(exportButton, { pointerEventsCheck: 0 });
-    });
+    await userEvent.click(toolsButton);
+    const exportButton = await result.findByText('exportToFile');
+    await userEvent.click(exportButton, { pointerEventsCheck: 0 });
     expect(result.queryByText('Export tokens')).toBeInTheDocument();
   });
 });

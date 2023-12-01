@@ -38,10 +38,10 @@ export default {
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
-     "json",
-     "text",
-     "lcov",
-     "clover"
+    'json',
+    'text',
+    'lcov',
+    'clover',
   ],
 
   // An object that configures minimum threshold enforcement for coverage results
@@ -63,7 +63,11 @@ export default {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  // globals: {},
+  // globals: {
+  //   "ts-jest": {
+  //     babelConfig: true,
+  //   },
+  // },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -93,7 +97,7 @@ export default {
   // notifyMode: "failure-change",
 
   // A preset that is used as a base for Jest's configuration
-  // preset: undefined,
+  // preset: 'ts-jest',
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -132,6 +136,7 @@ export default {
     './tests/__mocks__/mixpanelMock.js',
     './tests/__mocks__/supernovaMock.js',
     './tests/__mocks__/domRect.js',
+    './tests/__mocks__/i18nMock.js',
   ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
@@ -175,10 +180,12 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: null,
-
+//   transform: {
+//     "node_modules/(react-dnd|dnd-core|@react-dnd)/.+\\.(j|t)sx?$": "ts-jest",
+//     "^.+\\.js$": "babel-jest",
+// },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-colorful)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|@react-dnd)/)', '\\.pnp\\.[^\\/]+$'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

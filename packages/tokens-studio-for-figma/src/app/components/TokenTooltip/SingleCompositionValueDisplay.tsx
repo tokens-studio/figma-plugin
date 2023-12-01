@@ -9,7 +9,7 @@ type Props = {
   resolvedValue: CompositionTokenValue | number;
 };
 
-export const SingleCompositionValueDisplay: React.FC<Props> = ({ property, value, resolvedValue }) => (
+export const SingleCompositionValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ property, value, resolvedValue }) => (
   <TooltipProperty
     label={property}
     value={typeof value === 'string' || typeof value === 'number' ? value : '…'}

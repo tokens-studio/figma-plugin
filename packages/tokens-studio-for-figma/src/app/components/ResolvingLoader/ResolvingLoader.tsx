@@ -17,7 +17,7 @@ const StyledResolvingLoaderBubble = styled('div', {
   animation: `${bounceUpDown} 1000ms 0ms infinite linear`,
 });
 
-export const ResolvingLoader: React.FC = () => (
+export const ResolvingLoader: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => (
   <Flex>
     <Box
       css={{

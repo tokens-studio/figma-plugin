@@ -27,6 +27,13 @@ jest.mock('launchdarkly-react-client-sdk', () => ({
   useFlags: () => ({}),
 }));
 
+function setup(jsx: JSX.Element) {
+  return {
+    user: userEvent.setup(),
+    ...render(jsx),
+  };
+}
+
 describe('Add license key', () => {
   beforeEach(() => {
     resetStore();
@@ -50,8 +57,7 @@ describe('Add license key', () => {
 
   it('User can type in the licensseKey input', async () => {
     const licenseKey = 'c421c4-c4214c21-c421c421-c421c1';
-    const user = userEvent.setup();
-    render(<AddLicenseKey />);
+    const { user } = setup(<AddLicenseKey />);
 
     const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
     const addKeyButton = screen.getByRole('button', { name: 'addLicenseKey' });
@@ -64,8 +70,7 @@ describe('Add license key', () => {
 
   it('User can paste the licenseKey in the input', async () => {
     const licenseKey = 'c421c4-c4214c21-c421c421-c421c1';
-    const user = userEvent.setup();
-    render(<AddLicenseKey />);
+    const { user } = setup(<AddLicenseKey />);
 
     const input = screen.getByTestId('settings-license-key-input') as HTMLInputElement;
 
@@ -99,98 +104,73 @@ describe('Add license key', () => {
   it('Adds the license key and hides the previous error message if the license is valid', async () => {
     const mockStore = createMockStore({});
 
-    let result: ReturnType<typeof render>;
+    const result = render(
+      <Provider store={mockStore}>
+        <AddLicenseKey />
+      </Provider>,
+    );
 
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <AddLicenseKey />
-        </Provider>,
-      );
+    const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
+    fireEvent.change(licenseKeyInput, {
+      target: { value: LICENSE_FOR_ERROR_RESPONSE },
+    });
+    expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
+
+    const addLicenseKeyButton = await result.findByText('addLicenseKey');
+    addLicenseKeyButton.click();
+
+    const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
+    expect(errorMessage).toBeInTheDocument();
+
+    fireEvent.change(licenseKeyInput, {
+      target: { value: LICENSE_FOR_VALID_RESPONSE },
     });
 
-    await act(async () => {
-      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
-      fireEvent.change(licenseKeyInput, {
-        target: { value: LICENSE_FOR_ERROR_RESPONSE },
-      });
-      expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
-
-      const addLicenseKeyButton = await result.findByText('addLicenseKey');
-      addLicenseKeyButton.click();
-
-      const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
-      expect(errorMessage).toBeInTheDocument();
-    });
-
-    await act(async () => {
-      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
-      fireEvent.change(licenseKeyInput, {
-        target: { value: LICENSE_FOR_VALID_RESPONSE },
-      });
-      expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
-    });
+    expect(licenseKeyInput.value).toEqual(LICENSE_FOR_VALID_RESPONSE);
   });
 
   it('User should be able to remove a key if its not valid', async () => {
-    const mockStore = createMockStore({});
+    const result = render(<AddLicenseKey />);
 
-    let result: ReturnType<typeof render>;
-
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <AddLicenseKey />
-        </Provider>,
-      );
+    const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
+    fireEvent.change(licenseKeyInput, {
+      target: { value: LICENSE_FOR_ERROR_RESPONSE },
     });
+    expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
 
-    await act(async () => {
-      const licenseKeyInput = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
-      fireEvent.change(licenseKeyInput, {
-        target: { value: LICENSE_FOR_ERROR_RESPONSE },
-      });
-      expect(licenseKeyInput.value).toEqual(LICENSE_FOR_ERROR_RESPONSE);
+    const addLicenseKeyButton = await result.findByText('addLicenseKey');
+    addLicenseKeyButton.click();
 
-      const addLicenseKeyButton = await result.findByText('addLicenseKey');
-      addLicenseKeyButton.click();
+    const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
+    expect(errorMessage).toBeInTheDocument();
 
-      const errorMessage = await result.findByText(LICENSE_ERROR_MESSAGE);
-      expect(errorMessage).toBeInTheDocument();
-
-      const removeKeyButton = await result.findByText('removeLicenseKey');
-      expect(removeKeyButton).toBeInTheDocument();
-      expect(removeKeyButton).not.toBeDisabled();
-    });
+    const removeKeyButton = await result.findByText('removeLicenseKey');
+    expect(removeKeyButton).toBeInTheDocument();
+    expect(removeKeyButton).not.toBeDisabled();
   });
 
   it('Should prompt the user when the user tries to remove the key', async () => {
     const mockStore = createMockStore({});
 
-    let result: ReturnType<typeof render>;
+    const result = render(
+      <Provider store={mockStore}>
+        <ConfirmDialog />
+        <AddLicenseKey />
+      </Provider>,
+    );
 
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <ConfirmDialog />
-          <AddLicenseKey />
-        </Provider>,
-      );
+    await mockStore.dispatch.userState.addLicenseKey({
+      key: LICENSE_FOR_VALID_RESPONSE,
+      source: AddLicenseSource.UI,
     });
 
-    await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({
-        key: LICENSE_FOR_VALID_RESPONSE,
-        source: AddLicenseSource.UI,
-      });
+    const removeKeyButton = await result.findByRole('button', {
+      name: 'removeLicenseKey',
     });
+    expect(removeKeyButton).not.toBeDisabled();
+    removeKeyButton.click();
 
-    await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
-        name: 'removeLicenseKey',
-      });
-      expect(removeKeyButton).not.toBeDisabled();
-      removeKeyButton.click();
+    waitFor(() => {
       expect(screen.getByText('confirmRemove')).toBeInTheDocument();
     });
   });
@@ -198,86 +178,63 @@ describe('Add license key', () => {
   it('Should succesfully remove a license key if the user confirms the action', async () => {
     const mockStore = createMockStore({});
 
-    let result: ReturnType<typeof render>;
+    const result = render(
+      <Provider store={mockStore}>
+        <ConfirmDialog />
+        <AddLicenseKey />
+      </Provider>,
+    );
 
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <ConfirmDialog />
-          <AddLicenseKey />
-        </Provider>,
-      );
+    await mockStore.dispatch.userState.addLicenseKey({
+      key: LICENSE_FOR_VALID_RESPONSE,
+      source: AddLicenseSource.UI,
     });
 
-    await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({
-        key: LICENSE_FOR_VALID_RESPONSE,
-        source: AddLicenseSource.UI,
-      });
+    const removeKeyButton = await result.findByRole('button', {
+      name: 'removeLicenseKey',
     });
+    expect(removeKeyButton).not.toBeDisabled();
+    removeKeyButton.click();
 
-    await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
-        name: 'removeLicenseKey',
-      });
-      expect(removeKeyButton).not.toBeDisabled();
-      removeKeyButton.click();
+    const confirmButton = await result.findByRole('button', {
+      name: 'removeKey',
     });
+    confirmButton.click();
 
-    await act(async () => {
-      const confirmButton = await result.findByRole('button', {
-        name: 'removeKey',
-      });
-      confirmButton.click();
+    const input = (await result.findByTestId('settings-license-key-input')) as HTMLInputElement;
 
-      const input = (await result.getByTestId('settings-license-key-input')) as HTMLInputElement;
-
-      const removeKeyButton = await result.findByRole('button', {
-        name: 'removeLicenseKey',
-      });
-
-      await waitFor(() => {
-        expect(input.value).toEqual('');
-        expect(removeKeyButton).not.toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(input.value).toEqual('');
+      expect(removeKeyButton).not.toBeInTheDocument();
     });
   });
 
   it('Should notify the ui if the license removal failed', async () => {
     const mockStore = createMockStore({});
     const notifyToUISpy = jest.spyOn(notifiers, 'notifyToUI');
-    let result: ReturnType<typeof render>;
 
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <ConfirmDialog />
-          <AddLicenseKey />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <ConfirmDialog />
+        <AddLicenseKey />
+      </Provider>,
+    );
+
+    await mockStore.dispatch.userState.addLicenseKey({
+      key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
+      source: AddLicenseSource.UI,
     });
 
-    await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({
-        key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
-        source: AddLicenseSource.UI,
-      });
+    const removeKeyButton = await result.getByRole('button', {
+      name: 'removeLicenseKey',
     });
+    expect(removeKeyButton).not.toBeDisabled();
+    removeKeyButton.click();
 
-    await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
-        name: 'removeLicenseKey',
-      });
-      expect(removeKeyButton).not.toBeDisabled();
-      removeKeyButton.click();
+    const confirmButton = await result.findByRole('button', {
+      name: 'removeKey',
     });
-
-    await act(async () => {
-      const confirmButton = await result.findByRole('button', {
-        name: 'removeKey',
-      });
-      confirmButton.click();
-    });
+    confirmButton.click();
 
     await waitFor(() => {
       notifyToUISpy.mockReturnValueOnce();
@@ -287,26 +244,21 @@ describe('Add license key', () => {
 
   it('If the key is invalid, The license key should be removed without confirmation and remove key should not be visible anymore', async () => {
     const mockStore = createMockStore({});
-    let result: ReturnType<typeof render>;
 
-    await act(async () => {
-      result = render(
-        <Provider store={mockStore}>
-          <ConfirmDialog />
-          <AddLicenseKey />
-        </Provider>,
-      );
+    const result = render(
+      <Provider store={mockStore}>
+        <ConfirmDialog />
+        <AddLicenseKey />
+      </Provider>,
+    );
+
+    await mockStore.dispatch.userState.addLicenseKey({
+      key: LICENSE_FOR_ERROR_RESPONSE,
+      source: AddLicenseSource.UI,
     });
 
     await act(async () => {
-      await mockStore.dispatch.userState.addLicenseKey({
-        key: LICENSE_FOR_ERROR_RESPONSE,
-        source: AddLicenseSource.UI,
-      });
-    });
-
-    await act(async () => {
-      const removeKeyButton = await result.findByRole('button', {
+      const removeKeyButton = await result.getByRole('button', {
         name: 'removeLicenseKey',
       });
       expect(removeKeyButton).not.toBeDisabled();

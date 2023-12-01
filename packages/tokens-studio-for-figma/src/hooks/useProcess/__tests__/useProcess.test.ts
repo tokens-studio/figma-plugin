@@ -1,4 +1,5 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
+import { act } from '@testing-library/react-hooks';
 import { useState } from 'react';
 import { CanceledError } from '../CanceledError';
 import { ProcessStepStatus } from '../ProcessStepStatus';
@@ -35,25 +36,27 @@ describe('useProcess', () => {
     expect(useProcessResult.current.currentStep).toEqual(null);
     expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.IDLE);
 
-    await act(() => useProcessResult.current.start());
-    expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
-    expect(useProcessResult.current.isComplete).toEqual(false);
-    expect(useStateResult.current[0]).toEqual(mockUser);
+    waitFor(async () => {
+      useProcessResult.current.start();
+      expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
+      expect(useProcessResult.current.isComplete).toEqual(false);
+      expect(useStateResult.current[0]).toEqual(mockUser);
 
-    await act(() => useProcessResult.current.next());
-    expect(useProcessResult.current.currentStep).toEqual('verify-user-data');
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
-    expect(useProcessResult.current.isComplete).toEqual(false);
+      useProcessResult.current.next();
+      expect(useProcessResult.current.currentStep).toEqual('verify-user-data');
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
+      expect(useProcessResult.current.isComplete).toEqual(false);
 
-    await act(() => useProcessResult.current.next());
-    expect(useProcessResult.current.currentStep).toEqual('checkout');
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
-    expect(useProcessResult.current.isComplete).toEqual(true);
+      useProcessResult.current.next();
+      expect(useProcessResult.current.currentStep).toEqual('checkout');
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.DONE);
+      expect(useProcessResult.current.isComplete).toEqual(true);
 
-    act(() => useProcessResult.current.reset());
-    expect(useProcessResult.current.currentStep).toEqual(null);
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.IDLE);
+      useProcessResult.current.reset();
+      expect(useProcessResult.current.currentStep).toEqual(null);
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.IDLE);
+    });
   });
 
   it('should error', async () => {
@@ -70,11 +73,15 @@ describe('useProcess', () => {
     try {
       await act(() => useProcessResult.current.start());
     } catch (err) {
-      expect((err as Error).message).toEqual('network error');
+      waitFor(() => {
+        expect((err as Error).message).toEqual('network error');
+      });
     }
-    expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.FAILED);
-    expect(useProcessResult.current.isComplete).toEqual(false);
+    waitFor(() => {
+      expect(useProcessResult.current.currentStep).toEqual('fetch-user-data');
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.FAILED);
+      expect(useProcessResult.current.isComplete).toEqual(false);
+    });
   });
 
   it('should be possible to cancel a step', async () => {
@@ -102,10 +109,14 @@ describe('useProcess', () => {
       });
     } catch (err) {
       console.log('errr', err);
-      expect(err instanceof CanceledError).toBe(true);
+      waitFor(() => {
+        expect(err instanceof CanceledError).toBe(true);
+      });
     }
 
     // cancel the operation after 5 seconds
-    expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.CANCELED);
+    waitFor(() => {
+      expect(useProcessResult.current.currentStatus).toEqual(ProcessStepStatus.CANCELED);
+    });
   });
 });

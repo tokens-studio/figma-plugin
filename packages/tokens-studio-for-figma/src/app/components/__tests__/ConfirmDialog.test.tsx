@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 import ConfirmDialog from '../ConfirmDialog';
 import {
   act, createMockStore, render,

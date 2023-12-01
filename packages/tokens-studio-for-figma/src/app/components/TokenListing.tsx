@@ -20,7 +20,7 @@ type Props = {
   isPro?: boolean;
 };
 
-const TokenListing: React.FC<Props> = ({
+const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   tokenKey, label, schema, values, isPro,
 }) => {
   const showEmptyGroups = useSelector(showEmptyGroupsSelector);

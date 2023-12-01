@@ -28,14 +28,14 @@ export default function WindowResizer() {
     debouncedSizeChange(size.width, size.height);
   }, [debouncedSizeChange, dispatch.settings]);
 
-  const onDown = React.useCallback((e) => {
+  const onDown = React.useCallback((e: any) => {
     if (cornerRef.current) {
       cornerRef.current.onpointermove = handleSizeChange;
       cornerRef.current.setPointerCapture(e.pointerId);
     }
   }, [handleSizeChange]);
 
-  const onUp = React.useCallback((e) => {
+  const onUp = React.useCallback((e: any) => {
     if (cornerRef.current) {
       cornerRef.current.onpointermove = null;
       cornerRef.current.releasePointerCapture(e.pointerId);

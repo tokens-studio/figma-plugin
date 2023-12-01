@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '../../../tests/config/setupTest';
+import { render, waitFor } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import ProBadge from './ProBadge';
 
@@ -13,8 +13,9 @@ describe('ProBadge', () => {
     const { getByText, queryByText } = render(<ProBadge />, { store });
     store.dispatch.userState.setLicenseKey('test-key-123');
 
-    expect(queryByText('getPro')).not.toBeInTheDocument();
-
-    expect(getByText('pro')).toBeInTheDocument();
+    waitFor(() => {
+      expect(queryByText('getPro')).not.toBeInTheDocument();
+      expect(getByText('pro')).toBeInTheDocument();
+    });
   });
 });

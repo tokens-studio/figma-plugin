@@ -37,7 +37,7 @@ const TokenFilter = () => {
     dispatch.uiState.setTokenFilter(value);
   }, 250);
 
-  const handleChange = React.useCallback((e) => {
+  const handleChange = React.useCallback((e: any) => {
     const { value } = e.target;
     setTokenString(value);
     debounced(value);

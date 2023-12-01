@@ -7,7 +7,7 @@ type Props = {
   itemSelected: (item: string) => void
 };
 
-export const DropdownMenuRadioElement: React.FC<Props> = ({ item, index, itemSelected }) => {
+export const DropdownMenuRadioElement: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ item, index, itemSelected }) => {
   const onSelect = React.useCallback(() => itemSelected(item), [item, itemSelected]);
 
   return (

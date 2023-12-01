@@ -26,7 +26,7 @@ import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;
-  isCollapsed?: boolean;
+  isCollapsed?: boolean; // eslint-disable-line react/no-unused-prop-types
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
   canEdit: boolean;
@@ -34,7 +34,7 @@ export type TokenSetItemProps = {
   canReorder?: boolean;
   extraBefore?: React.ReactNode;
   onClick: (item: TreeItem) => void;
-  onCollapse?: (itemPath: string) => void;
+  onCollapse?: (itemPath: string) => void; // eslint-disable-line react/no-unused-prop-types
   onCheck: (checked: boolean, item: TreeItem) => void;
   onRename: (set: string) => void;
   onDelete: (set: string) => void;
@@ -102,7 +102,7 @@ export function TokenSetItem({
       return t('sets.activeDescription') as string;
     }
     return t('sets.inactiveDescription') as string;
-  }, [isChecked, tokenSetStatus]);
+  }, [isChecked, tokenSetStatus, t]);
 
   const renderIcon = useCallback(
     (checked: typeof isChecked, fallbackIcon: React.ReactNode) => {

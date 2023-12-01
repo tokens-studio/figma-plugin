@@ -42,7 +42,7 @@ const itemStyles = {
 const StyledItem = styled(ContextMenuPrimitive.Item, { ...itemStyles });
 const StyledCheckboxItem = styled(ContextMenuPrimitive.CheckboxItem, { ...itemStyles });
 const StyledRadioItem = styled(ContextMenuPrimitive.RadioItem, { ...itemStyles });
-const StyledTriggerItem = styled(ContextMenuPrimitive.TriggerItem, {
+const StyledTriggerItem = styled(ContextMenuPrimitive.Trigger, {
   '&[data-state="open"]': {
     backgroundColor: '$accentDefault',
     color: '$fgOnEmphasis',

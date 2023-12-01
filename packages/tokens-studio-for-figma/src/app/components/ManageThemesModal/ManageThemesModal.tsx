@@ -27,7 +27,7 @@ import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@
 
 type Props = unknown;
 
-export const ManageThemesModal: React.FC<Props> = () => {
+export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
   const dispatch = useDispatch<Dispatch>();
   const themes = useSelector(themesListSelector);
   const activeTheme = useSelector(activeThemeSelector);

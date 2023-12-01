@@ -24,7 +24,7 @@ type Props = {
   handleToggleSelectedStyle: (token: string) => void
 };
 
-export const ThemeStyleManagementCategoryStyleEntry: React.FC<Props> = ({
+export const ThemeStyleManagementCategoryStyleEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   token,
   styleInfo,
   icon,

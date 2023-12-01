@@ -1,5 +1,6 @@
 module.exports = {
   extends: ['airbnb', 'airbnb-typescript', 'plugin:react-hooks/recommended'],
+  plugins: ["validate-jsx-nesting"],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname,
@@ -44,6 +45,14 @@ module.exports = {
       allowFunctions: false,
       allowBind: false,
     }],
-    "@typescript-eslint/no-shadow": 1
+    "@typescript-eslint/no-shadow": 1,
+    "validate-jsx-nesting/no-invalid-jsx-nesting": 2
+  },
+  overrides: [{
+    "files": ['**/benchmark/**', "**/mocks/**"],
+    "rules": {
+      "import/no-extraneous-dependencies": 0,
+    }
   }
+],
 };

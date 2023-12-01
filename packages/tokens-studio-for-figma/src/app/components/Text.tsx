@@ -35,7 +35,7 @@ type TextProps = Omit<React.ComponentProps<typeof StyledText>, 'muted' | 'bold' 
   size?: 'xsmall' | 'small';
 };
 
-const Text: React.FC<TextProps> = ({
+const Text: React.FC<React.PropsWithChildren<React.PropsWithChildren<TextProps>>> = ({
   children, muted, bold, size = 'small', ...props
 }) => (
   <StyledText muted={muted} size={size} bold={bold} {...props}>

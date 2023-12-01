@@ -15,7 +15,7 @@ type Props = {
   background: string | undefined;
 };
 
-export const ColorPickerTrigger: React.FC<Props> = ({
+export const ColorPickerTrigger: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   onClick, background,
 }) => (
   <TriggerButton
