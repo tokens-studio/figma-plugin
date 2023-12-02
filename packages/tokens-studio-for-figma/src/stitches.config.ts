@@ -13,6 +13,22 @@ export const stitchesInstance = createStitches({
     },
     shadows: lightTheme.shadows,
     ...core,
+    fontWeights: {
+      ...core.fontWeights,
+      sansBold: 500,
+    },
+    fontSizes: {
+      ...core.fontSizes,
+      xxsmall: '11px !important',
+      xsmall: '12px !important',
+      small: '13px !important',
+      medium: '14px !important',
+      large: '16px !important',
+    },
+    radii: {
+      ...core.radii,
+      full: '999px',
+    },
     sizes: {
       ...core.sizes,
       scrollbarWidth: '8px',
