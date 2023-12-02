@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useDispatch, useSelector } from 'react-redux';
+import { IconButton } from '@tokens-studio/ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -30,8 +31,8 @@ export default function InspectSearchOptionDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger css={{ padding: '$2' }} data-testid="inspect-search-option-dropdown">
-        <IconSetting />
+      <DropdownMenuTrigger asChild data-testid="inspect-search-option-dropdown">
+        <IconButton icon={<IconSetting />} variant="invisible" size="small" tooltip="Options" tooltipSide="bottom" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="left">

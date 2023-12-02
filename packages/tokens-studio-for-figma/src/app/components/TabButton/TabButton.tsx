@@ -18,22 +18,8 @@ type Props<T extends string> = {
 };
 
 const StyledButton = styled('button', {
-  '@initial': {
-    padding: '$5 $4',
-    maxWidth: 'fit-content',
-  },
-  '@xs': {
-    padding: '$5 $3',
-    maxWidth: '64px',
-  },
-  '@sm': {
-    padding: '$5 $4',
-    maxWidth: '96px',
-  },
-  '@md': {
-    padding: '$5 $4',
-    maxWidth: 'fit-content',
-  },
+  padding: '$5 $4',
+  maxWidth: 'fit-content',
   fontSize: '$xsmall',
   fontWeight: '$sansBold',
   display: 'flex',
@@ -48,11 +34,6 @@ const StyledButton = styled('button', {
     outline: 'none',
     boxShadow: 'none',
     color: '$fgDefault',
-  },
-  '@container (width < 64px)': {
-    '> svg': {
-      display: 'none',
-    },
   },
   '> svg': {
     minHeight: '100%',

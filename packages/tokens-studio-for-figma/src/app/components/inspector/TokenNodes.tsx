@@ -86,6 +86,8 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
         css={{
           marginLeft: '$4',
         }}
+        variant="invisible"
+        size="small"
         icon={<Crosshair2Icon />}
       />
     </Box>

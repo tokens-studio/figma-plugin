@@ -147,6 +147,8 @@ export default function InspectorTokenSingle({
               dataCy="button-token-remap"
               onClick={handleClick}
               icon={<IconToggleableDisclosure />}
+              size="small"
+              variant="invisible"
             />
             )
           }

@@ -128,14 +128,17 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
               {t('selectAll')}
             </Label>
           </Box>
-          <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-            <Button onClick={handleShowBulkRemap} variant="secondary">
+          <Box css={{
+            display: 'flex', flexDirection: 'row', gap: '$1', paddingTop: '$2',
+          }}
+          >
+            <Button size="small" onClick={handleShowBulkRemap} variant="secondary">
               {t('bulkRemap')}
             </Button>
-            <Button onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            <Button size="small" onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
               {t('setToNone')}
             </Button>
-            <Button onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            <Button size="small" onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
               {t('removeSelected')}
             </Button>
           </Box>

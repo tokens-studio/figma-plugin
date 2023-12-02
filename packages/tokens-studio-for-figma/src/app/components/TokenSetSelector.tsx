@@ -183,12 +183,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               name="tokensetname"
               data-testid="rename-set-input"
               required
+              size="large"
             />
             <Stack direction="row" gap={4}>
-              <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
+              <Button variant="secondary" onClick={handleCloseRenameModal}>
                 {t('cancel')}
               </Button>
-              <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
+              <Button type="submit" variant="primary" disabled={!newTokenSetName}>
                 {
                   isDuplicate ? t('save') : t('change')
                 }

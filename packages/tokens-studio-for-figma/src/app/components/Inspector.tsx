@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from '@tokens-studio/ui';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
@@ -10,7 +11,6 @@ import IconButton from './IconButton';
 import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
-import Tooltip from './Tooltip';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
@@ -95,16 +95,15 @@ function Inspector() {
             />
             <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{ fontWeight: '$sansBold', fontSize: '$small', marginBottom: '$1' }}>
+                <Box css={{ fontWeight: '$sansBold', fontSize: '$small' }}>
                   {t('deepInspect')}
-
                 </Box>
               </Label>
             </Tooltip>
           </Stack>
           <Stack direction="row">
             <IconButton
-              variant={inspectView === 'multi' ? 'primary' : 'default'}
+              variant={inspectView === 'multi' ? 'primary' : 'invisible'}
               dataCy="inspector-multi"
               onClick={handleSetInspectViewMulti}
               icon={<IconInspect />}
@@ -112,7 +111,7 @@ function Inspector() {
               tooltip={t('inspectLayers') as string}
             />
             <IconButton
-              variant={inspectView === 'debug' ? 'primary' : 'default'}
+              variant={inspectView === 'debug' ? 'primary' : 'invisible'}
               dataCy="inspector-debug"
               onClick={handleSetInspectViewDebug}
               icon={<IconDebug />}
