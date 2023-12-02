@@ -13,7 +13,7 @@ const PluginResizerWrapper: React.FC<React.PropsWithChildren<React.PropsWithChil
 
   return isPluginminimized ? (
     <Box css={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <IconButton size="large" onClick={handleResize} icon={<Maximize />} />
+      <IconButton size="large" onClick={handleResize} variant="invisible" icon={<Maximize />} />
     </Box>
   ) : (
     children

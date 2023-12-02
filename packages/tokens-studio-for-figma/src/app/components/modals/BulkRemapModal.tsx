@@ -78,7 +78,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
               id="remapDocument"
               onCheckedChange={updateShouldRemapDocument}
             />
-            <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+            <Label htmlFor="remapDocument" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               Remap across document (slow)
             </Label>
           </Box>

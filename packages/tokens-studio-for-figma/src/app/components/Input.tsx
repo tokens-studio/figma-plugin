@@ -142,7 +142,7 @@ const StyledPrefix = styled('div', {
 
 const StyledLabel = styled('label', {
   display: 'block',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   fontSize: '$small',
 });
 

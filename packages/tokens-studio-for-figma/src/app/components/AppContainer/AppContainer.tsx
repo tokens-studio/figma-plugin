@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -76,10 +77,18 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     handlePerformStartup();
   }, [handlePerformStartup]);
 
+  useEffect(() => {
+    if (isDarkTheme) {
+      document.body.className = darkThemeMode;
+    } else {
+      document.body.className = lightThemeMode;
+    }
+  }, [isDarkTheme]);
+
   globalStyles();
 
   const appContent = (
-    <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }} className={isDarkTheme ? darkThemeMode : lightThemeMode}>
+    <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}
@@ -102,5 +111,5 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     </Box>
   );
 
-  return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;
+  return <AuthContextProvider authData={params.authData}><Tooltip.Provider>{appContent}</Tooltip.Provider></AuthContextProvider>;
 });

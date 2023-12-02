@@ -22,7 +22,7 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => {
         <Box>
           <IconFile />
         </Box>
-        <Box css={{ fontSize: '$small', fontWeight: '$bold' }}>{t('localDocument')}</Box>
+        <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
       </Box>
       <Box css={{ marginRight: '$2' }}>
         {isActive ? <Badge text="Active" /> : (

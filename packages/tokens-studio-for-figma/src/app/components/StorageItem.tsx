@@ -96,7 +96,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
           </Box>
           <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
             <Box css={{
-              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$bold',
+              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$sansBold',
             }}
             >
               {name}

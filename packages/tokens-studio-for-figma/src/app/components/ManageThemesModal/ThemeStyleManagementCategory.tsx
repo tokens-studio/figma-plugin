@@ -95,7 +95,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
                 id="detachSelected"
                 onCheckedChange={handleSelectAll}
               />
-              <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+              <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
                 Select all
               </Label>
             </Box>

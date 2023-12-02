@@ -6,19 +6,20 @@ import Box from './Box';
 import Heading from './Heading';
 import Stack from './Stack';
 import IconButton from './IconButton';
+import { Link } from '@tokens-studio/ui';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
-  color: '$accentFg',
+  color: '$accentDefault',
 });
 
 const StyledTextPlan = styled('p', {
-  fontWeight: '$normal',
+  fontWeight: '$sansRegular',
   color: '$fgDefault',
   fontSize: '$xsmall',
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$accentFg',
+  color: '$accentDefault',
   fontSize: '$xsmall',
 });
 
@@ -45,14 +46,14 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
           <StyledInfoIconButton />
           <Heading size="small">{data.title}</Heading>
         </Stack>
-        <IconButton dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
+        <IconButton variant="invisible" size="small" dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
       </Stack>
       <StyledTextPlan>
         {data.text}
       </StyledTextPlan>
-      <StyledReadMoreLink href={data.url} target="_blank" rel="noreferrer">
+      <Link href={data.url} target="_blank" rel="noreferrer">
         {t('readMore')}
-      </StyledReadMoreLink>
+      </Link>
     </Box>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledHeading = styled('p', {
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   color: '$fgDefault',
   letterSpacing: 0,
   variants: {

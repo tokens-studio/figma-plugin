@@ -44,7 +44,7 @@ export const StyledList = styled(List as ComponentType<any>, {
 
 export const StyledItemValue = styled('div', {
   color: 'var(--mentions-color-muted, var(--colors-fgMuted))',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   textAlign: 'right',
   maxWidth: '300px',
   overflow: 'hidden',
@@ -93,7 +93,7 @@ export const StyledPart = styled('span', {
   variants: {
     matches: {
       true: {
-        fontWeight: '$bold',
+        fontWeight: '$sansBold',
       },
     },
   },

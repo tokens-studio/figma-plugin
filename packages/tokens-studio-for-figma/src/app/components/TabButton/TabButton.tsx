@@ -35,7 +35,7 @@ const StyledButton = styled('button', {
     maxWidth: 'fit-content',
   },
   fontSize: '$xsmall',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',

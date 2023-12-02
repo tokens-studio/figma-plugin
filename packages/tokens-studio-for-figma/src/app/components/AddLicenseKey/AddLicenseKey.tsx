@@ -64,7 +64,7 @@ export default function AddLicenseKey() {
   }, [t, dispatch, confirm, removeAccessToFeatures, licenseKeyError]);
 
   const ManageSubscriptionLink = styled('a', {
-    color: '$accentFg',
+    color: '$accentDefault',
     fontSize: '$xsmall',
   });
 

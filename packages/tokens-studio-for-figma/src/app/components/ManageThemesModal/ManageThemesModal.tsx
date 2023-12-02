@@ -63,6 +63,10 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
   }, [themeEditorOpen]);
 
+  const handleToggleOpenThemeEditor = useCallback(() => {
+    setThemeEditorOpen(!themeEditorOpen);
+  }, [themeEditorOpen]);
+
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
       const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?' });
@@ -155,7 +159,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               id="button-manage-themes-modal-new-theme"
               variant="secondary"
               icon={<IconPlus />}
-              onClick={handleToggleThemeEditor}
+              onClick={handleToggleOpenThemeEditor}
             >
               New theme
             </Button>
@@ -177,7 +181,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               <Button
                 id="button-manage-themes-modal-cancel"
                 variant="secondary"
-                onClick={handleToggleThemeEditor}
+                onClick={handleToggleOpenThemeEditor}
               >
                 Cancel
               </Button>

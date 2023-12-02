@@ -396,8 +396,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     }
                   </Box>,
                   portalPlaceholder,
-                )
-                }
+                )}
               </>
             ) : null}
         </div>

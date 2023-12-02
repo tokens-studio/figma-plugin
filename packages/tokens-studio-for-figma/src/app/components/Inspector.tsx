@@ -95,7 +95,7 @@ function Inspector() {
             />
             <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>
+                <Box css={{ fontWeight: '$sansBold', fontSize: '$small', marginBottom: '$1' }}>
                   {t('deepInspect')}
 
                 </Box>

@@ -90,7 +90,7 @@ export function TokenGroupHeading({
           <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
-              <Heading muted size="small">{label}</Heading>
+              <Heading muted size="xsmall">{label}</Heading>
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuPortal>
@@ -134,6 +134,8 @@ export function TokenGroupHeading({
         onClick={handleShowNewForm}
         disabled={editProhibited}
         dataCy="button-add-new-token-in-group"
+        size="small"
+        variant="invisible"
       />
     </StyledTokenGroupHeading>
   );

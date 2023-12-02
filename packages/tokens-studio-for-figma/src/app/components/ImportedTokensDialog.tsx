@@ -43,7 +43,7 @@ function NewOrExistingToken({
           <Box css={{
             padding: '$2',
             wordBreak: 'break-all',
-            fontWeight: '$bold',
+            fontWeight: '$sansBold',
             borderRadius: '$small',
             fontSize: '$xsmall',
             backgroundColor: '$successBg',
@@ -56,7 +56,7 @@ function NewOrExistingToken({
             <Box css={{
               padding: '$2',
               wordBreak: 'break-all',
-              fontWeight: '$bold',
+              fontWeight: '$sansBold',
               borderRadius: '$small',
               fontSize: '$xsmall',
               backgroundColor: '$dangerBg',

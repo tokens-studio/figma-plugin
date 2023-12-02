@@ -58,7 +58,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
                 background: '$dangerBgEmphasis',
                 color: '$fgOnEmphasis',
                 fontSize: '$xsmall',
-                fontWeight: '$bold',
+                fontWeight: '$sansBold',
                 padding: '$3 $4',
                 paddingLeft: 0,
                 boxShadow: '$contextMenu',
@@ -230,6 +230,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
             onClick={handleToggleTokenSetsVisibility}
             icon={<SidebarIcon />}
             tooltipSide="bottom"
+            size="small"
+            variant="invisible"
             tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
           />
           <TokenFilter />
@@ -247,6 +249,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               dataCy="tokensTabList"
               onClick={handleSetTokensTabToList}
               icon={<IconListing />}
+              size="small"
               tooltipSide="bottom"
               tooltip={t('listing')}
             />
@@ -255,6 +258,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               dataCy="tokensTabJSON"
               onClick={handleSetTokensTabToJSON}
               icon={<IconJSON />}
+              size="small"
               tooltipSide="bottom"
               tooltip="JSON"
             />

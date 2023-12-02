@@ -6,7 +6,7 @@ export const StyledItem = styled(Box, {
   position: 'relative',
   alignItems: 'center',
   gap: '$1',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   fontSize: '$xsmall',
   width: '100%',
 });

@@ -26,19 +26,19 @@ export const StyledBetaBadge = styled('span', {
   backgroundColor: '$accentBg',
   lineHeight: 1,
   color: '$fgDefault',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   textTransform: 'uppercase',
   border: '1px solid transparent',
 });
 
 const StyledP = styled('p', {
-  fontWeight: '$normal',
+  fontWeight: '$sansRegular',
   color: '$fgDefault',
   fontSize: '$xsmall',
 });
 
 const StyledReadMoreLink = styled('a', {
-  color: '$accentFg',
+  color: '$accentDefault',
   fontSize: '$xsmall',
 });
 

@@ -60,7 +60,7 @@ export default function TokenListingHeading({
         <Tooltip label={`Alt + Click ${t('toggle')}`}>
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
-        <Heading size="small">{label}</Heading>
+        <Heading size="xsmall">{label}</Heading>
         {isPro ? <ProBadge /> : null}
       </StyledTokenGroupHeadingButton>
       <Box
@@ -76,6 +76,8 @@ export default function TokenListingHeading({
             icon={displayType === 'GRID' ? <IconList /> : <IconGrid />}
             tooltip={displayType === 'GRID' ? t('showAsList') : t('showAsGrid')}
             onClick={handleToggleDisplayType}
+            variant="invisible"
+            size="small"
           />
         )}
 
@@ -86,6 +88,8 @@ export default function TokenListingHeading({
           icon={<IconAdd />}
           tooltip={t('addNew')}
           onClick={handleShowNewForm}
+          variant="invisible"
+          size="small"
         />
       </Box>
     </Stack>

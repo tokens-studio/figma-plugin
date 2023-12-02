@@ -124,7 +124,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
               id="selectAll"
               onCheckedChange={handleSelectAll}
             />
-            <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$bold' }}>
+            <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
               {t('selectAll')}
             </Label>
           </Box>

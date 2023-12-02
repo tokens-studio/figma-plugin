@@ -154,7 +154,7 @@ function Settings() {
             />
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('ignorePrefix')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
                   {t('usefulIgnore')}
                   {' '}
@@ -179,7 +179,7 @@ function Settings() {
 
             <Label htmlFor="prefixStylesWithThemeName">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('prefixStyles')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
               </Stack>
             </Label>
@@ -193,7 +193,7 @@ function Settings() {
             />
             <Label htmlFor="ignoreFirstPartForVariables">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('ignoreVariablesPrefix')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('ignoreVariablesPrefix')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
                   {t('usefulIgnore')}
                   {' '}
@@ -220,7 +220,7 @@ function Settings() {
 
             <Label htmlFor="storeTokenIdInJsonEditor">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('storeTokenId')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('storeTokenId')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
               </Stack>
             </Label>

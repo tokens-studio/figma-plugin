@@ -6,7 +6,7 @@ export const globalStyles = globalCss({
   ],
   body: {
     fontFamily: '$sans',
-    fontSize: '$small',
+    fontSize: '$xsmall',
     letterSpacing: '0',
     color: '$fgDefault',
   },

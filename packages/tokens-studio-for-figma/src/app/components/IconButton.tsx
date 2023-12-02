@@ -1,3 +1,8 @@
-import { IconButton } from "@tokens-studio/ui";
+import { IconButton } from '@tokens-studio/ui';
+import React from 'react';
 
-export default IconButton;
+function InternalIconButton(props) {
+  return <IconButton {...props} />;
+}
+
+export default InternalIconButton;

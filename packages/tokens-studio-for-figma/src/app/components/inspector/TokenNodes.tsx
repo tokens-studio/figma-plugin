@@ -51,7 +51,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
             display: 'flex',
             alignItems: 'center',
             gap: '$3',
-            fontWeight: '$bold',
+            fontWeight: '$sansBold',
             fontSize: '$small',
           }}
         >

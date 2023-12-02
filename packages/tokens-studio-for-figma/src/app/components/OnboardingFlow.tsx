@@ -13,7 +13,7 @@ import { styled } from '@/stitches.config';
 const StyledLink = styled('a', {
   display: 'inline-flex',
   fontSize: '$1',
-  color: '$accentFg',
+  color: '$accentDefault',
 });
 
 const StyledImage = styled('img', {

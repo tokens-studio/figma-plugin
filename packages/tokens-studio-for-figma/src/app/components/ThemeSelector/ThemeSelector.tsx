@@ -128,11 +128,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
       <DropdownMenu>
         <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
-            <ThemeDropdownLabel muted size="small">
+            <ThemeDropdownLabel muted size="xsmall">
               {t('theme')}
               :
             </ThemeDropdownLabel>
-            <Text size="small">{activeThemeLabel}</Text>
+            <Text size="xsmall">{activeThemeLabel}</Text>
           </Flex>
           <IconToggleableDisclosure css={{ flexShrink: 0 }} />
         </DropdownMenuTrigger>
@@ -152,7 +152,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
             <DropdownMenuItem
               data-cy="themeselector-managethemes"
               css={{
-                paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
+                paddingLeft: '$6', fontSize: '$xsmall', display: 'flex', justifyContent: 'space-between',
               }}
               disabled={!tokenThemes}
               onSelect={handleManageThemes}

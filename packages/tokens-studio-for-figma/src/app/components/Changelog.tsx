@@ -10,7 +10,7 @@ import Stack from './Stack';
 import { styled } from '@/stitches.config';
 
 const StyledReadMoreLink = styled('a', {
-  color: '$accentFg',
+  color: '$accentDefault',
   fontSize: '$xsmall',
 });
 

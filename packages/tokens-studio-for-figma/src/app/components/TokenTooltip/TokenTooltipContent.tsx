@@ -18,15 +18,14 @@ export const TokenTooltipContent: React.FC<React.PropsWithChildren<React.PropsWi
   ), [token, tokensContext.resolvedTokens]);
 
   return (
-    <Stack direction="column" gap={1} css={{ background: '$tooltipBg' }}>
+    <Stack direction="column" gap={1} css={{ background: '$tooltipBg', fontSize: '$xsmall' }}>
       <Stack
         direction="row"
         justify="start"
         align="center"
         gap={2}
         css={{
-          fontSize: '$0',
-          fontWeight: '$bold',
+          fontWeight: '$sansBold',
           color: '$tooltipFg',
           position: 'relative',
         }}

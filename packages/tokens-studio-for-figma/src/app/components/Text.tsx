@@ -1,46 +1,9 @@
 import React from 'react';
-import { styled } from '@/stitches.config';
+import { Text as InternalText } from '@tokens-studio/ui';
 
-const StyledText = styled('div', {
-  lineHeight: '$default',
-  variants: {
-    bold: {
-      true: {
-        fontWeight: '$bold',
-      },
-    },
-    size: {
-      xsmall: {
-        fontSize: '$xsmall',
-      },
-      small: {
-        fontSize: '$small',
-      },
-    },
-    muted: {
-      true: {
-        color: '$fgMuted',
-      },
-      false: {
-        color: '$fgDefault',
-      },
-    },
-  },
-});
+function WrappedText(props) {
+  const { size = 'xsmall' } = props;
+  return <InternalText {...props} size={size} />;
+}
 
-type TextProps = Omit<React.ComponentProps<typeof StyledText>, 'muted' | 'bold' | 'size'> & {
-  children: React.ReactNode;
-  muted?: boolean;
-  bold?: boolean;
-  size?: 'xsmall' | 'small';
-};
-
-const Text: React.FC<React.PropsWithChildren<React.PropsWithChildren<TextProps>>> = ({
-  children, muted, bold, size = 'small', ...props
-}) => (
-  <StyledText muted={muted} size={size} bold={bold} {...props}>
-    {children}
-  </StyledText>
-);
-
-export default Text;
+export default WrappedText;

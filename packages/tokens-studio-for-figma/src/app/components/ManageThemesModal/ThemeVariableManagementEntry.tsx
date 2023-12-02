@@ -80,7 +80,7 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
             <Text bold size="small" title={variableInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{variableInfo.name}</Text>
           )}
         </Box>
-        <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} dataCy="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
+        <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} variant="invisible" dataCy="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
       </Flex>
     </Flex>
   );
