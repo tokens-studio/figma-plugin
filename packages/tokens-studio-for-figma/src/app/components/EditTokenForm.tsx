@@ -440,11 +440,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
-  const handleSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    checkAndSubmitTokenValue();
-  }, [checkAndSubmitTokenValue]);
-
   const handleSubmitButton = React.useCallback(() => {
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
@@ -573,34 +568,34 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   return (
-      <Stack gap={3} direction="column" justify="start">
-        <Input
-          required
-          full
-          label={t('name')}
-          value={internalEditToken?.name}
-          onChange={handleNameChange}
-          type="text"
-          autofocus
-          name="name"
-          error={error}
-          placeholder={t('uniqueName')}
-        />
-        {renderTokenForm()}
+    <Stack gap={3} direction="column" justify="start">
+      <Input
+        required
+        full
+        label={t('name')}
+        value={internalEditToken?.name}
+        onChange={handleNameChange}
+        type="text"
+        autofocus
+        name="name"
+        error={error}
+        placeholder={t('uniqueName')}
+      />
+      {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
-        <Box>
-          <Heading size="xsmall">{t('description')}</Heading>
-          <Textarea
-            key="description"
-            value={internalEditToken?.description || ''}
-            placeholder={t('optionalDescription')}
-            onChange={handleDescriptionChange}
-            rows={3}
-            border
-          />
-        </Box>
-        {
+      {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
+      <Box>
+        <Heading size="xsmall">{t('description')}</Heading>
+        <Textarea
+          key="description"
+          value={internalEditToken?.description || ''}
+          placeholder={t('optionalDescription')}
+          onChange={handleDescriptionChange}
+          rows={3}
+          border
+        />
+      </Box>
+      {
           internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
             <Box>
               <Heading size="xsmall">{t('set', { ns: 'general' })}</Heading>
@@ -608,20 +603,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
             </Box>
           )
         }
-        <Stack direction="row" justify="end" gap={2}>
-          <Button variant="secondary" type="button" onClick={handleReset}>
-            {t('cancel')}
-          </Button>
-          <Button disabled={!isValid} variant="primary" type="button" onClick={handleSubmitButton}>
-            {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
-            {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
-            {(
-              internalEditToken?.status !== EditTokenFormStatus.CREATE
+      <Stack direction="row" justify="end" gap={2}>
+        <Button variant="secondary" type="button" onClick={handleReset}>
+          {t('cancel')}
+        </Button>
+        <Button disabled={!isValid} variant="primary" type="button" onClick={handleSubmitButton}>
+          {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
+          {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
+          {(
+            internalEditToken?.status !== EditTokenFormStatus.CREATE
               && internalEditToken?.status !== EditTokenFormStatus.EDIT
-            ) && t('duplicate')}
-          </Button>
-        </Stack>
+          ) && t('duplicate')}
+        </Button>
       </Stack>
+    </Stack>
   );
 }
 

@@ -55,6 +55,12 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'queries' 
 // msw setup
 beforeAll(() => {
   server.listen();
+  Object.defineProperty(global.window, 'location', {
+    value: {
+      href: 'http://localhost',
+    },
+    writable: true,
+  });
 });
 
 afterEach(() => {

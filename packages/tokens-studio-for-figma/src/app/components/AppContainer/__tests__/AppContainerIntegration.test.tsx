@@ -14,7 +14,7 @@ import {
 } from '@/figmaStorage';
 import * as validateLicenseModule from '@/utils/validateLicense';
 import {
-  act, screen, createMockStore, render, waitFor, fireEvent,
+  screen, createMockStore, render, waitFor, fireEvent,
 } from '../../../../../tests/config/setupTest';
 import { mockGetContent } from '../../../../../tests/__mocks__/octokitRestMock';
 import { AppContainer } from '../AppContainer';
@@ -363,10 +363,11 @@ describe('AppContainer (integration)', () => {
     );
 
     waitFor(async () => {
-      (await result.findByTestId('tokensetitem-playground'))?.click();
+      const set = await result.findByTestId('tokensetitem-playground');
+      set.click();
       expect(mockStore.getState().tokenState.activeTokenSet).toEqual('playground');
       result.unmount();
-    }, { timeout: 10000 });
+    });
   }));
 
   it('can toggle a tokenset', withOrWithoutLicense({
@@ -415,16 +416,14 @@ describe('AppContainer (integration)', () => {
   }, async (params) => {
     const mockStore = createMockStore({});
 
-    await act(async () => {
-      const result = render(
-        <Provider store={mockStore}>
-          <AppContainer {...params} />
-        </Provider>,
-      );
-      waitFor(async () => {
-        await result.findByText("Couldn't load tokens stored on GitHub");
-        expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
-      });
+    const result = render(
+      <Provider store={mockStore}>
+        <AppContainer {...params} />
+      </Provider>,
+    );
+    waitFor(async () => {
+      await result.findByText("Couldn't load tokens stored on GitHub");
+      expect(result.queryByText("Couldn't load tokens stored on GitHub")).toBeInTheDocument();
     });
   }));
 });
