@@ -1,10 +1,11 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "1.38.4",
+  "version": "1.38.5",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
   "scripts": {
+    "bundle": "ts-node ./scripts/bundle.ts",
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build": "cross-env NODE_ENV=production webpack --mode=production",
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
@@ -16,7 +17,7 @@
     "benchmark:run:update": "node benchmark/index.mjs --update",
     "prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
     "test:watch": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest --watch --collectCoverage=false",
-    "test": "cross-env NODE_ENV=test LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest",
+    "test": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest",
     "test:quiet": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest --reporters=jest-silent-reporter --coverage=false",
     "test:write": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest --coverage --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json",
     "cy:open": "cypress open",
@@ -81,6 +82,7 @@
     "i18next": "^23.2.3",
     "ignore-styles": "^5.0.1",
     "json5": "^2.2.3",
+    "js-yaml": "^4.1.0",
     "jszip": "^3.10.0",
     "just-compact": "^3.0.1",
     "just-extend": "^6.0.1",
@@ -156,6 +158,7 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^26.0.24",
+    "@types/js-yaml": "^4.0.9",
     "@types/lodash.debounce": "^4.0.7",
     "@types/minimatch": "^5.1.2",
     "@types/node": "^20.8.5",
@@ -223,6 +226,11 @@
     "webpack": "5",
     "webpack-cli": "^3.3.6",
     "whatwg-fetch": "^3.6.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
