@@ -69,6 +69,8 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
             dataCy={`singlethemeentry-${theme.id}`}
             icon={<IconDiveInto />}
             onClick={handleOpenClick}
+            size="small"
+            variant="invisible"
           />
         </Stack>
       </Stack>

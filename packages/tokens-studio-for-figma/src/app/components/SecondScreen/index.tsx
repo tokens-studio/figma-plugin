@@ -149,7 +149,7 @@ export default function SecondScreen() {
 
           ) : (
             <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
-              <Button variant="secondary" size="small" icon={<EnterIcon />} onClick={onSyncClick}>
+              <Button variant="primary" icon={<EnterIcon />} onClick={onSyncClick}>
                 {t('signInToContinue')}
               </Button>
             </Stack>

@@ -49,7 +49,8 @@ export default function TokenFlowButton() {
     (existingKey && !licenseKeyError)
       ? (
         <IconButton
-          size="large"
+          size="small"
+          variant="invisible"
           tooltip="Open visualization flow"
           dataCy="token-flow-button"
           loading={loading}

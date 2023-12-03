@@ -95,6 +95,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             data-cy="button-return-to-overview"
             data-testid="button-return-to-overview"
             icon={<IconBack />}
+            size="small"
+            variant="invisible"
             onClick={onCancel}
           />
           {

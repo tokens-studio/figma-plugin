@@ -86,6 +86,9 @@ export function ThemeListGroupHeader({
             <IconButton
               onClick={handleEditButtonClick}
               icon={<IconPencil />}
+              size="small"
+              variant="invisible"
+              tooltip="Rename group"
             />
           </>
         ) : (

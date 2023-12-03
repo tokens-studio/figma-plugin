@@ -9,7 +9,6 @@ export const ModalFooter = styled('footer', {
       true: {
         backgroundColor: '$bgDefault',
         position: 'sticky',
-        bottom: 0,
         left: 0,
         right: 0,
         zIndex: 1,

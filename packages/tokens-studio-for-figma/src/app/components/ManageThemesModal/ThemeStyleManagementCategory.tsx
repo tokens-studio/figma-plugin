@@ -71,7 +71,8 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
       )}
       extra={(
         <Button
-          variant="secondary"
+          variant="invisible"
+          size="small"
           disabled={isAttachingLocalStyles}
           onClick={onAttachLocalStyles}
         >
@@ -83,7 +84,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
       {
         stylesEntries.length > 0 && (
           <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1',
+            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1', paddingTop: '$2',
           }}
           >
             <Box css={{
@@ -100,7 +101,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
               </Label>
             </Box>
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-              <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="secondary">
+              <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="invisible" size="small">
                 Detach selected
               </Button>
             </Box>

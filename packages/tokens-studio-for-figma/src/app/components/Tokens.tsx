@@ -3,6 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { ToggleGroup } from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -245,7 +246,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             }}
           >
             <IconButton
-              variant={activeTokensTab === 'list' ? 'primary' : 'default'}
+              variant={activeTokensTab === 'list' ? 'primary' : 'invisible'}
               dataCy="tokensTabList"
               onClick={handleSetTokensTabToList}
               icon={<IconListing />}
@@ -254,7 +255,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
               tooltip={t('listing')}
             />
             <IconButton
-              variant={activeTokensTab === 'json' ? 'primary' : 'default'}
+              variant={activeTokensTab === 'json' ? 'primary' : 'invisible'}
               dataCy="tokensTabJSON"
               onClick={handleSetTokensTabToJSON}
               icon={<IconJSON />}

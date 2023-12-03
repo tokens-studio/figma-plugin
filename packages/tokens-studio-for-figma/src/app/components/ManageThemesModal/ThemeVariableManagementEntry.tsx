@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import { LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { IconArrowRight } from '@/icons';
-import Box from '../Box';
+import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
+import { Box } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
@@ -66,7 +65,7 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
         }}
         >
           <Text size="small">{token}</Text>
-          <IconArrowRight width="16" />
+          <ArrowRightIcon />
           {(!variableInfo.name && !variableInfo.isResolved) && (
             <ResolvingLoader />
           )}

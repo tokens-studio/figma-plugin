@@ -126,14 +126,15 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
       label={(
         <Stack direction="row" gap={2} align="center">
           <Heading size="medium">
-            Variable
+            Variables
           </Heading>
           {variableEntries.length > 0 ? <Count count={variableEntries.length} /> : null}
         </Stack>
       )}
       extra={(
         <Button
-          variant="secondary"
+          variant="invisible"
+          size="small"
           disabled={isAttachingLocalVariables}
           onClick={handleAttachLocalVariables}
         >
@@ -145,7 +146,7 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
       {
         variableEntries.length > 0 && (
           <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1',
+            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1', paddingTop: '$2',
           }}
           >
             <Box css={{
@@ -162,7 +163,7 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
               </Label>
             </Box>
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-              <Button onClick={handleDisconnectSelectedVariables} disabled={selectedVariables.length === 0} variant="secondary">
+              <Button onClick={handleDisconnectSelectedVariables} disabled={selectedVariables.length === 0} variant="invisible" size="small">
                 Detach selected
               </Button>
             </Box>

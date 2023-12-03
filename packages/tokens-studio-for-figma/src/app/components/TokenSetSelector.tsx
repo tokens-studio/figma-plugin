@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Label } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
@@ -206,6 +207,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       >
         <form onSubmit={handleNewTokenSetSubmit}>
           <Stack direction="column" gap={4}>
+            <Label htmlFor="tokensetname">Name</Label>
             <Input
               full
               value={newTokenSetName}
@@ -217,11 +219,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               data-testid="create-set-input"
               autofocus
             />
-            <Stack direction="row" gap={4}>
-              <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
+            <Stack direction="row" gap={4} justify="end">
+              <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
                 {t('cancel')}
               </Button>
-              <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
+              <Button data-cy="create-token-set" type="submit" variant="primary">
                 {t('create')}
               </Button>
             </Stack>

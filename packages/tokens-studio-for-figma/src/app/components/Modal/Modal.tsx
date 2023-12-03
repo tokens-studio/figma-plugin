@@ -1,5 +1,7 @@
 import React from 'react';
-import { Stack, Dialog, IconButton } from '@tokens-studio/ui';
+import {
+  Stack, Dialog, IconButton, Box,
+} from '@tokens-studio/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from '@primer/octicons-react';
 import Heading from '../Heading';
@@ -79,7 +81,6 @@ export function Modal({
                 borderBottomColor: '$borderMuted',
                 borderBottomWidth: '1px',
                 padding: '$4',
-                marginBottom: '-$5',
               }}
             >
               {title && (
@@ -101,9 +102,9 @@ export function Modal({
             {children}
           </StyledBody>
           {(!!footer) && (
-          <ModalFooter stickyFooter={stickyFooter}>
-            {footer}
-          </ModalFooter>
+            <ModalFooter stickyFooter={stickyFooter}>
+                {footer}
+            </ModalFooter>
           )}
         </Dialog.Content>
       </Dialog.Portal>
