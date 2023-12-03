@@ -1,5 +1,18 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.5
+
+### Minor Changes
+
+- 28cd5d74: Allow skipping first part of token name when creating variables, similarly to how it has worked for styles
+
+### Patch Changes
+
+- caebd05d: Skip multi value tokens when creating variables
+- e8ad7c48: Fixed an issue that caused some tokens to falsely appear as broken
+- 4d63ce61: Reordered the typography composite token fields to have lineHeight follow fontSize
+- c9e2a9b4: Fixed an issue that caused color modifiers values to be ignored when creating or updating variables
+
 ## 1.38.4
 
 ### Patch Changes
