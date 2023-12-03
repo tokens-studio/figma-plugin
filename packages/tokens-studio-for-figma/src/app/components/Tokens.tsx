@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup } from '@tokens-studio/ui';
+import { ToggleGroup, Tooltip } from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -161,12 +161,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
 
-  const handleSetTokensTabToList = React.useCallback(() => {
-    dispatch.uiState.setActiveTokensTab('list');
-  }, [dispatch.uiState]);
-
-  const handleSetTokensTabToJSON = React.useCallback(() => {
-    dispatch.uiState.setActiveTokensTab('json');
+  const handleSetTokensTab = React.useCallback((tab: 'list' | 'json') => {
+    dispatch.uiState.setActiveTokensTab(tab);
   }, [dispatch.uiState]);
 
   const tokensContextValue = React.useMemo(() => ({
@@ -219,10 +215,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingLeft: '$4',
-            paddingRight: '$4',
-            paddingTop: '$2',
-            paddingBottom: '$2',
+            padding: '$2',
             gap: '$2',
             borderBottom: '1px solid',
             borderColor: '$borderMuted',
@@ -246,24 +239,18 @@ function Tokens({ isActive }: { isActive: boolean }) {
               alignItems: 'center',
             }}
           >
-            <IconButton
-              variant={activeTokensTab === 'list' ? 'primary' : 'invisible'}
-              dataCy="tokensTabList"
-              onClick={handleSetTokensTabToList}
-              icon={<IconListing />}
-              size="small"
-              tooltipSide="bottom"
-              tooltip={t('listing')}
-            />
-            <IconButton
-              variant={activeTokensTab === 'json' ? 'primary' : 'invisible'}
-              dataCy="tokensTabJSON"
-              onClick={handleSetTokensTabToJSON}
-              icon={<IconJSON />}
-              size="small"
-              tooltipSide="bottom"
-              tooltip="JSON"
-            />
+            <ToggleGroup
+              type="single"
+              value={activeTokensTab}
+              onValueChange={handleSetTokensTab}
+            >
+              <ToggleGroup.Item value="list">
+                <IconListing />
+              </ToggleGroup.Item>
+              <ToggleGroup.Item value="json">
+                <IconJSON />
+              </ToggleGroup.Item>
+            </ToggleGroup>
           </Box>
         </Box>
         <Box
