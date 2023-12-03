@@ -168,6 +168,18 @@ const tokens = [
     type: TokenTypes.BOX_SHADOW,
   },
   {
+    name: 'shadow.shadowAlias1',
+    value: '{shadow.unResolvedSingle}',
+    description: 'the one with a nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
+    name: 'shadow.shadowAlias2',
+    value: '{shadow.multiple}',
+    description: 'the one with multiple nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
     name: 'colors.modify',
     value: '#00a2ba',
     $extensions: {
@@ -435,6 +447,37 @@ const output = [
       ...singleShadowToken.value,
       color: '#ff0000',
     },
+  },
+  {
+    ...unResolvedSingleShadowToken,
+    failedToResolve: true,
+    description: 'the one with a nested shadow alias',
+    name: 'shadow.shadowAlias1',
+    rawValue: '{shadow.unResolvedSingle}',
+    value: {
+      ...unResolvedSingleShadowToken.value,
+      color: '{colors.blue.500}',
+    },
+  },
+  {
+    ...multipleShadowToken,
+    description: 'the one with multiple nested shadow alias',
+    name: 'shadow.shadowAlias2',
+    rawValue: '{shadow.multiple}',
+    value: [
+      {
+        ...multipleShadowToken.value[0],
+        color: '#ff000080',
+      },
+      {
+        ...multipleShadowToken.value[1],
+        color: '#ff000066',
+      },
+      {
+        ...multipleShadowToken.value[2],
+        color: '#000000',
+      },
+    ],
   },
   {
     $extensions: {

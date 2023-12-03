@@ -1,3 +1,4 @@
+import { dump } from 'js-yaml';
 import { SingleToken } from '@/types/tokens';
 import { TokenMap } from '../types/TokenMap';
 
@@ -37,6 +38,7 @@ class TokenResolver {
     this.tokenMap = new Map();
     this.memo = new Map();
     this.populateTokenMap();
+
     return this.resolveTokenValues();
   }
 
@@ -46,7 +48,9 @@ class TokenResolver {
 
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
-
+      if (typeof resolvedValue.value === 'string' && AliasRegex.test(resolvedValue.value)) {
+        resolvedValue.failedToResolve = true;
+      }
       resolvedTokens.push({
         ...resolvedValue,
         rawValue: token.value,
@@ -211,7 +215,10 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-        const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
+
+        const yamlString = dump(finalValue);
+
+        const hasFailingReferences = AliasRegex.test(yamlString);
 
         resolvedToken = {
           ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
