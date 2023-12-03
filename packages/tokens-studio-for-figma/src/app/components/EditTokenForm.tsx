@@ -445,6 +445,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
+  const handleSubmitButton = React.useCallback(() => {
+    checkAndSubmitTokenValue();
+  }, [checkAndSubmitTokenValue]);
+
   const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey) {
       checkAndSubmitTokenValue();
@@ -569,7 +573,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
       <Stack gap={3} direction="column" justify="start">
         <Input
           required
@@ -609,7 +612,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Button variant="secondary" type="button" onClick={handleReset}>
             {t('cancel')}
           </Button>
-          <Button disabled={!isValid} variant="primary" type="submit">
+          <Button disabled={!isValid} variant="primary" type="button" onClick={handleSubmitButton}>
             {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
             {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
             {(
@@ -619,7 +622,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           </Button>
         </Stack>
       </Stack>
-    </form>
   );
 }
 
