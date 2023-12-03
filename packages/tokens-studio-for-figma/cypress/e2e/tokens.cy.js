@@ -9,7 +9,7 @@ const fillTokenForm = ({
 }) => {
   cy.get('input[name=name]').type(name);
   cy.get('[data-cy=mention-input-value]').type(value);
-  cy.get('input[name=name]').type('{enter}');
+  cy.get('[data-cy=mention-input-value]').type('{enter}');
 };
 
 const fillInput = ({
