@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { render, RenderOptions } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { init } from '@rematch/core';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { server } from '../../src/mocks/server';
 import { RootState, store } from '../../src/app/store';
 import { models } from '../../src/app/store/models';
@@ -13,7 +14,9 @@ import { undoableEnhancer } from '@/app/enhancers/undoableEnhancer';
 
 export const AllTheProviders: FC = ({ children }) => (
   <Provider store={store}>
-    {children}
+    <TooltipProvider>
+      {children}
+    </TooltipProvider>
   </Provider>
 );
 

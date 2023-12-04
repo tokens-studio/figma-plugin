@@ -73,7 +73,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
 
   return (
     <StyledStorageItem
-      data-cy={`storageitem-${provider}-${id}`}
+      data-testid={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
       active={isActive()}
     >

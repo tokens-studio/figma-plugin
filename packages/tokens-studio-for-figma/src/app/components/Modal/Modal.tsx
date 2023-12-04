@@ -90,7 +90,7 @@ export function Modal({
               )}
               <IconButton
                 onClick={handleClose}
-                data-cy="close-button"
+                data-testid="close-button"
                 data-testid="close-button"
                 icon={<XIcon />}
                 size="small"
@@ -98,7 +98,7 @@ export function Modal({
               />
             </Stack>
           )}
-          <StyledBody compact={compact} full={full} data-cy={id}>
+          <StyledBody compact={compact} full={full} data-testid={id}>
             {children}
           </StyledBody>
           {(!!footer) && (

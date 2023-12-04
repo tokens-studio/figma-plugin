@@ -114,7 +114,7 @@ export default function BitbucketForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <ErrorMessage data-cy="provider-modal-error">
+          <ErrorMessage data-testid="provider-modal-error">
             {errorMessage}
           </ErrorMessage>
         )}

@@ -27,7 +27,7 @@ export default function Select({
   css, value, id, onChange, children,
 }: React.PropsWithChildren<Props>) {
   return (
-    <StyledSelect css={css} value={value} name={id} data-cy={id} id={id} onChange={onChange}>
+    <StyledSelect css={css} value={value} name={id} data-testid={id} id={id} onChange={onChange}>
       {children}
     </StyledSelect>
   );

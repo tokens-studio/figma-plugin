@@ -43,7 +43,7 @@ export default function ApplySelector() {
   return (
     <Stack direction="row">
       <Button
-        id="update-button"
+        data-testid="update-button"
         variant="primary"
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}

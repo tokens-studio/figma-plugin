@@ -130,7 +130,7 @@ export default function CreateBranchModal({
           />
           {
             !isBranchNameValid && (
-              <ErrorMessage data-cy="provider-modal-error">
+              <ErrorMessage data-testid="provider-modal-error">
                 Branch name cannot contain spaces
               </ErrorMessage>
             )
@@ -144,7 +144,7 @@ export default function CreateBranchModal({
             </Button>
           </Stack>
           {hasErrored && (
-            <ErrorMessage data-cy="provider-modal-error">
+            <ErrorMessage data-testid="provider-modal-error">
               There was an error connecting. Check your credentials.
             </ErrorMessage>
           )}

@@ -74,14 +74,14 @@ export default function BorderTokenForm({
           mode === 'input' ? (
             <IconButton
               tooltip={t('reference-mode')}
-              dataCy="mode-change-button"
+              data-testid="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
               tooltip={t('input-mode')}
-              dataCy="mode-change-button"
+              data-testid="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
             />

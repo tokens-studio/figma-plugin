@@ -104,7 +104,7 @@ function Inspector() {
           <Stack direction="row">
             <IconButton
               variant={inspectView === 'multi' ? 'primary' : 'invisible'}
-              dataCy="inspector-multi"
+              data-testid="inspector-multi"
               onClick={handleSetInspectViewMulti}
               icon={<IconInspect />}
               tooltipSide="bottom"
@@ -112,7 +112,7 @@ function Inspector() {
             />
             <IconButton
               variant={inspectView === 'debug' ? 'primary' : 'invisible'}
-              dataCy="inspector-debug"
+              data-testid="inspector-debug"
               onClick={handleSetInspectViewDebug}
               icon={<IconDebug />}
               tooltipSide="bottom"

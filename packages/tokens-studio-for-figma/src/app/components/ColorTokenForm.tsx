@@ -240,7 +240,7 @@ export default function ColorTokenForm({
           !modifyVisible ? (
             <IconButton
               tooltip={t('addNewModifier')}
-              dataCy="button-add-new-modify"
+              data-testid="button-add-new-modify"
               onClick={addModify}
               disabled={!colorModifier}
               icon={<IconPlus />}
@@ -248,7 +248,7 @@ export default function ColorTokenForm({
           ) : (
             <IconButton
               tooltip={t('removeModifier')}
-              dataCy="button-remove=modify"
+              data-testid="button-remove=modify"
               onClick={removeModify}
               disabled={!colorModifier}
               icon={<IconMinus />}
@@ -271,7 +271,7 @@ export default function ColorTokenForm({
             >
               <DropdownMenu open={operationMenuOpened} onOpenChange={handleOperationToggleMenu}>
                 <DropdownMenuTrigger
-                  data-cy="colortokenform-operation-selector"
+                  data-testid="colortokenform-operation-selector"
                   bordered
                   css={{
                     flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
@@ -288,7 +288,7 @@ export default function ColorTokenForm({
               </DropdownMenu>
               <DropdownMenu open={colorSpaceMenuOpened} onOpenChange={handleColorSpaceToggleMenu}>
                 <DropdownMenuTrigger
-                  data-cy="colortokenform-colorspace-selector"
+                  data-testid="colortokenform-colorspace-selector"
                   bordered
                   css={{
                     flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',

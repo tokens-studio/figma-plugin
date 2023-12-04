@@ -105,7 +105,7 @@ export default function InspectorTokenSingle({
         paddingTop: '$2',
         paddingBottom: '$2',
       }}
-      data-cy={`inspector-token-single-${token.category}`}
+      data-testid={`inspector-token-single-${token.category}`}
     >
       <Box
         css={{
@@ -144,7 +144,7 @@ export default function InspectorTokenSingle({
             !token.resolvedValue && (
             <IconButton
               tooltip={t('changeToAnotherToken')}
-              dataCy="button-token-remap"
+              data-testid="button-token-remap"
               onClick={handleClick}
               icon={<IconToggleableDisclosure />}
               size="small"

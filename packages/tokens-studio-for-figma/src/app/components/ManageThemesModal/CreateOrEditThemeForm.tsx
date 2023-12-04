@@ -92,7 +92,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
             tooltip="Return to overview"
-            data-cy="button-return-to-overview"
+            data-testid="button-return-to-overview"
             data-testid="button-return-to-overview"
             icon={<IconBack />}
             size="small"
@@ -103,7 +103,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             showGroupInput ? (
               <Input
                 autofocus
-                data-cy="create-or-edit-theme-form--group--name"
+                data-testid="create-or-edit-theme-form--group--name"
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
               />
@@ -142,7 +142,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           }
           <Box>/</Box>
           <Input
-            data-cy="create-or-edit-theme-form--input--name"
+            data-testid="create-or-edit-theme-form--input--name"
             data-testid="create-or-edit-theme-form--input--name"
             {...register('name', { required: true })}
           />

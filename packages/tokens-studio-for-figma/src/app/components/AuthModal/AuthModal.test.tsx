@@ -42,8 +42,8 @@ describe('Add license key', () => {
     );
 
     const loginButton = screen.getByRole('button', { name: /log in/i });
-    const emailInput = screen.getByTestId('input-email');
-    const passInput = screen.getByTestId('input-password');
+    const emailInput = screen.getByRole('textbox', { name: /email/i });
+    const passInput = screen.getByLabelText(/password/i);
 
     expect(loginButton).toBeInTheDocument();
     expect(emailInput).toBeInTheDocument();
@@ -80,10 +80,8 @@ describe('Add license key', () => {
 
     fireEvent.click(signupLink);
 
-    const signupMessage = screen.getByText(/already have an account \?/i);
-    const loginLink = screen.getByText(/log in here/i);
+    const loginLink = screen.getByText(/back to login/i);
 
-    expect(signupMessage).toBeInTheDocument();
     expect(loginLink).toBeInTheDocument();
   });
 
@@ -103,7 +101,7 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    const emailInput = screen.getByTestId('input-email');
+    const emailInput = screen.getByRole('textbox', { name: /email/i });
     expect(emailInput).toHaveValue(usedEmail);
   });
 
@@ -130,8 +128,8 @@ describe('Add license key', () => {
     );
 
     const loginButton = screen.getByRole('button', { name: /log in/i });
-    const emailInput = screen.getByTestId('input-email');
-    const passInput = screen.getByTestId('input-password');
+    const emailInput = screen.getByRole('textbox', { name: /email/i });
+    const passInput = screen.getByLabelText(/password/i);
 
     expect(loginButton).toBeInTheDocument();
     expect(emailInput).toBeInTheDocument();
@@ -184,8 +182,8 @@ it('Displays signup error', async () => {
   fireEvent.click(signupLink);
 
   const signupButton = screen.getByRole('button', { name: /sign up/i });
-  const emailInput = screen.getByTestId('input-email');
-  const passInput = screen.getByTestId('input-password');
+  const emailInput = screen.getByRole('textbox', { name: /email/i });
+  const passInput = screen.getByLabelText(/password/i);
 
   expect(signupButton).toBeInTheDocument();
   expect(emailInput).toBeInTheDocument();

@@ -30,7 +30,7 @@ export default function Callout({
             <Heading>{heading}</Heading>
             <Text size="xsmall">{description}</Text>
           </Stack>
-          <Button data-cy={id} size="small" variant="primary" onClick={action.onClick}>
+          <Button data-testid={id} size="small" variant="primary" onClick={action.onClick}>
             {action.text}
           </Button>
         </Stack>

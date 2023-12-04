@@ -85,7 +85,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
       <ScrollDropdownMenuRadioItem
         key={value}
         value={value}
-        data-cy={`themeselector--themeoptions--${value}`}
+        data-testid={`themeselector--themeoptions--${value}`}
         data-testid={`themeselector--themeoptions--${value}`}
         // @README we can disable this because we are using Memo for the whole list anyways
         // eslint-disable-next-line react/jsx-no-bind
@@ -126,7 +126,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   return (
     <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
       <DropdownMenu>
-        <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
+        <DropdownMenuTrigger data-testid="themeselector-dropdown" data-testid="themeselector-dropdown">
           <Flex>
             <ThemeDropdownLabel muted size="xsmall">
               {t('theme')}
@@ -150,7 +150,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
             {availableThemeOptions}
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              data-cy="themeselector-managethemes"
+              data-testid="themeselector-managethemes"
               css={{
                 paddingLeft: '$6', fontSize: '$xsmall', display: 'flex', justifyContent: 'space-between',
               }}

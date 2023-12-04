@@ -60,7 +60,7 @@ export default function ActionButton({
 
   return (
     <Box css={css}>
-      <StyledButton disabled={disabled} data-cy={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
+      <StyledButton disabled={disabled} data-testid={dataCy} type="button" onClick={handleClick} buttonVariant={variant}>
         {icon ? <Box css={{ transition: 'transform 200ms ease-in-out', transform: 'var(--transform)' }}>{icon}</Box> : null}
         {text}
       </StyledButton>

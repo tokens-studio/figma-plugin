@@ -82,7 +82,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<React.PropsWithChi
             <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
           )}
         </Box>
-        <IconButton size="small" variant="invisible" tooltip="Detach style" icon={<LinkBreak2Icon />} dataCy="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
+        <IconButton size="small" variant="invisible" tooltip="Detach style" icon={<LinkBreak2Icon />} data-testid="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
       </Flex>
     </Flex>
   );

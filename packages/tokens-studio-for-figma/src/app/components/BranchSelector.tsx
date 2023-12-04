@@ -50,7 +50,7 @@ const BranchSwitchMenuItemElement: React.FC<React.PropsWithChildren<React.PropsW
   ), [branch, createNewBranchFrom]);
 
   return (
-    <BranchSwitchMenuItem data-cy={`branch-selector-create-branch-from-branch-${branch}`} onSelect={onSelect}>
+    <BranchSwitchMenuItem data-testid={`branch-selector-create-branch-from-branch-${branch}`} onSelect={onSelect}>
       <GitBranchIcon size={12} />
       {` ${branch}`}
     </BranchSwitchMenuItem>
@@ -195,7 +195,7 @@ export default function BranchSelector() {
     currentBranch
       ? (
         <BranchSwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <BranchSwitchMenuMainTrigger data-cy="branch-selector-menu-trigger">
+          <BranchSwitchMenuMainTrigger data-testid="branch-selector-menu-trigger">
             <GitBranchIcon size={16} />
             <span>{currentBranch}</span>
           </BranchSwitchMenuMainTrigger>
@@ -217,7 +217,7 @@ export default function BranchSelector() {
                 && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
             </BranchSwitchMenuRadioGroup>
             <BranchSwitchMenu>
-              <BranchSwitchMenuTrigger data-cy="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
+              <BranchSwitchMenuTrigger data-testid="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
                 {t('createNewBranch')}
 
                 <ChevronRightIcon />
@@ -225,7 +225,7 @@ export default function BranchSelector() {
               <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="right" align="end">
                 {hasChanges
                   && (
-                    <BranchSwitchMenuItem data-cy="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
+                    <BranchSwitchMenuItem data-testid="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
                       {t('currentChanges')}
                     </BranchSwitchMenuItem>
                   )}

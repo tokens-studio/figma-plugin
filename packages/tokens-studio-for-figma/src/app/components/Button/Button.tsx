@@ -50,7 +50,7 @@ const Button: React.FC<React.PropsWithChildren<React.PropsWithChildren<ButtonPro
         rel="noreferrer"
         download={download}
         href={href}
-        data-cy={id}
+        data-testid={id}
         data-testid={id}
       >
         <StyledButton
@@ -77,7 +77,7 @@ const Button: React.FC<React.PropsWithChildren<React.PropsWithChildren<ButtonPro
     // eslint-disable-next-line react/button-has-type
     (
       <StyledButton
-        data-cy={id}
+        data-testid={id}
         data-testid={id}
         ref={buttonRef}
         disabled={disabled}

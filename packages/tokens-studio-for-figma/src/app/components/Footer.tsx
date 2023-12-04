@@ -95,7 +95,7 @@ export default function Footer() {
           <>
             <BranchSelector />
             <IconButton
-              dataCy="footer-pull-button"
+              data-testid="footer-pull-button"
               badge={hasRemoteChange}
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
@@ -107,7 +107,7 @@ export default function Footer() {
               }) as string}
             />
             <IconButton
-              dataCy="footer-push-button"
+              data-testid="footer-push-button"
               badge={hasChanges}
               icon={<UploadIcon />}
               onClick={onPushButtonClicked}
@@ -126,7 +126,7 @@ export default function Footer() {
         {storageType.provider === StorageProviderType.SUPERNOVA && (
           <>
             <IconButton
-              dataCy="footer-pull-button"
+              data-testid="footer-pull-button"
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
               variant="invisible"
@@ -140,7 +140,7 @@ export default function Footer() {
 }
             />
             <IconButton
-              dataCy="footer-push-button"
+              data-testid="footer-push-button"
               badge={hasChanges}
               icon={<UploadIcon />}
               onClick={onPushButtonClicked}

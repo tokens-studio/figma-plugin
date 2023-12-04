@@ -148,7 +148,7 @@ export default function GenericVersionedForm({
         <DropdownMenu>
           <Stack direction="column" gap={0}>
             <Label htmlFor="flow-dropdown">{t('providers.generic.flowType')}</Label>
-            <DropdownMenuTrigger id="flow-dropdown" bordered data-cy="flow-dropdown" data-testid="flow-dropdown">
+            <DropdownMenuTrigger id="flow-dropdown" bordered data-testid="flow-dropdown" data-testid="flow-dropdown">
               <Text size="small">{flow}</Text>
               <TriangleDownIcon />
             </DropdownMenuTrigger>
@@ -219,7 +219,7 @@ export default function GenericVersionedForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <ErrorMessage data-cy="provider-modal-error">
+          <ErrorMessage data-testid="provider-modal-error">
             {errorMessage}
           </ErrorMessage>
         )}

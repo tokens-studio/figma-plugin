@@ -215,7 +215,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               type="text"
               name="tokensetname"
               required
-              data-cy="token-set-input"
+              data-testid="token-set-input"
               data-testid="create-set-input"
               autofocus
             />
@@ -223,14 +223,14 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
                 {t('cancel')}
               </Button>
-              <Button data-cy="create-token-set" type="submit" variant="primary">
+              <Button data-testid="create-token-set" type="submit" variant="primary">
                 {t('create')}
               </Button>
             </Stack>
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-cy="button-new-token-set" data-testid="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         {t('sets.new')}
         <IconAdd />
       </StyledButton>

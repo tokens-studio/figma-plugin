@@ -63,7 +63,7 @@ describe('Loads application', () => {
         },
       },
     });
-    cy.get('[data-cy=tokenlisting-sizing]').should('exist');
+    cy.get('[data-testid=tokenlisting-sizing]').should('exist');
   });
 
   it('shows welcome page when no token values are given', () => {

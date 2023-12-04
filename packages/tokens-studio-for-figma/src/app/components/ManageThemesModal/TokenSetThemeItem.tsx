@@ -93,14 +93,14 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
             </StyledThemeLabel>
           </Button>
           <DropdownMenu>
-            <DropdownMenuTrigger data-cy={`tokensettheme-item--dropdown-trigger--${item.key}`}>
+            <DropdownMenuTrigger data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`}>
               <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
               <IconChevronDown />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom">
               <DropdownMenuRadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
                 {tokenSetStatusValues.map((status) => (
-                  <DropdownMenuRadioItem key={status} value={status} data-cy={`tokensettheme-item--dropdown-content--${status}`}>
+                  <DropdownMenuRadioItem key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
                     <DropdownMenuItemIndicator>
                       <CheckIcon />
                     </DropdownMenuItemIndicator>

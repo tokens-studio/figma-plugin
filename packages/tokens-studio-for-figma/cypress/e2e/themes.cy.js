@@ -65,16 +65,16 @@ describe('Themes', () => {
 
   it('Can create a new theme', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="themeselector-dropdown"]').click();
-    cy.get('[data-cy="themeselector-managethemes"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-new-theme"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-new-group"]').click();
-    cy.get('[data-cy="create-or-edit-theme-form--group--name"]').type('GroupA');
-    cy.get('[data-cy="create-or-edit-theme-form--input--name"]').type('My first theme');
-    cy.get('[data-cy="tokensettheme-item--dropdown-trigger--global-set"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-content--source"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-save-theme"]').click();
-    cy.get('[data-cy="singlethemeentry"]').should('have.length', 1)
+    cy.get('[data-testid="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-new-group"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--group--name"]').type('GroupA');
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('My first theme');
+    cy.get('[data-testid="tokensettheme-item--dropdown-trigger--global-set"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-content--source"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click();
+    cy.get('[data-testid="singlethemeentry"]').should('have.length', 1)
   });
 
   it('Can enable a previously created theme', () => {
@@ -93,9 +93,9 @@ describe('Themes', () => {
         ],
       },
     });
-    cy.get('[data-cy="themeselector-dropdown"]').click()
-    cy.get('[data-cy="themeselector--themeoptions--my-first-theme"]').click()
-    cy.get('[data-cy="themeselector-dropdown"]').should('have.text', 'Theme:My first theme')
+    cy.get('[data-testid="themeselector-dropdown"]').click()
+    cy.get('[data-testid="themeselector--themeoptions--my-first-theme"]').click()
+    cy.get('[data-testid="themeselector-dropdown"]').should('have.text', 'Theme:My first theme')
   });
 
   it('Can delete a theme', () => {
@@ -114,10 +114,10 @@ describe('Themes', () => {
         ],
       },
     });
-    cy.get('[data-cy="themeselector-dropdown"]').click()
-    cy.get('[data-cy="themeselector-managethemes"]').click();
-    cy.get('[data-cy="singlethemeentry-my-first-theme"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-delete-theme"]').click();
-    cy.get('[data-cy="singlethemeentry"]').should('have.length', 0)
+    cy.get('[data-testid="themeselector-dropdown"]').click()
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+    cy.get('[data-testid="singlethemeentry-my-first-theme"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-delete-theme"]').click();
+    cy.get('[data-testid="singlethemeentry"]').should('have.length', 0)
   });
 });

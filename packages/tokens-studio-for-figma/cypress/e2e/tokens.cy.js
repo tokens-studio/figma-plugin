@@ -8,8 +8,8 @@ const fillTokenForm = ({
   value
 }) => {
   cy.get('input[name=name]').type(name);
-  cy.get('[data-cy=mention-input-value]').type(value);
-  cy.get('[data-cy=mention-input-value]').type('{enter}');
+  cy.get('[data-testid=mention-input-value]').type(value);
+  cy.get('[data-testid=mention-input-value]').type('{enter}');
 };
 
 const fillInput = ({
@@ -29,10 +29,10 @@ const fillValueInput = ({
   input,
   value
 }) => {
-  cy.get(`[data-cy=mention-input-${input}]`).type(`{selectall} ${value}`);
+  cy.get(`[data-testid=mention-input-${input}]`).type(`{selectall} ${value}`);
 
   if (submit) {
-    cy.get(`[data-cy=mention-input-${input}]`).type('{enter}');
+    cy.get(`[data-testid=mention-input-${input}]`).type('{enter}');
   }
 };
 
@@ -42,10 +42,10 @@ const fillInputNth = ({
   value,
   nth,
 }) => {
-  cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type(`{selectall}${value}`);
+  cy.get(`[data-testid=mention-input-${input}]`).eq(nth).type(`{selectall}${value}`);
 
   if (submit) {
-    cy.get(`[data-cy=mention-input-${input}]`).eq(nth).type('{enter}');
+    cy.get(`[data-testid=mention-input-${input}]`).eq(nth).type('{enter}');
   }
 };
 
@@ -101,7 +101,7 @@ describe('TokenListing', () => {
 
   it('can add a new token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -117,7 +117,7 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-sizing] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillTokenForm({
@@ -125,7 +125,7 @@ describe('TokenListing', () => {
       value: '4',
     });
     cy.get('@postMessage').should('be.calledThrice');
-    cy.get('[data-cy=tokenlisting-sizing] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-sizing] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillTokenForm({
@@ -136,7 +136,7 @@ describe('TokenListing', () => {
 
   it('can add a new shadow token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -152,7 +152,7 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-boxShadow] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillInput({
@@ -186,7 +186,7 @@ describe('TokenListing', () => {
 
   it('can add multiple shadow tokens', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -202,7 +202,7 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-boxShadow] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-boxShadow] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillInput({
@@ -229,7 +229,7 @@ describe('TokenListing', () => {
       input: 'blur',
       value: '0',
     });
-    cy.get('[data-cy=button-shadow-add-multiple]').click({
+    cy.get('[data-testid=button-shadow-add-multiple]').click({
       timeout: 1000
     });
     fillInputNth({
@@ -248,7 +248,7 @@ describe('TokenListing', () => {
 
   it('can add a new typography token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -264,7 +264,7 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-typography] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-typography] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillInput({
@@ -302,7 +302,7 @@ describe('TokenListing', () => {
 
   it('can add a new token in group', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -319,7 +319,7 @@ describe('TokenListing', () => {
       },
     });
     cy.get(
-      '[data-cy=tokenlisting-sizing] [data-cy=token-group-sizing] [data-cy=button-add-new-token-in-group]',
+      '[data-testid=tokenlisting-sizing] [data-testid=token-group-sizing] [data-testid=button-add-new-token-in-group]',
     ).click({
       timeout: 1000
     });
@@ -332,7 +332,7 @@ describe('TokenListing', () => {
 
   it('token listing stays collapsed after creating a new token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -348,22 +348,22 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-header-sizing]').click({
+    cy.get('[data-testid=tokenlisting-header-sizing]').click({
       timeout: 1000
     });
-    cy.get('[data-cy=tokenlisting-opacity] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-opacity] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillTokenForm({
       name: 'sizing.sm',
       value: '4',
     });
-    cy.get('[data-cy=tokenlisting-sizing-content]').should('be.hidden');
+    cy.get('[data-testid=tokenlisting-sizing-content]').should('be.hidden');
   });
 
   it('can add a new composition token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible')
+    cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -387,23 +387,23 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-cy=tokenlisting-composition] [data-cy=button-add-new-token]').click({
+    cy.get('[data-testid=tokenlisting-composition] [data-testid=button-add-new-token]').click({
       timeout: 1000
     });
     fillInput({
       input: 'name',
       value: 'composition.regular',
     });
-    cy.get('[data-cy=composition-token-dropdown]').click();
-    cy.get('[data-cy=item-dropdown-menu-element-sizing]').click();
+    cy.get('[data-testid=composition-token-dropdown]').click();
+    cy.get('[data-testid=item-dropdown-menu-element-sizing]').click();
     fillValueInput({
       input: 'value',
       value: '$sizing.xs',
     });
-    cy.get('[data-cy=button-style-add-multiple]').click();
+    cy.get('[data-testid=button-style-add-multiple]').click();
 
-    cy.get('[data-cy=composition-token-dropdown]').eq(1).click();
-    cy.get('[data-cy=item-dropdown-menu-element-fontFamilies]').click();
+    cy.get('[data-testid=composition-token-dropdown]').eq(1).click();
+    cy.get('[data-testid=item-dropdown-menu-element-fontFamilies]').click();
     fillInputNth({
       input: 'value',
       value: '$fontFamilies.aria',

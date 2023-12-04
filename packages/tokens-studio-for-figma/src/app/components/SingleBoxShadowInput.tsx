@@ -223,7 +223,7 @@ export default function SingleBoxShadowInput({
         {isMultiple && (
           <IconButton
             tooltip={t('shadow.removeThisShadow')}
-            dataCy="button-shadow-remove-multiple"
+            data-testid="button-shadow-remove-multiple"
             onClick={handleRemove}
             icon={<IconMinus />}
           />

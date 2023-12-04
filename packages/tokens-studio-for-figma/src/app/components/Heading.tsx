@@ -39,7 +39,7 @@ function Heading({
   size = 'small', children, id, muted,
 }: HeadingProps) {
   return (
-    <StyledHeading size={size} muted={muted} data-cy={id}>
+    <StyledHeading size={size} muted={muted} data-testid={id}>
       {children}
     </StyledHeading>
   );

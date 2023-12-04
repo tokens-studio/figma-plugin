@@ -52,7 +52,7 @@ export default function TokenFlowButton() {
           size="small"
           variant="invisible"
           tooltip="Open visualization flow"
-          dataCy="token-flow-button"
+          data-testid="token-flow-button"
           loading={loading}
           onClick={handleOpenTokenFlowApp}
           icon={<FlowIcon />}

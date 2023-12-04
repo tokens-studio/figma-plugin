@@ -1,12 +1,12 @@
 import React from 'react';
 import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { Link } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import Box from './Box';
 import Heading from './Heading';
 import Stack from './Stack';
 import IconButton from './IconButton';
-import { Link } from '@tokens-studio/ui';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
   color: '$accentDefault',
@@ -46,7 +46,7 @@ export default function OnboardingExplainer({ data, closeOnboarding }: Props) {
           <StyledInfoIconButton />
           <Heading size="small">{data.title}</Heading>
         </Stack>
-        <IconButton variant="invisible" size="small" dataCy="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
+        <IconButton variant="invisible" size="small" data-testid="closeButton" onClick={closeOnboarding} icon={<Cross1Icon />} />
       </Stack>
       <StyledTextPlan>
         {data.text}

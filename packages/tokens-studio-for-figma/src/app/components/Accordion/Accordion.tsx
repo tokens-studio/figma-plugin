@@ -34,6 +34,7 @@ export function Accordion({
       }}
       >
         <IconButton
+          data-testid="accordion-toggle"
           size="small"
           variant="invisible"
           icon={isOpen ? <IconChevronDown /> : <IconChevronRight />}
@@ -64,7 +65,7 @@ export function Accordion({
             }}
             key="content"
             data-testid="accordion-content"
-            data-cy="accordion-content"
+            data-testid="accordion-content"
             transition={reducedMotion ? {
               duration: 0,
             } : undefined}

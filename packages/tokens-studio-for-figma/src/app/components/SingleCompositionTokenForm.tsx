@@ -100,7 +100,7 @@ export default function SingleCompositionTokenForm({
     >
       <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
         <DropdownMenuTrigger
-          data-cy="composition-token-dropdown"
+          data-testid="composition-token-dropdown"
           bordered
           css={{
             width: '130px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', height: '$10',
@@ -133,7 +133,7 @@ export default function SingleCompositionTokenForm({
       <Box css={{ width: '$5', marginRight: '$3' }}>
         <IconButton
           tooltip={t('removeThisStyle')}
-          dataCy="button-style-remove-multiple"
+          data-testid="button-style-remove-multiple"
           onClick={handleRemove}
           icon={<IconMinus />}
         />
