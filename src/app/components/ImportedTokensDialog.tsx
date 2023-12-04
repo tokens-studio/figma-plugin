@@ -106,7 +106,7 @@ export default function ImportedTokensDialog() {
     // TODO: This should probably be a batch operation
     newTokens.forEach((token) => {
       createSingleToken({
-        parent: activeTokenSet,
+        parent: token.parent ? token.parent : activeTokenSet,
         name: token.name,
         type: token.type,
         value: token.value,
@@ -122,7 +122,7 @@ export default function ImportedTokensDialog() {
     // TODO: This should probably be a batch operation
     updatedTokens.forEach((token) => {
       editSingleToken({
-        parent: activeTokenSet,
+        parent: token.parent ? token.parent : activeTokenSet,
         name: token.name,
         value: token.value,
         type: token.type,
@@ -170,6 +170,7 @@ export default function ImportedTokensDialog() {
     dispatch.tokenState.resetImportedTokens();
   }, [dispatch]);
 
+  // If the imported tokens change, update the state
   React.useEffect(() => {
     setNewTokens(importedTokens.newTokens);
     setUpdatedTokens(importedTokens.updatedTokens);

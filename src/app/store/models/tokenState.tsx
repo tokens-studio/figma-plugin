@@ -25,6 +25,8 @@ import {
   DuplicateTokenPayload,
   DeleteTokenGroupPayload,
   StyleToCreateToken,
+  VariableToCreateToken,
+  SetTokensFromVariablesPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -207,11 +209,19 @@ export const tokenState = createModel<RootModel>()({
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
-      const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
-      if (!existingToken) {
+      if (data.parent in state.tokens) {
+        const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
+        if (!existingToken) {
+          newTokens = {
+            [data.parent]: [
+              ...state.tokens[data.parent],
+              updateTokenPayloadToSingleToken(data, uuidv4()),
+            ],
+          };
+        }
+      } else {
         newTokens = {
           [data.parent]: [
-            ...state.tokens[data.parent],
             updateTokenPayloadToSingleToken(data, uuidv4()),
           ],
         };
@@ -270,6 +280,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+
     // Imports received styles as tokens, if needed
     setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
       const newTokens: StyleToCreateToken[] = [];
@@ -279,6 +290,7 @@ export const tokenState = createModel<RootModel>()({
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
           const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
+
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               if (
@@ -299,6 +311,51 @@ export const tokenState = createModel<RootModel>()({
             }
           } else {
             newTokens.push(token);
+          }
+        });
+      });
+
+      return {
+        ...state,
+        importedTokens: {
+          newTokens,
+          updatedTokens,
+        },
+      } as TokenState;
+    },
+    // Imports received variables as tokens, if needed
+    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload): TokenState => {
+      const newTokens: VariableToCreateToken[] = [];
+      const existingTokens: VariableToCreateToken[] = [];
+      const updatedTokens: VariableToCreateToken[] = [];
+
+      // Iterate over received styles and check if they existed before or need updating
+      Object.values(receivedVariables).forEach((values) => {
+        values.forEach((token) => {
+          if (state.tokens && state.tokens[token.parent]) {
+            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+
+            if (oldValue) {
+              if (isEqual(oldValue.value, token.value)) {
+                if (
+                  oldValue.description === token.description
+                  || (typeof token.description === 'undefined' && oldValue.description === '')
+                ) {
+                  existingTokens.push(token);
+                } else {
+                  updatedTokens.push({
+                    ...token,
+                    oldDescription: oldValue.description,
+                  });
+                }
+              } else {
+                const updatedToken = { ...token };
+                updatedToken.oldValue = oldValue.value;
+                updatedTokens.push(updatedToken);
+              }
+            } else {
+              newTokens.push(token);
+            }
           }
         });
       });
@@ -513,6 +570,10 @@ export const tokenState = createModel<RootModel>()({
   },
   effects: (dispatch) => ({
     editToken(payload: UpdateTokenPayload, rootState) {
+      if (payload.parent && !rootState.tokenState.tokens[payload.parent]) {
+        console.error('Token parent does not exist', payload.parent);
+      }
+
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
       }

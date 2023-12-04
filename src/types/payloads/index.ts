@@ -1,4 +1,5 @@
 export * from './SetTokensFromStylesPayload';
+export * from './SetTokensFromVariablesPayload';
 export * from './UpdateTokenPayload';
 export * from './DeleteTokenPayload';
 export * from './SetTokenDataPayload';
