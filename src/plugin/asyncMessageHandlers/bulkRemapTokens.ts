@@ -8,6 +8,8 @@ import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { postToUI } from '../notifiers';
 import { ProgressTracker } from '../ProgressTracker';
 import { defaultWorker } from '../Worker';
+import getAppliedVariablesFromNode from '../getAppliedVariablesFromNode';
+import getAppliedStylesFromNode from '../getAppliedStylesFromNode';
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
@@ -37,6 +39,44 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
             node.setSharedPluginData(namespace, key, jsonValue);
           }
         });
+
+        if (Object.keys(tokens).length === 0) {
+          if (getAppliedVariablesFromNode(node).length > 0) {
+            const { name: variableName, type: variableType } = getAppliedVariablesFromNode(node)[0];
+
+            const savedVariableData = node.getSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType);
+            if (savedVariableData.length > 0) {
+              if (savedVariableData.includes(oldName)) {
+                const newValue = JSON.parse(savedVariableData).replace(oldName, newName);
+                const jsonValue = JSON.stringify(newValue);
+                node.setSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType, jsonValue);
+              }
+            } else if (variableName.includes(oldName)) {
+              const newValue = variableName.replace(oldName, newName);
+              const jsonValue = JSON.stringify(newValue);
+              node.setSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType, jsonValue);
+            }
+          }
+
+          if (getAppliedStylesFromNode(node).length > 0) {
+            const { name: styleName, type: styleType } = getAppliedStylesFromNode(node)[0];
+
+            const savedStyleData = node.getSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType);
+
+            if (savedStyleData.length > 0) {
+              if (savedStyleData.includes(oldName)) {
+                const newValue = JSON.parse(savedStyleData).replace(oldName, newName);
+                const jsonValue = JSON.stringify(newValue);
+                node.setSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType, jsonValue);
+              }
+            } else if (styleName.includes(oldName)) {
+              const newValue = styleName.replace(oldName, newName);
+              const jsonValue = JSON.stringify(newValue);
+              node.setSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType, jsonValue);
+            }
+          }
+        }
+
         tracker.next();
         tracker.reportIfNecessary();
       }));
