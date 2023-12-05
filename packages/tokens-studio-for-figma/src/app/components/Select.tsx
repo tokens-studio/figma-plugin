@@ -10,7 +10,7 @@ const StyledSelect = styled('select', {
   lineHeight: 1,
   backgroundColor: '$bgDefault',
   color: '$fgDefault',
-  border: '1px solid $borderDefault',
+  border: '1px solid $borderMuted',
   cursor: 'pointer',
   '&:focus': { boxShadow: '$focus', outline: 'none' },
 });

@@ -212,7 +212,13 @@ export default function SingleBoxShadowInput({
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} ref={ref}>
         {isMultiple && (
           <Box css={{ display: 'flex', width: '$8' }}>
-            <IconButton tooltip="Click to drag" icon={<IconGrabber />} data-handler-id={handlerId} />
+            <IconButton
+              tooltip="Click to drag"
+              icon={<IconGrabber />}
+              data-handler-id={handlerId}
+              variant="invisible"
+              size="small"
+            />
           </Box>
         )}
         <Tooltip label="type"><StyledPrefix isText>{t('type')}</StyledPrefix></Tooltip>
@@ -226,6 +232,7 @@ export default function SingleBoxShadowInput({
             data-testid="button-shadow-remove-multiple"
             onClick={handleRemove}
             icon={<IconMinus />}
+            variant="invisible"
           />
         )}
       </Box>
