@@ -38,6 +38,7 @@ function NewOrExistingToken({
   return (
     <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
       <Stack direction="column" gap={1}>
+        <Text size="xsmall" muted>{token.parent}</Text>
         <Text bold size="small">{token.name}</Text>
         <Stack direction="row" align="center" gap={1}>
           <Box css={{
@@ -105,6 +106,8 @@ export default function ImportedTokensDialog() {
     // Create new tokens according to styles
     // TODO: This should probably be a batch operation
     newTokens.forEach((token) => {
+      // Add new token sets here
+
       createSingleToken({
         parent: token.parent ? token.parent : activeTokenSet,
         name: token.name,
@@ -181,7 +184,7 @@ export default function ImportedTokensDialog() {
   return (
     <Modal
       full
-      title={t('importStyles')}
+      title="Import"
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}

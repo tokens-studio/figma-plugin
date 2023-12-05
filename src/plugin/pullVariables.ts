@@ -95,6 +95,7 @@ export default function pullVariables(options: PullVariablesOptions): void {
     booleans,
     strings,
     numbers,
+    dimensions,
   };
 
   type ResultObject = Record<string, VariableToCreateToken[]>;

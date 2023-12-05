@@ -98,6 +98,11 @@ export default function useManageTokens() {
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
 
+    // Importing a variable token can make a new set
+    if (!store.getState().tokenState.tokens[parent]) {
+      dispatch.tokenState.addTokenSet(parent, true);
+    }
+
     if (shouldUpdate) {
       createToken({
         parent,
@@ -110,7 +115,7 @@ export default function useManageTokens() {
       } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
-  }, [createToken, dispatch.uiState]);
+  }, [createToken, dispatch.uiState, dispatch.tokenState, store]);
 
   const duplicateSingleToken = useCallback(async (data: DuplicateTokenPayload) => {
     dispatch.uiState.startJob({
