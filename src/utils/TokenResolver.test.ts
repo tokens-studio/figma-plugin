@@ -168,6 +168,18 @@ const tokens = [
     type: TokenTypes.BOX_SHADOW,
   },
   {
+    name: 'shadow.shadowAlias1',
+    value: '{shadow.unResolvedSingle}',
+    description: 'the one with a nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
+    name: 'shadow.shadowAlias2',
+    value: '{shadow.multiple}',
+    description: 'the one with multiple nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
     name: 'colors.modify',
     value: '#00a2ba',
     $extensions: {
@@ -215,6 +227,66 @@ const tokens = [
     name: 'deepreference',
     value: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
+  },
+  {
+    name: 'colors.lilac.500',
+    value: '#ff0000',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'primary',
+    value: 'lilac',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'nestedprimary',
+    value: '{primary}',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'thatprimarycolor',
+    value: '{colors.{primary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'thatnestedprimarycolor',
+    value: '{colors.{nestedprimary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: '0',
+    type: TokenTypes.DIMENSION,
   },
 ];
 
@@ -412,6 +484,37 @@ const output = [
     },
   },
   {
+    ...unResolvedSingleShadowToken,
+    failedToResolve: true,
+    description: 'the one with a nested shadow alias',
+    name: 'shadow.shadowAlias1',
+    rawValue: '{shadow.unResolvedSingle}',
+    value: {
+      ...unResolvedSingleShadowToken.value,
+      color: '{colors.blue.500}',
+    },
+  },
+  {
+    ...multipleShadowToken,
+    description: 'the one with multiple nested shadow alias',
+    name: 'shadow.shadowAlias2',
+    rawValue: '{shadow.multiple}',
+    value: [
+      {
+        ...multipleShadowToken.value[0],
+        color: '#ff000080',
+      },
+      {
+        ...multipleShadowToken.value[1],
+        color: '#ff000066',
+      },
+      {
+        ...multipleShadowToken.value[2],
+        color: '#000000',
+      },
+    ],
+  },
+  {
     $extensions: {
       'studio.tokens': {
         modify: {
@@ -468,6 +571,78 @@ const output = [
     rawValue: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
   },
+  {
+    name: 'colors.lilac.500',
+    value: '#ff0000',
+    rawValue: '#ff0000',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'primary',
+    value: 'lilac',
+    rawValue: 'lilac',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'nestedprimary',
+    value: 'lilac',
+    rawValue: '{primary}',
+    type: TokenTypes.OTHER,
+  },
+  {
+    name: 'thatprimarycolor',
+    value: '#ff0000',
+    rawValue: '{colors.{primary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'thatnestedprimarycolor',
+    value: '#ff0000',
+    rawValue: '{colors.{nestedprimary}.500}',
+    type: TokenTypes.COLOR,
+  },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    rawValue: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    rawValue: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    rawValue: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    rawValue: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    rawValue: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    rawValue: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: 0,
+    rawValue: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
@@ -500,5 +675,21 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
     expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
+  });
+
+  it('resolves zeros correctly', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens([{
+      name: 'pure-zero',
+      value: '0',
+      type: TokenTypes.DIMENSION,
+    }]);
+    expect(resolvedTokens).toEqual([
+      {
+        name: 'pure-zero',
+        rawValue: '0',
+        value: 0,
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
   });
 });

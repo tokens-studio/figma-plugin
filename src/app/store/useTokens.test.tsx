@@ -19,6 +19,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { NodeInfo } from '@/types/NodeInfo';
 import { Properties } from '@/constants/Properties';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
+import { TokensContext } from '@/context';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -526,6 +527,130 @@ describe('useToken test', () => {
           removeStyle: true,
         },
         settings: store.getState().settings,
+      });
+    });
+  });
+
+  describe('createVariables', () => {
+    const tokenMockStore = createMockStore({
+      tokenState: {
+        usedTokenSet: { global: TokenSetStatus.ENABLED, light: TokenSetStatus.ENABLED },
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
+        themes: [{
+          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
+        }],
+        tokens: {
+          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          light: [
+            { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
+            { name: 'borderRadius-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-2', value: '{base.base-50} {base.base-125}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+            { name: 'spacing-1', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
+            { name: 'spacing-2', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
+            { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+            { name: 'borderWidth-1', value: '{base.base-350} {base.base-187} {base.base-50}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-2', value: '{base.base-50} {base.base-187} {base.base-150}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
+            { name: 'text', value: 'text value', type: TokenTypes.TEXT },
+            { name: 'shadow.base', value: '#1450c8', type: TokenTypes.COLOR },
+            {
+              value: '{color.slate.50}',
+              type: 'color',
+              name: 'shadow.strong',
+              $extensions: {
+                'studio.tokens': {
+                  modify: {
+                    type: 'alpha',
+                    value: '.3',
+                    space: 'lch',
+                  },
+                },
+              },
+            },
+            {
+              value: '{color.slate.50}',
+              type: 'color',
+              name: 'shadow.intense',
+              $extensions: {
+                'studio.tokens': {
+                  modify: {
+                    type: 'alpha',
+                    value: '.4',
+                    space: 'lch',
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    const customTokens = {
+      resolvedTokens,
+    };
+
+    beforeEach(() => {
+      resetStore();
+      result = renderHook(() => useTokens(), {
+        wrapper: ({ children }: { children?: React.ReactNode }) => (
+          <Provider store={tokenMockStore}>
+            <TokensContext.Provider value={customTokens}>
+              {children}
+            </TokensContext.Provider>
+            ,
+          </Provider>
+        ),
+      }).result;
+    });
+
+    it('skip multi value tokens and respect values ', async () => {
+      const multiValueFilteredTokens = result.current.filterMultiValueTokens();
+
+      expect(multiValueFilteredTokens).toStrictEqual({
+        global: [
+          { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
+          { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
+          { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+        light: [
+          { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
+          { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
+          { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
+          { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
+          { name: 'text', value: 'text value', type: TokenTypes.TEXT },
+          { name: 'shadow.base', value: '#1450c8', type: TokenTypes.COLOR },
+          {
+            value: '#f8fafc',
+            type: 'color',
+            name: 'shadow.strong',
+            $extensions: {
+              'studio.tokens': {
+                modify: {
+                  type: 'alpha',
+                  value: '.3',
+                  space: 'lch',
+                },
+              },
+            },
+          },
+          {
+            value: '#f8fafc',
+            type: 'color',
+            name: 'shadow.intense',
+            $extensions: {
+              'studio.tokens': {
+                modify: {
+                  type: 'alpha',
+                  value: '.4',
+                  space: 'lch',
+                },
+              },
+            },
+          },
+        ],
       });
     });
   });

@@ -10,7 +10,7 @@ import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { checkIfAlias } from '@/utils/alias';
+import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   storeTokenIdInJsonEditorSelector,
@@ -74,6 +74,7 @@ export default function useTokens() {
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+  const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -114,7 +115,7 @@ export default function useTokens() {
       confirm({
         text: 'Are you sure?',
         description:
-            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+          'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
       }).then((result) => {
         if (result && result.result) {
           dispatch.tokenState.updateDocument();
@@ -393,12 +394,40 @@ export default function useTokens() {
     });
   }, []);
 
+  const filterMultiValueTokens = useCallback(() => {
+    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
+        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
+        // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
+        // in which case we collapse the value as it cannot be used as a variable
+        if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
+          // We don't want to change the actual value as this could cause unintended side effects
+          tokenItem = { ...tokenItem };
+          // @ts-ignore
+          tokenItem.value = resolvedValue;
+        }
+        if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
+          if (resolvedValue.toString().trim().includes(' ')) {
+            return acc;
+          }
+        }
+        acc.push(tokenItem);
+        return acc;
+      }, [] as AnyTokenList);
+      tempTokens[tokenSetKey] = filteredTokenList;
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+
+    return tempTokens;
+  }, [tokens]);
+
   const createVariables = useCallback(async () => {
     track('createVariables');
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
+    const multiValueFilteredTokens = filterMultiValueTokens();
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -409,7 +438,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens,
+      tokens: multiValueFilteredTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
@@ -486,6 +515,7 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   }), [
     isAlias,
     getTokenValue,
@@ -508,5 +538,6 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   ]);
 }

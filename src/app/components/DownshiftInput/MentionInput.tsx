@@ -78,13 +78,14 @@ export default function MentionsInput({
   }, [handleBlur]);
 
   const getHighlightedText = React.useCallback((text: string, highlight: string) => {
+    // Note that the highlight might be numeric, hence we cast it to a string
     // Split on highlight term and include term into parts, ignore case
-    const parts = text.split(new RegExp(`(${highlight.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
+    const parts = text.split(new RegExp(`(${String(highlight).replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi'));
     return (
       <span>
         {parts.map((part, i) => (
           // eslint-disable-next-line react/no-array-index-key
-          <StyledPart key={i} matches={part.toLowerCase() === highlight.toLowerCase()}>
+          <StyledPart key={i} matches={part.toLowerCase() === String(highlight).toLowerCase()}>
             {part}
           </StyledPart>
         ))}

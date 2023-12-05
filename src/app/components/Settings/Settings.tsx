@@ -12,7 +12,7 @@ import Heading from '../Heading';
 import { Dispatch } from '../../store';
 import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector, ignoreFirstPartForVariablesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from '../Stack';
 import Box from '../Box';
@@ -38,6 +38,7 @@ function Settings() {
 
   const { removeRelaunchData } = useDebug();
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
+  const ignoreFirstPartForVariables = useSelector(ignoreFirstPartForVariablesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
@@ -82,10 +83,17 @@ function Settings() {
     }
     getSessionId();
   });
-  const handleIgnoreChange = React.useCallback(
+  const handleIgnoreFirstPartForStylesChange = React.useCallback(
     (state: CheckedState) => {
       track('setIgnoreFirstPartForStyles', { value: state });
       dispatch.settings.setIgnoreFirstPartForStyles(!!state);
+    },
+    [dispatch.settings],
+  );
+  const handleIgnoreFirstPartForVariablesChange = React.useCallback(
+    (state: CheckedState) => {
+      track('setIgnoreFirstPartForVariables', { value: state });
+      dispatch.settings.setIgnoreFirstPartForVariables(!!state);
     },
     [dispatch.settings],
   );
@@ -142,7 +150,7 @@ function Settings() {
               id="ignoreFirstPartForStyles"
               checked={!!ignoreFirstPartForStyles}
               defaultChecked={ignoreFirstPartForStyles}
-              onCheckedChange={handleIgnoreChange}
+              onCheckedChange={handleIgnoreFirstPartForStylesChange}
             />
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
@@ -173,6 +181,30 @@ function Settings() {
               <Stack direction="column" gap={2}>
                 <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
+              </Stack>
+            </Label>
+          </Stack>
+          <Stack direction="row" gap={3} align="start">
+            <Checkbox
+              id="ignoreFirstPartForVariables"
+              checked={!!ignoreFirstPartForVariables}
+              defaultChecked={ignoreFirstPartForVariables}
+              onCheckedChange={handleIgnoreFirstPartForVariablesChange}
+            />
+            <Label htmlFor="ignoreFirstPartForVariables">
+              <Stack direction="column" gap={2}>
+                <Box css={{ fontWeight: '$bold' }}>{t('ignoreVariablesPrefix')}</Box>
+                <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
+                  {t('usefulIgnore')}
+                  {' '}
+                  <code>colors</code>
+                  {' '}
+                  {t('inAToken')}
+                  {' '}
+                  <code>colors.blue.500</code>
+                  {' '}
+                  {t('forYourVariables')}
+                </Box>
               </Stack>
             </Label>
           </Stack>
