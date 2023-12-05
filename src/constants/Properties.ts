@@ -54,4 +54,5 @@ export enum Properties {
   value = 'value',
   tokenName = 'tokenName',
   description = 'description',
+  stroke = 'stroke',
 }

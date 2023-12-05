@@ -23,6 +23,7 @@ export function useTypeForProperty(property: string): string {
         return TokenTypes.BORDER_RADIUS;
       case Properties.borderColor:
       case Properties.fill:
+      case Properties.stroke:
         return TokenTypes.COLOR;
       case Properties.borderWidthTop:
       case Properties.borderWidthLeft:

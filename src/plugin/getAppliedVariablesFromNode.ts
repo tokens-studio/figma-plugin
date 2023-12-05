@@ -40,6 +40,34 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
           }
         }
       }
+      if (key === 'strokes' && Array.isArray(value)) {
+        const variableId = node.boundVariables?.strokes?.[0].id;
+
+        if (variableId) {
+          const variable = figma.variables.getVariableById(variableId);
+          if (variable && 'strokes' in node && typeof node.strokes !== 'undefined') {
+            const paint = clone(node.strokes);
+            let variableObject: SingleColorToken | null = {} as SingleColorToken;
+            if (paint[0].type === 'SOLID') {
+              const { r, g, b } = paint[0].color;
+              const a = paint[0].opacity;
+              variableObject.value = figmaRGBToHex({
+                r,
+                g,
+                b,
+                a,
+              });
+            } else {
+              variableObject = null;
+            }
+            localVariables.push({
+              ...variableObject,
+              name: variable?.name.split('/').join('.'),
+              type: Properties.stroke,
+            });
+          }
+        }
+      }
       if (!Array.isArray(value) && key in node) {
         const variableId = value.id;
         if (variableId && typeof variableId === 'string') {
@@ -56,6 +84,6 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
       }
     });
   }
-
+  console.log('local variables', localVariables);
   return localVariables;
 }
