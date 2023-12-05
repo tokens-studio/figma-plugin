@@ -18,7 +18,6 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
       updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
-      ignoreFirstPartForVariables: uiSettings.ignoreFirstPartForVariables ?? data?.ignoreFirstPartForVariables,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
       shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
@@ -44,7 +43,6 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let updateOnChange: boolean;
     let updateStyles: boolean;
     let ignoreFirstPartForStyles: boolean;
-    let ignoreFirstPartForVariables: boolean;
     let prefixStylesWithThemeName: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
@@ -64,7 +62,6 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
       updateStyles = typeof data.updateStyles === 'undefined' ? true : data.updateStyles;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
-      ignoreFirstPartForVariables = typeof data.ignoreFirstPartForVariables === 'undefined' ? false : data.ignoreFirstPartForVariables;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
@@ -83,7 +80,6 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         updateRemote,
         updateStyles,
         ignoreFirstPartForStyles,
-        ignoreFirstPartForVariables,
         prefixStylesWithThemeName,
         inspectDeep,
         shouldSwapStyles,
