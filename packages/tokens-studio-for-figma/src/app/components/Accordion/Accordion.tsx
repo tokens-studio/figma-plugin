@@ -65,7 +65,6 @@ export function Accordion({
             }}
             key="content"
             data-testid="accordion-content"
-            data-testid="accordion-content"
             transition={reducedMotion ? {
               duration: 0,
             } : undefined}

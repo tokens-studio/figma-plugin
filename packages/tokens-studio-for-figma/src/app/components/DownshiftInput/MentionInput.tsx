@@ -140,7 +140,6 @@ export default function MentionsInput({
       onFocus={handleOnFocus}
       onPressEnter={handleEnterKeyDown}
       data-testid={`mention-input-${name}`}
-      data-testid={`mention-input-${name}`}
     >
       {mentionData.map((item) => (
         renderMentionListItem(item)

@@ -60,7 +60,6 @@ export function TabButton<T extends string = Tabs>({
   return (
     <StyledButton
       data-testid={`navitem-${name}`}
-      data-testid={`navitem-${name}`}
       type="button"
       isActive={activeTab === name}
       data-active={activeTab === name}

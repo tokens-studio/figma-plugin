@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -23,7 +24,6 @@ import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
-import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
@@ -86,7 +86,6 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         key={value}
         value={value}
         data-testid={`themeselector--themeoptions--${value}`}
-        data-testid={`themeselector--themeoptions--${value}`}
         // @README we can disable this because we are using Memo for the whole list anyways
         // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
@@ -126,7 +125,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   return (
     <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
       <DropdownMenu>
-        <DropdownMenuTrigger data-testid="themeselector-dropdown" data-testid="themeselector-dropdown">
+        <DropdownMenuTrigger data-testid="themeselector-dropdown">
           <Flex>
             <ThemeDropdownLabel muted size="xsmall">
               {t('theme')}

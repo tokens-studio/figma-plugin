@@ -216,7 +216,6 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
               name="tokensetname"
               required
               data-testid="token-set-input"
-              data-testid="create-set-input"
               autofocus
             />
             <Stack direction="row" gap={4} justify="end">

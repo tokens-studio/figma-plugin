@@ -91,7 +91,6 @@ export function Modal({
               <IconButton
                 onClick={handleClose}
                 data-testid="close-button"
-                data-testid="close-button"
                 icon={<XIcon />}
                 size="small"
                 variant="invisible"

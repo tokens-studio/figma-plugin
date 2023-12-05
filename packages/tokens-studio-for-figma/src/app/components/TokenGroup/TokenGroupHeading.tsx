@@ -83,7 +83,6 @@ export function TokenGroupHeading({
       <StyledTokenGroupHeadingCollapsable
         collapsed={collapsed.includes(path)}
         data-testid={`tokenlisting-group-${path}`}
-        data-testid={`tokenlisting-group-${path}`}
         type="button"
       >
         <ContextMenu>

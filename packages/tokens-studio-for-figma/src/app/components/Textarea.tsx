@@ -54,7 +54,6 @@ function Textarea({
   return (
     <StyledTextarea
       data-testid={id}
-      data-testid={id}
       name={name}
       spellCheck={false}
       rows={rows}

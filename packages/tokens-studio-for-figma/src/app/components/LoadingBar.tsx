@@ -69,7 +69,7 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar" data-testid="loadingBar">
+    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar">
       <Stack
         direction="row"
         align="center"

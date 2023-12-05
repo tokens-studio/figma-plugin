@@ -335,7 +335,6 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                           return (
                             <StyledItem
                               data-testid="downshift-input-item"
-                              data-testid="downshift-input-item"
                               className="dropdown-item"
                               {...getItemProps({ key: token.name, index, item: token.name })}
                               css={{
@@ -366,7 +365,6 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                               const filteredValue = filteredValues[index];
                               return (
                                 <StyledItem
-                                  data-testid="downshift-input-item"
                                   data-testid="downshift-input-item"
                                   className="dropdown-item"
                                   {...getItemProps({ key: value, index, item: value })}

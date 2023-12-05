@@ -56,7 +56,6 @@ export default function ChangeStateListingHeading({
       <Tooltip label={`Alt + Click ${t('toggle')}`}>
         <StyledChangedStateGroupHeadingButton
           isCollapsed={isCollapsed}
-          data-testid={`changestatelisting-header-${set}`}
           type="button"
           onClick={handleCollapse}
           data-testid={`changestatelisting-${set}-collapse-button`}
