@@ -13,7 +13,6 @@ export * from './showPullDialogSelector';
 export * from './mainNodeSelectionValuesSelector';
 export * from './storageTypeSelector';
 export * from './ignoreFirstPartForStylesSelector';
-export * from './ignoreFirstPartForVariablesSelector';
 export * from './apiProvidersSelector';
 export * from './hasUnsavedChangesSelector';
 export * from './activeTabSelector';

@@ -253,6 +253,41 @@ const tokens = [
     value: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 
 const output = [
@@ -566,6 +601,48 @@ const output = [
     rawValue: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    rawValue: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    rawValue: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    rawValue: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    rawValue: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    rawValue: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    rawValue: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: 0,
+    rawValue: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
@@ -598,5 +675,21 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
     expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
+  });
+
+  it('resolves zeros correctly', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens([{
+      name: 'pure-zero',
+      value: '0',
+      type: TokenTypes.DIMENSION,
+    }]);
+    expect(resolvedTokens).toEqual([
+      {
+        name: 'pure-zero',
+        rawValue: '0',
+        value: 0,
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
   });
 });
