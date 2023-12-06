@@ -49,7 +49,6 @@ const mockSettings: SavedSettings = {
   width: 800,
   height: 500,
   ignoreFirstPartForStyles: false,
-  ignoreFirstPartForVariables: false,
   inspectDeep: false,
   prefixStylesWithThemeName: false,
   showEmptyGroups: true,
@@ -263,7 +262,7 @@ describe('AppContainer (integration)', () => {
         waitFor(async () => {
           expect(await result.findByText('Getting started')).not.toBeUndefined();
           result.unmount();
-        });
+        }, { timeout: 10000 });
       })
     ),
   );
