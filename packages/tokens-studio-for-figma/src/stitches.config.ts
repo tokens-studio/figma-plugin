@@ -6,7 +6,7 @@ export const stitchesInstance = createStitches({
   theme: {
     colors: {
       ...lightTheme.colors,
-      buttonPrimaryBgRest: 'red',
+      // TODO: We need to add these to the ui tokens.
       proBg: '#e1d8ec',
       proBorder: '#c2b2d8',
       proFg: '#694993',
@@ -15,10 +15,12 @@ export const stitchesInstance = createStitches({
     ...core,
     fontWeights: {
       ...core.fontWeights,
+      // TODO: We should likely make everything 500 and get rid of 600
       sansBold: 500,
     },
     fontSizes: {
       ...core.fontSizes,
+      // TODO: We should remove this once we have a way to choose density / font size
       xxsmall: '11px !important',
       xsmall: '12px !important',
       small: '13px !important',
@@ -27,10 +29,12 @@ export const stitchesInstance = createStitches({
     },
     radii: {
       ...core.radii,
+      // TODO: Add to tokens
       full: '999px',
     },
     sizes: {
       ...core.sizes,
+      // TODO: Add to tokens
       scrollbarWidth: '8px',
     },
   },
@@ -43,6 +47,7 @@ const {
 const lightThemeMode = createTheme('figma-light', {
   colors: {
     ...lightTheme.colors,
+    // TODO: We need to add these to the ui tokens.
     proBg: '#e1d8ec',
     proBorder: '#c2b2d8',
     proFg: '#694993',
@@ -53,6 +58,7 @@ const lightThemeMode = createTheme('figma-light', {
 const darkThemeMode = createTheme('figma-dark', {
   colors: {
     ...darkTheme.colors,
+    // TODO: We need to add these to the ui tokens.
     proBg: '#402d5a',
     proBorder: '#694993',
     proFg: '#c2b2d8',

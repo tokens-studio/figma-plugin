@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import * as Tooltip from '@radix-ui/react-tooltip';
 import App from '../App';
 import FigmaLoading from '../FigmaLoading';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
@@ -111,5 +110,5 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     </Box>
   );
 
-  return <AuthContextProvider authData={params.authData}><Tooltip.Provider>{appContent}</Tooltip.Provider></AuthContextProvider>;
+  return <AuthContextProvider authData={params.authData}>{appContent}</AuthContextProvider>;
 });

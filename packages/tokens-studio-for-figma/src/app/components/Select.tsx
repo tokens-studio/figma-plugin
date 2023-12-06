@@ -3,9 +3,8 @@ import { styled } from '@/stitches.config';
 import type { StitchesCSS } from '@/types';
 
 const StyledSelect = styled('select', {
-  borderRadius: '$small',
   fontSize: '$xsmall',
-  height: '$controlMedium',
+  height: '$controlSmall',
   paddingLeft: '$2',
   lineHeight: 1,
   backgroundColor: '$bgDefault',

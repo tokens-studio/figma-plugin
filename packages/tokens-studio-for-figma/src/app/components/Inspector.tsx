@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from '@tokens-studio/ui';
+import { ToggleGroup, Tooltip } from '@tokens-studio/ui';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
@@ -36,14 +36,9 @@ function Inspector() {
     defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
   ), [tokens, usedTokenSet]);
 
-  const handleSetInspectViewMulti = React.useCallback(() => {
-    setInspectView('multi');
-    track('setInspectView', { view: 'multi' });
-  }, []);
-
-  const handleSetInspectViewDebug = React.useCallback(() => {
-    setInspectView('debug');
-    track('setInspectView', { view: 'debug' });
+  const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
+    track('setInspectView', { view });
+    setInspectView(view);
   }, []);
 
   function renderInspectView() {
@@ -101,24 +96,18 @@ function Inspector() {
               </Label>
             </Tooltip>
           </Stack>
-          <Stack direction="row">
-            <IconButton
-              variant={inspectView === 'multi' ? 'primary' : 'invisible'}
-              data-testid="inspector-multi"
-              onClick={handleSetInspectViewMulti}
-              icon={<IconInspect />}
-              tooltipSide="bottom"
-              tooltip={t('inspectLayers') as string}
-            />
-            <IconButton
-              variant={inspectView === 'debug' ? 'primary' : 'invisible'}
-              data-testid="inspector-debug"
-              onClick={handleSetInspectViewDebug}
-              icon={<IconDebug />}
-              tooltipSide="bottom"
-              tooltip={t('debugAndAnnotate') as string}
-            />
-          </Stack>
+          <ToggleGroup type="single" value={inspectView} onValueChange={handleSetInspectView}>
+            {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
+            <ToggleGroup.Item value="multi" tooltip={t('inspectLayers') as string} tooltipSide="bottom"> */}
+            <ToggleGroup.Item value="multi">
+              <IconInspect />
+            </ToggleGroup.Item>
+            {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
+              <ToggleGroup.Item value="debug" tooltip={t('debugAndAnnotate') as string} tooltipSide="bottom"> */}
+            <ToggleGroup.Item value="debug">
+              <IconDebug />
+            </ToggleGroup.Item>
+          </ToggleGroup>
           <InspectSearchOptionDropdown />
         </Stack>
       </Box>

@@ -78,7 +78,7 @@ export function ThemeListGroupHeader({
         {!isEditing ? (
           <>
             <Text css={{
-              color: '$fgMuted', height: '28px', display: 'flex', alignItems: 'center',
+              color: '$fgMuted', height: '$controlSmall', display: 'flex', alignItems: 'center',
             }}
             >
               {label}

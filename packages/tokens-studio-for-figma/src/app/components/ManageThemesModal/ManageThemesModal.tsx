@@ -152,6 +152,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       large
       title="Themes"
       stickyFooter
+      showClose
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (

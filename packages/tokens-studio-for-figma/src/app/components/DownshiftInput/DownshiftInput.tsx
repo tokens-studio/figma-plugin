@@ -290,11 +290,11 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     css={{
                       backgroundColor: '$bgDefault',
                       border: '1px solid',
-                      borderColor: '$borderDefault',
+                      borderColor: '$borderSubtle',
                       borderRadius: '$medium',
                       position: 'absolute',
                       width: `${inputContainerWidth}px`,
-                      top: '$2',
+                      top: '$1',
                       boxShadow: '$contextMenu',
                       zIndex: '10',
                       transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,

@@ -1,10 +1,9 @@
 import React from 'react';
 import {
-  Stack, Dialog, IconButton, Box,
+  Stack, Dialog, IconButton, Box, Heading,
 } from '@tokens-studio/ui';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from '@primer/octicons-react';
-import Heading from '../Heading';
 import { ModalFooter } from './ModalFooter';
 import { styled } from '@/stitches.config';
 
@@ -24,7 +23,7 @@ export type ModalProps = {
 
 const StyledBody = styled('div', {
   position: 'relative',
-  padding: '$6',
+  padding: '$4',
   overflow: 'auto',
   variants: {
     full: {
@@ -72,7 +71,11 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ padding: 0 }}>
-          {(showClose || title) && (
+          <Box css={{
+            overflow: 'auto',
+          }}
+          >
+            {(showClose || title) && (
             <Stack
               direction="row"
               justify="between"
@@ -96,15 +99,16 @@ export function Modal({
                 variant="invisible"
               />
             </Stack>
-          )}
-          <StyledBody compact={compact} full={full} data-testid={id}>
-            {children}
-          </StyledBody>
-          {(!!footer) && (
+            )}
+            <StyledBody compact={compact} full={full} data-testid={id}>
+              {children}
+            </StyledBody>
+            {(!!footer) && (
             <ModalFooter stickyFooter={stickyFooter}>
                 {footer}
             </ModalFooter>
-          )}
+            )}
+          </Box>
         </Dialog.Content>
       </Dialog.Portal>
     </DialogPrimitive.Root>

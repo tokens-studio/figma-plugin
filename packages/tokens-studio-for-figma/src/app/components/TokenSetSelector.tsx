@@ -175,18 +175,21 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       >
         <form onSubmit={handleRenameTokenSetSubmit}>
           <Stack direction="column" gap={4}>
-            <Input
-              full
-              autofocus
-              value={newTokenSetName}
-              onChange={handleChangeName}
-              type="text"
-              name="tokensetname"
-              data-testid="rename-set-input"
-              required
-              size="large"
-            />
-            <Stack direction="row" gap={4}>
+            <Stack direction="column" gap={2}>
+              <Label htmlFor="tokensetname">Name</Label>
+              <Input
+                full
+                autofocus
+                value={newTokenSetName}
+                onChange={handleChangeName}
+                type="text"
+                name="tokensetname"
+                data-testid="rename-set-input"
+                required
+                size="large"
+              />
+            </Stack>
+            <Stack direction="row" gap={4} justify="end">
               <Button variant="secondary" onClick={handleCloseRenameModal}>
                 {t('cancel')}
               </Button>
@@ -207,17 +210,21 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       >
         <form onSubmit={handleNewTokenSetSubmit}>
           <Stack direction="column" gap={4}>
-            <Label htmlFor="tokensetname">Name</Label>
-            <Input
-              full
-              value={newTokenSetName}
-              onChange={handleChangeName}
-              type="text"
-              name="tokensetname"
-              required
-              data-testid="token-set-input"
-              autofocus
-            />
+            <Stack direction="column" gap={2}>
+              <Label htmlFor="tokensetname">Name</Label>
+              <Input
+                full
+                value={newTokenSetName}
+                onChange={handleChangeName}
+                type="text"
+                name="tokensetname"
+                required
+                data-testid="token-set-input"
+                autofocus
+                placeholder="Enter a name"
+                size="large"
+              />
+            </Stack>
             <Stack direction="row" gap={4} justify="end">
               <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
                 {t('cancel')}

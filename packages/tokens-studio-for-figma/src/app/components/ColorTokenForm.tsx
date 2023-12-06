@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
 import { useTranslation } from 'react-i18next';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -244,6 +245,7 @@ export default function ColorTokenForm({
               onClick={addModify}
               disabled={!colorModifier}
               icon={<IconPlus />}
+              variant="invisible"
             />
           ) : (
             <IconButton
@@ -252,6 +254,7 @@ export default function ColorTokenForm({
               onClick={removeModify}
               disabled={!colorModifier}
               icon={<IconMinus />}
+              variant="invisible"
             />
           )
         }
@@ -280,11 +283,13 @@ export default function ColorTokenForm({
                   <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'}</span>
                   <IconToggleableDisclosure />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type}>
-                    {Object.values(ColorModifierTypes).map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+                    <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type}>
+                      {Object.values(ColorModifierTypes).map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
               </DropdownMenu>
               <DropdownMenu open={colorSpaceMenuOpened} onOpenChange={handleColorSpaceToggleMenu}>
                 <DropdownMenuTrigger
@@ -297,11 +302,13 @@ export default function ColorTokenForm({
                   <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.space || 'Choose a color space'}</span>
                   <IconToggleableDisclosure />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                  <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space}>
-                    {Object.values(ColorSpaceTypes).map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
+                <DropdownMenuPortal>
+                  <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+                    <DropdownMenuRadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space}>
+                      {Object.values(ColorSpaceTypes).map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenuPortal>
               </DropdownMenu>
             </Box>
             {

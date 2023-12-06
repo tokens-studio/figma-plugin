@@ -8,8 +8,8 @@ export const StyledIconDisclosure = styled(IconDisclosure, {
 });
 
 export const StyledInputSuffix = styled('button', {
-  width: '28px',
-  height: '28px',
+  width: '$controlSmall',
+  height: '$controlSmall',
   backgroundColor: '$bgSubtle',
   border: '1px solid',
   borderColor: '$borderMuted',

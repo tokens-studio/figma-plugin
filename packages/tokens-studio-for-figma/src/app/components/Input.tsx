@@ -60,10 +60,10 @@ const StyledInput = styled('input', {
   variants: {
     size: {
       small: {
-        height: '28px',
+        height: '$controlSmall',
       },
       large: {
-        height: '34px',
+        height: '$controlLarge',
       },
     },
     hasSuffix: {
@@ -100,12 +100,12 @@ const StyledSuffix = styled('button', {
   variants: {
     size: {
       small: {
-        width: '28px',
-        height: '28px',
+        width: '$controlSmall',
+        height: '$controlSmall',
       },
       large: {
-        width: '34px',
-        height: '34px',
+        width: '$controlLarge',
+        height: '$controlLarge',
       },
     },
   },
@@ -113,7 +113,7 @@ const StyledSuffix = styled('button', {
 
 const StyledPrefix = styled('div', {
   padding: '0 $3',
-  height: '28px',
+  height: '$controlSmall',
   flexShrink: 0,
   border: '1px solid $borderMuted',
   borderTopRightRadius: 0,

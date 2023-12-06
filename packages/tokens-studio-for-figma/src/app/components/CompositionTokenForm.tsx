@@ -95,6 +95,8 @@ export default function CompositionTokenForm({
           onClick={addToken}
           icon={<IconPlus />}
           disabled={error}
+          size="small"
+          variant="invisible"
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>

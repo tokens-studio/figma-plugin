@@ -1,16 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
+import { Select, Box, IconButton } from '@tokens-studio/ui';
 import IconMinus from '@/icons/minus.svg';
-import IconButton from './IconButton';
-import Box from './Box';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-} from './DropdownMenu';
-import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -43,7 +35,6 @@ export default function SingleCompositionTokenForm({
   setError: (newError: boolean) => void;
   onSubmit: () => void
 }) {
-  const [menuOpened, setMenuOpened] = useState(false);
   const propertyType = useTypeForProperty(property);
   const seed = useUIDSeed();
   const { t } = useTranslation(['tokens']);
@@ -78,10 +69,6 @@ export default function SingleCompositionTokenForm({
     setTokenValue(tokenValue);
   }, [property, setTokenValue, tokenValue]);
 
-  const handleToggleMenu = useCallback(() => {
-    setMenuOpened(!menuOpened);
-  }, [menuOpened]);
-
   const handleRemove = useCallback(() => {
     onRemove(property);
   }, [onRemove, property]);
@@ -98,24 +85,16 @@ export default function SingleCompositionTokenForm({
       },
     }}
     >
-      <DropdownMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-        <DropdownMenuTrigger
+      <Select value={property || t('chooseAProperty')} onValueChange={onPropertySelected}>
+        <Select.Trigger
+          value={property || t('chooseAProperty')}
           data-testid="composition-token-dropdown"
-          bordered
-          css={{
-            width: '130px', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', height: '$10',
-          }}
-        >
-          {property || t('chooseAProperty')}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-          {' '}
-          <DropdownMenuRadioGroup value={property}>
-            {properties.length > 0
-                && properties.map((prop, idx) => <DropdownMenuRadioElement key={`property-${seed(idx)}`} item={prop} index={idx} itemSelected={onPropertySelected} />)}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        />
+        <Select.Content>
+          {properties.length > 0
+                && properties.map((prop, idx) => <Select.Item key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
+        </Select.Content>
+      </Select>
       <Box css={{ flexGrow: 1 }}>
         <DownshiftInput
           value={propertyValue}
@@ -136,6 +115,8 @@ export default function SingleCompositionTokenForm({
           data-testid="button-style-remove-multiple"
           onClick={handleRemove}
           icon={<IconMinus />}
+          size="small"
+          variant="invisible"
         />
       </Box>
     </Box>

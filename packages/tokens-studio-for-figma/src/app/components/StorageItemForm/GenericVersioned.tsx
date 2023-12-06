@@ -2,10 +2,10 @@ import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
 import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Button from '../Button';
-import { StyledButton } from '../Button/StyledButton';
 import Input from '../Input';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -153,34 +153,36 @@ export default function GenericVersionedForm({
               <TriangleDownIcon />
             </DropdownMenuTrigger>
           </Stack>
-          <DropdownMenuContent
-            side="bottom"
-            css={{ minWidth: '100%' }}
-          >
-            <DropdownMenuRadioGroup onValueChange={handleValueChange}>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
-                <Text>
-                  {t('providers.generic.readOnly')}
-                </Text>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
-                <Text>
-                  {t('providers.generic.readWrite')}
-                </Text>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
-                <Text>
-                  {t('providers.generic.readWriteCreate')}
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              side="bottom"
+              css={{ minWidth: '100%' }}
+            >
+              <DropdownMenuRadioGroup onValueChange={handleValueChange}>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
+                  <Text>
+                    {t('providers.generic.readOnly')}
+                  </Text>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
+                  <Text>
+                    {t('providers.generic.readWrite')}
+                  </Text>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
+                  <Text>
+                    {t('providers.generic.readWriteCreate')}
 
-                </Text>
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
+                  </Text>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
         <Stack direction="column" gap={4}>
           <Heading>{t('providers.generic.additionalHeaders')}</Heading>
           {headers.map((x, i) => (
-            <Box css={{ display: 'flex', gap: '1em' }}>
+            <Box css={{ display: 'flex', alignItems: 'flex-end', gap: '1em' }}>
               <Input
                 label={t('providers.generic.name')}
                 value={x?.name}
@@ -210,7 +212,7 @@ export default function GenericVersionedForm({
           ))}
         </Stack>
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
 
