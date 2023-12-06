@@ -5,7 +5,7 @@ import { PullVariablesOptions } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 
-export default function pullVariables(options: PullVariablesOptions): void {
+export default async function pullVariables(options: PullVariablesOptions): Promise<void> {
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
   const booleans: VariableToCreateToken[] = [];
@@ -13,29 +13,55 @@ export default function pullVariables(options: PullVariablesOptions): void {
   const numbers: VariableToCreateToken[] = [];
   const dimensions: VariableToCreateToken[] = [];
 
+  let baseRem = 16;
+  if (options.useRem) {
+    baseRem = await figma.clientStorage.getAsync('uiSettings').then(async (uiSettings) => {
+      const settings = JSON.parse(await uiSettings);
+      return settings.baseFontSize;
+    });
+  }
+
   figma.variables.getLocalVariables().forEach((variable) => {
+    const variableName = variable.name.replace(/\//g, '.');
     const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
     switch (variable.resolvedType) {
       case 'COLOR':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+          let tokenValue;
 
-          colors.push({
-            name: variable.name,
-            value: figmaRGBToHex(value as RGBA),
-            type: TokenTypes.COLOR,
-            parent: `${collection?.name}/${modeName}`,
-            description: variable.description,
-          });
+          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+            const alias = figma.variables.getVariableById(value.id);
+            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+          } else {
+            tokenValue = figmaRGBToHex(value as RGBA);
+          }
+
+          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+          if (tokenValue) {
+            colors.push({
+              name: variableName,
+              value: tokenValue as string,
+              type: TokenTypes.COLOR,
+              parent: `${collection?.name}/${modeName}`,
+              description: variable.description,
+            });
+          }
         });
         break;
       case 'BOOLEAN':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+          let tokenValue;
+          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+            const alias = figma.variables.getVariableById(value.id);
+            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+          } else {
+            tokenValue = JSON.stringify(value);
+          }
 
           booleans.push({
-            name: variable.name,
-            value: JSON.stringify(value),
+            name: variableName,
+            value: tokenValue,
             type: TokenTypes.BOOLEAN,
             parent: `${collection?.name}/${modeName}`,
             description: variable.description,
@@ -45,10 +71,17 @@ export default function pullVariables(options: PullVariablesOptions): void {
       case 'STRING':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+          let tokenValue;
+          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+            const alias = figma.variables.getVariableById(value.id);
+            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+          } else {
+            tokenValue = value;
+          }
 
           strings.push({
-            name: variable.name,
-            value: value as string,
+            name: variableName,
+            value: tokenValue as string,
             type: TokenTypes.TEXT,
             parent: `${collection?.name}/${modeName}`,
             description: variable.description,
@@ -57,18 +90,20 @@ export default function pullVariables(options: PullVariablesOptions): void {
         break;
       case 'FLOAT':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+          let tokenValue: string | number = value as number;
+          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+            const alias = figma.variables.getVariableById(value.id);
+            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+          } else if (options.useDimensions && options.useRem) {
+            tokenValue = `${Number(tokenValue) / baseRem}rem`;
+          } else {
+            tokenValue = `${tokenValue}px`;
+          }
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-          if (options.useDimensions) {
-            let tokenValue: string | number = value as number;
-            if (options.useRem) {
-              // TODO: get user setting for rem base
-              tokenValue = `${tokenValue / 16}rem`;
-            } else {
-              tokenValue = `${tokenValue}px`;
-            }
 
+          if (options.useDimensions) {
             dimensions.push({
-              name: variable.name,
+              name: variableName,
               value: tokenValue as string,
               type: TokenTypes.DIMENSION,
               parent: `${collection?.name}/${modeName}`,
@@ -76,7 +111,7 @@ export default function pullVariables(options: PullVariablesOptions): void {
             });
           } else {
             numbers.push({
-              name: variable.name,
+              name: variableName,
               value: value.toString(),
               type: TokenTypes.NUMBER,
               parent: `${collection?.name}/${modeName}`,

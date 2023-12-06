@@ -199,14 +199,27 @@ export default function ImportedTokensDialog() {
             align="center"
             css={{ padding: '$2 $4' }}
           >
-            <Heading>{t('newTokens')}</Heading>
-            <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
-              {t('createAll')}
-            </Button>
+            <Heading>
+              {t('newTokens')}
+            </Heading>
+
+            <Stack direction="row" gap={2}>
+              <Button variant="secondary" id="button-import-close" onClick={handleClose}>
+                {t('cancel')}
+              </Button>
+              <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
+                {t('createAll')}
+              </Button>
+              <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
+                {t('importAll')}
+              </Button>
+            </Stack>
+
           </Stack>
           <Stack
             direction="column"
             gap={1}
+            className="content scroll-container"
             css={{
               borderTop: '1px solid',
               borderColor: '$borderMuted',
@@ -215,7 +228,7 @@ export default function ImportedTokensDialog() {
             {newTokens.map((token) => (
               <NewOrExistingToken
                 token={token}
-                key={token.name}
+                key={`${token.parent}/${token.name}`}
                 updateAction="Create"
                 removeToken={handleIgnoreNewToken}
                 updateToken={handleCreateSingleClick}
@@ -257,21 +270,6 @@ export default function ImportedTokensDialog() {
           </Stack>
         </div>
         )}
-        <Box css={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '$4',
-          borderTop: '1px solid',
-          borderColor: '$borderMuted',
-        }}
-        >
-          <Button variant="secondary" id="button-import-close" onClick={handleClose}>
-            {t('cancel')}
-          </Button>
-          <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
-            {t('importAll')}
-          </Button>
-        </Box>
       </Stack>
     </Modal>
   );

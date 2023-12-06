@@ -136,8 +136,8 @@ export const tokenState = createModel<RootModel>()({
       activeTheme: data.activeTheme || state.activeTheme,
       tokens: addIdPropertyToTokens(data.sets ?? {}) || addIdPropertyToTokens(state.tokens),
     }),
-    addTokenSet: (state, name: string, quiet?: boolean): TokenState => {
-      if (name in state.tokens && !quiet) {
+    addTokenSet: (state, name: string): TokenState => {
+      if (name in state.tokens) {
         notifyToUI('Token set already exists', { error: true });
         return state;
       }
@@ -325,23 +325,27 @@ export const tokenState = createModel<RootModel>()({
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedVariables).forEach((values) => {
         values.forEach((token) => {
-          const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
-          if (oldValue) {
-            if (isEqual(oldValue.value, token.value)) {
-              if (
-                oldValue.description !== token.description
-              ) {
-                existingTokens.push(token);
+          if (state.tokens[token.parent]) {
+            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+            if (oldValue) {
+              if (isEqual(oldValue.value, token.value)) {
+                if (
+                  oldValue.description !== token.description
+                ) {
+                  existingTokens.push(token);
+                } else {
+                  updatedTokens.push({
+                    ...token,
+                    oldDescription: oldValue.description,
+                  });
+                }
               } else {
-                updatedTokens.push({
-                  ...token,
-                  oldDescription: oldValue.description,
-                });
+                const updatedToken = { ...token };
+                updatedToken.oldValue = oldValue.value;
+                updatedTokens.push(updatedToken);
               }
             } else {
-              const updatedToken = { ...token };
-              updatedToken.oldValue = oldValue.value;
-              updatedTokens.push(updatedToken);
+              newTokens.push(token);
             }
           } else {
             newTokens.push(token);
@@ -558,10 +562,6 @@ export const tokenState = createModel<RootModel>()({
   },
   effects: (dispatch) => ({
     editToken(payload: UpdateTokenPayload, rootState) {
-      if (payload.parent && !rootState.tokenState.tokens[payload.parent]) {
-        console.error('Token parent does not exist', payload.parent);
-      }
-
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });
       }

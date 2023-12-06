@@ -173,7 +173,7 @@ export default function useTokens() {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.PULL_VARIABLES,
         options: {
-          useDimension: userDecision.data.includes('useDimension'),
+          useDimensions: userDecision.data.includes('useDimension'),
           useRem: userDecision.data.includes('useRem'),
         },
       });

@@ -100,7 +100,7 @@ export default function useManageTokens() {
 
     // Importing a variable token can make a new set
     if (!store.getState().tokenState.tokens[parent]) {
-      dispatch.tokenState.addTokenSet(parent, true);
+      dispatch.tokenState.addTokenSet(parent);
     }
 
     if (shouldUpdate) {

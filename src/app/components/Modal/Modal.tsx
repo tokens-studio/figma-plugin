@@ -104,8 +104,14 @@ export function Modal({
       contentLabel={title || ''}
     >
       {(showClose || title) && (
-        <ModalHeader>
-          <Stack direction="row" justify="between" align="center">
+        <ModalHeader style={{
+          position: 'fixed',
+          width: '100%',
+          height: '$4',
+          background: '$bgDefault',
+        }}
+        >
+          <Stack direction="row" justify="between" align="center" style={{ scrollPaddingBlockStart: '$4' }}>
             {title && (
               <Box css={{ paddingLeft: '$4' }}>
                 <Heading size="small">{title}</Heading>
