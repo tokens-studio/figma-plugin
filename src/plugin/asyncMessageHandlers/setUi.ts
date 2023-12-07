@@ -17,7 +17,6 @@ export const setUi: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_UI] = asyn
     updateOnChange: msg.updateOnChange,
     updateStyles: msg.updateStyles,
     ignoreFirstPartForStyles: msg.ignoreFirstPartForStyles,
-    ignoreFirstPartForVariables: msg.ignoreFirstPartForVariables,
     prefixStylesWithThemeName: msg.prefixStylesWithThemeName,
     inspectDeep: msg.inspectDeep,
     baseFontSize: msg.baseFontSize,
