@@ -63,7 +63,7 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
             localVariables.push({
               ...variableObject,
               name: variable?.name.split('/').join('.'),
-              type: Properties.stroke,
+              type: Properties.borderColor,
             });
           }
         }
@@ -84,6 +84,5 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
       }
     });
   }
-  console.log('local variables', localVariables);
   return localVariables;
 }

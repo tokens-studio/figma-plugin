@@ -2,4 +2,4 @@
 '@tokens-studio/figma-plugin': patch
 ---
 
-Refactor the bug that stroke is not displayed in the inspect tab.
+Inspect now also properly shows stroke variables that were applied
