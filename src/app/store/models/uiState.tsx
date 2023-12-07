@@ -57,7 +57,7 @@ export interface UIState {
   displayType: DisplayType;
   disabled: boolean;
   activeTab: Tabs;
-  activeTokensTab: 'list' | 'json';
+  activeTokensTab: 'list' | 'json' | 'params';
   projectURL: string;
   storageType: StorageType;
   api: StorageTypeCredentials;
@@ -239,7 +239,7 @@ export const uiState = createModel<RootModel>()({
         activeTab: payload,
       };
     },
-    setActiveTokensTab(state, payload: 'list' | 'json') {
+    setActiveTokensTab(state, payload: UIState['activeTokensTab']) {
       return {
         ...state,
         activeTokensTab: payload,

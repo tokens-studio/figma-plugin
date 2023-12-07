@@ -192,8 +192,34 @@ describe('convertFigmaGradientToString', () => {
     output: 'linear-gradient(45deg, #ffffff 0%, #ff0000 53.5%, #000000 100%)',
   };
 
+  const test3: {
+    input: GradientPaint;
+    output: string;
+  } = {
+    input: {
+      type: 'GRADIENT_LINEAR',
+      visible: true,
+      opacity: 1,
+      blendMode: 'NORMAL',
+      gradientStops: [{
+        color: {
+          r: 0.8509804010391235, g: 0.8509804010391235, b: 0.8509804010391235, a: 1,
+        },
+        position: 0,
+      }, {
+        color: {
+          r: 0.8509804010391235, g: 0.8509804010391235, b: 0.8509804010391235, a: 0,
+        },
+        position: 1,
+      }],
+      gradientTransform: [[0.9939767718315125, -0.046795930713415146, 0.029189540073275566], [0.04679592698812485, 0.3635683059692383, 0.2732197642326355]],
+    },
+    output: 'background: linear-gradient(87deg, #D9D9D9 1.69%, rgba(217, 217, 217, 0.00) 97.77%)',
+  };
+
   expect(convertFigmaGradientToString(test1.input)).toEqual(test1.output);
   expect(convertFigmaGradientToString(test2.input)).toEqual(test2.output);
+  expect(convertFigmaGradientToString(test3.input)).toEqual(test3.output);
 });
 
 describe('convertDegreeToNumber', () => {

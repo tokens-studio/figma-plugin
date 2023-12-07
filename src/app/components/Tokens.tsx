@@ -1,7 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+// @ts-nocheck
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useControls, Leva } from 'leva';
 import { useTranslation } from 'react-i18next';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
@@ -33,6 +35,8 @@ import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { IconSettings } from '@/icons';
+import { AnyTokenList } from '@/types/tokens';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -81,6 +85,27 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
       ) : null}
     </AnimatePresence>
   );
+};
+
+const ParamControls: React.FC<{ tokens: Record<string, AnyTokenList>, activeTokenSet: string }> = ({ tokens, activeTokenSet }) => {
+  const dispatch = useDispatch<Dispatch>();
+
+  const tokensObj = React.useMemo(() => {
+    const newTokensObj: Record<string, { value: string, onChange: (newValue: string) => void }> = {};
+    tokens[activeTokenSet].forEach((token) => {
+      newTokensObj[token.name] = {
+        value: token.value,
+        onChange: (newValue) => {
+          console.log(token.name, newValue);
+        },
+      };
+    });
+    return newTokensObj;
+  }, [tokens, activeTokenSet]);
+
+  useControls(tokensObj, [tokensObj]);
+
+  return null;
 };
 
 function Tokens({ isActive }: { isActive: boolean }) {
@@ -167,6 +192,10 @@ function Tokens({ isActive }: { isActive: boolean }) {
     dispatch.uiState.setActiveTokensTab('json');
   }, [dispatch.uiState]);
 
+  const handleSetTokensTabToParams = React.useCallback(() => {
+    dispatch.uiState.setActiveTokensTab('params');
+  }, [dispatch.uiState]);
+
   const tokensContextValue = React.useMemo(() => ({
     resolvedTokens,
   }), [resolvedTokens]);
@@ -200,6 +229,25 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
+
+  // const memoizedActiveTokens: Record<string, { value: string, onChange: (newValue: string) => void }> = React.useMemo(() => {
+  //   const tokensObj: Record<string, { value: string, onChange: (newValue: string) => void }> = {};
+  //   tokens[activeTokenSet].forEach((token) => {
+  //     if (typeof token.value === 'string') {
+  //       tokensObj[token.name] = {
+  //         value: token.value,
+  //         onChange: (newValue) => {
+  //           dispatch.tokenState.editTokenValue({
+  //             name: token.name,
+  //             set: activeTokenSet,
+  //             value: newValue,
+  //           });
+  //         },
+  //       };
+  //     }
+  //   });
+  //   return tokensObj;
+  // }, [dispatch.tokenState, tokens, activeTokenSet]);
 
   return (
     <TokensContext.Provider value={tokensContextValue}>
@@ -258,6 +306,14 @@ function Tokens({ isActive }: { isActive: boolean }) {
               tooltipSide="bottom"
               tooltip="JSON"
             />
+            <IconButton
+              variant={activeTokensTab === 'params' ? 'primary' : 'default'}
+              dataCy="tokensTabJSON"
+              onClick={handleSetTokensTabToParams}
+              icon={<IconSettings />}
+              tooltipSide="bottom"
+              tooltip="Params"
+            />
           </Box>
         </Box>
         <Box
@@ -283,35 +339,54 @@ function Tokens({ isActive }: { isActive: boolean }) {
               flexDirection: 'column',
               height: '100%',
               overflow: 'hidden',
+
             }}
           >
-            {activeTokensTab === 'json' ? (
-              <Box css={{ position: 'relative', height: '100%' }}>
-                <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
-                <StatusToast
-                  open={Boolean(error)}
-                  error={error}
-                />
-              </Box>
-            ) : (
-              <Box ref={tokenDiv} css={{ width: '100%', paddingBottom: '$6' }} className="content scroll-container">
-                {memoizedTokens.map(({
-                  key, values, isPro, schema,
-                }) => (
-                  <div key={key}>
-                    <TokenListing
-                      tokenKey={key}
-                      label={schema.label || key}
-                      schema={schema}
-                      values={values}
-                      isPro={isPro}
-                    />
-                  </div>
-                ))}
-                <ToggleEmptyButton />
-                {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
-              </Box>
-            )}
+            <Box ref={tokenDiv} css={{ width: '100%', height: '100%', paddingBottom: '$6' }} className="content scroll-container">
+              {
+              (() => {
+                switch (activeTokensTab) {
+                  case 'json':
+                    return (
+                      <>
+                        <JSONEditor stringTokens={stringTokens} handleChange={handleChangeJSON} />
+                        <StatusToast
+                          open={Boolean(error)}
+                          error={error}
+                        />
+                      </>
+                    );
+                  case 'params':
+                    return (
+                      <>
+                        <Leva fill flat neverHide titleBar={{ drag: false, title: activeTokenSet }} hideCopyButton />
+                        <ParamControls tokens={tokens} activeTokenSet={activeTokenSet} />
+                      </>
+                    );
+                  default:
+                    return (
+                      <>
+                        {memoizedTokens.map(({
+                          key, values, isPro, schema,
+                        }) => (
+                          <div key={key}>
+                            <TokenListing
+                              tokenKey={key}
+                              label={schema.label || key}
+                              schema={schema}
+                              values={values}
+                              isPro={isPro}
+                            />
+                          </div>
+                        ))}
+                        <ToggleEmptyButton />
+                        {showEditForm && <EditTokenFormModal resolvedTokens={resolvedTokens} />}
+                      </>
+                    );
+                }
+              })()
+            }
+            </Box>
           </Box>
           {manageThemesModalOpen && <ManageThemesModal />}
         </Box>

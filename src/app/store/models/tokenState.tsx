@@ -311,6 +311,23 @@ export const tokenState = createModel<RootModel>()({
         },
       } as TokenState;
     },
+    editTokenValue: (state, data: { name: string, set: string, value: string }) => {
+      const nameToFind = data.name;
+      const index = state.tokens[data.set].findIndex((token) => token.name === nameToFind);
+      const newArray = [...state.tokens[data.set]];
+      newArray[index] = {
+        ...newArray[index],
+        value: data.value,
+      } as SingleToken;
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          [data.set]: newArray,
+        },
+      };
+    },
+
     editToken: (state, data: UpdateTokenPayload) => {
       const nameToFind = data.oldName ? data.oldName : data.name;
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
@@ -512,6 +529,9 @@ export const tokenState = createModel<RootModel>()({
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
+    editTokenValue(payload: UpdateTokenPayload, rootState) {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: rootState.settings.updateOnChange });
+    },
     editToken(payload: UpdateTokenPayload, rootState) {
       if (payload.oldName && payload.oldName !== payload.name) {
         dispatch.tokenState.updateAliases({ oldName: payload.oldName, newName: payload.name });

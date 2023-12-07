@@ -92,6 +92,7 @@
     "just-split": "^3.0.1",
     "launchdarkly-js-client-sdk": "^2.22.1",
     "launchdarkly-react-client-sdk": "^2.26.0",
+    "leva": "^0.9.35",
     "lodash.debounce": "^4.0.8",
     "mixpanel-figma": "^2.0.1",
     "ml-matrix": "^6.9.0",

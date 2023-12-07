@@ -74,7 +74,7 @@ export default function TokenButtonContent({
     <TokenTooltip token={token}>
       <StyledTokenButton tokenType={type as TokenTypes.COLOR} displayType={type === TokenTypes.COLOR ? displayType : 'GRID'} active={active} disabled={uiDisabled} type="button" onClick={handleButtonClick} css={cssOverrides}>
         <BrokenReferenceIndicator token={token} />
-        <StyledTokenButtonText>{showValue && <span>{visibleName}</span>}</StyledTokenButtonText>
+        <StyledTokenButtonText>{showValue && <span>{token.name}</span>}</StyledTokenButtonText>
       </StyledTokenButton>
     </TokenTooltip>
   );
