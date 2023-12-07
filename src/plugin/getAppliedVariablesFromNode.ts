@@ -11,9 +11,9 @@ export type SelectionVariable = {
 
 export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVariable[] {
   const localVariables: SelectionVariable[] = [];
-  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
+  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && node.boundVariables) {
     Object.entries(node.boundVariables).forEach(([key, value]) => {
-      if (key === 'fills' && Array.isArray(value)) {
+      if ('fills' in node && key === 'fills' && Array.isArray(value)) {
         const variableId = node.boundVariables?.fills?.[0].id;
         if (variableId) {
           const variable = figma.variables.getVariableById(variableId);
@@ -84,5 +84,6 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
       }
     });
   }
+
   return localVariables;
 }
