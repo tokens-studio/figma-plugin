@@ -75,7 +75,6 @@ export default function useTokens() {
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
   const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
-  const uiState = useSelector(uiStateSelector, isEqual);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -190,7 +189,6 @@ export default function useTokens() {
       newName,
       updateMode,
       resolvedTokens,
-      selectionValues: uiState.selectionValues,
     }));
   }, []);
 
