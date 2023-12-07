@@ -164,6 +164,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
         <BulkRemapModal
           isOpen={bulkRemapModalVisible}
           onClose={handleHideBulkRemap}
+          resolvedTokens={resolvedTokens}
         />
       )}
     </>

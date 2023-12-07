@@ -1,3 +1,4 @@
+import { clone } from '@figma-plugin/helpers';
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../NodeManager';
@@ -9,12 +10,21 @@ import { postToUI } from '../notifiers';
 import { ProgressTracker } from '../ProgressTracker';
 import { defaultWorker } from '../Worker';
 import getAppliedVariablesFromNode from '../getAppliedVariablesFromNode';
-import getAppliedStylesFromNode from '../getAppliedStylesFromNode';
+import { AnyTokenList } from '@/types/tokens';
+
+const getTokenValue = (name: string, resolvedTokens: AnyTokenList) => (
+  resolvedTokens.find((token) => token.name === name)
+);
+
+const getLocalVariableByName = (name: string) => {
+  const localVariables = figma.variables.getLocalVariables();
+  return localVariables.find((variable) => variable.resolvedType === 'COLOR' && variable.name.split('/').join('.') === name);
+};
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
-    const { oldName, newName } = msg;
+    const { oldName, newName, resolvedTokens } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -40,39 +50,24 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
           }
         });
 
-        if (Object.keys(tokens).length === 0) {
+        if (Object.keys(tokens).length > 0) {
           if (getAppliedVariablesFromNode(node).length > 0) {
-            const { name: variableName, type: variableType } = getAppliedVariablesFromNode(node)[0];
-
-            const savedVariableData = node.getSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType);
-            if (savedVariableData.length > 0) {
-              if (savedVariableData.includes(oldName)) {
-                const newValue = JSON.parse(savedVariableData).replace(oldName, newName);
-                const jsonValue = JSON.stringify(newValue);
-                node.setSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType, jsonValue);
+            const { name: variableName } = getAppliedVariablesFromNode(node)[0];
+            if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
+              const variableId = node.boundVariables?.fills?.[0].id;
+              if (variableId) {
+                const variable = figma.variables.getVariableById(variableId);
+                if (variable) {
+                  const newValue = variableName.replace(oldName, newName);
+                  const resolvedValue = getTokenValue(newValue, resolvedTokens ?? []);
+                  const paint = figma.util.solidPaint(resolvedValue?.value as string);
+                  const fillsCopy = clone(node.fills);
+                  fillsCopy[0] = figma.variables.setBoundVariableForPaint(paint, 'color', variable);
+                  const newLocalVariable = getLocalVariableByName(resolvedValue?.name as string);
+                  fillsCopy[0].boundVariables.color.id = newLocalVariable?.id;
+                  node.fills = fillsCopy;
+                }
               }
-            } else if (variableName.includes(oldName)) {
-              const newValue = variableName.replace(oldName, newName);
-              const jsonValue = JSON.stringify(newValue);
-              node.setSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variableType, jsonValue);
-            }
-          }
-
-          if (getAppliedStylesFromNode(node).length > 0) {
-            const { name: styleName, type: styleType } = getAppliedStylesFromNode(node)[0];
-
-            const savedStyleData = node.getSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType);
-
-            if (savedStyleData.length > 0) {
-              if (savedStyleData.includes(oldName)) {
-                const newValue = JSON.parse(savedStyleData).replace(oldName, newName);
-                const jsonValue = JSON.stringify(newValue);
-                node.setSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType, jsonValue);
-              }
-            } else if (styleName.includes(oldName)) {
-              const newValue = styleName.replace(oldName, newName);
-              const jsonValue = JSON.stringify(newValue);
-              node.setSharedPluginData(SharedPluginDataNamespaces.STYLES, styleType, jsonValue);
             }
           }
         }

@@ -9,7 +9,6 @@ import { SelectionGroup, SelectionValue } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import getAppliedStylesFromNode from './getAppliedStylesFromNode';
 import getAppliedVariablesFromNode from './getAppliedVariablesFromNode';
-import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 
 // @TODO FIX TYPINGS! Missing or bad typings are very difficult for other developers to work in
 
@@ -38,7 +37,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
       if (!isTokenApplied) {
         const category = get(Properties, variable.type) as Properties | TokenTypes;
         acc.push({
-          value: curr.node.getSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variable.type).length === 0 ? variable.name : JSON.parse(curr.node.getSharedPluginData(SharedPluginDataNamespaces.VARIABLES, variable.type)),
+          value: variable.name,
           type: variable.type,
           category,
           nodes: [{ id, name, type }],
@@ -56,7 +55,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
       if (!isTokenApplied) {
         const category = get(Properties, style.type) as Properties | TokenTypes;
         acc.push({
-          value: curr.node.getSharedPluginData(SharedPluginDataNamespaces.STYLES, style.type).length === 0 ? style.name : JSON.parse(curr.node.getSharedPluginData(SharedPluginDataNamespaces.STYLES, style.type)),
+          value: style.name,
           type: style.type,
           category,
           nodes: [{ id, name, type }],

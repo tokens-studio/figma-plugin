@@ -8,13 +8,15 @@ import Box from '../Box';
 import Checkbox from '../Checkbox';
 import Label from '../Label';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { AnyTokenList } from '@/types/tokens';
 
 type Props = {
   isOpen: boolean
   onClose: () => void;
+  resolvedTokens: AnyTokenList;
 };
 
-export default function BulkRemapModal({ isOpen, onClose }: Props) {
+export default function BulkRemapModal({ isOpen, onClose, resolvedTokens }: Props) {
   const [oldName, setOldName] = React.useState('');
   const [newName, setNewName] = React.useState('');
   const [shouldRemapDocument, setShouldRemapDocument] = React.useState(false);
@@ -26,7 +28,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
 
   const onConfirm = React.useCallback(async () => {
     const updateMode = shouldRemapDocument ? UpdateMode.DOCUMENT : UpdateMode.SELECTION;
-    await handleBulkRemap(newName, oldName, updateMode);
+    await handleBulkRemap(newName, oldName, updateMode, resolvedTokens);
     onClose();
   }, [handleBulkRemap, onClose, newName, oldName, shouldRemapDocument]);
 

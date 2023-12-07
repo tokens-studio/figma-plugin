@@ -75,6 +75,7 @@ export default function useTokens() {
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
   const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
+  const uiState = useSelector(uiStateSelector, isEqual);
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -180,7 +181,7 @@ export default function useTokens() {
     }));
   }, [settings]);
 
-  const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION) => {
+  const handleBulkRemap = useCallback(async (newName: string, oldName: string, updateMode = UpdateMode.SELECTION, resolvedTokens?: AnyTokenList) => {
     track('bulkRemapToken', { fromInspect: true });
 
     wrapTransaction({ name: 'bulkRemapToken' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -188,6 +189,8 @@ export default function useTokens() {
       oldName,
       newName,
       updateMode,
+      resolvedTokens,
+      selectionValues: uiState.selectionValues,
     }));
   }, []);
 
