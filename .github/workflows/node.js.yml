@@ -7,6 +7,7 @@ on: [pull_request]
 
 env:
   TOKEN_FLOW_APP_URL: ${{ secrets.TOKEN_FLOW_APP_URL }}
+  LICENSE_API_URL: ${{ secrets.LICENSE_API_URL }}
 
 jobs:
   # install dependencies and store artifact
