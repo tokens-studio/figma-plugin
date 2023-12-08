@@ -36,13 +36,12 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
 
-  nodes.forEach(({ node, tokens: appliedTokens, variables }) => {
+  nodes.forEach(({ node, tokens: appliedTokens }) => {
     promises.add(
       defaultWorker.schedule(async () => {
         try {
-          const newTokenValues = { ...appliedTokens, ...variables };
-          const rawTokenMap = destructureTokenForAlias(tokens, newTokenValues);
-          const tokenValues = mapValuesToTokens(tokens, newTokenValues);
+          const rawTokenMap = destructureTokenForAlias(tokens, appliedTokens);
+          const tokenValues = mapValuesToTokens(tokens, appliedTokens);
           setValuesOnNode(
             node,
             tokenValues,
