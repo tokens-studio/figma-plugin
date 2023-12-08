@@ -11,15 +11,15 @@ import { ProgressTracker } from '../ProgressTracker';
 import { defaultWorker } from '../Worker';
 import getAppliedVariablesFromNode from '../getAppliedVariablesFromNode';
 import { AnyTokenList } from '@/types/tokens';
+import getAppliedStylesFromNode from '../getAppliedStylesFromNode';
 
 const getTokenValue = (name: string, resolvedTokens: AnyTokenList) => (
   resolvedTokens.find((token) => token.name === name)
 );
 
-const getLocalVariableByName = (name: string) => {
-  const localVariables = figma.variables.getLocalVariables();
-  return localVariables.find((variable) => variable.resolvedType === 'COLOR' && variable.name.split('/').join('.') === name);
-};
+const getStyleByName = (name: string) => (
+  figma.getLocalPaintStyles().find((style) => style.name === name)
+);
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
@@ -50,7 +50,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
           }
         });
 
-        if (Object.keys(tokens).length > 0) {
+        if (Object.keys(tokens).length === 0) {
           if (getAppliedVariablesFromNode(node).length > 0) {
             const { name: variableName } = getAppliedVariablesFromNode(node)[0];
             if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
@@ -63,11 +63,18 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
                   const paint = figma.util.solidPaint(resolvedValue?.value as string);
                   const fillsCopy = clone(node.fills);
                   fillsCopy[0] = figma.variables.setBoundVariableForPaint(paint, 'color', variable);
-                  const newLocalVariable = getLocalVariableByName(resolvedValue?.name as string);
-                  fillsCopy[0].boundVariables.color.id = newLocalVariable?.id;
+                  const newVariable = await figma.variables.importVariableByKeyAsync(resolvedValue?.name as string);
+                  fillsCopy[0].boundVariables.color.id = newVariable.id;
                   node.fills = fillsCopy;
                 }
               }
+            }
+          }
+          if (getAppliedStylesFromNode(node).length > 0) {
+            const { name: styleName } = getAppliedStylesFromNode(node)[0];
+            if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node) {
+              const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
+              node.fillStyleId = newStyle?.id as string;
             }
           }
         }
