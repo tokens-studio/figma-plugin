@@ -2,7 +2,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { findAll } from '@/utils/findAll';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { tokensSharedDataHandler, variablesSharedDataHandler } from './SharedDataHandler';
+import { tokensSharedDataHandler } from './SharedDataHandler';
 import { postToUI } from './notifiers';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
@@ -12,7 +12,6 @@ export type NodeManagerNode = {
   id: string;
   node: BaseNode
   tokens: NodeTokenRefMap;
-  variables: NodeTokenRefMap;
 };
 
 export class NodeManager {
@@ -37,7 +36,6 @@ export class NodeManager {
     return {
       node,
       tokens: await tokensSharedDataHandler.getAll(node),
-      variables: await variablesSharedDataHandler.getAll(node),
       id: node.id,
     };
   }
@@ -83,7 +81,6 @@ export class NodeManager {
           returnedNodes.push({
             node: relevantNodes[nodeIndex],
             tokens: await tokensSharedDataHandler.getAll(node),
-            variables: await variablesSharedDataHandler.getAll(node),
             id: node.id,
           });
           tracker.next();

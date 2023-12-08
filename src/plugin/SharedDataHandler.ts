@@ -49,4 +49,3 @@ class SharedDataHandler {
 }
 
 export const tokensSharedDataHandler = new SharedDataHandler(SharedPluginDataNamespaces.TOKENS);
-export const variablesSharedDataHandler = new SharedDataHandler(SharedPluginDataNamespaces.VARIABLES);
