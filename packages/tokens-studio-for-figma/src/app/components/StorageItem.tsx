@@ -126,7 +126,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
       </Stack>
       <Box css={{ marginRight: '$3' }}>
         {isActive() ? <Badge text={t('active')} /> : (
-          <Button id="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
+          <Button data-testid="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
             {t('apply')}
           </Button>
         )}

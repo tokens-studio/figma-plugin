@@ -348,7 +348,7 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-testid=tokenlisting-header-sizing-collapse-button]').click({
+    cy.get('[data-testid=tokenlisting-sizing-collapse-button]').click({
       timeout: 1000
     });
     cy.get('[data-testid=tokenlisting-opacity] [data-testid=button-add-new-token]').click({

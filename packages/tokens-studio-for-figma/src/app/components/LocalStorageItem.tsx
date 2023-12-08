@@ -26,7 +26,7 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => {
       </Box>
       <Box css={{ marginRight: '$2' }}>
         {isActive ? <Badge text="Active" /> : (
-          <Button id="button-storage-item-apply" variant="secondary" onClick={onClick}>
+          <Button data-testid="button-storage-item-apply" variant="secondary" onClick={onClick}>
             {t('apply')}
           </Button>
         )}
