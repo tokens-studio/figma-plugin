@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
+import { Button } from '@tokens-studio/ui';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
@@ -18,7 +19,6 @@ import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFo
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
-import Button from '../Button';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
 
 export type FormValues = {

@@ -125,8 +125,8 @@ describe('TokenListing', () => {
     cy.contains('My first theme').click({
       force: true,
     });
-    cy.get('[data-state="indeterminate"]').should('have.length', 2);
-    cy.get('[data-state="checked"]').should('have.length', 2);
-    cy.get('[data-state="unchecked"]').should('have.length', 4);
+    cy.get('[data-testid="tokensetitem-token-source-checkbox"]').should('have.length', 1);
+    cy.get('[data-testid="tokensetitem-token-enabled-checkbox"]').should('have.length', 1);
+    cy.get('[data-testid="tokensetitem-token-disabled-checkbox"]').should('have.length', 4);
   });
 });
