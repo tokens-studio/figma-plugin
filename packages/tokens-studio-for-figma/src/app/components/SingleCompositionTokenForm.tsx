@@ -92,7 +92,7 @@ export default function SingleCompositionTokenForm({
         />
         <Select.Content>
           {properties.length > 0
-                && properties.map((prop, idx) => <Select.Item key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
+                && properties.map((prop, idx) => <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
         </Select.Content>
       </Select>
       <Box css={{ flexGrow: 1 }}>

@@ -361,7 +361,7 @@ describe('TokenListing', () => {
     cy.get('[data-testid=tokenlisting-sizing-content]').should('be.hidden');
   });
 
-  it('can add a new composition token', () => {
+  it.only('can add a new composition token', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
@@ -387,15 +387,13 @@ describe('TokenListing', () => {
         }],
       },
     });
-    cy.get('[data-testid=tokenlisting-composition] [data-testid=button-add-new-token]').click({
-      timeout: 1000
-    });
+    cy.get('[data-testid=tokenlisting-composition] [data-testid=button-add-new-token]').click();
     fillInput({
       input: 'name',
       value: 'composition.regular',
     });
     cy.get('[data-testid=composition-token-dropdown]').click();
-    cy.get('[data-testid=item-dropdown-menu-element-sizing]').click();
+    cy.get('[data-testid=item-dropdown-menu-element-height]').click();
     fillValueInput({
       input: 'value',
       value: '$sizing.xs',

@@ -22,7 +22,7 @@
     "test:write": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest --coverage --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
-    "serve": "serve dist",
+    "serve": "serve dist -p 58630",
     "changeset": "changeset",
     "translate": "node  ./scripts/translate.mjs",
     "lint": "eslint . --quiet --fix",
