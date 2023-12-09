@@ -36,6 +36,11 @@ describe('updatePluginDataAndNodes', () => {
       entries, values, tokensMap, figmaStyleMaps, figmaVariableReferences: new Map(), figmaStyleReferences: {},
     });
 
+    console.log('entries: ', entries);
+    console.log('values: ', values);
+    console.log('tokensMap: ', tokensMap);
+    console.log('figmaStyleMaps: ', figmaStyleMaps);
+
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'borderRadius', 'none');
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'fill', '"red"');
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'spacing', '');
@@ -50,6 +55,7 @@ describe('updatePluginDataAndNodes', () => {
       {
         borderRadius: 'none',
         fill: 'red',
+        spacing: 'delete',
       },
       figmaStyleMaps,
       {},
