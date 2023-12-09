@@ -207,6 +207,25 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       tokens: addIdPropertyToTokens(newTokens),
     }),
+    importMultipleTokens: (state, data: UpdateTokenPayload[]) => {
+      const { activeTokenSet } = state;
+      const importedTokens = state.tokens;
+      data.forEach((token) => {
+        let { parent } = token;
+        if (!parent) {
+          parent = activeTokenSet;
+        }
+        if (importedTokens[parent]) {
+          importedTokens[parent].push(token);
+        } else {
+          importedTokens[parent] = [token];
+        }
+      });
+      return {
+        ...state,
+        tokens: { ...state.tokens, ...importedTokens },
+      };
+    },
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
 

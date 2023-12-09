@@ -14,6 +14,10 @@ import TrashIcon from '@/icons/trash.svg';
 import Box from './Box';
 import { ImportToken } from '@/types/tokens';
 import Text from './Text';
+import { UpdateTokenPayload } from '@/types/payloads';
+import Accordion from './Accordion';
+import { Count } from './Count';
+import Footer from './Footer';
 
 function NewOrExistingToken({
   token,
@@ -69,11 +73,11 @@ function NewOrExistingToken({
           ) : null}
         </Stack>
         {(token.description || token.oldDescription) && (
-        <Text size="small">
-          {token.description}
-          {' '}
-          {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
-        </Text>
+          <Text size="small">
+            {token.description}
+            {' '}
+            {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
+          </Text>
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
@@ -86,7 +90,7 @@ function NewOrExistingToken({
 
 export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
-  const { editSingleToken, createSingleToken } = useManageTokens();
+  const { editSingleToken, createSingleToken, importMultipleTokens } = useManageTokens();
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const importedTokens = useSelector(importedTokensSelector);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
@@ -102,46 +106,24 @@ export default function ImportedTokensDialog() {
     setNewTokens(newTokens.filter((t) => t.name !== token.name));
   }, [setNewTokens, newTokens]);
 
-  const handleCreateNewClick = React.useCallback(() => {
+  const handleCreateAllClick = React.useCallback(() => {
     // Create new tokens according to styles
-    // TODO: This should probably be a batch operation
-    newTokens.forEach((token) => {
-      // Add new token sets here
-
-      createSingleToken({
-        parent: token.parent ? token.parent : activeTokenSet,
-        name: token.name,
-        type: token.type,
-        value: token.value,
-        description: token.description,
-        shouldUpdateDocument: false,
-      });
-    });
+    importMultipleTokens(newTokens as UpdateTokenPayload[]);
     setNewTokens([]);
-  }, [newTokens, activeTokenSet, createSingleToken]);
+  }, [newTokens, importMultipleTokens]);
 
-  const handleUpdateClick = React.useCallback(() => {
+  const handleUpdateAllClick = React.useCallback(() => {
     // Go through each token that needs to be updated
-    // TODO: This should probably be a batch operation
-    updatedTokens.forEach((token) => {
-      editSingleToken({
-        parent: token.parent ? token.parent : activeTokenSet,
-        name: token.name,
-        value: token.value,
-        type: token.type,
-        description: token.description,
-        shouldUpdateDocument: false,
-      });
-    });
+    importMultipleTokens(updatedTokens as UpdateTokenPayload[]);
     setUpdatedTokens([]);
-  }, [updatedTokens, editSingleToken, activeTokenSet]);
+  }, [updatedTokens, importMultipleTokens]);
 
   const handleImportAllClick = React.useCallback(() => {
     // Perform both actions for all the tokens
-    // TODO: This should probably be a batch operation
-    handleUpdateClick();
-    handleCreateNewClick();
-  }, [handleCreateNewClick, handleUpdateClick]);
+    importMultipleTokens([...newTokens, ...updatedTokens] as UpdateTokenPayload[]);
+    setNewTokens([]);
+    setUpdatedTokens([]);
+  }, [importMultipleTokens, newTokens, updatedTokens]);
 
   const handleCreateSingleClick = React.useCallback((token) => {
     // Create new tokens according to styles
@@ -179,96 +161,98 @@ export default function ImportedTokensDialog() {
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
-  if (!newTokens.length && !updatedTokens.length) return null;
+  // if (!newTokens.length && !updatedTokens.length) return null;
 
   return (
     <Modal
-      full
       title="Import"
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
       close={handleClose}
+      height="90vh"
+      stickyFooter
+      footer={(
+        <Stack direction="row" gap={2}>
+          <Button variant="secondary" id="button-import-close" onClick={handleClose}>
+            {t('cancel')}
+          </Button>
+          <Button variant="secondary" id="button-import-create-all" onClick={handleCreateAllClick}>
+            {t('createAll')}
+          </Button>
+          <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
+            CLICK ME
+          </Button>
+        </Stack>
+      )}
     >
+
       <Stack direction="column" gap={4}>
         {newTokens.length > 0 && (
-        <div>
-          <Stack
-            direction="row"
-            justify="between"
-            align="center"
-            css={{ padding: '$2 $4' }}
+          <Accordion
+            label="New Tokens"
+            extra={(
+              <>
+                <Count count={newTokens.length} />
+                {' '}
+                <Button variant="secondary" id="button-import-update-all" onClick={handleCreateAllClick}>
+                  {t('createAll')}
+                </Button>
+              </>
+            )}
           >
-            <Heading>
-              {t('newTokens')}
-            </Heading>
-
-            <Stack direction="row" gap={2}>
-              <Button variant="secondary" id="button-import-close" onClick={handleClose}>
-                {t('cancel')}
-              </Button>
-              <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
-                {t('createAll')}
-              </Button>
-              <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
-                {t('importAll')}
-              </Button>
+            <Stack
+              direction="column"
+              gap={1}
+              css={{
+                borderTop: '1px solid',
+                borderColor: '$borderMuted',
+              }}
+            >
+              {newTokens.map((token) => (
+                <NewOrExistingToken
+                  token={token}
+                  key={`${token.parent}/${token.name}`}
+                  updateAction="Create"
+                  removeToken={handleIgnoreNewToken}
+                  updateToken={handleCreateSingleClick}
+                />
+              ))}
             </Stack>
-
-          </Stack>
-          <Stack
-            direction="column"
-            gap={1}
-            className="content scroll-container"
-            css={{
-              borderTop: '1px solid',
-              borderColor: '$borderMuted',
-            }}
-          >
-            {newTokens.map((token) => (
-              <NewOrExistingToken
-                token={token}
-                key={`${token.parent}/${token.name}`}
-                updateAction="Create"
-                removeToken={handleIgnoreNewToken}
-                updateToken={handleCreateSingleClick}
-              />
-            ))}
-          </Stack>
-        </div>
+          </Accordion>
         )}
         {updatedTokens.length > 0 && (
-        <div>
-          <Stack
-            direction="row"
-            justify="between"
-            align="center"
-            css={{ padding: '$2 $4' }}
+          <Accordion
+            label="Updated Tokens"
+            extra={(
+              <>
+                <Count count={updatedTokens.length} />
+                {' '}
+                <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateAllClick}>
+                  {t('updateAll')}
+                </Button>
+              </>
+            )}
           >
-            <Heading>{t('existingTokens')}</Heading>
-            <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
-              {t('updateAll')}
-            </Button>
-          </Stack>
-          <Stack
-            direction="column"
-            gap={1}
-            css={{
-              borderTop: '1px solid',
-              borderColor: '$borderMuted',
-            }}
-          >
-            {updatedTokens.map((token) => (
-              <NewOrExistingToken
-                token={token}
-                key={token.name}
-                updateAction="Update"
-                removeToken={handleIgnoreExistingToken}
-                updateToken={handleUpdateSingleClick}
-              />
-            ))}
-          </Stack>
-        </div>
+            <Stack
+              direction="column"
+              gap={1}
+              css={{
+                borderTop: '1px solid',
+                borderColor: '$borderMuted',
+              }}
+            >
+              {updatedTokens.map((token) => (
+                <NewOrExistingToken
+                  token={token}
+                  key={token.name}
+                  updateAction="Update"
+                  removeToken={handleIgnoreExistingToken}
+                  updateToken={handleUpdateSingleClick}
+                />
+              ))}
+            </Stack>
+          </Accordion>
         )}
       </Stack>
     </Modal>
