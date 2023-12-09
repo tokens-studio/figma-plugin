@@ -83,13 +83,18 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
     >
       {
         stylesEntries.length > 0 && (
-          <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$1', paddingTop: '$2',
-          }}
-          >
-            <Box css={{
-              display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+          <Stack
+            align="center"
+            justify="between"
+            gap={3}
+            css={{
+              paddingInline: '$1', paddingTop: '$2',
             }}
+          >
+            <Stack
+              align="center"
+              gap={3}
+              css={{ fontSize: '$small' }}
             >
               <Checkbox
                 checked={selectedStyles.length === stylesEntries.length}
@@ -99,13 +104,13 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
               <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
                 Select all
               </Label>
-            </Box>
-            <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
+            </Stack>
+            <Stack gap={1}>
               <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="invisible" size="small">
                 Detach selected
               </Button>
-            </Box>
-          </Box>
+            </Stack>
+          </Stack>
         )
       }
       <Box css={{
