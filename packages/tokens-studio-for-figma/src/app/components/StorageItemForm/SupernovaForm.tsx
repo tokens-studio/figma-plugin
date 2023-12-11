@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Box from '../Box';
@@ -9,7 +9,6 @@ import Input from '../Input';
 import Stack from '../Stack';
 import Text from '../Text';
 import { generateId } from '@/utils/generateId';
-import Heading from '../Heading';
 import Link from '../Link';
 import Textarea from '../Textarea';
 import { ErrorMessage } from '../ErrorMessage';

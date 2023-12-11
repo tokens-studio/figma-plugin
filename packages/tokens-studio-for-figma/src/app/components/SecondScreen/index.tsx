@@ -4,7 +4,7 @@ import {
   Link1Icon, LinkBreak1Icon, EnterIcon, ExitIcon, ExternalLinkIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import { useAuth } from '@/context/AuthContext';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -13,7 +13,6 @@ import { Dispatch } from '@/app/store';
 import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
 import { Switch, SwitchThumb } from '../Switch';
-import Heading from '../Heading';
 import { Divider } from '../Divider';
 
 export const StyledBetaBadge = styled('span', {

@@ -1,7 +1,7 @@
 import React from 'react';
+import { Heading } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
-import Heading from './Heading';
 import InspectorTokenSingle from './InspectorTokenSingle';
 import { Properties } from '@/constants/Properties';
 import { SelectionGroup } from '@/types';

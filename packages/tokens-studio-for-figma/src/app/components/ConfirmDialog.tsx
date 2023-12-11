@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import useConfirm from '../hooks/useConfirm';
-import Heading from './Heading';
 import Modal from './Modal';
 import Box from './Box';
 import Text from './Text';

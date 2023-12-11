@@ -4,10 +4,9 @@ import {
   BookmarkIcon, ReaderIcon, ChatBubbleIcon, GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
-import Heading from './Heading';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';

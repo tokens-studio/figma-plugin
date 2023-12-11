@@ -1,9 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { GitBranchIcon } from '@primer/octicons-react';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Heading from '../Heading';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import {

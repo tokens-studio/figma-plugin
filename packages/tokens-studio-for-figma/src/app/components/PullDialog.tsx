@@ -1,12 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import {
   changedStateSelector, storageTypeSelector,
 } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
-import Heading from './Heading';
 import Modal from './Modal';
 import Stack from './Stack';
 import Spinner from './Spinner';

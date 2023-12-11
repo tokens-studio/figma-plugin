@@ -5,11 +5,10 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import Box from '../Box';
 import Input from '../Input';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import Heading from '../Heading';
 import Stack from '../Stack';
 import { styled } from '@/stitches.config';
 import { Dispatch } from '@/app/store';

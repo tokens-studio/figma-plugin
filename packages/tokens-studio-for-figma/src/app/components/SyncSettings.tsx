@@ -2,8 +2,8 @@
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Heading } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
-import Heading from './Heading';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';

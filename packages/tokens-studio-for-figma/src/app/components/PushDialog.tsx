@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import {
   localApiStateSelector, remoteDataSelector, storageTypeSelector, themesListSelector, tokensSelector,
 } from '@/selectors';
@@ -10,7 +10,6 @@ import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
-import Heading from './Heading';
 import Text from './Text';
 import Modal from './Modal';
 import Stack from './Stack';

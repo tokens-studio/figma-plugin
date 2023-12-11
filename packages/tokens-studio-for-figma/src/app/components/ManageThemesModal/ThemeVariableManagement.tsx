@@ -3,10 +3,9 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Sentry from '@sentry/react';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import Box from '../Box';
 import Accordion from '../Accordion';
-import Heading from '../Heading';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isWaitingForBackgroundJobSelector, themeByIdSelector, tokensSelector } from '@/selectors';
 import { Dispatch, RootState } from '@/app/store';

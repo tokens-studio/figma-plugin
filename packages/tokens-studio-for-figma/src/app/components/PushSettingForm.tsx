@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Heading } from '@tokens-studio/ui';
 import Stack from './Stack';
 import { localApiStateSelector } from '@/selectors';
 import Box from './Box';
 import Text from './Text';
-import Heading from './Heading';
 import Textarea from './Textarea';
 import Input from './Input';
 import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';

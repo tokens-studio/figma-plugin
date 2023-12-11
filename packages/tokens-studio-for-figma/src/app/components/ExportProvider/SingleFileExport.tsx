@@ -1,12 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import set from 'set-value';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import useTokens from '@/app/store/useTokens';
 import {
   themesListSelector, tokensSelector,
 } from '@/selectors';
-import Heading from '../Heading';
 import Textarea from '../Textarea';
 import Checkbox from '../Checkbox';
 import Label from '../Label';

@@ -2,11 +2,11 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { ContextMenuPortal } from '@radix-ui/react-context-menu';
+import { Heading } from '@tokens-studio/ui';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from '../ContextMenu';
 import Stack from '../Stack';
-import Heading from '../Heading';
 import useManageTokens from '../../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
@@ -89,7 +89,7 @@ export function TokenGroupHeading({
           <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
-              <Heading muted size="xsmall">{label}</Heading>
+              <Heading muted size="small">{label}</Heading>
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuPortal>

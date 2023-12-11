@@ -1,8 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
-import Heading from './Heading';
+import { Button, Heading } from '@tokens-studio/ui';
 import Text from './Text';
 import Modal from './Modal';
 import { changelogSelector } from '@/selectors';
