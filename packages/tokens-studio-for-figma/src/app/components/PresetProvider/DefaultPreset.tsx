@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { Button } from '@tokens-studio/ui';
 import { Dispatch } from '@/app/store';
-import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import Text from '../Text';

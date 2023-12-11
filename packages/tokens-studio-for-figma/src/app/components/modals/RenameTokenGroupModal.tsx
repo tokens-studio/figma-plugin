@@ -1,6 +1,6 @@
 import React from 'react';
+import { Button } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
 import Text from '../Text';

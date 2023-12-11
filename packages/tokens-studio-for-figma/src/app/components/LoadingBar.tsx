@@ -1,7 +1,7 @@
 import React from 'react';
 import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
-import Button from './Button';
+import { Button } from '@tokens-studio/ui';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';

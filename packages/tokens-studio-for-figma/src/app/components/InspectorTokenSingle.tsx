@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { IconButton } from '@tokens-studio/ui';
+import { IconButton, Button } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
@@ -14,7 +14,6 @@ import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure'
 import TokenNodes from './inspector/TokenNodes';
 import { inspectStateSelector } from '@/selectors';
 import { useTypeForProperty } from '../hooks/useTypeForProperty';
-import Button from './Button';
 import DownshiftInput from './DownshiftInput';
 import Modal from './Modal';
 import Stack from './Stack';

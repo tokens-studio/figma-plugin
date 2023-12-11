@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Button } from '@tokens-studio/ui';
 import Box from '../Box';
 import Accordion from '../Accordion';
 import Heading from '../Heading';
-import Button from '../Button';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isWaitingForBackgroundJobSelector } from '@/selectors';
 import { RootState } from '@/app/store';

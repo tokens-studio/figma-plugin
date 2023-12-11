@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Button from '../Button';
 import Stack from '../Stack';
 import Input from '../Input';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';

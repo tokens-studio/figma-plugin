@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Label } from '@tokens-studio/ui';
+import { Label, Button } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
-import Button from './Button';
 import IconAdd from '@/icons/add.svg';
 import Input from './Input';
 import Modal from './Modal';
