@@ -5,7 +5,7 @@ export const StyledButton = styled('button', {
   borderStyle: 'solid',
   borderColor: 'transparent',
   borderRadius: '$small',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   fontSize: '$xsmall',
   padding: '$3',
   background: '$btnPrimaryBg',

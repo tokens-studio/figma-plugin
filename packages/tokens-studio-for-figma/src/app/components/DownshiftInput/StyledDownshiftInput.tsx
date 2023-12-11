@@ -1,4 +1,4 @@
-import React,{ComponentType} from 'react';
+import React, { ComponentType } from 'react';
 import type { GetInputPropsOptions } from 'downshift';
 import { FixedSizeList as List } from 'react-window';
 import { styled } from '@/stitches.config';
@@ -39,12 +39,11 @@ export const StyledList = styled(List as ComponentType<any>, {
   backgroundColor: '$bgDefault',
   marginTop: '1px',
   cursor: 'pointer',
-  boxShadow: '$contextMenu',
 });
 
 export const StyledItemValue = styled('div', {
   color: 'var(--mentions-color-muted, var(--colors-fgMuted))',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   textAlign: 'right',
   maxWidth: '300px',
   overflow: 'hidden',
@@ -93,7 +92,7 @@ export const StyledPart = styled('span', {
   variants: {
     matches: {
       true: {
-        fontWeight: '$bold',
+        fontWeight: '$sansBold',
       },
     },
   },

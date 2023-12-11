@@ -66,26 +66,26 @@ describe('Branch switcher', () => {
 
   it('successfully shows list of branches', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-switch-menu-radio-element-main]').should('have.length', 1);
-    cy.get('[data-cy=branch-switch-menu-radio-element-development]').should('have.length', 1);
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-switch-menu-radio-element-main]').should('have.length', 1);
+    cy.get('[data-testid=branch-switch-menu-radio-element-development]').should('have.length', 1);
   });
 
   it('successfully create a new branch', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-selector-create-new-branch-trigger]').click();
-    cy.get('[data-cy=branch-selector-create-branch-from-branch-main]').click();
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-selector-create-new-branch-trigger]').click();
+    cy.get('[data-testid=branch-selector-create-branch-from-branch-main]').click();
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-switch-menu-radio-element-new-branch]').should('have.length', 1);
   });
 
   it('successfully create a new branch from current change', () => {
     cy.startup(mockStartupParams);
 
-    cy.get('[data-cy=branch-selector-menu-trigger]').should('be.visible')
+    cy.get('[data-testid=branch-selector-menu-trigger]').should('be.visible')
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -101,27 +101,27 @@ describe('Branch switcher', () => {
         }],
       },
     });
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-selector-create-new-branch-trigger]').click();
-    cy.get('[data-cy=branch-selector-create-new-branch-from-current-change]').click();
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-selector-create-new-branch-trigger]').click();
+    cy.get('[data-testid=branch-selector-create-new-branch-from-current-change]').click();
     cy.get('input[name=branch]').type('new-branch');
     cy.get('button[type=submit]').click();
-    cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
-    cy.get('[data-cy=push-dialog-button-push-changes]').click();
-    cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
+    cy.get('[data-testid=push-dialog-commit-message]').type('push changes');
+    cy.get('[data-testid=push-dialog-button-push-changes]').click();
+    cy.get('[data-testid=push-dialog-success-heading]').should('have.length', 1);
   });
 
   it('successfully change to an existing branch', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-switch-menu-radio-element-development]').click();
-    cy.get('[data-cy=branch-selector-menu-trigger]').click();
-    cy.get('[data-cy=branch-switch-menu-radio-element-development] [data-cy=branch-switch-menu-check-icon]').should('have.length', 1);
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-switch-menu-radio-element-development]').click();
+    cy.get('[data-testid=branch-selector-menu-trigger]').click();
+    cy.get('[data-testid=branch-switch-menu-radio-element-development] [data-testid=branch-switch-menu-check-icon]').should('have.length', 1);
   });
 
   it('successfully push change', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy=footer-push-button]').should('be.visible');
+    cy.get('[data-testid=footer-push-button]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -137,9 +137,9 @@ describe('Branch switcher', () => {
         }],
       },
     });
-    cy.get('[data-cy=footer-push-button]').click();
-    cy.get('[data-cy=push-dialog-commit-message]').type('push changes');
-    cy.get('[data-cy=push-dialog-button-push-changes]').click();
-    cy.get('[data-cy=push-dialog-success-heading]').should('have.length', 1);
+    cy.get('[data-testid=footer-push-button]').click();
+    cy.get('[data-testid=push-dialog-commit-message]').type('push changes');
+    cy.get('[data-testid=push-dialog-button-push-changes]').click();
+    cy.get('[data-testid=push-dialog-success-heading]').should('have.length', 1);
   });
 });

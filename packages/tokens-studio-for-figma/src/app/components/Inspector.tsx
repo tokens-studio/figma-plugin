@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { ToggleGroup, Tooltip } from '@tokens-studio/ui';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
@@ -10,7 +11,6 @@ import IconButton from './IconButton';
 import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';
-import Tooltip from './Tooltip';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
 import {
@@ -36,14 +36,9 @@ function Inspector() {
     defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
   ), [tokens, usedTokenSet]);
 
-  const handleSetInspectViewMulti = React.useCallback(() => {
-    setInspectView('multi');
-    track('setInspectView', { view: 'multi' });
-  }, []);
-
-  const handleSetInspectViewDebug = React.useCallback(() => {
-    setInspectView('debug');
-    track('setInspectView', { view: 'debug' });
+  const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
+    track('setInspectView', { view });
+    setInspectView(view);
   }, []);
 
   function renderInspectView() {
@@ -95,31 +90,24 @@ function Inspector() {
             />
             <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{ fontWeight: '$bold', fontSize: '$small', marginBottom: '$1' }}>
+                <Box css={{ fontWeight: '$sansBold', fontSize: '$small' }}>
                   {t('deepInspect')}
-
                 </Box>
               </Label>
             </Tooltip>
           </Stack>
-          <Stack direction="row">
-            <IconButton
-              variant={inspectView === 'multi' ? 'primary' : 'default'}
-              dataCy="inspector-multi"
-              onClick={handleSetInspectViewMulti}
-              icon={<IconInspect />}
-              tooltipSide="bottom"
-              tooltip={t('inspectLayers') as string}
-            />
-            <IconButton
-              variant={inspectView === 'debug' ? 'primary' : 'default'}
-              dataCy="inspector-debug"
-              onClick={handleSetInspectViewDebug}
-              icon={<IconDebug />}
-              tooltipSide="bottom"
-              tooltip={t('debugAndAnnotate') as string}
-            />
-          </Stack>
+          <ToggleGroup type="single" value={inspectView} onValueChange={handleSetInspectView}>
+            {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
+            <ToggleGroup.Item value="multi" tooltip={t('inspectLayers') as string} tooltipSide="bottom"> */}
+            <ToggleGroup.Item value="multi">
+              <IconInspect />
+            </ToggleGroup.Item>
+            {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
+              <ToggleGroup.Item value="debug" tooltip={t('debugAndAnnotate') as string} tooltipSide="bottom"> */}
+            <ToggleGroup.Item value="debug">
+              <IconDebug />
+            </ToggleGroup.Item>
+          </ToggleGroup>
           <InspectSearchOptionDropdown />
         </Stack>
       </Box>

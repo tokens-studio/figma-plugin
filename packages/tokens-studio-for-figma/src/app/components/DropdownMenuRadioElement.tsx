@@ -11,7 +11,7 @@ export const DropdownMenuRadioElement: React.FC<React.PropsWithChildren<React.Pr
   const onSelect = React.useCallback(() => itemSelected(item), [item, itemSelected]);
 
   return (
-    <DropdownMenuRadioItem data-cy={`item-dropdown-menu-element-${item}`} key={`item_${index}`} value={item} onSelect={onSelect}>
+    <DropdownMenuRadioItem data-testid={`item-dropdown-menu-element-${item}`} key={`item_${index}`} value={item} onSelect={onSelect}>
       {` ${item}`}
     </DropdownMenuRadioItem>
   );

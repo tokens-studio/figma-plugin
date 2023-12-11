@@ -18,24 +18,10 @@ type Props<T extends string> = {
 };
 
 const StyledButton = styled('button', {
-  '@initial': {
-    padding: '$5 $4',
-    maxWidth: 'fit-content',
-  },
-  '@xs': {
-    padding: '$5 $3',
-    maxWidth: '64px',
-  },
-  '@sm': {
-    padding: '$5 $4',
-    maxWidth: '96px',
-  },
-  '@md': {
-    padding: '$5 $4',
-    maxWidth: 'fit-content',
-  },
+  padding: '$5 $4',
+  maxWidth: 'fit-content',
   fontSize: '$xsmall',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -48,11 +34,6 @@ const StyledButton = styled('button', {
     outline: 'none',
     boxShadow: 'none',
     color: '$fgDefault',
-  },
-  '@container (width < 64px)': {
-    '> svg': {
-      display: 'none',
-    },
   },
   '> svg': {
     minHeight: '100%',
@@ -78,7 +59,6 @@ export function TabButton<T extends string = Tabs>({
 
   return (
     <StyledButton
-      data-cy={`navitem-${name}`}
       data-testid={`navitem-${name}`}
       type="button"
       isActive={activeTab === name}

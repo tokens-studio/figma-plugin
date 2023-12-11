@@ -43,7 +43,7 @@ function NewOrExistingToken({
           <Box css={{
             padding: '$2',
             wordBreak: 'break-all',
-            fontWeight: '$bold',
+            fontWeight: '$sansBold',
             borderRadius: '$small',
             fontSize: '$xsmall',
             backgroundColor: '$successBg',
@@ -56,7 +56,7 @@ function NewOrExistingToken({
             <Box css={{
               padding: '$2',
               wordBreak: 'break-all',
-              fontWeight: '$bold',
+              fontWeight: '$sansBold',
               borderRadius: '$small',
               fontSize: '$xsmall',
               backgroundColor: '$dangerBg',
@@ -76,8 +76,8 @@ function NewOrExistingToken({
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton dataCy="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
-        <IconButton dataCy="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
+        <IconButton data-testid="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
+        <IconButton data-testid="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );
@@ -196,7 +196,7 @@ export default function ImportedTokensDialog() {
             css={{ padding: '$2 $4' }}
           >
             <Heading>{t('newTokens')}</Heading>
-            <Button variant="secondary" id="button-import-create-all" onClick={handleCreateNewClick}>
+            <Button variant="secondary" data-testid="button-import-create-all" onClick={handleCreateNewClick}>
               {t('createAll')}
             </Button>
           </Stack>
@@ -229,7 +229,7 @@ export default function ImportedTokensDialog() {
             css={{ padding: '$2 $4' }}
           >
             <Heading>{t('existingTokens')}</Heading>
-            <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateClick}>
+            <Button variant="secondary" data-testid="button-import-update-all" onClick={handleUpdateClick}>
               {t('updateAll')}
             </Button>
           </Stack>

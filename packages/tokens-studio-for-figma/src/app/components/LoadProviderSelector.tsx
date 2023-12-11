@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledButton = styled('button', {
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   fontSize: '$xsmall',
   display: 'flex',
   padding: '$3 $4',

@@ -17,7 +17,7 @@ function App() {
   const activeTab = useSelector(activeTabSelector);
 
   return (
-    <Box>
+    <Box css={{ isolation: 'isolate' }}>
       {activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box

@@ -76,10 +76,18 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
     handlePerformStartup();
   }, [handlePerformStartup]);
 
+  useEffect(() => {
+    if (isDarkTheme) {
+      document.body.className = darkThemeMode;
+    } else {
+      document.body.className = lightThemeMode;
+    }
+  }, [isDarkTheme]);
+
   globalStyles();
 
   const appContent = (
-    <Box css={{ backgroundColor: '$bgDefault' }} className={isDarkTheme ? darkThemeMode : lightThemeMode}>
+    <Box css={{ backgroundColor: '$bgDefault', color: '$fgDefault' }}>
       <FigmaLoading
         isLoading={showLoadingScreen}
         label={startupProcess.currentStep ? applicationInitStepLabels[startupProcess.currentStep] : undefined}

@@ -25,9 +25,9 @@ describe('TokenSetSelector Component', () => {
   it('create rename duplicate token set', async () => {
     const result = render(<TokenSetSelector />);
     // create new token set
-    const newTokenSetButton = await result.findByTestId('new-set-button');
+    const newTokenSetButton = await result.findByTestId('button-new-token-set');
     fireEvent.click(newTokenSetButton);
-    const newTokenSetInput = await result.findByTestId('create-set-input');
+    const newTokenSetInput = await result.findByTestId('token-set-input');
     fireEvent.change(newTokenSetInput, { target: { value: 'Folder/newSetCreated' } });
     const createButton = await result.getByRole('button', {
       name: /create/i,

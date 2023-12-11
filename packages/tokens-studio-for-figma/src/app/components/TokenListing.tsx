@@ -78,7 +78,7 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
   if (!values && !showEmptyGroups) return null;
 
   return (
-    <Box css={{ borderBottom: '1px solid $borderMuted' }} data-cy={`tokenlisting-${tokenKey}`}>
+    <Box css={{ borderBottom: '1px solid $borderMuted' }} data-testid={`tokenlisting-${tokenKey}`}>
       <TokenListingHeading
         onCollapse={handleSetIntCollapsed}
         showDisplayToggle={showDisplayToggle}
@@ -91,7 +91,7 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
       {values && (
         <DndProvider backend={HTML5Backend}>
           <Box
-            data-cy={`tokenlisting-${tokenKey}-content`}
+            data-testid={`tokenlisting-${tokenKey}-content`}
             css={{
               padding: '$4',
               paddingTop: 0,

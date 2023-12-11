@@ -11,7 +11,7 @@ export const StyledBadge = styled('div', {
   backgroundColor: '$accentDefault',
   lineHeight: 1,
   color: '$fgOnEmphasis',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
 });
 
 type Props = {

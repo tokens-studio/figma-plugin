@@ -6,5 +6,5 @@ export const ErrorMessage = styled('div', {
   borderRadius: '$small',
   padding: '$4',
   fontSize: '$xs',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
 });

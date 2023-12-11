@@ -78,7 +78,7 @@ export function ThemeListGroupHeader({
         {!isEditing ? (
           <>
             <Text css={{
-              color: '$fgMuted', height: '28px', display: 'flex', alignItems: 'center',
+              color: '$fgMuted', height: '$controlSmall', display: 'flex', alignItems: 'center',
             }}
             >
               {label}
@@ -86,6 +86,9 @@ export function ThemeListGroupHeader({
             <IconButton
               onClick={handleEditButtonClick}
               icon={<IconPencil />}
+              size="small"
+              variant="invisible"
+              tooltip="Rename group"
             />
           </>
         ) : (

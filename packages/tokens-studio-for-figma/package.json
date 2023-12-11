@@ -22,7 +22,7 @@
     "test:write": "cross-env LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton jest --coverage --json --outputFile=/home/runner/work/_actions/mattallty/jest-github-action/v1/dist/jest.results.json",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
-    "serve": "serve dist",
+    "serve": "serve dist -p 58630",
     "changeset": "changeset",
     "translate": "node  ./scripts/translate.mjs",
     "lint": "eslint . --quiet --fix",
@@ -31,6 +31,8 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "@tokens-studio/ui": "0.3.12",
+    "@tokens-studio/tokens": "0.0.23",
     "@figma-plugin/helpers": "^0.15.2",
     "@gitbeaker/rest": "^39.21.2",
     "@monaco-editor/react": "^4.5.1",
@@ -131,7 +133,6 @@
     "zod": "^3.22.3"
   },
   "devDependencies": {
-    "0x": "^5.6.0",
     "@babel/core": "^7.12.16",
     "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@babel/preset-env": "^7.23.3",
@@ -171,6 +172,7 @@
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
+    "0x": "^5.6.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "changeset": "^0.2.6",

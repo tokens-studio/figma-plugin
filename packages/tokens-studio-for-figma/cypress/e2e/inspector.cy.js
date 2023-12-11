@@ -56,7 +56,7 @@ describe('Inspector tokens', () => {
 
   it('successfully shows tokens applied on the node', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible');
+    cy.get('[data-testid="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -122,7 +122,7 @@ describe('Inspector tokens', () => {
         fontSizes: "font-size.12",
       }
     });
-    cy.get('[data-cy=navitem-inspector]').click({
+    cy.get('[data-testid=navitem-inspector]').click({
       timeout: 1000
     });
     cy.contains('sizing.xs');
@@ -132,7 +132,7 @@ describe('Inspector tokens', () => {
 
   it('successfully remaps a token', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible');
+    cy.get('[data-testid="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -203,11 +203,11 @@ describe('Inspector tokens', () => {
         fontSizes: "font-size.12",
       }
     });
-    cy.get('[data-cy=navitem-inspector]').click({
+    cy.get('[data-testid=navitem-inspector]').click({
       timeout: 1000
     });
-    cy.get('[data-cy=inspector-token-single-opacity] [data-cy=button-token-remap]').click();
-    cy.get(`[data-cy=mention-input-value]`).type('$opacity.100').type('{enter}');
+    cy.get('[data-testid=inspector-token-single-opacity] [data-testid=button-token-remap]').click();
+    cy.get(`[data-testid=mention-input-value]`).type('$opacity.100').type('{enter}');
     cy.receiveSelectionValues({
       selectionValues: [{
         category: "sizing",

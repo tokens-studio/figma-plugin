@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Label } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
@@ -174,21 +175,25 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       >
         <form onSubmit={handleRenameTokenSetSubmit}>
           <Stack direction="column" gap={4}>
-            <Input
-              full
-              autofocus
-              value={newTokenSetName}
-              onChange={handleChangeName}
-              type="text"
-              name="tokensetname"
-              data-testid="rename-set-input"
-              required
-            />
-            <Stack direction="row" gap={4}>
-              <Button variant="secondary" size="large" onClick={handleCloseRenameModal}>
+            <Stack direction="column" gap={2}>
+              <Label htmlFor="tokensetname">Name</Label>
+              <Input
+                full
+                autofocus
+                value={newTokenSetName}
+                onChange={handleChangeName}
+                type="text"
+                name="tokensetname"
+                data-testid="rename-set-input"
+                required
+                size="large"
+              />
+            </Stack>
+            <Stack direction="row" gap={4} justify="end">
+              <Button variant="secondary" onClick={handleCloseRenameModal}>
                 {t('cancel')}
               </Button>
-              <Button type="submit" variant="primary" size="large" disabled={!newTokenSetName}>
+              <Button type="submit" variant="primary" disabled={!newTokenSetName}>
                 {
                   isDuplicate ? t('save') : t('change')
                 }
@@ -205,29 +210,33 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       >
         <form onSubmit={handleNewTokenSetSubmit}>
           <Stack direction="column" gap={4}>
-            <Input
-              full
-              value={newTokenSetName}
-              onChange={handleChangeName}
-              type="text"
-              name="tokensetname"
-              required
-              data-cy="token-set-input"
-              data-testid="create-set-input"
-              autofocus
-            />
-            <Stack direction="row" gap={4}>
-              <Button variant="secondary" size="large" onClick={handleCloseNewTokenSetModal}>
+            <Stack direction="column" gap={2}>
+              <Label htmlFor="tokensetname">Name</Label>
+              <Input
+                full
+                value={newTokenSetName}
+                onChange={handleChangeName}
+                type="text"
+                name="tokensetname"
+                required
+                data-testid="token-set-input"
+                autofocus
+                placeholder="Enter a name"
+                size="large"
+              />
+            </Stack>
+            <Stack direction="row" gap={4} justify="end">
+              <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
                 {t('cancel')}
               </Button>
-              <Button data-cy="create-token-set" type="submit" variant="primary" size="large">
+              <Button data-testid="create-token-set" type="submit" variant="primary">
                 {t('create')}
               </Button>
             </Stack>
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-cy="button-new-token-set" data-testid="new-set-button" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+      <StyledButton data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
         {t('sets.new')}
         <IconAdd />
       </StyledButton>

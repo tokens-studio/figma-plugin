@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledHeading = styled('p', {
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   color: '$fgDefault',
   letterSpacing: 0,
   variants: {
@@ -39,7 +39,7 @@ function Heading({
   size = 'small', children, id, muted,
 }: HeadingProps) {
   return (
-    <StyledHeading size={size} muted={muted} data-cy={id}>
+    <StyledHeading size={size} muted={muted} data-testid={id}>
       {children}
     </StyledHeading>
   );

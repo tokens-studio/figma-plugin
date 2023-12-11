@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import Box from '../Box';
 import {
   DropdownMenu,
@@ -65,22 +66,24 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
           )
         }
       </StyledDropdownMenuTrigger>
-      <DropdownMenuContent side="bottom">
-        <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
-          {
+      <DropdownMenuPortal>
+        <DropdownMenuContent side="bottom">
+          <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
+            {
             themeGroupList
           }
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          css={{
-            paddingLeft: '$6',
-          }}
-          onSelect={addGroup}
-        >
-          Create new group
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            css={{
+              paddingLeft: '$6',
+            }}
+            onSelect={addGroup}
+          >
+            Create new group
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
     </DropdownMenu>
   );
 };

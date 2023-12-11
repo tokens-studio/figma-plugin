@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
+import { Button } from '@tokens-studio/ui';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
@@ -18,7 +19,6 @@ import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFo
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
-import Button from '../Button';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
 
 export type FormValues = {
@@ -92,16 +92,16 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
             tooltip="Return to overview"
-            data-cy="button-return-to-overview"
             data-testid="button-return-to-overview"
             icon={<IconBack />}
+            size="small"
+            variant="invisible"
             onClick={onCancel}
           />
           {
             showGroupInput ? (
               <Input
                 autofocus
-                data-cy="create-or-edit-theme-form--group--name"
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
               />
@@ -124,8 +124,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                     />
                   ) : (
                     <Button
-                      id="button-manage-themes-modal-new-group"
-                      variant="secondary"
+                      data-testid="button-manage-themes-modal-new-group"
+                      variant="invisible"
                       icon={<IconPlus />}
                       onClick={handleAddGroup}
                       size="small"
@@ -140,7 +140,6 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           }
           <Box>/</Box>
           <Input
-            data-cy="create-or-edit-theme-form--input--name"
             data-testid="create-or-edit-theme-form--input--name"
             {...register('name', { required: true })}
           />

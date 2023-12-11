@@ -53,7 +53,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
   }, [dispatch, theme.id, isActive, activeTheme, groupName]);
 
   return (
-    <Box key={theme.id} data-cy="singlethemeentry" css={{ width: '100%', overflow: 'hidden' }}>
+    <Box key={theme.id} data-testid="singlethemeentry" css={{ width: '100%', overflow: 'hidden' }}>
       <Stack direction="row" align="center" justify="between">
         <Stack gap={4} direction="row" align="center">
           <Switch checked={isActive} onCheckedChange={handleToggle}>
@@ -66,9 +66,11 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
             {`${tokenSetCount} sets, ${stylesCount} styles, ${variablesCount} variables`}
           </StyledThemeMetaLabel>
           <IconButton
-            dataCy={`singlethemeentry-${theme.id}`}
+            data-testid={`singlethemeentry-${theme.id}`}
             icon={<IconDiveInto />}
             onClick={handleOpenClick}
+            size="small"
+            variant="invisible"
           />
         </Stack>
       </Stack>

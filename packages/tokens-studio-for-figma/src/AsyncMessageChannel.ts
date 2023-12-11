@@ -66,7 +66,7 @@ export class AsyncMessageChannel {
       // This appears to be related to the monaco editor being opened. It appears to post a message to the window message event listener with no data.
       if (!msg || !msg.id || !msg.message || !msg.message.type.startsWith('async/')) {
         // eslint-disable-next-line no-console
-        console.warn('Invalid message received', msg);
+        // console.warn('Invalid message received', msg);
         return;
       }
       const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;

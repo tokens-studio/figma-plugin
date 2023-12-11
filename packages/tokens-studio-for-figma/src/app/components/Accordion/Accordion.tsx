@@ -2,14 +2,11 @@ import React, {
   PropsWithChildren, ReactNode, useCallback, useState,
 } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Box, IconButton, Stack } from '@tokens-studio/ui';
 import type { StitchesCSS } from '@/types';
 import { StyledContainer } from './StyledContainer';
-import { StyledHeader } from './StyledHeader';
-import { StyledCollapseHandle } from './StyledCollapseHandle';
-import { IconChevronDown } from '@/icons';
-import Box from '../Box';
+import { IconChevronDown, IconChevronRight } from '@/icons';
 import { Flex } from '../Flex';
-import { StyledIconButton } from './StyledIconButton';
 
 type Props = PropsWithChildren<{
   label: ReactNode
@@ -31,21 +28,33 @@ export function Accordion({
 
   return (
     <StyledContainer css={css}>
-      <StyledCollapseHandle>
-        <StyledIconButton
-          open={isOpen}
-          dataCy="accordion-toggle"
-          icon={<IconChevronDown width={6} height={6} fill="currentColor" />}
+      <Box css={{
+        gridColumn: '1',
+        gridRow: '1',
+      }}
+      >
+        <IconButton
+          data-testid="accordion-toggle"
+          size="small"
+          variant="invisible"
+          icon={isOpen ? <IconChevronDown /> : <IconChevronRight />}
           disabled={disabled}
           onClick={handleToggle}
         />
-      </StyledCollapseHandle>
-      <StyledHeader>
+      </Box>
+      <Stack css={{
+        gridRow: '1',
+        gridColumn: '2',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        minHeight: '100%',
+      }}
+      >
         <Box>{label}</Box>
         <Flex css={{ height: 0, alignItems: 'center' }}>
           {extra}
         </Flex>
-      </StyledHeader>
+      </Stack>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -56,7 +65,6 @@ export function Accordion({
             }}
             key="content"
             data-testid="accordion-content"
-            data-cy="accordion-content"
             transition={reducedMotion ? {
               duration: 0,
             } : undefined}

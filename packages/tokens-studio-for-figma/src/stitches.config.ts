@@ -1,20 +1,42 @@
 // stitches.config.ts
 import { createStitches } from '@stitches/react';
-import * as core from './tokens/core';
-import * as lightTheme from './tokens/light';
-import * as darkTheme from './tokens/dark';
+import { lightTheme, darkTheme, core } from '@tokens-studio/tokens';
 
 export const stitchesInstance = createStitches({
-  media: {
-    xs: '(min-width: 300px)',
-    sm: '(min-width: 360px)',
-    md: '(min-width: 480px)',
-    lg: '(min-width: 768px)',
-  },
   theme: {
-    colors: lightTheme.colors,
+    colors: {
+      ...lightTheme.colors,
+      // TODO: We need to add these to the ui tokens.
+      proBg: '#e1d8ec',
+      proBorder: '#c2b2d8',
+      proFg: '#694993',
+    },
     shadows: lightTheme.shadows,
     ...core,
+    fontWeights: {
+      ...core.fontWeights,
+      // TODO: We should likely make everything 500 and get rid of 600
+      sansBold: 500,
+    },
+    fontSizes: {
+      ...core.fontSizes,
+      // TODO: We should remove this once we have a way to choose density / font size
+      xxsmall: '11px !important',
+      xsmall: '12px !important',
+      small: '13px !important',
+      medium: '14px !important',
+      large: '16px !important',
+    },
+    radii: {
+      ...core.radii,
+      // TODO: Add to tokens
+      full: '999px',
+    },
+    sizes: {
+      ...core.sizes,
+      // TODO: Add to tokens
+      scrollbarWidth: '8px',
+    },
   },
 });
 
@@ -23,12 +45,24 @@ const {
 } = stitchesInstance;
 
 const lightThemeMode = createTheme('figma-light', {
-  colors: lightTheme.colors,
+  colors: {
+    ...lightTheme.colors,
+    // TODO: We need to add these to the ui tokens.
+    proBg: '#e1d8ec',
+    proBorder: '#c2b2d8',
+    proFg: '#694993',
+  },
   shadows: lightTheme.shadows,
 });
 
 const darkThemeMode = createTheme('figma-dark', {
-  colors: darkTheme.colors,
+  colors: {
+    ...darkTheme.colors,
+    // TODO: We need to add these to the ui tokens.
+    proBg: '#402d5a',
+    proBorder: '#694993',
+    proFg: '#c2b2d8',
+  },
   shadows: darkTheme.shadows,
 });
 

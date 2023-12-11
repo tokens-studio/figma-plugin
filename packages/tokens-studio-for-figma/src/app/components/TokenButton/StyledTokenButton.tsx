@@ -10,6 +10,7 @@ export const StyledTokenButtonText = styled('span', {
   flexShrink: 0,
   textAlign: 'left',
   gap: '$2',
+  fontSize: '$xsmall',
 });
 
 export const StyledTokenButton = styled('button', {

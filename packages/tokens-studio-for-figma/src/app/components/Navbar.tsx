@@ -43,6 +43,10 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
     return <IconSecondScreenIndeterminate />;
   }, [secondScreenisEnabled, user]);
 
+  const switchToSecondScreen = useCallback(() => {
+    dispatch.uiState.setActiveTab(Tabs.SECONDSCREEN);
+  }, [dispatch.uiState]);
+
   return (
     <Box
       css={{
@@ -66,9 +70,9 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         <NavbarUndoButton />
       </Stack>
       <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { (existingKey && !licenseKeyError) && <TabButton name={Tabs.SECONDSCREEN} activeTab={activeTab} endEnhancer={secondScreenIcon} tooltip="Second Screen" onSwitch={handleSwitch} />}
+        { (existingKey && !licenseKeyError) && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
         <TokenFlowButton />
-        <IconButton size="large" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
+        <IconButton size="small" variant="invisible" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
       </Stack>
     </Box>
   );

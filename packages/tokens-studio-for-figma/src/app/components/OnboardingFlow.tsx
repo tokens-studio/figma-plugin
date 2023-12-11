@@ -13,7 +13,7 @@ import { styled } from '@/stitches.config';
 const StyledLink = styled('a', {
   display: 'inline-flex',
   fontSize: '$1',
-  color: '$accentFg',
+  color: '$accentDefault',
 });
 
 const StyledImage = styled('img', {
@@ -111,16 +111,16 @@ export default function OnboardingFlow() {
         ))}
         <Stack direction="row" gap={2} justify={activeIndex > 1 ? 'between' : 'end'}>
           {activeIndex > 1 && (
-            <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
+            <Button data-testid="button-changelog-prev" onClick={handlePrev} variant="secondary">
               {t('previous')}
             </Button>
           )}
           {onboardingflow.length > activeIndex + 1 ? (
-            <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
+            <Button data-testid="button-changelog-next" variant="primary" onClick={handleNext}>
               {t('next')}
             </Button>
           ) : (
-            <Button id="button-changelog-close" variant="primary" onClick={handleClose}>
+            <Button data-testid="button-changelog-close" variant="primary" onClick={handleClose}>
               {t('close')}
             </Button>
           )}

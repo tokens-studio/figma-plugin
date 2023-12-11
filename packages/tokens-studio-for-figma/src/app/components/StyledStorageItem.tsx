@@ -13,7 +13,7 @@ export const StyledStorageItem = styled('div', {
   variants: {
     active: {
       true: {
-        borderColor: '$borderAccent',
+        borderColor: '$accentBorder',
         backgroundColor: '$accentBg',
       },
       false: {

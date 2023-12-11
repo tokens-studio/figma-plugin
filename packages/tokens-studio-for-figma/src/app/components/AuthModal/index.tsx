@@ -1,15 +1,13 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  Box, Button, Label, Stack, TextInput, Link, Text, Heading,
+} from '@tokens-studio/ui';
+import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
-import Input from '../Input';
-import Box from '../Box';
-import Button from '../Button';
-import Text from '../Text';
-import Spinner from '../Spinner';
-import Link from '../Link';
 import { usedEmailSelector } from '@/selectors/usedEmailSelector';
 
 enum AuthModes {
@@ -27,7 +25,7 @@ export default function AuthModal() {
   const usedEmail = useSelector(usedEmailSelector);
 
   const [values, setValues] = React.useState({
-    email: usedEmail,
+    email: usedEmail || '',
     password: '',
   });
 
@@ -56,43 +54,44 @@ export default function AuthModal() {
     }
   }, [mode, logIn, signUp, values]);
 
-  const getSubmitButtonContent = () => {
-    if (authInProgress) {
-      return (
-        <Box css={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Spinner />
-        </Box>
-      );
-    }
-    return mode === AuthModes.LOGIN ? 'Log in' : 'Sign up';
-  };
-
-  const getInfo = () => {
-    const text = mode === AuthModes.LOGIN ? 'Do not have an account ?' : 'Already have an account ?';
-    const cta = mode === AuthModes.LOGIN ? 'Sign up here' : 'Log in here';
-
-    return (
-      <>
-        <Text>{text}</Text>
-        <Text css={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={onCtaClick}>
-          {cta}
-        </Text>
-      </>
-    );
-  };
-
   return (
-    <Modal close={dispatch.uiState.toggleSecondScreen} isOpen={secondScreenEnabled && !user}>
-      <Box css={{ display: 'flex', flexDirection: 'column', gap: '$5' }}>
-        <Input name="email" type="email" value={values.email} onChange={handleChange} label="Email" />
-        <Input name="password" type="password" value={values.password} onChange={handleChange} label="Password" />
-        <Button variant="primary" onClick={onSubmitButtonClick}>
-          {getSubmitButtonContent()}
+    <Modal
+      title={mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
+      showClose
+      close={dispatch.uiState.toggleSecondScreen}
+      isOpen={secondScreenEnabled && !user}
+    >
+      <Stack direction="column" align="start" gap={5}>
+        <Label css={{ width: '100%' }}>
+          Email
+          <TextInput name="email" type="email" value={values.email} onChange={handleChange} />
+        </Label>
+        <Label css={{ width: '100%' }}>
+          Password
+          <TextInput name="password" type="password" value={values.password} onChange={handleChange} />
+        </Label>
+        <Button loading={authInProgress} variant="primary" onClick={onSubmitButtonClick}>
+          {mode === AuthModes.LOGIN ? 'Log in' : 'Sign up'}
         </Button>
-        <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>{getInfo()}</Box>
-        <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Link href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`}>Forgot password ?</Link>
-        </Box>
+        {mode === AuthModes.LOGIN && (
+          <>
+            <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
+              <Text>Do not have an account ?</Text>
+              <Button size="small" variant="invisible" onClick={onCtaClick}>
+                Sign up here
+              </Button>
+
+            </Box>
+            <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Link target="_blank" href={`https://google.com/${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">Forgot password ?</Link>
+            </Box>
+          </>
+        )}
+        {mode === AuthModes.SIGNUP && (
+        <Button icon={<ChevronLeftIcon />} size="small" variant="invisible" onClick={onCtaClick}>
+          Back to login
+        </Button>
+        )}
 
         <Box
           css={{
@@ -105,7 +104,7 @@ export default function AuthModal() {
         >
           {authError}
         </Box>
-      </Box>
+      </Stack>
     </Modal>
   );
 }

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import {
   DropdownMenu,
@@ -23,7 +24,6 @@ import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
-import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 
 const ThemeDropdownLabel = styled(Text, {
   marginRight: '$2',
@@ -85,7 +85,6 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
       <ScrollDropdownMenuRadioItem
         key={value}
         value={value}
-        data-cy={`themeselector--themeoptions--${value}`}
         data-testid={`themeselector--themeoptions--${value}`}
         // @README we can disable this because we are using Memo for the whole list anyways
         // eslint-disable-next-line react/jsx-no-bind
@@ -126,13 +125,13 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   return (
     <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
       <DropdownMenu>
-        <DropdownMenuTrigger data-cy="themeselector-dropdown" data-testid="themeselector-dropdown">
+        <DropdownMenuTrigger data-testid="themeselector-dropdown">
           <Flex>
-            <ThemeDropdownLabel muted size="small">
+            <ThemeDropdownLabel muted size="xsmall">
               {t('theme')}
               :
             </ThemeDropdownLabel>
-            <Text size="small">{activeThemeLabel}</Text>
+            <Text size="xsmall">{activeThemeLabel}</Text>
           </Flex>
           <IconToggleableDisclosure css={{ flexShrink: 0 }} />
         </DropdownMenuTrigger>
@@ -150,9 +149,9 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
             {availableThemeOptions}
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              data-cy="themeselector-managethemes"
+              data-testid="themeselector-managethemes"
               css={{
-                paddingLeft: '$6', fontSize: '$small', display: 'flex', justifyContent: 'space-between',
+                paddingLeft: '$6', fontSize: '$xsmall', display: 'flex', justifyContent: 'space-between',
               }}
               disabled={!tokenThemes}
               onSelect={handleManageThemes}

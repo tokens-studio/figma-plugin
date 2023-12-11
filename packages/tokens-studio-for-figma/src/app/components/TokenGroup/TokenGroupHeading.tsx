@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 import {
   ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
 } from '../ContextMenu';
@@ -16,7 +17,6 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
-import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 
 export type Props = {
   id: string
@@ -82,7 +82,6 @@ export function TokenGroupHeading({
     <StyledTokenGroupHeading>
       <StyledTokenGroupHeadingCollapsable
         collapsed={collapsed.includes(path)}
-        data-cy={`tokenlisting-group-${path}`}
         data-testid={`tokenlisting-group-${path}`}
         type="button"
       >
@@ -90,7 +89,7 @@ export function TokenGroupHeading({
           <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
-              <Heading muted size="small">{label}</Heading>
+              <Heading muted size="xsmall">{label}</Heading>
             </Stack>
           </ContextMenuTrigger>
           <ContextMenuPortal>
@@ -133,7 +132,9 @@ export function TokenGroupHeading({
         tooltipSide="left"
         onClick={handleShowNewForm}
         disabled={editProhibited}
-        dataCy="button-add-new-token-in-group"
+        data-testid="button-add-new-token-in-group"
+        size="small"
+        variant="invisible"
       />
     </StyledTokenGroupHeading>
   );

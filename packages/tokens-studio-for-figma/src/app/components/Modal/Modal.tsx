@@ -1,36 +1,11 @@
 import React from 'react';
-import ReactModal, { Styles as ReactModalStyles } from 'react-modal';
-import Heading from '../Heading';
-import Stack from '../Stack';
-import XIcon from '@/icons/x.svg';
+import {
+  Stack, Dialog, IconButton, Box, Heading,
+} from '@tokens-studio/ui';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { XIcon } from '@primer/octicons-react';
 import { ModalFooter } from './ModalFooter';
-import { ModalHeader } from './ModalHeader';
-import Box from '../Box';
 import { styled } from '@/stitches.config';
-
-const customStyles = (large = false): ReactModalStyles => ({
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1rem',
-    zIndex: 1,
-  },
-  content: {
-    backgroundColor: '$bgDefault',
-    padding: '0',
-    position: 'relative',
-    top: 'unset',
-    right: 'unset',
-    bottom: 'unset',
-    left: 'unset',
-    overflow: 'auto',
-    maxHeight: '100%',
-    border: 'none',
-    width: large ? '100%' : 'auto',
-  },
-});
 
 export type ModalProps = {
   id?: string;
@@ -46,19 +21,10 @@ export type ModalProps = {
   close: () => void;
 };
 
-const StyledButton = styled('button', {
-  padding: '$4',
-  '&:hover': {
-    backgroundColor: '$bgSubtle',
-  },
-  '&:focus': {
-    outline: 'none',
-  },
-});
-
 const StyledBody = styled('div', {
   position: 'relative',
-  padding: '$6',
+  padding: '$4',
+  overflow: 'auto',
   variants: {
     full: {
       true: {
@@ -98,43 +64,53 @@ export function Modal({
   }, [close]);
 
   return (
-    <>
-      {/* @ts-ignore */}
-      <ReactModal
-        isOpen={isOpen}
-        appElement={document.getElementById('app')!}
-        onRequestClose={close}
-        style={customStyles(large)}
-        contentLabel={title || ''}
-      >
-        {(showClose || title) && (
-          <ModalHeader>
-            <Stack direction="row" justify="between" align="center">
+    <DialogPrimitive.Root
+      open={isOpen}
+      onOpenChange={close}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content css={{ padding: 0 }}>
+          <Box css={{
+            overflow: 'auto',
+          }}
+          >
+            {(showClose || title) && (
+            <Stack
+              direction="row"
+              justify="between"
+              align="center"
+              css={{
+                borderBottomColor: '$borderMuted',
+                borderBottomWidth: '1px',
+                padding: '$4',
+              }}
+            >
               {title && (
-                <Box css={{ paddingLeft: '$4' }}>
+                <Dialog.Title>
                   <Heading size="small">{title}</Heading>
-                </Box>
+                </Dialog.Title>
               )}
-              <StyledButton
-                type="button"
+              <IconButton
                 onClick={handleClose}
-                data-cy="close-button"
                 data-testid="close-button"
-              >
-                <XIcon />
-              </StyledButton>
+                icon={<XIcon />}
+                size="small"
+                variant="invisible"
+              />
             </Stack>
-          </ModalHeader>
-        )}
-        <StyledBody compact={compact} full={full} data-cy={id}>
-          {children}
-        </StyledBody>
-        {(!!footer) && (
-          <ModalFooter stickyFooter={stickyFooter}>
-            {footer}
-          </ModalFooter>
-        )}
-      </ReactModal>
-    </>
+            )}
+            <StyledBody compact={compact} full={full} data-testid={id}>
+              {children}
+            </StyledBody>
+            {(!!footer) && (
+            <ModalFooter stickyFooter={stickyFooter}>
+                {footer}
+            </ModalFooter>
+            )}
+          </Box>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </DialogPrimitive.Root>
   );
 }

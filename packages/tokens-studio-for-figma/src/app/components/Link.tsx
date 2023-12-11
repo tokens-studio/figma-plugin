@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const StyledLink = styled('a', {
-  color: '$accentFg',
+  color: '$accentDefault',
   textDecoration: 'none',
   ':hover': {
     textDecoration: 'underline',

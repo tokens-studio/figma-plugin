@@ -52,7 +52,6 @@ export default function TokenListingHeading({
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
       <StyledTokenGroupHeadingButton
         isCollapsed={isCollapsed}
-        data-cy={`tokenlisting-header-${tokenKey}`}
         type="button"
         onClick={onCollapse}
         data-testid={`tokenlisting-${tokenKey}-collapse-button`}
@@ -60,7 +59,7 @@ export default function TokenListingHeading({
         <Tooltip label={`Alt + Click ${t('toggle')}`}>
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
-        <Heading size="small">{label}</Heading>
+        <Heading size="xsmall">{label}</Heading>
         {isPro ? <ProBadge /> : null}
       </StyledTokenGroupHeadingButton>
       <Box
@@ -76,16 +75,20 @@ export default function TokenListingHeading({
             icon={displayType === 'GRID' ? <IconList /> : <IconGrid />}
             tooltip={displayType === 'GRID' ? t('showAsList') : t('showAsGrid')}
             onClick={handleToggleDisplayType}
+            variant="invisible"
+            size="small"
           />
         )}
 
         <IconButton
-          dataCy="button-add-new-token"
+          data-testid="button-add-new-token"
           // TODO: Add proper logic to disable adding a token type depending on flags
           disabled={editProhibited || (isPro && !gitBranchSelector)}
           icon={<IconAdd />}
           tooltip={t('addNew')}
           onClick={handleShowNewForm}
+          variant="invisible"
+          size="small"
         />
       </Box>
     </Stack>

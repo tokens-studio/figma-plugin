@@ -91,10 +91,12 @@ export default function CompositionTokenForm({
         <Heading size="small">{t('tokens')}</Heading>
         <IconButton
           tooltip={error ? t('chooseAPropertyFirst') : t('addAnotherStyle')}
-          dataCy="button-style-add-multiple"
+          data-testid="button-style-add-multiple"
           onClick={addToken}
           icon={<IconPlus />}
           disabled={error}
+          size="small"
+          variant="invisible"
         />
       </Box>
       <Box css={{ display: 'flex', flexDirection: 'column', gap: '$4' }}>

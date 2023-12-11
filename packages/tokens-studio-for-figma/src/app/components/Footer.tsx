@@ -95,20 +95,24 @@ export default function Footer() {
           <>
             <BranchSelector />
             <IconButton
-              dataCy="footer-pull-button"
+              data-testid="footer-pull-button"
               badge={hasRemoteChange}
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
+              variant="invisible"
+              size="small"
               tooltipSide="top"
               tooltip={t('pullFrom', {
                 provider: transformProviderName(storageType.provider),
               }) as string}
             />
             <IconButton
-              dataCy="footer-push-button"
+              data-testid="footer-push-button"
               badge={hasChanges}
               icon={<UploadIcon />}
               onClick={onPushButtonClicked}
+              variant="invisible"
+              size="small"
               tooltipSide="top"
               disabled={editProhibited}
               tooltip={
@@ -122,9 +126,11 @@ export default function Footer() {
         {storageType.provider === StorageProviderType.SUPERNOVA && (
           <>
             <IconButton
-              dataCy="footer-pull-button"
+              data-testid="footer-pull-button"
               icon={<DownloadIcon />}
               onClick={onPullButtonClicked}
+              variant="invisible"
+              size="small"
               tooltipSide="top"
               tooltip={
 
@@ -134,10 +140,12 @@ export default function Footer() {
 }
             />
             <IconButton
-              dataCy="footer-push-button"
+              data-testid="footer-push-button"
               badge={hasChanges}
               icon={<UploadIcon />}
               onClick={onPushButtonClicked}
+              variant="invisible"
+              size="small"
               tooltipSide="top"
               disabled={editProhibited}
               tooltip={
@@ -170,6 +178,8 @@ export default function Footer() {
                   provider: transformProviderName(storageType.provider),
                 }) as string}
                 onClick={handlePullTokens}
+                variant="invisible"
+                size="small"
                 icon={<RefreshIcon />}
               />
             </Stack>
@@ -181,8 +191,20 @@ export default function Footer() {
         </Box>
         <Stack direction="row" gap={1}>
           <ProBadge />
-          <IconButton href="https://docs.tokens.studio/?ref=pf" icon={<DocsIcon />} tooltip={t('docs') as string} />
-          <IconButton href="https://github.com/tokens-studio/figma-plugin" icon={<FeedbackIcon />} tooltip={t('feedback') as string} />
+          <IconButton
+            href="https://docs.tokens.studio/?ref=pf"
+            icon={<DocsIcon />}
+            variant="invisible"
+            size="small"
+            tooltip={t('docs') as string}
+          />
+          <IconButton
+            href="https://github.com/tokens-studio/figma-plugin"
+            icon={<FeedbackIcon />}
+            variant="invisible"
+            size="small"
+            tooltip={t('feedback') as string}
+          />
         </Stack>
       </Stack>
 

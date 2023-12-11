@@ -10,7 +10,7 @@ import Stack from './Stack';
 import { styled } from '@/stitches.config';
 
 const StyledReadMoreLink = styled('a', {
-  color: '$accentFg',
+  color: '$accentDefault',
   fontSize: '$xsmall',
 });
 
@@ -67,17 +67,17 @@ export default function Changelog() {
           ))}
         </div>
         <Stack direction="row" gap={2} justify="between">
-          <Button id="button-changelog-close" onClick={handleClose} variant="secondary">
+          <Button data-testid="button-changelog-close" onClick={handleClose} variant="secondary">
             {t('close')}
           </Button>
           <Stack direction="row" justify="between" gap={2}>
             {activeIndex !== 0 && (
-              <Button id="button-changelog-prev" onClick={handlePrev} variant="secondary">
+              <Button data-testid="button-changelog-prev" onClick={handlePrev} variant="secondary">
                 {t('previous')}
               </Button>
             )}
             {changelog.length > activeIndex + 1 && (
-              <Button id="button-changelog-next" variant="primary" onClick={handleNext}>
+              <Button data-testid="button-changelog-next" variant="primary" onClick={handleNext}>
                 {t('next')}
               </Button>
             )}

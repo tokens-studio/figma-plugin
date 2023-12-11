@@ -84,14 +84,14 @@ export default function TypographyInput({
           mode === 'input' ? (
             <IconButton
               tooltip={t('referenceMode')}
-              dataCy="mode-change-button"
+              data-testid="mode-change-button"
               onClick={handleMode}
               icon={<TokensIcon />}
             />
           ) : (
             <IconButton
               tooltip={t('inputMode')}
-              dataCy="mode-change-button"
+              data-testid="mode-change-button"
               onClick={handleMode}
               icon={<LinkBreak2Icon />}
             />

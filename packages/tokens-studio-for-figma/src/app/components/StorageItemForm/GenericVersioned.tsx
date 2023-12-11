@@ -2,10 +2,10 @@ import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
 import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Button from '../Button';
-import { StyledButton } from '../Button/StyledButton';
 import Input from '../Input';
 import Box from '../Box';
 import Stack from '../Stack';
@@ -20,6 +20,7 @@ import Heading from '../Heading';
 import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
 import Link from '../Link';
+import IconButton from '../IconButton';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -147,39 +148,41 @@ export default function GenericVersionedForm({
         <DropdownMenu>
           <Stack direction="column" gap={0}>
             <Label htmlFor="flow-dropdown">{t('providers.generic.flowType')}</Label>
-            <DropdownMenuTrigger id="flow-dropdown" bordered data-cy="flow-dropdown" data-testid="flow-dropdown">
+            <DropdownMenuTrigger id="flow-dropdown" bordered data-testid="flow-dropdown">
               <Text size="small">{flow}</Text>
               <TriangleDownIcon />
             </DropdownMenuTrigger>
           </Stack>
-          <DropdownMenuContent
-            side="bottom"
-            css={{ minWidth: '100%' }}
-          >
-            <DropdownMenuRadioGroup onValueChange={handleValueChange}>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
-                <Text>
-                  {t('providers.generic.readOnly')}
-                </Text>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
-                <Text>
-                  {t('providers.generic.readWrite')}
-                </Text>
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
-                <Text>
-                  {t('providers.generic.readWriteCreate')}
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              side="bottom"
+              css={{ minWidth: '100%' }}
+            >
+              <DropdownMenuRadioGroup onValueChange={handleValueChange}>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
+                  <Text>
+                    {t('providers.generic.readOnly')}
+                  </Text>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
+                  <Text>
+                    {t('providers.generic.readWrite')}
+                  </Text>
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
+                  <Text>
+                    {t('providers.generic.readWriteCreate')}
 
-                </Text>
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
+                  </Text>
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
         <Stack direction="column" gap={4}>
           <Heading>{t('providers.generic.additionalHeaders')}</Heading>
           {headers.map((x, i) => (
-            <Box css={{ display: 'flex', gap: '1em' }}>
+            <Box css={{ display: 'flex', alignItems: 'flex-end', gap: '1em' }}>
               <Input
                 label={t('providers.generic.name')}
                 value={x?.name}
@@ -198,19 +201,18 @@ export default function GenericVersionedForm({
                 name="value"
                 data-index={i}
               />
-              <StyledButton
+              <IconButton
                 onClick={handleClose}
                 data-index={i}
                 size="small"
-                variant="ghost"
-              >
-                <XIcon />
-              </StyledButton>
+                variant="invisible"
+                icon={<XIcon />}
+              />
             </Box>
           ))}
         </Stack>
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
 
@@ -219,7 +221,7 @@ export default function GenericVersionedForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <ErrorMessage data-cy="provider-modal-error">
+          <ErrorMessage data-testid="provider-modal-error">
             {errorMessage}
           </ErrorMessage>
         )}

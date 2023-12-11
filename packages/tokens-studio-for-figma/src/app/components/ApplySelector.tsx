@@ -43,7 +43,7 @@ export default function ApplySelector() {
   return (
     <Stack direction="row">
       <Button
-        id="update-button"
+        data-testid="update-button"
         variant="primary"
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
@@ -57,14 +57,14 @@ export default function ApplySelector() {
           css={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-            backgroundColor: '$accentDefault',
+            backgroundColor: '$buttonPrimaryBgRest',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '32px',
-            borderLeft: '1px solid $accentMuted',
-            color: '$fgOnEmphasis',
-            '&:hover, &:focus-visible': { backgroundColor: '$accentMuted' },
+            width: '$controlMedium',
+            borderLeft: '1px solid $buttonPrimaryBorderRest',
+            color: '$buttonPrimaryFg',
+            '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', borderColor: '$buttonPrimaryBorderRest' },
           }}
           data-testid="apply-selector"
         >

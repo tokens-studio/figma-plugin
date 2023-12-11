@@ -4,7 +4,7 @@ import Text from './Text';
 export const StyledDiff = styled((Text), {
   padding: '$1 $2',
   wordBreak: 'break-all',
-  fontWeight: '$bold',
+  fontWeight: '$sansBold',
   borderRadius: '$medium',
   fontSize: '$xsmall',
   variants: {

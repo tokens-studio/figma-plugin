@@ -4,8 +4,8 @@ import {
 import { UpdateMode } from '@/constants/UpdateMode';
 
 const createTokenSet = ({ name }) => {
-  cy.get('[data-cy="button-new-token-set"]').click({ timeout: 1000 })
-    .get('[data-cy="token-set-input"]')
+  cy.get('[data-testid="button-new-token-set"]').click({ timeout: 1000 })
+    .get('[data-testid="token-set-input"]')
     .type(name).type('{enter}');
 };
 
@@ -60,7 +60,7 @@ describe('TokenListing', () => {
 
   it('create token set', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible');
+    cy.get('[data-testid="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -84,7 +84,7 @@ describe('TokenListing', () => {
 
   it('Can create a new theme & select theme', () => {
     cy.startup(mockStartupParams);
-    cy.get('[data-cy="button-configure"]').should('be.visible');
+    cy.get('[data-testid="button-configure"]').should('be.visible');
     cy.receiveSetTokens({
       version: '5',
       values: {
@@ -105,28 +105,31 @@ describe('TokenListing', () => {
     createTokenSet({ name: 'token-enabled' });
     createTokenSet({ name: 'token-disabled' });
 
-    cy.get('[data-cy="themeselector-dropdown"]').click();
-    cy.get('[data-cy="themeselector-managethemes"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-new-theme"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-new-group"]').click();
-    cy.get('[data-cy="create-or-edit-theme-form--group--name"]').type('GroupA');
-    cy.get('[data-cy="create-or-edit-theme-form--input--name"]').type('My first theme');
-    cy.get('[data-cy="tokensettheme-item--dropdown-trigger--token-source-set"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-content--source"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-trigger--token-enabled-set"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-content--enabled"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-trigger--token-disabled-set"]').click();
-    cy.get('[data-cy="tokensettheme-item--dropdown-content--disabled"]').click();
-    cy.get('[data-cy="button-manage-themes-modal-save-theme"]').click();
-    cy.get('[data-cy="close-button"]').click();
+    cy.get('[data-testid="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-managethemes"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-new-theme"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-new-group"]').click();
+    cy.get('[data-testid="create-or-edit-theme-form--group--name"]').type('GroupA');
+    cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('My first theme');
+    cy.get('[data-testid="tokensettheme-item--dropdown-trigger--token-source-set"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-content--source"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-trigger--token-enabled-set"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-content--enabled"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-trigger--token-disabled-set"]').click();
+    cy.get('[data-testid="tokensettheme-item--dropdown-content--disabled"]').click();
+    cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click();
+    cy.get('[data-testid="close-button"]').click();
     createTokenSet({ name: 'token-extra' });
 
-    cy.get('[data-cy="themeselector-dropdown"]').click();
+    cy.get('[data-testid="themeselector-dropdown"]').click();
     cy.contains('My first theme').click({
       force: true,
     });
-    cy.get('[data-state="indeterminate"]').should('have.length', 2);
-    cy.get('[data-state="checked"]').should('have.length', 2);
-    cy.get('[data-state="unchecked"]').should('have.length', 4);
+    cy.get('[data-testid="tokensetitem-options-checkbox"]').should('have.attr', 'aria-checked', 'false');
+    cy.get('[data-testid="tokensetitem-global-checkbox"]').should('have.attr', 'aria-checked', 'false');
+    cy.get('[data-testid="tokensetitem-token-source-checkbox"]').should('have.attr', 'aria-checked', 'mixed');
+    cy.get('[data-testid="tokensetitem-token-enabled-checkbox"]').should('have.attr', 'aria-checked', 'true');
+    cy.get('[data-testid="tokensetitem-token-disabled-checkbox"]').should('have.attr', 'aria-checked', 'false');
+    cy.get('[data-testid="tokensetitem-token-extra-checkbox"]').should('have.attr', 'aria-checked', 'false');
   });
 });

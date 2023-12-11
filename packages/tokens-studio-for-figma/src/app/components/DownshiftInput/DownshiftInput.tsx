@@ -290,11 +290,11 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     css={{
                       backgroundColor: '$bgDefault',
                       border: '1px solid',
-                      borderColor: '$borderDefault',
+                      borderColor: '$borderSubtle',
                       borderRadius: '$medium',
                       position: 'absolute',
                       width: `${inputContainerWidth}px`,
-                      top: '$2',
+                      top: '$1',
                       boxShadow: '$contextMenu',
                       zIndex: '10',
                       transform: `translate(${inputContainerPosX}px, ${inputContainerPosY}px)`,
@@ -324,7 +324,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                         value={searchInput}
                         onChange={handleSearchInputChange}
                         getInputProps={getInputProps}
-                        dataCy="downshift-search-input"
+                        data-testid="downshift-search-input"
                       />
                     </Box>
                     {
@@ -334,7 +334,6 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                           const token = filteredTokenItems[index];
                           return (
                             <StyledItem
-                              data-cy="downshift-input-item"
                               data-testid="downshift-input-item"
                               className="dropdown-item"
                               {...getItemProps({ key: token.name, index, item: token.name })}
@@ -366,7 +365,6 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                               const filteredValue = filteredValues[index];
                               return (
                                 <StyledItem
-                                  data-cy="downshift-input-item"
                                   data-testid="downshift-input-item"
                                   className="dropdown-item"
                                   {...getItemProps({ key: value, index, item: value })}
@@ -396,8 +394,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     }
                   </Box>,
                   portalPlaceholder,
-                )
-                }
+                )}
               </>
             ) : null}
         </div>

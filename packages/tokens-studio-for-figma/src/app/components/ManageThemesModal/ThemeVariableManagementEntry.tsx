@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import { LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { IconArrowRight } from '@/icons';
-import Box from '../Box';
+import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
+import { Box } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
@@ -66,7 +65,7 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
         }}
         >
           <Text size="small">{token}</Text>
-          <IconArrowRight width="16" />
+          <ArrowRightIcon />
           {(!variableInfo.name && !variableInfo.isResolved) && (
             <ResolvingLoader />
           )}
@@ -80,7 +79,7 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
             <Text bold size="small" title={variableInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{variableInfo.name}</Text>
           )}
         </Box>
-        <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} dataCy="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
+        <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} variant="invisible" data-testid="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
       </Flex>
     </Flex>
   );

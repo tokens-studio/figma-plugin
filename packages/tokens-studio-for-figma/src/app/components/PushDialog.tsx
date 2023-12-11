@@ -183,10 +183,10 @@ function PushDialog() {
               backgroundColor: '$bgDefault',
             }}
             >
-              <Button variant="secondary" id="push-dialog-button-close" onClick={onCancel}>
+              <Button variant="secondary" data-testid="push-dialog-button-close" onClick={onCancel}>
                 {t('cancel')}
               </Button>
-              <Button variant="primary" id="push-dialog-button-push-changes" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)} onClick={handlePushChanges}>
+              <Button variant="primary" data-testid="push-dialog-button-push-changes" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)} onClick={handlePushChanges}>
                 {t('pushChanges')}
               </Button>
             </Box>

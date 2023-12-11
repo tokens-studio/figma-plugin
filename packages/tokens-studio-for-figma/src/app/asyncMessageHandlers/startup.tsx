@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import * as Sentry from '@sentry/react';
 import { Provider } from 'react-redux';
 import i18next from 'i18next';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { ErrorFallback } from '../components/ErrorFallback';
@@ -19,7 +20,9 @@ export const startup: AsyncMessageChannelHandlers[AsyncMessageTypes.STARTUP] = a
   root.render(
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
       <Provider store={store}>
-        <AppContainer {...params} />
+        <Tooltip.Provider>
+          <AppContainer {...params} />
+        </Tooltip.Provider>
       </Provider>
     </Sentry.ErrorBoundary>,
   );

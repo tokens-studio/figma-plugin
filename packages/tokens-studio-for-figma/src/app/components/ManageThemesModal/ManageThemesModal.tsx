@@ -63,6 +63,10 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
   }, [themeEditorOpen]);
 
+  const handleToggleOpenThemeEditor = useCallback(() => {
+    setThemeEditorOpen(!themeEditorOpen);
+  }, [themeEditorOpen]);
+
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
       const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?' });
@@ -148,14 +152,15 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       large
       title="Themes"
       stickyFooter
+      showClose
       footer={(
         <Stack gap={2} direction="row" justify="end">
           {!themeEditorOpen && (
             <Button
-              id="button-manage-themes-modal-new-theme"
+              data-testid="button-manage-themes-modal-new-theme"
               variant="secondary"
               icon={<IconPlus />}
-              onClick={handleToggleThemeEditor}
+              onClick={handleToggleOpenThemeEditor}
             >
               New theme
             </Button>
@@ -165,7 +170,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               <Box css={{ marginRight: 'auto' }}>
                 {typeof themeEditorOpen === 'string' && (
                 <Button
-                  id="button-manage-themes-modal-delete-theme"
+                  data-testid="button-manage-themes-modal-delete-theme"
                   variant="danger"
                   type="submit"
                   onClick={handleDeleteTheme}
@@ -175,14 +180,14 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                 )}
               </Box>
               <Button
-                id="button-manage-themes-modal-cancel"
+                data-testid="button-manage-themes-modal-cancel"
                 variant="secondary"
-                onClick={handleToggleThemeEditor}
+                onClick={handleToggleOpenThemeEditor}
               >
                 Cancel
               </Button>
               <Button
-                id="button-manage-themes-modal-save-theme"
+                data-testid="button-manage-themes-modal-save-theme"
                 variant="primary"
                 type="submit"
                 form="form-create-or-edit-theme"

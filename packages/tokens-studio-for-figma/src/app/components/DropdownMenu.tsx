@@ -9,8 +9,9 @@ const itemStyles = {
 
   '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
     outline: 'none',
-    backgroundColor: '$accentDefault',
-    color: '$fgOnEmphasis',
+    backgroundColor: '$contextMenuBgHover',
+    color: '$contextMenuFgHover',
+    cursor: 'pointer',
   },
 
   '&[data-disabled]': {
@@ -22,6 +23,7 @@ const StyledDropdownMenuContent = styled(DropdownMenuPrimitive.Content, {
   minWidth: 130,
   maxWidth: 'min(300px, 80vw)',
   backgroundColor: '$contextMenuBg',
+  border: '1px solid $contextMenuBorder',
   color: '$contextMenuFg',
   borderRadius: '$medium',
   padding: '$2',

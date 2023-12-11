@@ -69,7 +69,7 @@ export default function LoadingBar() {
   const message = get(backgroundJobTitles, backgroundJobs[backgroundJobs.length - 1]?.name ?? '', '');
 
   return (
-    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar" data-cy="loadingBar">
+    <Box css={{ position: 'fixed', width: '100%', zIndex: 20 }} data-testid="loadingBar">
       <Stack
         direction="row"
         align="center"
@@ -93,7 +93,7 @@ export default function LoadingBar() {
                   `${expectedWaitTimeInSeconds}s`
                 )}
               </Text>
-              <Button variant="ghost" size="small" onClick={handleCancel}>Cancel</Button>
+              <Button variant="invisible" size="small" onClick={handleCancel}>Cancel</Button>
             </Stack>
           </Stack>
         )}

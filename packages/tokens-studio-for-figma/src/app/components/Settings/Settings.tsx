@@ -146,7 +146,7 @@ function Settings() {
             />
             <Label htmlFor="ignoreFirstPartForStyles">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('ignorePrefix')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('ignorePrefix')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
                   {t('usefulIgnore')}
                   {' '}
@@ -171,7 +171,7 @@ function Settings() {
 
             <Label htmlFor="prefixStylesWithThemeName">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('prefixStyles')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('prefixStyles')}</Box>
                 <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
               </Stack>
             </Label>
@@ -188,7 +188,7 @@ function Settings() {
 
             <Label htmlFor="storeTokenIdInJsonEditor">
               <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$bold' }}>{t('storeTokenId')}</Box>
+                <Box css={{ fontWeight: '$sansBold' }}>{t('storeTokenId')}</Box>
                 <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
               </Stack>
             </Label>
@@ -243,8 +243,8 @@ function Settings() {
         </Stack>
       </Stack>
       <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-        <Button variant="secondary" size="small" id="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-        <Button variant="secondary" size="small" id="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
+        <Button variant="secondary" size="small" data-testid="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
+        <Button variant="secondary" size="small" data-testid="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
       </Stack>
     </Box>
   );

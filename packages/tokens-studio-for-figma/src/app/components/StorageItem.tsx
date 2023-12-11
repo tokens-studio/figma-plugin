@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
 import isSameCredentials from '@/utils/isSameCredentials';
 import Button from './Button';
 import useRemoteTokens from '../store/remoteTokens';
@@ -73,7 +74,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
 
   return (
     <StyledStorageItem
-      data-cy={`storageitem-${provider}-${id}`}
+      data-testid={`storageitem-${provider}-${id}`}
       key={`${provider}-${id}`}
       active={isActive()}
     >
@@ -96,7 +97,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
           </Box>
           <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
             <Box css={{
-              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$bold',
+              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$sansBold',
             }}
             >
               {name}
@@ -125,7 +126,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
       </Stack>
       <Box css={{ marginRight: '$3' }}>
         {isActive() ? <Badge text={t('active')} /> : (
-          <Button id="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
+          <Button data-testid="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
             {t('apply')}
           </Button>
         )}
@@ -134,10 +135,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
         <DropdownMenuTrigger css={{ padding: '$2', borderRadius: '$small', background: 'none' }} data-testid="storage-item-tools-dropdown">
           <DotsVerticalIcon />
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenuItem>
-          <DropdownMenuItem textValue={t('delete')} onSelect={handleDelete}>{t('delete')}</DropdownMenuItem>
-        </DropdownMenuContent>
+        <DropdownMenuPortal>
+          <DropdownMenuContent>
+            <DropdownMenuItem textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenuItem>
+            <DropdownMenuItem textValue={t('delete')} onSelect={handleDelete}>{t('delete')}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
       </DropdownMenu>
     </StyledStorageItem>
   );

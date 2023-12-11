@@ -3,14 +3,13 @@ import { styled } from '@/stitches.config';
 import type { StitchesCSS } from '@/types';
 
 const StyledSelect = styled('select', {
-  borderRadius: '$small',
   fontSize: '$xsmall',
-  height: '$controlMedium',
+  height: '$controlSmall',
   paddingLeft: '$2',
   lineHeight: 1,
   backgroundColor: '$bgDefault',
   color: '$fgDefault',
-  border: '1px solid $borderDefault',
+  border: '1px solid $borderMuted',
   cursor: 'pointer',
   '&:focus': { boxShadow: '$focus', outline: 'none' },
 });
@@ -27,7 +26,7 @@ export default function Select({
   css, value, id, onChange, children,
 }: React.PropsWithChildren<Props>) {
   return (
-    <StyledSelect css={css} value={value} name={id} data-cy={id} id={id} onChange={onChange}>
+    <StyledSelect css={css} value={value} name={id} data-testid={id} id={id} onChange={onChange}>
       {children}
     </StyledSelect>
   );

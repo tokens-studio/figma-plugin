@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import { LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { IconArrowRight } from '@/icons';
-import Box from '../Box';
+import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
+import { Box } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
@@ -69,7 +68,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<React.PropsWithChi
         }}
         >
           <Text size="small">{token}</Text>
-          <IconArrowRight width="16" />
+          <ArrowRightIcon />
           {(!styleInfo.name && !styleInfo.failedToResolve) && (
             <ResolvingLoader />
           )}
@@ -83,7 +82,7 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<React.PropsWithChi
             <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
           )}
         </Box>
-        <IconButton tooltip="Detach style" icon={<LinkBreak2Icon />} dataCy="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
+        <IconButton size="small" variant="invisible" tooltip="Detach style" icon={<LinkBreak2Icon />} data-testid="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
       </Flex>
     </Flex>
   );

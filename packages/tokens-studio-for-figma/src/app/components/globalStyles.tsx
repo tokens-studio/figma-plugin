@@ -6,16 +6,18 @@ export const globalStyles = globalCss({
   ],
   body: {
     fontFamily: '$sans',
-    fontSize: '$small',
+    fontSize: '$xsmall',
     letterSpacing: '0',
     color: '$fgDefault',
+  },
+  form: {
+    marginBottom: 0,
   },
   'button[disabled]': {
     opacity: 0.5,
   },
   'button:focus': {
     outline: 'none',
-    boxShadow: '0 0 0 4px $accentBg',
   },
   'textarea.input, select.input, input.input': {
     outline: 'none',
