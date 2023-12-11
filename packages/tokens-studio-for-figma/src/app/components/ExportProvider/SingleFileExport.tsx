@@ -1,12 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import set from 'set-value';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Textarea } from '@tokens-studio/ui';
 import useTokens from '@/app/store/useTokens';
 import {
   themesListSelector, tokensSelector,
 } from '@/selectors';
-import Textarea from '../Textarea';
 import Checkbox from '../Checkbox';
 import Label from '../Label';
 import Box from '../Box';
@@ -139,7 +138,7 @@ export default function SingleFileExport({ onClose }: Props) {
       <Heading size="medium">Preview</Heading>
       <Textarea
         rows={10}
-        isDisabled
+        disabled
         value={exportData}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>

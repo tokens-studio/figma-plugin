@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Textarea } from '@tokens-studio/ui';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import Box from '../Box';
@@ -10,7 +10,6 @@ import Stack from '../Stack';
 import Text from '../Text';
 import { generateId } from '@/utils/generateId';
 import Link from '../Link';
-import Textarea from '../Textarea';
 import { ErrorMessage } from '../ErrorMessage';
 import Label from '../Label';
 
@@ -53,8 +52,9 @@ export default function SupernovaForm({
   }, [values, onSubmit]);
 
   const handleMappingChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange(event);
+    (value: string, event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      // TODO: Refactor how we pass on state here. Right now storage item form requires the full event.
+      onChange({ ...event, target: { ...event.target, name: 'mapping', value: event.target.value } });
     },
     [onChange],
   );
@@ -100,7 +100,6 @@ export default function SupernovaForm({
         </Label>
         <Textarea
           id="mapping"
-          name="mapping"
           border
           rows={8}
           value={values.mapping ?? ''}
@@ -108,7 +107,7 @@ export default function SupernovaForm({
           placeholder=""
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}>
