@@ -3,11 +3,10 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
-import { Button } from '@tokens-studio/ui';
+import { Button, EmptyState } from '@tokens-studio/ui';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
-import Blankslate from '../Blankslate';
 import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
@@ -201,10 +200,10 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       close={handleClose}
     >
       {!themes.length && !themeEditorOpen && (
-        <Blankslate
+        <EmptyState
           css={{ padding: '$8 $4' }}
           title="You don't have any themes yet"
-          text="Create your first theme now"
+          description="Create your first theme now"
         />
       )}
       {!!themes.length && !themeEditorOpen && (
