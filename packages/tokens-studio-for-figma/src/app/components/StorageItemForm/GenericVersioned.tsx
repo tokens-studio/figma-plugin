@@ -3,6 +3,7 @@ import zod from 'zod';
 import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
+import { IconButton } from '@tokens-studio/ui';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Button from '../Button';
@@ -20,7 +21,6 @@ import Heading from '../Heading';
 import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
 import Link from '../Link';
-import IconButton from '../IconButton';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {

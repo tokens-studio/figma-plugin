@@ -1,5 +1,5 @@
+import { IconButton } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import IconButton from '../IconButton';
 
 export const StyledTokenGroupAddIcon = styled(IconButton, {
   opacity: 0,

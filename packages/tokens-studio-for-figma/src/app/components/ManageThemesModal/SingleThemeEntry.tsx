@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { IconButton } from '@tokens-studio/ui';
 import Box from '../Box';
 import { ThemeObject } from '@/types';
 import Stack from '../Stack';
 import IconDiveInto from '@/icons/dive-into.svg';
 import { StyledThemeMetaLabel } from './StyledThemeMetaLabel';
-import IconButton from '../IconButton';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { Switch, SwitchThumb } from '../Switch';
 import { Dispatch } from '@/app/store';

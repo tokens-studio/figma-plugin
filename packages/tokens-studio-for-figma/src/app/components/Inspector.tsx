@@ -1,13 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, Tooltip } from '@tokens-studio/ui';
+import { ToggleGroup, Tooltip, IconButton } from '@tokens-studio/ui';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
 import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
-import IconButton from './IconButton';
 import { Dispatch } from '../store';
 import Checkbox from './Checkbox';
 import Label from './Label';

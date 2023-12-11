@@ -1,12 +1,11 @@
 import React from 'react';
 import { InfoCircledIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@tokens-studio/ui';
+import { Link, IconButton } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import Box from './Box';
 import Heading from './Heading';
 import Stack from './Stack';
-import IconButton from './IconButton';
 
 const StyledInfoIconButton = styled(InfoCircledIcon, {
   color: '$accentDefault',

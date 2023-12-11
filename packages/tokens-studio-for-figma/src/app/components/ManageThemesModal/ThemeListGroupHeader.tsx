@@ -2,6 +2,7 @@ import React, {
   useCallback, useContext, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { IconButton } from '@tokens-studio/ui';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -10,7 +11,6 @@ import Text from '../Text';
 import Box from '../Box';
 import Input from '../Input';
 import IconPencil from '@/icons/pencil.svg';
-import IconButton from '../IconButton';
 import { Dispatch } from '@/app/store';
 
 type Props = React.PropsWithChildren<{

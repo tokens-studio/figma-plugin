@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -23,7 +24,6 @@ import {
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
-import IconButton from './IconButton';
 import Tooltip from './Tooltip';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
@@ -31,6 +31,7 @@ import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
+import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -94,33 +95,37 @@ export default function Footer() {
         {isGitProvider(localApiState) && localApiState.branch && (
           <>
             <BranchSelector />
-            <IconButton
-              data-testid="footer-pull-button"
-              badge={hasRemoteChange}
-              icon={<DownloadIcon />}
-              onClick={onPullButtonClicked}
-              variant="invisible"
-              size="small"
-              tooltipSide="top"
-              tooltip={t('pullFrom', {
-                provider: transformProviderName(storageType.provider),
-              }) as string}
-            />
-            <IconButton
-              data-testid="footer-push-button"
-              badge={hasChanges}
-              icon={<UploadIcon />}
-              onClick={onPushButtonClicked}
-              variant="invisible"
-              size="small"
-              tooltipSide="top"
-              disabled={editProhibited}
-              tooltip={
-              t('pushTo', {
-                provider: transformProviderName(storageType.provider),
-              }) as string
-}
-            />
+            <DirtyStateBadgeWrapper badge={hasRemoteChange}>
+              <IconButton
+                data-testid="footer-pull-button"
+                icon={<DownloadIcon />}
+                onClick={onPullButtonClicked}
+                variant="invisible"
+                size="small"
+                tooltipSide="top"
+                tooltip={
+                  t('pullFrom', {
+                    provider: transformProviderName(storageType.provider),
+                  }) as string
+                }
+              />
+            </DirtyStateBadgeWrapper>
+            <DirtyStateBadgeWrapper badge={hasChanges}>
+              <IconButton
+                data-testid="footer-push-button"
+                icon={<UploadIcon />}
+                onClick={onPushButtonClicked}
+                variant="invisible"
+                size="small"
+                tooltipSide="top"
+                disabled={editProhibited}
+                tooltip={
+                  t('pushTo', {
+                    provider: transformProviderName(storageType.provider),
+                  }) as string
+                }
+              />
+            </DirtyStateBadgeWrapper>
           </>
         )}
         {storageType.provider === StorageProviderType.SUPERNOVA && (
@@ -133,27 +138,27 @@ export default function Footer() {
               size="small"
               tooltipSide="top"
               tooltip={
-
-              t('pullFrom', {
-                provider: transformProviderName(storageType.provider),
-              }) as string
-}
+                t('pullFrom', {
+                  provider: transformProviderName(storageType.provider),
+                }) as string
+              }
             />
-            <IconButton
-              data-testid="footer-push-button"
-              badge={hasChanges}
-              icon={<UploadIcon />}
-              onClick={onPushButtonClicked}
-              variant="invisible"
-              size="small"
-              tooltipSide="top"
-              disabled={editProhibited}
-              tooltip={
-                 t('pushTo', {
-                   provider: transformProviderName(storageType.provider),
-                 }) as string
-}
-            />
+            <DirtyStateBadgeWrapper badge={hasChanges}>
+              <IconButton
+                data-testid="footer-push-button"
+                icon={<UploadIcon />}
+                onClick={onPushButtonClicked}
+                variant="invisible"
+                size="small"
+                tooltipSide="top"
+                disabled={editProhibited}
+                tooltip={
+                  t('pushTo', {
+                    provider: transformProviderName(storageType.provider),
+                  }) as string
+                }
+              />
+            </DirtyStateBadgeWrapper>
           </>
         )}
         {storageType.provider !== StorageProviderType.LOCAL

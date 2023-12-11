@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { useUIDSeed } from 'react-uid';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import { Properties } from '@/constants/Properties';
 import { EditTokenObject } from '@/types/tokens';
 import Heading from './Heading';
-import IconButton from './IconButton';
 import Box from './Box';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
