@@ -61,7 +61,6 @@ export type SavedSettings = {
   updateOnChange: boolean;
   updateStyles: boolean;
   ignoreFirstPartForStyles: boolean;
-  ignoreFirstPartForVariables: boolean;
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;

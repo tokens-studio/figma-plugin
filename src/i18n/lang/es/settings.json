@@ -43,7 +43,5 @@
   "secondScreenExplainer": "Potencie su flujo de trabajo de diseño, permitiéndole administrar sus tokens de diseño en una segunda pantalla.",
   "language": "Idioma",
   "languageExplainer": "Tokens Studio ha sido traducido automáticamente, por lo tanto, las traducciones pueden parecer inexactas.\n ¿No ves tu idioma? Enviar una solicitud de función",
-  "liveSyncActive": "Sincronización en vivo activa",
-  "ignoreVariablesPrefix": "Ignorar la primera parte del nombre del token para las variables",
-  "forYourVariables": "para tus variables"
+  "liveSyncActive": "Sincronización en vivo activa"
 }
