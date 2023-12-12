@@ -212,6 +212,7 @@ export const tokenState = createModel<RootModel>()({
       const importedTokens = state.tokens;
       data.forEach((token) => {
         let { parent } = token;
+
         if (!parent) {
           parent = activeTokenSet;
         }
@@ -221,9 +222,10 @@ export const tokenState = createModel<RootModel>()({
           importedTokens[parent] = [token];
         }
       });
+
       return {
         ...state,
-        tokens: { ...state.tokens, ...importedTokens },
+        tokens: { ...importedTokens, ...state.tokens },
       };
     },
     createToken: (state, data: UpdateTokenPayload) => {
