@@ -184,7 +184,7 @@ export default function ImportedTokensDialog() {
       <Stack direction="column" gap={6}>
         {newTokens.length > 0 && (
           <Accordion
-            height={200}
+            height="30vh"
             label="New Tokens"
             extra={(
               <Stack direction="row" gap={2} align="center">
@@ -199,7 +199,7 @@ export default function ImportedTokensDialog() {
             {
               newTokens.map((token) => (
                 <NewOrExistingToken
-                  key={token.name}
+                  key={token.parent + token.name}
                   token={token}
                   updateAction="Create New"
                   removeToken={handleIgnoreNewToken}
@@ -212,6 +212,7 @@ export default function ImportedTokensDialog() {
 
         {updatedTokens.length > 0 && (
           <Accordion
+            height="30vh"
             label="Updated Tokens"
             extra={(
               <Stack direction="row" gap={2} align="center">
@@ -226,7 +227,7 @@ export default function ImportedTokensDialog() {
             {
               updatedTokens.map((token) => (
                 <NewOrExistingToken
-                  key={token.name}
+                  key={token.parent + token.name}
                   token={token}
                   updateAction="Update Existing"
                   removeToken={handleIgnoreExistingToken}
