@@ -63,8 +63,9 @@ export default function ApplySelector() {
             justifyContent: 'center',
             width: '$controlMedium',
             borderLeft: '1px solid $buttonPrimaryBorderRest',
+            boxShadow: '$buttonPrimaryShadow',
             color: '$buttonPrimaryFg',
-            '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', borderColor: '$buttonPrimaryBorderRest' },
+            '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', boxShadow: '$buttonPrimaryShadow' },
           }}
           data-testid="apply-selector"
         >

@@ -1,7 +1,7 @@
 import React from 'react';
+import { IconButton } from '@tokens-studio/ui';
 import Maximize from '@/icons/maximize.svg';
 import useMinimizeWindow from './useMinimizeWindow';
-import IconButton from './IconButton';
 import Box from './Box';
 
 type Props = {

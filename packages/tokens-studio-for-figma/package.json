@@ -31,8 +31,8 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@tokens-studio/ui": "0.3.12",
-    "@tokens-studio/tokens": "0.0.23",
+    "@tokens-studio/ui": "0.3.13",
+    "@tokens-studio/tokens": "0.0.24",
     "@figma-plugin/helpers": "^0.15.2",
     "@gitbeaker/rest": "^39.21.2",
     "@monaco-editor/react": "^4.5.1",

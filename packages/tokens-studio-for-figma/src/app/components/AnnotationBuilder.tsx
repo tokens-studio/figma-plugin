@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import { uiStateSelector } from '@/selectors';
 import createAnnotation from './createAnnotation';
 import Stack from './Stack';
@@ -8,7 +9,6 @@ import Text from './Text';
 import Box from './Box';
 import { isEqual } from '@/utils/isEqual';
 import { Direction } from '@/constants/Direction';
-import IconButton from './IconButton';
 
 export default function AnnotationBuilder() {
   const { t } = useTranslation(['inspect']);

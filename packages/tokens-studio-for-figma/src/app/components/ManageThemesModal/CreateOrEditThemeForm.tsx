@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
-import { Button } from '@tokens-studio/ui';
+import { Button, IconButton } from '@tokens-studio/ui';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
@@ -13,7 +13,6 @@ import { StyledForm } from './StyledForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import Box from '../Box';
 import { RootState } from '@/app/store';
-import IconButton from '../IconButton';
 import { IconBack, IconPlus } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';

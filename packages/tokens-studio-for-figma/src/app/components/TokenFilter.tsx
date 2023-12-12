@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { XCircleFillIcon } from '@primer/octicons-react';
+import { IconButton } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import Box from './Box';
 import { styled } from '@/stitches.config';
 import { tokenFilterSelector } from '@/selectors';
-import IconButton from './IconButton';
 
 const StyledInput = styled('input', {
   background: 'transparent',

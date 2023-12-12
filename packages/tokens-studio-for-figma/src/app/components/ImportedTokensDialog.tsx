@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import Heading from './Heading';
 import Button from './Button';
 import Modal from './Modal';
@@ -8,7 +9,6 @@ import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
 import Stack from './Stack';
-import IconButton from './IconButton';
 import AddIcon from '@/icons/add.svg';
 import TrashIcon from '@/icons/trash.svg';
 import Box from './Box';

@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { IconButton } from '@tokens-studio/ui';
 import FlowIcon from '@/icons/flow.svg';
-import IconButton from '../IconButton';
 
 import {
   themeObjectsSelector,

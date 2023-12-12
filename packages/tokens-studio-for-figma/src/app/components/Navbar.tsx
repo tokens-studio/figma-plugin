@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import Box from './Box';
 import { Tabs } from '@/constants/Tabs';
 import Stack from './Stack';
@@ -11,7 +12,6 @@ import IconSecondScreenOn from '@/icons/second-screen-on.svg';
 import IconSecondScreenOff from '@/icons/second-screen-off.svg';
 import IconSecondScreenIndeterminate from '@/icons/second-screen-indeterminate.svg';
 import useMinimizeWindow from './useMinimizeWindow';
-import IconButton from './IconButton';
 import { activeTabSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import TokenFlowButton from './TokenFlowButton';

@@ -1,12 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from '@tokens-studio/ui';
 import {
   IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
 } from '@/icons';
 import { displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import Heading from './Heading';
-import IconButton from './IconButton';
 import ProBadge from './ProBadge';
 
 import { useFlags } from './LaunchDarkly';

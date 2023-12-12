@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
+import { IconButton } from '@tokens-studio/ui';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
 import { selectNodes } from '@/utils/figma/selectNodes';
 import { NodeInfo } from '@/types/NodeInfo';
 import TokenNode from './TokenNode';
-import IconButton from '../IconButton';
 
 const NODE_HEIGHT = 22;
 const VISIBLE_VIEWPORT_NODES = 10;

@@ -1,10 +1,9 @@
 import React, { useCallback } from 'react';
 import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { Box } from '@tokens-studio/ui';
+import { Box, IconButton } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
-import IconButton from '../IconButton';
 import Stack from '../Stack';
 import Checkbox from '../Checkbox';
 
