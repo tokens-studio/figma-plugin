@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import Heading from './Heading';
+import { List, AutoSizer } from 'react-virtualized';
 import Button from './Button';
 import Modal from './Modal';
 import { Dispatch } from '../store';
@@ -17,7 +17,6 @@ import Text from './Text';
 import { UpdateTokenPayload } from '@/types/payloads';
 import Accordion from './Accordion';
 import { Count } from './Count';
-import Footer from './Footer';
 
 function NewOrExistingToken({
   token,
@@ -161,7 +160,31 @@ export default function ImportedTokensDialog() {
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
-  // if (!newTokens.length && !updatedTokens.length) return null;
+  const newTokensRowRenderer = React.useCallback(({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    key, index, isScrolling, isVisible, style,
+  }) => (
+    <NewOrExistingToken
+      key={key}
+      token={newTokens[index]}
+      updateAction="Create New"
+      removeToken={handleIgnoreNewToken}
+      updateToken={handleCreateSingleClick}
+    />
+  ), [newTokens, handleIgnoreNewToken, handleCreateSingleClick]);
+
+  const updatedTokensRowRenderer = React.useCallback(({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    key, index, isScrolling, isVisible, style,
+  }) => (
+    <NewOrExistingToken
+      key={key}
+      token={updatedTokens[index]}
+      updateAction="Update Existing"
+      removeToken={handleIgnoreExistingToken}
+      updateToken={handleUpdateSingleClick}
+    />
+  ), [updatedTokens, handleIgnoreExistingToken, handleUpdateSingleClick]);
 
   return (
     <Modal
@@ -186,10 +209,10 @@ export default function ImportedTokensDialog() {
         </Stack>
       )}
     >
-
-      <Stack direction="column" gap={4}>
+      <Stack direction="column" gap={2}>
         {newTokens.length > 0 && (
           <Accordion
+            height={200}
             label="New Tokens"
             extra={(
               <>
@@ -201,29 +224,25 @@ export default function ImportedTokensDialog() {
               </>
             )}
           >
-            <Stack
-              direction="column"
-              gap={1}
-              css={{
-                borderTop: '1px solid',
-                borderColor: '$borderMuted',
-              }}
-            >
-              {newTokens.map((token) => (
-                <NewOrExistingToken
-                  token={token}
-                  key={`${token.parent}/${token.name}`}
-                  updateAction="Create"
-                  removeToken={handleIgnoreNewToken}
-                  updateToken={handleCreateSingleClick}
+            <AutoSizer>
+              {({ width }) => (
+                <List
+                  width={width}
+                  height={200}
+                  rowHeight={80}
+                  rowCount={newTokens.length}
+                  rowRenderer={newTokensRowRenderer}
                 />
-              ))}
-            </Stack>
+              )}
+            </AutoSizer>
+
           </Accordion>
         )}
+
         {updatedTokens.length > 0 && (
           <Accordion
             label="Updated Tokens"
+            height={200}
             extra={(
               <>
                 <Count count={updatedTokens.length} />
@@ -234,24 +253,17 @@ export default function ImportedTokensDialog() {
               </>
             )}
           >
-            <Stack
-              direction="column"
-              gap={1}
-              css={{
-                borderTop: '1px solid',
-                borderColor: '$borderMuted',
-              }}
-            >
-              {updatedTokens.map((token) => (
-                <NewOrExistingToken
-                  token={token}
-                  key={token.name}
-                  updateAction="Update"
-                  removeToken={handleIgnoreExistingToken}
-                  updateToken={handleUpdateSingleClick}
+            <AutoSizer>
+              {({ width }) => (
+                <List
+                  width={width}
+                  height={200}
+                  rowHeight={80}
+                  rowCount={updatedTokens.length}
+                  rowRenderer={updatedTokensRowRenderer}
                 />
-              ))}
-            </Stack>
+              )}
+            </AutoSizer>
           </Accordion>
         )}
       </Stack>

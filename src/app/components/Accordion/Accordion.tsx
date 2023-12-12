@@ -18,12 +18,13 @@ type Props = PropsWithChildren<{
   css?: StitchesCSS
   disabled?: boolean
   isOpenByDefault?: boolean
+  height?: string | number
 }>;
 
 const MotionStyledContent = motion(StyledContent);
 
 export function Accordion({
-  css, label, extra, disabled, isOpenByDefault, children,
+  css, label, extra, disabled, isOpenByDefault, height, children,
 }: Props) {
   const reducedMotion = useReducedMotion();
   const [isOpen, setIsOpen] = useState(isOpenByDefault ?? false);
@@ -60,7 +61,7 @@ export function Accordion({
             } : undefined}
             initial={{ opacity: 0, height: 0 }}
             exit={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: height || 'auto' }}
           >
             <Box css={{ paddingTop: '$4' }}>
               {children}

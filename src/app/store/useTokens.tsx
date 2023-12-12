@@ -115,7 +115,7 @@ export default function useTokens() {
       confirm({
         text: 'Are you sure?',
         description:
-            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+          'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
       }).then((result) => {
         if (result && result.result) {
           dispatch.tokenState.updateDocument();
