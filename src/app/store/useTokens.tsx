@@ -203,7 +203,9 @@ export default function useTokens() {
     }));
   }, [settings.updateMode]);
 
-  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName, type }: { oldGroupName: string, newGroupName: string, type: string }) => {
+  const remapTokensInGroup = useCallback(async ({
+    oldGroupName, newGroupName, type, tokensToRename,
+  }: { oldGroupName: string, newGroupName: string, type: string, tokensToRename: { oldName: string, newName: string }[] }) => {
     const confirmData = await confirm({
       text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
@@ -227,7 +229,9 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0]);
+        tokensToRename.forEach(async (tokenToRename) => {
+          await handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0]);
+        });
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
