@@ -1,6 +1,6 @@
 import { useDispatch, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { SingleToken } from '@/types/tokens';
+import { SingleToken, TokenToRename } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -165,7 +165,7 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<{ oldName: string, newName: string }[]> => {
+  const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<TokenToRename[]> => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     const tokens = tokensSelector(store.getState());
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
