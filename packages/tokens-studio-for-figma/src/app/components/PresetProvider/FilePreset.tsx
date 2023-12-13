@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Button } from '@tokens-studio/ui';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import {
@@ -7,7 +8,6 @@ import {
   activeThemeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../../store/remoteTokens';
-import Button from '../Button';
 import Stack from '../Stack';
 import Heading from '../Heading';
 import Text from '../Text';

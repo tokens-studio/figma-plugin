@@ -2,9 +2,9 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import Heading from './Heading';
 import Text from './Text';
-import Button from './Button';
 import Modal from './Modal';
 import { getLastopened } from '@/selectors';
 import Stack from './Stack';

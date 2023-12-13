@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import ApplySelector from './ApplySelector';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
 import { hasUnsavedChangesSelector } from '@/selectors';
-import Button from './Button';
 import Stack from './Stack';
 import SettingsDropdown from './SettingsDropdown';
 import useTokens from '../store/useTokens';

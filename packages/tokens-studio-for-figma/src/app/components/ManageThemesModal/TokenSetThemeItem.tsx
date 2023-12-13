@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
+import { Button } from '@tokens-studio/ui';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import Box from '../Box';
@@ -14,7 +15,6 @@ import {
 } from '../DropdownMenu';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconChevronDown from '@/icons/chevrondown.svg';
-import Button from '../Button';
 import TokenSetStatusIcon from './TokenSetStatusIcon';
 
 type Props = {

@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,7 +17,6 @@ import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
 import { UpdateMode } from '@/constants/UpdateMode';
 import Stack from './Stack';
-import Button from './Button';
 import useTokens from '../store/useTokens';
 import Box from './Box';
 

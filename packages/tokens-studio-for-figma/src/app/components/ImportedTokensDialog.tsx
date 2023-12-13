@@ -1,9 +1,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { IconButton } from '@tokens-studio/ui';
+import { IconButton, Button } from '@tokens-studio/ui';
 import Heading from './Heading';
-import Button from './Button';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';

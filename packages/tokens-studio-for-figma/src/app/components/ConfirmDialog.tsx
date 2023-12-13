@@ -1,6 +1,6 @@
 import React from 'react';
+import { Button } from '@tokens-studio/ui';
 import useConfirm from '../hooks/useConfirm';
-import Button from './Button';
 import Heading from './Heading';
 import Modal from './Modal';
 import Box from './Box';
@@ -135,7 +135,7 @@ function ConfirmDialog() {
             <Button variant="secondary" onClick={onCancel}>
               {confirmState?.cancelAction}
             </Button>
-            <Button type="submit" variant="primary" buttonRef={confirmButton}>
+            <Button type="submit" variant="primary" ref={confirmButton}>
               {confirmState?.confirmAction}
             </Button>
           </Stack>

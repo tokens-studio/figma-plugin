@@ -1,8 +1,8 @@
 import React from 'react';
 import { RgbaColorPicker, RgbaColor } from 'react-colorful';
 import { parseToRgb, parseToHsl, toColorString } from 'polished';
+import { Button } from '@tokens-studio/ui';
 import Input from '../Input';
-import Button from '../Button';
 import Stack from '../Stack';
 
 enum InputMode {

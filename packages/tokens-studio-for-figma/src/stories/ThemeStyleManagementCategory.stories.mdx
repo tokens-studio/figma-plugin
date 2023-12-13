@@ -1,6 +1,5 @@
 import { Meta, Story, ArgsTable, Canvas, Preview } from '@storybook/addon-docs';
 import { ThemeStyleManagementCategory } from '@/app/components/ManageThemesModal/ThemeStyleManagementCategory';
-import ColorDisplayBubble from '@/app/components/ColorDisplayBubble';
 
 <Meta 
   title='ThemeStyleManagementCategory' 
@@ -26,10 +25,7 @@ export const ThemeStyleManagementCategoryDefaultStory = (args) => {
         'id': 'S:1235',
         'name': 'body/bold',
       },
-    },
-    icon: (
-      <ColorDisplayBubble color="#ff0000" />
-    )
+    }
   }}>
     {ThemeStyleManagementCategoryDefaultStory.bind({})}
   </Story>

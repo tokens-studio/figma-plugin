@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -22,7 +23,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
-import Button from './Button';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
 import trimValue from '@/utils/trimValue';

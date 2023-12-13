@@ -3,13 +3,13 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
+import { Button } from '@tokens-studio/ui';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
 import Blankslate from '../Blankslate';
 import Stack from '../Stack';
 import IconPlus from '@/icons/plus.svg';
-import Button from '../Button';
 import { CreateOrEditThemeForm, FormValues } from './CreateOrEditThemeForm';
 import { ThemeObject, ThemeObjectsList } from '@/types';
 import Box from '../Box';

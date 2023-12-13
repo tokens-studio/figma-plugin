@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@tokens-studio/ui';
 import { showEmptyGroupsSelector } from '@/selectors';
 import { Dispatch } from '../store';
-import Button from './Button';
 import Stack from './Stack';
 
 export default function ToggleEmptyButton() {
