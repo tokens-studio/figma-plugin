@@ -355,11 +355,6 @@ export const tokenState = createModel<RootModel>()({
                   oldValue.description !== token.description
                 ) {
                   existingTokens.push(token);
-                } else {
-                  updatedTokens.push({
-                    ...token,
-                    oldDescription: oldValue.description,
-                  });
                 }
               } else {
                 const updatedToken = { ...token };

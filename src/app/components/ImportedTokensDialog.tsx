@@ -217,18 +217,17 @@ export default function ImportedTokensDialog() {
 }
             {' '}
             {newTokens.length > 4 && (
-            <Button
+            <Text
               css={{ marginBlockStart: '$3' }}
-              variant="secondary"
-              id="new-show-more"
-              disabled
+              size="small"
             >
-              Review all
+              ...and
               {' '}
               {newTokens.length}
               {' '}
-              coming soon
-            </Button>
+              more
+
+            </Text>
             )}
 
           </Accordion>
@@ -260,13 +259,13 @@ export default function ImportedTokensDialog() {
             }
             { updatedTokens.length > 4 && (
 
-            <Button css={{ marginBlockStart: '$3' }} variant="secondary" id="new-show-more" disabled>
-              Review all
+            <Text css={{ marginBlockStart: '$3' }} size="small">
+              ...and
               {' '}
               {updatedTokens.length}
               {' '}
-              coming soon
-            </Button>
+              more
+            </Text>
             )}
           </Accordion>
         )}
