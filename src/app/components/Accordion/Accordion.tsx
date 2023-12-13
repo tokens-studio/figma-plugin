@@ -61,9 +61,9 @@ export function Accordion({
             } : undefined}
             initial={{ opacity: 0, height: 0 }}
             exit={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: height || 'auto' }}
+            animate={{ opacity: 1, height: 'auto' }}
           >
-            <Box css={{ paddingTop: '$4', height: height || 'inherit', overflowY: 'scroll' }}>
+            <Box css={{ paddingTop: '$4', maxHeight: height || 'inherit', overflowY: 'scroll' }}>
               {children}
             </Box>
           </MotionStyledContent>

@@ -37,11 +37,19 @@ function NewOrExistingToken({
     updateToken(token);
   }, [updateToken, token]);
 
+  const importedTokens = useSelector(importedTokensSelector);
+
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const allParents = [...new Set([...importedTokens.newTokens.map((t: ImportToken) => t.parent), ...importedTokens.updatedTokens.map((t) => t.parent)])];
+  const isMultiParent = allParents.length > 1;
+
   return (
-    <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
+    <Stack direction="row" justify="between">
       <Stack direction="column" gap={1}>
-        <Text size="xsmall" muted>{token.parent}</Text>
-        <Text bold size="small">{token.name}</Text>
+        <Stack direction="row" gap={2}>
+          {isMultiParent && (<Text size="small" muted>{token.parent}</Text>)}
+          <Text bold size="small">{token.name}</Text>
+        </Stack>
         <Stack direction="row" align="center" gap={1}>
           <Box css={{
             padding: '$2',
@@ -97,11 +105,11 @@ export default function ImportedTokensDialog() {
   const { t } = useTranslation(['tokens']);
 
   const handleIgnoreExistingToken = React.useCallback((token) => {
-    setUpdatedTokens((updatedTokens.filter((t) => t.name !== token.name)));
+    setUpdatedTokens((updatedTokens.filter((updatedToken) => updatedToken.name !== token.name)));
   }, [setUpdatedTokens, updatedTokens]);
 
   const handleIgnoreNewToken = React.useCallback((token) => {
-    setNewTokens(newTokens.filter((t) => t.name !== token.name));
+    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
   }, [setNewTokens, newTokens]);
 
   const handleCreateAllClick = React.useCallback(() => {
@@ -133,7 +141,7 @@ export default function ImportedTokensDialog() {
       description: token.description,
       shouldUpdateDocument: false,
     });
-    setNewTokens(newTokens.filter((t) => t.name !== token.name));
+    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
   const handleUpdateSingleClick = React.useCallback((token) => {
@@ -146,7 +154,7 @@ export default function ImportedTokensDialog() {
       description: token.description,
       shouldUpdateDocument: false,
     });
-    setUpdatedTokens(updatedTokens.filter((t) => t.name !== token.name));
+    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
   }, [updatedTokens, editSingleToken, activeTokenSet]);
 
   const handleClose = React.useCallback(() => {
@@ -184,8 +192,8 @@ export default function ImportedTokensDialog() {
       <Stack direction="column" gap={6}>
         {newTokens.length > 0 && (
           <Accordion
-            height="30vh"
             label="New Tokens"
+            isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
                 <Count count={newTokens.length} />
@@ -197,7 +205,7 @@ export default function ImportedTokensDialog() {
             )}
           >
             {
-              newTokens.map((token) => (
+              newTokens.slice(0, 4).map((token) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
                   token={token}
@@ -206,14 +214,29 @@ export default function ImportedTokensDialog() {
                   updateToken={handleCreateSingleClick}
                 />
               ))
-            }
+}
+            {' '}
+            {newTokens.length > 4 && (
+            <Button
+              css={{ marginBlockStart: '$3' }}
+              variant="secondary"
+              id="new-show-more"
+              disabled
+            >
+              Review all
+              {' '}
+              {newTokens.length}
+              {' '}
+              coming soon
+            </Button>
+            )}
+
           </Accordion>
         )}
-
         {updatedTokens.length > 0 && (
           <Accordion
-            height="30vh"
             label="Updated Tokens"
+            isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
                 <Count count={updatedTokens.length} />
@@ -225,7 +248,7 @@ export default function ImportedTokensDialog() {
             )}
           >
             {
-              updatedTokens.map((token) => (
+              updatedTokens.slice(0, 4).map((token) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
                   token={token}
@@ -235,6 +258,16 @@ export default function ImportedTokensDialog() {
                 />
               ))
             }
+            { updatedTokens.length > 4 && (
+
+            <Button css={{ marginBlockStart: '$3' }} variant="secondary" id="new-show-more" disabled>
+              Review all
+              {' '}
+              {updatedTokens.length}
+              {' '}
+              coming soon
+            </Button>
+            )}
           </Accordion>
         )}
       </Stack>
