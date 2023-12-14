@@ -215,7 +215,7 @@ function PushDialog() {
         <Modal large isOpen close={onCancel}>
           <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
             <Stack direction="column" gap={4}>
-              <Heading id="push-dialog-success-heading" size="medium">All done!</Heading>
+              <Heading data-testid="push-dialog-success-heading" size="medium">All done!</Heading>
               <Text size="small">
                 {t('changesPushedTo')}
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
