@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Heading from './Heading';
+import { Heading } from '@tokens-studio/ui';
 import Box from './Box';
 import Text from './Text';
 import Stack from './Stack';

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading, Textarea } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -29,8 +29,6 @@ import trimValue from '@/utils/trimValue';
 import BoxShadowInput from './BoxShadowInput';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { StyleOptions } from '@/constants/StyleOptions';
-import Textarea from './Textarea';
-import Heading from './Heading';
 import BorderTokenForm from './BorderTokenForm';
 import Box from './Box';
 import ColorTokenForm from './ColorTokenForm';
@@ -280,11 +278,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const handleDescriptionChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (value: string) => {
       if (internalEditToken) {
         setInternalEditToken({
           ...internalEditToken,
-          description: e.target.value,
+          description: value,
         });
       }
     },
@@ -585,7 +583,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
       {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
       <Box>
-        <Heading size="xsmall">{t('description')}</Heading>
+        <Heading size="small">{t('description')}</Heading>
         <Textarea
           key="description"
           value={internalEditToken?.description || ''}
@@ -598,7 +596,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       {
           internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
             <Box>
-              <Heading size="xsmall">{t('set', { ns: 'general' })}</Heading>
+              <Heading size="small">{t('set', { ns: 'general' })}</Heading>
               <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
             </Box>
           )

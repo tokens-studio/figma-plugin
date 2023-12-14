@@ -3,10 +3,9 @@ import { useSelector } from 'react-redux';
 import { useUIDSeed } from 'react-uid';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Stack from '../Stack';
-import Heading from '../Heading';
 import { IconFile } from '@/icons';
 import {
   tokensSelector, themesListSelector, storeTokenIdInJsonEditorSelector,

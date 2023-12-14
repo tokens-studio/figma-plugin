@@ -1,13 +1,12 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, EmptyState } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
 import Box from './Box';
 import Checkbox from './Checkbox';
 import Label from './Label';
-import Blankslate from './Blankslate';
 import InspectorTokenGroup from './InspectorTokenGroup';
 import { SingleToken } from '@/types/tokens';
 import { inspectStateSelector, uiStateSelector } from '@/selectors';
@@ -156,7 +155,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
           </Box>
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
-            <Blankslate title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} text={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
+            <EmptyState title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
             )}

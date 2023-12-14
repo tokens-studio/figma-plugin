@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Heading } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import Heading from '../Heading';
 import Stack from '../Stack';
 import Text from '../Text';
 

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button } from '@tokens-studio/ui';
+import { Button, Heading } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Heading from '../Heading';
 import Text from '../Text';
 import Stack from '../Stack';
 

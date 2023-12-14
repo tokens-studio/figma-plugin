@@ -1,7 +1,6 @@
 import React from 'react';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { Box, Button } from '@tokens-studio/ui';
-import Heading from './Heading';
+import { Box, Button, Heading } from '@tokens-studio/ui';
 import Stack from './Stack';
 import Text from './Text';
 
