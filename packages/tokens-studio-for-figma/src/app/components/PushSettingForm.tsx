@@ -39,7 +39,7 @@ function PushSettingForm({
       </Box>
       <Heading size="small">{t('commitMessage')}</Heading>
       <Textarea
-        id="push-dialog-commit-message"
+        data-testid="push-dialog-commit-message"
         border
         rows={3}
         value={commitMessage}
