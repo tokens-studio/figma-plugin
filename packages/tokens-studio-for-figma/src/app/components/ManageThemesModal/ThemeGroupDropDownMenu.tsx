@@ -1,18 +1,7 @@
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu } from '@tokens-studio/ui';
 import Box from '../Box';
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  ScrollDropdownMenuRadioItem,
-  ScrollDropdownMenuItemIndicator,
-  DropdownMenuSeparator,
-} from '../DropdownMenu';
-import { styled } from '@/stitches.config';
 import { IconPlus } from '@/icons';
 
 type Props = {
@@ -21,8 +10,6 @@ type Props = {
   onChange: (value: string) => void
   addGroup: () => void
 };
-
-const StyledDropdownMenuTrigger = styled(DropdownMenuTrigger, {});
 
 export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   availableGroups, selectedGroup, onChange, addGroup,
@@ -34,27 +21,27 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
   const themeGroupList = React.useMemo(() => availableGroups.map((groupName) => {
     const handleSelect = () => handleSelectGroup(groupName);
     return (
-      <ScrollDropdownMenuRadioItem
+      <DropdownMenu.RadioItem
         key={groupName}
         value={groupName}
           // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
         <Box css={{ width: '$5', marginRight: '$2' }}>
-          <ScrollDropdownMenuItemIndicator>
+          <DropdownMenu.ItemIndicator>
             <CheckIcon />
-          </ScrollDropdownMenuItemIndicator>
+          </DropdownMenu.ItemIndicator>
         </Box>
         <Box>
           {groupName}
         </Box>
-      </ScrollDropdownMenuRadioItem>
+      </DropdownMenu.RadioItem>
     );
   }), [availableGroups, handleSelectGroup]);
 
   return (
     <DropdownMenu>
-      <StyledDropdownMenuTrigger>
+      <DropdownMenu.Trigger>
         {
           selectedGroup ? (
             <span>{selectedGroup}</span>
@@ -65,25 +52,25 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
             </Box>
           )
         }
-      </StyledDropdownMenuTrigger>
-      <DropdownMenuPortal>
-        <DropdownMenuContent side="bottom">
-          <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content side="bottom">
+          <DropdownMenu.RadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
             {
             themeGroupList
           }
-          </DropdownMenuRadioGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
+          </DropdownMenu.RadioGroup>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item
             css={{
               paddingLeft: '$6',
             }}
             onSelect={addGroup}
           >
             Create new group
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu>
   );
 };

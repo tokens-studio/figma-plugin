@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Heading } from '@tokens-studio/ui';
+import { DropdownMenu, Heading } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
@@ -14,12 +14,7 @@ import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from
 import Stack from './Stack';
 import Box from './Box';
 import Text from './Text';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from './DropdownMenu';
+
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
@@ -176,22 +171,22 @@ const SyncSettings = () => {
             </Stack>
           )}
           <DropdownMenu>
-            <DropdownMenuTrigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
+            <DropdownMenu.Trigger css={{ border: '1px solid $borderMuted' }} data-testid="add-storage-item-dropdown">
               <Text size="small">{t('addNew')}</Text>
               <IconToggleableDisclosure />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
               side="bottom"
             >
               {
                 providers.map((provider) => (
-                  <DropdownMenuItem key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                  <DropdownMenu.Item key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
                     <Box css={{ color: '$contextMenuFg' }}>{getProviderIcon(provider.type)}</Box>
                     {provider.text}
-                  </DropdownMenuItem>
+                  </DropdownMenu.Item>
                 ))
               }
-            </DropdownMenuContent>
+            </DropdownMenu.Content>
           </DropdownMenu>
         </Stack>
       </Box>

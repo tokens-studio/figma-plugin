@@ -1,21 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { Button } from '@tokens-studio/ui';
+import { Button, DropdownMenu } from '@tokens-studio/ui';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import Box from '../Box';
 import Stack from '../Stack';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
-} from '../DropdownMenu';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import TokenSetStatusIcon from './TokenSetStatusIcon';
+
+DropdownMenu;
 
 type Props = {
   item: TreeItem
@@ -93,22 +87,22 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
             </StyledThemeLabel>
           </Button>
           <DropdownMenu>
-            <DropdownMenuTrigger data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`}>
+            <DropdownMenu.Trigger data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`}>
               <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
               <IconChevronDown />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom">
-              <DropdownMenuRadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content side="bottom">
+              <DropdownMenu.RadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
                 {tokenSetStatusValues.map((status) => (
-                  <DropdownMenuRadioItem key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
-                    <DropdownMenuItemIndicator>
+                  <DropdownMenu.RadioItem key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
+                    <DropdownMenu.ItemIndicator>
                       <CheckIcon />
-                    </DropdownMenuItemIndicator>
+                    </DropdownMenu.ItemIndicator>
                     {tokenSetSatusLabels[status]}
-                  </DropdownMenuRadioItem>
+                  </DropdownMenu.RadioItem>
                 ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
+              </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
           </DropdownMenu>
         </Stack>
         )}

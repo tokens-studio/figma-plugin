@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
-import { IconButton } from '@tokens-studio/ui';
+import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
 import { selectNodes } from '@/utils/figma/selectNodes';
@@ -45,7 +44,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
         display: 'flex',
       }}
     >
-      <DropdownMenu.Root>
+      <DropdownMenu>
         <Box
           css={{
             display: 'flex',
@@ -78,7 +77,7 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
           </DropdownMenu.Trigger>
           {dropdownContent}
         </Box>
-      </DropdownMenu.Root>
+      </DropdownMenu>
       <IconButton
         tooltip="Select all"
         tooltipSide="bottom"

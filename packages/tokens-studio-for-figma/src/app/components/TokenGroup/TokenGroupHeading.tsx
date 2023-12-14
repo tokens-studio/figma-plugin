@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ContextMenuPortal } from '@radix-ui/react-context-menu';
-import { Heading } from '@tokens-studio/ui';
 import {
-  ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger,
-} from '../ContextMenu';
+  Heading,
+  ContextMenu,
+} from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
 import { editProhibitedSelector } from '@/selectors';
@@ -86,25 +85,25 @@ export function TokenGroupHeading({
         type="button"
       >
         <ContextMenu>
-          <ContextMenuTrigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
+          <ContextMenu.Trigger data-testid={`group-heading-${path}-${label}-${id}`} onClick={handleToggleCollapsed}>
             <Stack direction="row" gap={2} align="center" css={{ color: '$fgMuted' }}>
               {collapsed.includes(path) ? <IconCollapseArrow /> : <IconExpandArrow />}
               <Heading muted size="small">{label}</Heading>
             </Stack>
-          </ContextMenuTrigger>
-          <ContextMenuPortal>
-            <ContextMenuContent>
-              <ContextMenuItem disabled={editProhibited} onSelect={handleRename}>
+          </ContextMenu.Trigger>
+          <ContextMenu.Portal>
+            <ContextMenu.Content>
+              <ContextMenu.Item disabled={editProhibited} onSelect={handleRename}>
                 {t('rename')}
-              </ContextMenuItem>
-              <ContextMenuItem disabled={editProhibited} onSelect={handleDuplicate}>
+              </ContextMenu.Item>
+              <ContextMenu.Item disabled={editProhibited} onSelect={handleDuplicate}>
                 {t('duplicate')}
-              </ContextMenuItem>
-              <ContextMenuItem disabled={editProhibited} onSelect={handleDelete}>
+              </ContextMenu.Item>
+              <ContextMenu.Item disabled={editProhibited} onSelect={handleDelete}>
                 {t('delete')}
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenuPortal>
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Portal>
         </ContextMenu>
       </StyledTokenGroupHeadingCollapsable>
 

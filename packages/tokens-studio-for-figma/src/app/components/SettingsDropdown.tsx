@@ -2,13 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItemIndicator,
-  DropdownMenuCheckboxItem,
-} from './DropdownMenu';
+import { DropdownMenu } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
@@ -46,66 +40,66 @@ export default function SettingsDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger data-testid="bottom-bar-settings">
+      <DropdownMenu.Trigger data-testid="bottom-bar-settings">
         <GearIcon />
-      </DropdownMenuTrigger>
+      </DropdownMenu.Trigger>
 
-      <DropdownMenuContent side="top">
-        <DropdownMenuCheckboxItem
+      <DropdownMenu.Content side="top">
+        <DropdownMenu.CheckboxItem
           data-testid="update-on-change"
           checked={updateOnChange}
           onCheckedChange={handleUpdateOnChange}
         >
-          <DropdownMenuItemIndicator>
+          <DropdownMenu.ItemIndicator>
             <CheckIcon />
-          </DropdownMenuItemIndicator>
+          </DropdownMenu.ItemIndicator>
           {t('update.onChange.title')}
           <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
             {t('update.onChange.description')}
           </Box>
-        </DropdownMenuCheckboxItem>
+        </DropdownMenu.CheckboxItem>
         {localApiState?.provider === StorageProviderType.JSONBIN ? (
-          <DropdownMenuCheckboxItem
+          <DropdownMenu.CheckboxItem
             data-testid="update-remote"
             checked={updateRemote}
             onCheckedChange={handleUpdateRemote}
           >
-            <DropdownMenuItemIndicator>
+            <DropdownMenu.ItemIndicator>
               <CheckIcon />
-            </DropdownMenuItemIndicator>
+            </DropdownMenu.ItemIndicator>
             {t('update.remoteJSONBin.title')}
             <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
               {t('update.remoteJSONBin.description')}
             </Box>
-          </DropdownMenuCheckboxItem>
+          </DropdownMenu.CheckboxItem>
         ) : null}
-        <DropdownMenuCheckboxItem
+        <DropdownMenu.CheckboxItem
           data-testid="update-styles"
           checked={updateStyles}
           onCheckedChange={handleUpdateStyles}
         >
-          <DropdownMenuItemIndicator>
+          <DropdownMenu.ItemIndicator>
             <CheckIcon />
-          </DropdownMenuItemIndicator>
+          </DropdownMenu.ItemIndicator>
           {t('update.styles.title')}
           <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
             {t('update.styles.description')}
           </Box>
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
+        </DropdownMenu.CheckboxItem>
+        <DropdownMenu.CheckboxItem
           data-testid="swap-styles"
           checked={shouldSwapStyles}
           onCheckedChange={handleShouldSwapStyles}
         >
-          <DropdownMenuItemIndicator>
+          <DropdownMenu.ItemIndicator>
             <CheckIcon />
-          </DropdownMenuItemIndicator>
+          </DropdownMenu.ItemIndicator>
           {t('update.swapStyles.title')}
           <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
             {t('update.swapStyles.description')}
           </Box>
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuContent>
+        </DropdownMenu.CheckboxItem>
+      </DropdownMenu.Content>
     </DropdownMenu>
   );
 }

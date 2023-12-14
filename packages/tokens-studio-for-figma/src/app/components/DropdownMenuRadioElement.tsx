@@ -1,5 +1,5 @@
 import React from 'react';
-import { DropdownMenuRadioItem } from './DropdownMenu';
+import { DropdownMenu } from '@tokens-studio/ui';
 
 type Props = {
   item: string,
@@ -11,8 +11,8 @@ export const DropdownMenuRadioElement: React.FC<React.PropsWithChildren<React.Pr
   const onSelect = React.useCallback(() => itemSelected(item), [item, itemSelected]);
 
   return (
-    <DropdownMenuRadioItem data-testid={`item-dropdown-menu-element-${item}`} key={`item_${index}`} value={item} onSelect={onSelect}>
+    <DropdownMenu.RadioItem data-testid={`item-dropdown-menu-element-${item}`} key={`item_${index}`} value={item} onSelect={onSelect}>
       {` ${item}`}
-    </DropdownMenuRadioItem>
+    </DropdownMenu.RadioItem>
   );
 };

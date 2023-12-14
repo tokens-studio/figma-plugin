@@ -1,14 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
+import { DropdownMenu } from '@tokens-studio/ui';
 import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
 import Box from './Box';
 import { StyledInput } from './Input';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from './DropdownMenu';
 
 import { MultiSelectCheckboxItem } from './MultiSelectCheckboxItem';
 
@@ -40,7 +36,7 @@ export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildre
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger css={{ width: '100%', padding: '0' }}>
+      <DropdownMenu.Trigger css={{ width: '100%', padding: '0' }}>
         <Box
           css={{
             display: 'flex', position: 'relative', width: '100%', flexGrow: 1,
@@ -52,12 +48,12 @@ export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildre
             <StyledIconDisclosure />
           </StyledInputSuffix>
         </Box>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content side="bottom" className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
         {
           menuItems.map((menuItem, index) => <MultiSelectCheckboxItem key={`multi_checkbox_${seed(index)}`} item={menuItem} isSelected={selectedItems.includes(menuItem)} onItemSelected={handleSelectedItem} />)
         }
-      </DropdownMenuContent>
+      </DropdownMenu.Content>
     </DropdownMenu>
   );
 };

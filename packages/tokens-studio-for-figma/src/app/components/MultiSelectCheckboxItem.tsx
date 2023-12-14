@@ -2,11 +2,8 @@ import React from 'react';
 import {
   CheckIcon,
 } from '@radix-ui/react-icons';
+import { DropdownMenu } from '@tokens-studio/ui';
 import Box from './Box';
-import {
-  DropdownMenuItemIndicator,
-  DropdownMenuCheckboxItem,
-} from './DropdownMenu';
 
 type Props = {
   item: string;
@@ -24,19 +21,19 @@ export const MultiSelectCheckboxItem: React.FunctionComponent<React.PropsWithChi
   }, [item, onItemSelected]);
 
   return (
-    <DropdownMenuCheckboxItem
+    <DropdownMenu.CheckboxItem
       checked={isSelected}
       onSelect={handleSelect}
       css={{ display: 'flex', padding: '$3 0' }}
     >
       <Box css={{ width: '$5' }}>
-        <DropdownMenuItemIndicator css={{ position: 'inherit' }}>
+        <DropdownMenu.ItemIndicator css={{ position: 'inherit' }}>
           <CheckIcon />
-        </DropdownMenuItemIndicator>
+        </DropdownMenu.ItemIndicator>
       </Box>
       <Box>
         {item}
       </Box>
-    </DropdownMenuCheckboxItem>
+    </DropdownMenu.CheckboxItem>
   );
 };

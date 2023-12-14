@@ -1,14 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useMemo } from 'react';
+import { DropdownMenu } from '@tokens-studio/ui';
 import { Dispatch } from '@/app/store';
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from '../DropdownMenu';
 import { IconChevronDown } from '@/icons';
 import { languages } from '@/i18n';
 import { languageSelector } from '@/selectors';
@@ -30,7 +24,7 @@ export const LanguageSelector = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
+      <DropdownMenu.Trigger
         css={{
           display: 'flex',
           alignItems: 'center',
@@ -42,23 +36,23 @@ export const LanguageSelector = () => {
       >
         {displayLang}
         <IconChevronDown />
-      </DropdownMenuTrigger>
+      </DropdownMenu.Trigger>
 
-      <DropdownMenuContent side="top">
-        <DropdownMenuRadioGroup value={currentLang} onValueChange={handleValueChange}>
+      <DropdownMenu.Content side="top">
+        <DropdownMenu.RadioGroup value={currentLang} onValueChange={handleValueChange}>
           {languages.map((lang) => (
 
-            <DropdownMenuRadioItem
+            <DropdownMenu.RadioItem
               key={lang.code}
               value={lang.code}
               data-testid="apply-to-selection"
             >
               {lang.title}
-            </DropdownMenuRadioItem>
+            </DropdownMenu.RadioItem>
           ))}
 
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
+        </DropdownMenu.RadioGroup>
+      </DropdownMenu.Content>
     </DropdownMenu>
   );
 };
