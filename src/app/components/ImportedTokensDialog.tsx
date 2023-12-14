@@ -22,25 +22,26 @@ function NewOrExistingToken({
   updateAction,
   removeToken,
   updateToken,
+  index,
 }: {
   token: ImportToken;
   updateAction: string;
-  removeToken: (token: ImportToken) => void;
-  updateToken: (token: ImportToken) => void;
+  index: number;
+  removeToken: (token: ImportToken, index: number) => void;
+  updateToken: (token: ImportToken, index: number) => void;
 }) {
   const { t } = useTranslation(['tokens']);
   const onRemoveToken = React.useCallback(() => {
-    removeToken(token);
-  }, [removeToken, token]);
+    removeToken(token, index);
+  }, [removeToken, token, index]);
 
   const onUpdateToken = React.useCallback(() => {
-    updateToken(token);
-  }, [updateToken, token]);
+    updateToken(token, index);
+  }, [updateToken, token, index]);
 
   const importedTokens = useSelector(importedTokensSelector);
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  const allParents = [...new Set([...importedTokens.newTokens.map((t: ImportToken) => t.parent), ...importedTokens.updatedTokens.map((t) => t.parent)])];
+  const allParents = [...new Set([...importedTokens.newTokens.map((newToken: ImportToken) => newToken.parent), ...importedTokens.updatedTokens.map((updatedToken) => updatedToken.parent)])];
   const isMultiParent = allParents.length > 1;
 
   return (
@@ -104,31 +105,32 @@ export default function ImportedTokensDialog() {
 
   const { t } = useTranslation(['tokens']);
 
-  const handleIgnoreExistingToken = React.useCallback((token) => {
-    setUpdatedTokens((updatedTokens.filter((updatedToken) => updatedToken.name !== token.name)));
+  const handleIgnoreExistingToken = React.useCallback((token, index) => {
+    const tokens = updatedTokens.filter((updatedToken) => updatedTokens.indexOf(updatedToken) !== index);
+    setUpdatedTokens(tokens);
   }, [setUpdatedTokens, updatedTokens]);
 
-  const handleIgnoreNewToken = React.useCallback((token) => {
-    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
+  const handleIgnoreNewToken = React.useCallback((token, index) => {
+    setNewTokens(newTokens.filter((newToken) => newTokens.indexOf(newToken) !== index));
   }, [setNewTokens, newTokens]);
 
   const handleCreateAllClick = React.useCallback(() => {
-    // Create new tokens according to styles
+    // Create new Tokens
     importMultipleTokens(newTokens as UpdateTokenPayload[]);
     setNewTokens([]);
   }, [newTokens, importMultipleTokens]);
 
   const handleUpdateAllClick = React.useCallback(() => {
-    // Go through each token that needs to be updated
+    // Update all existing tokens
     importMultipleTokens(updatedTokens as UpdateTokenPayload[]);
     setUpdatedTokens([]);
   }, [updatedTokens, importMultipleTokens]);
 
   const handleImportAllClick = React.useCallback(() => {
-    // Perform both actions for all the tokens
+    // Update all existing tokens, and create new ones
     importMultipleTokens([...newTokens, ...updatedTokens] as UpdateTokenPayload[]);
-    setNewTokens([]);
     setUpdatedTokens([]);
+    setNewTokens([]);
   }, [importMultipleTokens, newTokens, updatedTokens]);
 
   const handleCreateSingleClick = React.useCallback((token) => {
@@ -180,9 +182,6 @@ export default function ImportedTokensDialog() {
           <Button variant="secondary" id="button-import-close" onClick={handleClose}>
             {t('cancel')}
           </Button>
-          <Button variant="secondary" id="button-import-create-all" onClick={handleCreateAllClick}>
-            {t('createAll')}
-          </Button>
           <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
             {t('importAll')}
           </Button>
@@ -198,16 +197,17 @@ export default function ImportedTokensDialog() {
               <Stack direction="row" gap={2} align="center">
                 <Count count={newTokens.length} />
                 {' '}
-                <Button variant="secondary" id="button-import-update-all" onClick={handleCreateAllClick}>
+                <Button variant="secondary" id="button-import-create-all" onClick={handleCreateAllClick}>
                   {t('createAll')}
                 </Button>
               </Stack>
             )}
           >
             {
-              newTokens.slice(0, 4).map((token) => (
+              newTokens.slice(0, 4).map((token, index) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
+                  index={index}
                   token={token}
                   updateAction="Create New"
                   removeToken={handleIgnoreNewToken}
@@ -247,10 +247,11 @@ export default function ImportedTokensDialog() {
             )}
           >
             {
-              updatedTokens.slice(0, 4).map((token) => (
+              updatedTokens.slice(0, 4).map((token, index) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
                   token={token}
+                  index={index}
                   updateAction="Update Existing"
                   removeToken={handleIgnoreExistingToken}
                   updateToken={handleUpdateSingleClick}

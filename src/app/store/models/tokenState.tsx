@@ -3,6 +3,7 @@ import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
+import { deepmerge } from 'deepmerge-ts';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -209,23 +210,32 @@ export const tokenState = createModel<RootModel>()({
     }),
     importMultipleTokens: (state, data: UpdateTokenPayload[]) => {
       const { activeTokenSet } = state;
-      const importedTokens = state.tokens;
+      const existingTokens = { ...state.tokens };
+      const importTokens: Record<string, AnyTokenList> = { };
       data.forEach((token) => {
         let { parent } = token;
 
         if (!parent) {
           parent = activeTokenSet;
         }
-        if (importedTokens[parent]) {
-          importedTokens[parent].push(token);
+
+        // Check if the token already exists in the respective parent token set
+        const existingToken = existingTokens[parent] && existingTokens[parent].find((existingToken) => existingToken.name === token.name);
+        if (existingToken) {
+          existingTokens[parent][existingTokens[parent].indexOf(existingToken)] = token;
         } else {
-          importedTokens[parent] = [token];
+          // Check if there is a parent for the token
+          if (!importTokens[parent]) {
+            importTokens[parent] = [];
+          }
+          importTokens[parent].push(token);
         }
       });
 
+      const merged = deepmerge(existingTokens, importTokens);
       return {
         ...state,
-        tokens: { ...importedTokens, ...state.tokens },
+        tokens: merged,
       };
     },
     createToken: (state, data: UpdateTokenPayload) => {
@@ -347,15 +357,13 @@ export const tokenState = createModel<RootModel>()({
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedVariables).forEach((values) => {
         values.forEach((token) => {
+          // If a set exists for the token
           if (state.tokens[token.parent]) {
             const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+            // If the token already exists
             if (oldValue) {
-              if (isEqual(oldValue.value, token.value)) {
-                if (
-                  oldValue.description !== token.description
-                ) {
-                  existingTokens.push(token);
-                }
+              if (isEqual(oldValue.value, token.value) && isEqual(oldValue.description, token.description)) {
+                existingTokens.push(token);
               } else {
                 const updatedToken = { ...token };
                 updatedToken.oldValue = oldValue.value;
