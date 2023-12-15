@@ -397,9 +397,10 @@ export default async function setValuesOnNode(
 
       // BORDER COLOR
       if (typeof values.borderColor !== 'undefined' && typeof values.borderColor === 'string') {
+        const borderColorData = data.borderColor?.replace('{', '').replace('}', '') as string;
         if ('strokes' in node && data.borderColor) {
           setBorderColorValuesOnTarget({
-            node, data: data.borderColor, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles, figmaVariableReferences,
+            node, data: borderColorData, value: values.borderColor, stylePathPrefix, stylePathSlice, styleReferences: figmaStyleReferences ?? {}, paintStyles: figmaStyleMaps.paintStyles, figmaVariableReferences,
           });
         }
       }
