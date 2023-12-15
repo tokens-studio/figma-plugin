@@ -350,13 +350,19 @@ describe('useToken test', () => {
   it('remapTokensInGroup', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection'], result: true }));
+    const mockTokensToRename = [
+      {
+        oldName: 'old.padding-start',
+        newName: 'new.padding-start',
+      },
+    ];
     await act(async () => {
-      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.', tokensToRename: mockTokensToRename });
     });
     expect(messageSpy).toBeCalledWith({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
-      oldName: 'old.',
-      newName: 'new.',
+      oldName: 'old.padding-start',
+      newName: 'new.padding-start',
       updateMode: UpdateMode.SELECTION,
     });
   });
