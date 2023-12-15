@@ -12,77 +12,77 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
 }));
 
-describe('ImportedTokensDialog', () => {
-  const defaultStore = {
-    tokenState: {
-      activeTokenSet: 'global',
-      tokens: {
-        global: [
-          {
-            name: 'light',
-            type: 'typography',
-            value: {
-              fontFamily: 'aria',
-              fontSize: '12',
-              fontWeight: 'bold',
-            },
+const getDefaultStore = () => ({
+  tokenState: {
+    activeTokenSet: 'global',
+    tokens: {
+      global: [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamily: 'aria',
+            fontSize: '12',
+            fontWeight: 'bold',
           },
-          {
-            name: 'opacity.50',
-            type: 'opacity',
-            value: '50%',
-          },
-        ],
-      },
-      importedTokens: {
-        newTokens: [
-          {
-            name: 'small',
-            type: 'sizing',
-            value: '12',
-            description: 'regular sizing token',
-          },
-          {
-            name: 'black',
-            type: 'color',
-            value: '#ffffff',
-            description: 'regular color token',
-          },
-          {
-            name: 'headline',
-            type: 'boxShadow',
-            value: {
-              blur: 1,
-              color: '#00000040',
-              spread: 1,
-              type: 'dropShadow',
-              x: 1,
-              y: 1,
-            },
-          },
-        ],
-        updatedTokens: [
-          {
-            name: 'light',
-            type: 'typography',
-            value: {
-              fontFamily: 'aria',
-              fontSize: '24',
-              fontWeight: 'light',
-            },
-          },
-          {
-            name: 'opacity.50',
-            type: 'opacity',
-            value: '30%',
-          },
-        ],
-      },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '50%',
+        },
+      ],
     },
-  };
+    importedTokens: {
+      newTokens: [
+        {
+          name: 'small',
+          type: 'sizing',
+          value: '12',
+          description: 'regular sizing token',
+        },
+        {
+          name: 'black',
+          type: 'color',
+          value: '#ffffff',
+          description: 'regular color token',
+        },
+        {
+          name: 'headline',
+          type: 'boxShadow',
+          value: {
+            blur: 1,
+            color: '#00000040',
+            spread: 1,
+            type: 'dropShadow',
+            x: 1,
+            y: 1,
+          },
+        },
+      ],
+      updatedTokens: [
+        {
+          name: 'light',
+          type: 'typography',
+          value: {
+            fontFamily: 'aria',
+            fontSize: '24',
+            fontWeight: 'light',
+          },
+        },
+        {
+          name: 'opacity.50',
+          type: 'opacity',
+          value: '30%',
+        },
+      ],
+    },
+  },
+});
 
+describe('ImportedTokensDialog', () => {
   it('shows dialog with newTokenlist and updateTokenlist', () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -111,7 +111,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should create single token', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -153,7 +153,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should create all tokens', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -219,7 +219,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should ignore a new token', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -281,7 +281,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should update a token', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -317,7 +317,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should update all tokens', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -354,7 +354,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should ignore an existing token', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -393,7 +393,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should import all tokens', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
@@ -450,7 +450,7 @@ describe('ImportedTokensDialog', () => {
   });
 
   it('should be able to close by clicking the close button', async () => {
-    const mockStore = createMockStore(defaultStore);
+    const mockStore = createMockStore(getDefaultStore());
     const result = render(
       <Provider store={mockStore}>
         <ImportedTokensDialog />
