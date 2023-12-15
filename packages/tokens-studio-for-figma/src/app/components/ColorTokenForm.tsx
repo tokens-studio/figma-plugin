@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import { useUIDSeed } from 'react-uid';
 import { useTranslation } from 'react-i18next';
-import { IconButton, Heading, DropdownMenu } from '@tokens-studio/ui';
+import {
+  IconButton, Heading, Select,
+} from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
 import { EditTokenObject } from '@/types/tokens';
@@ -11,8 +13,6 @@ import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import ColorPicker from './ColorPicker';
 import { checkIfContainsAlias, getAliasValue } from '@/utils/alias';
-import { DropdownMenuRadioElement } from './DropdownMenuRadioElement';
-import IconToggleableDisclosure from './IconToggleableDisclosure';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { ColorModifier, MixModifier } from '@/types/Modifier';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -264,44 +264,18 @@ export default function ColorTokenForm({
               },
             }}
             >
-              <DropdownMenu open={operationMenuOpened} onOpenChange={handleOperationToggleMenu}>
-                <DropdownMenu.Trigger
-                  data-testid="colortokenform-operation-selector"
-                  bordered
-                  css={{
-                    flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
-                  }}
-                >
-                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'}</span>
-                  <IconToggleableDisclosure />
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                    <DropdownMenu.RadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type}>
-                      {Object.values(ColorModifierTypes).map((operation, index) => <DropdownMenuRadioElement key={`operation-${seed(index)}`} item={operation} index={index} itemSelected={onOperationSelected} />)}
-                    </DropdownMenu.RadioGroup>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu>
-              <DropdownMenu open={colorSpaceMenuOpened} onOpenChange={handleColorSpaceToggleMenu}>
-                <DropdownMenu.Trigger
-                  data-testid="colortokenform-colorspace-selector"
-                  bordered
-                  css={{
-                    flex: 1, height: '$10', display: 'flex', justifyContent: 'space-between',
-                  }}
-                >
-                  <span>{internalEditToken?.$extensions?.['studio.tokens']?.modify?.space || 'Choose a color space'}</span>
-                  <IconToggleableDisclosure />
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content sideOffset={2} className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-                    <DropdownMenu.RadioGroup value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space}>
-                      {Object.values(ColorSpaceTypes).map((colorSpace, index) => <DropdownMenuRadioElement key={`colorspace-${seed(index)}`} item={colorSpace} index={index} itemSelected={onColorSpaceSelected} />)}
-                    </DropdownMenu.RadioGroup>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu>
+              <Select data-testid="colortokenform-operation-selector" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'} onValueChange={onOperationSelected}>
+                <Select.Trigger label="Operation" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'} />
+                <Select.Content>
+                  {Object.values(ColorModifierTypes).map((operation, index) => <Select.Item key={`operation-${seed(index)}`} value={operation}>{operation}</Select.Item>)}
+                </Select.Content>
+              </Select>
+              <Select data-testid="colortokenform-colorspace-selector" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space || 'Choose a color space'} onValueChange={onColorSpaceSelected}>
+                <Select.Trigger css={{ flexGrow: 1 }} label="Space" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.space || 'Choose a color space'} />
+                <Select.Content>
+                  {Object.values(ColorSpaceTypes).map((colorSpace, index) => <Select.Item key={`colorspace-${seed(index)}`} value={colorSpace}>{colorSpace}</Select.Item>)}
+                </Select.Content>
+              </Select>
             </Box>
             {
               internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX && (

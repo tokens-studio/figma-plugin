@@ -1,12 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu } from '@tokens-studio/ui';
-import IconChevronDown from '@/icons/chevrondown.svg';
+import { DropdownMenu, Button } from '@tokens-studio/ui';
 import useTokens from '../store/useTokens';
 
 import { editProhibitedSelector, themeOptionsSelector } from '@/selectors';
-import Box from './Box';
 
 export default function StylesDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -18,13 +16,10 @@ export default function StylesDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenu.Trigger>
-        <span>
+      <DropdownMenu.Trigger asChild>
+        <Button variant="invisible" size="small" asDropdown>
           {t('stylesAndVariables')}
-        </span>
-        <Box css={{ flexShrink: 0 }}>
-          <IconChevronDown />
-        </Box>
+        </Button>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content side="top">

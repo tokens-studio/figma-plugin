@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu } from '@tokens-studio/ui';
+import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
@@ -40,11 +40,11 @@ export default function SettingsDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenu.Trigger data-testid="bottom-bar-settings">
-        <GearIcon />
+      <DropdownMenu.Trigger asChild data-testid="bottom-bar-settings">
+        <IconButton variant="invisible" icon={<GearIcon />} />
       </DropdownMenu.Trigger>
 
-      <DropdownMenu.Content side="top">
+      <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>
         <DropdownMenu.CheckboxItem
           data-testid="update-on-change"
           checked={updateOnChange}

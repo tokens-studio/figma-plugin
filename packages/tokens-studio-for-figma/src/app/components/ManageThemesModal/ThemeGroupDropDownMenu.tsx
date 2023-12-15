@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { DropdownMenu } from '@tokens-studio/ui';
+import { useTranslation } from 'react-i18next';
 import Box from '../Box';
 import { IconPlus } from '@/icons';
 
@@ -14,6 +15,7 @@ type Props = {
 export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   availableGroups, selectedGroup, onChange, addGroup,
 }) => {
+  const { t } = useTranslation(['tokens']);
   const handleSelectGroup = useCallback((groupName: string) => {
     onChange(groupName);
   }, [onChange]);
@@ -27,11 +29,9 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
           // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
-        <Box css={{ width: '$5', marginRight: '$2' }}>
-          <DropdownMenu.ItemIndicator>
-            <CheckIcon />
-          </DropdownMenu.ItemIndicator>
-        </Box>
+        <DropdownMenu.ItemIndicator>
+          <CheckIcon />
+        </DropdownMenu.ItemIndicator>
         <Box>
           {groupName}
         </Box>
@@ -55,19 +55,17 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content side="bottom">
-          <DropdownMenu.RadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
-            {
-            themeGroupList
-          }
+          <DropdownMenu.RadioGroup value={selectedGroup ?? ''}>
+            {themeGroupList}
           </DropdownMenu.RadioGroup>
           <DropdownMenu.Separator />
           <DropdownMenu.Item
             css={{
-              paddingLeft: '$6',
+              paddingLeft: '$7',
             }}
             onSelect={addGroup}
           >
-            Create new group
+            {t('createNewGroup')}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

@@ -2,23 +2,16 @@ import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu } from '@tokens-studio/ui';
+import { DropdownMenu, Button } from '@tokens-studio/ui';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 
-import { Flex } from '../Flex';
 import Text from '../Text';
-import { styled } from '@/stitches.config';
-import IconToggleableDisclosure from '@/app/components/IconToggleableDisclosure';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
 import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
-
-const ThemeDropdownLabel = styled(Text, {
-  marginRight: '$2',
-});
 
 type AvailableTheme = {
   value: string
@@ -81,14 +74,10 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
-        <Box css={{ width: '$5', marginRight: '$2' }}>
-          <DropdownMenu.ItemIndicator>
-            <CheckIcon />
-          </DropdownMenu.ItemIndicator>
-        </Box>
-        <Box>
-          {label}
-        </Box>
+        <DropdownMenu.ItemIndicator>
+          <CheckIcon />
+        </DropdownMenu.ItemIndicator>
+        {label}
       </DropdownMenu.RadioItem>
     );
   }), [handleSelectTheme]);
@@ -101,7 +90,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           return (
             filteredThemes.length > 0 && (
               <DropdownMenu.RadioGroup key={groupName} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-                <Text css={{ color: '$contextMenuFgMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                <Text css={{ color: '$fgSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
                 {
                   renderThemeOption(filteredThemes)
                 }
@@ -114,45 +103,46 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   ), [availableThemes, groupNames, activeTheme, renderThemeOption]);
 
   return (
-    <Flex alignItems="center" css={{ flexShrink: 1, overflow: 'hidden' }}>
-      <DropdownMenu>
-        <DropdownMenu.Trigger data-testid="themeselector-dropdown">
-          <Flex>
-            <ThemeDropdownLabel muted size="xsmall">
-              {t('theme')}
-              :
-            </ThemeDropdownLabel>
-            <Text size="xsmall">{activeThemeLabel}</Text>
-          </Flex>
-          <IconToggleableDisclosure css={{ flexShrink: 0 }} />
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            data-testid="themeselector-dropdown-content"
-            side="bottom"
-            css={{ minWidth: '180px' }}
+    <DropdownMenu>
+      <DropdownMenu.Trigger asChild data-testid="themeselector-dropdown">
+        <Button size="small" variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
+          <Box css={{
+            marginRight: '$2',
+            color: '$fgSubtle',
+          }}
           >
-            {availableThemes.length === 0 && (
-              <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-                <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
-              </DropdownMenu.RadioItem>
-            )}
-            {availableThemeOptions}
-            <DropdownMenu.Separator />
-            <DropdownMenu.Item
-              data-testid="themeselector-managethemes"
-              css={{
-                paddingLeft: '$6', fontSize: '$xsmall', display: 'flex', justifyContent: 'space-between',
-              }}
-              disabled={!tokenThemes}
-              onSelect={handleManageThemes}
-            >
-              <span>{t('manageThemes')}</span>
-              {!tokenThemes && <ProBadge compact />}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu>
-    </Flex>
+            {t('theme')}
+            :
+          </Box>
+          {activeThemeLabel}
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          data-testid="themeselector-dropdown-content"
+          side="bottom"
+          css={{ minWidth: '180px' }}
+        >
+          {availableThemes.length === 0 && (
+          <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+            <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+          </DropdownMenu.RadioItem>
+          )}
+          {availableThemeOptions}
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item
+            data-testid="themeselector-managethemes"
+            css={{
+              paddingLeft: '$7', display: 'flex', justifyContent: 'space-between',
+            }}
+            disabled={!tokenThemes}
+            onSelect={handleManageThemes}
+          >
+            <span>{t('manageThemes')}</span>
+            {!tokenThemes && <ProBadge compact />}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu>
   );
 };

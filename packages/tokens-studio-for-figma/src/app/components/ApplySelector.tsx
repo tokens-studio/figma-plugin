@@ -47,6 +47,8 @@ export default function ApplySelector() {
       <DropdownMenu>
         <DropdownMenu.Trigger
           css={{
+            borderTopRightRadius: '$medium',
+            borderBottomRightRadius: '$medium',
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
             backgroundColor: '$buttonPrimaryBgRest',
@@ -54,7 +56,7 @@ export default function ApplySelector() {
             alignItems: 'center',
             justifyContent: 'center',
             width: '$controlMedium',
-            borderLeft: '1px solid $buttonPrimaryBorderRest',
+            borderLeft: '1px solid $borderSubtle',
             boxShadow: '$buttonPrimaryShadow',
             color: '$buttonPrimaryFg',
             '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', boxShadow: '$buttonPrimaryShadow' },

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { Button, DropdownMenu } from '@tokens-studio/ui';
+import { Button, IconButton, DropdownMenu } from '@tokens-studio/ui';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
@@ -117,16 +117,16 @@ const StorageItem = ({ item, onEdit }: Props) => {
           </Box>
         )}
       </Stack>
-      <Box css={{ marginRight: '$3' }}>
+      <Box css={{ marginRight: '$1' }}>
         {isActive() ? <Badge text={t('active')} /> : (
-          <Button data-testid="button-storage-item-apply" variant="secondary" onClick={handleRestore}>
+          <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
             {t('apply')}
           </Button>
         )}
       </Box>
       <DropdownMenu>
-        <DropdownMenu.Trigger css={{ padding: '$2', borderRadius: '$small', background: 'none' }} data-testid="storage-item-tools-dropdown">
-          <DotsVerticalIcon />
+        <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
+          <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content>

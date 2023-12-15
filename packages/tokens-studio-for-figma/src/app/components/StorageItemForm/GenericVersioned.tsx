@@ -4,6 +4,7 @@ import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
   IconButton, Button, Heading, DropdownMenu,
+  Select,
 } from '@tokens-studio/ui';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
@@ -141,40 +142,20 @@ export default function GenericVersionedForm({
           name="id"
           required
         />
-        <DropdownMenu>
-          <Stack direction="column" gap={0}>
-            <Label htmlFor="flow-dropdown">{t('providers.generic.flowType')}</Label>
-            <DropdownMenu.Trigger id="flow-dropdown" bordered data-testid="flow-dropdown">
-              <Text size="small">{flow}</Text>
-              <TriangleDownIcon />
-            </DropdownMenu.Trigger>
-          </Stack>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              side="bottom"
-              css={{ minWidth: '100%' }}
-            >
-              <DropdownMenu.RadioGroup onValueChange={handleValueChange}>
-                <DropdownMenu.RadioItem value={GenericVersionedStorageFlow.READ_ONLY}>
-                  <Text>
-                    {t('providers.generic.readOnly')}
-                  </Text>
-                </DropdownMenu.RadioItem>
-                <DropdownMenu.RadioItem value={GenericVersionedStorageFlow.READ_WRITE}>
-                  <Text>
-                    {t('providers.generic.readWrite')}
-                  </Text>
-                </DropdownMenu.RadioItem>
-                <DropdownMenu.RadioItem value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
-                  <Text>
-                    {t('providers.generic.readWriteCreate')}
-
-                  </Text>
-                </DropdownMenu.RadioItem>
-              </DropdownMenu.RadioGroup>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu>
+        <Select value={flow} onValueChange={handleValueChange}>
+          <Select.Trigger data-testid="flow-dropdown" value={flow} label={t('providers.generic.flowType')} />
+          <Select.Content>
+            <Select.Item value={GenericVersionedStorageFlow.READ_ONLY}>
+              {t('providers.generic.readOnly')}
+            </Select.Item>
+            <Select.Item value={GenericVersionedStorageFlow.READ_WRITE}>
+              {t('providers.generic.readWrite')}
+            </Select.Item>
+            <Select.Item value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
+              {t('providers.generic.readWriteCreate')}
+            </Select.Item>
+          </Select.Content>
+        </Select>
         <Stack direction="column" gap={4}>
           <Heading>{t('providers.generic.additionalHeaders')}</Heading>
           {headers.map((x, i) => (

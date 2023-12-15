@@ -80,8 +80,8 @@ function Inspector() {
             placeholder={`${t('search')}...`}
           />
         </Box>
-        <Stack direction="row" align="center" gap={4}>
-          <Stack direction="row" align="center" gap={2}>
+        <Stack direction="row" align="center" gap={2}>
+          <Stack direction="row" align="center">
             <Checkbox
               checked={inspectDeep}
               id="inspectDeep"
@@ -89,7 +89,10 @@ function Inspector() {
             />
             <Tooltip label={t('scansSelected') as string} side="bottom">
               <Label htmlFor="inspectDeep">
-                <Box css={{ fontWeight: '$sansBold', fontSize: '$small' }}>
+                <Box css={{
+                  fontWeight: '$sansBold', fontSize: '$xsmall', padding: '$2',
+                }}
+                >
                   {t('deepInspect')}
                 </Box>
               </Label>

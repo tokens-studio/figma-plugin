@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu } from '@tokens-studio/ui';
-import IconChevronDown from '@/icons/chevrondown.svg';
+import { DropdownMenu, Button } from '@tokens-studio/ui';
 
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
@@ -34,11 +33,10 @@ export default function ToolsDropdown() {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenu.Trigger>
-          <span>
+        <DropdownMenu.Trigger asChild>
+          <Button variant="invisible" size="small" asDropdown>
             {t('tools')}
-          </span>
-          <IconChevronDown />
+          </Button>
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Content side="top">

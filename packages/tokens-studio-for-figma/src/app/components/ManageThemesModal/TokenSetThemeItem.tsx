@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { Button, DropdownMenu } from '@tokens-studio/ui';
+import { Button, DropdownMenu, Select } from '@tokens-studio/ui';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import Box from '../Box';
@@ -86,24 +86,16 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
               {item.label}
             </StyledThemeLabel>
           </Button>
-          <DropdownMenu>
-            <DropdownMenu.Trigger data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`}>
-              <span>{tokenSetSatusLabels[tokenSetStatus]}</span>
-              <IconChevronDown />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content side="bottom">
-              <DropdownMenu.RadioGroup value={tokenSetStatus} onValueChange={handleValueChange}>
-                {tokenSetStatusValues.map((status) => (
-                  <DropdownMenu.RadioItem key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
-                    <DropdownMenu.ItemIndicator>
-                      <CheckIcon />
-                    </DropdownMenu.ItemIndicator>
-                    {tokenSetSatusLabels[status]}
-                  </DropdownMenu.RadioItem>
-                ))}
-              </DropdownMenu.RadioGroup>
-            </DropdownMenu.Content>
-          </DropdownMenu>
+          <Select value={tokenSetStatus} onValueChange={handleValueChange}>
+            <Select.Trigger value={tokenSetSatusLabels[tokenSetStatus]} data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`} />
+            <Select.Content>
+              {tokenSetStatusValues.map((status) => (
+                <Select.Item key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
+                  {tokenSetSatusLabels[status]}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
         </Stack>
         )}
       </Stack>
