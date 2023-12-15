@@ -141,5 +141,6 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     }
     return acc;
   }, {});
+
   notifyVariableValues(returnedObject);
 }
