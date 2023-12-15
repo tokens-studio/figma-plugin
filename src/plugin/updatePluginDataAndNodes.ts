@@ -61,7 +61,7 @@ export async function updatePluginDataAndNodes({
         if (typeof rawTokenMap.borderColor !== undefined && typeof mappedValues.borderColor === 'string') {
           const resolvedToken = tokensMap.get(tokenValues.border as string);
           if (resolvedToken && resolvedToken.rawValue && typeof resolvedToken.rawValue === 'object') {
-            rawTokenMap.borderColor = resolvedToken.rawValue.color;
+            if ('color' in resolvedToken.rawValue) rawTokenMap.borderColor = resolvedToken.rawValue.color as string;
           }
         }
 
