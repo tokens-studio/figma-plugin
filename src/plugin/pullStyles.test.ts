@@ -3,7 +3,7 @@ import pullStyles from './pullStyles';
 import * as notifiers from './notifiers';
 
 describe('pullStyles', () => {
-  const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyVariableValues');
+  const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyStyleValues');
 
   it('pulls color styles', async () => {
     figma.getLocalPaintStyles.mockReturnValue([

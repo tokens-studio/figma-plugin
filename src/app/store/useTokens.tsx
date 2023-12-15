@@ -162,7 +162,7 @@ export default function useTokens() {
       text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
-        { key: 'useDimension', label: 'Convert numbers to dimensions', enabled: true },
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
         { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
       ],
       confirmAction: 'Import',
@@ -173,7 +173,7 @@ export default function useTokens() {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.PULL_VARIABLES,
         options: {
-          useDimensions: userDecision.data.includes('useDimension'),
+          useDimensions: userDecision.data.includes('useDimensions'),
           useRem: userDecision.data.includes('useRem'),
         },
       });
