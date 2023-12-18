@@ -50,6 +50,7 @@ describe('updatePluginDataAndNodes', () => {
       {
         borderRadius: 'none',
         fill: 'red',
+        spacing: 'delete',
       },
       figmaStyleMaps,
       {},
