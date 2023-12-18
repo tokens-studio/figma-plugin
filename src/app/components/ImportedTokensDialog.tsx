@@ -30,7 +30,7 @@ function NewOrExistingToken({
   removeToken: (token: ImportToken, index: number) => void;
   updateToken: (token: ImportToken, index: number) => void;
 }) {
-  const { t } = useTranslation(['tokens']);
+  const { t } = useTranslation(['general', 'tokens']);
   const onRemoveToken = React.useCallback(() => {
     removeToken(token, index);
   }, [removeToken, token, index]);
@@ -169,9 +169,11 @@ export default function ImportedTokensDialog() {
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
+  const ListLength = 15;
+
   return (
     <Modal
-      title="Import"
+      title={t('imported', { ns: 'tokens' })}
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
@@ -198,13 +200,13 @@ export default function ImportedTokensDialog() {
                 <Count count={newTokens.length} />
                 {' '}
                 <Button variant="secondary" id="button-import-create-all" onClick={handleCreateAllClick}>
-                  {t('createAll')}
+                  {t('createAll', { ns: 'tokens' })}
                 </Button>
               </Stack>
             )}
           >
             {
-              newTokens.slice(0, 4).map((token, index) => (
+              newTokens.slice(0, ListLength - 1).map((token, index) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
                   index={index}
@@ -216,16 +218,18 @@ export default function ImportedTokensDialog() {
               ))
 }
             {' '}
-            {newTokens.length > 4 && (
+            {newTokens.length > ListLength && (
             <Text
               css={{ marginBlockStart: '$3' }}
               size="small"
             >
-              ...and
+              ...
               {' '}
-              {newTokens.length}
+              {t('and', { ns: 'general' })}
               {' '}
-              more
+              {newTokens.length - ListLength}
+              {' '}
+              {t('more', { ns: 'general' })}
 
             </Text>
             )}
@@ -247,7 +251,7 @@ export default function ImportedTokensDialog() {
             )}
           >
             {
-              updatedTokens.slice(0, 4).map((token, index) => (
+              updatedTokens.slice(0, ListLength).map((token, index) => (
                 <NewOrExistingToken
                   key={token.parent + token.name}
                   token={token}
@@ -261,11 +265,13 @@ export default function ImportedTokensDialog() {
             { updatedTokens.length > 4 && (
 
             <Text css={{ marginBlockStart: '$3' }} size="small">
-              ...and
+              ...
               {' '}
-              {updatedTokens.length}
+              {t('and', { ns: 'general' })}
               {' '}
-              more
+              {updatedTokens.length - ListLength}
+              {' '}
+              {t('more', { ns: 'general' })}
             </Text>
             )}
           </Accordion>
