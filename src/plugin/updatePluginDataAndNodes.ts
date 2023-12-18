@@ -7,7 +7,6 @@ import { AnyTokenList } from '@/types/tokens';
 import { postToUI } from './notifiers';
 import { defaultWorker } from './Worker';
 import { ProgressTracker } from './ProgressTracker';
-import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { removePluginData, setNonePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
@@ -44,7 +43,6 @@ export async function updatePluginDataAndNodes({
           const jsonValue = JSON.stringify(value);
           switch (value) {
             case 'delete':
-              delete tokenValues[key as CompositionTokenProperty];
               await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: true });
               break;
             case 'none':
