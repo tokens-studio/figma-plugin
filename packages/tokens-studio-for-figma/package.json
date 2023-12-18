@@ -33,6 +33,7 @@
   "dependencies": {
     "@tokens-studio/ui": "0.3.15",
     "@tokens-studio/tokens": "0.0.24",
+    "@tokens-studio/sdk": "1.0.0",
     "@figma-plugin/helpers": "^0.15.2",
     "@gitbeaker/rest": "^39.21.2",
     "@monaco-editor/react": "^4.5.1",

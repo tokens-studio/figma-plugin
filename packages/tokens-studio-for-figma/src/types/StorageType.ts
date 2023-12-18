@@ -71,6 +71,14 @@ StorageProviderType.BITBUCKET,
 }
 >;
 
+export type TokensStudioStorageType = GenericStorageType<
+StorageProviderType.TOKENS_STUDIO,
+{
+  name: string; // this is only for refrence
+  id: string; // this is the project urn
+}
+>;
+
 export type ADOStorageType = GenericStorageType<
 StorageProviderType.ADO,
 {
@@ -110,7 +118,8 @@ export type StorageType =
   | GenericVersionedStorageType
   | ADOStorageType
   | BitbucketStorageType
-  | SupernovaStorageType;
+  | SupernovaStorageType
+  | TokensStudioStorageType;
 
 export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
@@ -120,7 +129,8 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<GenericVersionedStorageType, false>
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
-  | StorageTypeCredential<SupernovaStorageType>;
+  | StorageTypeCredential<SupernovaStorageType>
+  | StorageTypeCredential<TokensStudioStorageType>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<
@@ -154,6 +164,10 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; id?: string; provider: StorageProviderType.GENERIC_VERSIONED_STORAGE } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<GenericVersionedStorageType>, 'provider'>
+  >)
+  | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<TokensStudioStorageType>, 'provider'>
   >)
   | { new?: boolean; provider: StorageProviderType.LOCAL };
 export { StorageProviderType };

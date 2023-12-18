@@ -64,6 +64,9 @@ export default function useRemoteTokens() {
     addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova,
   } = useSupernova();
   const {
+    addNewTokensStudioCredentials, syncTokensWithTokensStudio, pushTokensToTokensStudio, pullTokensFromTokensStudio,
+  } = useTokensStudio();
+  const {
     addNewADOCredentials, syncTokensWithADO, pullTokensFromADO, pushTokensToADO, createADOBranch, fetchADOBranches,
   } = useADO();
   const { pullTokensFromURL } = useURL();
@@ -106,6 +109,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.SUPERNOVA: {
         remoteData = await pullTokensFromSupernova(context);
+        break;
+      }
+      case StorageProviderType.TOKENS_STUDIO: {
+        remoteData = await pullTokensFromTokensStudio(context);
         break;
       }
       default:
@@ -275,6 +282,10 @@ export default function useRemoteTokens() {
         await pushTokensToSupernova(context);
         break;
       }
+      case StorageProviderType.TOKENS_STUDIO: {
+        await pushTokensToTokensStudio(context);
+        break;
+      }
       default:
         throw new Error('Not implemented');
     }
@@ -344,6 +355,10 @@ export default function useRemoteTokens() {
       }
       case StorageProviderType.SUPERNOVA: {
         content = await addNewSupernovaCredentials(credentials);
+        break;
+      }
+      case StorageProviderType.TOKENS_STUDIO: {
+        content = await addNewTokensStudioCredentials(credentials);
         break;
       }
       default:
