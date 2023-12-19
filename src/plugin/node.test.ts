@@ -59,6 +59,15 @@ const borderToken = {
   },
 };
 
+const borderTokenWithAliasColor = {
+  type: TokenTypes.BORDER,
+  value: {
+    color: '{global.colors.blue}',
+    width: '12px',
+    type: 'solid',
+  },
+};
+
 const tokens = new Map([
   ['global.colors.blue',
     {
@@ -142,6 +151,14 @@ const tokens = new Map([
       value: borderToken.value,
     },
   ],
+  ['global.border.aliased',
+    {
+      ...borderTokenWithAliasColor,
+      name: 'border.aliased',
+      rawValue: borderTokenWithAliasColor.value,
+      value: borderTokenWithAliasColor.value,
+    },
+  ],
 ]);
 
 const values = [
@@ -207,7 +224,8 @@ const applyTokens = [
   { boxShadow: 'global.shadow.multiple' },
   { boxShadow: 'global.shadow.single' },
   { boxShadow: 'global.shadow.multiple' },
-  { border: 'global.border.general', borderColor: 'global.border.general' },
+  { border: 'global.border.general', borderColor: '#ff0000' },
+  { borderLeft: 'global.border.aliased', borderColor: 'global.colors.blue' },
 ];
 
 describe('mapValuesToTokens', () => {

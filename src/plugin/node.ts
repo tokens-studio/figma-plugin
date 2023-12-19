@@ -168,12 +168,28 @@ export function goToNode(id: string) {
   }
 }
 
+function removeReferenceBrackets(value: string | number): string {
+  if (String(value).startsWith('$')) return String(value).slice(1, String(value).length);
+  if (String(value).startsWith('{')) return String(value).slice(1, String(value).length - 1);
+  return String(value);
+}
+
 export function selectNodes(ids: string[]) {
   const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
     node.type !== 'PAGE' && node.type !== 'DOCUMENT'
   )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
   figma.currentPage.selection = nodes;
 }
+
+function getBorderTokenValue(tokens: Map<string, AnyTokenList[number]>, value: string) {
+  const resolvedToken = tokens.get(value);
+  let borderColorValue = value;
+  if (resolvedToken?.type === TokenTypes.BORDER && resolvedToken?.rawValue && resolvedToken?.rawValue.color) {
+    borderColorValue = removeReferenceBrackets(resolvedToken.rawValue.color);
+  }
+  return borderColorValue;
+}
+
 // Tokens: The full token object
 // Values: The values applied to the node
 export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
@@ -183,8 +199,10 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     if (resolvedToken?.rawValue) {
       Object.entries(resolvedToken?.rawValue).forEach(([property, value]) => {
         let tokenName: string = resolvedToken.name;
-        if (String(value).startsWith('$')) tokenName = String(value).slice(1, String(value).length);
-        if (String(value).startsWith('{')) tokenName = String(value).slice(1, String(value).length - 1);
+        if (typeof value === 'string' || typeof value === 'number') {
+          tokenName = removeReferenceBrackets(value);
+        }
+
         tokensInCompositionToken[property as CompositionTokenProperty] = tokenName;
       });
       const { composition, ...objExcludedCompositionToken } = values;
@@ -192,19 +210,19 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     }
   }
   if (values && values.border) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: getBorderTokenValue(tokens, values.border) }) };
   }
   if (values && values.borderTop) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: getBorderTokenValue(tokens, values.borderTop) }) };
   }
   if (values && values.borderRight) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight }) };
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: getBorderTokenValue(tokens, values.borderRight) }) };
   }
   if (values && values.borderLeft) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft }) };
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: getBorderTokenValue(tokens, values.borderLeft) }) };
   }
   if (values && values.borderBottom) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: getBorderTokenValue(tokens, values.borderBottom) }) };
   }
   return values;
 }
