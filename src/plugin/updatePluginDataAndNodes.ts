@@ -56,13 +56,6 @@ export async function updatePluginDataAndNodes({
         const rawTokenMap = destructureTokenForAlias(tokensMap, tokenValues);
         const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
 
-        if (typeof rawTokenMap.borderColor !== undefined && typeof mappedValues.borderColor === 'string') {
-          const resolvedToken = tokensMap.get(tokenValues.border as string);
-          if (resolvedToken && resolvedToken.rawValue && typeof resolvedToken.rawValue === 'object') {
-            if ('color' in resolvedToken.rawValue) rawTokenMap.borderColor = resolvedToken.rawValue.color as string;
-          }
-        }
-
         setValuesOnNode(
           node,
           mappedValues,
