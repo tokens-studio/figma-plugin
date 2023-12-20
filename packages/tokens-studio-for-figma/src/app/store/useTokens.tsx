@@ -3,6 +3,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import {
   AnyTokenList,
   SingleToken,
+  TokenToRename,
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
@@ -205,7 +206,9 @@ export default function useTokens() {
     }));
   }, [settings.updateMode]);
 
-  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName, type }: { oldGroupName: string, newGroupName: string, type: string }) => {
+  const remapTokensInGroup = useCallback(async ({
+    oldGroupName, newGroupName, type, tokensToRename,
+  }: { oldGroupName: string, newGroupName: string, type: string, tokensToRename: TokenToRename[] }) => {
     const confirmData = await confirm({
       text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
@@ -229,13 +232,13 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0] as UpdateMode);
+        await Promise.all(tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0])));
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
         track('renameVariablesInTokenGroup', { newGroupName, oldGroupName });
         const tokensInParent = tokens[activeTokenSet] ?? [];
-        const tokensToRename: { oldName: string, newName: string }[] = [];
+        const tokensToRename: TokenToRename[] = [];
         tokensInParent.map((token) => {
           if (token.name.startsWith(oldGroupName) && token.type === type) {
             tokensToRename.push({
@@ -447,7 +450,7 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
+  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
 
     const result = await wrapTransaction({ name: 'renameVariables' }, async () => AsyncMessageChannel.ReactInstance.message({

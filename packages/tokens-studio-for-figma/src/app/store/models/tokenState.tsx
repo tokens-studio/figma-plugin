@@ -12,7 +12,7 @@ import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
 import {
-  AnyTokenList, ImportToken, SingleToken, TokenStore,
+  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
 } from '@/types/tokens';
 import {
   DeleteTokenPayload,
@@ -406,7 +406,7 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
-    updateAliases: (state, data: { oldName: string; newName: string }) => {
+    updateAliases: (state, data: TokenToRename) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
         (acc, [key, values]) => {
           const newValues = values.map<SingleToken>((token) => {
