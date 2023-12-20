@@ -244,7 +244,9 @@ class TokenResolver {
         this.memo.set(memoKey, resolvedToken);
       }
 
-      resolvedToken.resolvedValueWithReferences = foundToken?.value;
+      if (foundToken?.value) {
+        resolvedToken.resolvedValueWithReferences = foundToken?.value;
+      }
 
       // And then return it
       return resolvedToken as ResolveTokenValuesResult;

@@ -727,7 +727,7 @@ describe('resolveTokenValues deep nested', () => {
     value: '#ff0000',
     type: 'color',
   }];
-  for (let i = 2; i < 10; i += 1) {
+  for (let i = 2; i < 1000; i += 1) {
     deepTokens.push({
       name: `${i}`,
       value: `{${i - 1}}`,
@@ -750,56 +750,17 @@ describe('resolveTokenValues deep nested', () => {
       resolvedValueWithReferences: '#ff0000',
       rawValue: '{1}',
     },
-    {
-      name: '3',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{1}',
-      rawValue: '{2}',
-    },
-    {
-      name: '4',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{2}',
-      rawValue: '{3}',
-    },
-    {
-      name: '5',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{3}',
-      rawValue: '{4}',
-    },
-    {
-      name: '6',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{4}',
-      rawValue: '{5}',
-    },
-    {
-      name: '7',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{5}',
-      rawValue: '{6}',
-    },
-    {
-      name: '8',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{6}',
-      rawValue: '{7}',
-    },
-    {
-      name: '9',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '{7}',
-      rawValue: '{8}',
-    },
   ];
+
+  for (let i = 3; i < 1000; i += 1) {
+    deepTokenOutput.push({
+      name: `${i}`,
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: `{${i - 2}}`,
+      rawValue: `{${i - 1}}`,
+    });
+  }
 
   it('resolves all values it can resolve', () => {
     const start = performance.now();
