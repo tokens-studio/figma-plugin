@@ -208,6 +208,7 @@ const applyTokens = [
   { boxShadow: 'global.shadow.single' },
   { boxShadow: 'global.shadow.multiple' },
   { border: 'global.border.general', borderColor: 'global.border.general' },
+  { border: 'global.border.general' },
 ];
 
 describe('mapValuesToTokens', () => {
