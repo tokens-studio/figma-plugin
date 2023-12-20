@@ -10,7 +10,6 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
-import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
@@ -36,11 +35,11 @@ export function useTokensStudio() {
   const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: TokensStudioCredentials) => {
-    const storageClient = new TokensStudioTokensStorage(context.urn, context.secret);
+    const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
     return storageClient;
   }, []);
 
-  const pushTokensToSupernova = useCallback(
+  const pushTokensToTokensStudio = useCallback(
     async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       const storage = await storageClientFactory(context);
 
@@ -52,20 +51,20 @@ export function useTokensStudio() {
         };
       }
 
-      if (
-        content
-        && isEqual(content.tokens, tokens)
-        && isEqual(content.themes, themes)
-        && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      ) {
-        notifyToUI('Nothing to commit');
-        return {
-          status: 'success',
-          tokens,
-          themes,
-          metadata: {},
-        };
-      }
+      // if (
+      //   content
+      //   && isEqual(content.tokens, tokens)
+      //   && isEqual(content.themes, themes)
+      //   && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+      // ) {
+      //   notifyToUI('Nothing to commit');
+      //   return {
+      //     status: 'success',
+      //     tokens,
+      //     themes,
+      //     metadata: {},
+      //   };
+      // }
 
       dispatch.uiState.setLocalApiState({ ...context });
       const pushSettings = await pushDialog();
@@ -85,7 +84,7 @@ export function useTokensStudio() {
             },
           );
           saveLastSyncedState(dispatch, tokens, themes, metadata);
-          dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
+          dispatch.uiState.setLocalApiState({ ...localApiState } as TokensStudioCredentials);
           dispatch.uiState.setApiData({ ...context });
           dispatch.tokenState.setTokenData({
             values: tokens,
@@ -103,18 +102,6 @@ export function useTokensStudio() {
           };
         } catch (e: any) {
           closePushDialog();
-          // Response can also be JSON because of how Supernova server works
-          try {
-            const parsedMessage = JSON.parse((e as any).message);
-            if (parsedMessage?.message) {
-              return {
-                status: 'failure',
-                errorMessage: parsedMessage.message,
-              };
-            }
-          } catch (e) {
-            console.error(e);
-          }
           return {
             status: 'failure',
             errorMessage: (e as any).message,
@@ -132,11 +119,14 @@ export function useTokensStudio() {
     [dispatch, storageClientFactory, pushDialog, closePushDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
   );
 
-  const pullTokensFromSupernova = useCallback(async (context: SupernovaCredentials): Promise<RemoteResponseData | null> => {
+  const pullTokensFromTokensStudio = useCallback(async (context: TokensStudioCredentials): Promise<RemoteResponseData | null> => {
+    console.log('Pulling tokens', context);
     const storage = storageClientFactory(context);
 
     try {
+      console.log('TRying to retrieve');
       const content = await storage.retrieve();
+      console.log('CONTENT', content);
       if (content?.status === 'failure') {
         return {
           status: 'failure',
@@ -163,25 +153,44 @@ export function useTokensStudio() {
     storageClientFactory,
   ]);
 
-  // Function to initially check auth and sync tokens with Supernova
-  const syncTokensWithSupernova = useCallback(
-    async (context: SupernovaCredentials): Promise<RemoteResponseData> => {
+  async function validateCredentials(context: TokensStudioCredentials): Promise<RemoteResponseData> {
+    try {
+      const data = await pullTokensFromTokensStudio(context);
+      console.log('DATA AFTER VAL', data);
+      if (!data) {
+        throw new Error();
+      }
+      return {
+        status: 'success',
+        tokens: {},
+        themes: [],
+        metadata: {},
+      };
+    } catch (e) {
+      console.log(e);
+      throw new Error(JSON.stringify(e));
+    }
+  }
+
+  // Function to initially check auth and sync tokens with Tokens Studio
+  const syncTokensWithTokensStudio = useCallback(
+    async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       try {
-        return (await pushTokensToSupernova(context)) as any;
+        return (await validateCredentials(context)) as any;
       } catch (e) {
-        notifyToUI('Error syncing with Supernova, check credentials', { error: true });
+        notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',
-          errorMessage: 'Beta error message',
+          errorMessage: JSON.stringify(e),
         };
       }
     },
-    [pushTokensToSupernova],
+    [pushTokensToTokensStudio],
   );
 
-  const addNewSupernovaCredentials = useCallback(
-    async (context: SupernovaFormValues): Promise<RemoteResponseData> => {
-      const data = await syncTokensWithSupernova(context);
+  const addNewTokensStudioCredentials = useCallback(
+    async (context: TokensStudioFormValues): Promise<RemoteResponseData> => {
+      const data = await syncTokensWithTokensStudio(context);
       if (!data) {
         return {
           status: 'failure',
@@ -209,16 +218,16 @@ export function useTokensStudio() {
         metadata: {},
       };
     },
-    [syncTokensWithSupernova, tokens, themes, dispatch.tokenState, usedTokenSet, activeTheme],
+    [syncTokensWithTokensStudio, tokens, themes, dispatch.tokenState, usedTokenSet, activeTheme],
   );
 
   return useMemo(
     () => ({
-      addNewSupernovaCredentials,
-      syncTokensWithSupernova,
-      pushTokensToSupernova,
-      pullTokensFromSupernova,
+      addNewTokensStudioCredentials,
+      syncTokensWithTokensStudio,
+      pushTokensToTokensStudio,
+      pullTokensFromTokensStudio,
     }),
-    [addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova],
+    [addNewTokensStudioCredentials, syncTokensWithTokensStudio, pushTokensToTokensStudio, pullTokensFromTokensStudio],
   );
 }

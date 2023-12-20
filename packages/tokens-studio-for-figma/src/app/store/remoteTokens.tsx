@@ -29,6 +29,7 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
 import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
+import { useTokensStudio } from './providers/tokens-studio';
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials,
