@@ -232,7 +232,7 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await Promise.all(tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0])));
+        await Promise.all(tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0] as UpdateMode)));
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
