@@ -134,7 +134,7 @@ function Settings() {
         )}
         <SyncSettings />
         <Divider />
-        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+        <Stack direction="column" align="start" gap={3} css={{ padding: '0 $4' }}>
           <Heading size="medium">{t('settings')}</Heading>
           <Stack direction="row" gap={3} align="start">
             <Checkbox
@@ -202,10 +202,7 @@ function Settings() {
 
           </Box>
           <RemConfiguration />
-          <Stack direction="row" gap={2} align="center">
-            <Heading size="small">{t('language')}</Heading>
-            <LanguageSelector />
-          </Stack>
+          <LanguageSelector />
         </Stack>
         <Divider />
         <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>

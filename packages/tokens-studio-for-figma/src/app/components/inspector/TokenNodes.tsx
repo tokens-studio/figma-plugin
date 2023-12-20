@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Crosshair2Icon } from '@radix-ui/react-icons';
-import { IconButton } from '@tokens-studio/ui';
+import {
+  DropdownMenu, Stack, Button, IconButton,
+} from '@tokens-studio/ui';
 import Box from '../Box';
 import IconLayers from '@/icons/layers.svg';
 import { selectNodes } from '@/utils/figma/selectNodes';
@@ -40,12 +41,11 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   );
 
   return (
-    <Box
-      css={{
-        display: 'flex',
-      }}
+    <Stack
+      align="center"
+      gap={1}
     >
-      <DropdownMenu.Root>
+      <DropdownMenu>
         <Box
           css={{
             display: 'flex',
@@ -55,41 +55,22 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
             fontSize: '$small',
           }}
         >
-          <DropdownMenu.Trigger>
-            <Box
-              css={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '$2 $3',
-                borderRadius: '$small',
-                cursor: 'pointer',
-                transition: 'background 200ms ease',
-                '&:hover': {
-                  background: '$bgSubtle',
-                },
-              }}
-            >
-              <Box css={{ color: '$fgSubtle', marginRight: '$3' }}>
-                <IconLayers />
-              </Box>
-              <Box css={{ color: '$fgMuted' }}>{nodes.length}</Box>
-            </Box>
+          <DropdownMenu.Trigger asChild>
+            <Button variant="invisible" size="small" icon={<IconLayers />}>
+              {nodes.length}
+            </Button>
           </DropdownMenu.Trigger>
           {dropdownContent}
         </Box>
-      </DropdownMenu.Root>
+      </DropdownMenu>
       <IconButton
         tooltip="Select all"
         tooltipSide="bottom"
         onClick={selectAllNodes}
-        css={{
-          marginLeft: '$4',
-        }}
         variant="invisible"
         size="small"
         icon={<Crosshair2Icon />}
       />
-    </Box>
+    </Stack>
   );
 }

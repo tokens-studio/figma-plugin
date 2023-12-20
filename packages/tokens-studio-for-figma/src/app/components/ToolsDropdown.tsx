@@ -1,10 +1,8 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import IconChevronDown from '@/icons/chevrondown.svg';
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from './DropdownMenu';
+import { DropdownMenu, Button } from '@tokens-studio/ui';
+
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
@@ -35,17 +33,16 @@ export default function ToolsDropdown() {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <span>
+        <DropdownMenu.Trigger asChild>
+          <Button variant="invisible" size="small" asDropdown>
             {t('tools')}
-          </span>
-          <IconChevronDown />
-        </DropdownMenuTrigger>
+          </Button>
+        </DropdownMenu.Trigger>
 
-        <DropdownMenuContent side="top">
-          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenuItem>
-          <DropdownMenuItem disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenuItem>
-        </DropdownMenuContent>
+        <DropdownMenu.Content side="top">
+          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
+          <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+        </DropdownMenu.Content>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}

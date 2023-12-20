@@ -2,15 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton } from '@tokens-studio/ui';
-import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItemIndicator,
-  DropdownMenuCheckboxItem,
-} from './DropdownMenu';
+import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { inspectStateSelector } from '@/selectors';
 import { Dispatch } from '../store';
 import { isEqual } from '@/utils/isEqual';
@@ -32,34 +24,34 @@ export default function InspectSearchOptionDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild data-testid="inspect-search-option-dropdown">
+      <DropdownMenu.Trigger asChild data-testid="inspect-search-option-dropdown">
         <IconButton icon={<IconSettings />} variant="invisible" tooltip="Options" tooltipSide="bottom" />
-      </DropdownMenuTrigger>
+      </DropdownMenu.Trigger>
 
-      <DropdownMenuPortal>
-        <DropdownMenuContent>
-          <DropdownMenuCheckboxItem
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content>
+          <DropdownMenu.CheckboxItem
             data-testid="show-broken-references"
             checked={inspectState.isShowBrokenReferences}
             onCheckedChange={handleIsShowBrokenReferences}
           >
-            <DropdownMenuItemIndicator>
+            <DropdownMenu.ItemIndicator>
               <CheckIcon />
-            </DropdownMenuItemIndicator>
+            </DropdownMenu.ItemIndicator>
             {t('showBrokenReferences')}
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
+          </DropdownMenu.CheckboxItem>
+          <DropdownMenu.CheckboxItem
             data-testid="show-resolved-references"
             checked={inspectState.isShowResolvedReferences}
             onCheckedChange={handleIsShowResolvedReferences}
           >
-            <DropdownMenuItemIndicator>
+            <DropdownMenu.ItemIndicator>
               <CheckIcon />
-            </DropdownMenuItemIndicator>
+            </DropdownMenu.ItemIndicator>
             {t('showResolvedReferences')}
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
+          </DropdownMenu.CheckboxItem>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu>
   );
 }

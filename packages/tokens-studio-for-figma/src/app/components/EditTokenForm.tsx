@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading, Textarea } from '@tokens-studio/ui';
+import {
+  Button, Heading, Textarea, Label,
+} from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -596,7 +598,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       {
           internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
             <Box>
-              <Heading size="small">{t('set', { ns: 'general' })}</Heading>
+              <Label>{t('set', { ns: 'general' })}</Label>
               <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
             </Box>
           )

@@ -1,18 +1,8 @@
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@radix-ui/react-icons';
-import { DropdownMenuPortal } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu } from '@tokens-studio/ui';
+import { useTranslation } from 'react-i18next';
 import Box from '../Box';
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  ScrollDropdownMenuRadioItem,
-  ScrollDropdownMenuItemIndicator,
-  DropdownMenuSeparator,
-} from '../DropdownMenu';
-import { styled } from '@/stitches.config';
 import { IconPlus } from '@/icons';
 
 type Props = {
@@ -22,11 +12,10 @@ type Props = {
   addGroup: () => void
 };
 
-const StyledDropdownMenuTrigger = styled(DropdownMenuTrigger, {});
-
 export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   availableGroups, selectedGroup, onChange, addGroup,
 }) => {
+  const { t } = useTranslation(['tokens']);
   const handleSelectGroup = useCallback((groupName: string) => {
     onChange(groupName);
   }, [onChange]);
@@ -34,27 +23,25 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
   const themeGroupList = React.useMemo(() => availableGroups.map((groupName) => {
     const handleSelect = () => handleSelectGroup(groupName);
     return (
-      <ScrollDropdownMenuRadioItem
+      <DropdownMenu.RadioItem
         key={groupName}
         value={groupName}
           // eslint-disable-next-line react/jsx-no-bind
         onSelect={handleSelect}
       >
-        <Box css={{ width: '$5', marginRight: '$2' }}>
-          <ScrollDropdownMenuItemIndicator>
-            <CheckIcon />
-          </ScrollDropdownMenuItemIndicator>
-        </Box>
+        <DropdownMenu.ItemIndicator>
+          <CheckIcon />
+        </DropdownMenu.ItemIndicator>
         <Box>
           {groupName}
         </Box>
-      </ScrollDropdownMenuRadioItem>
+      </DropdownMenu.RadioItem>
     );
   }), [availableGroups, handleSelectGroup]);
 
   return (
     <DropdownMenu>
-      <StyledDropdownMenuTrigger>
+      <DropdownMenu.Trigger>
         {
           selectedGroup ? (
             <span>{selectedGroup}</span>
@@ -65,25 +52,23 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
             </Box>
           )
         }
-      </StyledDropdownMenuTrigger>
-      <DropdownMenuPortal>
-        <DropdownMenuContent side="bottom">
-          <DropdownMenuRadioGroup className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={selectedGroup ?? ''}>
-            {
-            themeGroupList
-          }
-          </DropdownMenuRadioGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content side="bottom">
+          <DropdownMenu.RadioGroup value={selectedGroup ?? ''}>
+            {themeGroupList}
+          </DropdownMenu.RadioGroup>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item
             css={{
-              paddingLeft: '$6',
+              paddingLeft: '$7',
             }}
             onSelect={addGroup}
           >
-            Create new group
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenuPortal>
+            {t('createNewGroup')}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu>
   );
 };

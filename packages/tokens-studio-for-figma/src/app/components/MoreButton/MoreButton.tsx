@@ -6,15 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import copy from 'copy-to-clipboard';
 
-import { styled } from '@/stitches.config';
 import {
   ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTriggerItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from '../ContextMenu';
+} from '@tokens-studio/ui';
+import { styled } from '@/stitches.config';
 import { activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
 import { MoreButtonProperty } from './MoreButtonProperty';
@@ -33,7 +28,6 @@ import TokenButtonContent from '../TokenButton/TokenButtonContent';
 import { useGetActiveState } from '@/hooks';
 import { usePropertiesForTokenType } from '../../hooks/usePropertiesForType';
 import { getAliasValue } from '@/utils/alias';
-import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 
 const RightSlot = styled('div', {
   marginLeft: 'auto',
@@ -140,67 +134,69 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger id={`${token.name}-button}`}>
+      <ContextMenu.Trigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
-      </ContextMenuTrigger>
-      <ContextMenuPortal>
-        <ContextMenuContent alignOffset={5} collisionPadding={30}>
-          {visibleProperties.map((property) => (property.childProperties ? (
-            <ContextMenu>
-              <ContextMenuTriggerItem>
-                {property.label}
-                <RightSlot>
-                  <ChevronRightIcon />
-                </RightSlot>
-              </ContextMenuTriggerItem>
-              <ContextMenuContent alignOffset={-5} collisionPadding={30}>
-                {property.childProperties.map((childProperty) => (
-                  <MoreButtonProperty
-                    key={childProperty.name}
-                    value={token.name}
-                    property={childProperty}
-                    onClick={handleClick}
-                  />
-                ))}
-              </ContextMenuContent>
-            </ContextMenu>
-          ) : (
-            <MoreButtonProperty
-              key={property.name}
-              value={token.name}
-              property={property}
-              onClick={handleClick}
-              disabled={property.disabled}
-            />
-          )))}
-          <ContextMenu>
-            <ContextMenuTriggerItem>
+      </ContextMenu.Trigger>
+      <ContextMenu.Portal>
+        <ContextMenu.Content alignOffset={5} collisionPadding={30}>
+          <ContextMenu.Sub>
+            {visibleProperties.map((property) => (property.childProperties ? (
+              <>
+                <ContextMenu.SubTrigger>
+                  {property.label}
+                  <RightSlot>
+                    <ChevronRightIcon />
+                  </RightSlot>
+                </ContextMenu.SubTrigger>
+                <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
+                  {property.childProperties.map((childProperty) => (
+                    <MoreButtonProperty
+                      key={childProperty.name}
+                      value={token.name}
+                      property={childProperty}
+                      onClick={handleClick}
+                    />
+                  ))}
+                </ContextMenu.Content>
+              </>
+            ) : (
+              <MoreButtonProperty
+                key={property.name}
+                value={token.name}
+                property={property}
+                onClick={handleClick}
+                disabled={property.disabled}
+              />
+            )))}
+          </ContextMenu.Sub>
+          <ContextMenu.Sub>
+            <ContextMenu.SubTrigger>
               Documentation Tokens
               <RightSlot>
                 <ChevronRightIcon />
               </RightSlot>
-            </ContextMenuTriggerItem>
-            <ContextMenuContent alignOffset={-5} collisionPadding={30}>
+            </ContextMenu.SubTrigger>
+            <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
               {DocumentationProperties.map((property) => (
                 <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
               ))}
-            </ContextMenuContent>
-          </ContextMenu>
-          <ContextMenuSeparator />
-          <ContextMenuItem onSelect={handleEditClick} disabled={editProhibited}>
+            </ContextMenu.Content>
+          </ContextMenu.Sub>
+          <ContextMenu.Separator />
+          <ContextMenu.Item onSelect={handleEditClick} disabled={editProhibited}>
             Edit Token
-          </ContextMenuItem>
-          <ContextMenuItem onSelect={handleDuplicateClick} disabled={editProhibited}>
+          </ContextMenu.Item>
+          <ContextMenu.Item onSelect={handleDuplicateClick} disabled={editProhibited}>
             Duplicate Token
-          </ContextMenuItem>
-          <ContextMenuItem onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
+          </ContextMenu.Item>
+          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
             Copy Token Path
-          </ContextMenuItem>
-          <ContextMenuItem onSelect={handleDeleteClick} disabled={editProhibited}>
+          </ContextMenu.Item>
+          <ContextMenu.Item onSelect={handleDeleteClick} disabled={editProhibited}>
             Delete Token
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenuPortal>
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Portal>
     </ContextMenu>
   );
 };

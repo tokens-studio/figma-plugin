@@ -1,14 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
-import { StyledIconDisclosure, StyledInputSuffix } from './StyledInputSuffix';
-import Box from './Box';
-import { StyledInput } from './Input';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from './DropdownMenu';
+import { DropdownMenu, Button } from '@tokens-studio/ui';
 
 import { MultiSelectCheckboxItem } from './MultiSelectCheckboxItem';
 
@@ -40,24 +33,16 @@ export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildre
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger css={{ width: '100%', padding: '0' }}>
-        <Box
-          css={{
-            display: 'flex', position: 'relative', width: '100%', flexGrow: 1,
-          }}
-          className="input"
-        >
-          <StyledInput placeholder={t('selectTokenSets')} value={selectedItemsString} readOnly />
-          <StyledInputSuffix type="button">
-            <StyledIconDisclosure />
-          </StyledInputSuffix>
-        </Box>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
+      <DropdownMenu.Trigger asChild css={{ width: '100%' }}>
+        <Button asDropdown>
+          {selectedItemsString}
+        </Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content side="bottom" className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
         {
           menuItems.map((menuItem, index) => <MultiSelectCheckboxItem key={`multi_checkbox_${seed(index)}`} item={menuItem} isSelected={selectedItems.includes(menuItem)} onItemSelected={handleSelectedItem} />)
         }
-      </DropdownMenuContent>
+      </DropdownMenu.Content>
     </DropdownMenu>
   );
 };

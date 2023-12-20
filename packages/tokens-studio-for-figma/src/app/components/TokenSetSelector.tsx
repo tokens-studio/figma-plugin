@@ -10,28 +10,11 @@ import Input from './Input';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import Box from './Box';
-import { styled } from '@/stitches.config';
 import {
   editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import OnboardingExplainer from './OnboardingExplainer';
-
-const StyledButton = styled('button', {
-  flexShrink: 0,
-  width: '100%',
-  fontSize: '$xsmall',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '$3 $4 $3 $5',
-  gap: '$2',
-  '&:focus, &:hover': {
-    outline: 'none',
-    boxShadow: 'none',
-    backgroundColor: '$bgSubtle',
-  },
-});
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const { t } = useTranslation(['tokens']);
@@ -235,10 +218,11 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </Stack>
         </form>
       </Modal>
-      <StyledButton data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
-        {t('sets.new')}
-        <IconAdd />
-      </StyledButton>
+      <Stack direction="column" css={{ padding: '$3' }}>
+        <Button icon={<IconAdd />} size="small" data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+          {t('sets.new')}
+        </Button>
+      </Stack>
       {uiState.onboardingExplainerSets && (
         <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
       )}

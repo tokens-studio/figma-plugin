@@ -2,15 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
-} from './DropdownMenu';
+import { Button, DropdownMenu } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
@@ -53,8 +45,10 @@ export default function ApplySelector() {
         {updateMode}
       </Button>
       <DropdownMenu>
-        <DropdownMenuTrigger
+        <DropdownMenu.Trigger
           css={{
+            borderTopRightRadius: '$medium',
+            borderBottomRightRadius: '$medium',
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
             backgroundColor: '$buttonPrimaryBgRest',
@@ -62,7 +56,7 @@ export default function ApplySelector() {
             alignItems: 'center',
             justifyContent: 'center',
             width: '$controlMedium',
-            borderLeft: '1px solid $buttonPrimaryBorderRest',
+            borderLeft: '1px solid $borderSubtle',
             boxShadow: '$buttonPrimaryShadow',
             color: '$buttonPrimaryFg',
             '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', boxShadow: '$buttonPrimaryShadow' },
@@ -70,47 +64,47 @@ export default function ApplySelector() {
           data-testid="apply-selector"
         >
           <IconChevronDown />
-        </DropdownMenuTrigger>
+        </DropdownMenu.Trigger>
 
-        <DropdownMenuContent side="top">
-          <DropdownMenuRadioGroup value={updateMode}>
-            <DropdownMenuRadioItem
+        <DropdownMenu.Content side="top">
+          <DropdownMenu.RadioGroup value={updateMode}>
+            <DropdownMenu.RadioItem
               data-testid="apply-to-selection"
               value={UpdateMode.SELECTION}
               onSelect={handleApplySelection}
             >
-              <DropdownMenuItemIndicator>
+              <DropdownMenu.ItemIndicator>
                 <DotFilledIcon />
-              </DropdownMenuItemIndicator>
+              </DropdownMenu.ItemIndicator>
               {t('applyTo.selection.title')}
               <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.selection.description')}
               </Box>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
-              <DropdownMenuItemIndicator>
+            </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+              <DropdownMenu.ItemIndicator>
                 <DotFilledIcon />
-              </DropdownMenuItemIndicator>
+              </DropdownMenu.ItemIndicator>
               {t('applyTo.page.title')}
               <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.page.description')}
               </Box>
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
+            </DropdownMenu.RadioItem>
+            <DropdownMenu.RadioItem
               data-testid="apply-to-document"
               value={UpdateMode.DOCUMENT}
               onSelect={handleApplyDocument}
             >
-              <DropdownMenuItemIndicator>
+              <DropdownMenu.ItemIndicator>
                 <DotFilledIcon />
-              </DropdownMenuItemIndicator>
+              </DropdownMenu.ItemIndicator>
               {t('applyTo.doc.title')}
               <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
                 {t('applyTo.doc.description')}
               </Box>
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
+            </DropdownMenu.RadioItem>
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.Content>
       </DropdownMenu>
     </Stack>
   );

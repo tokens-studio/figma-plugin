@@ -2,17 +2,11 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import Checkbox from '../Checkbox';
-import Box from '../Box';
 import {
   ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-  ContextMenuSeparator,
-  ContextMenuItemIndicator,
-  ContextMenuCheckboxItem,
-} from '../ContextMenu';
+} from '@tokens-studio/ui';
+import Checkbox from '../Checkbox';
+import Box from '../Box';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
@@ -23,7 +17,6 @@ import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
 import Tooltip from '../Tooltip';
-import { ContextMenuPortal } from '@radix-ui/react-context-menu';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -119,7 +112,7 @@ export function TokenSetItem({
     <StyledWrapper>
       <ContextMenu>
         {!item.isLeaf ? (
-          <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+          <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
             <StyledDragButton
               itemType="folder"
               type="button"
@@ -134,9 +127,9 @@ export function TokenSetItem({
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
               {extraBefore}
             </StyledDragButton>
-          </ContextMenuTrigger>
+          </ContextMenu.Trigger>
         ) : (
-          <ContextMenuTrigger asChild id={`${item.path}-trigger`}>
+          <ContextMenu.Trigger asChild id={`${item.path}-trigger`}>
             <StyledDragButton
               type="button"
               css={{
@@ -158,35 +151,35 @@ export function TokenSetItem({
                 {item.label}
               </Box>
             </StyledDragButton>
-          </ContextMenuTrigger>
+          </ContextMenu.Trigger>
         )}
-        <ContextMenuPortal>
-          <ContextMenuContent>
-            {canEdit && <ContextMenuItem onSelect={handleRename}>{t('rename')}</ContextMenuItem>}
+        <ContextMenu.Portal>
+          <ContextMenu.Content>
+            {canEdit && <ContextMenu.Item onSelect={handleRename}>{t('rename')}</ContextMenu.Item>}
             {item.isLeaf && (
               <>
                 {canEdit && (
                   <>
-                    <ContextMenuItem onSelect={handleDuplicate}>{t('duplicate')}</ContextMenuItem>
-                    <ContextMenuItem disabled={!canDelete} onSelect={handleDelete}>
+                    <ContextMenu.Item onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
+                    <ContextMenu.Item disabled={!canDelete} onSelect={handleDelete}>
                       {t('delete')}
-                    </ContextMenuItem>
-                    <ContextMenuSeparator />
+                    </ContextMenu.Item>
+                    <ContextMenu.Separator />
                   </>
                 )}
-                <ContextMenuCheckboxItem
+                <ContextMenu.CheckboxItem
                   checked={tokenSetStatus === TokenSetStatus.SOURCE}
                   onSelect={handleTreatAsSource}
                 >
-                  <ContextMenuItemIndicator>
+                  <ContextMenu.ItemIndicator>
                     <CheckIcon />
-                  </ContextMenuItemIndicator>
+                  </ContextMenu.ItemIndicator>
                   {t('sets.treatAsSource')}
-                </ContextMenuCheckboxItem>
+                </ContextMenu.CheckboxItem>
               </>
             )}
-          </ContextMenuContent>
-        </ContextMenuPortal>
+          </ContextMenu.Content>
+        </ContextMenu.Portal>
       </ContextMenu>
       <StyledCheckbox checked={isChecked}>
         {item.isLeaf ? (

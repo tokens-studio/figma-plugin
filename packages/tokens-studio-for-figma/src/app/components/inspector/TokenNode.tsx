@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu } from '@tokens-studio/ui';
 import NodeIcon from './NodeIcon';
 import Box from '../Box';
 import { goToNodeId } from '@/utils/figma';
