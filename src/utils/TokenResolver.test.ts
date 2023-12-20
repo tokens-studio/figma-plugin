@@ -325,13 +325,11 @@ const output = [
   {
     name: 'colors.red.500',
     rawValue: '#ff0000',
-    resolvedValueWithReferences: undefined,
     value: '#ff0000',
   },
   {
     name: 'opacity.default',
     rawValue: '0.2 + 0.2',
-    resolvedValueWithReferences: undefined,
     value: 0.4,
   },
   {
@@ -396,13 +394,11 @@ const output = [
   {
     name: 'opacity.40',
     rawValue: '40%',
-    resolvedValueWithReferences: undefined,
     value: '40%',
   },
   {
     name: 'border-radius.7',
     rawValue: '24px',
-    resolvedValueWithReferences: undefined,
     value: '24px',
   },
   {
@@ -440,7 +436,6 @@ const output = [
   {
     name: 'size.25',
     rawValue: '2px',
-    resolvedValueWithReferences: undefined,
     value: '2px',
   },
   {
@@ -582,7 +577,6 @@ const output = [
     },
     description: 'color with modifier',
     name: 'colors.modify',
-    resolvedValueWithReferences: undefined,
     rawValue: '#00a2ba',
     type: 'color',
     value: '#007182',
@@ -590,7 +584,6 @@ const output = [
   {
     description: 'color with modifier',
     name: 'colors.white',
-    resolvedValueWithReferences: undefined,
     rawValue: '#00a2ba',
     type: 'color',
     value: '#00a2ba',
@@ -627,21 +620,18 @@ const output = [
   {
     name: 'deepreference',
     value: 'IBM Plex Sans',
-    resolvedValueWithReferences: undefined,
     rawValue: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
   },
   {
     name: 'colors.lilac.500',
     value: '#ff0000',
-    resolvedValueWithReferences: undefined,
     rawValue: '#ff0000',
     type: TokenTypes.COLOR,
   },
   {
     name: 'primary',
     value: 'lilac',
-    resolvedValueWithReferences: undefined,
     rawValue: 'lilac',
     type: TokenTypes.OTHER,
   },
@@ -669,48 +659,41 @@ const output = [
   {
     name: 'numerictext-1',
     value: '003e78',
-    resolvedValueWithReferences: undefined,
     rawValue: '003e78',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-2',
     value: '000000',
-    resolvedValueWithReferences: undefined,
     rawValue: '000000',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-3',
     value: '001000',
-    resolvedValueWithReferences: undefined,
     rawValue: '001000',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-4',
     value: '06e455',
-    resolvedValueWithReferences: undefined,
     rawValue: '06e455',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-5',
     value: '013456',
-    resolvedValueWithReferences: undefined,
     rawValue: '013456',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-6',
     value: '000001',
-    resolvedValueWithReferences: undefined,
     rawValue: '000001',
     type: TokenTypes.TEXT,
   },
   {
     name: 'pure-numeric',
-    resolvedValueWithReferences: undefined,
     value: 0,
     rawValue: '0',
     type: TokenTypes.DIMENSION,
@@ -740,7 +723,6 @@ describe('resolveTokenValues deep nested', () => {
       name: '1',
       value: '#ff0000',
       type: 'color',
-      resolvedValueWithReferences: undefined,
       rawValue: '#ff0000',
     },
     {
