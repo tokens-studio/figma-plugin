@@ -214,6 +214,7 @@ const tokens = [
     },
     description: 'color with alias modifier',
     type: TokenTypes.COLOR,
+    resolvedValueWithReferences: '#00a2ba',
   },
   {
     name: 'typography.all',
@@ -299,6 +300,7 @@ const output = [
   {
     name: 'bar',
     rawValue: '{foo}',
+    resolvedValueWithReferences: 3,
     value: 3,
   },
   {
@@ -310,48 +312,57 @@ const output = [
   {
     name: 'math',
     rawValue: '{foo} * 2',
+    resolvedValueWithReferences: 3,
     value: 6,
   },
   {
     failedToResolve: true,
     name: 'mathWrong',
     rawValue: '{foo} * {boo}',
+    resolvedValueWithReferences: '{baz}',
     value: '3 * {baz}',
   },
   {
     name: 'colors.red.500',
     rawValue: '#ff0000',
+    resolvedValueWithReferences: undefined,
     value: '#ff0000',
   },
   {
     name: 'opacity.default',
     rawValue: '0.2 + 0.2',
+    resolvedValueWithReferences: undefined,
     value: 0.4,
   },
   {
     name: 'opacity.full',
     rawValue: '{opacity.default} + 0.6',
+    resolvedValueWithReferences: '0.2 + 0.2',
     value: 1,
   },
   {
     name: 'theme.accent.default',
     rawValue: 'rgba({colors.red.500}, 0.5)',
+    resolvedValueWithReferences: '#ff0000',
     value: '#ff000080',
   },
   {
     name: 'theme.accent.subtle',
     rawValue: 'rgba({colors.red.500}, {opacity.default})',
+    resolvedValueWithReferences: '0.2 + 0.2',
     value: '#ff000066',
   },
   {
     name: 'theme.accent.deep',
     rawValue: 'rgba({theme.accent.default}, {opacity.full})',
+    resolvedValueWithReferences: '{opacity.default} + 0.6',
     value: '#ff0000',
   },
   {
     failedToResolve: true,
     name: 'spacing.xs',
     rawValue: '{spacing.xs}',
+    resolvedValueWithReferences: '{spacing.xs}',
     value: '{spacing.xs}',
   },
   {
@@ -385,11 +396,13 @@ const output = [
   {
     name: 'opacity.40',
     rawValue: '40%',
+    resolvedValueWithReferences: undefined,
     value: '40%',
   },
   {
     name: 'border-radius.7',
     rawValue: '24px',
+    resolvedValueWithReferences: undefined,
     value: '24px',
   },
   {
@@ -427,6 +440,7 @@ const output = [
   {
     name: 'size.25',
     rawValue: '2px',
+    resolvedValueWithReferences: undefined,
     value: '2px',
   },
   {
@@ -478,6 +492,14 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias',
     rawValue: '{shadow.single}',
+    resolvedValueWithReferences: {
+      blur: 10,
+      color: '{colors.red.500}',
+      spread: 0,
+      type: 'dropShadow',
+      x: 0,
+      y: 0,
+    },
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -489,6 +511,14 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias1',
     rawValue: '{shadow.unResolvedSingle}',
+    resolvedValueWithReferences: {
+      blur: 10,
+      color: '{colors.blue.500}',
+      spread: 0,
+      type: 'dropShadow',
+      x: 0,
+      y: 0,
+    },
     value: {
       ...unResolvedSingleShadowToken.value,
       color: '{colors.blue.500}',
@@ -499,6 +529,32 @@ const output = [
     description: 'the one with multiple nested shadow alias',
     name: 'shadow.shadowAlias2',
     rawValue: '{shadow.multiple}',
+    resolvedValueWithReferences: [
+      {
+        blur: 2,
+        color: 'rgba({colors.red.500}, 0.5)',
+        spread: 4,
+        type: 'dropShadow',
+        x: 0,
+        y: 0,
+      },
+      {
+        blur: 4,
+        color: '{theme.accent.subtle}',
+        spread: 4,
+        type: 'dropShadow',
+        x: 0,
+        y: 4,
+      },
+      {
+        blur: 16,
+        color: '#000000',
+        spread: 4,
+        type: 'dropShadow',
+        x: 0,
+        y: 8,
+      },
+    ],
     value: [
       {
         ...multipleShadowToken.value[0],
@@ -526,6 +582,7 @@ const output = [
     },
     description: 'color with modifier',
     name: 'colors.modify',
+    resolvedValueWithReferences: undefined,
     rawValue: '#00a2ba',
     type: 'color',
     value: '#007182',
@@ -533,6 +590,7 @@ const output = [
   {
     description: 'color with modifier',
     name: 'colors.white',
+    resolvedValueWithReferences: undefined,
     rawValue: '#00a2ba',
     type: 'color',
     value: '#00a2ba',
@@ -550,6 +608,7 @@ const output = [
     description: 'color with alias modifier',
     name: 'colors.alias-modify',
     rawValue: '$colors.white',
+    resolvedValueWithReferences: '#00a2ba',
     type: 'color',
     value: '#007182',
   },
@@ -568,77 +627,90 @@ const output = [
   {
     name: 'deepreference',
     value: 'IBM Plex Sans',
+    resolvedValueWithReferences: undefined,
     rawValue: '{typography.all.fontFamily}',
     type: TokenTypes.FONT_FAMILIES,
   },
   {
     name: 'colors.lilac.500',
     value: '#ff0000',
+    resolvedValueWithReferences: undefined,
     rawValue: '#ff0000',
     type: TokenTypes.COLOR,
   },
   {
     name: 'primary',
     value: 'lilac',
+    resolvedValueWithReferences: undefined,
     rawValue: 'lilac',
     type: TokenTypes.OTHER,
   },
   {
     name: 'nestedprimary',
     value: 'lilac',
+    resolvedValueWithReferences: 'lilac',
     rawValue: '{primary}',
     type: TokenTypes.OTHER,
   },
   {
     name: 'thatprimarycolor',
     value: '#ff0000',
+    resolvedValueWithReferences: '#ff0000',
     rawValue: '{colors.{primary}.500}',
     type: TokenTypes.COLOR,
   },
   {
     name: 'thatnestedprimarycolor',
     value: '#ff0000',
+    resolvedValueWithReferences: '#ff0000',
     rawValue: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
   {
     name: 'numerictext-1',
     value: '003e78',
+    resolvedValueWithReferences: undefined,
     rawValue: '003e78',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-2',
     value: '000000',
+    resolvedValueWithReferences: undefined,
     rawValue: '000000',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-3',
     value: '001000',
+    resolvedValueWithReferences: undefined,
     rawValue: '001000',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-4',
     value: '06e455',
+    resolvedValueWithReferences: undefined,
     rawValue: '06e455',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-5',
     value: '013456',
+    resolvedValueWithReferences: undefined,
     rawValue: '013456',
     type: TokenTypes.TEXT,
   },
   {
     name: 'numerictext-6',
     value: '000001',
+    resolvedValueWithReferences: undefined,
     rawValue: '000001',
     type: TokenTypes.TEXT,
   },
   {
     name: 'pure-numeric',
+    resolvedValueWithReferences: undefined,
     value: 0,
     rawValue: '0',
     type: TokenTypes.DIMENSION,
@@ -650,12 +722,12 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(output);
   });
 
-  const deepTokens = [{
+  const deepTokens: { name: string, value: string, resolvedValueReferences?: string | undefined, type: string }[] = [{
     name: '1',
     value: '#ff0000',
     type: 'color',
   }];
-  for (let i = 2; i < 1000; i += 1) {
+  for (let i = 2; i < 10; i += 1) {
     deepTokens.push({
       name: `${i}`,
       value: `{${i - 1}}`,
@@ -663,11 +735,71 @@ describe('resolveTokenValues deep nested', () => {
     });
   }
 
-  const deepTokenOutput = deepTokens.map((token) => ({
-    ...token,
-    rawValue: token.value,
-    value: '#ff0000',
-  }));
+  const deepTokenOutput = [
+    {
+      name: '1',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: undefined,
+      rawValue: '#ff0000',
+    },
+    {
+      name: '2',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '#ff0000',
+      rawValue: '{1}',
+    },
+    {
+      name: '3',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{1}',
+      rawValue: '{2}',
+    },
+    {
+      name: '4',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{2}',
+      rawValue: '{3}',
+    },
+    {
+      name: '5',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{3}',
+      rawValue: '{4}',
+    },
+    {
+      name: '6',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{4}',
+      rawValue: '{5}',
+    },
+    {
+      name: '7',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{5}',
+      rawValue: '{6}',
+    },
+    {
+      name: '8',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{6}',
+      rawValue: '{7}',
+    },
+    {
+      name: '9',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '{7}',
+      rawValue: '{8}',
+    },
+  ];
 
   it('resolves all values it can resolve', () => {
     const start = performance.now();

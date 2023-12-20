@@ -7,28 +7,34 @@ describe('convertTokensObjectToResolved', () => {
       options: {
         colors: {
           red: {
+            resolvedValueWithReferences: undefined,
             value: '#ff0000',
             type: TokenTypes.COLOR,
           },
           blue: {
+            resolvedValueWithReferences: undefined,
             value: '#0000ff',
             type: TokenTypes.COLOR,
           },
         },
         sizing: {
           base: {
+            resolvedValueWithReferences: undefined,
             value: '2',
             type: TokenTypes.SIZING,
           },
           scale: {
+            resolvedValueWithReferences: undefined,
             value: '1.5',
             type: TokenTypes.SIZING,
           },
           small: {
+            resolvedValueWithReferences: '2',
             value: '1 * {sizing.base}',
             type: TokenTypes.SIZING,
           },
           medium: {
+            resolvedValueWithReferences: '1.5',
             value: '{sizing.small} * {sizing.scale}',
             type: TokenTypes.SIZING,
           },
@@ -37,6 +43,7 @@ describe('convertTokensObjectToResolved', () => {
       theme: {
         colors: {
           primary: {
+            resolvedValueWithReferences: '#ff0000',
             value: '$colors.red',
             type: TokenTypes.COLOR,
           },
@@ -592,37 +599,44 @@ describe('convertTokensObjectToResolved', () => {
       global: {
         colors: {
           blue: {
+            resolvedValueWithReferences: undefined,
             type: TokenTypes.COLOR,
             value: '#0000ff',
           },
           primary: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '#ff0000',
             type: TokenTypes.COLOR,
             value: '$colors.red',
           },
           red: {
+            resolvedValueWithReferences: undefined,
             type: TokenTypes.COLOR,
             value: '#ff0000',
           },
           opaqueRed: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '0.5',
             type: TokenTypes.COLOR,
             value: 'rgba(255, 0, 0, {opacity.medium})',
           },
         },
         opacity: {
           medium: {
+            resolvedValueWithReferences: undefined,
             type: TokenTypes.OPACITY,
             value: '0.5',
           },
         },
         radii: {
           full: {
+            resolvedValueWithReferences: undefined,
             value: '100%',
             type: TokenTypes.BORDER_RADIUS,
           },
           leaf: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '100%',
             value: '{radii.full} 0%',
             type: TokenTypes.BORDER_RADIUS,
           },
@@ -630,39 +644,47 @@ describe('convertTokensObjectToResolved', () => {
         sizing: {
           base: {
             value: '2',
+            resolvedValueWithReferences: undefined,
             type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
+            resolvedValueWithReferences: undefined,
             type: TokenTypes.SIZING,
           },
           xsmall: {
             description: 'Should be resolved',
+            resolvedValueWithReferences: '2',
             value: '1 * {sizing.base}',
             type: TokenTypes.SIZING,
           },
           small: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '2',
             value: '{sizing.base}',
             type: TokenTypes.SIZING,
           },
           medium: {
             description: 'Should be resolved',
+            resolvedValueWithReferences: '1.5',
             value: '{sizing.small} * {sizing.scale}',
             type: TokenTypes.SIZING,
           },
           large: {
             description: 'Should be resolved',
+            resolvedValueWithReferences: '1.5',
             value: '$sizing.medium * $sizing.scale',
             type: TokenTypes.SIZING,
           },
           responsive25: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '{sizing.base}',
             value: 'calc(25vw * $sizing.small)',
             type: TokenTypes.SIZING,
           },
           responsive50: {
             description: 'Should NOT be resolved',
+            resolvedValueWithReferences: '$sizing.medium * $sizing.scale',
             value: 'calc(50vw - {sizing.large}px)',
             type: TokenTypes.SIZING,
           },
@@ -670,19 +692,23 @@ describe('convertTokensObjectToResolved', () => {
         text: {
           size: {
             base: {
+              resolvedValueWithReferences: undefined,
               value: '16',
               type: 'fontSize',
             },
             h1: {
+              resolvedValueWithReferences: undefined,
               value: '96',
               type: 'fontSize',
             },
             unit: {
+              resolvedValueWithReferences: undefined,
               value: 'px',
               type: 'fontSize',
             },
             default: {
               description: 'Should NOT be resolved',
+              resolvedValueWithReferences: 'px',
               value: '{text.size.base}{text.size.unit}',
               type: 'fontSize',
             },
@@ -690,9 +716,11 @@ describe('convertTokensObjectToResolved', () => {
           fontWeight: {
             base: {
               value: '100',
+              resolvedValueWithReferences: undefined,
               type: 'fontWeight',
             },
             light: {
+              resolvedValueWithReferences: undefined,
               value: 'Light',
               type: 'fontWeight',
             },
