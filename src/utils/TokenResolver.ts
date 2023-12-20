@@ -126,6 +126,7 @@ class TokenResolver {
       const references = token.value.toString().match(AliasRegex) || [];
 
       let finalValue: SingleToken['value'] = token.value;
+      let foundToken;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
@@ -135,7 +136,9 @@ class TokenResolver {
         if (resolvedReferences.has(path)) {
           console.log('Circular reference detected:', path);
           return {
-            ...token, rawValue: token.value, failedToResolve: true,
+            ...token,
+            rawValue: token.value,
+            failedToResolve: true,
           } as ResolveTokenValuesResult;
         }
 
@@ -170,7 +173,7 @@ class TokenResolver {
         const propertyPath = resolvedPath.split('.');
         const propertyName = propertyPath.pop() as string;
         const tokenNameWithoutLastPart = propertyPath.join('.');
-        const foundToken = this.tokenMap.get(resolvedPath);
+        foundToken = this.tokenMap.get(resolvedPath);
 
         if (foundToken) {
           // We add the already resolved references to the new set, so we can check for circular references
@@ -240,6 +243,8 @@ class TokenResolver {
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
       }
+
+      resolvedToken.resolvedValueWithReferences = foundToken?.value;
 
       // And then return it
       return resolvedToken as ResolveTokenValuesResult;

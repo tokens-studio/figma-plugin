@@ -194,10 +194,9 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
   if (values && values.border) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
     const resolvedToken = tokens.get(values.border as string);
-    if (resolvedToken && resolvedToken.rawValue && typeof resolvedToken.rawValue === 'object') {
-      if ('color' in resolvedToken.rawValue) {
-        const borderColorTokenName = resolvedToken.rawValue.color as string;
-        borderColorTokenName.replace('{', '').replace('}', '');
+    if (resolvedToken && resolvedToken.resolvedValueWithReferences) {
+      if (typeof resolvedToken.resolvedValueWithReferences === 'object' && 'color' in resolvedToken.resolvedValueWithReferences) {
+        const borderColorTokenName = (resolvedToken.resolvedValueWithReferences.color as string).replace('{', '').replace('}', '');
         values.borderColor = borderColorTokenName;
       }
     }

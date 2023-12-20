@@ -58,6 +58,7 @@ export default function useManageTokens() {
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
+    console.log('editSingleToken: ', data);
     const {
       parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
     } = data;

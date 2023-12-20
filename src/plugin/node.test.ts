@@ -274,6 +274,8 @@ describe('mapValuesToTokens', () => {
 describe('destructureTokenForAlias', () => {
   it('return extract border color from border token', () => {
     values.forEach((value, index) => {
+      console.log('applyTokens[index]: ', applyTokens[index]);
+      console.log('destructureTokenForAlias(tokens, value): ', destructureTokenForAlias(tokens, value));
       expect(destructureTokenForAlias(tokens, value)).toEqual(applyTokens[index]);
     });
   });
