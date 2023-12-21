@@ -7,24 +7,20 @@ describe('convertTokensObjectToResolved', () => {
       options: {
         colors: {
           red: {
-            resolvedValueWithReferences: undefined,
             value: '#ff0000',
             type: TokenTypes.COLOR,
           },
           blue: {
-            resolvedValueWithReferences: undefined,
             value: '#0000ff',
             type: TokenTypes.COLOR,
           },
         },
         sizing: {
           base: {
-            resolvedValueWithReferences: undefined,
             value: '2',
             type: TokenTypes.SIZING,
           },
           scale: {
-            resolvedValueWithReferences: undefined,
             value: '1.5',
             type: TokenTypes.SIZING,
           },
@@ -599,7 +595,6 @@ describe('convertTokensObjectToResolved', () => {
       global: {
         colors: {
           blue: {
-            resolvedValueWithReferences: undefined,
             type: TokenTypes.COLOR,
             value: '#0000ff',
           },
@@ -610,7 +605,6 @@ describe('convertTokensObjectToResolved', () => {
             value: '$colors.red',
           },
           red: {
-            resolvedValueWithReferences: undefined,
             type: TokenTypes.COLOR,
             value: '#ff0000',
           },
@@ -623,14 +617,12 @@ describe('convertTokensObjectToResolved', () => {
         },
         opacity: {
           medium: {
-            resolvedValueWithReferences: undefined,
             type: TokenTypes.OPACITY,
             value: '0.5',
           },
         },
         radii: {
           full: {
-            resolvedValueWithReferences: undefined,
             value: '100%',
             type: TokenTypes.BORDER_RADIUS,
           },
@@ -644,12 +636,10 @@ describe('convertTokensObjectToResolved', () => {
         sizing: {
           base: {
             value: '2',
-            resolvedValueWithReferences: undefined,
             type: TokenTypes.SIZING,
           },
           scale: {
             value: '1.5',
-            resolvedValueWithReferences: undefined,
             type: TokenTypes.SIZING,
           },
           xsmall: {
@@ -692,17 +682,14 @@ describe('convertTokensObjectToResolved', () => {
         text: {
           size: {
             base: {
-              resolvedValueWithReferences: undefined,
               value: '16',
               type: 'fontSize',
             },
             h1: {
-              resolvedValueWithReferences: undefined,
               value: '96',
               type: 'fontSize',
             },
             unit: {
-              resolvedValueWithReferences: undefined,
               value: 'px',
               type: 'fontSize',
             },
@@ -716,11 +703,9 @@ describe('convertTokensObjectToResolved', () => {
           fontWeight: {
             base: {
               value: '100',
-              resolvedValueWithReferences: undefined,
               type: 'fontWeight',
             },
             light: {
-              resolvedValueWithReferences: undefined,
               value: 'Light',
               type: 'fontWeight',
             },

@@ -4,7 +4,6 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
 {
   "colors": {
     "blue": {
-      "resolvedValueWithReferences": undefined,
       "type": "color",
       "value": "#0000ff",
     },
@@ -14,14 +13,12 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
       "value": "#ff0000",
     },
     "red": {
-      "resolvedValueWithReferences": undefined,
       "type": "color",
       "value": "#ff0000",
     },
   },
   "sizing": {
     "base": {
-      "resolvedValueWithReferences": undefined,
       "type": "sizing",
       "value": 2,
     },
@@ -31,7 +28,6 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
       "value": 3,
     },
     "scale": {
-      "resolvedValueWithReferences": undefined,
       "type": "sizing",
       "value": 1.5,
     },
@@ -519,7 +515,6 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
 {
   "colors": {
     "blue": {
-      "resolvedValueWithReferences": undefined,
       "type": "color",
       "value": "#0000ff",
     },
@@ -536,21 +531,18 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
       "value": "$colors.red",
     },
     "red": {
-      "resolvedValueWithReferences": undefined,
       "type": "color",
       "value": "#ff0000",
     },
   },
   "opacity": {
     "medium": {
-      "resolvedValueWithReferences": undefined,
       "type": "opacity",
       "value": 0.5,
     },
   },
   "radii": {
     "full": {
-      "resolvedValueWithReferences": undefined,
       "type": "borderRadius",
       "value": "100%",
     },
@@ -563,7 +555,6 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
   },
   "sizing": {
     "base": {
-      "resolvedValueWithReferences": undefined,
       "type": "sizing",
       "value": 2,
     },
@@ -592,7 +583,6 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
       "value": "calc(50vw - {sizing.large}px)",
     },
     "scale": {
-      "resolvedValueWithReferences": undefined,
       "type": "sizing",
       "value": 1.5,
     },
@@ -612,19 +602,16 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
   "text": {
     "fontWeight": {
       "base": {
-        "resolvedValueWithReferences": undefined,
         "type": "fontWeight",
         "value": 100,
       },
       "light": {
-        "resolvedValueWithReferences": undefined,
         "type": "fontWeight",
         "value": "Light",
       },
     },
     "size": {
       "base": {
-        "resolvedValueWithReferences": undefined,
         "type": "fontSize",
         "value": 16,
       },
@@ -635,12 +622,10 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
         "value": "{text.size.base}{text.size.unit}",
       },
       "h1": {
-        "resolvedValueWithReferences": undefined,
         "type": "fontSize",
         "value": 96,
       },
       "unit": {
-        "resolvedValueWithReferences": undefined,
         "type": "fontSize",
         "value": "px",
       },
