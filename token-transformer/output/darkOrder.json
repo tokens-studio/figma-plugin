@@ -2,11 +2,11 @@
   "gray": {
     "value": "#2B70E8",
     "type": "color",
-    "resolvedValueWithReferences": "{color.neutral.50}"
+    "resolvedValueWithReferences": "default"
   },
   "background": {
     "value": "#E6EFFF",
     "type": "color",
-    "resolvedValueWithReferences": "#E6EFFF"
+    "resolvedValueWithReferences": "color.neutral.10"
   }
 }

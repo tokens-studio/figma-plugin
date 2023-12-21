@@ -25,7 +25,7 @@
         "white-10": {
           "value": "#ffffff1a",
           "type": "color",
-          "resolvedValueWithReferences": "#ffffff",
+          "resolvedValueWithReferences": "core.color.neutral.white",
           "rawValue": "rgba($core.color.neutral.white, 0.1)"
         }
       }
