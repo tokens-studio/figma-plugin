@@ -8,7 +8,7 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
       "value": "#0000ff",
     },
     "primary": {
-      "resolvedValueWithReferences": "#ff0000",
+      "resolvedValueWithReferences": "colors.red",
       "type": "color",
       "value": "#ff0000",
     },
@@ -23,7 +23,7 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
       "value": 2,
     },
     "medium": {
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": 3,
     },
@@ -32,7 +32,7 @@ exports[`convertTokensObjectToResolved converts object-like unresolved tokens to
       "value": 1.5,
     },
     "small": {
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": 2,
     },
@@ -193,13 +193,13 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
     },
     "opaqueRed": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "0.5",
+      "resolvedValueWithReferences": "opacity.medium",
       "type": "color",
       "value": "rgba(255, 0, 0, {opacity.medium})",
     },
     "primary": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "#ff0000",
+      "resolvedValueWithReferences": "colors.red",
       "type": "color",
       "value": "$colors.red",
     },
@@ -221,7 +221,7 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
     },
     "leaf": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "100%",
+      "resolvedValueWithReferences": "radii.full",
       "type": "borderRadius",
       "value": "{radii.full} 0%",
     },
@@ -233,25 +233,25 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
     },
     "large": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": "$sizing.medium * $sizing.scale",
     },
     "medium": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": "{sizing.small} * {sizing.scale}",
     },
     "responsive25": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "{sizing.base}",
+      "resolvedValueWithReferences": "sizing.small",
       "type": "sizing",
       "value": "calc(25vw * $sizing.small)",
     },
     "responsive50": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "$sizing.medium * $sizing.scale",
+      "resolvedValueWithReferences": "sizing.large",
       "type": "sizing",
       "value": "calc(50vw - {sizing.large}px)",
     },
@@ -261,13 +261,13 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
     },
     "small": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": "{sizing.base}",
     },
     "xsmall": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": "1 * {sizing.base}",
     },
@@ -290,7 +290,7 @@ exports[`convertTokensObjectToResolved preserves all references when requested 1
       },
       "default": {
         "description": "Should NOT be resolved",
-        "resolvedValueWithReferences": "px",
+        "resolvedValueWithReferences": "text.size.unit",
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
@@ -341,7 +341,7 @@ exports[`convertTokensObjectToResolved preserves rawValue when requested 1`] = `
   "colors": {
     "background": {
       "rawValue": "$colors.black",
-      "resolvedValueWithReferences": "#000000",
+      "resolvedValueWithReferences": "colors.black",
       "type": "color",
       "value": "#000000",
     },
@@ -368,13 +368,13 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     },
     "opaqueRed": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "0.5",
+      "resolvedValueWithReferences": "opacity.medium",
       "type": "color",
       "value": "#ff000080",
     },
     "primary": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "#ff0000",
+      "resolvedValueWithReferences": "colors.red",
       "type": "color",
       "value": "#ff0000",
     },
@@ -396,7 +396,7 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     },
     "leaf": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "100%",
+      "resolvedValueWithReferences": "radii.full",
       "type": "borderRadius",
       "value": "100% 0%",
     },
@@ -408,25 +408,25 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     },
     "large": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": 4.5,
     },
     "medium": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": 3,
     },
     "responsive25": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "{sizing.base}",
+      "resolvedValueWithReferences": "sizing.small",
       "type": "sizing",
       "value": "calc(25vw * 2)",
     },
     "responsive50": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "$sizing.medium * $sizing.scale",
+      "resolvedValueWithReferences": "sizing.large",
       "type": "sizing",
       "value": "calc(50vw - 4.5px)",
     },
@@ -436,13 +436,13 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
     },
     "small": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": 2,
     },
     "xsmall": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": 2,
     },
@@ -465,7 +465,7 @@ exports[`convertTokensObjectToResolved resolves all references when requested 1`
       },
       "default": {
         "description": "Should be resolved",
-        "resolvedValueWithReferences": "px",
+        "resolvedValueWithReferences": "text.size.unit",
         "type": "fontSize",
         "value": "16px",
       },
@@ -520,13 +520,13 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     },
     "opaqueRed": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "0.5",
+      "resolvedValueWithReferences": "opacity.medium",
       "type": "color",
       "value": "rgba(255, 0, 0, {opacity.medium})",
     },
     "primary": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "#ff0000",
+      "resolvedValueWithReferences": "colors.red",
       "type": "color",
       "value": "$colors.red",
     },
@@ -548,7 +548,7 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     },
     "leaf": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "100%",
+      "resolvedValueWithReferences": "radii.full",
       "type": "borderRadius",
       "value": "{radii.full} 0%",
     },
@@ -560,25 +560,25 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     },
     "large": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": 4.5,
     },
     "medium": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "1.5",
+      "resolvedValueWithReferences": "sizing.scale",
       "type": "sizing",
       "value": 3,
     },
     "responsive25": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "{sizing.base}",
+      "resolvedValueWithReferences": "sizing.small",
       "type": "sizing",
       "value": "calc(25vw * $sizing.small)",
     },
     "responsive50": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "$sizing.medium * $sizing.scale",
+      "resolvedValueWithReferences": "sizing.large",
       "type": "sizing",
       "value": "calc(50vw - {sizing.large}px)",
     },
@@ -588,13 +588,13 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
     },
     "small": {
       "description": "Should NOT be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": "{sizing.base}",
     },
     "xsmall": {
       "description": "Should be resolved",
-      "resolvedValueWithReferences": "2",
+      "resolvedValueWithReferences": "sizing.base",
       "type": "sizing",
       "value": 2,
     },
@@ -617,7 +617,7 @@ exports[`convertTokensObjectToResolved resolves only math expressions when reque
       },
       "default": {
         "description": "Should NOT be resolved",
-        "resolvedValueWithReferences": "px",
+        "resolvedValueWithReferences": "text.size.unit",
         "type": "fontSize",
         "value": "{text.size.base}{text.size.unit}",
       },
@@ -667,7 +667,7 @@ exports[`convertTokensObjectToResolved respects used sets 1`] = `
 {
   "colors": {
     "background": {
-      "resolvedValueWithReferences": "#ffffff",
+      "resolvedValueWithReferences": "colors.white",
       "type": "color",
       "value": "#ffffff",
     },

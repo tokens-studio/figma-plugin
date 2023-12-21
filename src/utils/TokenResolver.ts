@@ -9,6 +9,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { convertModifiedColorToHex } from './convertModifiedColorToHex';
 import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 class TokenResolver {
   private tokens: SingleToken[];
@@ -121,12 +122,13 @@ class TokenResolver {
       }
     }
 
+    let foundToken;
+
     // For strings, we need to check if there are any references, as those can only occur in strings
     if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
 
       let finalValue: SingleToken['value'] = token.value;
-      let foundToken;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
@@ -244,8 +246,12 @@ class TokenResolver {
         this.memo.set(memoKey, resolvedToken);
       }
 
-      if (foundToken?.value) {
-        resolvedToken.resolvedValueWithReferences = foundToken?.value;
+      if (foundToken) {
+        if (foundToken.type === TokenTypes.BORDER) {
+          resolvedToken.resolvedValueWithReferences = foundToken?.value;
+        } else {
+          resolvedToken.resolvedValueWithReferences = foundToken?.name;
+        }
       }
 
       // And then return it
@@ -301,6 +307,9 @@ class TokenResolver {
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
       }
+
+      if (token.type === TokenTypes.BORDER) resolvedToken.resolvedValueWithReferences = token.value;
+
       return resolvedToken;
     }
 
