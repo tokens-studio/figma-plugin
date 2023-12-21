@@ -32,7 +32,12 @@
         "fontSize": 96,
         "fontWeight": "Bold"
       },
-      "type": "typography"
+      "type": "typography",
+      "resolvedValueWithReferences": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": "96",
+        "fontWeight": "{typography.fontWeight}"
+      }
     }
   }
 }
