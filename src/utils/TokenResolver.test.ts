@@ -666,66 +666,66 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(output);
   });
 
-  // const deepTokens: { name: string, value: string, resolvedValueReferences?: string | undefined, type: string }[] = [{
-  //   name: '1',
-  //   value: '#ff0000',
-  //   type: 'color',
-  // }];
-  // for (let i = 2; i < 1000; i += 1) {
-  //   deepTokens.push({
-  //     name: `${i}`,
-  //     value: `{${i - 1}}`,
-  //     type: 'color',
-  //   });
-  // }
+  const deepTokens: { name: string, value: string, resolvedValueReferences?: string | undefined, type: string }[] = [{
+    name: '1',
+    value: '#ff0000',
+    type: 'color',
+  }];
+  for (let i = 2; i < 1000; i += 1) {
+    deepTokens.push({
+      name: `${i}`,
+      value: `{${i - 1}}`,
+      type: 'color',
+    });
+  }
 
-  // const deepTokenOutput = [
-  //   {
-  //     name: '1',
-  //     value: '#ff0000',
-  //     type: 'color',
-  //     rawValue: '#ff0000',
-  //   },
-  //   {
-  //     name: '2',
-  //     value: '#ff0000',
-  //     type: 'color',
-  //     resolvedValueWithReferences: '1',
-  //     rawValue: '{1}',
-  //   },
-  // ];
+  const deepTokenOutput = [
+    {
+      name: '1',
+      value: '#ff0000',
+      type: 'color',
+      rawValue: '#ff0000',
+    },
+    {
+      name: '2',
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: '1',
+      rawValue: '{1}',
+    },
+  ];
 
-  // for (let i = 3; i < 1000; i += 1) {
-  //   deepTokenOutput.push({
-  //     name: `${i}`,
-  //     value: '#ff0000',
-  //     type: 'color',
-  //     resolvedValueWithReferences: `${i - 1}`,
-  //     rawValue: `{${i - 1}}`,
-  //   });
-  // }
+  for (let i = 3; i < 1000; i += 1) {
+    deepTokenOutput.push({
+      name: `${i}`,
+      value: '#ff0000',
+      type: 'color',
+      resolvedValueWithReferences: `${i - 1}`,
+      rawValue: `{${i - 1}}`,
+    });
+  }
 
-  // it('resolves all values it can resolve', () => {
-  //   const start = performance.now();
-  //   const resolvedTokens = defaultTokenResolver.setTokens(deepTokens);
-  //   expect(resolvedTokens).toEqual(deepTokenOutput);
-  //   const end = performance.now();
-  //   expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
-  // });
+  it('resolves all values it can resolve', () => {
+    const start = performance.now();
+    const resolvedTokens = defaultTokenResolver.setTokens(deepTokens);
+    expect(resolvedTokens).toEqual(deepTokenOutput);
+    const end = performance.now();
+    expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
+  });
 
-  // it('resolves zeros correctly', () => {
-  //   const resolvedTokens = defaultTokenResolver.setTokens([{
-  //     name: 'pure-zero',
-  //     value: '0',
-  //     type: TokenTypes.DIMENSION,
-  //   }]);
-  //   expect(resolvedTokens).toEqual([
-  //     {
-  //       name: 'pure-zero',
-  //       rawValue: '0',
-  //       value: 0,
-  //       type: TokenTypes.DIMENSION,
-  //     },
-  //   ]);
-  // });
+  it('resolves zeros correctly', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens([{
+      name: 'pure-zero',
+      value: '0',
+      type: TokenTypes.DIMENSION,
+    }]);
+    expect(resolvedTokens).toEqual([
+      {
+        name: 'pure-zero',
+        rawValue: '0',
+        value: 0,
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
+  });
 });
