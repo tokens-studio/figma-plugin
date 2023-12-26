@@ -689,7 +689,6 @@ const output = [
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
     const resolvedTokens = defaultTokenResolver.setTokens(tokens);
-    console.log('resolvedTokens: ', resolvedTokens);
     expect(resolvedTokens).toEqual(output);
   });
 
