@@ -285,7 +285,11 @@ class TokenResolver {
           if (resolvedValue.failedToResolve) {
             failedToResolve = true;
           }
-          resolvedObject[key] = resolvedValue.value;
+          if (typeof resolvedValue.value === 'object' && key in resolvedValue.value) {
+            resolvedObject[key] = resolvedValue.value[key as keyof typeof resolvedValue.value];
+          } else {
+            resolvedObject[key] = resolvedValue.value;
+          }
         }
       }
 
