@@ -59,6 +59,13 @@ const resolvedTypographyToken = {
   },
 };
 
+const resolvedTypographyFontFamilyToken = {
+  type: TokenTypes.TYPOGRAPHY,
+  value: {
+    fontFamily: 'Arial',
+  },
+};
+
 const unResolvedTypographyToken = {
   type: TokenTypes.TYPOGRAPHY,
   value: {
@@ -287,6 +294,15 @@ const tokens = [
     name: 'pure-numeric',
     value: '0',
     type: TokenTypes.DIMENSION,
+  },
+  {
+    name: 'typography.font-family.resolved',
+    value: { ...resolvedTypographyFontFamilyToken },
+    type: TokenTypes.TYPOGRAPHY,
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    value: '{typography.font-family.resolved}',
   },
 ];
 
@@ -643,10 +659,37 @@ const output = [
     rawValue: '0',
     type: TokenTypes.DIMENSION,
   },
+  {
+    name: 'typography.font-family.resolved',
+    rawValue: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    type: 'typography',
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    rawValue: '{typography.font-family.resolved}',
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+  },
 ];
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
     const resolvedTokens = defaultTokenResolver.setTokens(tokens);
+    console.log('resolvedTokens: ', resolvedTokens);
     expect(resolvedTokens).toEqual(output);
   });
 
