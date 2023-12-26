@@ -286,10 +286,11 @@ class TokenResolver {
             failedToResolve = true;
           }
           if (typeof resolvedValue.value === 'object' && key in resolvedValue.value) {
-            resolvedObject[key] = resolvedValue.value[key as keyof typeof resolvedValue.value];
-          } else {
-            resolvedObject[key] = resolvedValue.value;
+            failedToResolve = true;
           }
+          //  else {
+          resolvedObject[key] = resolvedValue.value;
+          // }
         }
       }
 
@@ -298,6 +299,7 @@ class TokenResolver {
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
       }
+
       return resolvedToken;
     }
 
