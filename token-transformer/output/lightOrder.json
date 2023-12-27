@@ -1,18 +1,15 @@
 {
   "default": {
     "value": "#2B70E8",
-    "type": "color",
-    "resolvedValueWithReferences": "#2B70E8"
+    "type": "color"
   },
   "gray": {
     "value": "#2B70E8",
-    "type": "color",
-    "resolvedValueWithReferences": "{color.neutral.50}"
+    "type": "color"
   },
   "background": {
     "value": "#E6EFFF",
-    "type": "color",
-    "resolvedValueWithReferences": "#E6EFFF"
+    "type": "color"
   },
   "color": {
     "neutral": {
