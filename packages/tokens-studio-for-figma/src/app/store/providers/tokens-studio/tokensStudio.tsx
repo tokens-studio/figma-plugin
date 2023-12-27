@@ -19,7 +19,6 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { saveLastSyncedState } from '../../../../utils/saveLastSyncedState';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
-import { applyTokenSetOrder } from '../../../../utils/tokenset';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
@@ -50,21 +49,6 @@ export function useTokensStudio() {
           errorMessage: content?.errorMessage,
         };
       }
-
-      // if (
-      //   content
-      //   && isEqual(content.tokens, tokens)
-      //   && isEqual(content.themes, themes)
-      //   && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-      // ) {
-      //   notifyToUI('Nothing to commit');
-      //   return {
-      //     status: 'success',
-      //     tokens,
-      //     themes,
-      //     metadata: {},
-      //   };
-      // }
 
       dispatch.uiState.setLocalApiState({ ...context });
       const pushSettings = await pushDialog();
@@ -116,67 +100,72 @@ export function useTokensStudio() {
         };
       }
     },
-    [dispatch, storageClientFactory, pushDialog, closePushDialog, tokens, themes, localApiState, usedTokenSet, activeTheme],
+    [
+      storageClientFactory,
+      dispatch,
+      pushDialog,
+      tokens,
+      themes,
+      storeTokenIdInJsonEditor,
+      localApiState,
+      usedTokenSet,
+      activeTheme,
+      closePushDialog,
+    ],
   );
 
-  const pullTokensFromTokensStudio = useCallback(async (context: TokensStudioCredentials): Promise<RemoteResponseData | null> => {
-    console.log('Pulling tokens', context);
-    const storage = storageClientFactory(context);
+  const pullTokensFromTokensStudio = useCallback(
+    async (context: TokensStudioCredentials): Promise<RemoteResponseData | null> => {
+      const storage = storageClientFactory(context);
 
-    try {
-      console.log('TRying to retrieve');
-      const content = await storage.retrieve();
-      console.log('CONTENT', content);
-      if (content?.status === 'failure') {
+      try {
+        const content = await storage.retrieve();
+        if (content?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: content.errorMessage,
+          };
+        }
+        if (content) {
+          // We're doing read-only for now, so no editing.
+          dispatch.tokenState.setEditProhibited(true);
+
+          return content;
+        }
+      } catch (e) {
         return {
           status: 'failure',
-          errorMessage: content.errorMessage,
+          errorMessage: ErrorMessages.TOKENSSTUDIO_CREDENTIAL_ERROR,
         };
       }
-      if (content) {
-        // If we didn't get a tokenSetOrder from metadata, use the order of the token sets as they appeared
-        const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+      return null;
+    },
+    [storageClientFactory, dispatch.tokenState],
+  );
 
-        return {
-          ...content,
-          tokens: sortedTokens,
-        };
-      }
-    } catch (e) {
-      return {
-        status: 'failure',
-        errorMessage: ErrorMessages.SUPERNOVA_CREDENTIAL_ERROR,
-      };
-    }
-    return null;
-  }, [
-    storageClientFactory,
-  ]);
-
-  async function validateCredentials(context: TokensStudioCredentials): Promise<RemoteResponseData> {
-    try {
-      const data = await pullTokensFromTokensStudio(context);
-      console.log('DATA AFTER VAL', data);
-      if (!data) {
-        throw new Error();
-      }
-      return {
-        status: 'success',
-        tokens: {},
-        themes: [],
-        metadata: {},
-      };
-    } catch (e) {
-      console.log(e);
-      throw new Error(JSON.stringify(e));
-    }
-  }
-
-  // Function to initially check auth and sync tokens with Tokens Studio
   const syncTokensWithTokensStudio = useCallback(
     async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       try {
-        return (await validateCredentials(context)) as any;
+        const storage = storageClientFactory(context);
+        const data = await storage.retrieve();
+        if (!data || data.status === 'failure') {
+          throw new Error(data?.errorMessage);
+        }
+        dispatch.tokenState.setTokenData({
+          values: data.tokens,
+          themes: data.themes,
+          activeTheme,
+          usedTokenSet,
+        });
+        dispatch.tokenState.setCollapsedTokenSets([]);
+        return {
+          status: 'success',
+          tokens: data.tokens,
+          // TODO: Add support for resolvers which are our theme configs
+          themes: [],
+          // TODO: We dont have metadata yet, but we'll likely need it in the form of token set ordering
+          metadata: {},
+        };
       } catch (e) {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
@@ -185,32 +174,23 @@ export function useTokensStudio() {
         };
       }
     },
-    [pushTokensToTokensStudio],
+    [activeTheme, dispatch.tokenState, storageClientFactory, usedTokenSet],
   );
 
   const addNewTokensStudioCredentials = useCallback(
     async (context: TokensStudioFormValues): Promise<RemoteResponseData> => {
       const data = await syncTokensWithTokensStudio(context);
-      if (!data) {
-        return {
-          status: 'failure',
-          errorMessage: 'Error syncing tokens',
-        };
-      }
-      if (data.status === 'success') {
-        AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.CREDENTIALS,
-          credential: context,
-        });
-        if (!data.tokens) {
-          notifyToUI('No tokens stored on remote');
-        }
-      } else {
+      if (!data || data.status === 'failure') {
         return {
           status: 'failure',
           errorMessage: data.errorMessage,
         };
       }
+      // TODO: I think we can refactor this for all providers and move this to remoteTokens and then remove individually
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREDENTIALS,
+        credential: context,
+      });
       return {
         status: 'success',
         tokens: data.tokens ?? tokens,
@@ -218,7 +198,7 @@ export function useTokensStudio() {
         metadata: {},
       };
     },
-    [syncTokensWithTokensStudio, tokens, themes, dispatch.tokenState, usedTokenSet, activeTheme],
+    [syncTokensWithTokensStudio, tokens, themes],
   );
 
   return useMemo(

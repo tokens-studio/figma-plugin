@@ -200,6 +200,7 @@ export default function useRemoteTokens() {
     showPullDialog,
     closePullDialog,
     pullTokensFromSupernova,
+    pullTokensFromTokensStudio,
   ]);
 
   const restoreStoredProvider = useCallback(async (context: StorageTypeCredentials) => {
@@ -230,6 +231,10 @@ export default function useRemoteTokens() {
         content = await syncTokensWithSupernova(context);
         break;
       }
+      case StorageProviderType.TOKENS_STUDIO: {
+        content = await syncTokensWithTokensStudio(context);
+        break;
+      }
       default:
         content = await pullTokens({ context });
     }
@@ -257,6 +262,7 @@ export default function useRemoteTokens() {
     syncTokensWithBitbucket,
     syncTokensWithADO,
     syncTokensWithSupernova,
+    syncTokensWithTokensStudio,
   ]);
 
   const pushTokens = useCallback(async (context: StorageTypeCredentials = api) => {
@@ -297,6 +303,7 @@ export default function useRemoteTokens() {
     pushTokensToBitbucket,
     pushTokensToADO,
     pushTokensToSupernova,
+    pushTokensToTokensStudio,
   ]);
 
   const addNewProviderItem = useCallback(async (credentials: StorageTypeFormValues<false>): Promise<RemoteResponseStatus> => {
@@ -392,6 +399,7 @@ export default function useRemoteTokens() {
     addNewBitbucketCredentials,
     addNewADOCredentials,
     addNewSupernovaCredentials,
+    addNewTokensStudioCredentials,
     createNewJSONBin,
     createNewGenericVersionedStorage,
     pullTokensFromURL,
