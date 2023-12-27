@@ -214,7 +214,6 @@ const tokens = [
     },
     description: 'color with alias modifier',
     type: TokenTypes.COLOR,
-    resolvedValueWithReferences: '#00a2ba',
   },
   {
     name: 'typography.all',
@@ -300,7 +299,6 @@ const output = [
   {
     name: 'bar',
     rawValue: '{foo}',
-    resolvedValueWithReferences: 'foo',
     value: 3,
   },
   {
@@ -312,14 +310,12 @@ const output = [
   {
     name: 'math',
     rawValue: '{foo} * 2',
-    resolvedValueWithReferences: 'foo',
     value: 6,
   },
   {
     failedToResolve: true,
     name: 'mathWrong',
     rawValue: '{foo} * {boo}',
-    resolvedValueWithReferences: 'boo',
     value: '3 * {baz}',
   },
   {
@@ -335,38 +331,34 @@ const output = [
   {
     name: 'opacity.full',
     rawValue: '{opacity.default} + 0.6',
-    resolvedValueWithReferences: 'opacity.default',
     value: 1,
   },
   {
     name: 'theme.accent.default',
     rawValue: 'rgba({colors.red.500}, 0.5)',
-    resolvedValueWithReferences: 'colors.red.500',
     value: '#ff000080',
   },
   {
     name: 'theme.accent.subtle',
     rawValue: 'rgba({colors.red.500}, {opacity.default})',
-    resolvedValueWithReferences: 'opacity.default',
     value: '#ff000066',
   },
   {
     name: 'theme.accent.deep',
     rawValue: 'rgba({theme.accent.default}, {opacity.full})',
-    resolvedValueWithReferences: 'opacity.full',
     value: '#ff0000',
   },
   {
     failedToResolve: true,
     name: 'spacing.xs',
     rawValue: '{spacing.xs}',
-    resolvedValueWithReferences: 'spacing.xs',
     value: '{spacing.xs}',
   },
   {
     ...singleShadowToken,
     name: 'shadow.single',
     rawValue: singleShadowToken.value,
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -410,6 +402,9 @@ const output = [
     rawValue: {
       opacity: '{opacity.40}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -422,6 +417,10 @@ const output = [
       opacity: '{opacity.40}',
       borderRadius: '{border-radius.7}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
@@ -430,6 +429,9 @@ const output = [
       fill: '#ff0000',
     },
     rawValue: {
+      fill: '{colors.red.500}',
+    },
+    resolvedValueWithReferences: {
       fill: '{colors.red.500}',
     },
   },
@@ -446,12 +448,14 @@ const output = [
       fontSize: '2px',
     },
     rawValue: resolvedTypographyToken.value,
+    resolvedValueWithReferences: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
+    resolvedValueWithReferences: unResolvedTypographyToken.value,
     value: unResolvedTypographyToken.value,
   },
   {
@@ -459,6 +463,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedSingle',
     rawValue: unResolvedSingleShadowToken.value,
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
     },
@@ -487,7 +492,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias',
     rawValue: '{shadow.single}',
-    resolvedValueWithReferences: 'shadow.single',
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -499,7 +504,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias1',
     rawValue: '{shadow.unResolvedSingle}',
-    resolvedValueWithReferences: 'shadow.unResolvedSingle',
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
       color: '{colors.blue.500}',
@@ -510,7 +515,7 @@ const output = [
     description: 'the one with multiple nested shadow alias',
     name: 'shadow.shadowAlias2',
     rawValue: '{shadow.multiple}',
-    resolvedValueWithReferences: 'shadow.multiple',
+    resolvedValueWithReferences: multipleShadowToken.value,
     value: [
       {
         ...multipleShadowToken.value[0],
@@ -562,7 +567,6 @@ const output = [
     description: 'color with alias modifier',
     name: 'colors.alias-modify',
     rawValue: '$colors.white',
-    resolvedValueWithReferences: 'colors.white',
     type: 'color',
     value: '#007182',
   },
@@ -573,6 +577,10 @@ const output = [
       fontWeight: 'bold',
     },
     rawValue: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    resolvedValueWithReferences: {
       fontFamily: 'IBM Plex Sans',
       fontWeight: 'bold',
     },
@@ -599,21 +607,18 @@ const output = [
   {
     name: 'nestedprimary',
     value: 'lilac',
-    resolvedValueWithReferences: 'primary',
     rawValue: '{primary}',
     type: TokenTypes.OTHER,
   },
   {
     name: 'thatprimarycolor',
     value: '#ff0000',
-    resolvedValueWithReferences: 'colors.lilac.500',
     rawValue: '{colors.{primary}.500}',
     type: TokenTypes.COLOR,
   },
   {
     name: 'thatnestedprimarycolor',
     value: '#ff0000',
-    resolvedValueWithReferences: 'colors.lilac.500',
     rawValue: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
@@ -666,7 +671,7 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(output);
   });
 
-  const deepTokens: { name: string, value: string, resolvedValueReferences?: string | undefined, type: string }[] = [{
+  const deepTokens = [{
     name: '1',
     value: '#ff0000',
     type: 'color',
@@ -679,31 +684,11 @@ describe('resolveTokenValues deep nested', () => {
     });
   }
 
-  const deepTokenOutput = [
-    {
-      name: '1',
-      value: '#ff0000',
-      type: 'color',
-      rawValue: '#ff0000',
-    },
-    {
-      name: '2',
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: '1',
-      rawValue: '{1}',
-    },
-  ];
-
-  for (let i = 3; i < 1000; i += 1) {
-    deepTokenOutput.push({
-      name: `${i}`,
-      value: '#ff0000',
-      type: 'color',
-      resolvedValueWithReferences: `${i - 1}`,
-      rawValue: `{${i - 1}}`,
-    });
-  }
+  const deepTokenOutput = deepTokens.map((token) => ({
+    ...token,
+    rawValue: token.value,
+    value: '#ff0000',
+  }));
 
   it('resolves all values it can resolve', () => {
     const start = performance.now();

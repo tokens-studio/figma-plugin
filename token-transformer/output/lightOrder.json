@@ -2,17 +2,17 @@
   "default": {
     "value": "#2B70E8",
     "type": "color",
-    "resolvedValueWithReferences": "color.neutral.50"
+    "resolvedValueWithReferences": "#2B70E8"
   },
   "gray": {
     "value": "#2B70E8",
     "type": "color",
-    "resolvedValueWithReferences": "default"
+    "resolvedValueWithReferences": "{color.neutral.50}"
   },
   "background": {
     "value": "#E6EFFF",
     "type": "color",
-    "resolvedValueWithReferences": "color.neutral.10"
+    "resolvedValueWithReferences": "#E6EFFF"
   },
   "color": {
     "neutral": {

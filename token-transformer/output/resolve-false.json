@@ -52,7 +52,24 @@
         }
       ],
       "type": "boxShadow",
-      "resolvedValueWithReferences": "shadows.multiple"
+      "resolvedValueWithReferences": [
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "4",
+          "blur": "2",
+          "spread": "0"
+        },
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": "0",
+          "y": "0",
+          "blur": "6",
+          "spread": "0"
+        }
+      ]
     },
     "reference-single": {
       "value": {
@@ -64,7 +81,14 @@
         "spread": 0
       },
       "type": "boxShadow",
-      "resolvedValueWithReferences": "shadows.single"
+      "resolvedValueWithReferences": {
+        "color": "{colors.gray.900}",
+        "type": "dropShadow",
+        "x": "0",
+        "y": "4",
+        "blur": "2",
+        "spread": "0"
+      }
     }
   },
   "theme": {
@@ -72,13 +96,13 @@
       "value": "{colors.gray.900}",
       "description": "Alias value",
       "type": "color",
-      "resolvedValueWithReferences": "colors.gray.900"
+      "resolvedValueWithReferences": "#1B1F24"
     },
     "backgroundSubtle": {
       "value": "rgba({colors.gray.900}, 0.5)",
       "description": "Nested color value",
       "type": "color",
-      "resolvedValueWithReferences": "colors.gray.900"
+      "resolvedValueWithReferences": "#1B1F24"
     },
     "backgroundDark": {
       "value": "{colors.gray.500}",
@@ -91,14 +115,14 @@
           "space": "hsl"
         }
       },
-      "resolvedValueWithReferences": "colors.gray.500"
+      "resolvedValueWithReferences": "#949DA7"
     },
     "size": {
       "default": {
         "value": "{sizing.base}",
         "description": "Sizing value",
         "type": "sizing",
-        "resolvedValueWithReferences": "sizing.base"
+        "resolvedValueWithReferences": "4"
       }
     },
     "components": {

@@ -9,7 +9,6 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { convertModifiedColorToHex } from './convertModifiedColorToHex';
 import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
-import { TokenTypes } from '@/constants/TokenTypes';
 
 class TokenResolver {
   private tokens: SingleToken[];
@@ -129,6 +128,7 @@ class TokenResolver {
       const references = token.value.toString().match(AliasRegex) || [];
 
       let finalValue: SingleToken['value'] = token.value;
+      let resolvedValueWithReferences: SingleToken['value'] | undefined;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
@@ -178,6 +178,10 @@ class TokenResolver {
         foundToken = this.tokenMap.get(resolvedPath);
 
         if (foundToken) {
+          // For composite tokens that are being referenced, we need to store the value of the found token so that we have something between raw value of a string and the final resolved token
+          if (typeof token.value === 'string' && typeof foundToken.value === 'object') {
+            resolvedValueWithReferences = foundToken.value;
+          }
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
           newResolvedReferences.add(resolvedPath);
@@ -236,22 +240,17 @@ class TokenResolver {
 
         const hasFailingReferences = AliasRegex.test(yamlString);
 
+        // We combine the values, add the failing reference indicator.
+        // Also, if the originating reference is a string but the resolved value is a composite, we need to add the specific value of the composite token
+        // This is needed for cases like border tokens referencing other border tokens where we want to return the raw value of the border color so we can assign styles or variables.
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
+          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}), ...(typeof resolvedValueWithReferences !== 'undefined' ? { resolvedValueWithReferences } : {}),
         } as ResolveTokenValuesResult;
       }
 
       // When we have a string, we store the result in cache
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
-      }
-
-      if (foundToken) {
-        if (foundToken.type === TokenTypes.BORDER) {
-          resolvedToken.resolvedValueWithReferences = foundToken?.value;
-        } else {
-          resolvedToken.resolvedValueWithReferences = foundToken?.name;
-        }
       }
 
       // And then return it
@@ -285,7 +284,7 @@ class TokenResolver {
       return resolvedToken;
     }
 
-    // If we have an object (typography, border, shadow, composititions), we need to resolve each property
+    // If we have an object (typography, border, shadow, compositions), we need to resolve each property
     if (typeof token.value === 'object' && token.value !== null) {
       const resolvedObject: { [key: string]: any } = {};
 
@@ -308,7 +307,9 @@ class TokenResolver {
         this.memo.set(memoKey, resolvedToken);
       }
 
-      if (token.type === TokenTypes.BORDER) resolvedToken.resolvedValueWithReferences = token.value;
+      // For all composite tokens we add the resolved value with references to the token.
+      // technically for composites this is not needed, but then we can rely on this one property to contain the original value
+      resolvedToken.resolvedValueWithReferences = token.value;
 
       return resolvedToken;
     }

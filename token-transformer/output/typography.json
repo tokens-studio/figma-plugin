@@ -33,7 +33,11 @@
         "fontWeight": "Bold"
       },
       "type": "typography",
-      "resolvedValueWithReferences": "typography.h1"
+      "resolvedValueWithReferences": {
+        "fontFamily": "{typography.fontFamily}",
+        "fontSize": "96",
+        "fontWeight": "{typography.fontWeight}"
+      }
     }
   }
 }
