@@ -74,7 +74,7 @@ StorageProviderType.BITBUCKET,
 export type TokensStudioStorageType = GenericStorageType<
 StorageProviderType.TOKENS_STUDIO,
 {
-  name: string; // this is only for refrence
+  name: string; // this is only for reference
   id: string; // this is the project urn
 }
 >;

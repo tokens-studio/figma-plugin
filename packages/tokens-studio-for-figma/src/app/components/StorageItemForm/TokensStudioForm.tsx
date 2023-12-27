@@ -66,10 +66,9 @@ export default function TokensStudioForm({
           required
         />
         <Stack direction="row" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
-
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
             Save
           </Button>

@@ -26,8 +26,6 @@ export function pullTokensFactory(
 ) {
   const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
   const askUserIfRecoverLocalChanges = async () => {
-    console.log('askUserIfRecoverLocalChanges');
-
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
       description: 'You have local changes unsaved to the remote storage.',
@@ -125,15 +123,12 @@ export function pullTokensFactory(
     }
   };
 
-  console.log('Pull tokens factory inside');
-
   return async () => {
     const state = store.getState();
 
     if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
       const storageType = storageTypeSelector(state);
-      console.log('Params', params, checkForChanges, storageType);
 
       if (
         !checkForChanges
