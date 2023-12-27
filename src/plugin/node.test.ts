@@ -196,6 +196,20 @@ const mappedTokens = [
   },
 ];
 
+const applyTokens = [
+  { fill: 'global.colors.blue' },
+  { opacity: 'opacity.40' },
+  {
+    opacity: 'opacity.40',
+    borderRadius: 'border-radius.7',
+  },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { boxShadow: 'global.shadow.single' },
+  { boxShadow: 'global.shadow.multiple' },
+  { border: 'global.border.general', borderColor: 'global.border.general' },
+];
+
 describe('mapValuesToTokens', () => {
   it('maps values to tokens', () => {
     values.forEach((value, index) => {
@@ -259,67 +273,8 @@ describe('mapValuesToTokens', () => {
 
 describe('destructureTokenForAlias', () => {
   it('return extract border color from border token', () => {
-    const tokens = new Map([
-      ['reference',
-        {
-          name: 'reference',
-          type: 'border' as const,
-          value: {
-            color: '#e4002b',
-            style: 'solid',
-            width: 1,
-          },
-          rawValue: {
-            color: '{global.colors.lighten}',
-            style: 'solid',
-            width: '1',
-          },
-          $extensions: {
-            id: '137b67d1-5344-4ac4-8e6b-4538df84ecc6',
-          },
-        },
-      ],
-      ['test',
-        {
-          name: 'test',
-          rawValue: '{reference}',
-          type: 'border',
-          value: {
-            color: '#e4002b',
-            style: 'solid',
-            width: 1,
-          },
-          resolvedValueWithReferences: {
-            color: 'global.colors.lighten',
-            style: 'solid',
-            width: '1',
-          },
-          $extensions: {
-            id: '6806ae0a-8b1d-46e4-8638-43149b847c25',
-          },
-        },
-      ],
-    ]);
-    const values = [
-      {
-        border: 'reference',
-      },
-      {
-        border: 'test',
-      },
-    ];
-    const outputValues = [
-      {
-        border: 'reference',
-        borderColor: 'reference',
-      },
-      {
-        border: 'test',
-        borderColor: 'global.colors.lighten',
-      },
-    ];
     values.forEach((value, index) => {
-      expect(destructureTokenForAlias(tokens, value)).toEqual(outputValues[index]);
+      expect(destructureTokenForAlias(tokens, value)).toEqual(applyTokens[index]);
     });
   });
 });
