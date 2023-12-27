@@ -87,10 +87,10 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
             </StyledThemeLabel>
           </Button>
           <Select value={tokenSetStatus} onValueChange={handleValueChange}>
-            <Select.Trigger value={tokenSetSatusLabels[tokenSetStatus]} data-testid={`tokensettheme-item--dropdown-trigger--${item.key}`} />
+            <Select.Trigger value={tokenSetSatusLabels[tokenSetStatus]} data-testid={`tokensettheme-item--select-trigger--${item.key}`} />
             <Select.Content>
               {tokenSetStatusValues.map((status) => (
-                <Select.Item key={status} value={status} data-testid={`tokensettheme-item--dropdown-content--${status}`}>
+                <Select.Item key={status} value={status} data-testid={`tokensettheme-item--select-content--${status}`}>
                   {tokenSetSatusLabels[status]}
                 </Select.Item>
               ))}
