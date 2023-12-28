@@ -52,15 +52,9 @@ export function useStartupProcess(params: StartupMessage) {
       key: ApplicationInitSteps.PULL_TOKENS,
       fn: pullTokensFactory(store, dispatch, flags, params, useConfirmResult, useRemoteTokensResult),
     },
-  ]), [
-    params,
-    store,
-    useStorageResult,
-    flags,
-    dispatch,
-    useConfirmResult,
-    useRemoteTokensResult,
-  ]));
+  // disabling as we don't want some of those deps to trigger the process
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ]), [params, store, flags]));
 
   useEffect(() => {
     if (ldClient) {
