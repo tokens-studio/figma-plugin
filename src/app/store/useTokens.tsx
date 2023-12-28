@@ -436,7 +436,6 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-    const multiValueFilteredTokens = filterMultiValueTokens();
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -447,7 +446,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: multiValueFilteredTokens,
+      tokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
