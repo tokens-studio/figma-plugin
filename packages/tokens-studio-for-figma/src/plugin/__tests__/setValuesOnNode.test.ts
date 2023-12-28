@@ -95,6 +95,8 @@ describe('Can set values on node', () => {
       borderRadiusTopRight: 'border-radius-10',
       borderRadiusBottomRight: 'border-radius-10',
       borderRadiusBottomLeft: 'border-radius-10',
+      borderWidth: 'border-width-2',
+      opacity: 'opacity-50',
     };
 
     await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
