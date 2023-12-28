@@ -3,24 +3,62 @@ import { SingleBorderToken } from '@/types/tokens';
 import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
 import getFigmaDashPattern from './getFigmaDashPattern';
+import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
-export default function setBorderValuesOnTarget(target: BaseNode, token: Pick<SingleBorderToken, 'value'>, baseFontSize: string, side?: 'top' | 'right' | 'bottom' | 'left') {
+export default async function setBorderValuesOnTarget(
+  target: BaseNode,
+  token: Pick<SingleBorderToken, 'value'>,
+  baseFontSize: string,
+  figmaVariableReferences: RawVariableReferenceMap,
+  side?: 'top' | 'right' | 'bottom' | 'left',
+) {
   const { value } = token;
   const { width, style } = value;
   try {
-    if ('strokeWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && !side) {
+    if (
+      'strokeWeight' in target
+      && typeof width !== 'undefined'
+      && isPrimitiveValue(width)
+      && !side
+      && !(await tryApplyVariableId(target, 'strokeWeight', width, figmaVariableReferences))
+    ) {
       target.strokeWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
-    if ('strokeTopWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && side === 'top') {
+    if (
+      'strokeTopWeight' in target
+      && typeof width !== 'undefined'
+      && isPrimitiveValue(width)
+      && side === 'top'
+      && !(await tryApplyVariableId(target, 'strokeTopWeight', width, figmaVariableReferences))
+    ) {
       target.strokeTopWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
-    if ('strokeRightWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && side === 'right') {
+    if (
+      'strokeRightWeight' in target
+      && typeof width !== 'undefined'
+      && isPrimitiveValue(width)
+      && side === 'right'
+      && !(await tryApplyVariableId(target, 'strokeRightWeight', width, figmaVariableReferences))
+    ) {
       target.strokeRightWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
-    if ('strokeBottomWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && side === 'bottom') {
+    if (
+      'strokeBottomWeight' in target
+      && typeof width !== 'undefined'
+      && isPrimitiveValue(width)
+      && side === 'bottom'
+      && !(await tryApplyVariableId(target, 'strokeBottomWeight', width, figmaVariableReferences))
+    ) {
       target.strokeBottomWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
-    if ('strokeLeftWeight' in target && typeof width !== 'undefined' && isPrimitiveValue(width) && side === 'left') {
+    if (
+      'strokeLeftWeight' in target
+      && typeof width !== 'undefined'
+      && isPrimitiveValue(width)
+      && side === 'left'
+      && !(await tryApplyVariableId(target, 'strokeLeftWeight', width, figmaVariableReferences))
+    ) {
       target.strokeLeftWeight = transformValue(String(width), 'borderWidth', baseFontSize);
     }
 
