@@ -9,9 +9,7 @@ import {
   textStyleMatchesTypographyToken,
 } from './figmaUtils/styleMatchers';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
-import {
-  isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue,
-} from '@/utils/is';
+import { isPrimitiveValue, isSingleBoxShadowValue, isSingleTypographyValue } from '@/utils/is';
 import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { transformValue } from './helpers';
@@ -65,19 +63,19 @@ export default async function setValuesOnNode(
       });
       // set border token
       if (values.border && isCompositeBorderValue(values.border)) {
-        setBorderValuesOnTarget(node, { value: values.border }, baseFontSize);
+        setBorderValuesOnTarget(node, { value: values.border }, baseFontSize, figmaVariableReferences);
       }
       if (values.borderTop && isCompositeBorderValue(values.borderTop)) {
-        setBorderValuesOnTarget(node, { value: values.borderTop }, baseFontSize, 'top');
+        setBorderValuesOnTarget(node, { value: values.borderTop }, baseFontSize, figmaVariableReferences, 'top');
       }
       if (values.borderRight && isCompositeBorderValue(values.borderRight)) {
-        setBorderValuesOnTarget(node, { value: values.borderRight }, baseFontSize, 'right');
+        setBorderValuesOnTarget(node, { value: values.borderRight }, baseFontSize, figmaVariableReferences, 'right');
       }
       if (values.borderBottom && isCompositeBorderValue(values.borderBottom)) {
-        setBorderValuesOnTarget(node, { value: values.borderBottom }, baseFontSize, 'bottom');
+        setBorderValuesOnTarget(node, { value: values.borderBottom }, baseFontSize, figmaVariableReferences, 'bottom');
       }
       if (values.borderLeft && isCompositeBorderValue(values.borderLeft)) {
-        setBorderValuesOnTarget(node, { value: values.borderLeft }, baseFontSize, 'left');
+        setBorderValuesOnTarget(node, { value: values.borderLeft }, baseFontSize, figmaVariableReferences, 'left');
       }
 
       // if applied border is just a string, it's the older version where border was just a color. apply color then.
@@ -214,29 +212,66 @@ export default async function setValuesOnNode(
       }
 
       // BORDER WIDTH
-      if ('strokeWeight' in node && typeof values.borderWidth !== 'undefined' && isPrimitiveValue(values.borderWidth)) {
+      if (
+        'strokeWeight' in node
+        && typeof values.borderWidth !== 'undefined'
+        && typeof data.borderWidth !== 'undefined'
+        && isPrimitiveValue(values.borderWidth)
+        // Have to set it individually as Figma does the same, hence the strokeWeight would never be set
+        && !(await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidth, figmaVariableReferences)
+          && await tryApplyVariableId(node, 'strokeRightWeight', data.borderWidth, figmaVariableReferences)
+          && await tryApplyVariableId(node, 'strokeBottomWeight', data.borderWidth, figmaVariableReferences)
+          && await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidth, figmaVariableReferences))
+      ) {
         node.strokeWeight = transformValue(String(values.borderWidth), 'borderWidth', baseFontSize);
       }
 
-      if ('strokeTopWeight' in node && typeof values.borderWidthTop !== 'undefined') {
+      if (
+        'strokeTopWeight' in node
+        && typeof values.borderWidthTop !== 'undefined'
+        && typeof data.borderWidthTop !== 'undefined'
+        && !(await tryApplyVariableId(node, 'strokeTopWeight', data.borderWidthTop, figmaVariableReferences))
+      ) {
         node.strokeTopWeight = transformValue(String(values.borderWidthTop), 'borderWidthTop', baseFontSize);
       }
 
-      if ('strokeRightWeight' in node && typeof values.borderWidthRight !== 'undefined') {
+      if (
+        'strokeRightWeight' in node
+        && typeof values.borderWidthRight !== 'undefined'
+        && typeof data.borderWidthRight !== 'undefined'
+        && !(await tryApplyVariableId(node, 'strokeRightWeight', data.borderWidthRight, figmaVariableReferences))
+      ) {
         node.strokeRightWeight = transformValue(String(values.borderWidthRight), 'borderWidthRight', baseFontSize);
       }
 
-      if ('strokeBottomWeight' in node && typeof values.borderWidthBottom !== 'undefined') {
+      if (
+        'strokeBottomWeight' in node
+        && typeof values.borderWidthBottom !== 'undefined'
+        && typeof data.borderWidthBottom !== 'undefined'
+        && !(await tryApplyVariableId(node, 'strokeBottomWeight', data.borderWidthBottom, figmaVariableReferences))
+      ) {
         node.strokeBottomWeight = transformValue(String(values.borderWidthBottom), 'borderWidthBottom', baseFontSize);
       }
 
-      if ('strokeLeftWeight' in node && typeof values.borderWidthLeft !== 'undefined') {
+      if (
+        'strokeLeftWeight' in node
+        && typeof values.borderWidthLeft !== 'undefined'
+        && typeof data.borderWidthLeft !== 'undefined'
+        && !(await tryApplyVariableId(node, 'strokeLeftWeight', data.borderWidthLeft, figmaVariableReferences))
+      ) {
         node.strokeLeftWeight = transformValue(String(values.borderWidthLeft), 'borderWidthLeft', baseFontSize);
       }
 
       // OPACITY
-      if ('opacity' in node && typeof values.opacity !== 'undefined' && isPrimitiveValue(values.opacity)) {
-        node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
+      if (
+        'opacity' in node
+        && typeof values.opacity !== 'undefined'
+        && typeof data.opacity !== 'undefined'
+        && isPrimitiveValue(values.opacity)
+      ) {
+        if (!(await tryApplyVariableId(node, 'opacity', data.opacity, figmaVariableReferences))) {
+          node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
+        }
       }
 
       // SIZING: BOTH
