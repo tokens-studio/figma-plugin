@@ -1,15 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
-import { CheckIcon } from '@radix-ui/react-icons';
-import { Button, DropdownMenu, Select } from '@tokens-studio/ui';
+import {
+  Button, Box, Stack, Select,
+} from '@tokens-studio/ui';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
-import Box from '../Box';
-import Stack from '../Stack';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import IconChevronDown from '@/icons/chevrondown.svg';
 import TokenSetStatusIcon from './TokenSetStatusIcon';
-
-DropdownMenu;
 
 type Props = {
   item: TreeItem

@@ -1,52 +1,37 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { Button, Heading } from '@tokens-studio/ui';
 import {
-  localApiStateSelector, remoteDataSelector, storageTypeSelector, themesListSelector, tokensSelector,
+  Box, Button, Heading, Spinner, Stack, Text,
+} from '@tokens-studio/ui';
+import {
+  localApiStateSelector,
+  storageTypeSelector,
 } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
-import Text from './Text';
-import Modal from './Modal';
-import Stack from './Stack';
-import Spinner from './Spinner';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import { useShortcut } from '@/hooks/useShortcut';
-import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
-import { findDifferentState } from '@/utils/findDifferentState';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
+import Modal from './Modal';
 
 function PushDialog() {
-  const {
-    onConfirm, onCancel, showPushDialog,
-  } = usePushDialog();
+  const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const { t } = useTranslation(['sync']);
   const localApiState = useSelector(localApiStateSelector);
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
   const [activeTab, setActiveTab] = React.useState('commit');
-  const remoteData = useSelector(remoteDataSelector);
-  const tokens = useSelector(tokensSelector);
-  const themes = useSelector(themesListSelector);
-  const changedState = React.useMemo(() => {
-    const tokenSetOrder = Object.keys(tokens);
-    return findDifferentState(remoteData, {
-      tokens,
-      themes,
-      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
-    });
-  }, [remoteData, tokens, themes, storageType]);
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
@@ -114,11 +99,14 @@ function PushDialog() {
     }
   }, [branch, commitMessage, onConfirm, localApiState]);
 
-  const handleSaveShortcut = React.useCallback((event: KeyboardEvent) => {
-    if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
-      handlePushChanges();
-    }
-  }, [handlePushChanges, showPushDialog]);
+  const handleSaveShortcut = React.useCallback(
+    (event: KeyboardEvent) => {
+      if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
+        handlePushChanges();
+      }
+    },
+    [handlePushChanges, showPushDialog],
+  );
 
   useShortcut(['Enter'], handleSaveShortcut);
 
@@ -143,49 +131,57 @@ function PushDialog() {
               <TabButton<string> name="diff" activeTab={activeTab} label={t('diff')} onSwitch={handleSwitch} />
               <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
             </Stack>
-            {
-              activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
-                <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
-                  {t('thisWillPushYourLocalChangesToTheBranch')}
+            {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
+              <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
+                {t('thisWillPushYourLocalChangesToTheBranch')}
+                {' '}
+                <Text
+                  bold
+                  css={{
+                    display: 'inline',
+                    whiteSpace: 'nowrap',
+                    background: '$bgSubtle',
+                    padding: '$2',
+                  }}
+                >
                   {' '}
-                  <Text
-                    bold
-                    css={{
-                      display: 'inline', whiteSpace: 'nowrap', background: '$bgSubtle', padding: '$2',
-                    }}
-                  >
-                    {' '}
-                    {branch}
-                  </Text>
-                </Stack>
-              )
-            }
-            {
-              activeTab === 'commit' && <PushSettingForm commitMessage={commitMessage} branch={branch} handleBranchChange={handleBranchChange} handleCommitMessageChange={handleCommitMessageChange} />
-            }
-            {
-              activeTab === 'diff' && <ChangedStateList changedState={changedState} />
-            }
-            {
-              activeTab === 'json' && <PushJSON />
-            }
-            <Box css={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: '$4',
-              borderTop: '1px solid',
-              borderColor: '$borderMuted',
-              position: 'sticky',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: '$bgDefault',
-            }}
+                  {branch}
+                </Text>
+              </Stack>
+            )}
+            {activeTab === 'commit' && (
+              <PushSettingForm
+                commitMessage={commitMessage}
+                branch={branch}
+                handleBranchChange={handleBranchChange}
+                handleCommitMessageChange={handleCommitMessageChange}
+              />
+            )}
+            {activeTab === 'diff' && <ChangedStateList />}
+            {activeTab === 'json' && <PushJSON />}
+            <Box
+              css={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '$4',
+                borderTop: '1px solid',
+                borderColor: '$borderMuted',
+                position: 'sticky',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: '$bgDefault',
+              }}
             >
               <Button variant="secondary" data-testid="push-dialog-button-close" onClick={onCancel}>
                 {t('cancel')}
               </Button>
-              <Button variant="primary" data-testid="push-dialog-button-push-changes" disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)} onClick={handlePushChanges}>
+              <Button
+                variant="primary"
+                data-testid="push-dialog-button-push-changes"
+                disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)}
+                onClick={handlePushChanges}
+              >
                 {t('pushChanges')}
               </Button>
             </Box>
@@ -213,9 +209,11 @@ function PushDialog() {
     case 'success': {
       return (
         <Modal large isOpen close={onCancel}>
-          <Stack direction="column" gap={6} css={{ textAlign: 'center' }}>
+          <Stack direction="column" align="center" gap={6} css={{ textAlign: 'center' }}>
             <Stack direction="column" gap={4}>
-              <Heading data-testid="push-dialog-success-heading" size="medium">All done!</Heading>
+              <Heading data-testid="push-dialog-success-heading" size="medium">
+                All done!
+              </Heading>
               <Text size="small">
                 {t('changesPushedTo')}
                 {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
@@ -226,9 +224,11 @@ function PushDialog() {
               </Text>
             </Stack>
             <Button variant="primary" href={redirectHref}>
-              {localApiState.provider === StorageProviderType.SUPERNOVA
-                ? <>{t('openSupernovaWorkspace')}</>
-                : <>{t('createPullRequest')}</>}
+              {localApiState.provider === StorageProviderType.SUPERNOVA ? (
+                <>{t('openSupernovaWorkspace')}</>
+              ) : (
+                <>{t('createPullRequest')}</>
+              )}
             </Button>
           </Stack>
         </Modal>

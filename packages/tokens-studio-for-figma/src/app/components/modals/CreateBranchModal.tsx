@@ -1,14 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { GitBranchIcon } from '@primer/octicons-react';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import Input from '../Input';
 import useRemoteTokens from '../../store/remoteTokens';
 import {
   activeThemeSelector, apiSelector, localApiStateSelector, usedTokenSetSelector,
 } from '@/selectors';
-import Stack from '../Stack';
 import { isGitProvider } from '@/utils/is';
 import type { StorageTypeCredentials } from '@/types/StorageType';
 import { ErrorMessage } from '../ErrorMessage';
@@ -100,21 +98,9 @@ export default function CreateBranchModal({
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal large isOpen={isOpen} close={handleModalClose}>
+    <Modal title={`Create a new branch from ${isCurrentChanges ? 'current changes' : startBranch}`} large isOpen={isOpen} close={handleModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
-          <Heading>
-            Create a new branch from
-            {' '}
-            {isCurrentChanges
-              ? 'current changes'
-              : (
-                <>
-                  <GitBranchIcon size={12} />
-                  {` ${startBranch}`}
-                </>
-              )}
-          </Heading>
           <Input
             required
             full
@@ -134,12 +120,12 @@ export default function CreateBranchModal({
               </ErrorMessage>
             )
           }
-          <Stack direction="row" gap={4}>
-            <Button variant="secondary" size="large" onClick={handleModalClose}>
+          <Stack direction="row" justify="end" gap={4}>
+            <Button variant="secondary" onClick={handleModalClose}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" disabled={!('branch' in formFields && isBranchNameValid)}>
-              Save
+              Create branch
             </Button>
           </Stack>
           {hasErrored && (

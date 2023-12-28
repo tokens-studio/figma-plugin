@@ -11,7 +11,7 @@ export const ModalFooter = styled('footer', {
         position: 'sticky',
         left: 0,
         right: 0,
-        bottom: 0,
+        bottom: -0.5,
         zIndex: 1,
       },
     },

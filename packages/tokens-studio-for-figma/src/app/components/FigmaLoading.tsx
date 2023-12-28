@@ -1,12 +1,10 @@
 import React, { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Box, Spinner, Stack } from '@tokens-studio/ui';
 import FigmaMark from '@/icons/figma-mark.svg';
 import FigmaLetter from '@/icons/figma-letter.svg';
 import * as pjs from '../../../package.json';
-import Stack from './Stack';
 import { styled } from '@/stitches.config';
-import Spinner from './Spinner';
-import Box from './Box';
 
 const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
@@ -54,7 +52,7 @@ export default function FigmaLoading({
           {pjs.version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
-          <Spinner inverse />
+          <Spinner onAccent />
           <Stack direction="column" gap={4} justify="center" align="center">
             {label ?? t('loadingWait')}
           </Stack>

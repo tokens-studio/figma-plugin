@@ -87,18 +87,14 @@ function ConfirmDialog() {
   }, [confirmState.show, confirmButton, confirmState.choices, firstInput]);
 
   return confirmState.show ? (
-    <Modal isOpen close={onCancel}>
+    <Modal isOpen close={onCancel} title={confirmState?.text && confirmState.text}>
       <form onSubmit={handleConfirm}>
         <Stack direction="column" justify="start" gap={4}>
           <Stack direction="column" gap={4}>
-            <Stack direction="column" gap={2}>
-              <Heading size="small">{confirmState?.text && confirmState.text}</Heading>
-              {confirmState?.description && (
+            {confirmState?.description && (
               <Text muted>{confirmState.description}</Text>
-              )}
-            </Stack>
-            {confirmState?.input && (
-            <Stack direction="column" gap={2}>
+            )}
+            {confirmState?.input ? (
               <Input
                 id="input"
                 type={confirmState.input.type}
@@ -108,27 +104,26 @@ function ConfirmDialog() {
                 full
                 required
               />
-            </Stack>
-            )}
-            {confirmState?.choices && (
-            <Stack direction="column" align="start" gap={2}>
-              {confirmState.choices.map((choice) => (
-                <Box
-                  css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
-                  key={choice.key}
-                >
-                  <ChoiceCheckbox
-                    checked={chosen.includes(choice.key)}
-                    choice={choice}
-                    onCheckedChange={toggleChosen}
-                  />
-                  <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
-                    {choice.label}
-                  </Label>
-                </Box>
-              ))}
-            </Stack>
-            )}
+            ) : null}
+            {confirmState?.choices?.length ? (
+              <Stack direction="column" align="start" gap={2}>
+                {confirmState.choices.map((choice) => (
+                  <Box
+                    css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
+                    key={choice.key}
+                  >
+                    <ChoiceCheckbox
+                      checked={chosen.includes(choice.key)}
+                      choice={choice}
+                      onCheckedChange={toggleChosen}
+                    />
+                    <Label css={{ paddingLeft: '$3' }} htmlFor={choice.key}>
+                      {choice.label}
+                    </Label>
+                  </Box>
+                ))}
+              </Stack>
+            ) : null}
           </Stack>
           <Stack direction="row" gap={3} justify="between">
             <Button variant="secondary" onClick={onCancel}>

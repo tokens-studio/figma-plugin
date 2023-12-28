@@ -6,18 +6,16 @@ import { useUIDSeed } from 'react-uid';
 import { XYCoord } from 'dnd-core';
 import debounce from 'lodash.debounce';
 import { useTranslation } from 'react-i18next';
-import { IconButton } from '@tokens-studio/ui';
+import {
+  Box, IconButton, Stack, ToggleGroup,
+} from '@tokens-studio/ui';
 import IconMinus from '@/icons/minus.svg';
 import IconGrabber from '@/icons/grabber.svg';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { TokenBoxshadowValue } from '@/types/values';
 import ColorPicker from './ColorPicker';
-import Select from './Select';
-import Box from './Box';
 import SingleBoxShadowDownShiftInput from './SingleBoxShadowDownShiftInput';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
-import Tooltip from './Tooltip';
-import { StyledPrefix } from './Input';
 
 interface DragItem {
   index: number;
@@ -81,16 +79,16 @@ export default function SingleBoxShadowInput({
     }
   }, [index, value, handleBoxShadowValueChange]);
 
-  const onTypeChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onTypeChange = React.useCallback((newValue: BoxShadowTypes) => {
     if (Array.isArray(value)) {
       const values = [...value];
-      values.splice(index, 1, { ...value[index], [e.target.name]: e.target.value });
+      values.splice(index, 1, { ...value[index], type: newValue });
       handleBoxShadowValueChange(values);
     } else {
       handleBoxShadowValueChange({
         ...newTokenValue,
         ...value,
-        [e.target.name]: e.target.value,
+        type: newValue,
       });
     }
   }, [index, value, handleBoxShadowValueChange]);
@@ -221,11 +219,12 @@ export default function SingleBoxShadowInput({
             />
           </Box>
         )}
-        <Tooltip label="type"><StyledPrefix isText>{t('type')}</StyledPrefix></Tooltip>
-        <Select css={{ flexGrow: 1 }} value={shadowItem?.type ?? newTokenValue.type} id="type" onChange={onTypeChange}>
-          <option value="innerShadow">{t('shadow.inner')}</option>
-          <option value="dropShadow">{t('shadow.drop')}</option>
-        </Select>
+        <Stack justify="end" css={{ width: '100%' }}>
+          <ToggleGroup type="single" value={shadowItem?.type ?? newTokenValue.type} onValueChange={onTypeChange}>
+            <ToggleGroup.Item iconOnly={false} value="innerShadow">{t('shadow.inner')}</ToggleGroup.Item>
+            <ToggleGroup.Item iconOnly={false} value="dropShadow">{t('shadow.drop')}</ToggleGroup.Item>
+          </ToggleGroup>
+        </Stack>
         {isMultiple && (
           <IconButton
             tooltip={t('shadow.removeThisShadow')}

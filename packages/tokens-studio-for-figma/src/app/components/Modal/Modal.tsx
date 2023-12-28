@@ -84,6 +84,10 @@ export function Modal({
                 borderBottomColor: '$borderMuted',
                 borderBottomWidth: '1px',
                 padding: '$4',
+                position: 'sticky',
+                backgroundColor: '$bgDefault',
+                top: 0,
+                zIndex: 10,
               }}
             >
               {title && (

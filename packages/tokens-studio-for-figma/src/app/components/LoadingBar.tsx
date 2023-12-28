@@ -1,18 +1,15 @@
 import React from 'react';
 import get from 'just-safe-get';
 import { useSelector } from 'react-redux';
-import { Button } from '@tokens-studio/ui';
+import {
+  Box, Button, Spinner, Stack, Text,
+} from '@tokens-studio/ui';
 import { useDelayedFlag } from '@/hooks';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { backgroundJobsSelector, windowSizeSelector } from '@/selectors';
-import Stack from './Stack';
-import Text from './Text';
-import Spinner from './Spinner';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import Box from './Box';
 import { formatNumber } from '@/utils/formatNumber';
-
 // TODO : i18n needs some refactoring
 export const backgroundJobTitles = {
   [BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA]: 'Finding nodes...',

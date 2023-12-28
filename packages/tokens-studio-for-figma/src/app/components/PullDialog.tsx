@@ -1,22 +1,19 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
 import {
-  changedStateSelector, storageTypeSelector,
-} from '@/selectors';
+  Box, Button, Heading, Spinner, Stack,
+} from '@tokens-studio/ui';
+import { storageTypeSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Modal from './Modal';
-import Stack from './Stack';
-import Spinner from './Spinner';
-import Box from './Box';
+
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 
 function PullDialog() {
   const { onConfirm, onCancel, pullDialogMode } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
-  const changedState = useSelector(changedStateSelector);
 
   const { t } = useTranslation(['sync']);
 
@@ -38,49 +35,33 @@ function PullDialog() {
           large
           isOpen
           close={onCancel}
-        >
-          <Stack direction="column" gap={4}>
-            <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-              {t('override')}
-            </Stack>
-            <ChangedStateList changedState={changedState} />
-            <Box css={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              padding: '$4',
-              borderTop: '1px solid',
-              borderColor: '$borderMuted',
-              position: 'sticky',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              backgroundColor: '$bgDefault',
-            }}
-            >
+          stickyFooter
+          footer={(
+            <Stack direction="row" gap={4} justify="between">
               <Button variant="secondary" id="pullDialog-button-close" onClick={handleClose}>
                 {t('cancel')}
               </Button>
               <Button variant="primary" id="pullDialog-button-override" onClick={handleOverrideClick}>
                 {t('pullTokens')}
               </Button>
-            </Box>
+            </Stack>
+          )}
+        >
+          <Stack direction="column" gap={4}>
+            <Stack direction="row" gap={2} css={{ padding: '$4' }}>
+              {t('override')}
+            </Stack>
+            <ChangedStateList />
           </Stack>
         </Modal>
       );
     }
     case 'loading': {
       return (
-        <Modal
-          large
-          isOpen
-          close={onCancel}
-          title={`Pull from ${transformProviderName(storageType.provider)}`}
-        >
+        <Modal large isOpen close={onCancel} title={`Pull from ${transformProviderName(storageType.provider)}`}>
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
-            <Heading size="medium">
-              {t('pullFrom', { provider: transformProviderName(storageType.provider) })}
-            </Heading>
+            <Heading size="medium">{t('pullFrom', { provider: transformProviderName(storageType.provider) })}</Heading>
           </Stack>
         </Modal>
       );

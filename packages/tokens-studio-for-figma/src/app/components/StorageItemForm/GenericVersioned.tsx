@@ -1,23 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
-import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  IconButton, Button, Heading, DropdownMenu,
-  Select,
+  Box, Stack, Text, Link, IconButton, Button, Heading, Select,
 } from '@tokens-studio/ui';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
 import Input from '../Input';
-import Box from '../Box';
-import Stack from '../Stack';
-import Text from '../Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
-import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
-import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
