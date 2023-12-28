@@ -8,4 +8,5 @@ export enum StorageProviderType {
   ADO = 'ado',
   URL = 'url',
   BITBUCKET = 'bitbucket',
+  TOKENS_STUDIO = 'tokensstudio',
 }

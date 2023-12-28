@@ -103,6 +103,9 @@ async function updateRemoteTokens({
     case StorageProviderType.SUPERNOVA: {
       break;
     }
+    case StorageProviderType.TOKENS_STUDIO: {
+      break;
+    }
     default:
       throw new Error(`Unimplemented storage provider for ${provider}`);
   }

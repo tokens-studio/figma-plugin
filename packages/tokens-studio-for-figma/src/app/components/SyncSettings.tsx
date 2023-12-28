@@ -53,6 +53,10 @@ const SyncSettings = () => {
       text: t('providers.generic.title'),
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
     },
+    {
+      text: 'Tokens Studio',
+      type: StorageProviderType.TOKENS_STUDIO,
+    },
   ], [t]);
 
   const storageType = useSelector(storageTypeSelector);

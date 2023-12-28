@@ -31,6 +31,11 @@ function isSameCredentials(
         && credential.provider === stored.provider
         && credential.designSystemUrl === stored.designSystemUrl
       );
+    case StorageProviderType.TOKENS_STUDIO:
+      return (
+        credential.id === stored.id
+        && credential.provider === stored.provider
+      );
     default:
       return false;
   }
