@@ -1,23 +1,25 @@
 {
-  "editCredentials": "Editar credenciales",
-  "addNew": "Agregar nuevo",
+  "setToDocumentStorage": "¿Configurado para almacenamiento de documentos?",
+  "youCanAlwaysGoBack": "Siempre puedes volver al almacenamiento remoto.",
+  "addNewSyncProvider": "Agregar nuevo proveedor de sincronización",
+  "editCredentials": "Editar credenciales del proveedor de sincronización",
+  "name": "Nombre",
   "pat": "Token de acceso personal",
-  "credentials": "cartas credenciales",
-  "gitExplained": "Acceda a los tokens almacenados en su repositorio, empuje y extraiga tokens en una sincronización bidireccional.",
+  "gitExplained": "Lea sus tokens que están almacenados en su repositorio, cerca de su código.",
   "readMore": "Leer más",
   "cancel": "Cancelar",
   "repo": "Repositorio (propietario/repositorio)",
   "branch": "Rama",
   "baseUrl": "URL base (opcional)",
-  "saveCredentials": "Guardar credenciales",
-  "filePath": "Ruta del archivo (p. ej., tokens.json) o ruta de la carpeta (p. ej., tokens)",
+  "secret": "Secreto",
+  "filePath": "Ruta de archivo",
+  "filePathCaption": "src/tokens para sincronizar con una carpeta, agregue .json al final para sincronizar con un solo archivo",
   "syncProviders": "Proveedores de sincronización",
   "providers": {
     "generic": {
       "title": "Versión genérica",
       "url": "URL",
-      "addNew": "Agregar un nuevo proveedor de almacenamiento genérico",
-      "description": "Acceda a tokens almacenados en su propio proveedor de almacenamiento, lo que permite operaciones bidireccionales de sincronización, creación y solo lectura.",
+      "description": "Acceda a tokens almacenados en su propio proveedor de almacenamiento, lo que permite operaciones de sincronización bidireccional, creación y de solo lectura.",
       "flowType": "Tipo de flujo",
       "readOnly": "Solo lectura",
       "readWrite": "Leer escribir",
@@ -28,11 +30,13 @@
     },
     "url": {
       "title": "URL",
-      "addNew": "Agregar un nuevo proveedor de URL",
-      "description": "Los tokens almacenados en un servidor le permiten agregarlos como un proveedor de solo lectura."
+      "description": "Los tokens almacenados en un servidor le permiten agregarlos como proveedor de solo lectura.",
+      "url": "URL",
+      "headers": "Encabezados"
     },
     "jsonbin": {
-      "title": "JSONBIN"
+      "title": "JSONBIN",
+      "description": "Acceda a tokens almacenados en JSONBin.io, un servicio de almacenamiento JSON gratuito para sincronización bidireccional."
     },
     "github": {
       "title": "GitHub"
@@ -41,16 +45,27 @@
       "title": "GitLab"
     },
     "supernova": {
-      "accessToken": "Ficha de acceso de supernova",
-      "addNew": "Agregar nuevas credenciales de Supernova",
+      "accessToken": "Token de acceso a supernova",
       "dsUrl": "URL del sistema de diseño",
       "description": "Le permite insertar tokens en una marca y un tema específicos en un sistema de diseño seleccionado."
+    },
+    "ado": {
+      "description": "Acceda a los tokens almacenados en su repositorio, envíe y extraiga tokens en una sincronización bidireccional.",
+      "pat": "Token de acceso personal",
+      "orgUrl": "URL de la organización",
+      "repositoryName": "Nombre del repositorio",
+      "projectName": "Nombre del proyecto (opcional)"
+    },
+    "bitbucket": {
+      "appPassword": "Contraseña de la aplicación",
+      "projectName": "Nombre del proyecto (opcional)",
+      "repository": "Repositorio (espacio de trabajo/repositorio)"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
-  "localDocument": "Documento local",
+  "localDocument": "documento local",
   "apply": "Aplicar",
-  "confirmDelete": "¿De verdad quieres borrar esto?",
+  "confirmDelete": "¿Realmente quieres eliminar esto?",
   "active": "Activo",
   "edit": "Editar",
   "delete": "Borrar",

@@ -11,15 +11,6 @@
   "inAToken": "dans un jeton appelé",
   "forYourStyles": "pour vos styles",
   "resetOnboarding": "Réinitialiser l'intégration",
-  "removeRelaunchData": {
-    "button": "Supprimer les données obsolètes",
-    "title": "Supprimer les données obsolètes ?",
-    "confirm": "Confirmer",
-    "description": "Cela supprimera les données obsolètes dans le panneau des propriétés à droite. Cela n'affectera pas vos jetons, styles ou thèmes.",
-    "selection": "Sélection",
-    "page": "Page",
-    "document": "Document"
-  },
   "issueSavingCredentials": "Un problème est survenu lors de l'enregistrement de vos informations d'identification. Veuillez réessayer.",
   "sessionRecordingDescription": "L'enregistrement de session est une nouvelle fonctionnalité de Tokens Studio pour suivre les sessions utilisateur lorsque des bogues se produisent, afin que nous puissions mieux comprendre le problème et le résoudre. Aucune donnée ne sera envoyée à notre serveur de télémétrie si vous ne rencontrez pas de bug ou si vous désactivez le débogage.",
   "dataCollectedIsAnonymised": "Toutes les données collectées sont anonymisées et ne seront pas partagées avec des tiers et sont utilisées uniquement pour résoudre les bogues et optimiser les performances.",
@@ -43,5 +34,6 @@
   "secondScreenExplainer": "Renforcez votre flux de travail de conception en vous permettant de gérer vos jetons de conception sur un deuxième écran.",
   "language": "Langue",
   "languageExplainer": "Tokens Studio a été traduit automatiquement, donc les traductions peuvent sembler inexactes.\n Vous ne voyez pas votre langue ? Soumettre une demande de fonctionnalité",
-  "liveSyncActive": "Synchronisation en direct active"
+  "liveSyncActive": "Synchronisation en direct active",
+  "chooseANewToken": "Entrez une nouvelle valeur ou choisissez un jeton"
 }

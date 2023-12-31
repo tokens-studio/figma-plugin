@@ -1,8 +1,8 @@
 import React, { ComponentType } from 'react';
 import type { GetInputPropsOptions } from 'downshift';
 import { FixedSizeList as List } from 'react-window';
+import { TextInput } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import { StyledInput } from '../Input';
 
 type Props = {
   type?: string;
@@ -24,25 +24,23 @@ export const StyledDropdown = styled('div', {
   maxHeight: '30vh',
   borderBottomLeftRadius: '$medium',
   borderBottomRightRadius: '$medium',
-  overflowY: 'scroll',
+  overflowY: 'auto',
   backgroundColor: '$bgDefault',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
 });
 
 export const StyledList = styled(List as ComponentType<any>, {
-  position: 'absolute',
   zIndex: '10',
-  width: 'calc(100% - $scrollbarWidth)',
   maxHeight: '30vh',
-  overflowY: 'scroll',
+  overflowY: 'auto',
   backgroundColor: '$bgDefault',
-  marginTop: '1px',
   cursor: 'pointer',
+  padding: '$2',
 });
 
 export const StyledItemValue = styled('div', {
-  color: 'var(--mentions-color-muted, var(--colors-fgMuted))',
+  color: '$fgMuted',
   fontWeight: '$sansBold',
   textAlign: 'right',
   maxWidth: '300px',
@@ -56,15 +54,11 @@ export const StyledItem = styled('div', {
   gap: '$2',
   padding: '$2 $3',
   borderRadius: '$small',
-  fontSize: '$xsmall',
+  fontSize: '$xxsmall',
   variants: {
     isFocused: {
       true: {
-        backgroundColor: '$accentDefault',
-        color: '$fgOnEmphasis',
-        [`& ${StyledItemValue}`]: {
-          color: '$fgOnEmphasis',
-        },
+        backgroundColor: '$bgSubtle',
       },
     },
   },
@@ -77,9 +71,9 @@ export const StyledItemColorDiv = styled('div', {
 export const StyledItemColor = styled('div', {
   width: '16px',
   height: '16px',
-  borderRadius: '$colorSwatch',
+  borderRadius: '$small',
   border: '1px solid',
-  borderColor: '$borderMuted',
+  borderColor: '$borderSubtle',
 });
 
 export const StyledItemName = styled('div', {
@@ -92,7 +86,7 @@ export const StyledPart = styled('span', {
   variants: {
     matches: {
       true: {
-        fontWeight: '$sansBold',
+        fontWeight: '$sansSemibold',
       },
     },
   },
@@ -134,12 +128,9 @@ export const StyledDownshiftInput: React.FC<React.PropsWithChildren<React.PropsW
   });
 
   return (
-    <StyledInput
+    <TextInput
       ref={ref as React.MutableRefObject<HTMLInputElement>}
       data-testid={dataCy}
-      hasSuffix={!!suffix}
-      size="small"
-      className="input"
       {...inputProps}
     />
   );
