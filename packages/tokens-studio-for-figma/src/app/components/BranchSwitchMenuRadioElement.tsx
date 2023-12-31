@@ -21,7 +21,7 @@ export const BranchSwitchMenuRadioElement: React.FC<React.PropsWithChildren<Reac
       data-testid={`branch-switch-menu-radio-element-${branch}`}
       value={branch}
       onSelect={onSelect}
-      css={{ position: 'relative', fontFamily: '$mono', fontSize: '$xxsmall' }}
+      css={{ position: 'relative' }}
     >
       <DropdownMenu.ItemIndicator>
         <CheckIcon data-testid="branch-switch-menu-check-icon" />

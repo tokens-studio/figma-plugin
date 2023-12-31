@@ -1,18 +1,16 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import Box from '../Box';
-import Input from '../Input';
-import Stack from '../Stack';
+
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
-import { transformProviderName } from '@/utils/transformProviderName';
-import Text from '../Text';
-import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
 type Props = {
@@ -27,7 +25,11 @@ type Props = {
 export default function GitForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const inputEl = useRef<HTMLInputElement | null>(null);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const { t } = useTranslation(['storage']);
 
@@ -59,73 +61,76 @@ export default function GitForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Stack direction="column" gap={1}>
-          <Heading>
-            {t('addNew')}
-            {' '}
-            {transformProviderName(values.provider)}
-            {' '}
-            {t('credentials')}
-
-          </Heading>
-          <Text muted>
-            {t('gitExplained')}
-            {' '}
-            <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}>{t('readMore')}</Link>
-          </Text>
-        </Stack>
-        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Box css={{ position: 'relative' }}>
-          <Input
-            full
-            label={t('pat')}
-            value={values.secret}
-            onChange={onChange}
-            inputRef={inputEl}
-            isMasked
-            type="password"
+      <Stack direction="column" gap={5}>
+        <Text muted>
+          {t('gitExplained')}
+          {' '}
+          <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`} target="_blank">{t('readMore')}</Link>
+        </Text>
+        <FormField>
+          <Label htmlFor="name">{t('name')}</Label>
+          <TextInput autoFocus name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('pat')}</Label>
+          <TextInput
             name="secret"
+            id="secret"
+            value={values.secret || ''}
+            onChange={onChange}
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
             required
           />
-        </Box>
-        <Input
-          full
-          label={t('repo')}
-          value={values.id}
-          onChange={onChange}
-          type="text"
-          name="id"
-          required
-        />
-        <Input
-          full
-          label={t('branch')}
-          value={values.branch}
-          onChange={onChange}
-          type="text"
-          name="branch"
-          required
-        />
-        <Input
-          full
-          label={t('filePath')}
-          defaultValue=""
-          value={values.filePath}
-          onChange={onChange}
-          type="text"
-          name="filePath"
-        />
-        <Input
-          full
-          label={t('baseUrl')}
-          value={values.baseUrl}
-          placeholder={baseUrlPlaceholder}
-          onChange={onChange}
-          type="text"
-          name="baseUrl"
-        />
-        <Stack direction="row" gap={4}>
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">{t('repo')}</Label>
+          <TextInput
+            name="id"
+            id="id"
+            value={values.id || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="branch">{t('branch')}</Label>
+          <TextInput
+            name="branch"
+            id="branch"
+            value={values.branch || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="filePath">{t('filePath')}</Label>
+          <TextInput
+            name="filePath"
+            id="filePath"
+            defaultValue=""
+            value={values.filePath || ''}
+            onChange={onChange}
+            type="text"
+          />
+          <Text muted size="xsmall">{t('filePathCaption')}</Text>
+        </FormField>
+        <FormField>
+          <Label htmlFor="baseUrl">{t('baseUrl')}</Label>
+          <TextInput
+            name="baseUrl"
+            id="baseUrl"
+            value={values.baseUrl || ''}
+            placeholder={baseUrlPlaceholder}
+            onChange={onChange}
+            type="text"
+          />
+        </FormField>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>

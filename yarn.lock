@@ -4029,6 +4029,28 @@
     aria-hidden "^1.1.1"
     react-remove-scroll "2.5.5"
 
+"@radix-ui/react-popover@^1.0.6":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-popover/-/react-popover-1.0.7.tgz#23eb7e3327330cb75ec7b4092d685398c1654e3c"
+  integrity sha512-shtvVnlsxT6faMnK/a7n0wptwBD23xc1Z5mdrtKLwVEfsEMXodS0r5s0/g5P0hX//EKYZS2sxUjqfzlg52ZSnQ==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "1.0.1"
+    "@radix-ui/react-compose-refs" "1.0.1"
+    "@radix-ui/react-context" "1.0.1"
+    "@radix-ui/react-dismissable-layer" "1.0.5"
+    "@radix-ui/react-focus-guards" "1.0.1"
+    "@radix-ui/react-focus-scope" "1.0.4"
+    "@radix-ui/react-id" "1.0.1"
+    "@radix-ui/react-popper" "1.1.3"
+    "@radix-ui/react-portal" "1.0.4"
+    "@radix-ui/react-presence" "1.0.1"
+    "@radix-ui/react-primitive" "1.0.3"
+    "@radix-ui/react-slot" "1.0.2"
+    "@radix-ui/react-use-controllable-state" "1.0.1"
+    aria-hidden "^1.1.1"
+    react-remove-scroll "2.5.5"
+
 "@radix-ui/react-popper@1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-popper/-/react-popper-1.1.2.tgz#4c0b96fcd188dc1f334e02dba2d538973ad842e9"
@@ -5963,10 +5985,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
   integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
 
-"@tokens-studio/ui@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.4.0.tgz#51f26936a1f766ec81c1bab9ea9dd8ba04753855"
-  integrity sha512-xOL2dCDNOFxfkb9WLOCMIqmc/oL4oqbAsluF39Ao8+7JzZRi03zQ7lgmoy+PHpjKFBJODM+PBAlk+XS5uCt2CA==
+"@tokens-studio/ui@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.0.tgz#4a525f7c6c792db4d4e9fa92f52a61df4d87f4d1"
+  integrity sha512-9PG13SkpcuKZ6Zv+ZoBEA64B+TeRyjdNmzMkhFfkY3Lh95/YHANmIgvrUeMWqGyZavnn66m/mJUnMf5xBqXgVg==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -5980,6 +6002,7 @@
     "@radix-ui/react-scroll-area" "^1.0.4"
     "@radix-ui/react-select" "^1.2.1"
     "@radix-ui/react-separator" "^1.0.2"
+    "@radix-ui/react-switch" "^1.0.3"
     "@radix-ui/react-tabs" "^1.0.3"
     "@radix-ui/react-toast" "^1.1.3"
     "@radix-ui/react-toggle-group" "^1.0.2"

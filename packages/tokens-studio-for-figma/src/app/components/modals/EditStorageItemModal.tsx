@@ -38,7 +38,7 @@ export default function EditStorageItemModal({
   }, [addNewProviderItem, onSuccess]);
 
   return (
-    <Modal title={t('editCredentials') as string} large id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
+    <Modal title={t('editCredentials') as string} id="modal-edit-storage-item" isOpen={isOpen} close={onClose}>
       <Stack direction="column" gap={4}>
         <StorageItemForm
           onChange={handleChange}

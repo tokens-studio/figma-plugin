@@ -1,13 +1,9 @@
 import React from 'react';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Button, Box, Text, Checkbox, Label, TextInput, Stack,
+} from '@tokens-studio/ui';
 import useConfirm from '../hooks/useConfirm';
 import Modal from './Modal';
-import Box from './Box';
-import Text from './Text';
-import Checkbox from './Checkbox';
-import Label from './Label';
-import Input from './Input';
-import Stack from './Stack';
 
 const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
   checked?: boolean
@@ -95,13 +91,12 @@ function ConfirmDialog() {
               <Text muted>{confirmState.description}</Text>
             )}
             {confirmState?.input ? (
-              <Input
+              <TextInput
                 id="input"
                 type={confirmState.input.type}
                 value={inputValue}
                 onChange={handleInputChange}
-                inputRef={firstInput}
-                full
+                ref={firstInput}
                 required
               />
             ) : null}
@@ -125,7 +120,7 @@ function ConfirmDialog() {
               </Stack>
             ) : null}
           </Stack>
-          <Stack direction="row" gap={3} justify="between">
+          <Stack direction="row" gap={3} justify="end">
             <Button variant="secondary" onClick={onCancel}>
               {confirmState?.cancelAction}
             </Button>

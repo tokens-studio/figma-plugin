@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
-import Box from './Box';
+import { Button, Box, Badge } from '@tokens-studio/ui';
 import { IconFile } from '@/icons';
 import { StyledStorageItem } from './StyledStorageItem';
-import Badge from './Badge';
 
 type Props = {
   onClick: () => void;
@@ -25,8 +23,8 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => {
         <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
       </Box>
       <Box css={{ marginRight: '$2' }}>
-        {isActive ? <Badge text="Active" /> : (
-          <Button data-testid="button-storage-item-apply" variant="secondary" onClick={onClick}>
+        {isActive ? <Badge>Active</Badge> : (
+          <Button data-testid="button-storage-item-apply" size="small" variant="secondary" onClick={onClick}>
             {t('apply')}
           </Button>
         )}

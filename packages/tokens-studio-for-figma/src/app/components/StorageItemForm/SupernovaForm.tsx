@@ -1,17 +1,14 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading, Textarea } from '@tokens-studio/ui';
+import {
+  Button, Textarea, TextInput, Stack, Text, Link, Label, IconButton, FormField,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import Box from '../Box';
-import Input from '../Input';
-import Stack from '../Stack';
-import Text from '../Text';
 import { generateId } from '@/utils/generateId';
-import Link from '../Link';
 import { ErrorMessage } from '../ErrorMessage';
-import Label from '../Label';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
 type Props = {
@@ -27,6 +24,11 @@ export default function SupernovaForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const { t } = useTranslation(['storage', 'general']);
 
@@ -61,52 +63,55 @@ export default function SupernovaForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Stack direction="column" gap={1}>
-          <Heading>
-            {t('providers.supernova.addNew')}
-          </Heading>
-          <Text muted>
-            {t('providers.supernova.description')}
-            {' '}
-            <Link href="https://learn.supernova.io/">{t('readMore', { ns: 'general' })}</Link>
-          </Text>
-        </Stack>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Box css={{ position: 'relative' }}>
-          <Input
-            full
-            label={t('providers.supernova.accessToken')}
-            value={values.secret}
-            onChange={onChange}
-            inputRef={inputEl}
-            isMasked
-            type="password"
+      <Stack direction="column" gap={5}>
+        <Text muted>
+          {t('providers.supernova.description')}
+          {' '}
+          <Link href="https://learn.supernova.io/" target="_blank">{t('readMore', { ns: 'general' })}</Link>
+        </Text>
+        <FormField>
+          <Label htmlFor="name">{t('name')}</Label>
+          <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('providers.supernova.accessToken')}</Label>
+          <TextInput
             name="secret"
+            id="secret"
+            value={values.secret || ''}
+            onChange={onChange}
+            ref={inputEl}
+            required
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="designSystemUrl">{t('providers.supernova.dsUrl')}</Label>
+          <TextInput
+            name="designSystemUrl"
+            id="designSystemUrl"
+            value={values.designSystemUrl || ''}
+            onChange={onChange}
+            type="text"
             required
           />
-        </Box>
-        <Input
-          full
-          label={t('providers.supernova.dsUrl')}
-          value={values.designSystemUrl}
-          onChange={onChange}
-          type="text"
-          name="designSystemUrl"
-          required
-        />
-        <Label htmlFor="mapping">
-          Supernova &lt;&gt; Tokens Studio mapping
-        </Label>
-        <Textarea
-          id="mapping"
-          border
-          rows={8}
-          value={values.mapping ?? ''}
-          onChange={handleMappingChange}
-          placeholder=""
-        />
-        <Stack direction="row" gap={4}>
+        </FormField>
+        <FormField>
+          <Label htmlFor="mapping">
+            Supernova &lt;&gt; Tokens Studio mapping
+          </Label>
+          <Textarea
+            id="mapping"
+            rows={8}
+            value={values.mapping ?? ''}
+            onChange={handleMappingChange}
+            placeholder=""
+          />
+        </FormField>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>

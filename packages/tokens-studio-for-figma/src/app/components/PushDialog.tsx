@@ -2,12 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
-  Box, Button, Heading, Spinner, Stack, Text,
+  Box, Button, Heading, Spinner, Stack, Text, ToggleGroup,
 } from '@tokens-studio/ui';
-import {
-  localApiStateSelector,
-  storageTypeSelector,
-} from '@/selectors';
+import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
@@ -124,15 +121,39 @@ function PushDialog() {
           large
           isOpen
           close={onCancel}
-        >
-          <Stack direction="column" gap={4}>
-            <Stack direction="row">
-              <TabButton<string> name="commit" activeTab={activeTab} label={t('commit')} onSwitch={handleSwitch} />
-              <TabButton<string> name="diff" activeTab={activeTab} label={t('diff')} onSwitch={handleSwitch} />
-              <TabButton<string> name="json" activeTab={activeTab} label="JSON" onSwitch={handleSwitch} />
+          stickyFooter
+          footer={(
+            <Stack direction="row" justify="end" gap={4}>
+              <Button variant="secondary" data-testid="push-dialog-button-close" onClick={onCancel}>
+                {t('cancel')}
+              </Button>
+              <Button
+                variant="primary"
+                data-testid="push-dialog-button-push-changes"
+                disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)}
+                onClick={handlePushChanges}
+              >
+                {t('pushChanges')}
+              </Button>
             </Stack>
+          )}
+        >
+          <Stack direction="column" align="start">
+            <Box css={{ padding: '$4', paddingBottom: 0 }}>
+              <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
+                <ToggleGroup.Item iconOnly={false} value="commit">
+                  {t('commit')}
+                </ToggleGroup.Item>
+                <ToggleGroup.Item iconOnly={false} value="diff">
+                  {t('diff')}
+                </ToggleGroup.Item>
+                <ToggleGroup.Item iconOnly={false} value="json">
+                  JSON
+                </ToggleGroup.Item>
+              </ToggleGroup>
+            </Box>
             {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
-              <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '0 $4' }}>
+              <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
                 {t('thisWillPushYourLocalChangesToTheBranch')}
                 {' '}
                 <Text
@@ -144,7 +165,6 @@ function PushDialog() {
                     padding: '$2',
                   }}
                 >
-                  {' '}
                   {branch}
                 </Text>
               </Stack>
@@ -159,32 +179,6 @@ function PushDialog() {
             )}
             {activeTab === 'diff' && <ChangedStateList />}
             {activeTab === 'json' && <PushJSON />}
-            <Box
-              css={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '$4',
-                borderTop: '1px solid',
-                borderColor: '$borderMuted',
-                position: 'sticky',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: '$bgDefault',
-              }}
-            >
-              <Button variant="secondary" data-testid="push-dialog-button-close" onClick={onCancel}>
-                {t('cancel')}
-              </Button>
-              <Button
-                variant="primary"
-                data-testid="push-dialog-button-push-changes"
-                disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)}
-                onClick={handlePushChanges}
-              >
-                {t('pushChanges')}
-              </Button>
-            </Box>
           </Stack>
         </Modal>
       );

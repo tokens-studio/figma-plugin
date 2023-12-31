@@ -13,7 +13,7 @@ export default function ChangedTokenItem({
   const { t } = useTranslation(['general']);
 
   return (
-    <Stack direction="row" justify="between" css={{ padding: '$2 $4' }}>
+    <Stack direction="row" justify="between" css={{ padding: '$2 0' }}>
       <Stack direction={token.importType === 'REMOVE' ? 'row' : 'column'} gap={1} justify="between" css={{ width: '100%' }}>
         <Text bold size="small">{token.name}</Text>
         {

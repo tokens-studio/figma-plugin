@@ -46,7 +46,7 @@ React.PropsWithChildren<{
     <DropdownMenu.Item
       data-testid={`branch-selector-create-branch-from-branch-${branch}`}
       onSelect={onSelect}
-      css={{ position: 'relative', fontFamily: '$mono', fontSize: '$xxsmall' }}
+      css={{ position: 'relative' }}
     >
       {branch}
     </DropdownMenu.Item>
@@ -98,14 +98,7 @@ export default function BranchSelector() {
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
       text: t('unSavedChanges') as string,
-      description: (
-        <div>
-          {t('ifYouCreate')}
-          <br />
-          {' '}
-          {t('toYourRepo')}
-        </div>
-      ),
+      description: t('ifYouCreate') as string,
       confirmAction: t('discardChanges') as string,
       cancelAction: t('cancel') as string,
     });
@@ -199,7 +192,7 @@ export default function BranchSelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top" sideOffset={5}>
+          <DropdownMenu.Content side="top" sideOffset={0}>
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger
                 data-testid="branch-selector-create-new-branch-trigger"
