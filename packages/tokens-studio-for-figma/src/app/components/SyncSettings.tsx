@@ -83,7 +83,6 @@ const SyncSettings = () => {
 
   const handleEditClick = React.useCallback(
     (provider: any) => () => {
-      console.log('setting edit');
       track('Edit Credentials');
       dispatch.uiState.setLocalApiState(provider);
       setShowEditStorageModalVisible(true);
@@ -93,7 +92,6 @@ const SyncSettings = () => {
   );
 
   const handleShowAddCredentials = React.useCallback((provider: StorageProviderType) => {
-    console.log('Handling create');
     track('Add Credentials', { provider });
     setShowCreateStorageModalVisible(true);
   }, []);
@@ -130,17 +128,12 @@ const SyncSettings = () => {
   }, [confirm, handleSubmitLocalStorage, storageType?.provider, t]);
 
   const handleHideStorageModal = React.useCallback(() => {
-    console.log('handling hide');
     setShowEditStorageModalVisible(false);
   }, []);
 
   const handleHideAddCredentials = React.useCallback(() => {
     setShowCreateStorageModalVisible(false);
   }, []);
-
-  useEffect(() => {
-    console.log('Has changed');
-  }, [editStorageItemModalVisible]);
 
   return (
     <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
