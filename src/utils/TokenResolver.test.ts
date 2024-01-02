@@ -358,6 +358,7 @@ const output = [
     ...singleShadowToken,
     name: 'shadow.single',
     rawValue: singleShadowToken.value,
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -401,6 +402,9 @@ const output = [
     rawValue: {
       opacity: '{opacity.40}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -413,6 +417,10 @@ const output = [
       opacity: '{opacity.40}',
       borderRadius: '{border-radius.7}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
@@ -421,6 +429,9 @@ const output = [
       fill: '#ff0000',
     },
     rawValue: {
+      fill: '{colors.red.500}',
+    },
+    resolvedValueWithReferences: {
       fill: '{colors.red.500}',
     },
   },
@@ -437,12 +448,14 @@ const output = [
       fontSize: '2px',
     },
     rawValue: resolvedTypographyToken.value,
+    resolvedValueWithReferences: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
+    resolvedValueWithReferences: unResolvedTypographyToken.value,
     value: unResolvedTypographyToken.value,
   },
   {
@@ -450,6 +463,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedSingle',
     rawValue: unResolvedSingleShadowToken.value,
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
     },
@@ -478,6 +492,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias',
     rawValue: '{shadow.single}',
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -489,6 +504,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias1',
     rawValue: '{shadow.unResolvedSingle}',
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
       color: '{colors.blue.500}',
@@ -499,6 +515,7 @@ const output = [
     description: 'the one with multiple nested shadow alias',
     name: 'shadow.shadowAlias2',
     rawValue: '{shadow.multiple}',
+    resolvedValueWithReferences: multipleShadowToken.value,
     value: [
       {
         ...multipleShadowToken.value[0],
@@ -560,6 +577,10 @@ const output = [
       fontWeight: 'bold',
     },
     rawValue: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    resolvedValueWithReferences: {
       fontFamily: 'IBM Plex Sans',
       fontWeight: 'bold',
     },
