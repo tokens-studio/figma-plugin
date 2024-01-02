@@ -72,34 +72,34 @@ describe('stringfyTokens', () => {
   it('convert token list to the JSON string with nested structure', () => {
     expect(stringifyTokens(tokens, activeTokenSet)).toEqual(JSON.stringify({
       scale: {
-        type: 'sizing',
-        value: '1',
+        $type: 'sizing',
+        $value: '1',
       },
       font: {
-        type: 'sizing',
+        $type: 'sizing',
         small: {
-          value: '2',
+          $value: '2',
         },
         big: {
-          value: '3',
+          $value: '3',
         },
         medium: {
-          type: 'dimension',
-          value: '3',
+          $type: 'dimension',
+          $value: '3',
         },
       },
       typography: {
-        type: 'typography',
+        $type: 'typography',
         headline: {
-          value: {
+          $value: {
             fontFamily: 'aria',
             fontWeight: 'bold',
             lineHeight: '12',
           },
         },
         content: {
-          type: 'typography',
-          value: {
+          $type: 'typography',
+          $value: {
             fontFamily: 'aria',
             fontWeight: 'light',
             lineHeight: '3',
@@ -107,9 +107,9 @@ describe('stringfyTokens', () => {
         },
       },
       box: {
-        type: 'boxShadow',
+        $type: 'boxShadow',
         default: {
-          value: {
+          $value: {
             blur: '2',
             color: '#000000',
             spread: '0',
@@ -119,9 +119,9 @@ describe('stringfyTokens', () => {
           },
         },
       },
-      type: 'sizing',
+      $type: 'sizing',
       mx: {
-        value: '4',
+        $value: '4',
       },
     }, null, 2));
     expect(stringifyTokens(emptyTokens, activeTokenSet)).toEqual('{}');

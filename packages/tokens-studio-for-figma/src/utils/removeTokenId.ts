@@ -5,9 +5,9 @@ export default function removeTokenId(token: SingleToken, shouldRemove: boolean)
   if (token.$extensions && shouldRemove) {
     const newToken = {
       ...token,
-      $extensions: {
-        ...omit(token?.$extensions, 'id'),
-      },
+      $extensions: token.$extensions && token.$extensions['studio.tokens']
+        ? { ...omit(token.$extensions['studio.tokens'], 'id') }
+        : {},
     };
     if (Object.keys(newToken.$extensions ?? {}).length < 1) {
       return omit(newToken, '$extensions') as SingleToken;

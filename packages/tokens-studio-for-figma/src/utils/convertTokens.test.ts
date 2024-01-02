@@ -5,13 +5,13 @@ describe('convertToTokenArray', () => {
     const typographyTokens = {
       withValue: {
         input: {
-          value: {
+          $value: {
             fontFamily: 'Inter',
             fontWeight: 'Regular',
             fontSize: 24,
           },
-          type: 'typography',
-          description: 'Use for headings',
+          $type: 'typography',
+          $description: 'Use for headings',
         },
         output: {
           value: {
@@ -26,11 +26,11 @@ describe('convertToTokenArray', () => {
     };
     const compositionTokens = {
       input: {
-        value: {
+        $value: {
           sizing: '{global.groupWithType.small}',
           opacity: '{global.opacity.50}',
         },
-        type: 'composition',
+        $type: 'composition',
       },
       output: {
         value: {
@@ -43,8 +43,8 @@ describe('convertToTokenArray', () => {
     const basicTokens = {
       global: {
         withValue: {
-          value: 'bar',
-          type: 'other',
+          $value: 'bar',
+          $type: 'other',
         },
         basic: '#ff0000',
         typography: {
@@ -54,32 +54,32 @@ describe('convertToTokenArray', () => {
         },
         opacity: {
           50: {
-            type: 'opacity',
-            value: '50%',
+            $type: 'opacity',
+            $value: '50%',
           },
         },
         composition: {
           heading: compositionTokens.input,
         },
         groupWithType: {
-          type: 'sizing',
+          $type: 'sizing',
           small: {
-            value: '12px',
+            $value: '12px',
           },
           big: {
-            value: '24px',
-            type: 'dimension',
+            $value: '24px',
+            $type: 'dimension',
           },
         },
         nestGroupWithType: {
-          type: 'sizing',
+          $type: 'sizing',
           font: {
             small: {
-              value: '12px',
+              $value: '12px',
             },
             big: {
-              value: '24px',
-              type: 'dimension',
+              $value: '24px',
+              $type: 'dimension',
             },
           },
         },

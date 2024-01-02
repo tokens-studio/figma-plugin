@@ -1,11 +1,24 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import {
-  isSingleBorderToken, isSingleBoxShadowToken, isSingleCompositionToken, isSingleTokenValueObject, isSingleTypographyToken,
+  isSingleBorderToken,
+  isSingleBoxShadowToken,
+  isSingleCompositionToken,
+  isSingleTokenValueObject,
+  isSingleTypographyToken,
 } from './is';
 import { isTokenGroupWithType } from './is/isTokenGroupWithType';
+import { TokenFormat } from '@/plugin/store';
 
-type Tokens = AnyTokenList | Partial<Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>> | { type: string } | { inheritType: string }>;
+type Tokens =
+  | AnyTokenList
+  | Partial<
+  | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>
+  | { $value: Pick<SingleToken, 'value'> }
+  | { type: string }
+  | { $type: string }
+  | { inheritType: string }
+  >;
 
 // @TODO fix typings
 function checkForTokens({
@@ -21,64 +34,73 @@ function checkForTokens({
   groupLevel = 0,
   currentTypeLevel = 0,
 }: {
-  obj: SingleToken<true>[]
-  token: Tokens
-  root: string | null
-  returnValuesOnly?: boolean
-  expandTypography?: boolean
-  expandShadow?: boolean
-  expandComposition?: boolean
-  expandBorder?: boolean
-  inheritType?: string
+  obj: SingleToken<true>[];
+  token: Tokens;
+  root: string | null;
+  returnValuesOnly?: boolean;
+  expandTypography?: boolean;
+  expandShadow?: boolean;
+  expandComposition?: boolean;
+  expandBorder?: boolean;
+  inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
 }): [SingleToken[], SingleToken | undefined] {
   // replaces / in token name
-  let returnValue: Pick<SingleToken<false>, 'name' | 'value'> | {
+  let returnValue:
+  | Pick<SingleToken<false>, 'name' | 'value' | 'description'>
+  | {
     type: TokenTypes;
     value: Record<string, SingleToken['value']>;
     description?: string;
-  } | undefined;
-  const shouldExpandTypography = (expandTypography && typeof token === 'object' && 'value' in token) ? isSingleTypographyToken(token.value) : false;
-  const shouldExpandShadow = (expandShadow && typeof token === 'object' && 'value' in token) ? isSingleBoxShadowToken(token.value) : false;
-  const shouldExpandComposition = (expandComposition && typeof token === 'object' && 'value' in token) ? isSingleCompositionToken(token.value) : false;
-  const shouldExpandBorder = (expandBorder && typeof token === 'object' && 'value' in token) ? isSingleBorderToken(token.value) : false;
-  if (isSingleTokenValueObject(token) && !shouldExpandTypography && !shouldExpandShadow && !shouldExpandComposition && !shouldExpandBorder) {
+  }
+  | undefined;
+  if (isSingleTokenValueObject(token)) {
+    const {
+      // @ts-ignore
+      [TokenFormat.tokenValueKey]: value,
+      // @ts-ignore
+      [TokenFormat.tokenTypeKey]: type,
+      // @ts-ignore
+      [TokenFormat.tokenDescriptionKey]: description,
+      ...remainingTokenProperties
+    } = token;
     returnValue = {
-      ...token,
-      ...((!('type' in token) && inheritType) ? { type: inheritType, inheritTypeLevel: currentTypeLevel } : { }),
+      ...remainingTokenProperties,
+      value,
+      ...(description ? { description } : {}),
+      ...(!(TokenFormat.tokenTypeKey in token) && inheritType
+        ? { type: inheritType, inheritTypeLevel: currentTypeLevel }
+        : { type }),
     };
   } else if (
-    (isSingleTypographyToken(token) && !expandTypography)
-    || (isSingleBoxShadowToken(token) && !expandShadow)
-    || (isSingleCompositionToken(token) && !expandComposition)
-    || (isSingleBorderToken(token) && !expandBorder)
+    isSingleTypographyToken(token)
+    || isSingleBoxShadowToken(token)
+    || isSingleCompositionToken(token)
+    || isSingleBorderToken(token)
   ) {
     returnValue = {
-      type: token.type,
+      type: token[TokenFormat.tokenTypeKey],
       value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
-        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val.value : val;
+        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
         return acc;
       }, {}),
+      ...(token[TokenFormat.tokenDescriptionKey] ? { description: token[TokenFormat.tokenDescriptionKey] } : {}),
     };
-
-    if (token.description) {
-      delete returnValue.value.description;
-      returnValue.description = token.description;
-    }
   } else if (typeof token === 'object') {
     let tokenToCheck = token;
     if (!isSingleTokenValueObject(token)) {
       groupLevel += 1;
     }
+    // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
-      const { type, ...tokenValues } = token;
-      inheritType = token.type;
+      const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
+      inheritType = groupType;
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
-    if (isSingleTokenValueObject(token) && typeof token.value !== 'string') {
-      tokenToCheck = token.value as typeof tokenToCheck;
+    if (isSingleTokenValueObject(token) && typeof token[TokenFormat.tokenValueKey] !== 'string') {
+      tokenToCheck = token[TokenFormat.tokenValueKey] as typeof tokenToCheck;
     }
     Object.entries(tokenToCheck).forEach(([key, value]) => {
       const [, result] = checkForTokens({
@@ -113,18 +135,11 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
-export default function convertToTokenArray({
-  tokens, returnValuesOnly = false, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
-}: {
-  tokens: Tokens
-  returnValuesOnly?: boolean
-  expandTypography?: boolean
-  expandShadow?: boolean
-  expandComposition?: boolean
-  expandBorder?: boolean
-}) {
+export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
   const [result] = checkForTokens({
-    obj: [], root: null, token: tokens, returnValuesOnly, expandTypography, expandShadow, expandComposition, expandBorder,
+    obj: [],
+    root: null,
+    token: tokens,
   });
   return Object.values(result);
 }

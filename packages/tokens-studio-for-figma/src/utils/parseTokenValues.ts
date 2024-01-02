@@ -24,6 +24,7 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
 
     if (typeof parsedGroup === 'object') {
       const convertedToArray = convertToTokenArray({ tokens: parsedGroup });
+      console.log('Converted to array');
       prev.push([group[0], convertedToArray]);
       return prev;
     }

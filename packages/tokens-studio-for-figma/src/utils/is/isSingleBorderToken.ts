@@ -1,8 +1,9 @@
 import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenFormat } from '@/plugin/store';
 import { SingleBorderToken, SingleToken } from '@/types/tokens';
 
 export function isSingleBorderToken(token: SingleToken | any): token is SingleBorderToken {
   if (typeof token !== 'object') return false;
-  return token.type === TokenTypes.BORDER
-  && (typeof token.value === 'string' || (typeof token.value === 'object' && !('value' in token.value)));
+  return token[TokenFormat.tokenTypeKey] === TokenTypes.BORDER
+  && (typeof token[TokenFormat.tokenValueKey] === 'string' || (typeof token[TokenFormat.tokenValueKey] === 'object' && !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])));
 }

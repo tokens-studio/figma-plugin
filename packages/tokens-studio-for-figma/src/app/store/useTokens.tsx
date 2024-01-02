@@ -408,7 +408,6 @@ export default function useTokens() {
         if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
           // We don't want to change the actual value as this could cause unintended side effects
           tokenItem = { ...tokenItem };
-          // @ts-ignore
           tokenItem.value = resolvedValue;
         }
         if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
