@@ -1,10 +1,10 @@
 import { useDispatch, useStore } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { SingleToken } from '@/types/tokens';
+import { SingleToken, TokenToRename } from '@/types/tokens';
 import { Dispatch, RootState } from '../store';
 import useConfirm from '../hooks/useConfirm';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import { activeTokenSetSelector } from '@/selectors';
+import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
   DeleteTokenPayload, DuplicateTokenGroupPayload, DuplicateTokenPayload, UpdateTokenPayload,
@@ -80,12 +80,12 @@ export default function useManageTokens() {
         $extensions,
       } as UpdateTokenPayload);
       if (oldName) {
-        dispatch.tokenState.renameStyleNamesToCurrentTheme(oldName, name);
-        dispatch.tokenState.renameVariableNamesToThemes(oldName, name);
+        dispatch.tokenState.renameStyleNamesToCurrentTheme([{ oldName, newName: name }]);
+        dispatch.tokenState.renameVariableNamesToThemes([{ oldName, newName: name }]);
       }
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
-  }, [editToken, dispatch.uiState]);
+  }, [editToken, dispatch.uiState, dispatch.tokenState]);
 
   const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
     const {
@@ -165,14 +165,25 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const renameGroup = useCallback(async (oldName: string, newName: string, type: string) => {
+  const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<TokenToRename[]> => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
+    const tokens = tokensSelector(store.getState());
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
     await renameTokenGroup({
       parent: activeTokenSet, oldName, newName, type,
     });
+    const tokensInParent = tokens[activeTokenSet] ?? [];
+    const tokensToRename = tokensInParent
+      .filter((token) => token.name.startsWith(oldName) && token.type === type)
+      .map((filteredToken) => ({
+        oldName: filteredToken.name,
+        newName: filteredToken.name.replace(oldName, newName),
+      }));
+    dispatch.tokenState.renameStyleNamesToCurrentTheme(tokensToRename);
+    dispatch.tokenState.renameVariableNamesToThemes(tokensToRename);
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
-  }, [store, renameTokenGroup, dispatch.uiState]);
+    return tokensToRename;
+  }, [store, renameTokenGroup, dispatch.uiState, dispatch.tokenState]);
 
   const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());

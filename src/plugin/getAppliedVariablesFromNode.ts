@@ -11,9 +11,9 @@ export type SelectionVariable = {
 
 export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVariable[] {
   const localVariables: SelectionVariable[] = [];
-  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
+  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && node.boundVariables) {
     Object.entries(node.boundVariables).forEach(([key, value]) => {
-      if (key === 'fills' && Array.isArray(value)) {
+      if ('fills' in node && key === 'fills' && Array.isArray(value)) {
         const variableId = node.boundVariables?.fills?.[0].id;
         if (variableId) {
           const variable = figma.variables.getVariableById(variableId);
@@ -36,6 +36,34 @@ export default function getAppliedVariablesFromNode(node: BaseNode): SelectionVa
               ...variableObject,
               name: variable?.name.split('/').join('.'),
               type: Properties.fill,
+            });
+          }
+        }
+      }
+      if (key === 'strokes' && Array.isArray(value)) {
+        const variableId = node.boundVariables?.strokes?.[0].id;
+
+        if (variableId) {
+          const variable = figma.variables.getVariableById(variableId);
+          if (variable && 'strokes' in node && typeof node.strokes !== 'undefined') {
+            const paint = clone(node.strokes);
+            let variableObject: SingleColorToken | null = {} as SingleColorToken;
+            if (paint[0].type === 'SOLID') {
+              const { r, g, b } = paint[0].color;
+              const a = paint[0].opacity;
+              variableObject.value = figmaRGBToHex({
+                r,
+                g,
+                b,
+                a,
+              });
+            } else {
+              variableObject = null;
+            }
+            localVariables.push({
+              ...variableObject,
+              name: variable?.name.split('/').join('.'),
+              type: Properties.borderColor,
             });
           }
         }

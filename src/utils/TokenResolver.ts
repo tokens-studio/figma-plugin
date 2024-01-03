@@ -1,3 +1,4 @@
+import { dump } from 'js-yaml';
 import { SingleToken } from '@/types/tokens';
 import { TokenMap } from '../types/TokenMap';
 
@@ -37,6 +38,7 @@ class TokenResolver {
     this.tokenMap = new Map();
     this.memo = new Map();
     this.populateTokenMap();
+
     return this.resolveTokenValues();
   }
 
@@ -46,7 +48,9 @@ class TokenResolver {
 
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
-
+      if (typeof resolvedValue.value === 'string' && AliasRegex.test(resolvedValue.value)) {
+        resolvedValue.failedToResolve = true;
+      }
       resolvedTokens.push({
         ...resolvedValue,
         rawValue: token.value,
@@ -56,11 +60,22 @@ class TokenResolver {
     return resolvedTokens;
   }
 
+  private isExponentialAndZero(str: string): boolean {
+    const regex = /^[+-]?\d*\.?\d+([eE][+-]?\d+)?$/;
+    const numericRegex = /^[+-]?\d*\.?\d+$/;
+
+    // Needs to be more than a single zero otherwise "0" will get evaluated incorrectly
+    const allZerosRegex = /^00+$/;
+    const leadingZerosRegex = /^0+[1-9]\d*$/;
+
+    return (regex.test(str) && !numericRegex.test(str)) || (allZerosRegex.test(str) || leadingZerosRegex.test(str));
+  }
+
   // When we resolve references, we also need to calculate the value of the token, meaning color and math transformations
   private calculateTokenValue(token: SingleToken, resolvedReferences: Set<string> = new Set()): SingleToken['value'] | undefined {
     // Calculations only happen on strings.
     if (typeof token.value === 'string') {
-      const couldBeNumberValue = checkAndEvaluateMath(token.value);
+      const couldBeNumberValue = !this.isExponentialAndZero(token.value) ? checkAndEvaluateMath(token.value) : token.value;
 
       // if it's a number, we don't need to do anything else and can return it
       if (typeof couldBeNumberValue === 'number') {
@@ -106,11 +121,14 @@ class TokenResolver {
       }
     }
 
+    let foundToken;
+
     // For strings, we need to check if there are any references, as those can only occur in strings
     if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
 
       let finalValue: SingleToken['value'] = token.value;
+      let resolvedValueWithReferences: SingleToken['value'] | undefined;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
@@ -120,25 +138,55 @@ class TokenResolver {
         if (resolvedReferences.has(path)) {
           console.log('Circular reference detected:', path);
           return {
-            ...token, rawValue: token.value, failedToResolve: true,
+            ...token,
+            rawValue: token.value,
+            failedToResolve: true,
           } as ResolveTokenValuesResult;
+        }
+
+        // Users can nest references, so we need to make sure to resolve any nested references first.
+        let resolvedPath = path;
+        let matches: boolean = true;
+
+        // As long as we have matches, we need to resolve them. This is needed for multiple levels of nesting. Performance will suffer, but that's the user's choice.
+        while (matches !== false) {
+          const match = resolvedPath.match(AliasRegex);
+          matches = Boolean(match?.length);
+          if (!match?.length) break;
+
+          const nestedTokenName = getPathName(match[0]);
+          const nestedToken = this.tokenMap.get(nestedTokenName);
+
+          if (nestedToken && nestedToken.value) {
+            const resolvedNestedToken = this.resolveReferences({ ...nestedToken, name: nestedTokenName } as SingleToken, new Set(resolvedReferences));
+
+            if (typeof resolvedNestedToken.value === 'string' || typeof resolvedNestedToken.value === 'number') {
+              resolvedPath = resolvedPath.replace(match[0], resolvedNestedToken.value);
+            }
+          } else {
+            break;
+          }
         }
 
         // We have the special case of deep references where we can reference the .fontFamily property of a typography token.
         // For that case, we need to split the path and get the last part, which might be the property name.
         // However, it might not be. If we have a token called "color.primary" and we reference "color.primary.fontFamily", we need to check if "color.primary" exists. If it does, we prefer to return that one.
         // If it doesn't it might be a composite token where we want to return the atomic property
-        const propertyPath = path.split('.');
+        const propertyPath = resolvedPath.split('.');
         const propertyName = propertyPath.pop() as string;
         const tokenNameWithoutLastPart = propertyPath.join('.');
-        const foundToken = this.tokenMap.get(path);
+        foundToken = this.tokenMap.get(resolvedPath);
 
         if (foundToken) {
+          // For composite tokens that are being referenced, we need to store the value of the found token so that we have something between raw value of a string and the final resolved token
+          if (typeof token.value === 'string' && typeof foundToken.value === 'object') {
+            resolvedValueWithReferences = foundToken.value;
+          }
           // We add the already resolved references to the new set, so we can check for circular references
           const newResolvedReferences = new Set(resolvedReferences);
-          newResolvedReferences.add(path);
+          newResolvedReferences.add(resolvedPath);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
-          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: path } as SingleToken, newResolvedReferences);
+          const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {
@@ -187,10 +235,16 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-        const hasFailingReferences = !AliasRegex.test(JSON.stringify(finalValue));
 
+        const yamlString = dump(finalValue);
+
+        const hasFailingReferences = AliasRegex.test(yamlString);
+
+        // We combine the values, add the failing reference indicator.
+        // Also, if the originating reference is a string but the resolved value is a composite, we need to add the specific value of the composite token
+        // This is needed for cases like border tokens referencing other border tokens where we want to return the raw value of the border color so we can assign styles or variables.
         resolvedToken = {
-          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}),
+          ...token, value: finalValue, rawValue: token.value, ...(hasFailingReferences ? { failedToResolve: true } : {}), ...(typeof resolvedValueWithReferences !== 'undefined' ? { resolvedValueWithReferences } : {}),
         } as ResolveTokenValuesResult;
       }
 
@@ -230,7 +284,7 @@ class TokenResolver {
       return resolvedToken;
     }
 
-    // If we have an object (typography, border, shadow, composititions), we need to resolve each property
+    // If we have an object (typography, border, shadow, compositions), we need to resolve each property
     if (typeof token.value === 'object' && token.value !== null) {
       const resolvedObject: { [key: string]: any } = {};
 
@@ -252,6 +306,11 @@ class TokenResolver {
       if (typeof memoKey === 'string') {
         this.memo.set(memoKey, resolvedToken);
       }
+
+      // For all composite tokens we add the resolved value with references to the token.
+      // technically for composites this is not needed, but then we can rely on this one property to contain the original value
+      resolvedToken.resolvedValueWithReferences = token.value;
+
       return resolvedToken;
     }
 

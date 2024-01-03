@@ -21,6 +21,8 @@ import Stack from './Stack';
 import { IconBrokenLink, IconVariable } from '@/icons';
 import StyleIcon from '@/icons/style.svg';
 import Tooltip from './Tooltip';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokensContext } from '@/context';
 
 export default function InspectorTokenSingle({
   token,
@@ -38,13 +40,24 @@ export default function InspectorTokenSingle({
   const [showDialog, setShowDialog] = React.useState<boolean>(false);
   const [isChecked, setChecked] = React.useState<boolean>(false);
   const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
+  const tokensContext = React.useContext(TokensContext);
 
   const { t } = useTranslation(['inspect']);
 
   const tokenToDisplay = React.useMemo(() => {
-    if (token.resolvedValue) return { name: token.value, value: token.resolvedValue, type: property };
+    if (token.resolvedValue) {
+      return { name: token.value, value: token.resolvedValue, type: property };
+    }
     const resolvedToken = getTokenValue(token.value, resolvedTokens);
-    if (resolvedToken) return { name: resolvedToken.name, value: resolvedToken.value, type: resolvedToken.type };
+    if (resolvedToken) {
+      if (resolvedToken.type === TokenTypes.COMPOSITION) {
+        return {
+          name: resolvedToken.name, value: resolvedToken.value, rawValue: resolvedToken.rawValue, type: resolvedToken.type,
+        };
+      }
+
+      return { name: resolvedToken.name, value: resolvedToken.value, type: resolvedToken.type };
+    }
     return null;
   }, [token, property, getTokenValue, resolvedTokens]);
 
@@ -52,6 +65,10 @@ export default function InspectorTokenSingle({
     setChecked(inspectState.selectedTokens.includes(`${token.category}-${token.value}`));
     if (!resolvedTokens.find((resolvedToken) => resolvedToken.name === token.value) && !token.resolvedValue) setIsBrokenLink(true);
   }, [inspectState.selectedTokens, token]);
+
+  React.useEffect(() => {
+    tokensContext.resolvedTokens = resolvedTokens;
+  }, [resolvedTokens]);
 
   const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
     setNewTokenName(newInputValue.replace(/[{}$]/g, ''));

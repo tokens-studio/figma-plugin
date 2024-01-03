@@ -14,7 +14,7 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption, SyncVariableOption } from '@/app/store/useTokens';
+import { SyncOption, SyncVariableOption, TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
@@ -65,6 +65,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
+  SET_INITIAL_LOAD = 'async/set-initial-load',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -172,8 +173,7 @@ export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREA
 }>;
 
 export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
-  oldName: string;
-  newName: string;
+  tokensToRename: TokensToRenamePayload[];
   parent: string;
   settings: Partial<SettingsState>;
 }>;
@@ -219,6 +219,11 @@ export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KE
   licenseKey: string | null
 }>;
 export type SetLicenseKeyMessageResult = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY>;
+
+export type SetInitialLoadMessage = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD, {
+  initialLoad: boolean | null
+}>;
+export type SetInitialLoadMessageResult = AsyncMessage<AsyncMessageTypes.SET_INITIAL_LOAD>;
 
 export type AttachLocalStylesToTheme = AsyncMessage<AsyncMessageTypes.ATTACH_LOCAL_STYLES_TO_THEME, {
   theme: ThemeObject
@@ -353,6 +358,7 @@ export type AsyncMessages =
   | UpdateAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
+  | SetInitialLoadMessage
   | StartupMessage
   | AttachLocalStylesToTheme
   | ResolveStyleInfo
@@ -396,6 +402,7 @@ export type AsyncMessageResults =
   | UpdateAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
+  | SetInitialLoadMessageResult
   | StartupMessageResult
   | AttachLocalStylesToThemeResult
   | ResolveStyleInfoResult

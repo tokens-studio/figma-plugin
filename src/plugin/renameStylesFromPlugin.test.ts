@@ -52,6 +52,6 @@ describe('renameStylesFromPlugin', () => {
   runAfter.push(AsyncMessageChannel.PluginInstance.connect());
 
   it('should remove styles from plugin', async () => {
-    expect(await renameStylesFromPlugin('global.colors.old', 'global.colors.new', 'global')).toEqual(['456']);
+    expect(await renameStylesFromPlugin([{ oldName: 'global.colors.old', newName: 'global.colors.new' }], 'global')).toEqual(['456']);
   });
 });

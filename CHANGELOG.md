@@ -1,5 +1,60 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.6
+
+### Patch Changes
+
+- 77117e77: Fixes an issue with extension data changes that would mutate data
+- e08fc62a: Revert "feat: ignore first part of token name for variables"
+- 3c6b4615: Fixed an issue which shows number value in case a text which its value is 003e78 and 000000
+
+## 1.38.5
+
+### Minor Changes
+
+- 28cd5d74: Allow skipping first part of token name when creating variables, similarly to how it has worked for styles
+
+### Patch Changes
+
+- caebd05d: Skip multi value tokens when creating variables
+- e8ad7c48: Fixed an issue that caused some tokens to falsely appear as broken
+- 4d63ce61: Reordered the typography composite token fields to have lineHeight follow fontSize
+- c9e2a9b4: Fixed an issue that caused color modifiers values to be ignored when creating or updating variables
+
+## 1.38.4
+
+### Patch Changes
+
+- 6015f46f: Fixed an issue with Update on change. It's now working again, but disabled for new users as intended.
+
+## 1.38.3
+
+### Patch Changes
+
+- 23ff7080: Fixes an issue that causes a crash when interacting with a numeric token, such as duplicating
+
+## 1.38.2
+
+### Patch Changes
+
+- 1e5beacb: We now carry over token descriptions when creating variables
+- abf1cb0b: Fixed an issue that caused the active theme to be reset when you were editing it in Manage themes
+- 20189a39: Changing a token group's name now lets you also rename attached styles and variables
+- e5de5250: Reintroduces support for nested references for 1 level deep (use at your own risk, this affects performance). For example, you can use `{colors.{primary}.500}` but not `{colors.{brand.{primary}}}`.
+- 02ac59b5: We now show token values in the inspect tab using tooltips to preview the value
+- 572840bd: Fixed a bug where expired license keys could not be removed
+
+## 1.38.1
+
+### Patch Changes
+
+- a4f87c0d: Fixes an issue with suggestions showing up in light theme
+- c39ed48b: Fixes a bug that caused raw value documentation tokens to stop working
+- c9aa3687: Fixes an issue where min width tokens would stop tokens from being applied if part of an instance
+- 0247885c: Fixed a bug that caused themes to be unset after branch switch and reopen of plugin
+- 6135aed7: Changes quick-edit shortcut on Windows to ctrl+click
+- 76ae4b95: Fixed some of the onboarding links pointing to a 404
+
 ## 1.38.0
 
 ### Minor Changes

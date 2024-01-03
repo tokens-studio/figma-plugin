@@ -58,7 +58,7 @@ export const settings = createModel<RootModel>()({
     sessionRecording: false,
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
-    updateOnChange: true,
+    updateOnChange: false,
     updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,

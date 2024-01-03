@@ -49,8 +49,10 @@ export function TokenGroupHeading({
 
   const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    renameGroup(path, newTokenGroupName, type);
-    remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type });
+    const tokensToRename = await renameGroup(path, newTokenGroupName, type);
+    await remapTokensInGroup({
+      oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type, tokensToRename,
+    });
     setShowRenameTokenGroupModal(false);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 

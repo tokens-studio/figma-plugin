@@ -90,9 +90,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
-    () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.name === internalEditToken?.name),
+    () => {
+      const editToken = resolvedTokens
+        .filter((t) => t.internal__Parent === activeTokenSet)
+        .find((t) => t.name === internalEditToken?.name);
+
+      if (editToken) {
+        editToken.description = internalEditToken.description;
+      }
+
+      return editToken;
+    },
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -392,7 +400,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
               renameTokensAcrossSets(oldName, newName, type, tokenSetsContainsSameToken);
             }
             if (confirmData.data.includes(StyleOptions.RENAME)) {
-              renameStylesFromTokens({ oldName, newName, parent: activeTokenSet });
+              renameStylesFromTokens([{ oldName, newName }], activeTokenSet);
               lastUsedRenameStyles = true;
             }
             if (confirmData.data.includes(ModalOptions.RENAME_VARIABLE)) {

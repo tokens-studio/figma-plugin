@@ -119,6 +119,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     })),
     [tokens, usedTokenSet, activeTokenSet],
   );
+
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
