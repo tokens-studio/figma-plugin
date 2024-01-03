@@ -330,46 +330,27 @@ describe('formatTokens', () => {
             typography: {
               heading: {
                 h1: {
-                  fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                  value: {
+                    fontFamily: 'Inter',
+                    fontWeight: 'Bold',
+                    fontSize: 36,
                   },
-                  fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
-                  },
-                  fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
-                  },
+                  type: 'typography',
+                  description: 'Use for bold headings',
                 },
                 h2: {
-                  fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                  value: {
+                    fontFamily: 'Inter',
+                    fontWeight: 'Regular',
+                    fontSize: 24,
                   },
-                  fontWeight: {
-                    value: 'Regular',
-                    type: 'fontWeights',
-                  },
-                  fontSize: {
-                    value: 24,
-                    type: 'fontSizes',
-                  },
+                  type: 'typography',
+                  description: 'Use for headings',
                 },
                 alias: {
-                  fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
-                  },
-                  fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
-                  },
-                  fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
-                  },
+                  value: '{typography.heading.h1}',
+                  type: 'typography',
+                  description: 'Use for headings',
                 },
                 non_resolved: {
                   value: '{typography.heading.new}',

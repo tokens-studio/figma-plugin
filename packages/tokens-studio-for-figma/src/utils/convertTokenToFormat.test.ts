@@ -4,6 +4,9 @@ import {
 } from '@/plugin/store';
 
 describe('convertTokenToFormat', () => {
+  beforeEach(() => {
+    setFormat('dtcg');
+  });
   it('should return an object with the same properties as the input, but with the keys replaced', () => {
     const token = {
       type: 'sizing',

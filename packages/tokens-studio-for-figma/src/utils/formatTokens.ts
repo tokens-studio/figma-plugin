@@ -37,7 +37,6 @@ export default function formatTokens({
     tokens[tokenSet]?.forEach((token) => {
       const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
       const convertedToFormat = convertTokenToFormat(tokenWithoutName);
-      console.log('converted to format', convertedToFormat, TokenFormat.tokenTypeKey);
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
@@ -58,9 +57,11 @@ export default function formatTokens({
             set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
           }
         } else {
+          if (token.name === 'shadows.alias') {
+            console.log('shadow alias', token);
+          }
           const expanded = expand(tokenWithoutName.value);
           const expandedToFormat = convertTokenToFormat(expanded, true);
-          console.log('expanded to format', expanded, expandedToFormat, TokenFormat.tokenTypeKey);
 
           set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedToFormat });
         }
