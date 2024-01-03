@@ -457,6 +457,10 @@ describe('usePropertiesForTokenType', () => {
           label: 'Background blur',
           name: Properties.backgroundBlur,
         },
+        {
+          label: 'Rotation',
+          name: Properties.rotation,
+        },
       ],
     },
   ];

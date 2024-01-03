@@ -1,4 +1,5 @@
 import { Properties } from '@/constants/Properties';
+import { resetNodeRotation } from '@/plugin/rotateNode';
 
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
@@ -82,6 +83,11 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'backgroundBlur':
       if ('effects' in node && typeof node.effects !== 'undefined') {
         node.effects = node.effects.filter((effect) => effect.type !== 'BACKGROUND_BLUR');
+      }
+      break;
+    case 'rotation':
+      if ('relativeTransform' in node && typeof node.relativeTransform !== 'undefined') {
+        resetNodeRotation(node);
       }
       break;
     case 'opacity':
