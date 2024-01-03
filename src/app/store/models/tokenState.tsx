@@ -595,6 +595,9 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument({ shouldUpdateNodes: rootState.settings.updateOnChange });
       }
     },
+    importMultipleTokens() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
     deleteToken() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
