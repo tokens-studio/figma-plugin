@@ -342,6 +342,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
+          console.log('11111111111111111111111111');
+          console.log('resolvedValue: ', resolvedValue);
+          console.log('rawValue: ', internalEditToken.value);
           updateVariablesFromToken({
             parent: activeTokenSet,
             name: internalEditToken.initialName ?? name,
@@ -435,6 +438,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       return;
     }
     if (isValid && internalEditToken) {
+      console.log('internalEditToken: ', internalEditToken);
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);
     }

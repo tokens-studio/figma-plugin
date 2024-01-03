@@ -11,19 +11,24 @@ import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariable
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 
 export default async function updateVariablesFromPlugin(payload: UpdateTokenVariablePayload) {
+  console.log('payload in updateVariableFromPlugin: ', payload);
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+  console.log('themeInfo: ', themeInfo);
   const variableMap = getVariablesMap();
   const nameToVariableMap = figma.variables.getLocalVariables().reduce<Record<string, Variable>>((acc, curr) => {
     acc[curr.name] = curr;
     return acc;
   }, {});
+  console.log('nameToVariableMap: ', nameToVariableMap);
 
   themeInfo.themes.forEach((theme) => {
     if (Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent)) { // Filter themes which contains this token
+      console.log('theme in updateVariablesFromPlugin: ', theme);
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
+        console.log('variable in updateVariablesFromPlugin: ', variable);
         if (checkCanReferenceVariable(payload)) { // If new token reference to another token, we update the variable to reference to another variable
           let referenceTokenName: string = '';
           if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
@@ -42,6 +47,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
           switch (payload.type) {
             case TokenTypes.COLOR:
               if (typeof payload.value === 'string') {
+                console.log('222222222222222222222222222222');
                 setColorValuesOnVariable(variable, theme.$figmaModeId, payload.value);
               }
               break;

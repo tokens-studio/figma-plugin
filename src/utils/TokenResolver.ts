@@ -45,6 +45,7 @@ class TokenResolver {
   // Initial function to iterate over all tokens and resolve references
   public resolveTokenValues(): ResolveTokenValuesResult[] {
     const resolvedTokens: ResolveTokenValuesResult[] = [];
+    console.log('tokens in TokenResolver: ', this.tokens);
 
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
@@ -56,6 +57,8 @@ class TokenResolver {
         rawValue: token.value,
       } as ResolveTokenValuesResult);
     }
+
+    console.log('resolvedTokens :', resolvedTokens);
 
     return resolvedTokens;
   }
