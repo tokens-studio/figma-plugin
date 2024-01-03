@@ -72,7 +72,9 @@ export function Modal({
         <Dialog.Overlay />
         <Dialog.Content css={{ padding: 0 }}>
           <Box css={{
-            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
           >
             {(showClose || title) && (
