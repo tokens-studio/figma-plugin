@@ -297,6 +297,7 @@ class TokenResolver {
           if (resolvedValue.failedToResolve) {
             failedToResolve = true;
           }
+          // Note: This is technically incorrect. We should not be expecting this, but we need to mark those tokens that are referencing an object even though they should be expecting a string as invalid, e only have failedToResolve today. See https://github.com/tokens-studio/figma-plugin/issues/2450
           if (typeof resolvedValue.value === 'object' && key in resolvedValue.value) {
             failedToResolve = true;
           }

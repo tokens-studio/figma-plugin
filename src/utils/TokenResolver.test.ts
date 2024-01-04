@@ -680,6 +680,7 @@ const output = [
     rawValue: '0',
     type: TokenTypes.DIMENSION,
   },
+  // Note: This is technically incorrect, but we're doing this because this needs to be shown as failed to resolve. See https://github.com/tokens-studio/figma-plugin/issues/2450
   {
     name: 'typography.font-family.resolved',
     rawValue: {
