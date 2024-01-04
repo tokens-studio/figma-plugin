@@ -53,18 +53,16 @@ export default function ChangeStateListingHeading({
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative', marginLeft: '$2' }}>
-      <Tooltip label={`Alt + Click ${t('toggle')}`}>
-        <StyledChangedStateGroupHeadingButton
-          isCollapsed={isCollapsed}
-          type="button"
-          onClick={handleCollapse}
-          data-testid={`changestatelisting-${set}-collapse-button`}
-        >
-          <Box css={{ padding: '$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
-          <Heading size="medium">{label}</Heading>
-          {count && <Count count={count} />}
-        </StyledChangedStateGroupHeadingButton>
-      </Tooltip>
+      <StyledChangedStateGroupHeadingButton
+        isCollapsed={isCollapsed}
+        type="button"
+        onClick={handleCollapse}
+        data-testid={`changestatelisting-${set}-collapse-button`}
+      >
+        <Box css={{ padding: '$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
+        <Heading size="medium">{label}</Heading>
+        {count && <Count count={count} />}
+      </StyledChangedStateGroupHeadingButton>
     </Stack>
   );
 }

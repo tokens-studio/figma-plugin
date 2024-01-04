@@ -1,6 +1,5 @@
 {
-  "ifYouCreate": "Als u uw branch maakt of verwisselt zonder uw lokale wijzigingen door te voeren",
-  "toYourRepo": "naar uw repository, zullen de wijzigingen verloren gaan.",
+  "ifYouCreate": "Als u uw branch maakt of verwisselt zonder uw lokale wijzigingen door te voeren naar uw repository, zullen de wijzigingen verloren gaan.",
   "discardChanges": "Veranderingen ongedaan maken",
   "cancel": "Annuleren",
   "createNewBranch": "Maak een nieuwe tak van",

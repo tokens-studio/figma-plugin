@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
-import { Button } from '@tokens-studio/ui';
+import {
+  Button, Box, TextInput, Stack, FormField, Label, IconButton, Text,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import Box from '../Box';
-import Input from '../Input';
-import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
@@ -23,7 +24,12 @@ type Props = {
 export default function BitbucketForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const inputEl = useRef<HTMLInputElement | null>(null);
+  const { t } = useTranslation(['storage']);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,64 +59,80 @@ export default function BitbucketForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Box css={{ position: 'relative' }}>
-          <Input
-            full
-            label="App Password"
-            value={values.secret}
+      <Stack direction="column" gap={5}>
+        <FormField>
+          <Label htmlFor="name">{t('name')}</Label>
+          <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
+          <TextInput
+            value={values.secret || ''}
             onChange={onChange}
-            inputRef={inputEl}
-            isMasked
-            type="password"
             name="secret"
+            id="secret"
+            required
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">
+            {t('providers.bitbucket.repository')}
+          </Label>
+          <TextInput
+            value={values.id || ''}
+            onChange={onChange}
+            type="text"
+            name="id"
+            id="id"
             required
           />
-        </Box>
-        <Input
-          full
-          label="Repository (workspace/repo)"
-          value={values.id}
-          onChange={onChange}
-          type="text"
-          name="id"
-          required
-        />
-        <Input
-          full
-          label="Branch"
-          value={values.branch}
-          onChange={onChange}
-          type="text"
-          name="branch"
-          required
-        />
-        <Input
-          full
-          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
-          value={values.filePath}
-          onChange={onChange}
-          type="text"
-          name="filePath"
-          required
-        />
-        <Input
-          full
-          label="baseUrl (optional)"
-          value={values.baseUrl}
-          placeholder="https://api.bitbucket.com/v2"
-          onChange={onChange}
-          type="text"
-          name="baseUrl"
-        />
-        <Stack direction="row" gap={4}>
+        </FormField>
+        <FormField>
+          <Label htmlFor="branch">{t('branch')}</Label>
+          <TextInput
+            value={values.branch || ''}
+            onChange={onChange}
+            type="text"
+            name="branch"
+            id="branch"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="filePath">{t('filePath')}</Label>
+          <TextInput
+            value={values.filePath || ''}
+            onChange={onChange}
+            type="text"
+            name="filePath"
+            id="filePath"
+            required
+          />
+          <Text muted size="xsmall">{t('filePathCaption')}</Text>
+        </FormField>
+        <FormField>
+          <Label htmlFor="name">{t('providers.bitbucket.projectName')}</Label>
+          <TextInput
+            value={values.baseUrl || ''}
+            placeholder="https://api.bitbucket.com/v2"
+            onChange={onChange}
+            type="text"
+            name="baseUrl"
+            id="baseUrl"
+          />
+        </FormField>
+
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" size="large" onClick={onCancel}>
-            Cancel
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

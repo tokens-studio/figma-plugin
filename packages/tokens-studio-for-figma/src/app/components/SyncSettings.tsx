@@ -1,23 +1,23 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu, Heading, Button } from '@tokens-studio/ui';
+import {
+  DropdownMenu, Heading, Button, Box, Stack,
+} from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
-import ConfirmLocalStorageModal from './modals/ConfirmLocalStorageModal';
 import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from '@/selectors';
-import Stack from './Stack';
-import Box from './Box';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
+import useConfirm from '../hooks/useConfirm';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -62,11 +62,11 @@ const SyncSettings = () => {
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
+  const { confirm } = useConfirm();
 
   const { setStorageType } = useStorage();
   const { fetchBranches } = useRemoteTokens();
 
-  const [confirmModalVisible, showConfirmModal] = React.useState(false);
   const [editStorageItemModalVisible, setShowEditStorageModalVisible] = React.useState(Boolean(localApiState.new));
   const [createStorageItemModalVisible, setShowCreateStorageModalVisible] = React.useState(false);
   const [storageProvider, setStorageProvider] = React.useState(localApiState.provider);
@@ -91,12 +91,6 @@ const SyncSettings = () => {
     [dispatch.uiState, setLocalBranches],
   );
 
-  const handleSetLocalStorage = React.useCallback(() => {
-    if (storageType?.provider !== StorageProviderType.LOCAL) {
-      showConfirmModal(true);
-    }
-  }, [storageType?.provider]);
-
   const handleShowAddCredentials = React.useCallback((provider: StorageProviderType) => {
     track('Add Credentials', { provider });
     setShowCreateStorageModalVisible(true);
@@ -118,8 +112,20 @@ const SyncSettings = () => {
       shouldSetInDocument: true,
     });
     dispatch.tokenState.setEditProhibited(false);
-    showConfirmModal(false);
   }, [dispatch.tokenState, dispatch.uiState, setStorageType]);
+
+  const handleSetLocalStorage = React.useCallback(async () => {
+    if (storageType?.provider !== StorageProviderType.LOCAL) {
+      const confirmResult = await confirm({
+        text: t('setToDocumentStorage') as string,
+        description: t('youCanAlwaysGoBack') as string,
+      });
+      if (confirmResult) {
+        handleSubmitLocalStorage();
+      }
+      return null;
+    }
+  }, [confirm, handleSubmitLocalStorage, storageType?.provider, t]);
 
   const handleHideStorageModal = React.useCallback(() => {
     setShowEditStorageModalVisible(false);
@@ -131,13 +137,6 @@ const SyncSettings = () => {
 
   return (
     <Box css={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-      {confirmModalVisible && (
-        <ConfirmLocalStorageModal
-          isOpen={confirmModalVisible}
-          onToggle={showConfirmModal}
-          onSuccess={handleSubmitLocalStorage}
-        />
-      )}
       {editStorageItemModalVisible && (
         <EditStorageItemModal
           isOpen={editStorageItemModalVisible}
@@ -156,9 +155,7 @@ const SyncSettings = () => {
       )}
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
-          <Stack gap={3} direction="column">
-            <Heading size="medium">{t('syncProviders')}</Heading>
-          </Stack>
+          <Heading size="medium">{t('syncProviders')}</Heading>
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">
               <LocalStorageItem onClick={handleSetLocalStorage} isActive={storageType.provider === StorageProviderType.LOCAL} />
@@ -174,7 +171,7 @@ const SyncSettings = () => {
           <DropdownMenu>
             <DropdownMenu.Trigger asChild data-testid="add-storage-item-dropdown">
               <Button asDropdown>
-                {t('addNew')}
+                {t('addNewSyncProvider')}
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
@@ -183,7 +180,7 @@ const SyncSettings = () => {
               {
                 providers.map((provider) => (
                   <DropdownMenu.Item key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
-                    <Box css={{ color: '$contextMenuFg' }}>{getProviderIcon(provider.type)}</Box>
+                    <Box css={{ color: '$fgSubtle' }}>{getProviderIcon(provider.type)}</Box>
                     {provider.text}
                   </DropdownMenu.Item>
                 ))

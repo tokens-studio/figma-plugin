@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import zod from 'zod';
 import {
-  Box, Button, Stack, TextInput,
+  Button, FormField, IconButton, Label, Stack, TextInput,
 } from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
@@ -22,6 +24,13 @@ type Props = {
 export default function TokensStudioForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
+  const { t } = useTranslation(['storage']);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
+
   const handleSubmit = React.useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -47,30 +56,42 @@ export default function TokensStudioForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" required />
-        <Box css={{ position: 'relative' }}>
+      <Stack direction="column" gap={5}>
+        <FormField>
+          <Label htmlFor="name">{t('name')}</Label>
+          <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('secret')}</Label>
           <TextInput
             value={values.secret || ''}
             onChange={onChange}
-            type="password"
             name="secret"
+            id="secret"
+            required
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">{t('id')}</Label>
+          <TextInput
+            value={values.id || ''}
+            onChange={onChange}
+            type="text"
+            name="id"
+            id="id"
             required
           />
-        </Box>
-        <TextInput
-          value={values.id || ''}
-          onChange={onChange}
-          type="text"
-          name="id"
-          required
-        />
-        <Stack direction="row" gap={4}>
+        </FormField>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

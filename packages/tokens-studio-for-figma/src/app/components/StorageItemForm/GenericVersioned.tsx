@@ -1,23 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
 import zod from 'zod';
-import { TriangleDownIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  IconButton, Button, Heading, DropdownMenu,
-  Select,
+  Box, Stack, Text, Link, IconButton, Button, Heading, Select, TextInput, Label, FormField,
 } from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
-import Input from '../Input';
-import Box from '../Box';
-import Stack from '../Stack';
-import Text from '../Text';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
-import Label from '../Label';
 import { ErrorMessage } from '../ErrorMessage';
-import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE; }>;
 type Props = {
@@ -45,6 +38,11 @@ export default function GenericVersionedForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { t } = useTranslation(['storage']);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -123,76 +121,87 @@ export default function GenericVersionedForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Stack direction="column" gap={1}>
-          <Heading>{t('providers.generic.addNew')}</Heading>
-          <Text muted>
-            {t('providers.generic.description')}
-            {' '}
-            <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider">{t('general.readMore')}</Link>
-          </Text>
-        </Stack>
-        <Input full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Input
-          full
-          label={t('providers.generic.url')}
-          value={values.id}
-          onChange={onChange}
-          type="text"
-          name="id"
-          required
-        />
-        <Select value={flow} onValueChange={handleValueChange}>
-          <Select.Trigger data-testid="flow-dropdown" value={flow} label={t('providers.generic.flowType')} />
-          <Select.Content>
-            <Select.Item value={GenericVersionedStorageFlow.READ_ONLY}>
-              {t('providers.generic.readOnly')}
-            </Select.Item>
-            <Select.Item value={GenericVersionedStorageFlow.READ_WRITE}>
-              {t('providers.generic.readWrite')}
-            </Select.Item>
-            <Select.Item value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
-              {t('providers.generic.readWriteCreate')}
-            </Select.Item>
-          </Select.Content>
-        </Select>
-        <Stack direction="column" gap={4}>
-          <Heading>{t('providers.generic.additionalHeaders')}</Heading>
+      <Stack direction="column" gap={5}>
+        <Text muted>
+          {t('providers.generic.description')}
+          {' '}
+          <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider" target="_blank">{t('readMore')}</Link>
+        </Text>
+        <FormField>
+          <Label htmlFor="name">{t('providers.generic.name')}</Label>
+          <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">{t('providers.generic.url')}</Label>
+          <TextInput
+            value={values.id || ''}
+            onChange={onChange}
+            type="text"
+            name="id"
+            id="id"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label>{t('providers.generic.flowType')}</Label>
+          <Select value={flow} onValueChange={handleValueChange}>
+            <Select.Trigger data-testid="flow-dropdown" value={flow} />
+            <Select.Content>
+              <Select.Item value={GenericVersionedStorageFlow.READ_ONLY}>
+                {t('providers.generic.readOnly')}
+              </Select.Item>
+              <Select.Item value={GenericVersionedStorageFlow.READ_WRITE}>
+                {t('providers.generic.readWrite')}
+              </Select.Item>
+              <Select.Item value={GenericVersionedStorageFlow.READ_WRITE_CREATE}>
+                {t('providers.generic.readWriteCreate')}
+              </Select.Item>
+            </Select.Content>
+          </Select>
+        </FormField>
+        <Stack direction="column" gap={5}>
+          <Heading size="medium">{t('providers.generic.additionalHeaders')}</Heading>
           {headers.map((x, i) => (
             <Box css={{ display: 'flex', alignItems: 'flex-end', gap: '1em' }}>
-              <Input
-                label={t('providers.generic.name')}
-                value={x?.name}
-                onChange={onHeaderChange}
-                type="text"
-                name="name"
-                data-index={i}
-              />
-              <Input
-                label={t('providers.generic.value')}
-                value={x.value}
-                disabled={!x.name}
-                isMasked
-                onChange={onHeaderChange}
-                type="password"
-                name="value"
-                data-index={i}
-              />
+              <FormField>
+                <Label htmlFor="name">{t('providers.generic.name')}</Label>
+                <TextInput
+                  value={x?.name}
+                  onChange={onHeaderChange}
+                  type="text"
+                  name="name"
+                  id="name"
+                  data-index={i}
+                />
+              </FormField>
+              <FormField>
+                <Label htmlFor="name">{t('providers.generic.value')}</Label>
+                <TextInput
+                  value={x.value}
+                  disabled={!x.name}
+                  onChange={onHeaderChange}
+                  type={isMasked ? 'password' : 'text'}
+                  trailingAction={
+                    <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+                  }
+                  name="value"
+                  id="value"
+                  data-index={i}
+                />
+              </FormField>
               <IconButton
                 onClick={handleClose}
                 data-index={i}
-                size="small"
                 variant="invisible"
                 icon={<XIcon />}
               />
             </Box>
           ))}
         </Stack>
-        <Stack direction="row" gap={4}>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-
           <Button variant="primary" type="submit" disabled={!values.id}>
             {t('save')}
           </Button>

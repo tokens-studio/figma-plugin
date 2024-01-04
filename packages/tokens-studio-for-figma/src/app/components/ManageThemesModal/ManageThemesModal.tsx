@@ -235,14 +235,12 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         </Box>
       )}
       {themeEditorOpen && (
-        <Box css={{ padding: '$4 $3' }}>
-          <CreateOrEditThemeForm
-            id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
-            defaultValues={themeEditorDefaultValues}
-            onSubmit={handleSubmit}
-            onCancel={handleCancelEdit}
-          />
-        </Box>
+      <CreateOrEditThemeForm
+        id={typeof themeEditorOpen === 'string' ? themeEditorOpen : undefined}
+        defaultValues={themeEditorDefaultValues}
+        onSubmit={handleSubmit}
+        onCancel={handleCancelEdit}
+      />
       )}
     </Modal>
   );

@@ -149,7 +149,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {activeTab === ThemeFormTabs.SETS && (
-        <Box css={{ paddingTop: '$4' }}>
+        <Box css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
@@ -158,7 +158,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </Box>
       )}
       {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
-        <Box css={{ paddingTop: '$4' }}>
+        <Box css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
           <ThemeStyleManagementForm id={id} />
         </Box>

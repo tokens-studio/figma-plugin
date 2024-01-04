@@ -10,6 +10,15 @@ import SyncSettings from './SyncSettings';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { GitHubStorageType, StorageTypeCredential } from '@/types/StorageType';
 
+const mockConfirm = jest.fn();
+
+jest.mock('../hooks/useConfirm', () => ({
+  __esModule: true,
+  default: () => ({
+    confirm: mockConfirm,
+  }),
+}));
+
 describe('ConfirmDialog', () => {
   const defaultStore = {
     uiState: {
@@ -45,47 +54,13 @@ describe('ConfirmDialog', () => {
     );
     expect(result.queryByText('syncProviders')).toBeInTheDocument();
     expect(result.queryByText('localDocument')).toBeInTheDocument();
-    expect(result.queryByText('addNew')).toBeInTheDocument();
-  });
-
-  it('should return ConfirmLocalStorageModal when seleting local storage', async () => {
-    const mockStore = createMockStore(defaultStore);
-    const result = render(
-      <Provider store={mockStore}>
-        <SyncSettings />
-      </Provider>,
-    );
-
-    await act(async () => {
-      result.queryAllByText('apply')[0]?.click();
-    });
-
-    expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
-  });
-
-  it('should close ConfirmLocalStorageModal when clicking cancel button', async () => {
-    const mockStore = createMockStore(defaultStore);
-    const result = render(
-      <Provider store={mockStore}>
-        <SyncSettings />
-      </Provider>,
-    );
-
-    await act(async () => {
-      result.queryAllByText('apply')[0]?.click();
-    });
-
-    expect(result.queryByText('Set to document storage?')).toBeInTheDocument();
-
-    await act(async () => {
-      result.queryByText('Cancel')?.click();
-    });
-
-    expect(result.queryByText('Set to document storage?')).not.toBeInTheDocument();
   });
 
   it('can convert to localStorage', async () => {
     const mockStore = createMockStore(defaultStore);
+    mockConfirm.mockImplementationOnce(() => (
+      Promise.resolve(true)
+    ));
     const result = render(
       <Provider store={mockStore}>
         <SyncSettings />
@@ -94,10 +69,6 @@ describe('ConfirmDialog', () => {
 
     await act(async () => {
       result.queryAllByText('apply')[0]?.click();
-    });
-
-    await act(async () => {
-      result.queryByText('Yes, set to local.')?.click();
     });
 
     expect(mockStore.getState().uiState.localApiState).toEqual({

@@ -8,4 +8,5 @@ export const StyledDirtyStateBadge = styled('div', {
   height: '$3',
   borderRadius: '100px',
   backgroundColor: '$accentDefault',
+  pointerEvents: 'none',
 });

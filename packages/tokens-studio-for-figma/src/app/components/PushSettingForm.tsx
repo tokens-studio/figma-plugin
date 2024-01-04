@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Heading, Textarea } from '@tokens-studio/ui';
-import Stack from './Stack';
+import {
+  Heading, Textarea, Stack, Box, Text, TextInput, FormField, Label,
+} from '@tokens-studio/ui';
 import { localApiStateSelector } from '@/selectors';
-import Box from './Box';
-import Text from './Text';
-import Input from './Input';
+
 import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -29,7 +28,7 @@ function PushSettingForm({
   const { t } = useTranslation(['sync']);
 
   return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
-    <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
+    <Stack direction="column" gap={3} css={{ padding: '$4', width: '100%' }}>
       <Text size="small">{t('pushYourLocalChangesToYourRepository')}</Text>
       <Box css={{
         padding: '$2', fontFamily: '$mono', color: '$fgMuted', background: '$bgSubtle', borderRadius: '$medium',
@@ -40,21 +39,22 @@ function PushSettingForm({
       <Heading size="small">{t('commitMessage')}</Heading>
       <Textarea
         data-testid="push-dialog-commit-message"
-        border
         rows={3}
         value={commitMessage}
         onChange={handleMessageChange}
         placeholder="Enter commit message"
       />
-      <Input
-        full
-        label="Branch"
-        value={branch}
-        onChange={handleBranchChange}
-        type="text"
-        name="branch"
-        required
-      />
+      <FormField>
+        <Label htmlFor="branch">{t('branch')}</Label>
+        <TextInput
+          value={branch}
+          onChange={handleBranchChange}
+          type="text"
+          name="branch"
+          id="branch"
+          required
+        />
+      </FormField>
     </Stack>
   );
 }

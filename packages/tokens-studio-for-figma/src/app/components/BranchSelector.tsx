@@ -4,16 +4,7 @@ import { ChevronRightIcon } from '@radix-ui/react-icons';
 import { GitBranchIcon } from '@primer/octicons-react';
 import { useUIDSeed } from 'react-uid';
 import { useTranslation } from 'react-i18next';
-import {
-  BranchSwitchMenu,
-  BranchSwitchMenuContent,
-  BranchSwitchMenuItem,
-  BranchSwitchMenuMainTrigger,
-  BranchSwitchMenuTrigger,
-  BranchSwitchMenuRadioGroup,
-  BranchSwitchMenuArrow,
-  BranchSwitchMenuSeparator,
-} from './BranchSwitchMenu';
+import { Button, DropdownMenu } from '@tokens-studio/ui';
 import {
   branchSelector,
   lastSyncedStateSelector,
@@ -41,19 +32,24 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
 
-const BranchSwitchMenuItemElement: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
-  branch: string
-  createNewBranchFrom: (branch: string) => void
-}>>> = ({ branch, createNewBranchFrom }) => {
-  const onSelect = React.useCallback(() => (
-    createNewBranchFrom(branch)
-  ), [branch, createNewBranchFrom]);
+const BranchSwitchMenuItemElement: React.FC<
+React.PropsWithChildren<
+React.PropsWithChildren<{
+  branch: string;
+  createNewBranchFrom: (branch: string) => void;
+}>
+>
+> = ({ branch, createNewBranchFrom }) => {
+  const onSelect = React.useCallback(() => createNewBranchFrom(branch), [branch, createNewBranchFrom]);
 
   return (
-    <BranchSwitchMenuItem data-testid={`branch-selector-create-branch-from-branch-${branch}`} onSelect={onSelect}>
-      <GitBranchIcon size={12} />
-      {` ${branch}`}
-    </BranchSwitchMenuItem>
+    <DropdownMenu.Item
+      data-testid={`branch-selector-create-branch-from-branch-${branch}`}
+      onSelect={onSelect}
+      css={{ position: 'relative' }}
+    >
+      {branch}
+    </DropdownMenu.Item>
   );
 };
 
@@ -79,7 +75,6 @@ export default function BranchSelector() {
   const { t } = useTranslation(['branch', 'licence']);
   const [currentBranch, setCurrentBranch] = useState(localApiStateBranch);
   const [startBranch, setStartBranch] = useState<string | null>(null);
-  const [menuOpened, setMenuOpened] = useState(false);
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
   const [isCurrentChanges, setIsCurrentChanges] = useState(false);
 
@@ -90,13 +85,11 @@ export default function BranchSelector() {
   const checkForChanges = React.useCallback(() => {
     const tokenSetOrder = Object.keys(tokens);
     const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
-    const hasChanged = !compareLastSyncedState(
-      tokens,
-      themes,
+    const hasChanged = !compareLastSyncedState(tokens, themes, defaultMetadata, lastSyncedState, [
+      {},
+      [],
       defaultMetadata,
-      lastSyncedState,
-      [{}, [], defaultMetadata],
-    );
+    ]);
     return hasChanged;
   }, [lastSyncedState, tokens, themes, storageType]);
 
@@ -105,14 +98,7 @@ export default function BranchSelector() {
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
       text: t('unSavedChanges') as string,
-      description: (
-        <div>
-          {t('ifYouCreate')}
-          <br />
-          {' '}
-          {t('toYourRepo')}
-        </div>
-      ),
+      description: t('ifYouCreate') as string,
       confirmAction: t('discardChanges') as string,
       cancelAction: t('cancel') as string,
     });
@@ -124,132 +110,153 @@ export default function BranchSelector() {
 
   const createBranchByChange = React.useCallback(() => {
     track('Create new branch from current changes');
-    setMenuOpened(false);
     setIsCurrentChanges(true);
     setStartBranch(currentBranch ?? null);
     setCreateBranchModalVisible(true);
   }, [currentBranch]);
 
-  const createNewBranchFrom = React.useCallback(async (branch: string) => {
-    track('Create new branch from specific branch');
-    setMenuOpened(false);
+  const createNewBranchFrom = React.useCallback(
+    async (branch: string) => {
+      track('Create new branch from specific branch');
 
-    if (hasChanges && (await askUserIfPushChanges())) {
-      await pushTokens();
-    }
+      if (hasChanges && (await askUserIfPushChanges())) {
+        await pushTokens();
+      }
 
-    setStartBranch(branch);
-    setCreateBranchModalVisible(true);
-  }, [hasChanges, askUserIfPushChanges, pushTokens]);
+      setStartBranch(branch);
+      setCreateBranchModalVisible(true);
+    },
+    [hasChanges, askUserIfPushChanges, pushTokens],
+  );
 
-  const changeAndPull = React.useCallback(async (branch: string) => {
-    if (isGitProvider(apiData) && isGitProvider(localApiState)) {
-      setMenuOpened(false);
-      setCurrentBranch(branch);
-      dispatch.uiState.setApiData({ ...apiData, branch });
-      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-      await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREDENTIALS,
-        credential: { ...apiData, branch },
-      });
-      setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
-    }
-  }, [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch]);
+  const changeAndPull = React.useCallback(
+    async (branch: string) => {
+      if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+        setCurrentBranch(branch);
+        dispatch.uiState.setApiData({ ...apiData, branch });
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+        await pullTokens({ context: { ...apiData, branch }, usedTokenSet, activeTheme });
+        AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREDENTIALS,
+          credential: { ...apiData, branch },
+        });
+        setStorageType({ provider: { ...apiData, branch } as StorageTypeCredentials, shouldSetInDocument: true });
+      }
+    },
+    [apiData, localApiState, pullTokens, usedTokenSet, activeTheme, dispatch],
+  );
 
-  const onBranchSelected = React.useCallback(async (branch: string) => {
-    track('Branch changed');
-    if (hasChanges) {
-      if (await askUserIfPushChanges()) {
+  const onBranchSelected = React.useCallback(
+    async (branch: string) => {
+      track('Branch changed');
+      if (hasChanges) {
+        if (await askUserIfPushChanges()) {
+          await changeAndPull(branch);
+        }
+      } else {
         await changeAndPull(branch);
-      } else setMenuOpened(false);
-    } else {
-      await changeAndPull(branch);
-    }
-  }, [hasChanges, askUserIfPushChanges, changeAndPull]);
+      }
+    },
+    [hasChanges, askUserIfPushChanges, changeAndPull],
+  );
 
   // @params
   /*
-  ** branch: branch name which is just created.
-  ** branches: a list of branch names before new branch is created.
-  */
-  const onCreateBranchModalSuccess = React.useCallback((branch: string, branches: string[]) => {
-    setCreateBranchModalVisible(false);
-    setCurrentBranch(branch);
-    if (isGitProvider(apiData) && isGitProvider(localApiState)) {
-      dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
-      dispatch.uiState.setApiData({ ...apiData, branch });
-      dispatch.uiState.setLocalApiState({ ...localApiState, branch });
-    }
-  }, [dispatch, apiData, localApiState]);
-
-  const handleToggleMenu = React.useCallback(() => {
-    setMenuOpened(!menuOpened);
-  }, [menuOpened]);
+   ** branch: branch name which is just created.
+   ** branches: a list of branch names before new branch is created.
+   */
+  const onCreateBranchModalSuccess = React.useCallback(
+    (branch: string, branches: string[]) => {
+      setCreateBranchModalVisible(false);
+      setCurrentBranch(branch);
+      if (isGitProvider(apiData) && isGitProvider(localApiState)) {
+        dispatch.branchState.setBranches(branches.includes(branch) ? branches : [...branches, branch]);
+        dispatch.uiState.setApiData({ ...apiData, branch });
+        dispatch.uiState.setLocalApiState({ ...localApiState, branch });
+      }
+    },
+    [dispatch, apiData, localApiState],
+  );
 
   const handleCloseModal = React.useCallback(() => {
     setCreateBranchModalVisible(false);
   }, []);
 
-  return (
-    currentBranch
-      ? (
-        <BranchSwitchMenu open={menuOpened} onOpenChange={handleToggleMenu}>
-          <BranchSwitchMenuMainTrigger data-testid="branch-selector-menu-trigger">
-            <GitBranchIcon size={16} />
-            <span>{currentBranch}</span>
-          </BranchSwitchMenuMainTrigger>
+  return currentBranch ? (
+    <>
+      <DropdownMenu>
+        <DropdownMenu.Trigger asChild data-testid="branch-selector-menu-trigger">
+          <Button size="small" variant="invisible" icon={<GitBranchIcon />}>
+            {currentBranch}
+          </Button>
+        </DropdownMenu.Trigger>
 
-          <BranchSwitchMenuContent side="top" sideOffset={5}>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content side="top" sideOffset={0}>
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger
+                data-testid="branch-selector-create-new-branch-trigger"
+                disabled={!gitBranchSelector}
+              >
+                {t('createNewBranch')}
+                <DropdownMenu.TrailingVisual>
+                  <ChevronRightIcon />
+                </DropdownMenu.TrailingVisual>
+              </DropdownMenu.SubTrigger>
+              <DropdownMenu.SubContent>
+                {hasChanges && (
+                  <DropdownMenu.Item
+                    data-testid="branch-selector-create-new-branch-from-current-change"
+                    onSelect={createBranchByChange}
+                  >
+                    {t('currentChanges')}
+                  </DropdownMenu.Item>
+                )}
+                {branchState.branches.length > 0
+                  && branchState.branches.map((branch, index) => (
+                    <BranchSwitchMenuItemElement
+                      key={seed(index)}
+                      branch={branch}
+                      createNewBranchFrom={createNewBranchFrom}
+                    />
+                  ))}
+              </DropdownMenu.SubContent>
+            </DropdownMenu.Sub>
+            <DropdownMenu.Separator />
             {!gitBranchSelector && (
               <>
-                <BranchSwitchMenuItem css={{ display: 'flex', justifyContent: 'space-between' }}>
-
+                <DropdownMenu.Item css={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>{t('upgradeToPro', { ns: 'licence' })}</span>
                   <ProBadge compact />
-
-                </BranchSwitchMenuItem>
-                <BranchSwitchMenuSeparator />
+                </DropdownMenu.Item>
+                <DropdownMenu.Separator />
               </>
             )}
-            <BranchSwitchMenuRadioGroup className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} value={currentBranch}>
+            <DropdownMenu.RadioGroup value={currentBranch}>
               {branchState.branches.length > 0
-                && branchState.branches.map((branch, index) => <BranchSwitchMenuRadioElement disabled={!gitBranchSelector} key={`radio_${seed(index)}`} branch={branch} branchSelected={onBranchSelected} />)}
-            </BranchSwitchMenuRadioGroup>
-            <BranchSwitchMenu>
-              <BranchSwitchMenuTrigger data-testid="branch-selector-create-new-branch-trigger" disabled={!gitBranchSelector}>
-                {t('createNewBranch')}
-
-                <ChevronRightIcon />
-              </BranchSwitchMenuTrigger>
-              <BranchSwitchMenuContent className="content scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }} side="right" align="end">
-                {hasChanges
-                  && (
-                    <BranchSwitchMenuItem data-testid="branch-selector-create-new-branch-from-current-change" onSelect={createBranchByChange}>
-                      {t('currentChanges')}
-                    </BranchSwitchMenuItem>
-                  )}
-                {branchState.branches.length > 0 && branchState.branches.map((branch, index) => (
-                  <BranchSwitchMenuItemElement
-                    key={seed(index)}
+                && branchState.branches.map((branch, index) => (
+                  <BranchSwitchMenuRadioElement
+                    disabled={!gitBranchSelector}
+                    key={`radio_${seed(index)}`}
                     branch={branch}
-                    createNewBranchFrom={createNewBranchFrom}
+                    branchSelected={onBranchSelected}
                   />
                 ))}
-              </BranchSwitchMenuContent>
-            </BranchSwitchMenu>
-            <BranchSwitchMenuArrow offset={12} />
-          </BranchSwitchMenuContent>
-          {(createBranchModalVisible && startBranch) && (
-            <CreateBranchModal
-              isOpen={createBranchModalVisible}
-              onClose={handleCloseModal}
-              onSuccess={onCreateBranchModalSuccess}
-              startBranch={startBranch}
-              isCurrentChanges={isCurrentChanges}
-            />
-          )}
-        </BranchSwitchMenu>
-      ) : <div />
+            </DropdownMenu.RadioGroup>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu>
+      {createBranchModalVisible && startBranch && (
+        <CreateBranchModal
+          isOpen={createBranchModalVisible}
+          onClose={handleCloseModal}
+          onSuccess={onCreateBranchModalSuccess}
+          startBranch={startBranch}
+          isCurrentChanges={isCurrentChanges}
+        />
+      )}
+    </>
+  ) : (
+    <div />
   );
 }

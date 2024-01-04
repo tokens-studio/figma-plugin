@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Stack from './Stack';
+import { Box, Stack, Text } from '@tokens-studio/ui';
 import ChangeStateListingHeading from './ChangeStateListingHeading';
-import { CompareStateType } from '@/utils/findDifferentState';
-import Text from './Text';
 import ChangedTokenItem from './ChangedTokenItem';
 import { StyledDiff } from './StyledDiff';
+import { useChangedState } from '@/hooks/useChangedState';
 
-function ChangedStateList({ changedState }: { changedState: CompareStateType }) {
+function ChangedStateList() {
+  const { changedState } = useChangedState();
   const [collapsed, setCollapsed] = React.useState(false);
   const { t } = useTranslation(['tokens']);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
@@ -29,18 +29,16 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
   }, [collapsedChangedStateList, changedState.tokens, collapsed]);
 
   return (
-    <Stack direction="column" gap={1}>
+    <Stack direction="column" gap={1} css={{ padding: '$4' }}>
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
-        tokenList.length > 0 && (
-          <>
-            <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
-            {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
-              tokenList.map((token) => (
-                <ChangedTokenItem token={token} />
-              ))
-            )}
-          </>
-        )
+        <Box key={tokenSet}>
+          <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
+          {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
+            tokenList.map((token) => (
+              <ChangedTokenItem key={token.name} token={token} />
+            ))
+          )}
+        </Box>
       ))}
       {
         changedState.themes.length > 0 && (
@@ -54,6 +52,7 @@ function ChangedStateList({ changedState }: { changedState: CompareStateType }) 
                   align="center"
                   gap={3}
                   css={{ padding: '$1 $4' }}
+                  key={theme.id}
                 >
                   <Text bold size="small">{theme.name}</Text>
                   {

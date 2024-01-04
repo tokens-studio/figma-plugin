@@ -72,7 +72,9 @@ export function Modal({
         <Dialog.Overlay />
         <Dialog.Content css={{ padding: 0 }}>
           <Box css={{
-            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
           >
             {(showClose || title) && (
@@ -84,6 +86,10 @@ export function Modal({
                 borderBottomColor: '$borderMuted',
                 borderBottomWidth: '1px',
                 padding: '$4',
+                position: 'sticky',
+                backgroundColor: '$bgDefault',
+                top: 0,
+                zIndex: 10,
               }}
             >
               {title && (

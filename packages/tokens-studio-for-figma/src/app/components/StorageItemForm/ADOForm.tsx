@@ -1,16 +1,15 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Button, FormField, Stack, Text, Link, IconButton, Label, TextInput,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import Box from '../Box';
-import Input from '../Input';
-import Stack from '../Stack';
-import Text from '../Text';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
-import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
 type Props = {
@@ -25,7 +24,12 @@ type Props = {
 export default function ADOForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const inputEl = useRef<HTMLInputElement | null>(null);
+  const { t } = useTranslation(['storage']);
+  const [isMasked, setIsMasked] = React.useState(true);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -52,83 +56,90 @@ export default function ADOForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Stack direction="column" gap={1}>
-          <Heading>
-            Add new Azure DevOps credentials
-          </Heading>
-          <Text muted>
-            Access tokens stored on your repository, push and pull tokens in a two-way sync.
-            {' '}
-            <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider">Read more</Link>
-          </Text>
-        </Stack>
-        <Input
-          autofocus
-          full
-          label="Organization Url"
-          value={values.baseUrl}
-          placeholder="https://dev.azure.com/yourOrgName"
-          onChange={onChange}
-          type="text"
-          name="baseUrl"
-          required
-        />
-        <Box css={{ position: 'relative' }}>
-          <Input
-            full
-            label="Personal Access Token"
-            value={values.secret}
+      <Stack direction="column" gap={5}>
+        <Text muted>
+          {t('providers.ado.description')}
+          {' '}
+          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider">{t('readMore')}</Link>
+        </Text>
+        <FormField>
+          <Label htmlFor="baseUrl">{t('providers.ado.orgUrl')}</Label>
+          <TextInput
+            autoFocus
+            value={values.baseUrl || ''}
+            placeholder="https://dev.azure.com/yourOrgName"
             onChange={onChange}
-            inputRef={inputEl}
-            isMasked
-            type="password"
-            name="secret"
+            type="text"
+            name="baseUrl"
+            id="baseUrl"
             required
           />
-        </Box>
-        <Input
-          full
-          label="Repository name"
-          value={values.id}
-          onChange={onChange}
-          type="text"
-          name="id"
-          required
-        />
-        <Input
-          full
-          label="Branch"
-          value={values.branch}
-          onChange={onChange}
-          type="text"
-          name="branch"
-          required
-        />
-        <Input
-          full
-          label="File Path (e.g. tokens.json) or Folder Path (e.g. tokens)"
-          defaultValue=""
-          value={values.filePath}
-          onChange={onChange}
-          type="text"
-          name="filePath"
-        />
-        <Input
-          full
-          label="Project Name (optional)"
-          value={values.name}
-          onChange={onChange}
-          type="text"
-          name="name"
-        />
-        <Stack direction="row" gap={4}>
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('providers.ado.pat')}</Label>
+          <TextInput
+            value={values.secret || ''}
+            onChange={onChange}
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
+            name="secret"
+            id="secret"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('providers.ado.repositoryName')}</Label>
+          <TextInput
+            value={values.id || ''}
+            onChange={onChange}
+            type="text"
+            name="id"
+            id="id"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="branch">{t('branch')}</Label>
+          <TextInput
+            name="branch"
+            id="branch"
+            value={values.branch || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="filePath">{t('filePath')}</Label>
+          <TextInput
+            value={values.filePath || ''}
+            onChange={onChange}
+            type="text"
+            name="filePath"
+            id="filePath"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="name">{t('providers.ado.projectName')}</Label>
+          <TextInput
+            value={values.name || ''}
+            onChange={onChange}
+            type="text"
+            name="name"
+            id="name"
+            required
+          />
+        </FormField>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            Cancel
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            Save credentials
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

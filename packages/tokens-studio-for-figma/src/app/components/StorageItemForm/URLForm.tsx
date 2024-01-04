@@ -1,16 +1,15 @@
 import React from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Button, TextInput, Stack, Text, Link, Label, IconButton, FormField,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import Input from '../Input';
-import Stack from '../Stack';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
-import Text from '../Text';
-import Link from '../Link';
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
 type Props = {
@@ -26,7 +25,12 @@ export default function URLForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { t } = useTranslation(['storage']);
-  const { t: tg } = useTranslation(['general']);
+
+  const [isMasked, setIsMasked] = React.useState(false);
+
+  const toggleMask = React.useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,25 +55,40 @@ export default function URLForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack direction="column" gap={4}>
-        <Stack direction="column" gap={1}>
-          <Heading>{t('providers.url.addNew')}</Heading>
-          <Text muted>
-            {t('providers.url.description')}
-            {' '}
-            <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">{tg('readMore')}</Link>
-          </Text>
-        </Stack>
-        <Input autofocus full label="Name" value={values.name} onChange={onChange} type="text" name="name" required />
-        <Input full label="Headers (optional)" value={values.secret} onChange={onChange} type="text" name="secret" />
-        <Input full label="URL" value={values.id} onChange={onChange} type="text" name="id" required />
-        <Stack direction="row" gap={4}>
+      <Stack direction="column" gap={5}>
+        <Text muted>
+          {t('providers.url.description')}
+          {' '}
+          <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">{t('readMore')}</Link>
+        </Text>
+        <FormField>
+          <Label htmlFor="name">{t('name')}</Label>
+          <TextInput autoFocus name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="secret">{t('providers.url.headers')}</Label>
+          <TextInput
+            name="secret"
+            id="secret"
+            value={values.secret || ''}
+            onChange={onChange}
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">{t('providers.url.url')}</Label>
+          <TextInput name="id" id="id" value={values.id || ''} onChange={onChange} type="text" required />
+        </FormField>
+        <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
-            {tg('cancel')}
+            {t('cancel')}
           </Button>
 
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
-            {tg('save')}
+            {t('save')}
           </Button>
         </Stack>
         {hasErrored && (

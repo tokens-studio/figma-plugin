@@ -2,18 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
-import { Button, IconButton, DropdownMenu } from '@tokens-studio/ui';
+import {
+  Button, Box, Badge, Stack, IconButton, DropdownMenu,
+} from '@tokens-studio/ui';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
 import { StorageProviderType, type StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
-import Box from './Box';
 import useConfirm from '../hooks/useConfirm';
 import { getProviderIcon } from '@/utils/getProviderIcon';
-import Stack from './Stack';
-import Badge from './Badge';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 
@@ -40,20 +39,21 @@ const StorageItem = ({ item, onEdit }: Props) => {
       text: t('confirmDelete') as string,
     });
     return shouldDelete;
-  }, [confirm]);
+  }, [confirm, t]);
 
   const isActive = React.useCallback(() => isSameCredentials(item, storageType), [item, storageType]);
 
   const handleDelete = React.useCallback(async () => {
     if (await askUserIfDelete()) {
       deleteProvider(item);
+      dispatch.tokenState.setEditProhibited(false);
       dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
       setStorageType({
         provider: { provider: StorageProviderType.LOCAL },
         shouldSetInDocument: true,
       });
     }
-  }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState]);
+  }, [deleteProvider, item, askUserIfDelete, setStorageType, dispatch.uiState, dispatch.tokenState]);
 
   const handleRestore = React.useCallback(async () => {
     const response = await restoreStoredProvider(item);
@@ -118,7 +118,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
         )}
       </Stack>
       <Box css={{ marginRight: '$1' }}>
-        {isActive() ? <Badge text={t('active')} /> : (
+        {isActive() ? <Badge>{t('active')}</Badge> : (
           <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
             {t('apply')}
           </Button>

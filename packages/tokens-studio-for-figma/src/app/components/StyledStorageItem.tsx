@@ -17,7 +17,7 @@ export const StyledStorageItem = styled('div', {
         backgroundColor: '$accentBg',
       },
       false: {
-        borderColor: '$borderMuted',
+        borderColor: '$borderSubtle',
         backgroundColor: 'transparent',
       },
     },

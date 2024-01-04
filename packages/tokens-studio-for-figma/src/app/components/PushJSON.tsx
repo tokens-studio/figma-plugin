@@ -7,7 +7,7 @@ import stringifyTokens from '@/utils/stringifyTokens';
 import { styled } from '@/stitches.config';
 
 const StyledJSONContent = styled('pre', {
-  padding: '$2 $4',
+  padding: '$2 0',
   whiteSpace: 'pre-wrap',
   overflow: 'hiden',
 });
@@ -40,6 +40,7 @@ function PushJSON() {
     <Stack
       direction="column"
       gap={1}
+      css={{ padding: '$4' }}
     >
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
