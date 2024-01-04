@@ -2,8 +2,8 @@ import React from 'react';
 import { styled } from '@/stitches.config';
 
 const TriggerButton = styled('button', {
-  width: '16px',
-  height: '16px',
+  width: '$5',
+  height: '$5',
   borderRadius: '$small',
   border: '1px solid $borderMuted',
   cursor: 'pointer',

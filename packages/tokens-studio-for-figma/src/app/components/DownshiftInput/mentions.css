@@ -67,7 +67,7 @@
   list-style-type: none;
   font-size: var(--fontSizes-small);
   padding: var(--space-2);
-  border: 1px solid var(--colors-borderDefault);
+  border: 1px solid var(--colors-borderSubtle);
   border-radius: var(--radii-medium);
   box-shadow: var(--shadows-contextMenu);
   background: var(--colors-bgDefault);

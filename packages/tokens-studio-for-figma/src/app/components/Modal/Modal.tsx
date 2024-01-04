@@ -39,12 +39,6 @@ const StyledBody = styled('div', {
   },
 });
 
-const StyledOverlay = styled(Dialog.Overlay, {
-  backgroundColor: 'rgba(0, 0, 0, .25)',
-  position: 'fixed',
-  inset: 0,
-});
-
 export function Modal({
   id,
   title,
@@ -87,8 +81,8 @@ export function Modal({
           css={
             large
               ? {
-                width: 'calc(100vw - 32px)',
-                maxWidth: 'calc(100vw - 32px)',
+                width: 'calc(100vw - $7)',
+                maxWidth: 'calc(100vw - $7)',
                 padding: 0,
                 boxShadow: '$contextMenu',
                 borderColor: '$borderSubtle',
