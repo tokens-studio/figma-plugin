@@ -102,6 +102,16 @@ const resolvedTokens: AnyTokenList = [
       textDecoration: 'none',
       textCase: 'none',
     },
+    resolvedValueWithReferences: {
+      fontFamily: 'Inter',
+      fontWeight: 'Regular',
+      lineHeight: 'AUTO',
+      fontSize: '14',
+      letterSpacing: '0%',
+      paragraphSpacing: '0',
+      textDecoration: 'none',
+      textCase: 'none',
+    },
   },
   {
     name: 'typography.alias',
@@ -117,6 +127,16 @@ const resolvedTokens: AnyTokenList = [
       textCase: 'none',
     },
     rawValue: '{typography.headlines.small}',
+    resolvedValueWithReferences: {
+      fontFamily: 'Inter',
+      fontWeight: 'Regular',
+      lineHeight: 'AUTO',
+      fontSize: '14',
+      letterSpacing: '0%',
+      paragraphSpacing: '0',
+      textDecoration: 'none',
+      textCase: 'none',
+    },
   },
   {
     name: 'font-family.serif',
@@ -161,6 +181,14 @@ const resolvedTokens: AnyTokenList = [
       color: '#000000',
       type: BoxShadowTypes.DROP_SHADOW,
     },
+    resolvedValueWithReferences: {
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
   },
   {
     name: 'typography.boxshadow.alias',
@@ -174,12 +202,19 @@ const resolvedTokens: AnyTokenList = [
       type: BoxShadowTypes.DROP_SHADOW,
     },
     rawValue: '{typography.headlines.boxshadow}',
+    resolvedValueWithReferences: {
+      x: 2,
+      y: 2,
+      blur: 2,
+      spread: 2,
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
   },
   {
     name: 'font-weight.regular',
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
-    default: '400',
     rawValue: 'Regular',
   },
   {
@@ -187,7 +222,6 @@ const resolvedTokens: AnyTokenList = [
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
     rawValue: '{font-weight.regular}',
-    default: '400',
   },
   {
     name: 'font-style.normal',
@@ -430,6 +464,10 @@ describe('useToken test', () => {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
+            resolvedValueWithReferences: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
             type: 'typography',
             value: {
               fontFamily: 'Inter',
@@ -462,6 +500,10 @@ describe('useToken test', () => {
           internal__Parent: 'global',
           name: 'headline',
           rawValue: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+          resolvedValueWithReferences: {
             fontFamily: 'Inter',
             fontWeight: 'Bold',
           },

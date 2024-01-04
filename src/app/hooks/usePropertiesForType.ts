@@ -22,6 +22,24 @@ const spacingProperties = (value?: SingleToken['value']) => {
         Properties.paddingBottom,
       ],
     },
+    {
+      label: 'Horizontal padding',
+      name: Properties.horizontalPadding,
+      clear: [
+        Properties.paddingLeft,
+        Properties.paddingRight,
+      ],
+      disabled: isMultiValue,
+    },
+    {
+      label: 'Vertical padding',
+      name: Properties.verticalPadding,
+      clear: [
+        Properties.paddingTop,
+        Properties.paddingBottom,
+      ],
+      disabled: isMultiValue,
+    },
     { label: 'Row gap', name: Properties.counterAxisSpacing, disabled: isMultiValue },
     { label: 'Top', name: Properties.paddingTop, disabled: isMultiValue },
     { label: 'Right', name: Properties.paddingRight, disabled: isMultiValue },
@@ -198,6 +216,12 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
             name: Properties.backgroundBlur,
           },
         );
+        if (type === TokenTypes.NUMBER) {
+          properties.push({
+            label: 'Rotation',
+            name: Properties.rotation,
+          });
+        }
         break;
       case TokenTypes.BOOLEAN:
         properties.push(
