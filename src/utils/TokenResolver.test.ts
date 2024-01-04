@@ -688,6 +688,12 @@ const output = [
         fontFamily: 'Arial',
       },
     },
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
     type: 'typography',
     value: {
       type: 'typography',
@@ -699,6 +705,12 @@ const output = [
   {
     name: 'typography.font-family.resolved.reference',
     rawValue: '{typography.font-family.resolved}',
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
     value: {
       type: 'typography',
       value: {
