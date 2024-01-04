@@ -19,7 +19,7 @@ export default function Callout({
 }: Props) {
   return (
     <Box css={{
-      backgroundColor: '$dangerBg', borderColor: '$dangerBorder', padding: '$5', borderRadius: '$small',
+      backgroundColor: '$dangerBg', border: '1px solid', borderColor: '$dangerBorder', padding: '$5', borderRadius: '$small',
     }}
     >
       <Stack direction="row" gap={4}>

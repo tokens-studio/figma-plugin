@@ -96,41 +96,42 @@ export function Modal({
               : { padding: 0 }
           }
         >
-          <Box
-            css={{
-              overflow: 'auto',
-            }}
+          <Box css={{
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
           >
             {(showClose || title) && (
-              <Stack
-                direction="row"
-                justify="between"
-                align="center"
-                css={{
-                  borderBottomColor: '$borderSubtle',
-                  borderBottomWidth: '1px',
-                  borderTopLeftRadius: '$medium',
-                  borderTopRightRadius: '$medium',
-                  padding: '$4',
-                  position: 'sticky',
-                  backgroundColor: '$bgDefault',
-                  top: 0,
-                  zIndex: 10,
-                }}
-              >
-                {title && (
-                  <Dialog.Title>
-                    <Heading size="small">{title}</Heading>
-                  </Dialog.Title>
-                )}
-                <IconButton
-                  onClick={handleClose}
-                  data-testid="close-button"
-                  icon={<XIcon />}
-                  size="small"
-                  variant="invisible"
-                />
-              </Stack>
+            <Stack
+              direction="row"
+              justify="between"
+              align="center"
+              css={{
+                borderBottomColor: '$borderSubtle',
+                borderBottomWidth: '1px',
+                borderTopLeftRadius: '$medium',
+                borderTopRightRadius: '$medium',
+                padding: '$4',
+                position: 'sticky',
+                backgroundColor: '$bgDefault',
+                top: 0,
+                zIndex: 10,
+              }}
+            >
+              {title && (
+              <Dialog.Title>
+                <Heading size="small">{title}</Heading>
+              </Dialog.Title>
+              )}
+              <IconButton
+                onClick={handleClose}
+                data-testid="close-button"
+                icon={<XIcon />}
+                size="small"
+                variant="invisible"
+              />
+            </Stack>
             )}
             <StyledBody compact={compact} full={full} data-testid={id}>
               {children}
