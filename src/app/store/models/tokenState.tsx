@@ -428,30 +428,7 @@ export const tokenState = createModel<RootModel>()({
                 }, {}),
               } as SingleToken;
             }
-
-            return {
-              ...token,
-              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
-            } as SingleToken;
-          });
-
-          acc[key] = newValues;
-          return acc;
-        },
-        {},
-      );
-
-      return {
-        ...state,
-        tokens: newTokens,
-      };
-    },
-    updateOtherAliases: (state, data: string[]) => {
-      const [oldName, newName] = data;
-      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
-        (acc, [key, values]) => {
-          const newValues = values.map<SingleToken>((token) => {
-            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(data.oldName)) {
               return {
                 ...token,
                 $extensions: {
@@ -460,14 +437,17 @@ export const tokenState = createModel<RootModel>()({
                     ...token.$extensions['studio.tokens'],
                     modify: {
                       ...token.$extensions['studio.tokens'].modify,
-                      value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
+                      value: token.$extensions['studio.tokens'].modify.value.replace(data.oldName, data.newName),
                     },
                   },
                 },
               } as SingleToken;
             }
 
-            return token;
+            return {
+              ...token,
+              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
+            } as SingleToken;
           });
 
           acc[key] = newValues;
