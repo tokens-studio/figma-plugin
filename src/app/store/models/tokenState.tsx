@@ -446,6 +446,41 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
+    updateOtherAliases: (state, data: string[]) => {
+      const [oldName, newName] = data;
+      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
+        (acc, [key, values]) => {
+          const newValues = values.map<SingleToken>((token) => {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...token.$extensions['studio.tokens'].modify,
+                      value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
+                    },
+                  },
+                },
+              } as SingleToken;
+            }
+
+            return token;
+          });
+
+          acc[key] = newValues;
+          return acc;
+        },
+        {},
+      );
+
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
     setCollapsedTokenSets: (state, data: string[]) => ({
       ...state,
       collapsedTokenSets: data,

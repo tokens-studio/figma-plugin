@@ -275,6 +275,12 @@ export default function useTokens() {
     }
   }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
 
+  const remapTokensWithOtherReference = useCallback(async ({
+    oldName, newName,
+  }: { oldName: string, newName:string }) => {
+    dispatch.tokenState.updateOtherAliases([oldName, newName]);
+  }, [dispatch.tokenState]);
+
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
     const userDecision = await confirm({
@@ -505,6 +511,7 @@ export default function useTokens() {
     pullStyles,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
@@ -528,6 +535,7 @@ export default function useTokens() {
     pullStyles,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
