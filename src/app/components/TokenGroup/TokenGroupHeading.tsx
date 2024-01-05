@@ -36,7 +36,7 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
-  const { remapTokensInGroup } = useTokens();
+  const { remapTokensInGroup, remapTokensWithOtherReference } = useTokens();
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
@@ -53,6 +53,7 @@ export function TokenGroupHeading({
     await remapTokensInGroup({
       oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type, tokensToRename,
     });
+    await remapTokensWithOtherReference({ oldName: `${path}.`, newName: `${newTokenGroupName}.` });
     setShowRenameTokenGroupModal(false);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 

@@ -59,6 +59,13 @@ const resolvedTypographyToken = {
   },
 };
 
+const resolvedTypographyFontFamilyToken = {
+  type: TokenTypes.TYPOGRAPHY,
+  value: {
+    fontFamily: 'Arial',
+  },
+};
+
 const unResolvedTypographyToken = {
   type: TokenTypes.TYPOGRAPHY,
   value: {
@@ -287,6 +294,15 @@ const tokens = [
     name: 'pure-numeric',
     value: '0',
     type: TokenTypes.DIMENSION,
+  },
+  {
+    name: 'typography.font-family.resolved',
+    value: { ...resolvedTypographyFontFamilyToken },
+    type: TokenTypes.TYPOGRAPHY,
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    value: '{typography.font-family.resolved}',
   },
 ];
 
@@ -663,6 +679,45 @@ const output = [
     value: 0,
     rawValue: '0',
     type: TokenTypes.DIMENSION,
+  },
+  // Note: This is technically incorrect, but we're doing this because this needs to be shown as failed to resolve. See https://github.com/tokens-studio/figma-plugin/issues/2450
+  {
+    name: 'typography.font-family.resolved',
+    rawValue: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    type: 'typography',
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    rawValue: '{typography.font-family.resolved}',
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
   },
 ];
 describe('resolveTokenValues deep nested', () => {
