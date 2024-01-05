@@ -428,7 +428,7 @@ export const tokenState = createModel<RootModel>()({
                 }, {}),
               } as SingleToken;
             }
-            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(data.oldName)) {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value && token.$extensions?.['studio.tokens'].modify.value.includes(data.oldName)) {
               return {
                 ...token,
                 $extensions: {
@@ -438,6 +438,8 @@ export const tokenState = createModel<RootModel>()({
                     modify: {
                       ...token.$extensions['studio.tokens'].modify,
                       value: token.$extensions['studio.tokens'].modify.value.replace(data.oldName, data.newName),
+                      space: token.$extensions['studio.tokens'].modify.space,
+                      type: token.$extensions['studio.tokens'].modify.type,
                     },
                   },
                 },
