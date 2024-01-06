@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleToken, SingleCompositionToken } from '@/types/tokens';
 
 export function isSingleCompositionToken(token: SingleToken | any): token is SingleCompositionToken {

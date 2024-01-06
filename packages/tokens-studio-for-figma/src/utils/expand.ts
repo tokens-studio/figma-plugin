@@ -1,6 +1,6 @@
 import { SingleToken } from '@/types/tokens';
 import { convertToDefaultProperty } from './convertToDefaultProperty';
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 interface BaseResult {
   type: string;

@@ -1,7 +1,5 @@
 import { convertTokenToFormat } from './convertTokenToFormat';
-import {
-  setFormat,
-} from '@/plugin/store';
+import { setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('convertTokenToFormat', () => {
   beforeEach(() => {

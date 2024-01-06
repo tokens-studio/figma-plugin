@@ -8,7 +8,7 @@ import {
   isSingleTypographyToken,
 } from './is';
 import { isTokenGroupWithType } from './is/isTokenGroupWithType';
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type Tokens =
   | AnyTokenList
@@ -69,7 +69,7 @@ function checkForTokens({
       ...remainingTokenProperties,
       value,
       ...(description ? { description } : {}),
-      ...(!(TokenFormat.tokenTypeKey in token) && inheritType
+      ...(!(type in token) && inheritType
         ? { type: inheritType, inheritTypeLevel: currentTypeLevel }
         : { type }),
     };

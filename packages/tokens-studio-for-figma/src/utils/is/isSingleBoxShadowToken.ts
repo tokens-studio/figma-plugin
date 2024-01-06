@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleToken, SingleBoxShadowToken } from '@/types/tokens';
 
 export function isSingleBoxShadowToken(token: SingleToken | any): token is SingleBoxShadowToken {

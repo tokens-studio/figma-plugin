@@ -4,7 +4,6 @@ import { AnyTokenList } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import removeTokenId from './removeTokenId';
 import { convertTokenToFormat } from './convertTokenToFormat';
-import { TokenFormat } from '@/plugin/store';
 
 type Options = {
   tokens: Record<string, AnyTokenList>;
@@ -57,9 +56,6 @@ export default function formatTokens({
             set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
           }
         } else {
-          if (token.name === 'shadows.alias') {
-            console.log('shadow alias', token);
-          }
           const expanded = expand(tokenWithoutName.value);
           const expandedToFormat = convertTokenToFormat(expanded, true);
 

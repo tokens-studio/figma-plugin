@@ -9,6 +9,7 @@ export default function addIdPropertyToTokens(tokens: Record<string, AnyTokenLis
           ...token,
           $extensions: {
             ...token.$extensions,
+            // Note: Fix this, this should live under studio.tokens
             id: uuidv4(),
           },
         };

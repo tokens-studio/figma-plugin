@@ -1,7 +1,7 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import formatTokens from './formatTokens';
-import { setFormat } from '@/plugin/store';
+import { setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('formatTokens', () => {
   afterEach(() => {

@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleBorderToken, SingleToken } from '@/types/tokens';
 
 export function isSingleBorderToken(token: SingleToken | any): token is SingleBorderToken {

@@ -1,4 +1,4 @@
-import { TokenFormat } from '@/plugin/store';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export function convertTokenToFormat(token, isExpanded = false) {
   const {
