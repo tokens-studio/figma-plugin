@@ -154,7 +154,7 @@ export default function InspectorTokenSingle({
         </Box>
         {
           showDialog && (
-            <Modal title={t('chooseANewTokenForValue', { value: tokenToDisplay?.name || token.value })} large isOpen close={onCancel}>
+            <Modal modal={false} title={t('chooseANewTokenForValue', { value: tokenToDisplay?.name || token.value })} large isOpen close={onCancel}>
               <form
                 onSubmit={onConfirm}
               >

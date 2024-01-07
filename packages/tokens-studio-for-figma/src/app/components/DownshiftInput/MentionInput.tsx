@@ -27,8 +27,9 @@ interface Props {
   resolvedTokens: ResolveTokenValuesResult[];
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
-  handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>
-  onSubmit?: () => void
+  handleOnFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
+  onSubmit?: () => void;
+  hasPrefix?: boolean;
 }
 
 const { Option } = Mentions;
@@ -45,6 +46,7 @@ export default function MentionsInput({
   handleBlur,
   handleOnFocus,
   onSubmit,
+  hasPrefix = false,
 }: Props) {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
 
@@ -140,6 +142,7 @@ export default function MentionsInput({
       onFocus={handleOnFocus}
       onPressEnter={handleEnterKeyDown}
       data-testid={`mention-input-${name}`}
+      style={hasPrefix ? {} : { borderTopLeftRadius: 'var(--borderRadius-small)', borderBottomLeftRadius: 'var(--borderRadius-small)' }}
     >
       {mentionData.map((item) => (
         renderMentionListItem(item)

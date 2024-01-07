@@ -80,7 +80,8 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
   });
 
   return {
-    tokens: Object.fromEntries(entries),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    tokens: Object.fromEntries(entries.filter(([_, tokens]) => tokens.length > 0)),
     themes: [...newThemes, ...changedThemes, ...removedThemes],
     metadata: !isEqual(baseState.metadata, compareState.metadata) ? compareState.metadata : null,
   };

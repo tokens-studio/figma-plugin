@@ -592,7 +592,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           placeholder={t('optionalDescription')}
           onChange={handleDescriptionChange}
           rows={3}
-          border
         />
       </Box>
       {

@@ -2,17 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
-import { styled } from '@/stitches.config';
-
-const StyledButton = styled('button', {
-  display: 'block',
-  width: '1.5rem',
-  height: '1.5rem',
-  borderRadius: '$small',
-  border: '1px solid',
-  borderColor: '$borderDefault',
-  cursor: 'pointer',
-});
+import { ColorPickerTrigger } from './ColorPickerTrigger';
 
 export default function SingleBoxShadowDownShiftInput({
   name,
@@ -48,13 +38,12 @@ export default function SingleBoxShadowDownShiftInput({
       placeholder={name === 'color' ? t('colorOrAlias') : t('valueOrAlias')}
       prefix={
         name === 'color' && value && (
-          <StyledButton
-            type="button"
-            style={{ background: value, fontSize: 0 }}
+          <ColorPickerTrigger
+            background={value}
             onClick={handleToggleInputHelper}
           >
             {value}
-          </StyledButton>
+          </ColorPickerTrigger>
         )
       }
       suffix

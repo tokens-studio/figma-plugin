@@ -5,11 +5,11 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
-import Box from '../Box';
-import Input from '../Input';
+import {
+  Button, Heading, TextInput, Box, Stack, IconButton,
+} from '@tokens-studio/ui';
+import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import Stack from '../Stack';
 import { styled } from '@/stitches.config';
 import { Dispatch } from '@/app/store';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
@@ -19,6 +19,7 @@ import ProBadge from '../ProBadge';
 import { userIdSelector } from '@/selectors/userIdSelector';
 import { licenseDetailsSelector } from '@/selectors';
 import { ldUserFactory } from '@/utils/ldUserFactory';
+import { ErrorMessage } from '../ErrorMessage';
 
 export default function AddLicenseKey() {
   const inputEl = useRef<HTMLInputElement | null>(null);
@@ -31,6 +32,11 @@ export default function AddLicenseKey() {
   const userId = useSelector(userIdSelector);
   const ldClient = useLDClient();
   const { t } = useTranslation(['licence']);
+  const [isMasked, setIsMasked] = useState(true);
+
+  const toggleMask = useCallback(() => {
+    setIsMasked((prev) => !prev);
+  }, []);
 
   const addKey = useCallback(async () => {
     if (newKey) {
@@ -84,13 +90,13 @@ export default function AddLicenseKey() {
   }, []);
 
   const addLicenseKeyButton = !existingKey && (
-    <Button variant="primary" onClick={addKey} disabled={existingKey === newKey}>
+    <Button onClick={addKey} disabled={existingKey === newKey}>
       {t('addLicenseKey')}
     </Button>
   );
 
   const removeLicenseKeyButton = existingKey && (
-    <Button variant="primary" onClick={removeKey}>
+    <Button onClick={removeKey}>
       {t('removeLicenseKey')}
     </Button>
   );
@@ -98,9 +104,7 @@ export default function AddLicenseKey() {
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
       <Stack direction="row" gap={2} align="center" justify="between">
-        <Heading size="medium">
-          {t('licenseKey')}
-        </Heading>
+        <Heading size="medium">{t('licenseKey')}</Heading>
         <Stack direction="row" gap={2} align="center">
           <ProBadge />
           {existingKey && !licenseKeyError && (
@@ -120,18 +124,18 @@ export default function AddLicenseKey() {
         }}
       >
         <Box css={{ flexGrow: 1 }}>
-          <Input
-            full
-            size="large"
+          <TextInput
+            type={isMasked ? 'password' : 'text'}
+            trailingAction={
+              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+            }
             name="license-key"
             data-testid="settings-license-key-input"
-            type="password"
-            inputRef={inputEl}
-            isMasked
             value={newKey || ''}
             onChange={onLicenseKeyChange}
-            error={licenseKeyError}
+            validationStatus={licenseKeyError ? 'error' : undefined}
           />
+          {licenseKeyError && <ErrorMessage>{licenseKeyError}</ErrorMessage>}
         </Box>
         {addLicenseKeyButton}
         {removeLicenseKeyButton}
