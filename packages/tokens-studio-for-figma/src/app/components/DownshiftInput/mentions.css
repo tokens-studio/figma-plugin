@@ -58,7 +58,7 @@
 
 .rc-mentions-dropdown-menu {
   width: 70vw;
-  max-width: 100vw;
+  max-width: 450px;
   margin: 0;
   padding: 0;
   max-height: 250px;
