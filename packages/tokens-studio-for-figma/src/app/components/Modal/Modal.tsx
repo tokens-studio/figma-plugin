@@ -107,10 +107,8 @@ export function Modal({
                 justify="between"
                 align="center"
                 css={{
-                  borderBottomColor: '$borderSubtle',
+                  borderBottomColor: '$borderMuted',
                   borderBottomWidth: '1px',
-                  borderTopLeftRadius: '$medium',
-                  borderTopRightRadius: '$medium',
                   padding: '$4',
                   position: 'sticky',
                   backgroundColor: '$bgDefault',

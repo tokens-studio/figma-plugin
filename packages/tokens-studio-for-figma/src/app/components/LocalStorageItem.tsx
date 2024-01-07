@@ -22,7 +22,10 @@ const LocalStorageItem = ({ onClick, isActive }: Props) => {
         </Box>
         <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
       </Box>
-      <Box css={{ marginRight: '$2' }}>
+      <Box css={{
+        marginRight: '$2', minHeight: '$controlSmall', display: 'flex', alignItems: 'center',
+      }}
+      >
         {isActive ? <Badge>Active</Badge> : (
           <Button data-testid="button-storage-item-apply" size="small" variant="secondary" onClick={onClick}>
             {t('apply')}
