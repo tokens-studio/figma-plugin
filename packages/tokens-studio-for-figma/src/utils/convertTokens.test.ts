@@ -1,6 +1,10 @@
+import { setFormat } from '@/plugin/TokenFormatStoreClass';
 import convertToTokenArray from './convertTokens';
 
 describe('convertToTokenArray', () => {
+  beforeEach(() => {
+    setFormat('dtcg');
+  });
   it('converts given tokens to an array', () => {
     const typographyTokens = {
       withValue: {

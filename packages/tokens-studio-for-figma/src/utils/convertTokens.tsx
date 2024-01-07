@@ -1,5 +1,5 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import {
   isSingleBorderToken,
   isSingleBoxShadowToken,
@@ -7,18 +7,35 @@ import {
   isSingleTokenValueObject,
   isSingleTypographyToken,
 } from './is';
-import { isTokenGroupWithType } from './is/isTokenGroupWithType';
+import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
 
-type Tokens =
-  | AnyTokenList
-  | Partial<
-  | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>
-  | { $value: Pick<SingleToken, 'value'> }
-  | { type: string }
-  | { $type: string }
-  | { inheritType: string }
-  >;
+// This is a token as it is incoming, so we can't be sure of the values or types
+export type TokenInJSON<T extends TokenTypes = any, V = any> = {
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      id?: string;
+      modify?: any;
+    };
+    id?: string;
+  };
+} & (
+  | {
+    type: T;
+    value: V;
+    description?: string;
+  }
+  | {
+    $type: T;
+    $value: V;
+    $description?: string;
+  }
+);
+
+export type Tokens = Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>> | TokenGroupInJSON;
 
 // @TODO fix typings
 function checkForTokens({
@@ -35,7 +52,7 @@ function checkForTokens({
   currentTypeLevel = 0,
 }: {
   obj: SingleToken<true>[];
-  token: Tokens;
+  token: Tokens | TokenGroupInJSON;
   root: string | null;
   returnValuesOnly?: boolean;
   expandTypography?: boolean;
@@ -46,7 +63,6 @@ function checkForTokens({
   groupLevel?: number;
   currentTypeLevel?: number;
 }): [SingleToken[], SingleToken | undefined] {
-  // replaces / in token name
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'description'>
   | {
@@ -55,23 +71,20 @@ function checkForTokens({
     description?: string;
   }
   | undefined;
-  if (isSingleTokenValueObject(token)) {
+  if (isSingleTokenInJSON(token)) {
     const {
-      // @ts-ignore
       [TokenFormat.tokenValueKey]: value,
-      // @ts-ignore
       [TokenFormat.tokenTypeKey]: type,
-      // @ts-ignore
       [TokenFormat.tokenDescriptionKey]: description,
       ...remainingTokenProperties
     } = token;
     returnValue = {
       ...remainingTokenProperties,
       value,
-      ...(description ? { description } : {}),
-      ...(!(type in token) && inheritType
-        ? { type: inheritType, inheritTypeLevel: currentTypeLevel }
-        : { type }),
+      ...(description && typeof description === 'string' ? { description } : {}),
+      ...(!type && inheritType
+        ? { type: inheritType as TokenTypes, inheritTypeLevel: currentTypeLevel }
+        : { type: type as TokenTypes }),
     };
   } else if (
     isSingleTypographyToken(token)
@@ -79,50 +92,61 @@ function checkForTokens({
     || isSingleCompositionToken(token)
     || isSingleBorderToken(token)
   ) {
+    const {
+      [TokenFormat.tokenValueKey]: value,
+      [TokenFormat.tokenTypeKey]: type,
+      [TokenFormat.tokenDescriptionKey]: description,
+      ...remainingTokenProperties
+    } = token;
     returnValue = {
-      type: token[TokenFormat.tokenTypeKey],
+      ...remainingTokenProperties,
+      type: type as TokenTypes,
       value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
         acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
         return acc;
       }, {}),
-      ...(token[TokenFormat.tokenDescriptionKey] ? { description: token[TokenFormat.tokenDescriptionKey] } : {}),
+      ...(description && typeof description === 'string' ? { description } : {}),
     };
   } else if (typeof token === 'object') {
+    // We dont have a single token value key yet, so it's likely a group which we need to iterate over
     let tokenToCheck = token;
-    if (!isSingleTokenValueObject(token)) {
-      groupLevel += 1;
-    }
+    groupLevel += 1;
     // When token groups are typed, we need to inherit the type to their children
     if (isTokenGroupWithType(token)) {
       const { [TokenFormat.tokenTypeKey]: groupType, ...tokenValues } = token;
-      inheritType = groupType;
+      inheritType = groupType as unknown as TokenTypes;
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
-    if (isSingleTokenValueObject(token) && typeof token[TokenFormat.tokenValueKey] !== 'string') {
-      tokenToCheck = token[TokenFormat.tokenValueKey] as typeof tokenToCheck;
-    }
-    Object.entries(tokenToCheck).forEach(([key, value]) => {
-      const [, result] = checkForTokens({
-        obj,
-        token: value,
-        root: [root, key].filter((n) => n).join('.'),
-        returnValuesOnly,
-        expandTypography,
-        expandShadow,
-        expandComposition,
-        expandBorder,
-        inheritType,
-        groupLevel,
-        currentTypeLevel,
+    // if (typeof token[TokenFormat.tokenValueKey] !== 'string') {
+    //   console.log('Is not string', token);
+    //   tokenToCheck = token[TokenFormat.tokenValueKey] as typeof tokenToCheck;
+    // }
+
+    if (typeof tokenToCheck !== 'undefined' || tokenToCheck !== null) {
+      Object.entries(tokenToCheck).forEach(([key, value]) => {
+        const [, result] = checkForTokens({
+          obj,
+          token: value as TokenGroupInJSON,
+          root: [root, key].filter((n) => n).join('.'),
+          returnValuesOnly,
+          expandTypography,
+          expandShadow,
+          expandComposition,
+          expandBorder,
+          inheritType,
+          groupLevel,
+          currentTypeLevel,
+        });
+        if (root && result) {
+          obj.push({ ...result, name: [root, key].join('.') });
+        } else if (result) {
+          obj.push({ ...result, name: key });
+        }
       });
-      if (root && result) {
-        obj.push({ ...result, name: [root, key].join('.') });
-      } else if (result) {
-        obj.push({ ...result, name: key });
-      }
-    });
+    }
   } else {
+    // If all else fails, we just return the token as the value, and type as other
     returnValue = {
       value: token,
     };

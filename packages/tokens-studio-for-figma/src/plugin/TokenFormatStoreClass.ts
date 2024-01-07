@@ -10,10 +10,10 @@ export class TokenFormatStoreClass {
   public format: 'dtcg' | 'legacy';
 
   constructor() {
-    this.tokenValueKey = '$value';
-    this.tokenTypeKey = '$type';
-    this.tokenDescriptionKey = '$description';
-    this.format = 'dtcg';
+    this.tokenValueKey = 'value';
+    this.tokenTypeKey = 'type';
+    this.tokenDescriptionKey = 'description';
+    this.format = 'legacy';
   }
 
   public setFormat = (format: TokenFormatOptions) => {
