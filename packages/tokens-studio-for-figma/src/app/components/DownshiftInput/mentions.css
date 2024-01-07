@@ -58,6 +58,7 @@
 
 .rc-mentions-dropdown-menu {
   width: 70vw;
+  max-width: 100vw;
   margin: 0;
   padding: 0;
   max-height: 250px;
@@ -84,15 +85,11 @@
 }
 
 .rc-mentions-dropdown-menu-item:focus {
-  background: var(--colors-accentEmphasis);
-  color: var(--colors-fgOnEmphasis);
-  --mentions-color-muted: var(--colors-fgOnEmphasis);
+  background: var(--colors-bgSubtle);
 }
 
 .rc-mentions-dropdown-menu-item-active {
-  background: var(--colors-accentEmphasis);
-  color: var(--colors-fgOnEmphasis);
-  --mentions-color-muted: var(--colors-fgOnEmphasis);
+  background: var(--colors-bgSubtle);
 }
 
 /* width */
@@ -107,6 +104,6 @@
 
 /* Handle */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--colors-fgSubtle);
+  background: var(--colors-borderSubtle);
   border-radius: 10px;
 }

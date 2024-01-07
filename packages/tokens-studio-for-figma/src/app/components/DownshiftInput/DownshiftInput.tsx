@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useCallback, useMemo } from 'react';
 import Downshift from 'downshift';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -26,10 +25,9 @@ import {
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
-import { theme } from '@/stitches.config';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
-type Arrow = 'top' | 'down';
+
 interface DownShiftProps {
   name?: string;
   type: string;
@@ -43,7 +41,6 @@ interface DownShiftProps {
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
   externalFontFamily?: string;
-  arrow?: Arrow;
   setInputValue(value: string): void;
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
@@ -64,99 +61,37 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
   setInputValue,
   resolvedTokens,
   externalFontFamily,
-  arrow = 'down',
   handleChange,
   handleBlur,
   onSubmit,
 }) => {
   const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
-  const [inputContainerPosX, setInputContainerPosX] = React.useState(0);
-  const [inputContainerPosY, setInputContainerPosY] = React.useState(0);
-  const [inputContainerWidth, setInputContainerWidth] = React.useState(0);
   const [searchInput, setSearchInput] = React.useState('');
-  const [portalPlaceholder] = React.useState(document.createElement('div'));
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
   const dispatch = useDispatch<Dispatch>();
   const figmaFonts = useSelector(figmaFontsSelector);
-  const inputContainerRef = React.useRef<HTMLDivElement>(null);
-  const downShiftSearchContainerRef = React.useRef<HTMLDivElement>(null);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const portalRef = React.useRef<HTMLDivElement>(null);
-  const blankBoxRef = React.useRef<HTMLDivElement>(null);
   const windowHeight = React.useRef(window.innerHeight);
   const downShiftContainerHeight = (windowHeight.current / 10) * 3;
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
   const { getFigmaFonts } = useFigmaFonts();
-  const portalContainer = document.body;
   const externalSearchField = useMemo<SearchField | undefined>(() => {
     if (type === TokenTypes.FONT_FAMILIES) return 'Fonts';
     if (type === TokenTypes.FONT_WEIGHTS) return 'Weights';
     return undefined;
   }, [type]);
 
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if ((downShiftSearchContainerRef.current && event.target instanceof Node && !downShiftSearchContainerRef.current.contains(event.target))
-     && (inputContainerRef.current && event.target instanceof Node && !inputContainerRef.current.contains(event.target))) {
-      setShowAutoSuggest(false);
-    }
-  }, []);
-
-  type RectsType = {
-    inputContainerRect?: DOMRect;
-    portalRect?: DOMRect;
-    blankBoxRect?: DOMRect;
-  };
-
-  const [rects, setRects] = React.useState<RectsType>({});
-  const updateRects = React.useCallback(() => {
-    setRects({
-      inputContainerRect: inputContainerRef.current?.getBoundingClientRect(),
-      portalRect: portalRef.current?.getBoundingClientRect(),
-      blankBoxRect: blankBoxRef.current?.getBoundingClientRect(),
-    });
-  }, []);
-
   React.useEffect(() => {
-    updateRects();
-    window.addEventListener('resize', updateRects);
-    window.addEventListener('scroll', updateRects);
-    return () => {
-      window.removeEventListener('resize', updateRects);
-      window.removeEventListener('scroll', updateRects);
-    };
-  }, [updateRects]);
-
-  React.useEffect(() => {
-    if (portalContainer) {
-      portalContainer.appendChild(portalPlaceholder);
-    }
-    if (rects.inputContainerRect) {
-      setInputContainerPosX(rects.inputContainerRect.left);
-      setInputContainerWidth(rects.inputContainerRect.width);
-      if (arrow === 'down') {
-        setInputContainerPosY(rects.inputContainerRect.bottom);
-      } else if (rects.portalRect && rects.blankBoxRect) {
-        const suggestionHeight = rects.blankBoxRect.top - rects.portalRect.height - 10;
-        setInputContainerPosY(suggestionHeight);
-      }
-    }
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
-  }, [arrow, portalContainer, portalPlaceholder, rects]);
+  }, []);
 
   React.useEffect(() => {
     if (externalSearchField === 'Fonts') {
       getFigmaFonts();
     }
   }, [externalSearchField, getFigmaFonts]);
-
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
 
   React.useEffect(() => {
     if (!showAutoSuggest) {
@@ -256,7 +191,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
             {label && !inlineLabel ? <Text size="small" bold>{label}</Text> : null}
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
-          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input" ref={inputContainerRef}>
+          <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
             {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
             {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
             <MentionsInput
@@ -302,7 +237,6 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                       css={{
                         display: 'flex', flexDirection: 'column', gap: '$3', padding: '$3', borderBottom: '1px solid $borderSubtle',
                       }}
-                      ref={downShiftSearchContainerRef}
                     >
                       {
                         externalSearchField && (
@@ -336,7 +270,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                               {...getItemProps({ key: token.name, index, item: token.name })}
                               isFocused={highlightedIndex === index}
                               style={style}
-                                  // eslint-disable-next-line react/jsx-no-bind
+                              // eslint-disable-next-line react/jsx-no-bind
                               onMouseDown={() => handleSelect(token.name)}
                             >
                               {type === 'color' && (
@@ -376,11 +310,9 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                     }
                     {
                       ((currentSearchField !== 'Tokens' && filteredValues.length === 0) || (currentSearchField === 'Tokens' && filteredTokenItems.length === 0)) && (
-                        <Box ref={blankBoxRef}>
-                          <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
-                            No suggestions found
-                          </Box>
-                        </Box>
+                      <Box css={{ padding: '$3', color: '$fgMuted', fontSize: '$small' }}>
+                        No suggestions found
+                      </Box>
                       )
                     }
                   </Box>
