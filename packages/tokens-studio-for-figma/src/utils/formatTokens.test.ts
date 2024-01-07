@@ -4,7 +4,7 @@ import formatTokens from './formatTokens';
 import { setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('formatTokens', () => {
-  afterEach(() => {
+  beforeEach(() => {
     setFormat('dtcg');
   });
 

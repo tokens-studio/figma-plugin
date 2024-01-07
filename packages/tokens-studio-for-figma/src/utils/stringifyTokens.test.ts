@@ -1,3 +1,4 @@
+import { setFormat } from '@/plugin/TokenFormatStoreClass';
 import stringifyTokens from './stringifyTokens';
 
 describe('stringfyTokens', () => {
@@ -70,6 +71,7 @@ describe('stringfyTokens', () => {
   };
   const activeTokenSet = 'global';
   it('convert token list to the JSON string with nested structure', () => {
+    setFormat('dtcg');
     expect(stringifyTokens(tokens, activeTokenSet)).toEqual(JSON.stringify({
       scale: {
         $type: 'sizing',
