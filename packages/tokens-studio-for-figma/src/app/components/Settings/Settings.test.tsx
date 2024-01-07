@@ -21,9 +21,9 @@ describe('Settings Component', () => {
   it('can toggle ignoreFirstPartForStyles', () => {
     render(<Settings />);
 
-    const checkbox = screen.getByTestId('ignoreFirstPartForStyles');
-    fireEvent.click(checkbox, {
-      target: checkbox,
+    const ignoreButton = screen.getByTestId('ignoreFirstPartForStyles');
+    fireEvent.click(ignoreButton, {
+      target: ignoreButton,
     });
 
     expect(store.getState().settings.ignoreFirstPartForStyles).toBe(true);
@@ -32,9 +32,9 @@ describe('Settings Component', () => {
   it('can toggle prefixStylesWithThemeName', () => {
     render(<Settings />);
 
-    const checkbox = screen.getByTestId('prefixStylesWithThemeName');
-    fireEvent.click(checkbox, {
-      target: checkbox,
+    const prefixButton = screen.getByTestId('prefixStylesWithThemeName');
+    fireEvent.click(prefixButton, {
+      target: prefixButton,
     });
 
     expect(store.getState().settings.prefixStylesWithThemeName).toBe(true);

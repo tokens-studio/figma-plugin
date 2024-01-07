@@ -164,6 +164,7 @@ function Settings() {
                 </Stack>
               </Stack>
               <Switch
+                data-testid="ignoreFirstPartForStyles"
                 id="ignoreFirstPartForStyles"
                 checked={!!ignoreFirstPartForStyles}
                 defaultChecked={ignoreFirstPartForStyles}
@@ -181,6 +182,7 @@ function Settings() {
                 </Stack>
               </Stack>
               <Switch
+                data-testid="prefixStylesWithThemeName"
                 id="prefixStylesWithThemeName"
                 checked={!!prefixStylesWithThemeName}
                 defaultChecked={prefixStylesWithThemeName}

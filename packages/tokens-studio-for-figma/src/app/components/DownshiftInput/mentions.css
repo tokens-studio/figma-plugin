@@ -58,6 +58,7 @@
 
 .rc-mentions-dropdown-menu {
   width: 70vw;
+  max-width: 450px;
   margin: 0;
   padding: 0;
   max-height: 250px;
@@ -67,7 +68,7 @@
   list-style-type: none;
   font-size: var(--fontSizes-small);
   padding: var(--space-2);
-  border: 1px solid var(--colors-borderDefault);
+  border: 1px solid var(--colors-borderSubtle);
   border-radius: var(--radii-medium);
   box-shadow: var(--shadows-contextMenu);
   background: var(--colors-bgDefault);
@@ -84,15 +85,11 @@
 }
 
 .rc-mentions-dropdown-menu-item:focus {
-  background: var(--colors-accentEmphasis);
-  color: var(--colors-fgOnEmphasis);
-  --mentions-color-muted: var(--colors-fgOnEmphasis);
+  background: var(--colors-bgSubtle);
 }
 
 .rc-mentions-dropdown-menu-item-active {
-  background: var(--colors-accentEmphasis);
-  color: var(--colors-fgOnEmphasis);
-  --mentions-color-muted: var(--colors-fgOnEmphasis);
+  background: var(--colors-bgSubtle);
 }
 
 /* width */
@@ -107,6 +104,6 @@
 
 /* Handle */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--colors-fgSubtle);
+  background: var(--colors-borderSubtle);
   border-radius: 10px;
 }

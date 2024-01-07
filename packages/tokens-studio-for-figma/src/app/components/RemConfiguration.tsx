@@ -101,7 +101,6 @@ const RemConfiguration = () => {
               handleChange={handleBaseFontSizeChange}
               setInputValue={handleDownShiftInputChange}
               suffix
-              arrow="top"
             />
           </Box>
         </Stack>
