@@ -98,6 +98,11 @@ export default function useManageTokens() {
     // should be a setting which users can toggle on / off to disable auto-sync after each token change
     const shouldUpdate = true;
 
+    // Importing a variable token can make a new set
+    if (!store.getState().tokenState.tokens[parent]) {
+      dispatch.tokenState.addTokenSet(parent);
+    }
+
     if (shouldUpdate) {
       createToken({
         parent,
@@ -110,7 +115,7 @@ export default function useManageTokens() {
       } as UpdateTokenPayload);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
-  }, [createToken, dispatch.uiState]);
+  }, [createToken, dispatch.uiState, dispatch.tokenState, store]);
 
   const duplicateSingleToken = useCallback(async (data: DuplicateTokenPayload) => {
     dispatch.uiState.startJob({
@@ -203,7 +208,13 @@ export default function useManageTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
   }, [renameTokenAcrossSets, dispatch.uiState]);
 
+  const importMultipleTokens = useCallback(async (data: UpdateTokenPayload[]) => {
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
+    dispatch.tokenState.importMultipleTokens(data);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
+  }, [dispatch.uiState, dispatch.tokenState]);
+
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets,
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets]);
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens,
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens]);
 }

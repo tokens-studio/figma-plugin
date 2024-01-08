@@ -131,7 +131,7 @@ export default function useTokens() {
   const pullStyles = useCallback(async () => {
     const userDecision = await confirm({
       text: 'Import styles',
-      description: 'What styles should be imported?',
+      description: 'Which styles should be imported?',
       confirmAction: 'Import',
       choices: [
         { key: 'colorStyles', label: 'Color', enabled: true },
@@ -153,6 +153,29 @@ export default function useTokens() {
           textStyles: userDecision.data.includes('textStyles'),
           colorStyles: userDecision.data.includes('colorStyles'),
           effectStyles: userDecision.data.includes('effectStyles'),
+        },
+      });
+    }
+  }, [confirm]);
+
+  const pullVariables = useCallback(async () => {
+    const userDecision = await confirm({
+      text: 'Import variables',
+      description: 'Sets will be created for each variable mode.',
+      choices: [
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+      ],
+      confirmAction: 'Import',
+    });
+
+    if (userDecision) {
+      track('Import variables');
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.PULL_VARIABLES,
+        options: {
+          useDimensions: userDecision.data.includes('useDimensions'),
+          useRem: userDecision.data.includes('useRem'),
         },
       });
     }
@@ -509,6 +532,7 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
     remapTokensWithOtherReference,
@@ -533,6 +557,7 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
     remapTokensWithOtherReference,
