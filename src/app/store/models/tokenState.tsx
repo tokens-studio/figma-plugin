@@ -42,6 +42,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
+import { ColorModifier } from '@/types/Modifier';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -499,6 +500,29 @@ export const tokenState = createModel<RootModel>()({
                   a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
                   return a;
                 }, {}),
+              } as SingleToken;
+            }
+
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens']?.modify && token.$extensions?.['studio.tokens'].modify.value) {
+              const updatedModify = Object.entries(token.$extensions?.['studio.tokens'].modify).reduce<ColorModifier>((modify, [key, value]: string[]) => {
+                modify = {
+                  ...modify,
+                  [key]: value.replace(data.oldName, data.newName),
+                };
+                return modify;
+              }, {} as ColorModifier);
+
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...updatedModify,
+                    },
+                  },
+                },
               } as SingleToken;
             }
 
