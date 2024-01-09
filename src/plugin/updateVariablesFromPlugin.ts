@@ -30,6 +30,7 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
         console.log('variable in updateVariablesFromPlugin: ', variable);
         if (checkCanReferenceVariable(payload)) { // If new token reference to another token, we update the variable to reference to another variable
+          console.log('has reference');
           let referenceTokenName: string = '';
           if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
             referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);
