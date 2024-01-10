@@ -3,6 +3,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import {
   AnyTokenList,
   SingleToken,
+  TokenToRename,
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
@@ -130,7 +131,7 @@ export default function useTokens() {
   const pullStyles = useCallback(async () => {
     const userDecision = await confirm({
       text: 'Import styles',
-      description: 'What styles should be imported?',
+      description: 'Which styles should be imported?',
       confirmAction: 'Import',
       choices: [
         { key: 'colorStyles', label: 'Color', enabled: true },
@@ -152,6 +153,29 @@ export default function useTokens() {
           textStyles: userDecision.data.includes('textStyles'),
           colorStyles: userDecision.data.includes('colorStyles'),
           effectStyles: userDecision.data.includes('effectStyles'),
+        },
+      });
+    }
+  }, [confirm]);
+
+  const pullVariables = useCallback(async () => {
+    const userDecision = await confirm({
+      text: 'Import variables',
+      description: 'Sets will be created for each variable mode.',
+      choices: [
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+      ],
+      confirmAction: 'Import',
+    });
+
+    if (userDecision) {
+      track('Import variables');
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.PULL_VARIABLES,
+        options: {
+          useDimensions: userDecision.data.includes('useDimensions'),
+          useRem: userDecision.data.includes('useRem'),
         },
       });
     }
@@ -203,7 +227,9 @@ export default function useTokens() {
     }));
   }, [settings.updateMode]);
 
-  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName, type }: { oldGroupName: string, newGroupName: string, type: string }) => {
+  const remapTokensInGroup = useCallback(async ({
+    oldGroupName, newGroupName, type, tokensToRename,
+  }: { oldGroupName: string, newGroupName: string, type: string, tokensToRename: TokenToRename[] }) => {
     const confirmData = await confirm({
       text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
@@ -227,13 +253,13 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0]);
+        await Promise.all(tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0])));
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
         track('renameVariablesInTokenGroup', { newGroupName, oldGroupName });
         const tokensInParent = tokens[activeTokenSet] ?? [];
-        const tokensToRename: { oldName: string, newName: string }[] = [];
+        const tokensToRename: TokenToRename[] = [];
         tokensInParent.map((token) => {
           if (token.name.startsWith(oldGroupName) && token.type === type) {
             tokensToRename.push({
@@ -271,6 +297,12 @@ export default function useTokens() {
       }
     }
   }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState]);
+
+  const remapTokensWithOtherReference = useCallback(async ({
+    oldName, newName,
+  }: { oldName: string, newName:string }) => {
+    dispatch.tokenState.updateOtherAliases([oldName, newName]);
+  }, [dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -445,7 +477,7 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
+  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
 
     const result = await wrapTransaction({ name: 'renameVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -500,8 +532,10 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
@@ -523,8 +557,10 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,

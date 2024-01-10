@@ -1,8 +1,9 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { TokenToRename } from '@/types/tokens';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 
-export default async function renameVariablesFromPlugin(tokens: { oldName: string, newName: string }[]) {
+export default async function renameVariablesFromPlugin(tokens: TokenToRename[]) {
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });

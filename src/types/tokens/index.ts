@@ -33,3 +33,4 @@ export * from './SingleBorderToken';
 export * from './SingleAssetToken';
 export * from './SingleBooleanToken';
 export * from './SingleNumberToken';
+export * from './TokenToRename';

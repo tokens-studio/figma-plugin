@@ -1,5 +1,23 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.7
+
+### Patch Changes
+
+- 3c9c1944: Inspect now also properly shows stroke variables that were applied
+- 55c8c224: Add rotation property to number & dimension tokens
+- b3b02db5: Fixes an issue that caused the plugin to not remove tokens when multiple layers were selected and you tried to remove tokens.
+- d44d993b: Fix un-usual remapping renaming behaviour
+- 30bf0e6b: Add horizontalPadding and verticalPadding as options for Spacing
+
+## 1.38.6
+
+### Patch Changes
+
+- 77117e77: Fixes an issue with extension data changes that would mutate data
+- e08fc62a: Revert "feat: ignore first part of token name for variables"
+- 3c6b4615: Fixed an issue which shows number value in case a text which its value is 003e78 and 000000
+
 ## 1.38.5
 
 ### Minor Changes

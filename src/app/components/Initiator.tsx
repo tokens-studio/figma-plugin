@@ -101,6 +101,17 @@ export function Initiator() {
             }
             break;
           }
+
+          case MessageFromPluginTypes.VARIABLES: {
+            const { values } = pluginMessage;
+            if (values) {
+              track('Import variables');
+              dispatch.tokenState.setTokensFromVariables(values);
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            }
+            break;
+          }
+
           case MessageFromPluginTypes.SHOW_EMPTY_GROUPS: {
             dispatch.uiState.toggleShowEmptyGroups(pluginMessage.showEmptyGroups);
             break;

@@ -36,7 +36,7 @@ export function TokenGroupHeading({
   const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
-  const { remapTokensInGroup } = useTokens();
+  const { remapTokensInGroup, remapTokensWithOtherReference } = useTokens();
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
@@ -49,8 +49,11 @@ export function TokenGroupHeading({
 
   const handleRenameTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    renameGroup(path, newTokenGroupName, type);
-    remapTokensInGroup({ oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type });
+    const tokensToRename = await renameGroup(path, newTokenGroupName, type);
+    await remapTokensInGroup({
+      oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type, tokensToRename,
+    });
+    await remapTokensWithOtherReference({ oldName: `${path}.`, newName: `${newTokenGroupName}.` });
     setShowRenameTokenGroupModal(false);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 

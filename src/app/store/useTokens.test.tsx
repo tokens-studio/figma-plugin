@@ -102,6 +102,16 @@ const resolvedTokens: AnyTokenList = [
       textDecoration: 'none',
       textCase: 'none',
     },
+    resolvedValueWithReferences: {
+      fontFamily: 'Inter',
+      fontWeight: 'Regular',
+      lineHeight: 'AUTO',
+      fontSize: '14',
+      letterSpacing: '0%',
+      paragraphSpacing: '0',
+      textDecoration: 'none',
+      textCase: 'none',
+    },
   },
   {
     name: 'typography.alias',
@@ -117,6 +127,16 @@ const resolvedTokens: AnyTokenList = [
       textCase: 'none',
     },
     rawValue: '{typography.headlines.small}',
+    resolvedValueWithReferences: {
+      fontFamily: 'Inter',
+      fontWeight: 'Regular',
+      lineHeight: 'AUTO',
+      fontSize: '14',
+      letterSpacing: '0%',
+      paragraphSpacing: '0',
+      textDecoration: 'none',
+      textCase: 'none',
+    },
   },
   {
     name: 'font-family.serif',
@@ -161,6 +181,14 @@ const resolvedTokens: AnyTokenList = [
       color: '#000000',
       type: BoxShadowTypes.DROP_SHADOW,
     },
+    resolvedValueWithReferences: {
+      x: '2',
+      y: '2',
+      blur: '2',
+      spread: '2',
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
   },
   {
     name: 'typography.boxshadow.alias',
@@ -174,12 +202,19 @@ const resolvedTokens: AnyTokenList = [
       type: BoxShadowTypes.DROP_SHADOW,
     },
     rawValue: '{typography.headlines.boxshadow}',
+    resolvedValueWithReferences: {
+      x: 2,
+      y: 2,
+      blur: 2,
+      spread: 2,
+      color: '#000000',
+      type: BoxShadowTypes.DROP_SHADOW,
+    },
   },
   {
     name: 'font-weight.regular',
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
-    default: '400',
     rawValue: 'Regular',
   },
   {
@@ -187,7 +222,6 @@ const resolvedTokens: AnyTokenList = [
     type: TokenTypes.FONT_WEIGHTS,
     value: 'Regular',
     rawValue: '{font-weight.regular}',
-    default: '400',
   },
   {
     name: 'font-style.normal',
@@ -271,6 +305,13 @@ describe('useToken test', () => {
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
+  it('pullVariables test', async () => {
+    mockConfirm.mockImplementation(() => Promise.resolve());
+    await act(async () => {
+      await result.current.pullVariables();
+    });
+    await expect(result.current.pullVariables()).resolves.not.toThrow();
+  });
 
   it('should send message to pull styles from figma', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
@@ -343,13 +384,19 @@ describe('useToken test', () => {
   it('remapTokensInGroup', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     mockConfirm.mockImplementation(() => Promise.resolve({ data: ['selection'], result: true }));
+    const mockTokensToRename = [
+      {
+        oldName: 'old.padding-start',
+        newName: 'new.padding-start',
+      },
+    ];
     await act(async () => {
-      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.' });
+      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.', tokensToRename: mockTokensToRename });
     });
     expect(messageSpy).toBeCalledWith({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
-      oldName: 'old.',
-      newName: 'new.',
+      oldName: 'old.padding-start',
+      newName: 'new.padding-start',
       updateMode: UpdateMode.SELECTION,
     });
   });
@@ -424,6 +471,10 @@ describe('useToken test', () => {
               fontFamily: 'Inter',
               fontWeight: 'Bold',
             },
+            resolvedValueWithReferences: {
+              fontFamily: 'Inter',
+              fontWeight: 'Bold',
+            },
             type: 'typography',
             value: {
               fontFamily: 'Inter',
@@ -456,6 +507,10 @@ describe('useToken test', () => {
           internal__Parent: 'global',
           name: 'headline',
           rawValue: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+          resolvedValueWithReferences: {
             fontFamily: 'Inter',
             fontWeight: 'Bold',
           },

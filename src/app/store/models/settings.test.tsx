@@ -199,11 +199,6 @@ describe('settings', () => {
     expect(store.getState().settings.ignoreFirstPartForStyles).toEqual(true);
   });
 
-  it('should be able to set ignoreFirstPartForVariables', () => {
-    store.dispatch.settings.setIgnoreFirstPartForVariables(true);
-    expect(store.getState().settings.ignoreFirstPartForVariables).toEqual(true);
-  });
-
   it('should be able to set baseFontSize', () => {
     store.dispatch.settings.setBaseFontSize('24px');
     expect(store.getState().settings.baseFontSize).toEqual('24px');
