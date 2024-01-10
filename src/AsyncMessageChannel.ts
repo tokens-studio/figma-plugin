@@ -127,9 +127,11 @@ export class AsyncMessageChannel {
                 const { activeTheme, themes } = msg.message;
                 const themeToFind = Object.values(activeTheme)[0];
                 const activeMode = themes.find((theme) => theme.id === themeToFind);
-                figma.currentPage.children.forEach((frame) => {
-                  frame.setExplicitVariableModeForCollection(activeMode?.$figmaCollectionId ?? '', activeMode?.$figmaModeId ?? '');
-                });
+                if (figma.currentPage.children && figma.currentPage.children.length > 0) {
+                  figma.currentPage.children.forEach((frame) => {
+                    frame.setExplicitVariableModeForCollection(activeMode?.$figmaCollectionId ?? '', activeMode?.$figmaModeId ?? '');
+                  });
+                }
               }
             }
             resolve(msg.message);
