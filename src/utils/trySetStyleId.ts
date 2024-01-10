@@ -7,6 +7,7 @@ export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: st
   const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
   if (styleKeyMatch) {
     actualStyleId = await new Promise<string>((resolve) => {
+      console.log('style key match', styleKeyMatch);
       const localStyle = figma.getStyleById(styleId);
       if (localStyle) {
         resolve(localStyle.id);

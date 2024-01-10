@@ -17,14 +17,16 @@ const getTokenValue = (name: string, resolvedTokens: AnyTokenList) => (
   resolvedTokens.find((token) => token.name === name)
 );
 
-const getStyleByName = (name: string) => (
-  figma.getLocalPaintStyles().find((style) => style.name === name)
-);
+// const getStyleByName = (name: string) => (
+//   figma.getLocalPaintStyles().find((style) => style.name === name)
+// );
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
     const { oldName, newName, resolvedTokens } = msg;
+    console.log('oldName: ', oldName);
+    console.log('newName: ', newName);
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -52,6 +54,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
 
         if (Object.keys(tokens).length === 0) {
           if (getAppliedVariablesFromNode(node).length > 0) {
+            console.log('111111111111');
             const { name: variableName } = getAppliedVariablesFromNode(node)[0];
             if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
               const variableId = node.boundVariables?.fills?.[0].id;
@@ -71,10 +74,16 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
             }
           }
           if (getAppliedStylesFromNode(node).length > 0) {
-            const { name: styleName } = getAppliedStylesFromNode(node)[0];
+            const appliedStyles = getAppliedStylesFromNode(node);
+            const newValue = appliedStyles[0].name.replace(oldName, newName);
+            console.log('appliedStyles: ', appliedStyles);
+            const newStyle = await figma.importStyleByKeyAsync(newValue);
+            // const { name: styleName } = getAppliedStylesFromNode(node)[0];
             if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node) {
-              const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
+              // const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
+              const fillsCopy = clone(node.fills);
               node.fillStyleId = newStyle?.id as string;
+              node.fills = fillsCopy;
             }
           }
         }
