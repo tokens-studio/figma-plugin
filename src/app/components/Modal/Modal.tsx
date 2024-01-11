@@ -8,7 +8,7 @@ import { ModalHeader } from './ModalHeader';
 import Box from '../Box';
 import { styled } from '@/stitches.config';
 
-const customStyles = (large = false): ReactModalStyles => ({
+const customStyles = (large = false, height?: string | number): ReactModalStyles => ({
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.2)',
     display: 'flex',
@@ -29,6 +29,7 @@ const customStyles = (large = false): ReactModalStyles => ({
     maxHeight: '100%',
     border: 'none',
     width: large ? '100%' : 'auto',
+    height: height || 'auto',
   },
 });
 
@@ -37,6 +38,7 @@ export type ModalProps = {
   title?: string;
   full?: boolean;
   large?: boolean;
+  height?: string | number;
   compact?: boolean;
   isOpen: boolean;
   children: React.ReactNode;
@@ -78,6 +80,7 @@ export function Modal({
   title,
   full,
   large,
+  height,
   isOpen,
   close,
   children,
@@ -100,11 +103,16 @@ export function Modal({
     <ReactModal
       isOpen={isOpen}
       onRequestClose={close}
-      style={customStyles(large)}
+      style={customStyles(large, height)}
       contentLabel={title || ''}
     >
       {(showClose || title) && (
-        <ModalHeader>
+        <ModalHeader style={{
+          width: '100%',
+          height: '$4',
+          background: '$bgDefault',
+        }}
+        >
           <Stack direction="row" justify="between" align="center">
             {title && (
               <Box css={{ paddingLeft: '$4' }}>
