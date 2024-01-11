@@ -31,7 +31,6 @@ export const initializeSentry = () => {
     case 'alpha':
     case 'beta':
     case 'production':
-      Sentry.addTracingExtensions();
       Sentry.init({
         dsn: DSN,
         release: `figma-tokens@${pjs.version}`,
@@ -44,6 +43,7 @@ export const initializeSentry = () => {
         replaysOnErrorSampleRate: 1.0,
         integrations: [],
       });
+      Sentry.addTracingExtensions();
       break;
     default:
       break;

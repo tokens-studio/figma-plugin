@@ -32,7 +32,7 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
           )}
         </Stack>
       )}
-      {typeof resolvedValue !== 'undefined' && !isEqual(String(resolvedValue), String(value)) ? <AliasBadge value={resolvedValue} /> : null}
+      {typeof resolvedValue !== 'undefined' && !isEqual(String(resolvedValue), String(value)) && typeof resolvedValue !== 'object' ? <AliasBadge value={resolvedValue} /> : null}
     </Stack>
   ) : null;
 }

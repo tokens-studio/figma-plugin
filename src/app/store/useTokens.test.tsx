@@ -305,6 +305,13 @@ describe('useToken test', () => {
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
+  it('pullVariables test', async () => {
+    mockConfirm.mockImplementation(() => Promise.resolve());
+    await act(async () => {
+      await result.current.pullVariables();
+    });
+    await expect(result.current.pullVariables()).resolves.not.toThrow();
+  });
 
   it('should send message to pull styles from figma', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
