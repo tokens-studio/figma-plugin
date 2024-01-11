@@ -92,15 +92,25 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
               const newValue = appliedStyles[0].name.replace(oldName, newName);
 
               const styleKeyMatch = figmaStyleReferences[newValue].match(/^S:([a-zA-Z0-9_-]+),/);
+              console.log('styleKeyMatch: ', styleKeyMatch);
 
-              const newStyle = await figma.importStyleByKeyAsync(styleKeyMatch ? styleKeyMatch[1] : '');
-
-              if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node) {
-                // const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
-                const fillsCopy = clone(node.fills);
-                node.fillStyleId = newStyle?.id as string;
-                node.fills = fillsCopy;
+              if (styleKeyMatch) {
+                console.log('1111111111111111111111111');
+                const localStyle = figma.getStyleById(figmaStyleReferences[newValue]);
+                console.log('localStyle: ', localStyle);
+                if (localStyle) {
+                  console.log('localStyle: ', localStyle);
+                }
               }
+
+              // const newStyle = await figma.importStyleByKeyAsync(styleKeyMatch ? styleKeyMatch[0] : '');
+
+              // if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node) {
+              //   // const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
+              //   const fillsCopy = clone(node.fills);
+              //   node.fillStyleId = newStyle?.id as string;
+              //   node.fills = fillsCopy;
+              // }
             }
           }
 
