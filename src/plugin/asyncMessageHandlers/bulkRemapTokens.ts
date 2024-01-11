@@ -16,16 +16,12 @@ import getAppliedStylesFromNode from '../getAppliedStylesFromNode';
 
 const getTokenValue = (name: string, resolvedTokens: AnyTokenList) => resolvedTokens.find((token) => token.name === name);
 
-// const getStyleByName = (name: string) => (
-//   figma.getLocalPaintStyles().find((style) => style.name === name)
-// );
+const variablesCache: { [key: string]: Variable } = {};
 
 export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK_REMAP_TOKENS] = async (msg) => {
   // Big O(n * m) + Big O(updatePluginData) + Big O(sendSelectionChange): (n = amount of nodes, m = amount of tokens in the node)
   try {
     const { oldName, newName, resolvedTokens } = msg;
-    console.log('oldName: ', oldName);
-    console.log('newName: ', newName);
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -54,7 +50,6 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
 
           if (Object.keys(tokens).length === 0) {
             if (getAppliedVariablesFromNode(node).length > 0) {
-              console.log('111111111111');
               const { name: variableName } = getAppliedVariablesFromNode(node)[0];
               if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
                 const variableId = node.boundVariables?.fills?.[0].id;
@@ -66,7 +61,13 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
                     const paint = figma.util.solidPaint(resolvedValue?.value as string);
                     const fillsCopy = clone(node.fills);
                     fillsCopy[0] = figma.variables.setBoundVariableForPaint(paint, 'color', variable);
-                    const newVariable = await figma.variables.importVariableByKeyAsync(resolvedValue?.name as string);
+                    let newVariable;
+                    if (variablesCache.hasOwnProperty(resolvedValue?.name as string)) {
+                      newVariable = variablesCache[resolvedValue?.name as string];
+                    } else {
+                      newVariable = await figma.variables.importVariableByKeyAsync(resolvedValue?.name as string);
+                      variablesCache[resolvedValue?.name as string] = newVariable;
+                    }
                     fillsCopy[0].boundVariables.color.id = newVariable.id;
                     node.fills = fillsCopy;
                   }
@@ -74,6 +75,11 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
               }
             }
             if (getAppliedStylesFromNode(node).length > 0) {
+              const effectStyles = figma.getLocalEffectStyles();
+              const paintStyles = figma.getLocalPaintStyles();
+              const textStyles = figma.getLocalTextStyles();
+              const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
+
               const themeInfo = await AsyncMessageChannel.PluginInstance.message({
                 type: AsyncMessageTypes.GET_THEME_INFO,
               });
@@ -92,25 +98,21 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
               const newValue = appliedStyles[0].name.replace(oldName, newName);
 
               const styleKeyMatch = figmaStyleReferences[newValue].match(/^S:([a-zA-Z0-9_-]+),/);
-              console.log('styleKeyMatch: ', styleKeyMatch);
 
               if (styleKeyMatch) {
-                console.log('1111111111111111111111111');
-                const localStyle = figma.getStyleById(figmaStyleReferences[newValue]);
-                console.log('localStyle: ', localStyle);
-                if (localStyle) {
-                  console.log('localStyle: ', localStyle);
+                const actualStyleId = await new Promise<string>((resolve) => {
+                  figma.importStyleByKeyAsync(styleKeyMatch[1])
+                    .then((remoteStyle) => resolve(remoteStyle.id))
+                    .catch(() => {
+                      const updatedNewValue = newValue.split('.').join('/');
+                      resolve(allStyles.filter((style) => style.name === updatedNewValue)[0]?.id);
+                    });
+                });
+
+                if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fillStyleId' in node) {
+                  node.fillStyleId = actualStyleId;
                 }
               }
-
-              // const newStyle = await figma.importStyleByKeyAsync(styleKeyMatch ? styleKeyMatch[0] : '');
-
-              // if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node) {
-              //   // const newStyle = getStyleByName(styleName.replace(oldName, newName).split('.').join('/'));
-              //   const fillsCopy = clone(node.fills);
-              //   node.fillStyleId = newStyle?.id as string;
-              //   node.fills = fillsCopy;
-              // }
             }
           }
 
