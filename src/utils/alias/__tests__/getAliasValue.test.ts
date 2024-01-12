@@ -71,7 +71,7 @@ describe('getAliasValue', () => {
     {
       name: 'colors.mix-extension',
       input: '#ff2277',
-      value: '#ff1445',
+      value: '#ff113b',
       type: TokenTypes.COLOR,
       $extensions: {
         'studio.tokens': {
