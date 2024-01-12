@@ -24,6 +24,26 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const { oldName, newName, resolvedTokens } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode: msg.updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
+
+    const effectStyles = figma.getLocalEffectStyles();
+    const paintStyles = figma.getLocalPaintStyles();
+    const textStyles = figma.getLocalTextStyles();
+    const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
+
+    const themeInfo = await AsyncMessageChannel.PluginInstance.message({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+    });
+
+    const figmaStyleReferences: Record<string, string> = {};
+
+    themeInfo.themes?.forEach((theme) => {
+      Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
+        if (!figmaStyleReferences[token]) {
+          figmaStyleReferences[token] = styleId;
+        }
+      });
+    });
+
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
       job: {
@@ -75,25 +95,6 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
               }
             }
             if (getAppliedStylesFromNode(node).length > 0) {
-              const effectStyles = figma.getLocalEffectStyles();
-              const paintStyles = figma.getLocalPaintStyles();
-              const textStyles = figma.getLocalTextStyles();
-              const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
-
-              const themeInfo = await AsyncMessageChannel.PluginInstance.message({
-                type: AsyncMessageTypes.GET_THEME_INFO,
-              });
-
-              const figmaStyleReferences: Record<string, string> = {};
-
-              themeInfo.themes?.forEach((theme) => {
-                Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
-                  if (!figmaStyleReferences[token]) {
-                    figmaStyleReferences[token] = styleId;
-                  }
-                });
-              });
-
               const appliedStyles = getAppliedStylesFromNode(node);
               const newValue = appliedStyles[0].name.replace(oldName, newName);
 
