@@ -11,6 +11,7 @@ export * from './remapTokens';
 export * from './gotoNode';
 export * from './selectNodes';
 export * from './pullStyles';
+export * from './pullVariables';
 export * from './syncStyles';
 export * from './notify';
 export * from './cancelOperation';

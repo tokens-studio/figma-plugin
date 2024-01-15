@@ -133,7 +133,7 @@ export default function useTokens() {
   const pullStyles = useCallback(async () => {
     const userDecision = await confirm({
       text: 'Import styles',
-      description: 'What styles should be imported?',
+      description: 'Which styles should be imported?',
       confirmAction: 'Import',
       choices: [
         { key: 'colorStyles', label: 'Color', enabled: true },
@@ -155,6 +155,29 @@ export default function useTokens() {
           textStyles: userDecision.data.includes('textStyles'),
           colorStyles: userDecision.data.includes('colorStyles'),
           effectStyles: userDecision.data.includes('effectStyles'),
+        },
+      });
+    }
+  }, [confirm]);
+
+  const pullVariables = useCallback(async () => {
+    const userDecision = await confirm({
+      text: 'Import variables',
+      description: 'Sets will be created for each variable mode.',
+      choices: [
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+      ],
+      confirmAction: 'Import',
+    });
+
+    if (userDecision) {
+      track('Import variables');
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.PULL_VARIABLES,
+        options: {
+          useDimensions: userDecision.data.includes('useDimensions'),
+          useRem: userDecision.data.includes('useRem'),
         },
       });
     }
@@ -276,6 +299,12 @@ export default function useTokens() {
       }
     }
   }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]);
+
+  const remapTokensWithOtherReference = useCallback(async ({
+    oldName, newName,
+  }: { oldName: string, newName:string }) => {
+    dispatch.tokenState.updateOtherAliases([oldName, newName]);
+  }, [dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
@@ -505,8 +534,10 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
@@ -528,8 +559,10 @@ export default function useTokens() {
     getStringTokens,
     createStylesFromTokens,
     pullStyles,
+    pullVariables,
     remapToken,
     remapTokensInGroup,
+    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
