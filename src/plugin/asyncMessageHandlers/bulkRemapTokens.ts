@@ -71,7 +71,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
           if (Object.keys(tokens).length === 0) {
             if (getAppliedVariablesFromNode(node).length > 0) {
               const appliedVariables = getAppliedStylesFromNode(node);
-              appliedVariables.forEach(async (variable) => {
+              await Promise.all(appliedVariables.map(async (variable) => {
                 const { name: variableName } = variable;
 
                 if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
@@ -96,11 +96,11 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
                     }
                   }
                 }
-              });
+              }));
             }
             if (getAppliedStylesFromNode(node).length > 0) {
               const appliedStyles = getAppliedStylesFromNode(node);
-              appliedStyles.forEach(async (style) => {
+              await Promise.all(appliedStyles.map(async (style) => {
                 const newValue = style.name.replace(oldName, newName);
 
                 const styleKeyMatch = figmaStyleReferences[newValue].match(/^S:([a-zA-Z0-9_-]+),/);
@@ -119,7 +119,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
                     node.fillStyleId = actualStyleId;
                   }
                 }
-              });
+              }));
             }
           }
 
