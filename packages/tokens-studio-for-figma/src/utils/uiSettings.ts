@@ -1,12 +1,14 @@
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials
 export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await UiSettingsProperty.read();
+    console.log('setting Ui', uiSettings.tokenFormat, data?.tokenFormat);
     await UiSettingsProperty.write({
       sessionRecording: uiSettings.sessionRecording ?? data?.sessionRecording,
       width: uiSettings.width ?? data?.width,
@@ -24,6 +26,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       baseFontSize: uiSettings.baseFontSize ?? data?.baseFontSize,
       aliasBaseFontSize: uiSettings.aliasBaseFontSize ?? data?.aliasBaseFontSize,
       storeTokenIdInJsonEditor: uiSettings.storeTokenIdInJsonEditor ?? data?.storeTokenIdInJsonEditor,
+      tokenFormat: uiSettings.tokenFormat ?? data?.tokenFormat,
     });
   } catch (err) {
     notifyUI('There was an issue saving your credentials. Please try again.');
@@ -34,6 +37,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
   let settings: SavedSettings = {} as SavedSettings;
   try {
     const data = await UiSettingsProperty.read();
+    console.log('reading data', data);
 
     let width: number;
     let height: number;
@@ -51,6 +55,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let language: string;
     let sessionRecording: boolean;
     let storeTokenIdInJsonEditor: boolean;
+    let tokenFormat: TokenFormatOptions;
 
     if (data) {
       width = data.width || 400;
@@ -69,6 +74,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       shouldSwapStyles = typeof data.shouldSwapStyles === 'undefined' ? false : data.shouldSwapStyles;
       sessionRecording = typeof data.sessionRecording === 'undefined' ? false : data.sessionRecording;
       storeTokenIdInJsonEditor = typeof data.storeTokenIdInJsonEditor === 'undefined' ? false : data.storeTokenIdInJsonEditor;
+      tokenFormat = data.tokenFormat || TokenFormatOptions.Legacy;
       settings = {
         language,
         width: Math.max(300, width),
@@ -86,6 +92,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         baseFontSize,
         aliasBaseFontSize,
         storeTokenIdInJsonEditor,
+        tokenFormat,
       };
 
       if (notify) {

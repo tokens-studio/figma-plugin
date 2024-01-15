@@ -3,8 +3,12 @@ import type { SetTokenDataPayload } from '@/types/payloads';
 import parseTokenValues from '@/utils/parseTokenValues';
 import type { TokenState } from '../../tokenState';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
+import { Tokens, detectFormat } from '@/utils/convertTokens';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
+  console.log('setting token data', payload);
+
+  const format = detectFormat(payload.values as Tokens);
   const values = parseTokenValues(payload.values);
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
@@ -22,6 +26,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
   return {
     ...state,
+    tokenFormat: format,
     tokens: addIdPropertyToTokens(values),
     themes: (payload.themes ?? []).map((theme) => ({
       ...theme,

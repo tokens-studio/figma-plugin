@@ -140,6 +140,7 @@ export default function SingleFileExport({ onClose }: Props) {
         rows={10}
         disabled
         value={exportData}
+        css={{ fontFamily: '$mono', fontSize: '$xxsmall', lineHeight: '140%' }}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>
         <Button variant="secondary" onClick={onClose}>

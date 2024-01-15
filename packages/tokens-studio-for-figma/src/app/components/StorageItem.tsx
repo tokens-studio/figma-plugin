@@ -15,6 +15,8 @@ import useConfirm from '../hooks/useConfirm';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -31,6 +33,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { confirm } = useConfirm();
   const { setStorageType } = useStorage();
   const dispatch = useDispatch<Dispatch>();
+  const tokenFormat = useSelector(tokenFormatSelector);
 
   const { t } = useTranslation(['storage']);
 
@@ -64,6 +67,10 @@ const StorageItem = ({ item, onEdit }: Props) => {
       setErrorMessage(response?.errorMessage);
     }
   }, [item, restoreStoredProvider]);
+
+  const handleValueChange = React.useCallback(() => {
+    dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
+  }, [dispatch.tokenState]);
 
   return (
     <StyledStorageItem
@@ -131,7 +138,8 @@ const StorageItem = ({ item, onEdit }: Props) => {
         <DropdownMenu.Portal>
           <DropdownMenu.Content>
             <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete}>{t('delete')}</DropdownMenu.Item>
+            {tokenFormat !== TokenFormatOptions.DTCG ? <DropdownMenu.Item onSelect={handleValueChange}>Convert to DTCG</DropdownMenu.Item> : null }
+            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>{t('delete')}</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

@@ -39,6 +39,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -60,6 +61,7 @@ export interface TokenState {
   collapsedTokens: string[];
   changedState: CompareStateType;
   remoteData: CompareStateType;
+  tokenFormat: TokenFormatOptions;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -94,6 +96,7 @@ export const tokenState = createModel<RootModel>()({
       themes: [],
       metadata: null,
     },
+    tokenFormat: TokenFormatOptions.Legacy,
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -184,6 +187,7 @@ export const tokenState = createModel<RootModel>()({
       },
     }),
     setJSONData(state, payload) {
+      console.log('set json data');
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens });
@@ -483,6 +487,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       remoteData: data,
     }),
+    setTokenFormat: (state, data: TokenFormatOptions): TokenState => ({
+      ...state,
+      tokenFormat: data,
+    }),
     renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
       const {
         oldName, newName, type, tokenSets,
@@ -565,6 +573,9 @@ export const tokenState = createModel<RootModel>()({
     },
     createToken() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    setTokenFormat(payload: TokenFormatOptions) {
+      setFormat(payload);
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {

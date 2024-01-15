@@ -7,21 +7,13 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import { SetTokenDataPayload } from '@/types/payloads';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
-const defaultTokens: TokenStore = {
-  version: pjs.version,
-  themes: [],
-  activeTheme: {},
-  updatedAt: new Date().toString(),
-  // @TODO this may not be correct
-  values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
-};
-
 export function setDefaultTokens(dispatch: RematchDispatch<RootModel>) {
   return (): void => {
+    console.log('setting default tokens');
     dispatch.tokenState.setTokenData({
-      values: defaultTokens.values,
-      themes: defaultTokens.themes,
-      activeTheme: defaultTokens.activeTheme,
+      values: parseTokenValues(defaultJSON as unknown as SetTokenDataPayload['values']),
+      themes: [],
+      activeTheme: {},
       usedTokenSet: { core: TokenSetStatus.SOURCE, light: TokenSetStatus.ENABLED, theme: TokenSetStatus.ENABLED },
     });
   };

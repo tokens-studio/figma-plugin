@@ -1,11 +1,11 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import formatTokens from './formatTokens';
-import { setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('formatTokens', () => {
   beforeEach(() => {
-    setFormat('dtcg');
+    setFormat(TokenFormatOptions.DTCG);
   });
 
   const resolvedTokens = [
@@ -104,9 +104,15 @@ describe('formatTokens', () => {
   } as unknown as Record<string, AnyTokenList>;
 
   it('converts given tokens to an array', () => {
-    expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: true, expandShadow: false,
-    })).toEqual(
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+        expandTypography: true,
+        expandShadow: false,
+      }),
+    ).toEqual(
       JSON.stringify(
         {
           global: {
@@ -199,9 +205,15 @@ describe('formatTokens', () => {
   });
 
   it('converts given tokens to an array without expanding', () => {
-    expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: false, expandShadow: true,
-    })).toEqual(
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+        expandTypography: false,
+        expandShadow: true,
+      }),
+    ).toEqual(
       JSON.stringify(
         {
           global: {
@@ -314,10 +326,14 @@ describe('formatTokens', () => {
   });
 
   it('respects the global token format setting', () => {
-    setFormat('legacy');
-    expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList,
-    })).toEqual(
+    setFormat(TokenFormatOptions.Legacy);
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+      }),
+    ).toEqual(
       JSON.stringify(
         {
           global: {

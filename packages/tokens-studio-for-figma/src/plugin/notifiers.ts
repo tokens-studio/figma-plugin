@@ -10,6 +10,7 @@ import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StyleToCreateToken } from '@/types/payloads';
+import { TokenFormatOptions } from './TokenFormatStoreClass';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -67,6 +68,7 @@ export type SavedSettings = {
   baseFontSize: string;
   aliasBaseFontSize: string;
   storeTokenIdInJsonEditor: boolean;
+  tokenFormat: TokenFormatOptions;
 };
 
 export function notifyUISettings(
@@ -87,6 +89,7 @@ export function notifyUISettings(
     baseFontSize,
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
+    tokenFormat,
   }: SavedSettings,
 ) {
   postToUI({
@@ -110,6 +113,7 @@ export function notifyUISettings(
       baseFontSize,
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
+      tokenFormat,
     },
   });
   postToUI({

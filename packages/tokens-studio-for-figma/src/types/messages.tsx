@@ -5,6 +5,7 @@ import type { TokenStore } from './tokens';
 import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageTypeCredentials } from './StorageType';
 import { StyleToCreateToken } from './payloads';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -51,6 +52,7 @@ export type UiSettingsFromPluginMessage = {
     baseFontSize: string;
     aliasBaseFontSize: string;
     storeTokenIdInJsonEditor: boolean;
+    tokenFormat: TokenFormatOptions;
   };
 };
 

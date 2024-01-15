@@ -1,4 +1,12 @@
-export type TokenFormatOptions = 'dtcg' | 'legacy';
+export enum TokenFormatOptions {
+  DTCG = 'dtcg',
+  Legacy = 'legacy',
+}
+
+export const TOKEN_FORMAT_OPTIONS = {
+  [TokenFormatOptions.DTCG]: { label: 'DTCG', value: TokenFormatOptions.DTCG },
+  [TokenFormatOptions.Legacy]: { label: 'Legacy', value: TokenFormatOptions.Legacy },
+};
 
 export class TokenFormatStoreClass {
   public tokenValueKey: 'value' | '$value';
@@ -7,21 +15,25 @@ export class TokenFormatStoreClass {
 
   public tokenDescriptionKey: 'description' | '$description';
 
-  public format: 'dtcg' | 'legacy';
+  public format: TokenFormatOptions;
 
   constructor() {
     this.tokenValueKey = 'value';
     this.tokenTypeKey = 'type';
     this.tokenDescriptionKey = 'description';
-    this.format = 'legacy';
+    this.format = TokenFormatOptions.Legacy;
   }
 
   public setFormat = (format: TokenFormatOptions) => {
-    this.tokenValueKey = format === 'dtcg' ? '$value' : 'value';
-    this.tokenTypeKey = format === 'dtcg' ? '$type' : 'type';
-    this.tokenDescriptionKey = format === 'dtcg' ? '$description' : 'description';
+    console.log('setting format', format, this.format, this);
+    this.format = format;
+    this.tokenValueKey = format === TokenFormatOptions.DTCG ? '$value' : 'value';
+    this.tokenTypeKey = format === TokenFormatOptions.DTCG ? '$type' : 'type';
+    this.tokenDescriptionKey = format === TokenFormatOptions.DTCG ? '$description' : 'description';
   };
+
+  public getFormat = () => this.format;
 }
 
 export const TokenFormat = new TokenFormatStoreClass();
-export const { setFormat } = TokenFormat;
+export const { setFormat, getFormat } = TokenFormat;

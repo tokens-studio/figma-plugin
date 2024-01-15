@@ -39,12 +39,6 @@ const StyledBody = styled('div', {
   },
 });
 
-const StyledOverlay = styled(Dialog.Overlay, {
-  backgroundColor: 'rgba(0, 0, 0, .25)',
-  position: 'fixed',
-  inset: 0,
-});
-
 export function Modal({
   id,
   title,
@@ -87,8 +81,8 @@ export function Modal({
           css={
             large
               ? {
-                width: 'calc(100vw - 32px)',
-                maxWidth: 'calc(100vw - 32px)',
+                width: 'calc(100vw - $7)',
+                maxWidth: 'calc(100vw - $7)',
                 padding: 0,
                 boxShadow: '$contextMenu',
                 borderColor: '$borderSubtle',
@@ -98,37 +92,41 @@ export function Modal({
         >
           <Box
             css={{
-              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
             }}
           >
             {(showClose || title) && (
-              <Stack
-                direction="row"
-                justify="between"
-                align="center"
-                css={{
-                  borderBottomColor: '$borderMuted',
-                  borderBottomWidth: '1px',
-                  padding: '$4',
-                  position: 'sticky',
-                  backgroundColor: '$bgDefault',
-                  top: 0,
-                  zIndex: 10,
-                }}
-              >
-                {title && (
-                  <Dialog.Title>
-                    <Heading size="small">{title}</Heading>
-                  </Dialog.Title>
-                )}
-                <IconButton
-                  onClick={handleClose}
-                  data-testid="close-button"
-                  icon={<XIcon />}
-                  size="small"
-                  variant="invisible"
-                />
-              </Stack>
+            <Stack
+              direction="row"
+              justify="between"
+              align="center"
+              css={{
+                borderBottomColor: '$borderSubtle',
+                borderBottomWidth: '1px',
+                borderTopLeftRadius: '$medium',
+                borderTopRightRadius: '$medium',
+                padding: '$4',
+                position: 'sticky',
+                backgroundColor: '$bgDefault',
+                top: 0,
+                zIndex: 10,
+              }}
+            >
+              {title && (
+              <Dialog.Title>
+                <Heading size="small">{title}</Heading>
+              </Dialog.Title>
+              )}
+              <IconButton
+                onClick={handleClose}
+                data-testid="close-button"
+                icon={<XIcon />}
+                size="small"
+                variant="invisible"
+              />
+            </Stack>
             )}
             <StyledBody compact={compact} full={full} data-testid={id}>
               {children}

@@ -13,6 +13,7 @@ import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/ty
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -113,6 +114,7 @@ export const uiState = createModel<RootModel>()({
     localApiState: {
       provider: StorageProviderType.LOCAL,
       new: false,
+      format: TokenFormatOptions.Legacy,
     },
     lastUpdatedAt: null,
     changelog: [],

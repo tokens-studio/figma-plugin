@@ -8,7 +8,7 @@ import {
   isSingleTypographyToken,
 } from './is';
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
 
 // This is a token as it is incoming, so we can't be sure of the values or types
@@ -35,7 +35,9 @@ export type TokenInJSON<T extends TokenTypes = any, V = any> = {
   }
 );
 
-export type Tokens = Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>> | TokenGroupInJSON;
+export type Tokens =
+  | Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>>
+  | TokenGroupInJSON;
 
 // @TODO fix typings
 function checkForTokens({
@@ -109,6 +111,7 @@ function checkForTokens({
     };
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
+    // This would be where we push a `group` entity to the array, once we do want to tackle group descriptions or group metadata
     let tokenToCheck = token;
     groupLevel += 1;
     // When token groups are typed, we need to inherit the type to their children
@@ -118,10 +121,6 @@ function checkForTokens({
       currentTypeLevel = groupLevel;
       tokenToCheck = tokenValues as Tokens;
     }
-    // if (typeof token[TokenFormat.tokenValueKey] !== 'string') {
-    //   console.log('Is not string', token);
-    //   tokenToCheck = token[TokenFormat.tokenValueKey] as typeof tokenToCheck;
-    // }
 
     if (typeof tokenToCheck !== 'undefined' || tokenToCheck !== null) {
       Object.entries(tokenToCheck).forEach(([key, value]) => {
@@ -159,7 +158,19 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
+export function detectFormat(tokens: Tokens) {
+  const stringifiedTokens = JSON.stringify(tokens);
+  if (stringifiedTokens.includes('$value')) {
+    TokenFormat.setFormat(TokenFormatOptions.DTCG);
+  } else {
+    TokenFormat.setFormat(TokenFormatOptions.Legacy);
+  }
+  return TokenFormatOptions.Legacy;
+}
+
 export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
+  detectFormat(tokens);
+
   const [result] = checkForTokens({
     obj: [],
     root: null,

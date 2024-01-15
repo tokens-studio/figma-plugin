@@ -1,4 +1,4 @@
-import { setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, setFormat } from '@/plugin/TokenFormatStoreClass';
 import stringifyTokens from './stringifyTokens';
 
 describe('stringfyTokens', () => {
@@ -71,61 +71,67 @@ describe('stringfyTokens', () => {
   };
   const activeTokenSet = 'global';
   it('convert token list to the JSON string with nested structure', () => {
-    setFormat('dtcg');
-    expect(stringifyTokens(tokens, activeTokenSet)).toEqual(JSON.stringify({
-      scale: {
-        $type: 'sizing',
-        $value: '1',
-      },
-      font: {
-        $type: 'sizing',
-        small: {
-          $value: '2',
-        },
-        big: {
-          $value: '3',
-        },
-        medium: {
-          $type: 'dimension',
-          $value: '3',
-        },
-      },
-      typography: {
-        $type: 'typography',
-        headline: {
-          $value: {
-            fontFamily: 'aria',
-            fontWeight: 'bold',
-            lineHeight: '12',
+    setFormat(TokenFormatOptions.DTCG);
+    expect(stringifyTokens(tokens, activeTokenSet)).toEqual(
+      JSON.stringify(
+        {
+          scale: {
+            $type: 'sizing',
+            $value: '1',
+          },
+          font: {
+            $type: 'sizing',
+            small: {
+              $value: '2',
+            },
+            big: {
+              $value: '3',
+            },
+            medium: {
+              $type: 'dimension',
+              $value: '3',
+            },
+          },
+          typography: {
+            $type: 'typography',
+            headline: {
+              $value: {
+                fontFamily: 'aria',
+                fontWeight: 'bold',
+                lineHeight: '12',
+              },
+            },
+            content: {
+              $type: 'typography',
+              $value: {
+                fontFamily: 'aria',
+                fontWeight: 'light',
+                lineHeight: '3',
+              },
+            },
+          },
+          box: {
+            $type: 'boxShadow',
+            default: {
+              $value: {
+                blur: '2',
+                color: '#000000',
+                spread: '0',
+                type: 'innerShadow',
+                x: '2',
+                y: '2',
+              },
+            },
+          },
+          $type: 'sizing',
+          mx: {
+            $value: '4',
           },
         },
-        content: {
-          $type: 'typography',
-          $value: {
-            fontFamily: 'aria',
-            fontWeight: 'light',
-            lineHeight: '3',
-          },
-        },
-      },
-      box: {
-        $type: 'boxShadow',
-        default: {
-          $value: {
-            blur: '2',
-            color: '#000000',
-            spread: '0',
-            type: 'innerShadow',
-            x: '2',
-            y: '2',
-          },
-        },
-      },
-      $type: 'sizing',
-      mx: {
-        $value: '4',
-      },
-    }, null, 2));
+        null,
+        2,
+      ),
+    );
     expect(stringifyTokens(emptyTokens, activeTokenSet)).toEqual('{}');
   });
 });

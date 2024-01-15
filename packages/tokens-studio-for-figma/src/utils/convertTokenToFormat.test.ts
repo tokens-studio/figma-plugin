@@ -1,9 +1,9 @@
 import { convertTokenToFormat } from './convertTokenToFormat';
-import { setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('convertTokenToFormat', () => {
   beforeEach(() => {
-    setFormat('dtcg');
+    setFormat(TokenFormatOptions.DTCG);
   });
   it('should return an object with the same properties as the input, but with the keys replaced', () => {
     const token = {
@@ -26,7 +26,7 @@ describe('convertTokenToFormat', () => {
 
 describe('convertTokenToFormat', () => {
   beforeEach(() => {
-    setFormat('legacy');
+    setFormat(TokenFormatOptions.Legacy);
   });
 
   it('converts to chosen format', async () => {

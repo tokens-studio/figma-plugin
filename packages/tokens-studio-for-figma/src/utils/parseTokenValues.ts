@@ -4,6 +4,8 @@ import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import convertToTokenArray from './convertTokens';
 
 export default function parseTokenValues(tokens: SetTokenDataPayload['values']): TokenStore['values'] {
+  console.log('parsing token val');
+
   // If we receive an array of tokens, move them all to the global set
   if (Array.isArray(tokens)) {
     return {
@@ -24,7 +26,6 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
 
     if (typeof parsedGroup === 'object') {
       const convertedToArray = convertToTokenArray({ tokens: parsedGroup });
-      console.log('Converted to array');
       prev.push([group[0], convertedToArray]);
       return prev;
     }
