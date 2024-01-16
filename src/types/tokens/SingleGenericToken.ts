@@ -5,6 +5,7 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
   type: T;
   value: V;
   rawValue?: V;
+  resolvedValueWithReferences?: V;
   description?: string;
   oldDescription?: string;
   oldValue?: V;

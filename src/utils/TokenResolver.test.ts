@@ -59,6 +59,13 @@ const resolvedTypographyToken = {
   },
 };
 
+const resolvedTypographyFontFamilyToken = {
+  type: TokenTypes.TYPOGRAPHY,
+  value: {
+    fontFamily: 'Arial',
+  },
+};
+
 const unResolvedTypographyToken = {
   type: TokenTypes.TYPOGRAPHY,
   value: {
@@ -288,6 +295,15 @@ const tokens = [
     value: '0',
     type: TokenTypes.DIMENSION,
   },
+  {
+    name: 'typography.font-family.resolved',
+    value: { ...resolvedTypographyFontFamilyToken },
+    type: TokenTypes.TYPOGRAPHY,
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    value: '{typography.font-family.resolved}',
+  },
 ];
 
 const output = [
@@ -358,6 +374,7 @@ const output = [
     ...singleShadowToken,
     name: 'shadow.single',
     rawValue: singleShadowToken.value,
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -401,6 +418,9 @@ const output = [
     rawValue: {
       opacity: '{opacity.40}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -413,6 +433,10 @@ const output = [
       opacity: '{opacity.40}',
       borderRadius: '{border-radius.7}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
@@ -421,6 +445,9 @@ const output = [
       fill: '#ff0000',
     },
     rawValue: {
+      fill: '{colors.red.500}',
+    },
+    resolvedValueWithReferences: {
       fill: '{colors.red.500}',
     },
   },
@@ -437,12 +464,14 @@ const output = [
       fontSize: '2px',
     },
     rawValue: resolvedTypographyToken.value,
+    resolvedValueWithReferences: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
+    resolvedValueWithReferences: unResolvedTypographyToken.value,
     value: unResolvedTypographyToken.value,
   },
   {
@@ -450,6 +479,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedSingle',
     rawValue: unResolvedSingleShadowToken.value,
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
     },
@@ -478,6 +508,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias',
     rawValue: '{shadow.single}',
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -489,6 +520,7 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias1',
     rawValue: '{shadow.unResolvedSingle}',
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
       color: '{colors.blue.500}',
@@ -499,6 +531,7 @@ const output = [
     description: 'the one with multiple nested shadow alias',
     name: 'shadow.shadowAlias2',
     rawValue: '{shadow.multiple}',
+    resolvedValueWithReferences: multipleShadowToken.value,
     value: [
       {
         ...multipleShadowToken.value[0],
@@ -560,6 +593,10 @@ const output = [
       fontWeight: 'bold',
     },
     rawValue: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
+    resolvedValueWithReferences: {
       fontFamily: 'IBM Plex Sans',
       fontWeight: 'bold',
     },
@@ -642,6 +679,45 @@ const output = [
     value: 0,
     rawValue: '0',
     type: TokenTypes.DIMENSION,
+  },
+  // Note: This is technically incorrect, but we're doing this because this needs to be shown as failed to resolve. See https://github.com/tokens-studio/figma-plugin/issues/2450
+  {
+    name: 'typography.font-family.resolved',
+    rawValue: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    type: 'typography',
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+  },
+  {
+    name: 'typography.font-family.resolved.reference',
+    rawValue: '{typography.font-family.resolved}',
+    resolvedValueWithReferences: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
+    value: {
+      type: 'typography',
+      value: {
+        fontFamily: 'Arial',
+      },
+    },
   },
 ];
 describe('resolveTokenValues deep nested', () => {

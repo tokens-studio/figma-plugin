@@ -34,6 +34,7 @@ export default function convertTokensToGroupedObject(
       delete tokenWithType.rawValue;
     }
     delete tokenWithType.internal__Parent;
+    delete tokenWithType.resolvedValueWithReferences;
     if (
       (!!options.expandTypography && tokenWithType.type === TokenTypes.TYPOGRAPHY)
       || (!!options.expandShadow && tokenWithType.type === TokenTypes.BOX_SHADOW)
