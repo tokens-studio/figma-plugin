@@ -21,6 +21,9 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     return acc;
   }, {});
 
+  console.log('payload: ', payload);
+  console.log('themes: ', themeInfo.themes);
+
   themeInfo.themes.forEach((theme) => {
     if (
       Object.entries(theme.selectedTokenSets).some(

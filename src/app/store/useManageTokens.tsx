@@ -61,6 +61,7 @@ export default function useManageTokens() {
     const {
       parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
     } = data;
+    console.log('data in editSingleToken: ', data);
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_EDITSINGLETOKEN,
       isInfinite: true,
