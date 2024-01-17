@@ -55,4 +55,6 @@ export enum Properties {
   tokenName = 'tokenName',
   description = 'description',
   rotation = 'rotation',
+  x = 'x',
+  y = 'y',
 }
