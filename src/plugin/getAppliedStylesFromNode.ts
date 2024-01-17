@@ -89,6 +89,41 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
     }
   }
 
+  if ('strokes' in node) {
+    const styleIdBackupKey = 'strokeStyleId_original';
+    const localStyle = getLocalStyle(node, styleIdBackupKey, 'strokes');
+    if (localStyle) {
+      const paint = localStyle.paints[0];
+      let styleObject: SingleColorToken | null = {} as SingleColorToken;
+      if (paint.type === 'SOLID') {
+        const { r, g, b } = paint.color;
+        const a = paint.opacity;
+        styleObject.value = figmaRGBToHex({
+          r,
+          g,
+          b,
+          a,
+        });
+      } else if (paint.type === 'GRADIENT_LINEAR') {
+        styleObject.value = convertFigmaGradientToString(paint);
+      } else {
+        styleObject = null;
+      }
+      const normalizedName = localStyle.name
+        .split('/')
+        .map((section) => section.trim())
+        .join('.');
+
+      if (styleObject) {
+        localStyles.push({
+          ...styleObject,
+          name: normalizedName,
+          type: Properties.borderColor,
+        });
+      }
+    }
+  }
+
   if (node.type === 'TEXT') {
     const styleIdBackupKey = 'textStyleId_original';
     const localStyle = getLocalStyle(node, styleIdBackupKey, 'typography');
