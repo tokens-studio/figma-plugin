@@ -2,4 +2,4 @@
 '@tokens-studio/figma-plugin': patch
 ---
 
-Allow to inspect stroke styles on node
+Fixed an issue where stroke styles on node where not shown in Inspect.
