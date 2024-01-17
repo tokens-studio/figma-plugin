@@ -335,6 +335,18 @@ export default async function setValuesOnNode(
         rotateNode(node, rotation);
       }
 
+      // X & Y Position
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && !isPartOfInstance(node.id)) {
+        if (typeof values.x !== 'undefined' && isPrimitiveValue(values.x)) {
+          const x = transformValue(String(values.x), 'dimension', baseFontSize);
+          node.x = x;
+        }
+        if (typeof values.y !== 'undefined' && isPrimitiveValue(values.y)) {
+          const y = transformValue(String(values.y), 'dimension', baseFontSize);
+          node.y = y;
+        }
+      }
+
       // FILL
       if (values.fill && typeof values.fill === 'string') {
         if ('fills' in node && data.fill) {
