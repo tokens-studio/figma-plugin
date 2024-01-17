@@ -29,6 +29,7 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 import { VariableReferenceMap } from '@/types/VariableReferenceMap';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
+import { rotateNode } from './rotateNode';
 
 // @README values typing is wrong
 
@@ -326,6 +327,12 @@ export default async function setValuesOnNode(
             node.maxHeight = transformValue(String(values.maxHeight), 'sizing', baseFontSize);
           }
         }
+      }
+
+      // ROTATION
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && typeof values.rotation !== 'undefined' && !isPartOfInstance(node.id) && isPrimitiveValue(values.rotation)) {
+        const rotation = transformValue(String(values.rotation), 'rotation', baseFontSize);
+        rotateNode(node, rotation);
       }
 
       // FILL

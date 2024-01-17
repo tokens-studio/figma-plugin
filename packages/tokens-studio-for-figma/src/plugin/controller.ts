@@ -35,6 +35,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.BULK_REMAP_TOKENS, a
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GOTO_NODE, asyncHandlers.gotoNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SELECT_NODES, asyncHandlers.selectNodes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, asyncHandlers.pullStyles);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_VARIABLES, asyncHandlers.pullVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, asyncHandlers.syncStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.NOTIFY, asyncHandlers.notify);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESIZE_WINDOW, asyncHandlers.resizeWindow);
@@ -66,7 +67,6 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, as
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_RELAUNCH_DATA, asyncHandlers.removeRelaunchData);
 
 figma.on('close', () => {
   defaultWorker.stop();

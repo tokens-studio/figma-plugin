@@ -35,6 +35,7 @@ const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildr
       compact
       large
       isOpen
+      modal={false}
       close={handleReset}
       // eslint-disable-next-line no-nested-ternary
       title={editToken.status === EditTokenFormStatus.CREATE ? t('newToken')

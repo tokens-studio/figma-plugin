@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Stack, Dialog, IconButton, Box, Heading,
 } from '@tokens-studio/ui';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from '@primer/octicons-react';
 import { ModalFooter } from './ModalFooter';
 import { styled } from '@/stitches.config';
@@ -15,10 +14,11 @@ export type ModalProps = {
   compact?: boolean;
   isOpen: boolean;
   children: React.ReactNode;
-  footer?: React.ReactNode
+  footer?: React.ReactNode;
   stickyFooter?: boolean;
   showClose?: boolean;
   close: () => void;
+  modal?: boolean;
 };
 
 const StyledBody = styled('div', {
@@ -51,26 +51,45 @@ export function Modal({
   stickyFooter = false,
   showClose = false,
   compact = false,
+  modal = true,
 }: ModalProps) {
-  // TODO: Check if this is needed
-  // React.useEffect(() => {
-  //   if (typeof document !== 'undefined' && document.getElementById('app')) {
-  //     ReactModal.setAppElement('#app');
-  //   }
-  // }, []);
-
   const handleClose = React.useCallback(() => {
     close();
   }, [close]);
 
+  const handleOnOpenChange = React.useCallback(
+    (open) => {
+      if (!open) {
+        close();
+      }
+    },
+    [close],
+  );
+
   return (
-    <DialogPrimitive.Root
-      open={isOpen}
-      onOpenChange={close}
-    >
+    <Dialog open={isOpen} onOpenChange={handleOnOpenChange} modal={modal}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ padding: 0 }}>
+        <Box
+          css={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: '$modalBackdrop',
+          }}
+        />
+        <Dialog.Content
+          css={
+            large
+              ? {
+                width: 'calc(100vw - $7)',
+                maxWidth: 'calc(100vw - $7)',
+                padding: 0,
+                boxShadow: '$contextMenu',
+                borderColor: '$borderSubtle',
+              }
+              : { padding: 0 }
+          }
+        >
           <Box css={{
             display: 'flex',
             flexDirection: 'column',
@@ -83,8 +102,10 @@ export function Modal({
               justify="between"
               align="center"
               css={{
-                borderBottomColor: '$borderMuted',
+                borderBottomColor: '$borderSubtle',
                 borderBottomWidth: '1px',
+                borderTopLeftRadius: '$medium',
+                borderTopRightRadius: '$medium',
                 padding: '$4',
                 position: 'sticky',
                 backgroundColor: '$bgDefault',
@@ -93,9 +114,9 @@ export function Modal({
               }}
             >
               {title && (
-                <Dialog.Title>
-                  <Heading size="small">{title}</Heading>
-                </Dialog.Title>
+              <Dialog.Title>
+                <Heading size="small">{title}</Heading>
+              </Dialog.Title>
               )}
               <IconButton
                 onClick={handleClose}
@@ -109,14 +130,10 @@ export function Modal({
             <StyledBody compact={compact} full={full} data-testid={id}>
               {children}
             </StyledBody>
-            {(!!footer) && (
-            <ModalFooter stickyFooter={stickyFooter}>
-                {footer}
-            </ModalFooter>
-            )}
+            {!!footer && <ModalFooter stickyFooter={stickyFooter}>{footer}</ModalFooter>}
           </Box>
         </Dialog.Content>
       </Dialog.Portal>
-    </DialogPrimitive.Root>
+    </Dialog>
   );
 }

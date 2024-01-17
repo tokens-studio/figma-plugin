@@ -116,6 +116,7 @@ const StyledPrefix = styled('div', {
   height: '$controlSmall',
   flexShrink: 0,
   border: '1px solid $borderMuted',
+  borderRadius: '$small',
   borderTopRightRadius: 0,
   borderBottomRightRadius: 0,
   borderRight: 0,

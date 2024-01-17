@@ -27,10 +27,7 @@ describe('findDifferentState', () => {
     const result = findDifferentState(baseState, compareState);
 
     expect(result).toEqual({
-      tokens: {
-        set1: [],
-        set2: [],
-      },
+      tokens: { },
       themes: [],
       metadata: null,
     });

@@ -3,28 +3,29 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Box, Link, Text, Button, Heading, Label, Stack, Switch,
+} from '@tokens-studio/ui';
+import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
+import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
-import Checkbox from '../Checkbox';
 import { Dispatch } from '../../store';
-import Label from '../Label';
 import {
-  ignoreFirstPartForStylesSelector, storeTokenIdInJsonEditorSelector, prefixStylesWithThemeNameSelector, uiStateSelector,
+  ignoreFirstPartForStylesSelector,
+  storeTokenIdInJsonEditorSelector,
+  prefixStylesWithThemeNameSelector,
+  uiStateSelector,
 } from '@/selectors';
-import Stack from '../Stack';
-import Box from '../Box';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
 import OnboardingExplainer from '../OnboardingExplainer';
 import RemConfiguration from '../RemConfiguration';
 import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
-import Text from '../Text';
-import Link from '../Link';
-import { useDebug } from '@/app/store/useDebug';
 import { useFlags } from '../LaunchDarkly';
+import { ExplainerModal } from '../ExplainerModal';
 
 function Settings() {
   const { t } = useTranslation(['settings']);
@@ -35,7 +36,6 @@ function Settings() {
     url: 'https://docs.tokens.studio/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
-  const { removeRelaunchData } = useDebug();
   const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
@@ -118,10 +118,6 @@ function Settings() {
     dispatch.uiState.setLastOpened(0);
   }, [dispatch]);
 
-  const handleRemoveRelaunchData = React.useCallback(() => {
-    removeRelaunchData();
-  }, [removeRelaunchData]);
-
   return (
     <Box className="content scroll-container">
       <Stack direction="column" gap={4} css={{ padding: '$3 0' }}>
@@ -134,113 +130,139 @@ function Settings() {
         )}
         <SyncSettings />
         <Divider />
-        <Stack direction="column" align="start" gap={3} css={{ padding: '0 $4' }}>
+        <Stack direction="column" align="start" gap={4} css={{ padding: '0 $4' }}>
           <Heading size="medium">{t('settings')}</Heading>
-          <Stack direction="row" gap={3} align="start">
-            <Checkbox
-              id="ignoreFirstPartForStyles"
-              checked={!!ignoreFirstPartForStyles}
-              defaultChecked={ignoreFirstPartForStyles}
-              onCheckedChange={handleIgnoreChange}
-            />
-            <Label htmlFor="ignoreFirstPartForStyles">
-              <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$sansBold' }}>{t('ignorePrefix')}</Box>
-                <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-                  {t('usefulIgnore')}
-                  {' '}
-                  <code>colors</code>
-                  {' '}
-                  {t('inAToken')}
-                  {' '}
-                  <code>colors.blue.500</code>
-                  {' '}
-                  {t('forYourStyles')}
-                </Box>
-              </Stack>
-            </Label>
+          <Stack
+            direction="column"
+            css={{
+              border: '1px solid $borderSubtle',
+              borderRadius: '$medium',
+              padding: '$4',
+              width: '100%',
+            }}
+          >
+            <LanguageSelector />
           </Stack>
-          <Stack direction="row" gap={3} align="start">
-            <Checkbox
-              id="prefixStylesWithThemeName"
-              checked={!!prefixStylesWithThemeName}
-              defaultChecked={prefixStylesWithThemeName}
-              onCheckedChange={handlePrefixWithThemeNameChange}
-            />
-
-            <Label htmlFor="prefixStylesWithThemeName">
-              <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$sansBold' }}>{t('prefixStyles')}</Box>
-                <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('prefixStylesExplanation')}</Box>
+          <Stack
+            direction="column"
+            gap={4}
+            css={{
+              border: '1px solid $borderSubtle',
+              borderRadius: '$medium',
+              padding: '$4',
+              width: '100%',
+            }}
+          >
+            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
+              <Stack direction="column">
+                <Stack direction="row" gap={1} align="center">
+                  <Label htmlFor="ignoreFirstPartForStyles">{t('ignorePrefix')}</Label>
+                  <ExplainerModal title={t('ignorePrefix')}>
+                    <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
+                    <Box>{t('usefulIgnore')}</Box>
+                  </ExplainerModal>
+                </Stack>
               </Stack>
-            </Label>
-          </Stack>
-          {idStorage
-          && (
-          <Stack direction="row" gap={3} align="start">
-            <Checkbox
-              id="storeTokenIdInJsonEditor"
-              checked={!!storeTokenIdInJsonEditor}
-              defaultChecked={storeTokenIdInJsonEditor}
-              onCheckedChange={handleStoreTokenIdInJsonEditorChange}
-            />
-
-            <Label htmlFor="storeTokenIdInJsonEditor">
-              <Stack direction="column" gap={2}>
-                <Box css={{ fontWeight: '$sansBold' }}>{t('storeTokenId')}</Box>
-                <Box css={{ color: '$textMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>{t('storeTokenIdExplanation')}</Box>
+              <Switch
+                data-testid="ignoreFirstPartForStyles"
+                id="ignoreFirstPartForStyles"
+                checked={!!ignoreFirstPartForStyles}
+                defaultChecked={ignoreFirstPartForStyles}
+                onCheckedChange={handleIgnoreChange}
+              />
+            </Stack>
+            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
+              <Stack direction="column">
+                <Stack direction="row" gap={1} align="center">
+                  <Label htmlFor="prefixStylesWithThemeName">{t('prefixStyles')}</Label>
+                  <ExplainerModal title={t('prefixStyles')}>
+                    <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
+                    <Box>{t('prefixStylesExplanation')}</Box>
+                  </ExplainerModal>
+                </Stack>
               </Stack>
-            </Label>
+              <Switch
+                data-testid="prefixStylesWithThemeName"
+                id="prefixStylesWithThemeName"
+                checked={!!prefixStylesWithThemeName}
+                defaultChecked={prefixStylesWithThemeName}
+                onCheckedChange={handlePrefixWithThemeNameChange}
+              />
+            </Stack>
+            {idStorage && (
+              <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
+                <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
+                <Switch
+                  id="storeTokenIdInJsonEditor"
+                  checked={!!storeTokenIdInJsonEditor}
+                  defaultChecked={storeTokenIdInJsonEditor}
+                  onCheckedChange={handleStoreTokenIdInJsonEditorChange}
+                />
+              </Stack>
+            )}
+            <RemConfiguration />
           </Stack>
-          )}
-          <Box>
-
-            <Heading size="small">{t('baseFont')}</Heading>
-            <Box css={{ color: '$fgMuted', fontSize: '$xsmall', lineHeight: 1.5 }}>
-              {t('baseFontExplanation')}
-            </Box>
-
-          </Box>
-          <RemConfiguration />
-          <LanguageSelector />
+          <Stack
+            direction="column"
+            gap={4}
+            css={{
+              border: '1px solid $borderSubtle',
+              borderRadius: '$medium',
+              padding: '$4',
+              width: '100%',
+            }}
+          >
+            <Stack direction="row" justify="between" gap={2} align="center" css={{ width: '100%' }}>
+              <Stack direction="column">
+                <Stack direction="row" align="center" gap={1}>
+                  <Label htmlFor="enableDebugging">{t('enableSessionRecording')}</Label>
+                  <ExplainerModal title={t('enableSessionRecording')}>
+                    <Box css={{
+                      color: '$fgMuted',
+                      fontSize: '$xsmall',
+                    }}
+                    >
+                      {t('sessionRecordingDescription')}
+                      {' '}
+                      {t('dataCollectedIsAnonymised')}
+                      {' '}
+                      {t('forMoreInformationPleaseSeeOur')}
+                      {' '}
+                      <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
+                    </Box>
+                  </ExplainerModal>
+                  <Box
+                    css={{
+                      color: '$fgMuted',
+                      fontSize: '$xsmall',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {debugSession && (
+                    <Text>
+                      {t('yourCurrentSessionIdIs')}
+                      {' '}
+                      <b>{debugSession}</b>
+                    </Text>
+                    )}
+                  </Box>
+                </Stack>
+              </Stack>
+              <Switch
+                id="enableDebugging"
+                checked={!!debugMode}
+                defaultChecked={debugMode}
+                onCheckedChange={toggleDebugMode}
+              />
+            </Stack>
+            <Stack direction="row" justify="between" gap={2} align="center" css={{ width: '100%' }}>
+              <Label>{t('resetOnboarding')}</Label>
+              <Button variant="secondary" data-testid="reset-onboarding" onClick={handleResetButton}>
+                {t('resetOnboarding')}
+              </Button>
+            </Stack>
+          </Stack>
         </Stack>
-        <Divider />
-        <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
-          <Box>
-            <Heading size="medium">{t('debugging')}</Heading>
-            <Text muted css={{ fontSize: '$xsmall', lineHeight: 1.5 }}>
-              {t('sessionRecordingDescription')}
-              {' '}
-              {t('dataCollectedIsAnonymised')}
-              {' '}
-              {t('forMoreInformationPleaseSeeOur')}
-              {' '}
-              <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
-            </Text>
-          </Box>
-          <Stack direction="row" gap={2} align="center">
-            <Checkbox
-              id="enableDebugging"
-              checked={!!debugMode}
-              defaultChecked={debugMode}
-              onCheckedChange={toggleDebugMode}
-            />
-            <Label htmlFor="enableDebugging">
-              {t('enableSessionRecording')}
-            </Label>
-          </Stack>
-          {debugSession && (
-          <Text>
-            {t('yourCurrentSessionIdIs')}
-            {' '}
-            <b>{debugSession}</b>
-          </Text>
-          )}
-        </Stack>
-      </Stack>
-      <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-        <Button variant="secondary" size="small" data-testid="reset-onboarding" onClick={handleResetButton}>{t('resetOnboarding')}</Button>
-        <Button variant="secondary" size="small" data-testid="reset-relaunch-data" onClick={handleRemoveRelaunchData}>{t('removeRelaunchData.button')}</Button>
       </Stack>
     </Box>
   );

@@ -52,7 +52,7 @@ export default function ChangeStateListingHeading({
   const { t } = useTranslation(['tokens']);
 
   return (
-    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative', marginLeft: '$2' }}>
+    <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>
       <StyledChangedStateGroupHeadingButton
         isCollapsed={isCollapsed}
         type="button"

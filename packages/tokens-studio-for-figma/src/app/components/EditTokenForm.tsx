@@ -86,7 +86,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && internalEditToken.name && !error;
+    return internalEditToken?.value && internalEditToken.name && !Boolean(error);
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -112,6 +112,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
+  const hasCurlyBraces = React.useMemo(() => {
+    if (internalEditToken?.name) {
+      return internalEditToken.name.includes('{') || internalEditToken.name.includes('}');
+    }
+    return false;
+  }, [internalEditToken]);
+
+  const hasDollarForFirstCharacter = React.useMemo(() => {
+    if (internalEditToken?.name) {
+      return internalEditToken.name.startsWith('$');
+    }
+    return false;
+  }, [internalEditToken]);
+
   const hasPriorTokenName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
@@ -132,6 +146,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError(t('tokensCantShareNameWithGroup', { ns: 'errors' }));
+    }
+    if ((internalEditToken?.status || nameWasChanged) && hasDollarForFirstCharacter) {
+      setError(t('tokenNamesCantStartWithDollar', { ns: 'errors' }));
+    }
+    if ((internalEditToken?.status || nameWasChanged) && hasCurlyBraces) {
+      setError(t('tokenNamesCantContainCurlyBraces', { ns: 'errors' }));
     }
   }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
@@ -592,7 +612,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
           placeholder={t('optionalDescription')}
           onChange={handleDescriptionChange}
           rows={3}
-          border
         />
       </Box>
       {
@@ -607,7 +626,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         <Button variant="secondary" type="button" onClick={handleReset}>
           {t('cancel')}
         </Button>
-        <Button disabled={!isValid} variant="primary" type="button" onClick={handleSubmitButton}>
+        <Button disabled={!isValid || !!error} variant="primary" type="button" onClick={handleSubmitButton}>
           {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
           {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
           {(

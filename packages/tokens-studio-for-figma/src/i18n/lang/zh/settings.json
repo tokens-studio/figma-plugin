@@ -11,15 +11,6 @@
   "inAToken": "在一个 Token 中",
   "forYourStyles": "适合您的风格",
   "resetOnboarding": "重置新手引导",
-  "removeRelaunchData": {
-    "button": "删除废弃数据",
-    "title": "删除废弃数据？",
-    "confirm": "确认",
-    "description": "这将删除右侧属性面板中的废弃数据。这不会影响您的令牌、样式或主题。",
-    "selection": "选择",
-    "page": "页面",
-    "document": "文档"
-  },
   "issueSavingCredentials": "保存您的凭据时出现问题。请再试一次。",
   "sessionRecordingDescription": "会话记录是 Tokens Studio 的一项新功能，用于在出现错误时跟踪用户会话，以便我们更好地了解问题并修复它。如果您没有遇到错误或关闭调试，则不会将任何数据发送到我们的遥测服务器。",
   "dataCollectedIsAnonymised": "收集的任何数据都是匿名的，不会与任何第三方共享，并且纯粹用于解决错误和优化性能。",
@@ -43,5 +34,6 @@
   "secondScreenExplainer": "增强您的设计工作流程，让您可以在第二个屏幕中管理您的 Token。",
   "language": "语言",
   "languageExplainer": "Tokens Studio 已经过 Mr. Biscuit 手动翻译，因此翻译较为准确。\n 没有看到您的语言？提交功能请求",
-  "liveSyncActive": "实时同步激活"
+  "liveSyncActive": "实时同步激活",
+  "chooseANewToken": "输入新值或选择令牌"
 }
