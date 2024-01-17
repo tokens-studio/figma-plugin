@@ -458,7 +458,7 @@ describe('ImportedTokensDialog', () => {
     );
 
     await act(async () => {
-      const closeButton = result.queryByText('cancel') as HTMLButtonElement;
+      const closeButton = result.queryByTestId('button-import-close') as HTMLButtonElement;
       closeButton.click();
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
