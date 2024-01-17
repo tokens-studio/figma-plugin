@@ -172,7 +172,7 @@ export default function ImportedTokensDialog() {
 
   return (
     <Modal
-      title={t('imported', { ns: 'tokens' })}
+      title={t('importStyles')}
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
