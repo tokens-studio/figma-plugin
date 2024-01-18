@@ -1,0 +1,29 @@
+{
+  "default": {
+    "value": "#2B70E8",
+    "type": "color",
+    "resolvedValueWithReferences": "color.neutral.50"
+  },
+  "gray": {
+    "value": "#2B70E8",
+    "type": "color",
+    "resolvedValueWithReferences": "default"
+  },
+  "background": {
+    "value": "#E6EFFF",
+    "type": "color",
+    "resolvedValueWithReferences": "color.neutral.10"
+  },
+  "color": {
+    "neutral": {
+      "10": {
+        "value": "#E6EFFF",
+        "type": "color"
+      },
+      "50": {
+        "value": "#2B70E8",
+        "type": "color"
+      }
+    }
+  }
+}

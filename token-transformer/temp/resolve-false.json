@@ -1,0 +1,117 @@
+{
+  "shadows": {
+    "multiple": {
+      "value": [
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "single": {
+      "value": {
+        "color": "{colors.gray.900}",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    },
+    "reference-multiple": {
+      "value": [
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow",
+      "resolvedValueWithReferences": "shadows.multiple"
+    },
+    "reference-single": {
+      "value": {
+        "color": "#1B1F24",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow",
+      "resolvedValueWithReferences": "shadows.single"
+    }
+  },
+  "theme": {
+    "background": {
+      "value": "{colors.gray.900}",
+      "description": "Alias value",
+      "type": "color",
+      "resolvedValueWithReferences": "colors.gray.900"
+    },
+    "backgroundSubtle": {
+      "value": "rgba({colors.gray.900}, 0.5)",
+      "description": "Nested color value",
+      "type": "color",
+      "resolvedValueWithReferences": "colors.gray.900"
+    },
+    "backgroundDark": {
+      "value": "{colors.gray.500}",
+      "description": "Darkened color value",
+      "type": "color",
+      "$extensions": {
+        "modify": {
+          "type": "darken",
+          "amount": 0.5,
+          "space": "hsl"
+        }
+      },
+      "resolvedValueWithReferences": "colors.gray.500"
+    },
+    "size": {
+      "default": {
+        "value": "{sizing.base}",
+        "description": "Sizing value",
+        "type": "sizing",
+        "resolvedValueWithReferences": "sizing.base"
+      }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "type": "composition",
+          "value": {
+            "borderRadius": "{sizing.base}",
+            "fill": "{theme.backgroundSubtle}",
+            "border": "{theme.background}"
+          }
+        }
+      }
+    }
+  }
+}

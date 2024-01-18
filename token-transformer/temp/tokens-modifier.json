@@ -1,0 +1,34 @@
+{
+  "color": {
+    "button": {
+      "primary": {
+        "press": {
+          "bg-color": {
+            "value": "#007182",
+            "type": "color",
+            "rawValue": "#00a2ba"
+          }
+        }
+      }
+    }
+  },
+  "core": {
+    "color": {
+      "neutral": {
+        "white": {
+          "value": "#ffffff",
+          "type": "color",
+          "rawValue": "#ffffff"
+        }
+      },
+      "transparent": {
+        "white-10": {
+          "value": "#ffffff1a",
+          "type": "color",
+          "resolvedValueWithReferences": "core.color.neutral.white",
+          "rawValue": "rgba($core.color.neutral.white, 0.1)"
+        }
+      }
+    }
+  }
+}

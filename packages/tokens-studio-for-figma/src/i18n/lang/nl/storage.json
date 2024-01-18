@@ -1,0 +1,73 @@
+{
+  "setToDocumentStorage": "Instellen op documentopslag?",
+  "youCanAlwaysGoBack": "U kunt altijd teruggaan naar externe opslag.",
+  "addNewSyncProvider": "Nieuwe synchronisatieprovider toevoegen",
+  "editCredentials": "Bewerk de inloggegevens van de synchronisatieprovider",
+  "name": "Naam",
+  "pat": "Persoonlijk toegangstoken",
+  "gitExplained": "Lees uw tokens die in uw repository zijn opgeslagen, dichtbij uw code.",
+  "readMore": "Lees verder",
+  "cancel": "Annuleren",
+  "repo": "Repository (eigenaar/repository)",
+  "branch": "Tak",
+  "baseUrl": "Basis-URL (optioneel)",
+  "secret": "Geheim",
+  "filePath": "Bestandspad",
+  "filePathCaption": "src/tokens voor synchronisatie met een map, voeg aan het einde .json toe om met één bestand te synchroniseren",
+  "syncProviders": "Synchronisatieproviders",
+  "providers": {
+    "generic": {
+      "title": "Generieke versie",
+      "url": "URL",
+      "description": "Toegangstokens opgeslagen op uw eigen opslagprovider, waardoor tweerichtingssynchronisatie, creatie en alleen-lezen-bewerkingen mogelijk zijn.",
+      "flowType": "Stroomtype",
+      "readOnly": "Alleen lezen",
+      "readWrite": "Lezen schrijven",
+      "readWriteCreate": "Lezen / schrijven / creëren",
+      "additionalHeaders": "Extra kopteksten",
+      "name": "Naam",
+      "value": "Waarde"
+    },
+    "url": {
+      "title": "URL",
+      "description": "Met tokens die op een server zijn opgeslagen, kunt u ze toevoegen als een alleen-lezen provider.",
+      "url": "URL",
+      "headers": "Kopteksten"
+    },
+    "jsonbin": {
+      "title": "JSONBIN",
+      "description": "Toegangstokens opgeslagen op JSONBin.io, een gratis JSON-opslagservice voor tweerichtingssynchronisatie."
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Supernova-toegangstoken",
+      "dsUrl": "Ontwerpsysteem-URL",
+      "description": "Hiermee kunt u tokens naar een specifiek merk en thema in een geselecteerd ontwerpsysteem pushen."
+    },
+    "ado": {
+      "description": "Krijg toegang tot tokens die zijn opgeslagen in uw repository, push- en pull-tokens in tweerichtingssynchronisatie.",
+      "pat": "Persoonlijk toegangstoken",
+      "orgUrl": "Organisatie-URL",
+      "repositoryName": "Naam van opslagplaats",
+      "projectName": "Projectnaam (optioneel)"
+    },
+    "bitbucket": {
+      "appPassword": "App-wachtwoord",
+      "projectName": "Projectnaam (optioneel)",
+      "repository": "Repository (werkruimte/repository)"
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",
+  "localDocument": "Lokaal document",
+  "apply": "Toepassen",
+  "confirmDelete": "Wil je dit echt verwijderen?",
+  "active": "Actief",
+  "edit": "Bewerking",
+  "delete": "Verwijderen",
+  "save": "Redden"
+}
