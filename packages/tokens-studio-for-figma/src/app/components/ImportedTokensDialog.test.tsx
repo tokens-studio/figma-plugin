@@ -463,6 +463,6 @@ describe('ImportedTokensDialog', () => {
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
-    expect(result.queryByText('importStyles')).not.toBeInTheDocument();
+    expect(result.queryByText('Import')).not.toBeInTheDocument();
   });
 });
