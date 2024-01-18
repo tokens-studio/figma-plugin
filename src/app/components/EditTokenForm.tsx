@@ -133,7 +133,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
       setError(t('tokensCantShareNameWithGroup', { ns: 'errors' }));
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName, selectedTokenSets]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
 
   const handleChange = React.useCallback(
     (property: string, value: string) => {
