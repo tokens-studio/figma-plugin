@@ -5,6 +5,7 @@ import type { TokenTypes } from '@/constants/TokenTypes';
 import type { NodeInfo } from './NodeInfo';
 import type { NodeTokenRefMap } from './NodeTokenRefMap';
 import type { PullStyleOptions } from './PullStylesOptions';
+import type { PullVariablesOptions } from './PullVariablesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
@@ -41,6 +42,7 @@ export enum AsyncMessageTypes {
   GOTO_NODE = 'async/goto-node',
   SELECT_NODES = 'async/select-nodes',
   PULL_STYLES = 'async/pull-styles',
+  PULL_VARIABLES = 'async/pull-variables',
   NOTIFY = 'async/notify',
   CANCEL_OPERATION = 'async/cancel-operation',
   RESIZE_WINDOW = 'async/resize-window',
@@ -134,6 +136,9 @@ export type SelectNodesMessageAsyncResult = AsyncMessage<AsyncMessageTypes.SELEC
 
 export type PullStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_STYLES, { styleTypes: PullStyleOptions; }>;
 export type PullStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PULL_STYLES>;
+
+export type PullVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES, { options: PullVariablesOptions; }>;
+export type PullVariablesMessageResult = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES>;
 
 export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
   msg: string;
@@ -349,6 +354,7 @@ export type AsyncMessages =
   | GotoNodeAsyncMessage
   | SelectNodesAsyncMessage
   | PullStylesAsyncMessage
+  | PullVariablesAsyncMessage
   | NotifyAsyncMessage
   | ResizeWindowAsyncMessage
   | CancelOperationAsyncMessage
@@ -393,6 +399,7 @@ export type AsyncMessageResults =
   | GotoNodeMessageAsyncResult
   | SelectNodesMessageAsyncResult
   | PullStylesAsyncMessageResult
+  | PullVariablesMessageResult
   | NotifyAsyncMessageResult
   | ResizeWindowAsyncMessageResult
   | CancelOperationAsyncMessage

@@ -42,6 +42,6 @@ describe('convertModifiedColorToHex', () => {
       value: '0.3',
       color: '#334455',
     } as ColorModifier;
-    expect(convertModifiedColorToHex(baseColor, lightenModifier)).toEqual('#c5393e');
+    expect(convertModifiedColorToHex(baseColor, lightenModifier)).toEqual('#c2143d');
   });
 });

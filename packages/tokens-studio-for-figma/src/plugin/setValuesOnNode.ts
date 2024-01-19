@@ -29,6 +29,7 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 import { VariableReferenceMap } from '@/types/VariableReferenceMap';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
+import { rotateNode } from './rotateNode';
 
 // @README values typing is wrong
 
@@ -325,6 +326,24 @@ export default async function setValuesOnNode(
           if (!(await tryApplyVariableId(node, 'maxHeight', data.maxHeight, figmaVariableReferences))) {
             node.maxHeight = transformValue(String(values.maxHeight), 'sizing', baseFontSize);
           }
+        }
+      }
+
+      // ROTATION
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && typeof values.rotation !== 'undefined' && !isPartOfInstance(node.id) && isPrimitiveValue(values.rotation)) {
+        const rotation = transformValue(String(values.rotation), 'rotation', baseFontSize);
+        rotateNode(node, rotation);
+      }
+
+      // X & Y Position
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && !isPartOfInstance(node.id)) {
+        if (typeof values.x !== 'undefined' && isPrimitiveValue(values.x)) {
+          const x = transformValue(String(values.x), 'dimension', baseFontSize);
+          node.x = x;
+        }
+        if (typeof values.y !== 'undefined' && isPrimitiveValue(values.y)) {
+          const y = transformValue(String(values.y), 'dimension', baseFontSize);
+          node.y = y;
         }
       }
 

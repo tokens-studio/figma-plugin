@@ -1,5 +1,25 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.8
+
+### Patch Changes
+
+- 70313100: Fixes an issue with the Mix color modifier ignoring colorspace options
+- e2e85625: Allow numbers and dimensions to be used in x and y node properties
+- 1424c9f8: Fix the renaming tokens in the other type breaks references
+- c306ddf2: Feat/import variables
+- 4f54a33d: Fixed an issue where stroke styles on node where not shown in Inspect.
+
+## 1.38.7
+
+### Patch Changes
+
+- 3c9c1944: Inspect now also properly shows stroke variables that were applied
+- 55c8c224: Add rotation property to number & dimension tokens
+- b3b02db5: Fixes an issue that caused the plugin to not remove tokens when multiple layers were selected and you tried to remove tokens.
+- d44d993b: Fix un-usual remapping renaming behaviour
+- 30bf0e6b: Add horizontalPadding and verticalPadding as options for Spacing
+
 ## 1.38.6
 
 ### Patch Changes

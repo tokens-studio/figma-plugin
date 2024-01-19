@@ -3,6 +3,7 @@ import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
+import { deepmerge } from 'deepmerge-ts';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -25,6 +26,8 @@ import {
   DuplicateTokenPayload,
   DeleteTokenGroupPayload,
   StyleToCreateToken,
+  VariableToCreateToken,
+  SetTokensFromVariablesPayload,
 } from '@/types/payloads';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { RootModel } from '@/types/RootModel';
@@ -40,6 +43,7 @@ import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcro
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
+import { ColorModifier } from '@/types/Modifier';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -209,8 +213,39 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       tokens: addIdPropertyToTokens(newTokens),
     }),
+    importMultipleTokens: (state, data: UpdateTokenPayload[]) => {
+      const { activeTokenSet } = state;
+      const existingTokens = { ...state.tokens };
+      const importTokens: Record<string, AnyTokenList> = { };
+      data.forEach((token) => {
+        let { parent } = token;
+
+        if (!parent) {
+          parent = activeTokenSet;
+        }
+
+        // Check if the token already exists in the respective parent token set
+        const existingToken = existingTokens[parent] && existingTokens[parent].find((existingToken) => existingToken.name === token.name);
+        if (existingToken) {
+          existingTokens[parent][existingTokens[parent].indexOf(existingToken)] = token;
+        } else {
+          // Check if there is a parent for the token
+          if (!importTokens[parent]) {
+            importTokens[parent] = [];
+          }
+          importTokens[parent].push(token);
+        }
+      });
+
+      const merged = deepmerge(existingTokens, importTokens);
+      return {
+        ...state,
+        tokens: merged,
+      };
+    },
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
+
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
@@ -275,6 +310,7 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+
     // Imports received styles as tokens, if needed
     setTokensFromStyles: (state, receivedStyles: SetTokensFromStylesPayload): TokenState => {
       const newTokens: StyleToCreateToken[] = [];
@@ -284,6 +320,7 @@ export const tokenState = createModel<RootModel>()({
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
           const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
+
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               if (
@@ -308,6 +345,43 @@ export const tokenState = createModel<RootModel>()({
         });
       });
 
+      return {
+        ...state,
+        importedTokens: {
+          newTokens,
+          updatedTokens,
+        },
+      } as TokenState;
+    },
+    // Imports received variables as tokens, if needed
+    setTokensFromVariables: (state, receivedVariables: SetTokensFromVariablesPayload): TokenState => {
+      const newTokens: VariableToCreateToken[] = [];
+      const existingTokens: VariableToCreateToken[] = [];
+      const updatedTokens: VariableToCreateToken[] = [];
+
+      // Iterate over received styles and check if they existed before or need updating
+      Object.values(receivedVariables).forEach((values) => {
+        values.forEach((token) => {
+          // If a set exists for the token
+          if (state.tokens[token.parent]) {
+            const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
+            // If the token already exists
+            if (oldValue) {
+              if (isEqual(oldValue.value, token.value) && isEqual(oldValue.description, token.description)) {
+                existingTokens.push(token);
+              } else {
+                const updatedToken = { ...token };
+                updatedToken.oldValue = oldValue.value;
+                updatedTokens.push(updatedToken);
+              }
+            } else {
+              newTokens.push(token);
+            }
+          } else {
+            newTokens.push(token);
+          }
+        });
+      });
       return {
         ...state,
         importedTokens: {
@@ -433,10 +507,68 @@ export const tokenState = createModel<RootModel>()({
               } as SingleToken;
             }
 
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens']?.modify && token.$extensions?.['studio.tokens'].modify.value) {
+              const updatedModify = Object.entries(token.$extensions?.['studio.tokens'].modify).reduce<ColorModifier>((modify, [key, value]: string[]) => {
+                modify = {
+                  ...modify,
+                  [key]: value.replace(data.oldName, data.newName),
+                };
+                return modify;
+              }, {} as ColorModifier);
+
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...updatedModify,
+                    },
+                  },
+                },
+              } as SingleToken;
+            }
+
             return {
               ...token,
               value: replaceReferences(token.value.toString(), data.oldName, data.newName),
             } as SingleToken;
+          });
+
+          acc[key] = newValues;
+          return acc;
+        },
+        {},
+      );
+
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
+    updateOtherAliases: (state, data: string[]) => {
+      const [oldName, newName] = data;
+      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
+        (acc, [key, values]) => {
+          const newValues = values.map<SingleToken>((token) => {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...token.$extensions['studio.tokens'].modify,
+                      value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
+                    },
+                  },
+                },
+              } as SingleToken;
+            }
+
+            return token;
           });
 
           acc[key] = newValues;
@@ -529,6 +661,9 @@ export const tokenState = createModel<RootModel>()({
       if (payload.shouldUpdate && rootState.settings.updateMode !== 'document') {
         dispatch.tokenState.updateDocument({ shouldUpdateNodes: rootState.settings.updateOnChange });
       }
+    },
+    importMultipleTokens() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     deleteToken() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });

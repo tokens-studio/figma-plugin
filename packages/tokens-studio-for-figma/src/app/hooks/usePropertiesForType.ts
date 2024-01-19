@@ -215,7 +215,16 @@ export function usePropertiesForTokenType(type: TokenTypes, value?: SingleToken[
             label: 'Background blur',
             name: Properties.backgroundBlur,
           },
+          { label: 'x', name: Properties.x },
+          { label: 'y', name: Properties.y },
         );
+
+        if (type === TokenTypes.NUMBER) {
+          properties.push({
+            label: 'Rotation',
+            name: Properties.rotation,
+          });
+        }
         break;
       case TokenTypes.BOOLEAN:
         properties.push(

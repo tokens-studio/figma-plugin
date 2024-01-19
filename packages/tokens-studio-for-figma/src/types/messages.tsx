@@ -4,13 +4,14 @@ import type { SelectionValue } from './SelectionValue';
 import type { TokenStore } from './tokens';
 import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageTypeCredentials } from './StorageType';
-import { StyleToCreateToken } from './payloads';
+import { StyleToCreateToken, VariableToCreateToken } from './payloads';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
   NO_SELECTION = 'noselection',
   STYLES = 'styles',
+  VARIABLES = 'variables',
   API_PROVIDERS = 'apiProviders',
   UI_SETTINGS = 'uiSettings',
   SHOW_EMPTY_GROUPS = 'show_empty_groups',
@@ -68,6 +69,12 @@ export type StylesFromPluginMessage = {
   type: MessageFromPluginTypes.STYLES;
   values?: Record<string, StyleToCreateToken[]>;
 };
+
+export type VariablesFromPluginMessage = {
+  type: MessageFromPluginTypes.VARIABLES;
+  values?: Record<string, VariableToCreateToken[]>;
+};
+
 export type StartJobFromPluginMessage = {
   type: MessageFromPluginTypes.START_JOB;
   job: BackgroundJob;
@@ -116,12 +123,12 @@ export type PostToUIMessage =
   | ShowEmptyGroupsFromPluginMessage
   | ApiProvidersFromPluginMessage
   | StylesFromPluginMessage
+  | VariablesFromPluginMessage
   | StartJobFromPluginMessage
   | CompleteJobFromPluginMessage
   | ClearJobsFromPluginMessage
   | AddJobTasksFromPluginMessage
   | CompleteJobTasksFromPluginMessage
-  | SetTokensFromPluginMessage
   | SetTokensFromPluginMessage
   | NotifyExceptionFromPluginMessage
   | TrackFromPluginMessage;

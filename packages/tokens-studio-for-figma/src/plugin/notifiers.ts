@@ -9,7 +9,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials } from '@/types/StorageType';
-import { StyleToCreateToken } from '@/types/payloads';
+import { StyleToCreateToken, VariableToCreateToken } from '@/types/payloads';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
@@ -128,6 +128,10 @@ export function notifyAPIProviders(providers: StorageTypeCredentials[]) {
 
 export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) {
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
+}
+
+export function notifyVariableValues(values: Record<string, VariableToCreateToken[]>) {
+  postToUI({ type: MessageFromPluginTypes.VARIABLES, values });
 }
 
 export function notifySetTokens(values: TokenStore) {
