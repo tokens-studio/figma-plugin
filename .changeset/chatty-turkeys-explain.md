@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": patch
 ---
 
-Fix to duplicate token to other token sets with same name.
+Fixes an issue where duplicating a token to another set incorrectly displayed an error message about token names needing to be unique.
