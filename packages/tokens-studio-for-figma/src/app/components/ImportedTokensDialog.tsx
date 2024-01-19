@@ -237,7 +237,7 @@ export default function ImportedTokensDialog() {
         )}
         {updatedTokens.length > 0 && (
           <Accordion
-            label={t('updatedTokens', { ns: 'tokens' })}
+            label={t('existingTokens', { ns: 'tokens' })}
             isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
