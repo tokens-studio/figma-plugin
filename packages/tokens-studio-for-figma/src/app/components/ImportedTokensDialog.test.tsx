@@ -90,7 +90,7 @@ describe('ImportedTokensDialog', () => {
     );
 
     waitFor(async () => {
-      expect(result.queryByText('Import')).toBeInTheDocument();
+      expect(result.queryByText('import')).toBeInTheDocument();
       expect(result.queryByText('newTokens')).toBeInTheDocument();
       expect(result.queryByText('createAll')).toBeInTheDocument();
       expect(result.queryByText('existingTokens')).toBeInTheDocument();
@@ -463,6 +463,6 @@ describe('ImportedTokensDialog', () => {
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
-    expect(result.queryByText('importStyles')).not.toBeInTheDocument();
+    expect(result.queryByText('import')).not.toBeInTheDocument();
   });
 });

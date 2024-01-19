@@ -172,7 +172,7 @@ export default function ImportedTokensDialog() {
 
   return (
     <Modal
-      title={t('importStyles')}
+      title={t('import', { ns: 'tokens' })}
       large
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
@@ -192,7 +192,7 @@ export default function ImportedTokensDialog() {
       <Stack direction="column" gap={6}>
         {newTokens.length > 0 && (
           <Accordion
-            label="New Tokens"
+            label={t('newTokens', { ns: 'tokens' })}
             isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
@@ -237,7 +237,7 @@ export default function ImportedTokensDialog() {
         )}
         {updatedTokens.length > 0 && (
           <Accordion
-            label="Updated Tokens"
+            label={t('existingTokens', { ns: 'tokens' })}
             isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">

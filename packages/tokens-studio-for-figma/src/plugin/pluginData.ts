@@ -66,6 +66,7 @@ export function transformPluginDataToSelectionValues(pluginData: NodeManagerNode
     });
     return acc;
   }, []);
+
   return selectionValues;
 }
 
