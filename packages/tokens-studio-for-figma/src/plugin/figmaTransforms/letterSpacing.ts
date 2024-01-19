@@ -9,7 +9,7 @@ export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: st
       unit: 'PERCENT',
       value: Number(value.slice(0, -1)),
     };
-  } else if (value.match(numbers) || value.endsWith('px')) {
+  } else if (value.match(numbers) || value.endsWith('px') || value.endsWith('rem')) {
     letterSpacing = {
       unit: 'PIXELS',
       value: convertTypographyNumberToFigma(value, baseFontSize),
