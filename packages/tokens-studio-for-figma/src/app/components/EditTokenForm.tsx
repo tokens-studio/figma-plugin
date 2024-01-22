@@ -126,6 +126,21 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return false;
   }, [internalEditToken]);
 
+  const hasPriorTokenName = React.useMemo(
+    () => {
+      const tokensWithSameParent = resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet);
+      if (internalEditToken?.status === EditTokenFormStatus.CREATE) {
+        // If we are creating a new token, disallow naming it as a prefix of an existing token
+        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
+      } else if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
+        // If we are editing a token, only disallow the name if it's prefix matches another token and it is not the token we are currently editing
+        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`) && internalEditToken.initialName !== t.name);
+      }
+      return false;
+    },
+    [internalEditToken, resolvedTokens, activeTokenSet],
+  );
+
   const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken?.name, [
     internalEditToken,
   ]);
@@ -136,6 +151,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError(t('mustNotUseNameOfAnotherGroup', { ns: 'errors' }));
+    }
+    if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
+      setError(t('tokensCantShareNameWithGroup', { ns: 'errors' }));
     }
     if ((internalEditToken?.status || nameWasChanged) && hasDollarForFirstCharacter) {
       setError(t('tokenNamesCantStartWithDollar', { ns: 'errors' }));
