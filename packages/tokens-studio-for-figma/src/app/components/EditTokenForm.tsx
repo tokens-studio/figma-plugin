@@ -126,13 +126,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return false;
   }, [internalEditToken]);
 
-  const hasPriorTokenName = React.useMemo(
-    () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
-    [internalEditToken, resolvedTokens, activeTokenSet],
-  );
-
   const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken?.name, [
     internalEditToken,
   ]);
@@ -144,16 +137,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
       setError(t('mustNotUseNameOfAnotherGroup', { ns: 'errors' }));
     }
-    if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
-      setError(t('tokensCantShareNameWithGroup', { ns: 'errors' }));
-    }
     if ((internalEditToken?.status || nameWasChanged) && hasDollarForFirstCharacter) {
       setError(t('tokenNamesCantStartWithDollar', { ns: 'errors' }));
     }
     if ((internalEditToken?.status || nameWasChanged) && hasCurlyBraces) {
       setError(t('tokenNamesCantContainCurlyBraces', { ns: 'errors' }));
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasAnotherTokenThatStartsWithName]);
 
   const handleChange = React.useCallback(
     (property: string, value: string) => {
