@@ -10,7 +10,7 @@ export type ModalProps = {
   id?: string;
   title?: string;
   full?: boolean;
-  large?: boolean;
+  size?: 'large' | 'fullscreen';
   compact?: boolean;
   isOpen: boolean;
   children: React.ReactNode;
@@ -39,11 +39,34 @@ const StyledBody = styled('div', {
   },
 });
 
+const StyledDialogContent = styled(Dialog.Content, {
+  variants: {
+    size: {
+      large: {
+        width: 'calc(100vw - $7)',
+        maxWidth: 'calc(100vw -$7)',
+        padding: 0,
+        boxShadow: '$contextMenu',
+        borderColor: '$borderSubtle',
+      },
+      fullscreen: {
+        width: '100vw',
+        maxWidth: '100vw',
+        padding: 0,
+        height: '100vh',
+        maxHeight: '100vh',
+        borderRadius: 0,
+        boxShadow: 'none',
+      },
+    },
+  },
+});
+
 export function Modal({
   id,
   title,
   full,
-  large,
+  size,
   isOpen,
   close,
   children,
@@ -77,19 +100,7 @@ export function Modal({
             backgroundColor: '$modalBackdrop',
           }}
         />
-        <Dialog.Content
-          css={
-            large
-              ? {
-                width: 'calc(100vw - $7)',
-                maxWidth: 'calc(100vw - $7)',
-                padding: 0,
-                boxShadow: '$contextMenu',
-                borderColor: '$borderSubtle',
-              }
-              : { padding: 0 }
-          }
-        >
+        <StyledDialogContent size={size}>
           <Box css={{
             display: 'flex',
             flexDirection: 'column',
@@ -130,9 +141,9 @@ export function Modal({
             <StyledBody compact={compact} full={full} data-testid={id}>
               {children}
             </StyledBody>
-            {!!footer && <ModalFooter stickyFooter={stickyFooter}>{footer}</ModalFooter>}
+            {!!footer && <ModalFooter stickyFooter={stickyFooter} fullscreen={size === 'fullscreen'}>{footer}</ModalFooter>}
           </Box>
-        </Dialog.Content>
+        </StyledDialogContent>
       </Dialog.Portal>
     </Dialog>
   );

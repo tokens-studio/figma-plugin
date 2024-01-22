@@ -18,7 +18,7 @@ export default function ExportModal({ onClose }: Props) {
   }, []);
 
   return (
-    <Modal large isOpen close={onClose} title="Export tokens">
+    <Modal size="large" isOpen close={onClose} title="Export tokens">
       <Stack gap={4} direction="column">
         <Stack direction="row" gap={1}>
           <LoadProviderItem

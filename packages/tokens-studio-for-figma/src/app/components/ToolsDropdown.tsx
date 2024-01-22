@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu, Button } from '@tokens-studio/ui';
+import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
-
+import { FileZipIcon } from '@primer/octicons-react';
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
 
@@ -34,9 +34,7 @@ export default function ToolsDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <Button variant="invisible" size="small" asDropdown>
-            {t('tools')}
-          </Button>
+          <IconButton size="small" variant="invisible" icon={<FileZipIcon/>}/>
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Content side="top">

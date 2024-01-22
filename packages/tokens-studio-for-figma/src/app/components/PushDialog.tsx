@@ -118,7 +118,7 @@ function PushDialog() {
           full
           title={t('pushTo', { provider: transformProviderName(storageType.provider) })}
           showClose
-          large
+          size="large"
           isOpen
           close={onCancel}
           stickyFooter
@@ -185,7 +185,7 @@ function PushDialog() {
     }
     case 'loading': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal size="large" isOpen close={onCancel}>
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">
@@ -202,7 +202,7 @@ function PushDialog() {
     }
     case 'success': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal size="large" isOpen close={onCancel}>
           <Stack direction="column" align="center" gap={6} css={{ textAlign: 'center' }}>
             <Stack direction="column" gap={4}>
               <Heading data-testid="push-dialog-success-heading" size="medium">

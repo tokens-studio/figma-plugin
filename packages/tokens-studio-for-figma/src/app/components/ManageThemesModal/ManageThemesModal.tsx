@@ -148,7 +148,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     <Modal
       isOpen
       full
-      large
+      size="large"
       title="Themes"
       stickyFooter
       showClose
