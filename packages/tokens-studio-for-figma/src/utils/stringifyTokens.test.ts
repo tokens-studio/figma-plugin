@@ -1,4 +1,4 @@
-import { TokenFormat, setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import stringifyTokens from './stringifyTokens';
 
 describe('stringfyTokens', () => {
