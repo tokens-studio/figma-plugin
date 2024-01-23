@@ -42,6 +42,7 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case Properties.borderWidthRight:
     case Properties.borderWidthBottom:
     case Properties.borderWidthLeft:
+      return convertTypographyNumberToFigma(value, baseFontSize);
     case 'width':
     case 'height':
     case 'sizing':
