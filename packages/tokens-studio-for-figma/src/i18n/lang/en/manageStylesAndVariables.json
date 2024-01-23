@@ -2,9 +2,10 @@
 "modalTitle": "Manage Styles and Variables",
 "actions": {
   "export": "Export to Figma",
-  "options": "Options",
   "import": "Import from Figma",
-  "cancel": "Cancel"
+  "options": "Options",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
 }
 }
 
