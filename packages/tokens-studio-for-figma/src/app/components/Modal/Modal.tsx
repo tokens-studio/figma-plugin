@@ -138,7 +138,15 @@ export function Modal({
               />
             </Stack>
             )}
-            <StyledBody compact={compact} full={full} data-testid={id}>
+            <StyledBody
+              compact={compact}
+              full={full}
+              data-testid={id}
+              css={{
+                scrollPaddingBlockEnd: footer ? '$8' : 0,
+                paddingBlockEnd: footer ? '$8' : 0,
+              }}
+            >
               {children}
             </StyledBody>
             {!!footer && <ModalFooter stickyFooter={stickyFooter} fullscreen={size === 'fullscreen'}>{footer}</ModalFooter>}

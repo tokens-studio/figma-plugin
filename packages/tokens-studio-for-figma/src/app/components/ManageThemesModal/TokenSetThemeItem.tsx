@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import {
-  Button, Box, Stack, Select,
+  Button, Box, Stack, Select, ToggleGroup, Tooltip,
 } from '@tokens-studio/ui';
+import { LinkIcon, XCircleFillIcon, CheckCircleFillIcon } from '@primer/octicons-react';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -50,6 +51,16 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
     return 'disabled';
   }, [tokenSetStatus]);
 
+  const statusIcon = (status) => {
+    if (status === TokenSetStatus.ENABLED) {
+      return <CheckCircleFillIcon />;
+    }
+    if (status === TokenSetStatus.SOURCE) {
+      return <LinkIcon />;
+    }
+    return <XCircleFillIcon />;
+  };
+
   return (
     (
       <Stack direction="row" align="center" css={{ width: '100%' }}>
@@ -75,6 +86,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           justify="between"
           align="center"
           css={{ width: '100%' }}
+          gap={2}
         >
           <Button size="small" variant="invisible" onClick={handleCycleValue}>
             <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
@@ -82,16 +94,17 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
               {item.label}
             </StyledThemeLabel>
           </Button>
-          <Select value={tokenSetStatus} onValueChange={handleValueChange}>
-            <Select.Trigger value={tokenSetSatusLabels[tokenSetStatus]} data-testid={`tokensettheme-item--select-trigger--${item.key}`} />
-            <Select.Content>
-              {tokenSetStatusValues.map((status) => (
-                <Select.Item key={status} value={status} data-testid={`tokensettheme-item--select-content--${status}`}>
-                  {tokenSetSatusLabels[status]}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select>
+          <ToggleGroup type="single" value={tokenSetStatus} onValueChange={handleValueChange} defaultValue={tokenSetStatus}>
+            {tokenSetStatusValues.map((status) => (
+
+              <ToggleGroup.Item key={status} value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${status}`}>
+                <Tooltip label={status} side="top">
+                  {statusIcon(status)}
+                </Tooltip>
+              </ToggleGroup.Item>
+
+            ))}
+          </ToggleGroup>
         </Stack>
         )}
       </Stack>
