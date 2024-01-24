@@ -168,6 +168,18 @@ const tokens = [
     type: TokenTypes.BOX_SHADOW,
   },
   {
+    name: 'shadow.shadowAlias1',
+    value: '{shadow.unResolvedSingle}',
+    description: 'the one with a nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
+    name: 'shadow.shadowAlias2',
+    value: '{shadow.multiple}',
+    description: 'the one with multiple nested shadow alias',
+    type: TokenTypes.BOX_SHADOW,
+  },
+  {
     name: 'colors.modify',
     value: '#00a2ba',
     $extensions: {
@@ -241,6 +253,41 @@ const tokens = [
     value: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 
 const output = [
@@ -311,6 +358,7 @@ const output = [
     ...singleShadowToken,
     name: 'shadow.single',
     rawValue: singleShadowToken.value,
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
@@ -354,6 +402,9 @@ const output = [
     rawValue: {
       opacity: '{opacity.40}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+    },
   },
   {
     name: 'composition.multiple',
@@ -366,6 +417,10 @@ const output = [
       opacity: '{opacity.40}',
       borderRadius: '{border-radius.7}',
     },
+    resolvedValueWithReferences: {
+      opacity: '{opacity.40}',
+      borderRadius: '{border-radius.7}',
+    },
   },
   {
     name: 'composition.alias',
@@ -374,6 +429,9 @@ const output = [
       fill: '#ff0000',
     },
     rawValue: {
+      fill: '{colors.red.500}',
+    },
+    resolvedValueWithReferences: {
       fill: '{colors.red.500}',
     },
   },
@@ -390,12 +448,14 @@ const output = [
       fontSize: '2px',
     },
     rawValue: resolvedTypographyToken.value,
+    resolvedValueWithReferences: resolvedTypographyToken.value,
   },
   {
     ...unResolvedTypographyToken,
     failedToResolve: true,
     name: 'typography.unResolved',
     rawValue: unResolvedTypographyToken.value,
+    resolvedValueWithReferences: unResolvedTypographyToken.value,
     value: unResolvedTypographyToken.value,
   },
   {
@@ -403,6 +463,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedSingle',
     rawValue: unResolvedSingleShadowToken.value,
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
     value: {
       ...unResolvedSingleShadowToken.value,
     },
@@ -431,10 +492,44 @@ const output = [
     description: 'the one with a nested shadow alias',
     name: 'shadow.shadowAlias',
     rawValue: '{shadow.single}',
+    resolvedValueWithReferences: singleShadowToken.value,
     value: {
       ...singleShadowToken.value,
       color: '#ff0000',
     },
+  },
+  {
+    ...unResolvedSingleShadowToken,
+    failedToResolve: true,
+    description: 'the one with a nested shadow alias',
+    name: 'shadow.shadowAlias1',
+    rawValue: '{shadow.unResolvedSingle}',
+    resolvedValueWithReferences: unResolvedSingleShadowToken.value,
+    value: {
+      ...unResolvedSingleShadowToken.value,
+      color: '{colors.blue.500}',
+    },
+  },
+  {
+    ...multipleShadowToken,
+    description: 'the one with multiple nested shadow alias',
+    name: 'shadow.shadowAlias2',
+    rawValue: '{shadow.multiple}',
+    resolvedValueWithReferences: multipleShadowToken.value,
+    value: [
+      {
+        ...multipleShadowToken.value[0],
+        color: '#ff000080',
+      },
+      {
+        ...multipleShadowToken.value[1],
+        color: '#ff000066',
+      },
+      {
+        ...multipleShadowToken.value[2],
+        color: '#000000',
+      },
+    ],
   },
   {
     $extensions: {
@@ -485,6 +580,10 @@ const output = [
       fontFamily: 'IBM Plex Sans',
       fontWeight: 'bold',
     },
+    resolvedValueWithReferences: {
+      fontFamily: 'IBM Plex Sans',
+      fontWeight: 'bold',
+    },
     type: TokenTypes.TYPOGRAPHY,
   },
   {
@@ -523,6 +622,48 @@ const output = [
     rawValue: '{colors.{nestedprimary}.500}',
     type: TokenTypes.COLOR,
   },
+  {
+    name: 'numerictext-1',
+    value: '003e78',
+    rawValue: '003e78',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-2',
+    value: '000000',
+    rawValue: '000000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-3',
+    value: '001000',
+    rawValue: '001000',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-4',
+    value: '06e455',
+    rawValue: '06e455',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-5',
+    value: '013456',
+    rawValue: '013456',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'numerictext-6',
+    value: '000001',
+    rawValue: '000001',
+    type: TokenTypes.TEXT,
+  },
+  {
+    name: 'pure-numeric',
+    value: 0,
+    rawValue: '0',
+    type: TokenTypes.DIMENSION,
+  },
 ];
 describe('resolveTokenValues deep nested', () => {
   it('resolves all values it can resolve', () => {
@@ -555,5 +696,21 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(deepTokenOutput);
     const end = performance.now();
     expect(end - start).toBeLessThan(500); // Setting to x2 the amount it takes on a test run to cover for variations in performance
+  });
+
+  it('resolves zeros correctly', () => {
+    const resolvedTokens = defaultTokenResolver.setTokens([{
+      name: 'pure-zero',
+      value: '0',
+      type: TokenTypes.DIMENSION,
+    }]);
+    expect(resolvedTokens).toEqual([
+      {
+        name: 'pure-zero',
+        rawValue: '0',
+        value: 0,
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
   });
 });

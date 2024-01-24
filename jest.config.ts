@@ -133,6 +133,7 @@ export default {
     './tests/__mocks__/octokitRestMock.js',
     './tests/__mocks__/figmaMock.js',
     './tests/__mocks__/mixpanelMock.js',
+    './tests/__mocks__/supernovaMock.js',
     './tests/__mocks__/domRect.js',
     './tests/__mocks__/i18nMock.js',
   ],
@@ -183,7 +184,7 @@ export default {
 //     "^.+\\.js$": "babel-jest",
 // },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|dnd-core|react-dnd-html5-backend|@react-dnd)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|dnd-core|react-dnd-html5-backend|@react-dnd|react-colorful)/)', '\\.pnp\\.[^\\/]+$'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

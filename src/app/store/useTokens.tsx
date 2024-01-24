@@ -3,6 +3,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import {
   AnyTokenList,
   SingleToken,
+  TokenToRename,
 } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
@@ -10,7 +11,7 @@ import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
-import { checkIfAlias } from '@/utils/alias';
+import { checkIfAlias, getAliasValue } from '@/utils/alias';
 import {
   activeTokenSetSelector,
   storeTokenIdInJsonEditorSelector,
@@ -74,6 +75,7 @@ export default function useTokens() {
   const store = useStore<RootState>();
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
+  const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -114,7 +116,7 @@ export default function useTokens() {
       confirm({
         text: 'Are you sure?',
         description:
-            'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
+          'You are about to run a document wide update. This operation can take more than 30 minutes on very large documents.',
       }).then((result) => {
         if (result && result.result) {
           // @ts-ignore
@@ -204,7 +206,9 @@ export default function useTokens() {
     }));
   }, [settings.updateMode]);
 
-  const remapTokensInGroup = useCallback(async ({ oldGroupName, newGroupName, type }: { oldGroupName: string, newGroupName: string, type: string }) => {
+  const remapTokensInGroup = useCallback(async ({
+    oldGroupName, newGroupName, type, tokensToRename,
+  }: { oldGroupName: string, newGroupName: string, type: string, tokensToRename: TokenToRename[] }) => {
     const confirmData = await confirm({
       text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
@@ -228,13 +232,13 @@ export default function useTokens() {
     });
     if (confirmData && confirmData.result) {
       if (Array.isArray(confirmData.data) && confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
-        await handleBulkRemap(newGroupName, oldGroupName, confirmData.data[0] as UpdateMode);
+        await Promise.all(tokensToRename.map((tokenToRename) => handleBulkRemap(tokenToRename.newName, tokenToRename.oldName, confirmData.data[0])));
         lastUsedRenameOption = confirmData.data[0] as UpdateMode;
       }
       if (confirmData.data.includes('rename-variable-token-group')) {
         track('renameVariablesInTokenGroup', { newGroupName, oldGroupName });
         const tokensInParent = tokens[activeTokenSet] ?? [];
-        const tokensToRename: { oldName: string, newName: string }[] = [];
+        const tokensToRename: TokenToRename[] = [];
         tokensInParent.map((token) => {
           if (token.name.startsWith(oldGroupName) && token.type === type) {
             tokensToRename.push({
@@ -393,7 +397,34 @@ export default function useTokens() {
       tokensToSet,
       tokens: resolvedTokens,
     });
-  }, [store]);
+  }, []);
+
+  const filterMultiValueTokens = useCallback(() => {
+    const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
+        const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
+        // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
+        // in which case we collapse the value as it cannot be used as a variable
+        if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
+          // We don't want to change the actual value as this could cause unintended side effects
+          tokenItem = { ...tokenItem };
+          // @ts-ignore
+          tokenItem.value = resolvedValue;
+        }
+        if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
+          if (resolvedValue.toString().trim().includes(' ')) {
+            return acc;
+          }
+        }
+        acc.push(tokenItem);
+        return acc;
+      }, [] as AnyTokenList);
+      tempTokens[tokenSetKey] = filteredTokenList;
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+
+    return tempTokens;
+  }, [tokens]);
 
   const createVariables = useCallback(async () => {
     track('createVariables');
@@ -401,6 +432,7 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
+    const multiValueFilteredTokens = filterMultiValueTokens();
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -411,14 +443,14 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens,
+      tokens: multiValueFilteredTokens,
       settings,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: { oldName: string, newName: string }) => {
+  const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
 
     const result = await wrapTransaction({ name: 'renameVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
@@ -488,6 +520,7 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   }), [
     isAlias,
     getTokenValue,
@@ -510,5 +543,6 @@ export default function useTokens() {
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
+    filterMultiValueTokens,
   ]);
 }

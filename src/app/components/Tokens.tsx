@@ -103,7 +103,7 @@ const ParamControls: React.FC<{ tokens: Record<string, AnyTokenList>, activeToke
     return newTokensObj;
   }, [tokens, activeTokenSet]);
 
-  useControls(tokensObj, [tokensObj]);
+  useControls(tokensObj, [tokensObj]); 
 
   return null;
 };
@@ -144,6 +144,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     })),
     [tokens, usedTokenSet, activeTokenSet],
   );
+
   const tokenType = useSelector(tokenTypeSelector);
 
   const [error, setError] = React.useState<string | null>(null);
