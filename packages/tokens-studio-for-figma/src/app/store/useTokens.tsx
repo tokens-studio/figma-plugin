@@ -432,14 +432,6 @@ export default function useTokens() {
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
         const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
-        // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
-        // in which case we collapse the value as it cannot be used as a variable
-        if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
-          // We don't want to change the actual value as this could cause unintended side effects
-          tokenItem = { ...tokenItem };
-          // @ts-ignore
-          tokenItem.value = resolvedValue;
-        }
         if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
           if (resolvedValue.toString().trim().includes(' ')) {
             return acc;
@@ -462,6 +454,8 @@ export default function useTokens() {
       isInfinite: true,
     });
     const multiValueFilteredTokens = filterMultiValueTokens();
+    console.log('tokens: ', tokens);
+    console.log('multiValueFilteredTokens: ', multiValueFilteredTokens);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
