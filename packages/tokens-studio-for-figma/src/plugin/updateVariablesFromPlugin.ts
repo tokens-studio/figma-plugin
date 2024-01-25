@@ -24,7 +24,10 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     if (Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent)) { // Filter themes which contains this token
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];
+        console.log('variables: ', variable);
+        console.log('theme.$figmaModeId: ', theme.$figmaModeId);
         if (checkCanReferenceVariable(payload)) { // If new token reference to another token, we update the variable to reference to another variable
+          console.log('1111111111111111111111');
           let referenceTokenName: string = '';
           if (payload.rawValue && payload.rawValue?.toString().startsWith('{')) {
             referenceTokenName = payload.rawValue?.toString().slice(1, payload.rawValue.toString().length - 1);

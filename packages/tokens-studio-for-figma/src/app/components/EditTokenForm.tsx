@@ -349,6 +349,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           ...($extensions ? { $extensions } : {}),
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
+        console.log('activeTokenSet: ', activeTokenSet);
         editSingleToken({
           description: (
             internalEditToken.description
@@ -450,6 +451,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
+    console.log('internalEditToken: ', internalEditToken);
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
       setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
       return;
