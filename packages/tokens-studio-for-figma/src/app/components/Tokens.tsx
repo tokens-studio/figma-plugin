@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, IconButton } from '@tokens-studio/ui';
+import { ToggleGroup, IconButton, Label } from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -246,8 +246,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               <ToggleGroup.Item value="list">
                 <IconListing />
               </ToggleGroup.Item>
-              <ToggleGroup.Item value="json">
-                <IconJSON />
+              <ToggleGroup.Item value="json" iconOnly={false}>
+                <Label css={{ fontSize: '$xxsmall' }}>JSON</Label>
               </ToggleGroup.Item>
             </ToggleGroup>
           </Box>

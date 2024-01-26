@@ -1,25 +1,33 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import {
-  Button, Stack, Tabs, Heading, Box, Link, Checkbox, Label, IconButton, DropdownMenu, ToggleGroup,
+  Button, Stack, Tabs, Heading, Box, Link, Checkbox, Label, IconButton
 } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import {
   AlertFillIcon,
-  ChevronLeftIcon, ChevronRightIcon, DiffAddedIcon, DiffRemovedIcon, PencilIcon, SlidersIcon, FileDirectoryIcon, XCircleFillIcon, CheckCircleFillIcon, CheckCircleIcon, LinkIcon,
+  ChevronLeftIcon, ChevronRightIcon, DiffAddedIcon, DiffRemovedIcon, PencilIcon, SlidersIcon, FileDirectoryIcon
 } from '@primer/octicons-react';
-import { EyeClosedIcon } from '@radix-ui/react-icons';
+import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
 import {
   allTokenSetsSelector, themesListSelector, usedTokenSetSelector,
 } from '@/selectors';
+import { useForm, Controller } from 'react-hook-form';
 
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
 import { ThemeObject } from '@/types';
 import { StyledProBadge } from '../ProBadge';
+import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
+import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
+import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
+import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
+import { RootState } from '@/app/store';
+
 import Modal from '../Modal';
 import Options from './options';
+import Input from '../Input';
 
 const docsLinks = {
   stylesAndVariables: 'https://docs.tokens.studio/',
@@ -64,19 +72,19 @@ const ThemeDetails = ({ theme: ThemeObject }) => (
   >
     <Label css={{ color: '$successFg', fontSize: '$xxsmall' }}>
       <DiffAddedIcon size="small" />
-      99
+      9999
     </Label>
     <Label css={{ color: '$dangerFg', fontSize: '$xxsmall' }}>
       <DiffRemovedIcon size="small" />
-      99
+      9999
     </Label>
     <Label css={{ color: '$accentEmphasis', fontSize: '$xxsmall' }}>
       <PencilIcon size="small" />
-      99
+      9999
     </Label>
     <Label css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
       <AlertFillIcon size="small" />
-      99
+      9999
     </Label>
   </Stack>
 );
@@ -92,6 +100,47 @@ export default function ManageStylesAndVariables() {
 
   const allSets = useSelector(allTokenSetsSelector);
   const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
+
+
+  const store = useStore<RootState>();
+
+  const githubMfsEnabled = useIsGitMultiFileEnabled();
+  const selectedTokenSets = React.useMemo(() => (
+    usedTokenSetSelector(store.getState())
+  ), [store]);
+  const availableTokenSets = useSelector(allTokenSetsSelector);
+
+  const groupNames = React.useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
+
+  const treeOrListItems = React.useMemo(() => (
+    githubMfsEnabled
+      ? tokenSetListToTree(availableTokenSets)
+      : tokenSetListToList(availableTokenSets)
+  ), [githubMfsEnabled, availableTokenSets]);
+
+
+  const { register, handleSubmit, control } = useForm<FormValues>({
+    defaultValues: {
+      tokenSets: { ...selectedTokenSets }
+    },
+  });
+
+  const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
+    <Controller
+      name="tokenSets"
+      control={control}
+      // this is the only way to do this
+      // eslint-disable-next-line
+      render={({ field }) => (
+        <TokenSetThemeItem
+          {...props}
+          value={field.value}
+          onChange={field.onChange}
+        />
+      )}
+    />
+  ), [control]);
+
 
   // TODO: Remeber selected themes in document storage
   // Reloading the plugin shouldn't forget the selected themes
@@ -248,7 +297,7 @@ export default function ManageStylesAndVariables() {
 
                       <p>Or switch to Sets to export without using Themes.</p>
 
-                      <Link href={docsLinks.themes}>Learn more - Themes</Link>
+                      <Link target="_blank" href={docsLinks.themes}>Learn more - Themes</Link>
                       <Box css={{ alignSelf: 'flex-end' }}>
                         <Button variant="secondary" size="small">Create Themes</Button>
                       </Box>
@@ -261,7 +310,7 @@ export default function ManageStylesAndVariables() {
                         <p>Combinations of token sets create themes.</p>
 
                         <p>Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. </p>
-                        <Link href={docsLinks.themes}>Learn more - Themes</Link>
+                        <Link target="_blank" href={docsLinks.themes}>Learn more - Themes</Link>
                         <Box css={{ alignSelf: 'flex-end' }}>
                           <Button variant="secondary" size="small">Get PRO</Button>
                         </Box>
@@ -308,7 +357,7 @@ export default function ManageStylesAndVariables() {
                   <Heading>Confirm Sets</Heading>
                   <p>You can use token sets to manage your styles, and variables.</p>
                   <p>Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts. </p>
-                  <Link href={docsLinks.stylesAndVariables}>Learn more - Styles and variables</Link>
+                  <Link target="_blank" href={docsLinks.stylesAndVariables}>Learn more - Styles and variables</Link>
                 </Stack>
                 <Stack direction="column" align="start" gap={4}>
                   {/* eslint-disable-next-line react/jsx-no-bind */}
@@ -322,41 +371,17 @@ export default function ManageStylesAndVariables() {
                     </Label>
                     <ThemeDetails theme={null} />
                     <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} />
-                    <Modal full compact isOpen={showChangeSets} close={handleCancelChangeSets}>
+                    <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} showClose>
                       <Heading>Enabled sets will export to Figma</Heading>
-                      <Link href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
+                      <Link target="_blank" href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
                       <Stack direction="column" gap={4} css={{ marginBlockStart: '$4' }}>
-                        {
-                        allSets.map((set) => (
-                          <Box css={{
-                            display: 'grid', gridTemplateColumns: '1fr min-content', alignItems: 'center', gridGap: '$3',
-                          }}
-                          >
-                            {/* eslint-disable react/jsx-no-bind */}
-                            {/* <Checkbox
-                              onCheckedChange={() => handleSelectedSetChange(set)}
-                              id={set}
-                              checked={selectedSets.includes(set)}
-                            /> */}
-                            <Label>{set}</Label>
-                            <ToggleGroup
-                              type="single"
-                              defaultValue="source"
-                            >
-                              <ToggleGroup.Item value="disabled" tooltip="Disabled" tooltipSide="top">
-                                <XCircleFillIcon />
-                              </ToggleGroup.Item>
-                              <ToggleGroup.Item value="source" tooltip="Source - use references only" tooltipSide="top">
-                                <LinkIcon />
-                              </ToggleGroup.Item>
-                              <ToggleGroup.Item value="enabled" tooltip="Enabled" tooltipSide="top">
-                                <CheckCircleFillIcon />
-                              </ToggleGroup.Item>
-                            </ToggleGroup>
-                            {/* eslint-enable react/jsx-no-bind */}
-                          </Box>
-                        ))
-                        }
+                        {/* TODO: Make this search filter the sets */}
+                        <Input  placeholder="Search sets" />
+                      <TokenSetTreeContent
+                            items={treeOrListItems}
+                            renderItemContent={TokenSetThemeItemInput}
+                            keyPosition="end"
+           />
                       </Stack>
                     </Modal>
                   </ExportThemeRow>
@@ -375,7 +400,7 @@ export default function ManageStylesAndVariables() {
         isOpen={showOptions}
         close={handleClose}
         footer={(
-          <Stack direction="row" gap={4} justify="between">
+          <Stack direction="row" justify="between">
             <Button variant="invisible" id="manageStyles-button-close" onClick={handleCancelOptions} icon={<ChevronLeftIcon />}>
               {t('actions.cancel')}
             </Button>

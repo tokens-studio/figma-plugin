@@ -2,11 +2,13 @@ import React, { useCallback, useMemo } from 'react';
 import {
   Button, Box, Stack, Select, ToggleGroup, Tooltip,
 } from '@tokens-studio/ui';
-import { LinkIcon, XCircleFillIcon, CheckCircleFillIcon } from '@primer/octicons-react';
+import { Check, Xmark, CodeBracketsSquare } from 'iconoir-react'
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import TokenSetStatusIcon from './TokenSetStatusIcon';
+import { styled } from '@stitches/react';
+
 
 type Props = {
   item: TreeItem
@@ -20,6 +22,12 @@ const tokenSetSatusLabels = {
   [TokenSetStatus.SOURCE]: 'Source',
   [TokenSetStatus.ENABLED]: 'Enabled',
 };
+
+const SmallToggleItem = styled(ToggleGroup.Item, {
+  width: 'calc($controlSmall - $2)',
+  height: 'calc($controlSmall - $2)',
+  background: 'lime'
+});
 
 export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   item, value, children, onChange,
@@ -53,17 +61,17 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
 
   const statusIcon = (status) => {
     if (status === TokenSetStatus.ENABLED) {
-      return <CheckCircleFillIcon />;
+      return <Check />;
     }
     if (status === TokenSetStatus.SOURCE) {
-      return <LinkIcon />;
+      return <CodeBracketsSquare />;
     }
-    return <XCircleFillIcon />;
+    return <Xmark />;
   };
 
   return (
     (
-      <Stack direction="row" align="center" css={{ width: '100%' }}>
+      <Stack direction="row" align="center" css={{ width: '100%' }} >
         {item.level > 0 && (
         // repeat the box n times according to item.level
           (Array.from({ length: item.level }).map((_, index) => (
@@ -86,7 +94,6 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           justify="between"
           align="center"
           css={{ width: '100%' }}
-          gap={2}
         >
           <Button size="small" variant="invisible" onClick={handleCycleValue}>
             <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
@@ -94,13 +101,15 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
               {item.label}
             </StyledThemeLabel>
           </Button>
-          <ToggleGroup type="single" value={tokenSetStatus} onValueChange={handleValueChange} defaultValue={tokenSetStatus}>
+          <ToggleGroup css={{
+          '> [data-radix-collection-item]': {
+            width: 'calc($controlSmall - $2)',
+            height: 'calc($controlSmall - $2)'
+            }}} type="single" value={tokenSetStatus} onValueChange={handleValueChange} defaultValue={tokenSetStatus}>
             {tokenSetStatusValues.map((status) => (
 
-              <ToggleGroup.Item key={status} value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${status}`}>
-                <Tooltip label={status} side="top">
+              <ToggleGroup.Item key={status} tooltip={status} tooltipSide='top' value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${status}`}>
                   {statusIcon(status)}
-                </Tooltip>
               </ToggleGroup.Item>
 
             ))}

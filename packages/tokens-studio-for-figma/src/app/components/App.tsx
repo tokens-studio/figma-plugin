@@ -12,12 +12,21 @@ import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
+import { IconoirProvider } from 'iconoir-react';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
 
   return (
     <Box css={{ isolation: 'isolate' }}>
+      <IconoirProvider 
+        iconProps={{
+          color: '$fgDefault',
+          strokeWidth: 1.5,
+          width: '1rem',
+          height: '1rem'
+        }}
+      >
       {activeTab !== 'loading' && <LoadingBar />}
       <PluginResizerWrapper>
         <Box
@@ -48,6 +57,8 @@ function App() {
           {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
         </Box>
       </PluginResizerWrapper>
+
+      </IconoirProvider>
     </Box>
   );
 }
