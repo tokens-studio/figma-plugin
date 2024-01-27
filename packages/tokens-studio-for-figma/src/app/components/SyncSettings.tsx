@@ -16,7 +16,6 @@ import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
-import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -60,7 +59,6 @@ const SyncSettings = () => {
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
-  const tokenFormat = useSelector(tokenFormatSelector);
 
   const { fetchBranches } = useRemoteTokens();
 
@@ -130,9 +128,6 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Heading size="medium">{t('syncProviders')}</Heading>
-          format:
-          {' '}
-          {tokenFormat}
           {apiProviders.length > 0 && (
             <Stack direction="column" gap={2} width="full" align="start">
               <LocalStorageItem />

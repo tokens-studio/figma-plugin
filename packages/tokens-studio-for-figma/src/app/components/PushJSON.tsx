@@ -5,7 +5,6 @@ import ChangeStateListingHeading from './ChangeStateListingHeading';
 import { storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector } from '@/selectors';
 import stringifyTokens from '@/utils/stringifyTokens';
 import { styled } from '@/stitches.config';
-import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const StyledJSONContent = styled('pre', {
   padding: '$2 0',
@@ -15,7 +14,6 @@ const StyledJSONContent = styled('pre', {
 
 function PushJSON() {
   const tokens = useSelector(tokensSelector);
-  const tokenFormat = useSelector(tokenFormatSelector);
   const themes = useSelector(themesListSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const [collapsed, setCollapsed] = React.useState(false);
@@ -44,7 +42,6 @@ function PushJSON() {
       gap={1}
       css={{ padding: '$4' }}
     >
-      {tokenFormat}
       {Object.entries(tokens).length > 0 && Object.entries(tokens)?.map(([tokenSet, tokenList]) => (
         tokenList.length > 0 && (
           <>

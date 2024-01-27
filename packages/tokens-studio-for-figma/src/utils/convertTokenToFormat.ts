@@ -1,6 +1,7 @@
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export function convertTokenToFormat(token, isExpanded = false) {
+  if (token.inheritTypeLevel) delete token.type;
   const {
     type, value, description, ...remainingTokenValues
   } = token;
@@ -12,10 +13,12 @@ export function convertTokenToFormat(token, isExpanded = false) {
     return returnedToken;
   }
   if ((typeof value === 'undefined')) return token;
-  return {
+  const returnValue = {
     ...remainingTokenValues,
     ...(value ? { [TokenFormat.tokenValueKey]: value } : {}),
     ...(type ? { [TokenFormat.tokenTypeKey]: type } : {}),
     ...(description ? { [TokenFormat.tokenDescriptionKey]: description } : {}),
   };
+  delete returnValue.inheritTypeLevel;
+  return returnValue;
 }

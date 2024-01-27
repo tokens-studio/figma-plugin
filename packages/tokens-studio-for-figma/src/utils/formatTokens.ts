@@ -4,6 +4,7 @@ import { AnyTokenList } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import removeTokenId from './removeTokenId';
 import { convertTokenToFormat } from './convertTokenToFormat';
+import { getGroupTypeName } from './stringifyTokens';
 
 type Options = {
   tokens: Record<string, AnyTokenList>;
@@ -35,7 +36,13 @@ export default function formatTokens({
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
       const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
+
       const convertedToFormat = convertTokenToFormat(tokenWithoutName);
+      // set type of group level
+      if (token.inheritTypeLevel) {
+        const nameToSet = getGroupTypeName(token.name, token.inheritTypeLevel);
+        set(tokenObj, nestUnderParent ? [tokenSet, nameToSet].join('.') : nameToSet, token.type, { merge: true });
+      }
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)

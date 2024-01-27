@@ -7,6 +7,7 @@ import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
 import { getThemeReferences } from './getThemeReferences';
+import { TokenFormatOptions } from '../TokenFormatStoreClass';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -20,6 +21,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       updatedAt: msg.updatedAt,
       checkForChanges: msg.checkForChanges ?? false,
       collapsedTokenSets: msg.collapsedTokenSets,
+      tokenFormat: msg.tokenFormat || TokenFormatOptions.Legacy,
     });
   }
   if (msg.settings.updateStyles && msg.tokens) {

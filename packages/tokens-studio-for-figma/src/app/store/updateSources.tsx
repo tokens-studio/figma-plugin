@@ -13,6 +13,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -44,6 +45,7 @@ type UpdateTokensOnSourcesPayload = {
   collapsedTokenSets: string[];
   storeTokenIdInJsonEditor: boolean
   dispatch: Dispatch
+  tokenFormat: TokenFormatOptions
 };
 
 async function updateRemoteTokens({
@@ -130,6 +132,7 @@ export default async function updateTokensOnSources({
   collapsedTokenSets,
   storeTokenIdInJsonEditor,
   dispatch,
+  tokenFormat,
 }: UpdateTokensOnSourcesPayload) {
   if (tokenValues && !isLocal && shouldUpdateRemote && !editProhibited) {
     updateRemoteTokens({
@@ -164,6 +167,7 @@ export default async function updateTokensOnSources({
     activeTheme,
     shouldSwapStyles,
     collapsedTokenSets,
+    tokenFormat,
   }).then((result) => {
     transaction.setMeasurement('nodes', result.nodes, '');
     transaction.finish();

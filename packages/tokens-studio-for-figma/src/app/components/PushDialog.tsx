@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
-  Box, Button, Heading, Spinner, Stack, Text, ToggleGroup,
+  Button, Heading, Spinner, Stack, Text, ToggleGroup,
 } from '@tokens-studio/ui';
 import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
@@ -19,6 +19,7 @@ import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Modal from './Modal';
+import { FormatSelector } from './FormatSelector';
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -134,7 +135,7 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <Box css={{ padding: '$4', paddingBottom: 0 }}>
+            <Stack direction="row" gap={2} justify="between" css={{ width: '100%', padding: '$4', paddingBottom: 0 }}>
               <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
                 <ToggleGroup.Item iconOnly={false} value="commit">
                   {t('commit')}
@@ -146,7 +147,8 @@ function PushDialog() {
                   JSON
                 </ToggleGroup.Item>
               </ToggleGroup>
-            </Box>
+              <FormatSelector />
+            </Stack>
             {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
               <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
                 {t('thisWillPushYourLocalChangesToTheBranch')}

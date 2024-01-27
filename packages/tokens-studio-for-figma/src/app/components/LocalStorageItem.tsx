@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Box, Badge, Stack, DropdownMenu, IconButton,
+  Button, Box, Text,
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
-import { DotsVerticalIcon } from '@radix-ui/react-icons';
 
 import { IconFile } from '@/icons';
 import { StyledStorageItem } from './StyledStorageItem';
@@ -13,32 +12,7 @@ import useStorage from '../store/useStorage';
 import { storageTypeSelector } from '@/selectors';
 import useConfirm from '../hooks/useConfirm';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import {
-  TokenFormatOptions,
-} from '@/plugin/TokenFormatStoreClass';
-import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
-
-function FormatSelector() {
-  const tokenFormat = useSelector(tokenFormatSelector);
-  const dispatch = useDispatch<Dispatch>();
-
-  const handleValueChange = React.useCallback(() => {
-    dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
-  }, [dispatch.tokenState]);
-
-  return tokenFormat === TokenFormatOptions.DTCG ? null : (
-    <DropdownMenu>
-      <DropdownMenu.Trigger asChild data-testid="storage-item-tools-dropdown">
-        <IconButton icon={<DotsVerticalIcon />} variant="invisible" size="small" />
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content>
-          <DropdownMenu.Item onSelect={handleValueChange}>Convert to DTCG</DropdownMenu.Item>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu>
-  );
-}
+import { FormatSelector } from './FormatSelector';
 
 const LocalStorageItem = () => {
   const { t } = useTranslation(['storage']);
@@ -87,7 +61,10 @@ const LocalStorageItem = () => {
         <Box>
           <IconFile />
         </Box>
-        <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
+        <Box>
+          <Box css={{ fontSize: '$small', fontWeight: '$sansBold' }}>{t('localDocument')}</Box>
+          <Text muted size="xsmall">Tokens will be stored on this Figma file</Text>
+        </Box>
       </Box>
       <Box
         css={{
@@ -98,10 +75,7 @@ const LocalStorageItem = () => {
         }}
       >
         {isActive ? (
-          <Stack direction="row" align="center" gap={2}>
-            <Badge>Active</Badge>
-            <FormatSelector />
-          </Stack>
+          <FormatSelector />
         ) : (
           <Button
             data-testid="button-storage-item-apply"

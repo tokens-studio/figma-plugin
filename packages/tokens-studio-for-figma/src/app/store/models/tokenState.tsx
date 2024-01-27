@@ -769,6 +769,7 @@ export const tokenState = createModel<RootModel>()({
             collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
             storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
             dispatch,
+            tokenFormat: rootState.tokenState.tokenFormat,
           });
         });
       } catch (e) {

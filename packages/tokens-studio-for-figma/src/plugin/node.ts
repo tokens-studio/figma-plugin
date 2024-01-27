@@ -9,10 +9,11 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
+import { TokenFormatOptions } from './TokenFormatStoreClass';
 
 // @TODO fix typings
 
@@ -98,6 +99,7 @@ export async function getTokenData(): Promise<{
   version: string;
   checkForChanges: boolean | null
   collapsedTokenSets: string[] | null
+  tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
@@ -107,6 +109,7 @@ export async function getTokenData(): Promise<{
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
+    const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
@@ -120,6 +123,7 @@ export async function getTokenData(): Promise<{
         version: version || '',
         checkForChanges,
         collapsedTokenSets,
+        tokenFormat: tokenFormat as TokenFormatOptions,
       };
     }
   } catch (e) {

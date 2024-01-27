@@ -94,7 +94,7 @@ export default function Footer() {
                 variant="invisible"
                 size="small"
                 tooltipSide="top"
-                disabled={editProhibited}
+                disabled={editProhibited || !hasChanges}
                 tooltip={
                   t('pushTo', {
                     provider: transformProviderName(storageType.provider),
@@ -172,18 +172,22 @@ export default function Footer() {
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton
+            as="a"
             href="https://docs.tokens.studio/?ref=pf"
             icon={<DocsIcon />}
             variant="invisible"
             size="small"
             tooltip={t('docs') as string}
+            target="_blank"
           />
           <IconButton
+            as="a"
             href="https://github.com/tokens-studio/figma-plugin"
             icon={<FeedbackIcon />}
             variant="invisible"
             size="small"
             tooltip={t('feedback') as string}
+            target="_blank"
           />
         </Stack>
       </Stack>

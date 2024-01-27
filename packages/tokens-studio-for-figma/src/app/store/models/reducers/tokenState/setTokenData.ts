@@ -3,15 +3,21 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import type { SetTokenDataPayload } from '@/types/payloads';
 import parseTokenValues from '@/utils/parseTokenValues';
 import type { TokenState } from '../../tokenState';
-import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenStore } from '@/types/tokens';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   if (payload.values.length === 0) {
     return state;
   }
-  const values = parseTokenValues(payload.values);
+  let values;
+  if (!Array.isArray) {
+    values = payload.values as TokenStore['values'];
+  } else {
+    values = parseTokenValues(payload.values);
+  }
+
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
     allAvailableTokenSets.map((tokenSet) => [tokenSet, payload.usedTokenSet?.[tokenSet] ?? TokenSetStatus.DISABLED]),
@@ -33,7 +39,7 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   return {
     ...state,
     lastSyncedState,
-    tokens: addIdPropertyToTokens(values),
+    tokens: values,
     themes: (payload.themes ?? []).map((theme) => ({
       ...theme,
       selectedTokenSets: Object.fromEntries(

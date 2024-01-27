@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import {
-  Button, Box, Badge, Stack, IconButton, DropdownMenu, Dialog,
+  Button, Box, Badge, Stack, IconButton, DropdownMenu,
 } from '@tokens-studio/ui';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
@@ -17,7 +17,6 @@ import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
-import Modal from './Modal';
 import { ConvertToDTCGModal } from './ConvertToDTCGModal';
 
 type Props = {
@@ -116,7 +115,7 @@ const StorageItem = ({ item, onEdit }: Props) => {
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
                 overflow: 'hidden',
-                opacity: '0.75',
+                color: '$fgMuted',
                 fontSize: '$xsmall',
                 maxWidth: '100%',
               }}
@@ -164,8 +163,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
             <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
               {t('delete')}
             </DropdownMenu.Item>
-            <DropdownMenu.Separator />
-            {tokenFormat !== TokenFormatOptions.DTCG ? <DropdownMenu.Item onSelect={openConvertModal}>Convert to W3C DTCG format</DropdownMenu.Item>
+            {isActive() && tokenFormat !== TokenFormatOptions.DTCG ? (
+              <>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item onSelect={openConvertModal}>Convert to W3C DTCG format</DropdownMenu.Item>
+              </>
+            )
               : null}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
