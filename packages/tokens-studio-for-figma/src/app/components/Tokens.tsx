@@ -33,6 +33,7 @@ import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -85,6 +86,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
+  const tokenFormat = useSelector(tokenFormatSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTokensTab = useSelector(activeTokensTabSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -174,7 +176,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     // because of specific logic requirements
     setError(null);
     dispatch.tokenState.setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenType, dispatch.tokenState, getStringTokens]);
+  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState, getStringTokens]);
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -184,7 +186,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
-  }, [dispatch, tokens, stringTokens, activeTokenSet]);
+  }, [dispatch, tokens, stringTokens, activeTokenSet, getStringTokens]);
 
   React.useEffect(() => {
     const newBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);

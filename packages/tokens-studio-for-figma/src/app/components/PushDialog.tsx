@@ -15,7 +15,6 @@ import { isGitProvider } from '@/utils/is';
 import { useShortcut } from '@/hooks/useShortcut';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
-import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
@@ -106,10 +105,6 @@ function PushDialog() {
   );
 
   useShortcut(['Enter'], handleSaveShortcut);
-
-  const handleSwitch = React.useCallback((tab: string) => {
-    setActiveTab(tab);
-  }, []);
 
   switch (showPushDialog) {
     case 'initial': {

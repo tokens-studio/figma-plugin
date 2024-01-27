@@ -42,7 +42,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
-import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { ColorModifier } from '@/types/Modifier';
 
 export interface TokenState {
@@ -690,6 +690,9 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setTokenData(payload: SetTokenDataPayload) {
+      // When tokens update we set the format to the format that we parsed
+      dispatch.tokenState.setTokenFormat(TokenFormat.format);
+
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }

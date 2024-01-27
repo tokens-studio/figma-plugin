@@ -92,6 +92,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
+    console.log('Retrieving');
 
     // successfully fetch data
     if (Array.isArray(files)) {

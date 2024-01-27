@@ -18,7 +18,6 @@ import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -101,7 +100,6 @@ export const useADO = () => {
           storeTokenIdInJsonEditor,
         });
 
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -109,6 +107,7 @@ export const useADO = () => {
           themes,
           usedTokenSet,
           activeTheme,
+          hasChangedRemote: true,
         });
 
         pushDialog('success');
@@ -224,12 +223,12 @@ export const useADO = () => {
           const userDecision = await askUserIfPull();
           if (userDecision) {
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
               usedTokenSet,
               activeTheme,
+              hasChangedRemote: true,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');

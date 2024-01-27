@@ -14,4 +14,5 @@ export type SetTokenDataPayload = {
   activeTheme?: Record<string, string>
   shouldUpdate?: boolean;
   usedTokenSet?: UsedTokenSetsMap | null
+  hasChangedRemote?: boolean
 };

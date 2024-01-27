@@ -115,8 +115,8 @@ export function Modal({
               }}
             >
               {title && (
-              <Dialog.Title>
-                <Heading size="small">{title}</Heading>
+              <Dialog.Title asChild>
+                <Heading as="h6" size="small">{title}</Heading>
               </Dialog.Title>
               )}
               <IconButton

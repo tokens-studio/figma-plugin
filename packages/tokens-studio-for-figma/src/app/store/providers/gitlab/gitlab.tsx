@@ -21,7 +21,6 @@ import { getRepositoryInformation } from '../getRepositoryInformation';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
@@ -112,7 +111,6 @@ export function useGitLab() {
           storeTokenIdInJsonEditor,
         });
         const latestCommitDate = await storage.getLatestCommitDate();
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GitlabCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
         dispatch.tokenState.setTokenData({
@@ -120,6 +118,7 @@ export function useGitLab() {
           themes,
           usedTokenSet,
           activeTheme,
+          hasChangedRemote: true,
         });
 
         pushDialog('success');
@@ -240,12 +239,12 @@ export function useGitLab() {
           if (userDecision) {
             const latestCommitDate = await storage.getLatestCommitDate();
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
               usedTokenSet,
               activeTheme,
+              hasChangedRemote: true,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });

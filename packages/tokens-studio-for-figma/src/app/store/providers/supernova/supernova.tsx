@@ -17,7 +17,6 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { SupernovaTokenStorage } from '../../../../storage/SupernovaTokenStorage';
 import usePushDialog from '../../../hooks/usePushDialog';
-import { saveLastSyncedState } from '../../../../utils/saveLastSyncedState';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { applyTokenSetOrder } from '../../../../utils/tokenset';
@@ -84,7 +83,6 @@ export function useSupernova() {
               storeTokenIdInJsonEditor,
             },
           );
-          saveLastSyncedState(dispatch, tokens, themes, metadata);
           dispatch.uiState.setLocalApiState({ ...localApiState } as SupernovaCredentials);
           dispatch.uiState.setApiData({ ...context });
           dispatch.tokenState.setTokenData({
@@ -92,6 +90,7 @@ export function useSupernova() {
             themes,
             usedTokenSet,
             activeTheme,
+            hasChangedRemote: true,
           });
 
           pushDialog('success');

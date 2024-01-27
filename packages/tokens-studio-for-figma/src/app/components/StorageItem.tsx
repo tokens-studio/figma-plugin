@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import {
-  Button, Box, Badge, Stack, IconButton, DropdownMenu,
+  Button, Box, Badge, Stack, IconButton, DropdownMenu, Dialog,
 } from '@tokens-studio/ui';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
@@ -17,6 +17,8 @@ import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import Modal from './Modal';
+import { ConvertToDTCGModal } from './ConvertToDTCGModal';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -34,6 +36,15 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { setStorageType } = useStorage();
   const dispatch = useDispatch<Dispatch>();
   const tokenFormat = useSelector(tokenFormatSelector);
+  const [isConvertModalOpen, setIsConvertModalOpen] = React.useState(false);
+  const closeConvertModal = React.useCallback(() => {
+    console.log('Closing!');
+    setIsConvertModalOpen(false);
+  }, []);
+  const openConvertModal = React.useCallback(() => {
+    console.log('Hello');
+    setIsConvertModalOpen(true);
+  }, []);
 
   const { t } = useTranslation(['storage']);
 
@@ -68,43 +79,47 @@ const StorageItem = ({ item, onEdit }: Props) => {
     }
   }, [item, restoreStoredProvider]);
 
-  const handleValueChange = React.useCallback(() => {
-    dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
-  }, [dispatch.tokenState]);
-
   return (
-    <StyledStorageItem
-      data-testid={`storageitem-${provider}-${id}`}
-      key={`${provider}-${id}`}
-      active={isActive()}
-    >
+    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()}>
       <Stack
         direction="column"
         gap={1}
         css={{
-          flexGrow: '1', overflow: 'hidden',
+          flexGrow: '1',
+          overflow: 'hidden',
         }}
       >
         <Stack
           direction="row"
           gap={3}
           css={{
-            flexGrow: '1', overflow: 'hidden', maxWidth: 'stretch',
+            flexGrow: '1',
+            overflow: 'hidden',
+            maxWidth: 'stretch',
           }}
         >
-          <Box css={{ color: '$fgDefault' }}>
-            { getProviderIcon(provider) }
-          </Box>
+          <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider)}</Box>
           <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
-            <Box css={{
-              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$sansBold',
-            }}
+            <Box
+              css={{
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                fontSize: '$small',
+                fontWeight: '$sansBold',
+              }}
             >
               {name}
             </Box>
-            <Box css={{
-              whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
-            }}
+            <Box
+              css={{
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                opacity: '0.75',
+                fontSize: '$xsmall',
+                maxWidth: '100%',
+              }}
             >
               {id}
               {' '}
@@ -115,7 +130,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
         {hasErrored && isActive() && (
           <Box
             css={{
-              display: 'flex', flexDirection: 'row', color: '$dangerFg', gap: '$3', marginTop: '$3',
+              display: 'flex',
+              flexDirection: 'row',
+              color: '$dangerFg',
+              gap: '$3',
+              marginTop: '$3',
             }}
             data-testid="error-message"
           >
@@ -125,7 +144,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
         )}
       </Stack>
       <Box css={{ marginRight: '$1' }}>
-        {isActive() ? <Badge>{t('active')}</Badge> : (
+        {isActive() ? (
+          <Badge>{t('active')}</Badge>
+        ) : (
           <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
             {t('apply')}
           </Button>
@@ -137,12 +158,19 @@ const StorageItem = ({ item, onEdit }: Props) => {
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content>
-            <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenu.Item>
-            {tokenFormat !== TokenFormatOptions.DTCG ? <DropdownMenu.Item onSelect={handleValueChange}>Convert to DTCG</DropdownMenu.Item> : null }
-            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>{t('delete')}</DropdownMenu.Item>
+            <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
+              {t('edit')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
+              {t('delete')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Separator />
+            {tokenFormat !== TokenFormatOptions.DTCG ? <DropdownMenu.Item onSelect={openConvertModal}>Convert to W3C DTCG format</DropdownMenu.Item>
+              : null}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
+      <ConvertToDTCGModal isOpen={isConvertModalOpen} setIsOpen={setIsConvertModalOpen} />
     </StyledStorageItem>
   );
 };

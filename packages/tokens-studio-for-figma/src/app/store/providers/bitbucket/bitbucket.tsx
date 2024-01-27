@@ -15,10 +15,10 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
+import { useChangedState } from '@/hooks/useChangedState';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -107,7 +107,6 @@ export function useBitbucket() {
           tokens,
           metadata,
         }, { commitMessage, storeTokenIdInJsonEditor });
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as BitbucketCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -115,6 +114,7 @@ export function useBitbucket() {
           themes,
           usedTokenSet,
           activeTheme,
+          hasChangedRemote: true,
         });
         pushDialog('success');
         return {
@@ -236,7 +236,6 @@ export function useBitbucket() {
             const userDecision = await askUserIfPull();
             if (userDecision) {
               const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-              saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
               dispatch.tokenState.setTokenData({
                 values: content.tokens,
                 themes: content.themes,

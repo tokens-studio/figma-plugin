@@ -27,17 +27,17 @@ export default function stringifyTokens(
       } = tokenWithoutName;
       // set type of group level
       set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
-      set(tokenObj, token.name, tokenWithoutTypeAndValue);
       set(tokenObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
       set(tokenObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
+      set(tokenObj, token.name, tokenWithoutTypeAndValue, { merge: true });
     } else {
       const {
         type, value, description, ...tokenWithoutTypeAndValue
       } = tokenWithoutName;
-      set(tokenObj, token.name, tokenWithoutTypeAndValue);
-      set(tokenObj, `${token.name}.${TokenFormat.tokenTypeKey}`, type);
       set(tokenObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
+      set(tokenObj, `${token.name}.${TokenFormat.tokenTypeKey}`, type);
       set(tokenObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
+      set(tokenObj, token.name, tokenWithoutTypeAndValue, { merge: true });
     }
   });
 

@@ -8,7 +8,7 @@ import {
   isSingleTypographyToken,
 } from './is';
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
-import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
 
 // This is a token as it is incoming, so we can't be sure of the values or types
@@ -81,12 +81,12 @@ function checkForTokens({
       ...remainingTokenProperties
     } = token;
     returnValue = {
-      ...remainingTokenProperties,
       value,
-      ...(description && typeof description === 'string' ? { description } : {}),
       ...(!type && inheritType
         ? { type: inheritType as TokenTypes, inheritTypeLevel: currentTypeLevel }
         : { type: type as TokenTypes }),
+      ...(description && typeof description === 'string' ? { description } : {}),
+      ...remainingTokenProperties,
     };
   } else if (
     isSingleTypographyToken(token)
@@ -101,13 +101,13 @@ function checkForTokens({
       ...remainingTokenProperties
     } = token;
     returnValue = {
-      ...remainingTokenProperties,
-      type: type as TokenTypes,
       value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
         acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
         return acc;
       }, {}),
+      type: type as TokenTypes,
       ...(description && typeof description === 'string' ? { description } : {}),
+      ...remainingTokenProperties,
     };
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
@@ -158,19 +158,7 @@ function checkForTokens({
   return [obj, returnValue as SingleToken | undefined];
 }
 
-export function detectFormat(tokens: Tokens) {
-  const stringifiedTokens = JSON.stringify(tokens);
-  if (stringifiedTokens.includes('$value')) {
-    TokenFormat.setFormat(TokenFormatOptions.DTCG);
-  } else {
-    TokenFormat.setFormat(TokenFormatOptions.Legacy);
-  }
-  return TokenFormatOptions.Legacy;
-}
-
 export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
-  detectFormat(tokens);
-
   const [result] = checkForTokens({
     obj: [],
     root: null,
