@@ -389,8 +389,12 @@ export const tokenState = createModel<RootModel>()({
     editToken: (state, data: UpdateTokenPayload) => {
       console.log('activeTheme: ', state.activeTheme);
       const nameToFind = data.oldName ? data.oldName : data.name;
+      console.log('nameToFind: ', nameToFind);
       const index = state.tokens[data.parent].findIndex((token) => token.name === nameToFind);
+      console.log('state.tokens[data.parent]: ', state.tokens[data.parent]);
+      console.log('index: ', index);
       const newArray = [...state.tokens[data.parent]];
+      console.log('newArray: ', newArray);
       newArray[index] = {
         ...omit(newArray[index], 'description'),
         ...updateTokenPayloadToSingleToken(data),

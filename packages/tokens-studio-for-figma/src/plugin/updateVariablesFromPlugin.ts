@@ -20,7 +20,10 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
     return acc;
   }, {});
 
+  console.log('payload: ', payload);
+
   themeInfo.themes.forEach((theme) => {
+    console.log('theme: ', theme);
     if (Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === payload.parent)) { // Filter themes which contains this token
       if (theme.$figmaVariableReferences?.[payload.name] && theme.$figmaModeId) {
         const variable = variableMap[theme?.$figmaVariableReferences?.[payload.name]];

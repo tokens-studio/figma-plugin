@@ -75,6 +75,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return true;
   }, [internalEditToken]);
 
+  console.log('editToken: ', editToken);
+
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
@@ -320,6 +322,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
+  const resolvedToken = React.useMemo(() => {
+    if (editToken && checkIfContainsAlias(editToken.value) && typeof editToken?.value === 'string') {
+      return resolvedTokens.find((t) => t.name === editToken.value?.toString().replace(/[\{\}\s]/g, ""));
+    }
+    return null;
+  }, [editToken, resolvedTokens]);
+
   // @TODO update to useCallback
   const submitTokenValue = async ({
     type, value, name, $extensions,
@@ -350,13 +359,22 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         console.log('activeTokenSet: ', activeTokenSet);
+        console.log('resolvedValue: ', resolvedValue);
+        console.log('resolvedToken: ', resolvedToken);
+        console.log('trimmedValue: ', trimmedValue);
+        console.log('parent: ', parent);
+        console.log('name: ', name);
+        console.log('oldName: ', oldName);
+        console.log('type: ', type);
+        console.log('value: ', trimmedValue as SingleToken['value']);
         editSingleToken({
           description: (
             internalEditToken.description
             ?? internalEditToken.oldDescription
           ),
           parent: activeTokenSet,
-          name: newName,
+          name: resolvedToken? resolvedToken.name: newName,
+          // name: newName,
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
