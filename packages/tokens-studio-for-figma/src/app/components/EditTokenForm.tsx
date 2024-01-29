@@ -75,8 +75,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return true;
   }, [internalEditToken]);
 
-  console.log('editToken: ', editToken);
-
   const isValid = React.useMemo(() => {
     if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
       && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
@@ -338,7 +336,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-
       const trimmedValue = trimValue(value);
       const newName = name
         .split('/')
@@ -357,24 +354,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
-      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
-        console.log('activeTokenSet: ', activeTokenSet);
-        console.log('resolvedValue: ', resolvedValue);
-        console.log('resolvedToken: ', resolvedToken);
-        console.log('trimmedValue: ', trimmedValue);
-        console.log('parent: ', parent);
-        console.log('name: ', name);
-        console.log('oldName: ', oldName);
-        console.log('type: ', type);
-        console.log('value: ', trimmedValue as SingleToken['value']);
+      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {        
         editSingleToken({
           description: (
             internalEditToken.description
             ?? internalEditToken.oldDescription
           ),
           parent: activeTokenSet,
-          name: resolvedToken? resolvedToken.name: newName,
-          // name: newName,
+          name: newName,
           oldName,
           type,
           value: trimmedValue as SingleToken['value'],
@@ -469,7 +456,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
-    console.log('internalEditToken: ', internalEditToken);
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
       setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
       return;
