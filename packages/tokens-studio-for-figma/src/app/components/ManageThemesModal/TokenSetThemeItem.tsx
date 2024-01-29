@@ -93,8 +93,8 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
             {item.label}
           </StyledThemeLabel>
           <ToggleGroup
-            size="small"
             type="single"
+            size="small"
             value={tokenSetStatus}
             onValueChange={handleValueChange}
             defaultValue={tokenSetStatus}

@@ -11,7 +11,7 @@ import settings from './settings.json';
 import storage from './storage.json';
 import general from './general.json';
 import branch from './branch.json';
-import manageStylesAndVariables from './manageStylesAndVariables.json'
+import manageStylesAndVariables from './manageStylesAndVariables.json';
 
 export default {
   general,
@@ -27,5 +27,5 @@ export default {
   sync,
   storage,
   settings,
-  manageStylesAndVariables
+  manageStylesAndVariables,
 };

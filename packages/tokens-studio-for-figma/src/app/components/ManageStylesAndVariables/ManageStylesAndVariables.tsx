@@ -2,18 +2,18 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useStore } from 'react-redux';
 import {
-  Button, Stack, Tabs, Heading, Box, Link, Checkbox, Label, IconButton
+  Button, Stack, Tabs, Heading, Box, Link, Checkbox, Label, IconButton,
 } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import {
   AlertFillIcon,
-  ChevronLeftIcon, ChevronRightIcon, DiffAddedIcon, DiffRemovedIcon, PencilIcon, SlidersIcon, FileDirectoryIcon
+  ChevronLeftIcon, ChevronRightIcon, DiffAddedIcon, DiffRemovedIcon, PencilIcon, SlidersIcon, FileDirectoryIcon,
 } from '@primer/octicons-react';
+import { useForm, Controller } from 'react-hook-form';
 import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
 import {
   allTokenSetsSelector, themesListSelector, usedTokenSetSelector,
 } from '@/selectors';
-import { useForm, Controller } from 'react-hook-form';
 
 import { licenseKeySelector } from '@/selectors/licenseKeySelector';
 import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
@@ -101,7 +101,6 @@ export default function ManageStylesAndVariables() {
   const allSets = useSelector(allTokenSetsSelector);
   const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
 
-
   const store = useStore<RootState>();
 
   const githubMfsEnabled = useIsGitMultiFileEnabled();
@@ -118,10 +117,9 @@ export default function ManageStylesAndVariables() {
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
 
-
   const { register, handleSubmit, control } = useForm<FormValues>({
     defaultValues: {
-      tokenSets: { ...selectedTokenSets }
+      tokenSets: { ...selectedTokenSets },
     },
   });
 
@@ -140,7 +138,6 @@ export default function ManageStylesAndVariables() {
       )}
     />
   ), [control]);
-
 
   // TODO: Remeber selected themes in document storage
   // Reloading the plugin shouldn't forget the selected themes
@@ -376,12 +373,12 @@ export default function ManageStylesAndVariables() {
                       <Link target="_blank" href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
                       <Stack direction="column" gap={4} css={{ marginBlockStart: '$4' }}>
                         {/* TODO: Make this search filter the sets */}
-                        <Input  placeholder="Search sets" />
-                      <TokenSetTreeContent
-                            items={treeOrListItems}
-                            renderItemContent={TokenSetThemeItemInput}
-                            keyPosition="end"
-           />
+                        <Input placeholder="Search sets" />
+                        <TokenSetTreeContent
+                          items={treeOrListItems}
+                          renderItemContent={TokenSetThemeItemInput}
+                          keyPosition="end"
+                        />
                       </Stack>
                     </Modal>
                   </ExportThemeRow>

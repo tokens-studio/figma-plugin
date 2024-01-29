@@ -86,7 +86,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && internalEditToken.name && !Boolean(error);
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(

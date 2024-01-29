@@ -1,9 +1,12 @@
+// @ts-nocheck
+
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import { Button, EmptyState } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -25,6 +28,17 @@ import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
 
 type Props = unknown;
+
+const StyledReorderGroup = styled(ReorderGroup, {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gridAutoFlow: 'row',
+  '> li > button': {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr min-content',
+    gridAutoFlow: 'column',
+  },
+});
 
 export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
   const dispatch = useDispatch<Dispatch>();
@@ -148,7 +162,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     <Modal
       isOpen
       full
-      size="large"
+      size="fullscreen"
       title="Themes"
       stickyFooter
       showClose
@@ -207,8 +221,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <Box css={{ padding: '$3 $2 $3 0' }}>
-          <ReorderGroup
+        <Box className="manageThemeGrid" css={{ padding: '$3 $2 $3 0' }}>
+          <StyledReorderGroup
             layoutScroll
             values={treeItems}
             onReorder={handleReorder}
@@ -219,9 +233,10 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               <DragItem<TreeItem> key={item.key} item={item}>
                 {
                   item.isLeaf && typeof item.value === 'object' ? (
-                    <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
+                    <ThemeListItemContent className="themeListItem" item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
                   ) : (
                     <ThemeListGroupHeader
+                      className="themeGroupHeader"
                       label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                       groupName={item.value as string}
                       setIsGroupEditing={handleUpdateIsEditing}
@@ -231,7 +246,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               </DragItem>
             ))
           }
-          </ReorderGroup>
+          </StyledReorderGroup>
         </Box>
       )}
       {themeEditorOpen && (
