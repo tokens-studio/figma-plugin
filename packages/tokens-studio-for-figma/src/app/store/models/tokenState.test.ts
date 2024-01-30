@@ -1091,14 +1091,14 @@ describe('editToken', () => {
         value: '1',
       },
       {
+        name: 'primary-copy',
+        value: '1',
+        type: 'sizing',
         $extensions: {
           'studio.tokens': {
             id: 'mock-uuid',
           },
         },
-        name: 'primary-copy',
-        value: '1',
-        type: 'sizing',
       },
       {
         name: 'alias',

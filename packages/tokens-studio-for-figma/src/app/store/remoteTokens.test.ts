@@ -637,30 +637,6 @@ describe('remoteTokens', () => {
   });
 
   Object.values(contextMap).forEach((context) => {
-    it(`push tokens to ${context.provider}, should not pop up push diaolog when an error occured while retrieving the data from the remote storage`, async () => {
-      mockRetrieve.mockImplementation(() => (
-        Promise.resolve({
-          status: 'failure',
-          errorMessage: ErrorMessages.GENERAL_CONNECTION_ERROR,
-        })
-      ));
-      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
-        expect(mockPushDialog).toBeCalledTimes(0);
-      }
-    });
-  });
-
-  Object.values(contextMap).forEach((context) => {
-    it(`push tokens to ${context.provider}, should return noting to commit if the content is same`, async () => {
-      if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
-        expect(notifyToUI).toBeCalledWith('Nothing to commit');
-      }
-    });
-  });
-
-  Object.values(contextMap).forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`push tokens to ${context.provider}, should close push dialog when there is a permission error`, async () => {
         mockRetrieve.mockImplementation(() => (

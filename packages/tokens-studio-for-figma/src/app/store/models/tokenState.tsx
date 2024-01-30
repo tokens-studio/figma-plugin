@@ -191,7 +191,6 @@ export const tokenState = createModel<RootModel>()({
       },
     }),
     setJSONData(state, payload) {
-      console.log('set json data');
       const parsedTokens = parseJson(payload);
       parseTokenValues(parsedTokens);
       const values = parseTokenValues({ [state.activeTokenSet]: parsedTokens });
