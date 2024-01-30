@@ -20,7 +20,6 @@ export default function convertTokensObjectToResolved(
     resolveReferences: true,
   },
 ) {
-  console.log('converts object');
   // Parse tokens into array structure
   const parsed = parseTokenValues(tokens);
   // Merge to one giant array

@@ -129,7 +129,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const handleChangeJSON = React.useCallback((val: string) => {
     setError(null);
     try {
-      console.log('handle change json');
       const parsedTokens = parseJson(val);
       parseTokenValues(parsedTokens);
     } catch (e) {

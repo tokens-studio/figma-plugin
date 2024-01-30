@@ -8,7 +8,6 @@ import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
   try {
     const data = await UiSettingsProperty.read();
-    console.log('setting Ui', uiSettings.tokenFormat, data?.tokenFormat);
     await UiSettingsProperty.write({
       sessionRecording: uiSettings.sessionRecording ?? data?.sessionRecording,
       width: uiSettings.width ?? data?.width,
@@ -37,7 +36,6 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
   let settings: SavedSettings = {} as SavedSettings;
   try {
     const data = await UiSettingsProperty.read();
-    console.log('reading data', data);
 
     let width: number;
     let height: number;

@@ -25,7 +25,6 @@ export class TokenFormatStoreClass {
   }
 
   public setFormat = (format: TokenFormatOptions) => {
-    console.log('setting format', format, this.format, this);
     this.format = format;
     this.tokenValueKey = format === TokenFormatOptions.DTCG ? '$value' : 'value';
     this.tokenTypeKey = format === TokenFormatOptions.DTCG ? '$type' : 'type';
