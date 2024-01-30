@@ -5,6 +5,7 @@ import {
 import { XIcon } from '@primer/octicons-react';
 import { ModalFooter } from './ModalFooter';
 import { styled } from '@/stitches.config';
+import { ArrowLeft } from 'iconoir-react';
 
 export type ModalProps = {
   id?: string;
@@ -17,6 +18,7 @@ export type ModalProps = {
   footer?: React.ReactNode;
   stickyFooter?: boolean;
   showClose?: boolean;
+  backArrow?: boolean
   close: () => void;
   modal?: boolean;
 };
@@ -75,6 +77,7 @@ export function Modal({
   showClose = false,
   compact = false,
   modal = true,
+  backArrow = false,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -107,10 +110,10 @@ export function Modal({
             overflow: 'hidden',
           }}
           >
-            {(showClose || title) && (
+            {(showClose || title || backArrow) && (
             <Stack
               direction="row"
-              justify="between"
+              justify={backArrow ? "start" : "between"}
               align="center"
               css={{
                 borderBottomColor: '$borderSubtle',
@@ -122,20 +125,31 @@ export function Modal({
                 backgroundColor: '$bgDefault',
                 top: 0,
                 zIndex: 10,
+                gap: '$3'
               }}
             >
+              {backArrow && (
+                <IconButton
+                  onClick={handleClose}
+                  data-testid="back-arrow"
+                  icon={<ArrowLeft />}
+                  size="small"
+                  variant="invisible"
+                  />
+              )}
               {title && (
               <Dialog.Title>
                 <Heading size="small">{title}</Heading>
               </Dialog.Title>
               )}
-              <IconButton
+              {showClose && (<IconButton
                 onClick={handleClose}
                 data-testid="close-button"
                 icon={<XIcon />}
                 size="small"
                 variant="invisible"
               />
+              )}
             </Stack>
             )}
             <StyledBody

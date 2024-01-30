@@ -5985,10 +5985,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
   integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
 
-"@tokens-studio/ui@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.1.tgz#a5bd52dae30249a432476d4a98e5f56318efd803"
-  integrity sha512-u7L4p6DLSW0a92/eF+Q4R9m2y8D3IJryjtMxI+yAQue+EYTChPaLFe8iokkdctXtB+zMulUc7Ipwt3/qfjJQRA==
+"@tokens-studio/ui@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.2.tgz#c05c1d261d4d5fdc5807b935e7633b36e2976492"
+  integrity sha512-DiwzqhyzadtOjtAJd8zROKmupiIJ6ID+3gUbpqO4NigWd3FjfpjXYc+u9WGAsTEx0eFBXRseoCC/6vn5anURxA==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -17943,7 +17943,7 @@ react-window@^1.8.8:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
 
-react@^18, react@^18.2.0:
+react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==

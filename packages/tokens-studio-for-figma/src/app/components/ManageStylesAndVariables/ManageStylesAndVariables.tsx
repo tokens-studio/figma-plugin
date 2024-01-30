@@ -26,8 +26,9 @@ import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
 import { RootState } from '@/app/store';
 
 import Modal from '../Modal';
-import Options from './options';
 import Input from '../Input';
+
+import useOptionsModal from './useOptionsModal';
 
 const docsLinks = {
   stylesAndVariables: 'https://docs.tokens.studio/',
@@ -93,7 +94,7 @@ export default function ManageStylesAndVariables() {
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
 
   const [showModal, setShowModal] = React.useState(false);
-  const [showOptions, setShowOptions] = React.useState(false);
+
   const [showChangeSets, setShowChangeSets] = React.useState(false);
 
   const themes = useSelector(themesListSelector);
@@ -190,23 +191,22 @@ export default function ManageStylesAndVariables() {
 
   const isPro = existingKey && !licenseKeyError;
 
+  const [showOptions, setShowOptions] = React.useState(false);
+
+  const { OptionsModal, exportOptions } = useOptionsModal();
+
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
-  }, []);
-
-  const handleSaveOptions = React.useCallback(() => {
-    alert('TODO: Save options');
-  }, []);
-
+  }, [setShowOptions]);
   const handleCancelOptions = React.useCallback(() => {
     // DO NOT SAVE THE OPTIONS
     setShowOptions(false);
-  }, [showOptions]);
+  }, [setShowOptions]);
 
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
     setShowChangeSets(false);
-  }, [showOptions]);
+  }, []);
 
   const handleSelectedSetChange = React.useCallback((set: string) => {
     if (selectedSets.includes(set)) {
@@ -244,7 +244,7 @@ export default function ManageStylesAndVariables() {
     } else {
       setShowModal(false);
     }
-  }, []);
+  }, [setShowOptions, showOptions]);
 
   return (
     <>
@@ -337,10 +337,12 @@ export default function ManageStylesAndVariables() {
                         {themes.filter((theme) => theme.group === group).map((theme) => createThemeRow(theme))}
                       </Stack>
                     ))}
-                    <Stack direction="column" gap={2}>
-                      <Heading size="small">No group</Heading>
-                      {ungroupedThemes.map((theme) => createThemeRow(theme))}
-                    </Stack>
+                    {ungroupedThemes.length ? (
+                      <Stack direction="column" gap={2}>
+                        <Heading size="small">No group</Heading>
+                        {ungroupedThemes.map((theme) => createThemeRow(theme))}
+                      </Stack>
+                    ) : null}
                   </Stack>
                 </Stack>
 
@@ -389,29 +391,7 @@ export default function ManageStylesAndVariables() {
         </Tabs>
       </Modal>
 
-      {/* TODO: Refactor this so the modal lives in its own file? */}
-      <Modal
-        size="fullscreen"
-        title={t('modalTitle')}
-        showClose
-        isOpen={showOptions}
-        close={handleClose}
-        footer={(
-          <Stack direction="row" justify="between">
-            <Button variant="invisible" id="manageStyles-button-close" onClick={handleCancelOptions} icon={<ChevronLeftIcon />}>
-              {t('actions.cancel')}
-            </Button>
-
-            <Button variant="primary" id="pullDialog-button-override" onClick={handleSaveOptions}>
-              {t('actions.confirm')}
-            </Button>
-
-          </Stack>
-  )}
-        stickyFooter
-      >
-        <Options />
-      </Modal>
+      <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
 
       <Button variant="secondary" size="small" onClick={handleOpen}>
         {t('stylesAndVariables', { ns: 'tokens' })}
