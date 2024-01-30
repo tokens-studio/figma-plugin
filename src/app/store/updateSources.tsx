@@ -140,7 +140,6 @@ export default async function updateTokensOnSources({
       dispatch,
     });
   }
-
   const mergedTokens = tokens
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;

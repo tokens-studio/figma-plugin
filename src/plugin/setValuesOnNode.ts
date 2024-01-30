@@ -49,7 +49,6 @@ export default async function setValuesOnNode(
   baseFontSize = defaultBaseFontSize,
 ) {
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
-
   try {
     // BORDER RADIUS
     if (
@@ -264,7 +263,7 @@ export default async function setValuesOnNode(
       }
 
       // min width, max width, min height, max height only are applicable to autolayout frames or their direct children
-      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && node.type !== 'INSTANCE' && !isPartOfInstance(node.id) && (isAutoLayout(node) || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))) {
+      if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && !isPartOfInstance(node.id) && (isAutoLayout(node) || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))) {
         // SIZING: MIN WIDTH
         if ('minWidth' in node && typeof values.minWidth !== 'undefined' && typeof data.minWidth !== 'undefined' && isPrimitiveValue(values.minWidth)) {
           if (!(await tryApplyVariableId(node, 'minWidth', data.minWidth, figmaVariableReferences))) {
