@@ -36,12 +36,8 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const dispatch = useDispatch<Dispatch>();
   const tokenFormat = useSelector(tokenFormatSelector);
   const [isConvertModalOpen, setIsConvertModalOpen] = React.useState(false);
-  const closeConvertModal = React.useCallback(() => {
-    console.log('Closing!');
-    setIsConvertModalOpen(false);
-  }, []);
+
   const openConvertModal = React.useCallback(() => {
-    console.log('Hello');
     setIsConvertModalOpen(true);
   }, []);
 

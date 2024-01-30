@@ -27,6 +27,7 @@ import ProBadge from './ProBadge';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
+import { docUrls } from '@/constants/docUrls';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -173,7 +174,7 @@ export default function Footer() {
           <ProBadge />
           <IconButton
             as="a"
-            href="https://docs.tokens.studio/?ref=pf"
+            href={docUrls.root}
             icon={<DocsIcon />}
             variant="invisible"
             size="small"

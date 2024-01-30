@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Stack, Text, ToggleGroup,
+  Stack, ToggleGroup,
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dispatch } from '../store';
@@ -19,8 +19,7 @@ export function FormatSelector() {
 
   return (
     <Stack align="center" gap={2}>
-      <Text size="xsmall" muted>Format</Text>
-      <ToggleGroup type="single" value={isDTCG ? TokenFormatOptions.DTCG : TokenFormatOptions.Legacy} onValueChange={handleValueChange}>
+      <ToggleGroup size="small" type="single" value={isDTCG ? TokenFormatOptions.DTCG : TokenFormatOptions.Legacy} onValueChange={handleValueChange}>
         <ToggleGroup.Item iconOnly={false} value={TokenFormatOptions.Legacy}>
           Legacy
         </ToggleGroup.Item>
