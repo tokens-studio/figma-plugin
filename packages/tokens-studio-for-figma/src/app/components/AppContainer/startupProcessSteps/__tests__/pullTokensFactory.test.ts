@@ -53,7 +53,9 @@ describe('pullTokensFactory', () => {
               name: 'colors.red',
               value: '#ff0000',
               $extensions: {
-                id: 'mock-uuid',
+                'studio.tokens': {
+                  id: 'mock-uuid',
+                },
               },
             },
           ],
@@ -259,7 +261,9 @@ describe('pullTokensFactory', () => {
               name: 'colors.red',
               value: '#ff0000',
               $extensions: {
-                id: 'mock-uuid',
+                'studio.tokens': {
+                  id: 'mock-uuid',
+                },
               },
             },
           ],

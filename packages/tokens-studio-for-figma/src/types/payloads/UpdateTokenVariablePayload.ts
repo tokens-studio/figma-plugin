@@ -12,6 +12,7 @@ export type UpdateTokenVariablePayload = {
     [key: string]: any;
     'studio.tokens'?: {
       [key: string]: any;
+      id?: string;
       modify?: ColorModifier
     }
   }
