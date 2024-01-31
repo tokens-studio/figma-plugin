@@ -18,9 +18,9 @@ Looking to contribute a translation for your language ? See [here](./developer-k
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. [Want to join](https://tokens.studio/slack).
 
 # Sponsors
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank"><img src="sponsors/mirahi_logo_dark.svg" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Mirahi Logo"/></a> |
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> |
 | --- | --- |
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank" style="display: block; text-align: center;">Mirahi</a> |
+| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> |
 
 Is your company using Tokens Studio for Figma? Consider subscribing to Pro to benefit from advanced features and support the project! More info on [our website.](https://tokens.studio)
 
@@ -36,7 +36,7 @@ Whenever you apply a token to a layer, the plugin will store hidden information 
 Most information can be found in the [docs](https://docs.tokens.studio) or [our website](https://tokens.studio).
 
 # Contribute
-* Run `npm ci` to install dependencies.
+* Run `yarn  --frozen-lockfile  --immutable` to install dependencies.
 * Run `npm run start` to start webpack in watch mode or `npm run build` to build once.
 * Open `Figma` -> `Plugins` -> `Development` -> `New Plugin...` and choose `manifest.json` file from this repo.
 * Create a Pull request for your branch

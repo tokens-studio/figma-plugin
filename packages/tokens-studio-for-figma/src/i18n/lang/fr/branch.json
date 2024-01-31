@@ -1,0 +1,8 @@
+{
+  "ifYouCreate": "Si vous créez ou changez de branche sans pousser vos modifications locales à votre référentiel, les modifications seront perdues.",
+  "discardChanges": "Annuler les modifications",
+  "cancel": "Annuler",
+  "createNewBranch": "Créer une nouvelle branche à partir de",
+  "currentChanges": "Changements actuels",
+  "unSavedChanges": "Vous avez des changements non enregistrés"
+}
