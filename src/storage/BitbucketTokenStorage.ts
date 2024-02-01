@@ -1,8 +1,22 @@
+/* eslint-disable @typescript-eslint/indent */
 /* eslint "@typescript-eslint/no-unused-vars": off */
-// @TODO this needs to be finalized
 import { Bitbucket } from 'bitbucket';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { GitTokenStorage } from './GitTokenStorage';
+import axios from 'axios';
+import compact from 'just-compact';
+import {
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
+  RemoteTokenStorageMetadataFile,
+  RemoteTokenStorageSingleTokenSetFile,
+  RemoteTokenStorageThemesFile,
+  RemoteTokenstorageErrorMessage,
+} from './RemoteTokenStorage';
+import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
+import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import IsJSONString from '@/utils/isJSONString';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -98,26 +112,81 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
-  // https://bitbucketjs.netlify.app/#api-source-source_readRoot OR
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
-  // Equivalent to directly hitting /2.0/repositories/{username}/{repo_slug}/src/{commit}/{path} without having to know the name or SHA1 of the repo's main branch.
-  public async read(): Promise<RemoteTokenStorageFile[]> {
+  /**
+   * Reads the content of the files in a Bitbucket repository.
+   *
+   * Fetches the content of the files in aBitbucket repository specified by the `owner`, `repository`, and `branch` properties.
+   * Filters out the JSON files and processes their content.
+   *
+   * Returns a promise that resolves to an array of `RemoteTokenStorageFile` objects, if successful.
+   * Each `RemoteTokenStorageFile` object represents a file in the repository and contains the file's path, name, type, and data.
+   *
+   * @returns A promise that resolves to an array of `RemoteTokenStorageFile` objects or a `RemoteTokenstorageErrorMessage` object.
+   * @throws Will throw an error if the operation fails.
+   */
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+    const normalizedPath = compact(this.path.split('/')).join('/');
+
     try {
-      const response = await this.bitbucketClient.repositories.get({
-        workspace: this.owner,
-        repo_slug: this.repository,
-        // path: this.path,
-        // ref: this.branch,
+      const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+
+      const response = await axios.get(url, {
+        auth: {
+          username: this.owner,
+          password: this.secret,
+        },
       });
 
-      // TODO: create a tree structure and read the directory
-      // the Bitbucket cloud API doesn't have a method like `createTree`
+      if (/^application\/json(;.*)?$/.test(response.headers['content-type'])) {
+        const { data } = response;
+        if (data.values && Array.isArray(data.values)) {
+          // Filter out the JSON files
+          const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
 
-      // read entire directory
+          // Fetch the content of each JSON file
+          const jsonFileContents = await Promise.all(
+            jsonFiles.map((file: any) => fetch(file.links.self.href).then((response) => response.text())),
+          );
+          // Process the content of each JSON file
+          return jsonFileContents.map((fileContent, index) => {
+            const { path } = jsonFiles[index];
+            const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
+            let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+            name = name.replace('.json', '');
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path: filePath,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: filePath,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
+            return {
+              path: filePath,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
+            };
+          });
+        }
+        return {
+          errorMessage: ErrorMessages.VALIDATION_ERROR,
+        };
+      }
+      console.error('Unexpected file type:', response.headers['content-type']);
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
-      console.log('Error', e);
+      console.error('Error', e);
       return [];
     }
   }
@@ -125,8 +194,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
   public async createOrUpdateFiles({
-    owner, repo, branch, changes,
-  }: CreatedOrUpdatedFileType) {
+ owner, repo, branch, changes,
+}: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
 
     const data = new FormData();

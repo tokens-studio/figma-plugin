@@ -20,11 +20,16 @@ type Props = {
   isNew?: boolean;
   hasErrored?: boolean;
   errorMessage?: string;
-
 };
 
 export default function StorageItemForm({
-  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  isNew = false,
+  onChange,
+  onSubmit,
+  onCancel,
+  values,
+  hasErrored,
+  errorMessage,
 }: Props) {
   const { bitBucketSync } = useFlags();
 
