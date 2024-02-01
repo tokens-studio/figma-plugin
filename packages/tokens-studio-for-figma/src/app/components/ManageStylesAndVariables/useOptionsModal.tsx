@@ -1,75 +1,57 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Checkbox, Stack, Label, Box, Heading, Link, Button,
+  Stack, Label, Box, Heading, Link, Button,
 } from '@tokens-studio/ui';
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
 import { styled } from '@stitches/react';
 import { Modal } from '../Modal/Modal';
+import { LabelledCheckbox } from './LabelledCheckbox';
 
 const StyledCheckboxGrid = styled(Box, {
   display: 'grid', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center',
 });
 
 type ExportOptions = {
-  variables: {
-    color: boolean;
-    string: boolean;
-    number: boolean;
-    boolean: boolean;
-  };
-  styles: {
-    color: boolean;
-    typography: boolean;
-    effect: boolean;
-  };
-  rules: {
-    overwriteExisting: boolean;
-    scopeByType: boolean;
-    ignoreFirstPart: boolean;
-    prefixStylesWithThemeName: boolean;
-  };
+  variablesColor: boolean,
+  variablesString: boolean,
+  variablesNumber: boolean,
+  variablesBoolean: boolean,
+  stylesColor: boolean,
+  stylesTypography: boolean,
+  stylesEffect: boolean,
+  rulesOverwriteExisting: boolean,
+  rulesScopeByType: boolean,
+  rulesIgnoreFirstPart: boolean,
+  rulesPrefixStylesWithThemeName: boolean,
 };
-
-const LabelledCheckbox = ({
-  label, id, checked,
-} : { label: string, id: string, checked: boolean }) => (
-  <>
-    <Checkbox id={id} checked={checked} />
-    <Label css={{ fontWeight: '$sansRegular' }} htmlFor={id}>{label}</Label>
-  </>
-);
 
 export default function useOptionsModal() {
   // TODO: This is the state that needs to be saved, it should be stored on the document.
   // If a user cancels this dialog, the state should be reverted to the last saved state.
   const [exportOptions, setExportOptions] = React.useState<ExportOptions>({
-    variables: {
-      color: true,
-      string: true,
-      number: true,
-      boolean: true,
-    },
-    styles: {
-      color: true,
-      typography: true,
-      effect: true,
-    },
-    rules: {
-      overwriteExisting: true,
-      scopeByType: true,
-      ignoreFirstPart: true,
-      prefixStylesWithThemeName: true,
-    },
+    variablesColor: true,
+    variablesString: true,
+    variablesNumber: true,
+    variablesBoolean: true,
+    stylesColor: true,
+    stylesTypography: true,
+    stylesEffect: true,
+    rulesOverwriteExisting: true,
+    rulesScopeByType: true,
+    rulesIgnoreFirstPart: true,
+    rulesPrefixStylesWithThemeName: true,
   });
+
+  const handleChangeOption = React.useCallback((e: any) => {
+    setExportOptions({ ...exportOptions, [e.target.name]: e.target.value });
+  }, [exportOptions]);
 
   const handleSaveOptions = React.useCallback(() => {
     alert('TODO: Save options');
   }, []);
-
-
 
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
 
@@ -107,23 +89,23 @@ export default function useOptionsModal() {
           <Stack direction="column" justify="between" gap={5} align="start" css={{ width: '100%' }}>
             <StyledCheckboxGrid>
               <Label css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>What variables will be created and updated?</Label>
-              <LabelledCheckbox id="variables-color" checked={exportOptions.variables.color} label="Color" />
-              <LabelledCheckbox id="variables-string" checked={exportOptions.variables.string} label="String" />
-              <LabelledCheckbox id="variables-number" checked={exportOptions.variables.number} label="Number & Dimension" />
-              <LabelledCheckbox id="variables-boolean" checked={exportOptions.variables.boolean} label="Boolean" />
+              <LabelledCheckbox id="variables-color" name="variablesColor" onChange={handleChangeOption} checked={exportOptions.variablesColor} label="Color" />
+              <LabelledCheckbox id="variables-string" name="variablesString" onChange={handleChangeOption} checked={exportOptions.variablesString} label="String" />
+              <LabelledCheckbox id="variables-number" name="variablesNumber" onChange={handleChangeOption} checked={exportOptions.variablesNumber} label="Number & Dimension" />
+              <LabelledCheckbox id="variables-boolean" name="variablesBoolean" onChange={handleChangeOption} checked={exportOptions.variablesBoolean} label="Boolean" />
             </StyledCheckboxGrid>
             <StyledCheckboxGrid>
               <Label css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>What styles will be created and updated?</Label>
-              <LabelledCheckbox id="styles-color" checked={exportOptions.styles.color} label="Color" />
-              <LabelledCheckbox id="styles-typography" checked={exportOptions.styles.typography} label="Typography" />
-              <LabelledCheckbox id="styles-effect" checked={exportOptions.styles.effect} label="Effects" />
+              <LabelledCheckbox id="styles-color" name="stylesColor" onChange={handleChangeOption} checked={exportOptions.stylesColor} label="Color" />
+              <LabelledCheckbox id="styles-typography" name="stylesTypography" onChange={handleChangeOption} checked={exportOptions.stylesTypography} label="Typography" />
+              <LabelledCheckbox id="styles-effect" name="stylesEffect" onChange={handleChangeOption} checked={exportOptions.stylesEffect} label="Effects" />
             </StyledCheckboxGrid>
             <StyledCheckboxGrid>
               <Label css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>Tokens exported to Figma should:</Label>
-              <LabelledCheckbox id="rules-overwrite-existing" checked={exportOptions.rules.overwriteExisting} label="Overwrite existing styles and variable" />
-              <LabelledCheckbox id="rules-scope-by-type" checked={exportOptions.rules.scopeByType} label="Scope variables by token type" />
-              <LabelledCheckbox id="rules-ignore-first-part" checked={exportOptions.rules.ignoreFirstPart} label="Ignore first part of token name for styles" />
-              <LabelledCheckbox id="rules-prefix-with-theme-name" checked={exportOptions.rules.prefixStylesWithThemeName} label="Prefix styles with theme name" />
+              <LabelledCheckbox id="rules-overwrite-existing" name="rulesOverwriteExisting" onChange={handleChangeOption} checked={exportOptions.rulesOverwriteExisting} label="Overwrite existing styles and variables" />
+              <LabelledCheckbox id="rules-scope-by-type" name="rulesScopeByType" onChange={handleChangeOption} checked={exportOptions.rulesScopeByType} label="Scope variables by token type" />
+              <LabelledCheckbox id="rules-ignore-first-part" name="rulesIgnoreFirstPart" onChange={handleChangeOption} checked={exportOptions.rulesIgnoreFirstPart} label="Ignore first part of token name for styles" />
+              <LabelledCheckbox id="rules-prefix-with-theme-name" name="rulesPrefixWithThemeName" onChange={handleChangeOption} checked={exportOptions.rulesPrefixStylesWithThemeName} label="Prefix styles with theme name" />
             </StyledCheckboxGrid>
           </Stack>
         </form>
