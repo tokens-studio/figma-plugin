@@ -140,7 +140,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'small',
             type: 'sizing',
@@ -182,7 +184,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'small',
             type: 'sizing',
@@ -191,7 +195,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'black',
             type: 'color',
@@ -200,7 +206,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'headline',
             type: 'boxShadow',
@@ -253,7 +261,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'black',
             type: 'color',
@@ -262,7 +272,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'headline',
             type: 'boxShadow',
