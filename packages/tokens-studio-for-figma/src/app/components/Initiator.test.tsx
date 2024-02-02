@@ -236,7 +236,9 @@ describe('Initiator', () => {
       global: [
         {
           $extensions: {
-            id: 'mock-uuid',
+            'studio.tokens': {
+              id: 'mock-uuid',
+            },
           },
           type: TokenTypes.COLOR,
           name: 'colors.red',
