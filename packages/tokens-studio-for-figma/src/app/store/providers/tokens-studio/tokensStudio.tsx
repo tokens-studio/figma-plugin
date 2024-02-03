@@ -18,6 +18,7 @@ import { TokensStudioTokenStorage } from '../../../../storage/TokensStudioTokenS
 import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
+import { PushOverrides } from '../../remoteTokens';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
@@ -38,19 +39,11 @@ export function useTokensStudio() {
   }, []);
 
   const pushTokensToTokensStudio = useCallback(
-    async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
+    async (context: TokensStudioCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
       const storage = await storageClientFactory(context);
 
-      const content = await storage.retrieve();
-      if (content?.status === 'failure') {
-        return {
-          status: 'failure',
-          errorMessage: content?.errorMessage,
-        };
-      }
-
       dispatch.uiState.setLocalApiState({ ...context });
-      const pushSettings = await pushDialog();
+      const pushSettings = await pushDialog({ state: 'initial', overrides });
       if (pushSettings) {
         try {
           const metadata = {
@@ -76,7 +69,7 @@ export function useTokensStudio() {
             hasChangedRemote: true,
           });
 
-          pushDialog('success');
+          pushDialog({ state: 'success' });
           return {
             status: 'success',
             tokens,

@@ -586,9 +586,9 @@ describe('remoteTokens', () => {
         })
       ));
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        await waitFor(() => { result.current.pushTokens({ context: context as StorageTypeCredentials }); });
         expect(mockPushDialog).toBeCalledTimes(2);
-        expect(mockPushDialog.mock.calls[1][0]).toBe('success');
+        expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
       }
     });
   });
@@ -629,9 +629,9 @@ describe('remoteTokens', () => {
         })
       ));
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        await waitFor(() => { result.current.pushTokens({ context: context as StorageTypeCredentials }); });
         expect(mockPushDialog).toBeCalledTimes(2);
-        expect(mockPushDialog.mock.calls[1][0]).toBe('success');
+        expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
       }
     });
   });
@@ -651,7 +651,7 @@ describe('remoteTokens', () => {
         mockSave.mockImplementationOnce(() => {
           throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
         });
-        await waitFor(() => { result.current.pushTokens(context as StorageTypeCredentials); });
+        await waitFor(() => { result.current.pushTokens({ context: context as StorageTypeCredentials }); });
         expect(mockClosePushDialog).toBeCalledTimes(1);
       });
     }
@@ -674,7 +674,7 @@ describe('remoteTokens', () => {
         ));
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
-        expect(mockPushDialog.mock.calls[1][0]).toBe('success');
+        expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'success',
         });

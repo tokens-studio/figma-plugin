@@ -30,6 +30,8 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 
+export type PushOverrides = { branch: string, commitMessage: string };
+
 type PullTokensOptions = {
   context?: StorageTypeCredentials;
   featureFlags?: LDProps['flags'];
@@ -305,13 +307,13 @@ export default function useRemoteTokens() {
   );
 
   const pushTokens = useCallback(
-    async (context: StorageTypeCredentials = api) => {
+    async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
       console.log('PUSH TOKENS');
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       track('pushTokens', { provider: context.provider, isFolder });
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
-          await pushTokensToGitHub(context);
+          await pushTokensToGitHub(context, overrides);
           break;
         }
         case StorageProviderType.GITLAB: {

@@ -25,8 +25,8 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
           type, value, description, ...tokenWithoutTypeAndValue
         } = tokenWithoutName;
         set(tokenGroupObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
         set(tokenGroupObj, `${token.name}.${TokenFormat.tokenTypeKey}`, type);
+        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
         set(tokenGroupObj, token.name, tokenWithoutTypeAndValue, { merge: true });
       }
     });

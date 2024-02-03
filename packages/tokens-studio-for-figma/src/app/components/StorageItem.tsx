@@ -17,7 +17,7 @@ import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
-import { ConvertToDTCGModal } from './ConvertToDTCGModal';
+import { TokenFormatBadge } from './TokenFormatBadge';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -140,7 +140,10 @@ const StorageItem = ({ item, onEdit }: Props) => {
       </Stack>
       <Box css={{ marginRight: '$1' }}>
         {isActive() ? (
-          <Badge>{t('active')}</Badge>
+          <Stack gap={2} align="center">
+            <TokenFormatBadge extended />
+            <Badge>{t('active')}</Badge>
+          </Stack>
         ) : (
           <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
             {t('apply')}
@@ -159,17 +162,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
             <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
               {t('delete')}
             </DropdownMenu.Item>
-            {isActive() && tokenFormat !== TokenFormatOptions.DTCG ? (
-              <>
-                <DropdownMenu.Separator />
-                <DropdownMenu.Item onSelect={openConvertModal}>Convert to W3C DTCG format</DropdownMenu.Item>
-              </>
-            )
-              : null}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
-      <ConvertToDTCGModal isOpen={isConvertModalOpen} setIsOpen={setIsConvertModalOpen} />
     </StyledStorageItem>
   );
 };

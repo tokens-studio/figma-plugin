@@ -14,7 +14,7 @@ describe('PushDialog', () => {
   it('should show push dialog', () => {
     const mockStore = createMockStore({
       uiState: {
-        showPushDialog: 'initial',
+        showPushDialog: { state: 'initial' },
         localApiState: {
           branch: 'main',
           provider: StorageProviderType.GITHUB,
@@ -36,7 +36,7 @@ describe('PushDialog', () => {
   it('should show success dialog', () => {
     const mockStore = createMockStore({
       uiState: {
-        showPushDialog: 'success',
+        showPushDialog: { state: 'success' },
         localApiState: {
           branch: 'main',
           provider: StorageProviderType.GITHUB,
@@ -58,7 +58,7 @@ describe('PushDialog', () => {
   it('should be able to push by pressing ctrl/cmd + Enter', () => {
     const mockStore = createMockStore({
       uiState: {
-        showPushDialog: 'initial',
+        showPushDialog: { state: 'initial' },
         localApiState: {
           branch: 'main',
           provider: StorageProviderType.GITHUB,
@@ -66,7 +66,7 @@ describe('PushDialog', () => {
       },
     });
 
-    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
+    expect(mockStore.getState().uiState.showPushDialog.state).toBe('initial');
 
     const result = render(
       <Provider store={mockStore}>
@@ -74,7 +74,7 @@ describe('PushDialog', () => {
       </Provider>,
     );
 
-    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
+    expect(mockStore.getState().uiState.showPushDialog.state).toBe('initial');
 
     const commitMessageInput = result.getByTestId('push-dialog-commit-message');
     fireEvent.change(commitMessageInput, {
@@ -89,7 +89,7 @@ describe('PushDialog', () => {
       });
     });
 
-    expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
+    expect(mockStore.getState().uiState.showPushDialog.state).toBe('loading');
 
     result.unmount();
   });
@@ -97,7 +97,7 @@ describe('PushDialog', () => {
   it('should be able to push to Supernova by pressing ctrl/cmd + Enter', async () => {
     const mockStore = createMockStore({
       uiState: {
-        showPushDialog: 'initial',
+        showPushDialog: { state: 'initial' },
         localApiState: {
           provider: StorageProviderType.SUPERNOVA,
         },
@@ -110,14 +110,14 @@ describe('PushDialog', () => {
       </Provider>,
     );
 
-    expect(mockStore.getState().uiState.showPushDialog).toBe('initial');
+    expect(mockStore.getState().uiState.showPushDialog.state).toBe('initial');
 
     await act(async () => {
       await fireEvent.click(result.getByTestId('push-dialog-button-push-changes'));
     });
 
     expect(result.getByText('pushingTo Supernova.io')).toBeInTheDocument();
-    expect(mockStore.getState().uiState.showPushDialog).toBe('loading');
+    expect(mockStore.getState().uiState.showPushDialog.state).toBe('loading');
 
     result.unmount();
   });

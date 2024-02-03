@@ -2,19 +2,19 @@
   "theme": {
     "background": {
       "value": "#FAFBFC",
-      "description": "Alias value",
-      "type": "color"
+      "type": "color",
+      "description": "Alias value"
     },
     "backgroundSubtle": {
       "value": "#fafbfc80",
-      "description": "Nested color value",
-      "type": "color"
+      "type": "color",
+      "description": "Nested color value"
     },
     "size": {
       "default": {
         "value": 8,
-        "description": "Sizing value",
-        "type": "sizing"
+        "type": "sizing",
+        "description": "Sizing value"
       }
     }
   },

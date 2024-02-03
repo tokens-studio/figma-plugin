@@ -2,13 +2,13 @@
   "typography": {
     "fontFamily": {
       "value": "Roboto",
-      "description": "Font value",
-      "type": "fontFamilies"
+      "type": "fontFamilies",
+      "description": "Font value"
     },
     "fontWeight": {
       "value": "Bold",
-      "description": "Weight value",
-      "type": "fontWeights"
+      "type": "fontWeights",
+      "description": "Weight value"
     },
     "h1": {
       "value": {

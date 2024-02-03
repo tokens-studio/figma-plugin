@@ -28,6 +28,7 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
+import { TokenFormatBadge } from './TokenFormatBadge';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -69,9 +70,10 @@ export default function Footer() {
     >
 
       <Stack direction="row" align="center" gap={2}>
-        {isGitProvider(localApiState) && localApiState.branch && (
+        {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />
+            <TokenFormatBadge />
             <DirtyStateBadgeWrapper badge={hasRemoteChange}>
               <IconButton
                 data-testid="footer-pull-button"
@@ -96,39 +98,6 @@ export default function Footer() {
                 size="small"
                 tooltipSide="top"
                 disabled={editProhibited || !hasChanges}
-                tooltip={
-                  t('pushTo', {
-                    provider: transformProviderName(storageType.provider),
-                  }) as string
-                }
-              />
-            </DirtyStateBadgeWrapper>
-          </>
-        )}
-        {storageType.provider === StorageProviderType.SUPERNOVA && (
-          <>
-            <IconButton
-              data-testid="footer-pull-button"
-              icon={<DownloadIcon />}
-              onClick={onPullButtonClicked}
-              variant="invisible"
-              size="small"
-              tooltipSide="top"
-              tooltip={
-                t('pullFrom', {
-                  provider: transformProviderName(storageType.provider),
-                }) as string
-              }
-            />
-            <DirtyStateBadgeWrapper badge={hasChanges}>
-              <IconButton
-                data-testid="footer-push-button"
-                icon={<UploadIcon />}
-                onClick={onPushButtonClicked}
-                variant="invisible"
-                size="small"
-                tooltipSide="top"
-                disabled={editProhibited}
                 tooltip={
                   t('pushTo', {
                     provider: transformProviderName(storageType.provider),

@@ -19,6 +19,7 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { useChangedState } from '@/hooks/useChangedState';
+import { PushOverrides } from '../../remoteTokens';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -61,40 +62,12 @@ export function useBitbucket() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToBitbucket = useCallback(async (context: BitbucketCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        themes,
-        tokens,
-        metadata: {
-          tokenSetOrder: Object.keys(tokens),
-        },
-      };
-    }
 
     dispatch.uiState.setLocalApiState({ ...context });
-    dispatch.tokenState.setRemoteData({
-      tokens: content?.tokens ?? {},
-      themes: content?.themes ?? [],
-      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
-    });
 
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -116,7 +89,7 @@ export function useBitbucket() {
           activeTheme,
           hasChangedRemote: true,
         });
-        pushDialog('success');
+        pushDialog({ state: 'success' });
         return {
           status: 'success',
           tokens,

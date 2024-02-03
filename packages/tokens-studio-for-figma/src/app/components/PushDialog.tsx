@@ -84,9 +84,9 @@ function PushDialog() {
   );
 
   React.useEffect(() => {
-    if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
-      setCommitMessage('');
-      setBranch(localApiState.branch ?? '');
+    if (showPushDialog?.state === 'initial' && isGitProvider(localApiState)) {
+      setCommitMessage(showPushDialog?.overrides?.commitMessage ?? '');
+      setBranch(showPushDialog?.overrides?.branch ?? localApiState.branch ?? '');
     }
   }, [showPushDialog, localApiState]);
 
@@ -98,7 +98,7 @@ function PushDialog() {
 
   const handleSaveShortcut = React.useCallback(
     (event: KeyboardEvent) => {
-      if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
+      if (showPushDialog?.state === 'initial' && (event.metaKey || event.ctrlKey)) {
         handlePushChanges();
       }
     },
@@ -107,7 +107,8 @@ function PushDialog() {
 
   useShortcut(['Enter'], handleSaveShortcut);
 
-  switch (showPushDialog) {
+  switch (showPushDialog?.state) {
+    case 'dtcgconversion':
     case 'initial': {
       return (
         <Modal
@@ -135,20 +136,17 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <Stack direction="row" gap={2} justify="between" css={{ width: '100%', padding: '$4', paddingBottom: 0 }}>
-              <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
-                <ToggleGroup.Item iconOnly={false} value="commit">
-                  {t('commit')}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item iconOnly={false} value="diff">
-                  {t('diff')}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item iconOnly={false} value="json">
-                  JSON
-                </ToggleGroup.Item>
-              </ToggleGroup>
-              <FormatSelector />
-            </Stack>
+            <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
+              <ToggleGroup.Item iconOnly={false} value="commit">
+                {t('commit')}
+              </ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value="diff">
+                {t('diff')}
+              </ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value="json">
+                JSON
+              </ToggleGroup.Item>
+            </ToggleGroup>
             {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
               <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
                 {t('thisWillPushYourLocalChangesToTheBranch')}
@@ -214,7 +212,8 @@ function PushDialog() {
                 {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
               </Text>
             </Stack>
-            <Button variant="primary" href={redirectHref}>
+            {/* @ts-ignore Exception for Button to accept target */}
+            <Button as="a" target="_blank" variant="primary" href={redirectHref}>
               {localApiState.provider === StorageProviderType.SUPERNOVA ? (
                 <>{t('openSupernovaWorkspace')}</>
               ) : (

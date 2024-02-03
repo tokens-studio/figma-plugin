@@ -12,7 +12,7 @@ import useStorage from '../store/useStorage';
 import { storageTypeSelector } from '@/selectors';
 import useConfirm from '../hooks/useConfirm';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { FormatSelector } from './FormatSelector';
+import { TokenFormatBadge } from './TokenFormatBadge';
 
 const LocalStorageItem = () => {
   const { t } = useTranslation(['storage']);
@@ -75,7 +75,7 @@ const LocalStorageItem = () => {
         }}
       >
         {isActive ? (
-          <FormatSelector />
+          <TokenFormatBadge extended />
         ) : (
           <Button
             data-testid="button-storage-item-apply"

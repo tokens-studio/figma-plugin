@@ -20,13 +20,12 @@ import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { PushOverrides } from '../../remoteTokens';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
 export function useGitHub() {
   const tokens = useSelector(tokensSelector);
-  const tokenFormat = useSelector(tokenFormatSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const themes = useSelector(themesListSelector);
   const localApiState = useSelector(localApiStateSelector);
@@ -55,11 +54,10 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
-
     dispatch.uiState.setLocalApiState({ ...context });
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -85,7 +83,7 @@ export function useGitHub() {
           activeTheme,
           hasChangedRemote: true,
         });
-        pushDialog('success');
+        pushDialog({ state: 'success' });
         return {
           status: 'success',
           tokens,

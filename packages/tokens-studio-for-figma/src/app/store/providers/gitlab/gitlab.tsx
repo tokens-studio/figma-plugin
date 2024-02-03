@@ -21,6 +21,7 @@ import { getRepositoryInformation } from '../getRepositoryInformation';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { PushOverrides } from '../../remoteTokens';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
@@ -61,40 +62,12 @@ export function useGitLab() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToGitLab = useCallback(async (context: GitlabCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = await storageClientFactory(context, multiFileSync);
 
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        tokens,
-        themes,
-        metadata: {},
-      };
-    }
-
     dispatch.uiState.setLocalApiState({ ...context });
-    dispatch.tokenState.setRemoteData({
-      tokens: content?.tokens ?? {},
-      themes: content?.themes ?? [],
-      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
-    });
 
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -121,7 +94,7 @@ export function useGitLab() {
           hasChangedRemote: true,
         });
 
-        pushDialog('success');
+        pushDialog({ state: 'success' });
         return {
           status: 'success',
           tokens,

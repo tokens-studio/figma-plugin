@@ -18,6 +18,7 @@ import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { PushOverrides } from '../../remoteTokens';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -50,40 +51,12 @@ export const useADO = () => {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToADO = React.useCallback(async (context: AdoCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
-    if (context.branch) {
-      storage.setSource(context.branch);
-    }
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        tokens,
-        themes,
-      };
-    }
 
     dispatch.uiState.setLocalApiState({ ...context });
-    dispatch.tokenState.setRemoteData({
-      tokens: content?.tokens ?? {},
-      themes: content?.themes ?? [],
-      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
-    });
 
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -110,7 +83,7 @@ export const useADO = () => {
           hasChangedRemote: true,
         });
 
-        pushDialog('success');
+        pushDialog({ state: 'success' });
 
         return {
           status: 'success',

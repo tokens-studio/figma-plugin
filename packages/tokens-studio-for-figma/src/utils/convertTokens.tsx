@@ -101,11 +101,11 @@ function checkForTokens({
       ...remainingTokenProperties
     } = token;
     returnValue = {
+      type: type as TokenTypes,
       value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
         acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
         return acc;
       }, {}),
-      type: type as TokenTypes,
       ...(description && typeof description === 'string' ? { description } : {}),
       ...remainingTokenProperties,
     };
