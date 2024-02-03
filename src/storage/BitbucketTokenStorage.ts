@@ -38,7 +38,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
         username: this.owner,
@@ -56,7 +55,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       repo_slug: this.repository,
     });
 
-    if (!branches.data) {
+    if (!branches || !branches.data) {
       return ['No data'];
     }
     // README we'll have to account for paginated branches somehow, this only returns
@@ -70,17 +69,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     try {
       const originRef = `refs/${source || this.branch}`;
       const newRef = `refs/${branch}`;
-      const originBranch = await this.bitbucketClient.listRefs({
+      const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
         ref: originRef,
       });
-      // TODO: createRef is not implemented on Bitbucket Cloud
-      // const newBranch = await this.bitbucketClient.git.createRef({
-      //   workspace: this.owner,
-      //   repo_slug: this.repository,
-      //   ref: newRef,
-      // });
 
       const newBranch = await this.bitbucketClient.refs.createBranch({
         workspace: this.owner,
@@ -115,7 +108,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   /**
    * Reads the content of the files in a Bitbucket repository.
    *
-   * Fetches the content of the files in aBitbucket repository specified by the `owner`, `repository`, and `branch` properties.
+   * Fetches the content of the files in a Bitbucket repository specified by the `owner`, `repository`, and `branch` properties.
    * Filters out the JSON files and processes their content.
    *
    * Returns a promise that resolves to an array of `RemoteTokenStorageFile` objects, if successful.
@@ -191,8 +184,37 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
-  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
+  /**
+   * Create or update files in a Bitbucket repository.
+   *
+   * [Bitbucket API reference](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post)
+   *
+   * @param {Object} params - The parameters for creating or updating files.
+   * @param {string} params.owner - The owner of the repository.
+   * @param {string} params.repo - The repository where the files will be created or updated.
+   * @param {string} params.branch - The branch where the files will be created or updated.
+   * @param {Array} params.changes - An array of changes to be made. Each change is an object that includes a message and files.
+   * @param {string} params.changes[].message - The commit message for the change.
+   * @param {Object} params.changes[].files - The files to be created or updated. This is a Record<string, string> where the key is the filename and the value is the new content.
+   *
+   * @returns {Promise} A promise that resolves to the response from the Bitbucket API.
+   *
+   * @example
+   * const params = {
+   *   owner: 'owner',
+   *   repo: 'repo',
+   *   branch: 'branch',
+   *   changes: [
+   *     {
+   *       message: 'Initial commit',
+   *       files: {
+   *         'data/tokens.json': JSON.stringify(data),
+   *       },
+   *     },
+   *   ],
+   * };
+   * const response = await createOrUpdateFiles(params);
+   */
   public async createOrUpdateFiles({
  owner, repo, branch, changes,
 }: CreatedOrUpdatedFileType) {
@@ -208,8 +230,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       data.append(file, content);
 
       // we will also add all the "files" parameters so we can perform deletions later down the line
-      // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData
-      // will be deleted
+      // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData will be deleted
       // @NOTE we can actually add the files parameter multiple times - this is fine and Bitbucket will pick this up correctly
       data.append('files', file);
     });

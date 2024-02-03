@@ -1,31 +1,58 @@
-// import { TokenTypes } from '@/constants/TokenTypes';
-// import { TokenSetStatus } from '@/constants/TokenSetStatus';
+/* eslint-disable arrow-body-style */
+/* eslint-disable operator-linebreak */
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
+import { TokenTypes } from '@/constants/TokenTypes';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { BitbucketTokenStorage } from '../BitbucketTokenStorage';
+import { RemoteTokenStorageFile } from '../RemoteTokenStorage';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
-const mockListBranches = jest.fn();
-const mockCanWrite = jest.fn();
-const mockCreateOrUpdateFiles = jest.fn();
-const mockGetAuthedUser = jest.fn();
-const mockListPermissions = jest.fn();
-const mockCreateSrcFileCommit = jest.fn();
+import {
+  mockGetAuthedUser,
+  mockListPermissions,
+  mockListBranches,
+  mockCreateOrUpdateFiles,
+  mockCreateBranch,
+} from '../../../tests/__mocks__/bitbucketMock';
 
-jest.mock('bitbucket', () => ({
-  Bitbucket: jest.fn().mockImplementation(() => ({
-    users: {
-      canWrite: mockCanWrite,
-      getAuthedUser: mockGetAuthedUser,
-    },
-    repositories: {
-      listBranches: mockListBranches,
-      createOrUpdateFiles: mockCreateOrUpdateFiles,
-      listPermissions: mockListPermissions,
-      createSrcFileCommit: mockCreateSrcFileCommit,
-    },
-  })),
-}));
+// Mock FormData
+// createOrUpdateFiles function uses a FormData object to send the data to the createSrcFileCommit method
+// mock the FormData class and make it return a plain object that can be easily compared in the test
+global.FormData = jest.fn().mockImplementation(() => {
+  const data: Record<string, any> = {};
+
+  return {
+    append: jest.fn().mockImplementation((key: string, value: any) => {
+      data[key] = value;
+    }),
+    getData: jest.fn().mockImplementation(() => data),
+  };
+});
+
+// mock the bitbucket-node module
+jest.mock('bitbucket', () => {
+  return {
+    Bitbucket: jest.fn().mockImplementation(() => {
+      return {
+        users: {
+          getAuthedUser: mockGetAuthedUser,
+        },
+        repositories: {
+          listPermissions: mockListPermissions,
+          listBranches: mockListBranches,
+          createSrcFileCommit: mockCreateOrUpdateFiles,
+        },
+        refs: {
+          createBranch: mockCreateBranch, // Add this line
+        },
+      };
+    }),
+  };
+});
 
 describe('BitbucketTokenStorage', () => {
-  const storageProvider = new BitbucketTokenStorage('', 'MattOliver', 'figma-tokens-testing');
+  const storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing');
   storageProvider.selectBranch('main');
 
   beforeEach(() => {
@@ -33,153 +60,196 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('canWrite should return false if unauthenticated', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
-      data: {
-        values: [
-          {
-            permission: '' || 'read',
-          },
-        ],
-      },
-    }));
+    mockGetAuthedUser.mockImplementationOnce(() => {
+      return Promise.resolve({
+        data: {},
+      });
+    });
+
+    mockListPermissions.mockImplementationOnce(() => {
+      return Promise.resolve({
+        data: {
+          values: [],
+        },
+      });
+    });
 
     expect(await storageProvider.canWrite()).toBe(false);
   });
 
   it('canWrite should return true if user has admin or write permissions', async () => {
-    mockGetAuthedUser.mockImplementationOnce(() => Promise.resolve({
-      data: { account_id: '123' },
-    }));
-    mockListPermissions.mockImplementationOnce(() => Promise.resolve({
-      data: { values: [{ permission: 'admin' }] },
-    }));
+    mockGetAuthedUser.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { account_id: '123' },
+      }),
+    );
+    mockListPermissions.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { values: [{ permission: 'admin' }] },
+      }),
+    );
 
     expect(await storageProvider.canWrite()).toBe(true);
   });
 
+  it('canWrite should return false if filePath is a folder and multiFileSync flag is false', async () => {
+    storageProvider.changePath('tokens');
+
+    const canWrite = await storageProvider.canWrite();
+    expect(canWrite).toBe(false);
+  });
+
   it('listBranches should fetch branches as a simple list', async () => {
-    mockListBranches.mockImplementationOnce(() => Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } }));
+    mockListBranches.mockImplementationOnce(() =>
+      Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } }),
+    );
 
     expect(await storageProvider.fetchBranches()).toEqual(['main', 'different-branch']);
   });
 
-  // it('should be able to write', async () => {
-  //   mockListBranches.mockImplementationOnce(() => Promise.resolve({
-  //     data: { values: [{ name: 'main' }] },
-  //   }));
+  it('should try to create a branch', async () => {
+    // Arrange
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    jest.spyOn(storageProvider['bitbucketClient'].refs, 'createBranch').mockImplementation(mockCreateBranch);
 
-  //   mockCreateOrUpdateFiles.mockImplementationOnce(() => Promise.resolve({
-  //     owner: 'MattOliver',
-  //     repo: 'figma-tokens-testing',
-  //     branch: 'main',
-  //     changes: [
-  //       {
-  //         message: 'Initial commit',
-  //         files: {
-  //           'data/tokens.json':
-  //               '{\n'
-  //               + '  "$themes": [\n'
-  //               + '    {\n'
-  //               + '      "id": "light",\n'
-  //               + '      "name": "Light",\n'
-  //               + '      "selectedTokenSets": {\n'
-  //               + '        "global": "enabled"\n'
-  //               + '      }\n'
-  //               + '    }\n'
-  //               + '  ],\n'
-  //               + '  "global": {\n'
-  //               + '    "red": {\n'
-  //               + '      "type": "color",\n'
-  //               + '      "name": "red",\n'
-  //               + '      "value": "#ff0000"\n'
-  //               + '    }\n'
-  //               + '  }\n'
-  //               + '}',
-  //         },
-  //       },
-  //     ],
-  //   }));
+    // Act
+    const result = await storageProvider.createBranch('new-branch');
 
-  //   storageProvider.changePath('data/tokens.json');
-  //   await storageProvider.write([
-  //     {
-  //       type: 'metadata',
-  //       path: '$metadata.json',
-  //       data: {},
-  //     },
-  //     {
-  //       type: 'themes',
-  //       path: '$themes.json',
-  //       data: [
-  //         {
-  //           id: 'light',
-  //           name: 'Light',
-  //           selectedTokenSets: {
-  //             global: TokenSetStatus.ENABLED,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       type: 'tokenSet',
-  //       name: 'global',
-  //       path: 'global.json',
-  //       data: {
-  //         red: {
-  //           type: TokenTypes.COLOR,
-  //           name: 'red',
-  //           value: '#ff0000',
-  //         },
-  //       },
-  //     },
-  //   ], {
-  //     commitMessage: '',
-  //   });
+    // Assert
+    expect(mockCreateBranch).toHaveBeenCalledWith({
+      workspace: expect.any(String),
+      _body: undefined,
+      repo_slug: expect.any(String),
+    });
+    expect(result).toBe(true);
+  });
 
-  //   expect(mockCreateOrUpdateFiles).toBeCalledWith({
-  //     branch: 'main',
-  //     owner: 'MattOliver',
-  //     repo: 'figma-tokens-testing',
-  //     createBranch: false,
-  //     changes: [
-  //       {
-  //         message: 'Initial commit',
-  //         files: {
-  //           'data/tokens.json': JSON.stringify(
-  //             {
-  //               $themes: [
-  //                 {
-  //                   id: 'light',
-  //                   name: 'Light',
-  //                   selectedTokenSets: {
-  //                     global: TokenSetStatus.ENABLED,
-  //                   },
-  //                 },
-  //               ],
-  //               global: {
-  //                 red: {
-  //                   type: TokenTypes.COLOR,
-  //                   name: 'red',
-  //                   value: '#ff0000',
-  //                 },
-  //               },
-  //             },
-  //             null,
-  //             2,
-  //           ),
-  //         },
-  //       },
-  //     ],
-  //   });
-  // });
+  it('should be able to write', async () => {
+    mockListBranches.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { values: [{ name: 'main' }] },
+      }),
+    );
+
+    const files: RemoteTokenStorageFile[] = [
+      {
+        type: 'metadata',
+        path: '$metadata.json',
+        data: {},
+      },
+      {
+        type: 'themes',
+        path: '$themes.json',
+        data: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+            },
+          },
+        ],
+      },
+      {
+        type: 'tokenSet',
+        name: 'global',
+        path: 'global.json',
+        data: {
+          red: {
+            type: TokenTypes.COLOR,
+            name: 'red',
+            value: '#ff0000',
+          },
+        },
+      },
+    ];
+
+    const changes = files.map((file) => ({
+      message: 'Initial commit',
+      files: {
+        [file.path]: JSON.stringify(file.data, null, 2),
+      },
+    }));
+
+    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+      Promise.resolve({
+        branch: 'main',
+        owner: 'MattOliver',
+        repo: 'figma-tokens-testing',
+        createBranch: false,
+        changes: changes.map((change) => {
+          const files: { [key: string]: string } = {};
+          if (change.files['$metadata.json']) files['$metadata.json'] = change.files['$metadata.json'];
+          if (change.files['$themes.json']) files['$themes.json'] = change.files['$themes.json'];
+          if (change.files['global.json']) files['global.json'] = change.files['global.json'];
+          return {
+            message: change.message,
+            files,
+          };
+        }),
+      }),
+    );
+
+    storageProvider.changePath('data/tokens.json');
+    await storageProvider.write(files, {
+      commitMessage: '',
+      storeTokenIdInJsonEditor: false,
+    });
+
+    expect(mockCreateOrUpdateFiles).toBeCalledWith({
+      _body: expect.objectContaining({
+        append: expect.any(Function),
+        getData: expect.any(Function),
+      }),
+      branch: 'main',
+      message: '',
+      repo_slug: 'figma-tokens-testing',
+      workspace: 'MattOliver',
+    });
+  });
+
+  it('should not be able to write a multi file structure when multi file flag is off', async () => {
+    mockCreateOrUpdateFiles.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: {
+          content: {},
+        },
+      }),
+    );
+
+    storageProvider.disableMultiFile();
+    storageProvider.changePath('data');
+
+    await expect(async () => {
+      await storageProvider.write(
+        [
+          {
+            type: 'tokenSet',
+            name: 'global',
+            path: 'global.json',
+            data: {
+              red: {
+                type: TokenTypes.COLOR,
+                name: 'red',
+                value: '#ff0000',
+              },
+            },
+          },
+        ],
+        {
+          commitMessage: '',
+          storeTokenIdInJsonEditor: false,
+        },
+      );
+    }).rejects.toThrow(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
+    expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
+  });
+
   // it('fetchBranches should return a flattened list of all paginated branches', async () => {
   //   // TODO
   //   expect((await 1) + 1).toEqual(3);
   // });
-  // it('should try to create a branch', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
+
   // it('create a branch should return false when it has failed', async () => {
   //   // TODO
   //   expect((await 1) + 1).toEqual(3);
