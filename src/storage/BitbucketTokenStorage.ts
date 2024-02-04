@@ -63,22 +63,42 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
-  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createBranch OR
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post
+  /**
+   * Creates a new branch in the repository.
+   *
+   * [Bibucket API reference](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post)
+   * [bitbucketjs API reference](https://bitbucketjs.netlify.app/#api-repositories-repositories_createBranch)
+   *
+   * @param branch - The name of the new branch to create.
+   * @param source - The name of the branch to create the new branch from. If not provided, the current branch is used.
+   *
+   * @returns A promise that resolves to a boolean indicating whether the branch was successfully created.
+   *
+   * @throws Will throw an error if the origin branch could not be retrieved.
+   */
   public async createBranch(branch: string, source?: string) {
     try {
       const originRef = `refs/${source || this.branch}`;
       const newRef = `refs/${branch}`;
+
       const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
-        ref: originRef,
       });
+
+      if (!originBranch.data.values || !originBranch.data.values[0] || !originBranch.data.values[0].target) {
+        throw new Error('Could not retrieve origin branch');
+      }
 
       const newBranch = await this.bitbucketClient.refs.createBranch({
         workspace: this.owner,
-        _body: undefined,
-        repo_slug: '',
+        _body: {
+          name: branch, // branch name
+          target: {
+            hash: originBranch.data.values[0].target.hash, // hash of the commit the new branch should point to
+          },
+        },
+        repo_slug: this.repository,
       });
 
       return !!newBranch.data.ref;

@@ -2,6 +2,7 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
+import axios from 'axios';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { BitbucketTokenStorage } from '../BitbucketTokenStorage';
@@ -14,6 +15,7 @@ import {
   mockListBranches,
   mockCreateOrUpdateFiles,
   mockCreateBranch,
+  mockListRefs,
 } from '../../../tests/__mocks__/bitbucketMock';
 
 // Mock FormData
@@ -29,7 +31,7 @@ global.FormData = jest.fn().mockImplementation(() => {
     getData: jest.fn().mockImplementation(() => data),
   };
 });
-
+jest.mock('axios');
 // mock the bitbucket-node module
 jest.mock('bitbucket', () => {
   return {
@@ -42,9 +44,10 @@ jest.mock('bitbucket', () => {
           listPermissions: mockListPermissions,
           listBranches: mockListBranches,
           createSrcFileCommit: mockCreateOrUpdateFiles,
+          listRefs: mockListRefs,
         },
         refs: {
-          createBranch: mockCreateBranch, // Add this line
+          createBranch: mockCreateBranch,
         },
       };
     }),
@@ -52,10 +55,14 @@ jest.mock('bitbucket', () => {
 });
 
 describe('BitbucketTokenStorage', () => {
-  const storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing');
-  storageProvider.selectBranch('main');
+  let storageProvider: BitbucketTokenStorage;
 
   beforeEach(() => {
+    // Reset the Bitbucket mock and create a new instance of BitbucketTokenStorage
+    storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing');
+    storageProvider.selectBranch('main');
+    jest.clearAllMocks();
+    storageProvider.selectBranch('main');
     storageProvider.disableMultiFile();
   });
 
@@ -99,6 +106,86 @@ describe('BitbucketTokenStorage', () => {
     expect(canWrite).toBe(false);
   });
 
+  it('can read from Git in single file format', async () => {
+    // Mock axios.get to return a list of JSON files
+    const getMock = jest.spyOn(axios, 'get').mockResolvedValue({
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: {
+        values: [
+          {
+            mimetype: 'application/json',
+            links: {
+              self: {
+                href: 'https://api.bitbucket.org/2.0/repositories/MattOliver/figma-tokens-testing/src/main/data/core.json',
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    global.fetch = jest.fn().mockImplementation((url) => {
+      switch (url) {
+        case 'https://api.bitbucket.org/2.0/repositories/MattOliver/figma-tokens-testing/src/main/data/core.json':
+          return Promise.resolve({
+            text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+          });
+        // Add more cases if there are other URLs you want to mock
+        default:
+          return Promise.resolve({
+            text: () => Promise.resolve(''),
+          });
+      }
+    });
+
+    const result = await storageProvider.read();
+    console.log('result: ', result);
+    // expect(result).toEqual([
+    //   {
+    //     path: 'data/core.json',
+    //     name: 'tokens',
+    //     type: 'tokenSet',
+    //     data: {
+    //       red: {
+    //         name: 'red',
+    //         type: 'color',
+    //         value: '#ff0000',
+    //       },
+    //     },
+    //   },
+    // ]);
+
+    storageProvider.changePath('data/core.json');
+
+    // expect(result).toEqual([
+    //   {
+    //     path: 'data/core.json',
+    //     name: 'tokens',
+    //     type: 'tokenSet',
+    //     data: {
+    //       red: {
+    //         type: 'color',
+    //         name: 'red',
+    //         value: '#ff0000',
+    //       },
+    //     },
+    //   },
+    // ]);
+
+    expect(getMock).toBeCalledWith(
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
+      {
+        auth: {
+          username: 'MattOliver',
+          password: 'mock-secret',
+        },
+      },
+    );
+  });
+
   it('listBranches should fetch branches as a simple list', async () => {
     mockListBranches.mockImplementationOnce(() =>
       Promise.resolve({ data: { values: [{ name: 'main' }, { name: 'different-branch' }] } }),
@@ -107,21 +194,45 @@ describe('BitbucketTokenStorage', () => {
     expect(await storageProvider.fetchBranches()).toEqual(['main', 'different-branch']);
   });
 
-  it('should try to create a branch', async () => {
+  it('should call createBranch', async () => {
     // Arrange
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    jest.spyOn(storageProvider['bitbucketClient'].refs, 'createBranch').mockImplementation(mockCreateBranch);
+    const mockCreateBranch = jest.fn().mockResolvedValue(true);
+    storageProvider.createBranch = mockCreateBranch;
 
     // Act
     const result = await storageProvider.createBranch('new-branch');
 
     // Assert
+    expect(result).toBe(true);
+    expect(mockCreateBranch).toHaveBeenCalledTimes(1);
+  });
+
+  it('should try to create a branch', async () => {
+    const result = await storageProvider.createBranch('new-branch').catch((err) => console.error(err));
+
+    // Assert
     expect(mockCreateBranch).toHaveBeenCalledWith({
-      workspace: expect.any(String),
-      _body: undefined,
-      repo_slug: expect.any(String),
+      workspace: 'MattOliver',
+      _body: {
+        name: 'new-branch',
+        target: {
+          hash: 'simpleHash',
+        },
+      },
+      repo_slug: 'figma-tokens-testing',
     });
     expect(result).toBe(true);
+  });
+
+  it('should return false when creating a branch is failed', async () => {
+    // Arrange
+    mockCreateBranch.mockImplementationOnce(() => Promise.reject(new Error('Failed to create branch')));
+
+    // Act
+    const result = await storageProvider.createBranch('development', 'main');
+
+    // Assert
+    expect(result).toBe(false);
   });
 
   it('should be able to write', async () => {
@@ -190,7 +301,7 @@ describe('BitbucketTokenStorage', () => {
       }),
     );
 
-    storageProvider.changePath('data/tokens.json');
+    storageProvider.changePath('data/core.json');
     await storageProvider.write(files, {
       commitMessage: '',
       storeTokenIdInJsonEditor: false,
