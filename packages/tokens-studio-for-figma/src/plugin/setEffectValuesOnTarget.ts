@@ -5,59 +5,103 @@ import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
 import convertOffsetToFigma from './figmaTransforms/offset';
 import { getShadowBehindNodeFromEffect } from './figmaUtils/getShadowBehindNodeFromEffect';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
+import { TokenBoxshadowValue } from '@/types/values';
 
-export default function setEffectValuesOnTarget(
-  // @TODO update this typing
+type ResolvedShadowObject = {
+  color: string;
+  type: string;
+  spread: string;
+  radius: string;
+  x: string;
+  y: string;
+};
+
+function transformShadowKeyToFigmaVariable(key: string): VariableBindableEffectField {
+  switch (key) {
+    case 'x':
+      return 'offsetX' as VariableBindableEffectField;
+    case 'y':
+      return 'offsetY' as VariableBindableEffectField;
+    default:
+      return key as VariableBindableEffectField;
+  }
+}
+
+async function tryApplyCompositeVariable({
+  target, value, baseFontSize, resolvedValue,
+}: {
+  target: BaseNode | EffectStyle;
+  value: TokenBoxshadowValue;
+  baseFontSize: string;
+  resolvedValue: ResolvedShadowObject;
+}) {
+  const { color, opacity: a } = convertToFigmaColor(value.color);
+  const { r, g, b } = color;
+
+  let effect: Effect = {
+    color: {
+      r,
+      g,
+      b,
+      a,
+    },
+    type: convertBoxShadowTypeToFigma(value.type),
+    spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
+    radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
+    offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
+    blendMode: (value.blendMode || 'NORMAL') as BlendMode,
+    visible: true,
+    ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},
+  };
+  try {
+    for (const [key, val] of Object.entries(resolvedValue)) {
+      console.log('looking at', key, val, effect);
+      if (val.startsWith('{') && val.endsWith('}')) {
+        const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
+        const allReferences = defaultTokenValueRetriever.getTokens();
+        console.log('ALL REFERENCES', Array.from(allReferences.entries()));
+        console.log('variable to apply is', variableToApply);
+        if (variableToApply && key !== 'blur') {
+          // NOTE: there's a bug with Figma's plugin API right now, it does not seem to let blur be something that is bindable to a node
+          console.log('Theres a variable to apply for', key);
+          effect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return effect;
+}
+
+export default async function setEffectValuesOnTarget(
   target: BaseNode | EffectStyle,
-  token: Pick<SingleBoxShadowToken, 'value' | 'description'>,
+  token: string,
   baseFontSize: string,
   key: 'effects' = 'effects',
 ) {
+  const resolvedToken = defaultTokenValueRetriever.get(token);
   try {
-    const { description, value } = token;
+    const { description, value } = resolvedToken;
+    const resolvedValue: ResolvedShadowObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
 
     if (Array.isArray(value)) {
-      const effectsArray = value.map((v, index) => {
-        const { color, opacity: a } = convertToFigmaColor(v.color);
-        const { r, g, b } = color;
-        return {
-          color: {
-            r,
-            g,
-            b,
-            a,
-          },
-          type: convertBoxShadowTypeToFigma(v.type),
-          spread: convertTypographyNumberToFigma(v.spread.toString(), baseFontSize),
-          radius: convertTypographyNumberToFigma(v.blur.toString(), baseFontSize),
-          offset: convertOffsetToFigma(convertTypographyNumberToFigma(v.x.toString(), baseFontSize), convertTypographyNumberToFigma(v.y.toString(), baseFontSize)),
-          blendMode: v.blendMode || 'NORMAL' as BlendMode,
-          visible: true,
-          ...v.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[index]) } : {},
-        };
-      }) as Effect[];
+      const effectsArray = await Promise.all(value.map(async (v, i) => {
+        const newEffect = await tryApplyCompositeVariable({
+          target, value: v, baseFontSize, resolvedValue: resolvedValue[i],
+        });
+        return newEffect;
+      }));
 
-      if ('effects' in target && key === 'effects') target[key] = effectsArray.reverse();
+      if ('effects' in target && key === 'effects') target.effects = effectsArray.reverse();
     } else if (typeof value !== 'string') {
-      const { color, opacity: a } = convertToFigmaColor(value.color);
-      const { r, g, b } = color;
       if ('effects' in target && key === 'effects') {
-        target[key] = [
-          {
-            color: {
-              r,
-              g,
-              b,
-              a,
-            },
-            type: convertBoxShadowTypeToFigma(value.type),
-            spread: convertTypographyNumberToFigma(value.spread.toString(), baseFontSize),
-            radius: convertTypographyNumberToFigma(value.blur.toString(), baseFontSize),
-            offset: convertOffsetToFigma(convertTypographyNumberToFigma(value.x.toString(), baseFontSize), convertTypographyNumberToFigma(value.y.toString(), baseFontSize)),
-            blendMode: (value.blendMode || 'NORMAL') as BlendMode,
-            visible: true,
-            ...value.type === 'dropShadow' && 'effects' in target ? { showShadowBehindNode: getShadowBehindNodeFromEffect(target.effects[0]) } : {},
-          },
+        const newEffect = await tryApplyCompositeVariable({
+          target, value, baseFontSize, resolvedValue,
+        });
+        target.effects = [
+          newEffect,
         ];
       }
     }
@@ -66,6 +110,6 @@ export default function setEffectValuesOnTarget(
       target.description = description;
     }
   } catch (e) {
-    console.error('Error setting color', e);
+    console.error('Error setting shadow', e);
   }
 }

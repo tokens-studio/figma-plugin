@@ -7,6 +7,7 @@ import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
 import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
 import { getThemeReferences } from './getThemeReferences';
+import { TokenValueRetriever, defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let receivedStyleIds: Record<string, string> = {};
@@ -26,14 +27,20 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
   }
   if (msg.tokens) {
-    const tokensMap = tokenArrayGroupToMap(msg.tokens);
+    console.log('Updating', msg.tokens);
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
     const {
-      figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+      figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
-    await updateNodes(allWithData, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, msg.settings, stylePathPrefix);
+    if (msg.tokens) {
+      defaultTokenValueRetriever.initiate({
+        tokens: msg.tokens, variableReferences: figmaVariableReferences, styleReferences: figmaStyleReferences, stylePathPrefix, ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+      });
+    }
+
+    await updateNodes(allWithData, msg.settings);
     if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }

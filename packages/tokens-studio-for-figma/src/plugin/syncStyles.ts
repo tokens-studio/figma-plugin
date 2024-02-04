@@ -103,6 +103,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
         setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
+        // TODO: FIX THIS
         setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken, settings.baseFontSize);
       }
     }

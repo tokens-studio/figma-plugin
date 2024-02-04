@@ -10,15 +10,14 @@ import { ProgressTracker } from './ProgressTracker';
 import { removePluginData, setNonePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
-import setValuesOnNode, { resolvedVariableReferences } from './setValuesOnNode';
-import { FigmaStyleMaps } from '@/types/FigmaStyleMaps';
-import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
+import setValuesOnNode from './setValuesOnNode';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export async function updatePluginDataAndNodes({
-  entries: nodes, values: tokenValues, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix, settings,
-}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; figmaStyleMaps: FigmaStyleMaps; figmaVariableReferences: RawVariableReferenceMap; figmaStyleReferences: Record<string, string>; stylePathPrefix?: string; settings?: SettingsState }) {
+  entries: nodes, values: tokenValues, tokensMap, settings,
+}: { entries: readonly BaseNode[]; values: NodeTokenRefMap; tokensMap: Map<string, AnyTokenList[number]>; settings?: SettingsState }) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
-  const { ignoreFirstPartForStyles, baseFontSize } = settings ?? {};
+  const { baseFontSize } = settings ?? {};
 
   const namespace = SharedPluginDataNamespaces.TOKENS;
   postToUI({
@@ -33,8 +32,6 @@ export async function updatePluginDataAndNodes({
 
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATEPLUGINDATA);
   const promises: Set<Promise<void>> = new Set();
-
-  // Store all figmaStyleReferences through all activeThemes (e.g {color.red: ['s.1234'], color.blue ['s.2345', 's.3456']})
 
   nodes.forEach((node) => {
     promises.add(defaultWorker.schedule(async () => {
@@ -57,15 +54,12 @@ export async function updatePluginDataAndNodes({
         const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
 
         setValuesOnNode(
-          node,
-          mappedValues,
-          rawTokenMap,
-          figmaStyleMaps,
-          figmaStyleReferences,
-          figmaVariableReferences,
-          stylePathPrefix,
-          ignoreFirstPartForStyles,
-          baseFontSize,
+          {
+            node,
+            values: mappedValues,
+            data: rawTokenMap,
+            baseFontSize,
+          },
         );
       } catch (e) {
         console.log('got error', e);
@@ -76,7 +70,8 @@ export async function updatePluginDataAndNodes({
     }));
   });
   await Promise.all(promises);
-  resolvedVariableReferences.clear();
+  console.log('running clear');
+  defaultTokenValueRetriever.clearCache();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,

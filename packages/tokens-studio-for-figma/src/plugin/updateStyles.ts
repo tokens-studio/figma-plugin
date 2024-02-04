@@ -53,7 +53,9 @@ export default async function updateStyles(
   const allStyleIds = {
     ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),
     ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
-    ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, settings.baseFontSize, shouldCreate) : {}),
+    ...(effectTokens.length > 0 ? updateEffectStyles({
+      effectTokens, baseFontSize: settings.baseFontSize, shouldCreate,
+    }) : {}), // TODO: FIX variable references
   };
   if (styleTokens.length < tokens.length && shouldCreate) {
     notifyUI('Some styles were not created due to your settings. Make sure Ignore first part of token name doesn\'t conflict', { error: true });
