@@ -235,11 +235,6 @@ describe('Initiator', () => {
     expect(state.tokenState.tokens).toEqual({
       global: [
         {
-          $extensions: {
-            'studio.tokens': {
-              id: 'mock-uuid',
-            },
-          },
           type: TokenTypes.COLOR,
           name: 'colors.red',
           value: '#ff0000',

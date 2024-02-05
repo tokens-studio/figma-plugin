@@ -183,33 +183,18 @@ describe('ImportedTokensDialog', () => {
             value: '50%',
           },
           {
-            $extensions: {
-              'studio.tokens': {
-                id: 'mock-uuid',
-              },
-            },
             name: 'small',
             type: 'sizing',
             value: '12',
             description: 'regular sizing token',
           },
           {
-            $extensions: {
-              'studio.tokens': {
-                id: 'mock-uuid',
-              },
-            },
             name: 'black',
             type: 'color',
             value: '#ffffff',
             description: 'regular color token',
           },
           {
-            $extensions: {
-              'studio.tokens': {
-                id: 'mock-uuid',
-              },
-            },
             name: 'headline',
             type: 'boxShadow',
             value: {

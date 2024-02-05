@@ -4,25 +4,24 @@ import { tryParseJson } from './tryParseJson';
 import type { ThemeObjectsList } from '@/types';
 import type { AnyTokenList } from '@/types/tokens';
 import removeIdPropertyFromTokens from './removeIdPropertyFromTokens';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
-export type LastSyncedState<Metadata = null> =
+export type LastSyncedState =
   [Record<string, AnyTokenList>]
-  | [Record<string, AnyTokenList>, ThemeObjectsList]
-  | [Record<string, AnyTokenList>, ThemeObjectsList, Metadata];
+  | [Record<string, AnyTokenList>, ThemeObjectsList];
 
-export function compareLastSyncedState<Metadata = null>(
+export function compareLastSyncedState(
   tokens: Record<string, AnyTokenList>,
   themes: ThemeObjectsList,
-  metadata: Metadata,
   lastSyncedState: string,
-  defaultSyncedState: LastSyncedState<Metadata>,
+  format: TokenFormatOptions,
 ) {
-  const parsedState = tryParseJson<LastSyncedState<Metadata>>(lastSyncedState);
+  const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
   if (!parsedState) {
     return false;
   }
   return isEqual(
-    compact([removeIdPropertyFromTokens(parsedState[0] ?? defaultSyncedState[0]), parsedState[1] ?? defaultSyncedState[1], parsedState[2] ?? defaultSyncedState[2]]),
-    compact([removeIdPropertyFromTokens(tokens), themes, metadata ?? defaultSyncedState[2]]),
+    lastSyncedState,
+    JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2),
   );
 }

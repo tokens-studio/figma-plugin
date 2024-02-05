@@ -5985,10 +5985,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
   integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
 
-"@tokens-studio/ui@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.0.tgz#4a525f7c6c792db4d4e9fa92f52a61df4d87f4d1"
-  integrity sha512-9PG13SkpcuKZ6Zv+ZoBEA64B+TeRyjdNmzMkhFfkY3Lh95/YHANmIgvrUeMWqGyZavnn66m/mJUnMf5xBqXgVg==
+"@tokens-studio/ui@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.2.tgz#c05c1d261d4d5fdc5807b935e7633b36e2976492"
+  integrity sha512-DiwzqhyzadtOjtAJd8zROKmupiIJ6ID+3gUbpqO4NigWd3FjfpjXYc+u9WGAsTEx0eFBXRseoCC/6vn5anURxA==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"

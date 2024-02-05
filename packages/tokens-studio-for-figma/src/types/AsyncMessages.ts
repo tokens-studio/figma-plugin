@@ -21,6 +21,7 @@ import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
 import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -214,6 +215,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   checkForChanges?: boolean
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
+  tokenFormat: TokenFormatOptions;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   styleIds: Record<string, string>;
