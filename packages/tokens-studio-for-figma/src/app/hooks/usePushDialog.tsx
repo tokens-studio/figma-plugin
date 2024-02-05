@@ -25,7 +25,6 @@ function usePushDialog(): UseDialogResult {
   const dispatch = useDispatch<Dispatch>();
 
   const pushDialog: UseDialogResult['pushDialog'] = useCallback(({ state, overrides }) => {
-    console.log('pushDialog', state, overrides);
     if (state) {
       dispatch.uiState.setShowPushDialog({ state, overrides });
     } else {
