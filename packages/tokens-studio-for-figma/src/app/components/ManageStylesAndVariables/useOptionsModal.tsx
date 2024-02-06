@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@stitches/react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import set from 'set-value';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
@@ -34,33 +35,42 @@ type ExportOptions = {
   stylesColor: boolean,
   stylesTypography: boolean,
   stylesEffect: boolean,
-  rulesOverwriteExisting: boolean,
-  rulesScopeByType: boolean,
-  rulesIgnoreFirstPart: boolean,
-  rulesPrefixStylesWithThemeName: boolean,
+  rulesOverwriteExistingStylesAndVariables: boolean | undefined,
+  rulesScopeVariablesByTokenType: boolean | undefined,
+  rulesIgnoreFirstPartForStyles: boolean | undefined,
+  rulesPrefixStylesWithThemeName: boolean | undefined,
 };
 
 export default function useOptionsModal() {
-  const overwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
-  const scopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
-  const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
-  const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const rulesOverwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
+  const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
+  const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
+  const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
 
   // TODO: This is the state that needs to be saved, it should be stored on the document.
   // If a user cancels this dialog, the state should be reverted to the last saved state.
-  const [exportOptions, setExportOptions] = React.useState<ExportOptions>({
-    variablesColor: true,
-    variablesString: true,
-    variablesNumber: true,
-    variablesBoolean: true,
-    stylesColor: true,
-    stylesTypography: true,
-    stylesEffect: true,
-    rulesOverwriteExisting: overwriteExistingStylesAndVariables || true,
-    rulesScopeByType: scopeVariablesByTokenType || true,
-    rulesIgnoreFirstPart: ignoreFirstPartForStyles || true,
-    rulesPrefixStylesWithThemeName: prefixStylesWithThemeName || true,
-  });
+  const [variablesColor, setVariablesColor] = React.useState(true);
+  const [variablesString, setVariablesString] = React.useState(true);
+  const [variablesNumber, setVariablesNumber] = React.useState(true);
+  const [variablesBoolean, setVariablesBoolean] = React.useState(true);
+
+  const [stylesColor, setStylesColor] = React.useState(true);
+  const [stylesTypography, setStylesTypography] = React.useState(true);
+  const [stylesEffect, setStylesEffect] = React.useState(true);
+
+  const exportOptions: ExportOptions = {
+    variablesColor,
+    variablesString,
+    variablesNumber,
+    variablesBoolean,
+    stylesColor,
+    stylesTypography,
+    stylesEffect,
+    rulesOverwriteExistingStylesAndVariables,
+    rulesScopeVariablesByTokenType,
+    rulesIgnoreFirstPartForStyles,
+    rulesPrefixStylesWithThemeName,
+  };
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -92,9 +102,50 @@ export default function useOptionsModal() {
     [dispatch.settings],
   );
 
-  const handleChangeOption = React.useCallback((e: any) => {
-    setExportOptions({ ...exportOptions, [e.target.name]: e.target.value });
-  }, [exportOptions]);
+  const handleExportVariablesColor = React.useCallback(
+    (state: CheckedState) => {
+      setVariablesColor(!!state);
+    },
+    [],
+  );
+
+  const handleExportVariablesNumber = React.useCallback(
+    (state: CheckedState) => {
+      console.log(state);
+      setVariablesNumber(!!state);
+    },
+    [],
+  );
+  const handleExportVariablesBoolean = React.useCallback(
+    (state: CheckedState) => {
+      setVariablesBoolean(!!state);
+    },
+    [],
+  );
+  const handleExportVariablesString = React.useCallback(
+    (state: CheckedState) => {
+      setVariablesString(!!state);
+    },
+    [],
+  );
+  const handleExportStylesColor = React.useCallback(
+    (state: CheckedState) => {
+      setStylesColor(!!state);
+    },
+    [],
+  );
+  const handleExportStylesTypography = React.useCallback(
+    (state: CheckedState) => {
+      setStylesTypography(!!state);
+    },
+    [],
+  );
+  const handleExportStylesEffect = React.useCallback(
+    (state: CheckedState) => {
+      setStylesEffect(!!state);
+    },
+    [],
+  );
 
   const handleSaveOptions = React.useCallback(() => {
     alert('TODO: Save options');
@@ -135,16 +186,16 @@ export default function useOptionsModal() {
           <Stack direction="column" justify="between" gap={5} align="start" css={{ width: '100%' }}>
             <StyledCheckboxGrid>
               <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichVariablesShouldBeCreatedAndUpdated')}</Text>
-              <LabelledCheckbox id="variablesColor" onChange={handleChangeOption} checked={exportOptions.variablesColor} label={t('variables.color')} />
-              <LabelledCheckbox id="variablesString" onChange={handleChangeOption} checked={exportOptions.variablesString} label={t('variables.string')} />
-              <LabelledCheckbox id="variablesNumber" onChange={handleChangeOption} checked={exportOptions.variablesNumber} label={t('variables.number')} />
-              <LabelledCheckbox id="variablesBoolean" onChange={handleChangeOption} checked={exportOptions.variablesBoolean} label={t('variables.boolean')} />
+              <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={exportOptions.variablesColor} label={t('variables.color')} />
+              <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={exportOptions.variablesString} label={t('variables.string')} />
+              <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={exportOptions.variablesNumber} label={t('variables.number')} />
+              <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={exportOptions.variablesBoolean} label={t('variables.boolean')} />
             </StyledCheckboxGrid>
             <StyledCheckboxGrid>
               <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichStylesShouldBeCreatedAndUpdated')}</Text>
-              <LabelledCheckbox id="styleColor" onChange={handleChangeOption} checked={exportOptions.stylesColor} label={t('styles.color')} />
-              <LabelledCheckbox id="stylesTypography" onChange={handleChangeOption} checked={exportOptions.stylesTypography} label={t('styles.typography')} />
-              <LabelledCheckbox id="stylesEffect" onChange={handleChangeOption} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
+              <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={exportOptions.stylesColor} label={t('styles.color')} />
+              <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={exportOptions.stylesTypography} label={t('styles.typography')} />
+              <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
             </StyledCheckboxGrid>
             <Box css={{
               display: 'grid', gridAutoRows: 'auto', gridTemplateColumns: 'min-content max-content min-content', width: '100%', gridColumnGap: '$4', gridRowGap: '$5',
@@ -155,8 +206,8 @@ export default function useOptionsModal() {
               <Switch
                 data-testid="overwriteExistingStylesAndVariables"
                 id="overwriteExistingStylesAndVariables"
-                checked={!!overwriteExistingStylesAndVariables}
-                defaultChecked={overwriteExistingStylesAndVariables}
+                checked={!!rulesOverwriteExistingStylesAndVariables}
+                defaultChecked={rulesOverwriteExistingStylesAndVariables}
                 onCheckedChange={handleOverwriteChange}
               />
               <Label htmlFor="overwriteExistingStylesAndVariables">{t('options.overwriteExistingStylesAndVariables')}</Label>
@@ -170,8 +221,8 @@ export default function useOptionsModal() {
               <Switch
                 data-testid="scopeVariablesByTokenType"
                 id="scopeVariablesByTokenType"
-                checked={!!scopeVariablesByTokenType}
-                defaultChecked={scopeVariablesByTokenType}
+                checked={!!rulesScopeVariablesByTokenType}
+                defaultChecked={rulesScopeVariablesByTokenType}
                 onCheckedChange={handleScopeChange}
               />
               <Label htmlFor="scopeVariablesByTokenType">{t('options.scopeVariablesByTokenType')}</Label>
@@ -185,8 +236,8 @@ export default function useOptionsModal() {
               <Switch
                 data-testid="ignoreFirstPartForStyles"
                 id="ignoreFirstPartForStyles"
-                checked={!!ignoreFirstPartForStyles}
-                defaultChecked={ignoreFirstPartForStyles}
+                checked={!!rulesIgnoreFirstPartForStyles}
+                defaultChecked={rulesIgnoreFirstPartForStyles}
                 onCheckedChange={handleIgnoreChange}
               />
               <Label htmlFor="ignoreFirstPartForStyles">{t('options.ignorePrefix')}</Label>
@@ -198,8 +249,8 @@ export default function useOptionsModal() {
               <Switch
                 data-testid="prefixStylesWithThemeName"
                 id="prefixStylesWithThemeName"
-                checked={!!prefixStylesWithThemeName}
-                defaultChecked={prefixStylesWithThemeName}
+                checked={!!rulesPrefixStylesWithThemeName}
+                defaultChecked={rulesPrefixStylesWithThemeName}
                 onCheckedChange={handlePrefixWithThemeNameChange}
               />
               <Label htmlFor="prefixStylesWithThemeName">{t('options.prefixStyles')}</Label>

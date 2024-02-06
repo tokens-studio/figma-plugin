@@ -29,14 +29,18 @@ export default function ManageStylesAndVariables() {
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
-  }, [setShowOptions]);
+  }, []);
+
   const handleCancelOptions = React.useCallback(() => {
     // DO NOT SAVE THE OPTIONS
     setShowOptions(false);
-  }, [setShowOptions]);
+  }, []);
 
   const handleExportToFigma = React.useCallback(() => {
-    alert('TODO: Export to Figma');
+    alert('TODO: Export to Figma - check the console for export options');
+    console.log('Export options:', exportOptions);
+    console.log('Selected themes:', selectedThemes);
+    console.log('Selected sets:', selectedSets);
   }, []);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);

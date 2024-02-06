@@ -7,7 +7,7 @@ export const LabelledCheckbox = ({
   <>
     {/* TODO, checkbox needs the name prop from the DS pr */}
     {/* @ts-ignore next-line */}
-    <Checkbox name={name} id={id} checked={checked} onClick={onChange} />
+    <Checkbox name={name} id={id} checked={checked} onCheckedChange={onChange} />
     <Label css={{ fontWeight: '$sansRegular' }} htmlFor={id}>{label}</Label>
   </>
 

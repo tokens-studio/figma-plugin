@@ -5,17 +5,17 @@ import {
 import React from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { filter } from 'jszip';
+
 import Input from '../Input';
 import Modal from '../Modal';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { StyledCard } from './StyledCard';
-import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
+
 import { ExportThemeRow } from './ExportThemeRow';
 import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
 import { docsLinks } from './docsLinks';
 import { RootState } from '@/app/store';
-import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
+import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 
@@ -27,36 +27,29 @@ export default function useExportSetsTab() {
   const allSets = useSelector(allTokenSetsSelector);
   const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
 
-  const githubMfsEnabled = useIsGitMultiFileEnabled();
   const selectedTokenSets = React.useMemo(() => (
     usedTokenSetSelector(store.getState())
   ), [store]);
 
   const availableTokenSets = useSelector(allTokenSetsSelector);
 
-  const treeOrListItems = React.useMemo(() => (
-    githubMfsEnabled
-      ? tokenSetListToTree(availableTokenSets)
-      : tokenSetListToList(availableTokenSets)
-  ), [githubMfsEnabled, availableTokenSets]);
+  const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
-  const [filteredItems, setFilteredItems] = React.useState(treeOrListItems);
+  const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
   const handleFilterTree = React.useCallback(
     (event) => {
       const value = event?.target.value;
-      const filtered = treeOrListItems.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
+      const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
       setFilteredItems(filtered);
     },
-    [treeOrListItems],
+    [setsTree],
   );
 
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
     setShowChangeSets(false);
   }, []);
-
-
 
   const handleShowChangeSets = React.useCallback(() => {
     setShowChangeSets(true);
