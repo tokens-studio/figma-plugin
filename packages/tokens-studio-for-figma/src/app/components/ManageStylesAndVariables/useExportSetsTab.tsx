@@ -1,11 +1,11 @@
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
-  Tabs, Stack, Heading, Button,
+  Tabs, Stack, Heading, Button, Link, Label,
 } from '@tokens-studio/ui';
-import { Link, Label } from 'iconoir-react';
 import React from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
+import { filter } from 'jszip';
 import Input from '../Input';
 import Modal from '../Modal';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
@@ -17,6 +17,7 @@ import { docsLinks } from './docsLinks';
 import { RootState } from '@/app/store';
 import { tokenSetListToTree, tokenSetListToList, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
+import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 
 export default function useExportSetsTab() {
   const store = useStore<RootState>();
@@ -39,24 +40,38 @@ export default function useExportSetsTab() {
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
 
+  const [filteredItems, setFilteredItems] = React.useState(treeOrListItems);
+
+  const handleFilterTree = React.useCallback(
+    (event) => {
+      const value = event?.target.value;
+      const filtered = treeOrListItems.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
+      setFilteredItems(filtered);
+    },
+    [treeOrListItems],
+  );
+
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
     setShowChangeSets(false);
   }, []);
 
-  const handleSelectedSetChange = React.useCallback((set: string) => {
-    if (selectedSets.includes(set)) {
-      setSelectedSets(selectedSets.filter((id) => id !== set));
-    } else {
-      setSelectedSets([...selectedSets, set]);
-    }
+
+
+  const handleShowChangeSets = React.useCallback(() => {
+    setShowChangeSets(true);
   }, []);
 
-
+  const { control } = useForm<FormValues>({
+    defaultValues: {
+      tokenSets: { ...selectedTokenSets },
+    },
+  });
 
   const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
     <Controller
       name="tokenSets"
+      control={control}
       // this is the only way to do this
       // eslint-disable-next-line
       render={({ field }) => (
@@ -67,7 +82,7 @@ export default function useExportSetsTab() {
         />
       )}
     />
-  ), []);
+  ), [control]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
@@ -80,8 +95,7 @@ export default function useExportSetsTab() {
             <Link target="_blank" href={docsLinks.stylesAndVariables}>Learn more - Styles and variables</Link>
           </Stack>
           <Stack direction="column" align="start" gap={4}>
-            { /* eslint-disable-next-line react/jsx-no-bind */}
-            <Button variant="secondary" size="small" onClick={() => setShowChangeSets(true)}>Change Sets</Button>
+            <Button variant="secondary" size="small" onClick={handleShowChangeSets}>Change Sets</Button>
             <ExportThemeRow>
               <FileDirectoryIcon size="small" />
               <Label>
@@ -89,32 +103,24 @@ export default function useExportSetsTab() {
                 {' of '}
                 {allSets.length}
               </Label>
-              {/*
-                    TODO: Add details for the set exports
-                    <ThemeDetails />
-                    <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} />
-                    */}
-              <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} showClose>
-                <Heading>Enabled sets will export to Figma</Heading>
-                <Link target="_blank" href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
-                <Stack
-                  direction="column"
-                  gap={4}
-                  css={{
-                    marginBlockStart: '$4',
-                  }}
-                >
-                  {
-                /* TODO: Make this search filter the sets */
-              }
-                  <Input placeholder="Search sets" />
-                  <TokenSetTreeContent items={treeOrListItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
-                </Stack>
-              </Modal>
             </ExportThemeRow>
           </Stack>
         </Stack>
       </StyledCard>
+      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Varibales / Export Sets">
+        <Heading>Enabled sets will export to Figma</Heading>
+        <Link target="_blank" href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
+        <Stack
+          direction="column"
+          gap={4}
+          css={{
+            marginBlockStart: '$4',
+          }}
+        >
+          <Input placeholder="Search sets" onInput={handleFilterTree} />
+          <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
+        </Stack>
+      </Modal>
     </Tabs.Content>
   );
   return {

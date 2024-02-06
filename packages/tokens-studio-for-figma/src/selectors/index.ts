@@ -44,6 +44,8 @@ export * from './allTokenSetsSelector';
 export * from './licenseStatusSelector';
 export * from './localApiStateBranchSelector';
 export * from './prefixStylesWithThemeNameSelector';
+export * from './scopeVariablesByTokenTypeSelector';
+export * from './overwriteExistingStylesAndVariablesSelector';
 export * from './collapsedTokenSetsSelector';
 export * from './collapsedTokenTypeObjSelector';
 export * from './scrollPositionSetSelector';

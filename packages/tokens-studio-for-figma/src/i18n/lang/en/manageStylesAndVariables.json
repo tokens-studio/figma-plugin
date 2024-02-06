@@ -6,6 +6,37 @@
   "options": "Options",
   "cancel": "Cancel",
   "confirm": "Confirm"
+},
+"docs": {
+  "exportToFigmaOptions": "Export to Figma Options",
+},
+"generic": {
+  "learnMore": "Learn more",
+},
+"options": {
+  "title": "Options",
+  "whichVariablesShouldBeCreatedAndUpdated": "Which variables should be created and updated?",
+  "whichStylesShouldBeCreatedAndUpdated": "Which styles should be created and updated?",
+  "tokensExportedToFigmaShould": "Tokens exported to Figma should:",
+  "ignorePrefix": "Ignore first part of token name for styles",
+  "ignorePrefixExplanation": "Useful if you want to ignore 'colors' in a token called 'colors.blue.500' for your styles",
+  "prefixStyles": "Prefix styles with active theme name",
+  "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
+  "overwriteExistingStylesAndVariables": "Overwrite existing styles and variables",
+  "overwriteExistingStylesAndVariablesExplanation": "Existing styles and variables with the same name will be overwritten",
+  "scopeVariablesByTokenType": "Scope Variables by token type",
+  "scopeVariablesByTokenTypeExplanation": "Varibale scopes will be inferred from the token type and intended usage"
+},
+"variables": {
+  "color": "Color",
+  "number": "Number",
+  "boolean": "Boolean",
+  "string": "String"
+},
+"styles": {
+  "color": "Color",
+  "typography": "Typography",
+  "effects": "Effects"
 }
 }
 
