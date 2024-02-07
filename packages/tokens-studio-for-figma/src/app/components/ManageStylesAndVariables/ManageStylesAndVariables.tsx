@@ -12,7 +12,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 import useExportThemesTab from './useExportThemesTab';
 import useExportSetsTab from './useExportSetsTab';
-import useOptionsModal from './useOptionsModal';
+import OptionsModal from './OptionsModal';
 
 export default function ManageStylesAndVariables() {
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
@@ -23,7 +23,6 @@ export default function ManageStylesAndVariables() {
 
   const [showOptions, setShowOptions] = React.useState(false);
 
-  const { OptionsModal } = useOptionsModal();
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
 

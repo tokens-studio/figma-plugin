@@ -40,7 +40,7 @@ type ExportOptions = {
   rulesPrefixStylesWithThemeName: boolean | undefined,
 };
 
-export default function useOptionsModal() {
+export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
   const rulesOverwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
   const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
@@ -156,7 +156,7 @@ export default function useOptionsModal() {
 
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
 
-  const OptionsModal = ({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) => (
+  return (
     <Modal
       size="large"
       title={title}
@@ -270,7 +270,4 @@ export default function useOptionsModal() {
       </Stack>
     </Modal>
   );
-  return {
-    OptionsModal, exportOptions,
-  };
 }
