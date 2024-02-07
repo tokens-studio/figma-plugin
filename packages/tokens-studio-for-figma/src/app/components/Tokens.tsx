@@ -16,7 +16,6 @@ import EditTokenFormModal from './EditTokenFormModal';
 import JSONEditor from './JSONEditor';
 import Box from './Box';
 import IconListing from '@/icons/listing.svg';
-import IconJSON from '@/icons/json.svg';
 import useTokens from '../store/useTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
@@ -247,7 +246,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
                 <IconListing />
               </ToggleGroup.Item>
               <ToggleGroup.Item value="json" iconOnly={false}>
-                <Label css={{ fontSize: '$xxsmall' }}>JSON</Label>
+                JSON
               </ToggleGroup.Item>
             </ToggleGroup>
           </Box>
