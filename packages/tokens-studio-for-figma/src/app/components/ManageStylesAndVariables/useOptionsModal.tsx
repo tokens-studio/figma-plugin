@@ -9,7 +9,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from '@stitches/react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
-import set from 'set-value';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
@@ -111,7 +110,6 @@ export default function useOptionsModal() {
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
-      console.log(state);
       setVariablesNumber(!!state);
     },
     [],
@@ -151,15 +149,22 @@ export default function useOptionsModal() {
     alert('TODO: Save options');
   }, []);
 
+  const onInteractOutside = (event: Event) => {
+    event.preventDefault();
+    console.log('preventing defualt in options');
+  };
+
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
 
   const OptionsModal = ({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) => (
     <Modal
-      size="fullscreen"
+      size="large"
       title={title}
       backArrow
       isOpen={isOpen}
       close={closeAction}
+      /* eslint-disable-next-line react/jsx-no-bind */
+      onInteractOutside={(event) => onInteractOutside(event)}
       footer={(
         <Stack direction="row" justify="between">
           <Button variant="invisible" id="manageStyles-button-close" onClick={closeAction} icon={<ChevronLeftIcon />}>

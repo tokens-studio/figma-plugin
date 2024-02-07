@@ -23,7 +23,7 @@ export default function ManageStylesAndVariables() {
 
   const [showOptions, setShowOptions] = React.useState(false);
 
-  const { OptionsModal, exportOptions } = useOptionsModal();
+  const { OptionsModal } = useOptionsModal();
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
 
@@ -38,7 +38,6 @@ export default function ManageStylesAndVariables() {
 
   const handleExportToFigma = React.useCallback(() => {
     alert('TODO: Export to Figma - check the console for export options');
-    console.log('Export options:', exportOptions);
     console.log('Selected themes:', selectedThemes);
     console.log('Selected sets:', selectedSets);
   }, []);
@@ -61,6 +60,11 @@ export default function ManageStylesAndVariables() {
     }
   }, [setShowOptions, showOptions]);
 
+  const onInteractOutside = (event: Event) => {
+    event.preventDefault();
+    console.log('preventing default - main modal');
+  };
+
   return (
     <>
       <Modal
@@ -69,17 +73,17 @@ export default function ManageStylesAndVariables() {
         showClose
         isOpen={showModal}
         close={handleClose}
+        // eslint-disable-next-line react/jsx-no-bind
+        onInteractOutside={(event: Event) => onInteractOutside(event)}
         footer={(
           <Stack direction="row" gap={4} justify="between">
             <Button variant="invisible" id="manageStyles-button-close" onClick={handleClose} icon={<ChevronLeftIcon />}>
               {t('actions.cancel')}
             </Button>
             <Stack direction="row" gap={4}>
-              {!showOptions && (
-              <Button variant="secondary" id="manageStyled-button-options" onClick={handleShowOptions} icon={<SlidersIcon />}>
+              <Button variant="secondary" icon={<SlidersIcon />} id="manageStyles-button-options" onClick={handleShowOptions}>
                 {t('actions.options')}
               </Button>
-              )}
               <Button variant="primary" id="pullDialog-button-override" onClick={handleExportToFigma} disabled={!canExportToFigma}>
                 {t('actions.export')}
               </Button>
@@ -101,11 +105,10 @@ export default function ManageStylesAndVariables() {
         </Tabs>
       </Modal>
 
-      <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
-
       <Button variant="secondary" size="small" onClick={handleOpen}>
         {t('stylesAndVariables', { ns: 'tokens' })}
       </Button>
+      <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
     </>
   );
 }

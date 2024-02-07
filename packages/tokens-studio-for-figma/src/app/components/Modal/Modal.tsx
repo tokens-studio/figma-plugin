@@ -3,9 +3,9 @@ import {
   Stack, Dialog, IconButton, Box, Heading,
 } from '@tokens-studio/ui';
 import { XIcon } from '@primer/octicons-react';
+import { ArrowLeft } from 'iconoir-react';
 import { ModalFooter } from './ModalFooter';
 import { styled } from '@/stitches.config';
-import { ArrowLeft } from 'iconoir-react';
 
 export type ModalProps = {
   id?: string;
@@ -13,7 +13,7 @@ export type ModalProps = {
   full?: boolean;
   size?: 'large' | 'fullscreen';
   compact?: boolean;
-  isOpen: boolean;
+  isOpen?: boolean;
   children: React.ReactNode;
   footer?: React.ReactNode;
   stickyFooter?: boolean;
@@ -21,6 +21,7 @@ export type ModalProps = {
   backArrow?: boolean
   close: () => void;
   modal?: boolean;
+  onInteractOutside?: (event: Event) => void;
 };
 
 const StyledBody = styled('div', {
@@ -78,6 +79,7 @@ export function Modal({
   compact = false,
   modal = true,
   backArrow = false,
+  onInteractOutside,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -103,7 +105,7 @@ export function Modal({
             backgroundColor: '$modalBackdrop',
           }}
         />
-        <StyledDialogContent size={size}>
+        <StyledDialogContent size={size} onInteractOutside={onInteractOutside}>
           <Box css={{
             display: 'flex',
             flexDirection: 'column',
@@ -113,7 +115,7 @@ export function Modal({
             {(showClose || title || backArrow) && (
             <Stack
               direction="row"
-              justify={backArrow ? "start" : "between"}
+              justify={backArrow ? 'start' : 'between'}
               align="center"
               css={{
                 borderBottomColor: '$borderSubtle',
@@ -125,7 +127,7 @@ export function Modal({
                 backgroundColor: '$bgDefault',
                 top: 0,
                 zIndex: 10,
-                gap: '$3'
+                gap: '$3',
               }}
             >
               {backArrow && (
@@ -135,20 +137,22 @@ export function Modal({
                   icon={<ArrowLeft />}
                   size="small"
                   variant="invisible"
-                  />
+                />
               )}
               {title && (
               <Dialog.Title>
                 <Heading size="small">{title}</Heading>
               </Dialog.Title>
               )}
-              {showClose && (<IconButton
-                onClick={handleClose}
+              {showClose && (
+              <IconButton
+                onClick={handleClose || null}
                 data-testid="close-button"
                 icon={<XIcon />}
                 size="small"
                 variant="invisible"
               />
+
               )}
             </Stack>
             )}
