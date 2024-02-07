@@ -61,9 +61,10 @@ const tsToToken = (raw: RawToken) => {
 };
 
 async function getTokens(urn: string): Promise<AnyTokenSet | null> {
-  const data = await Graphql.exec<TokenSetsQuery>(
-    Graphql.op(
-      `query TokenSets(
+  try {
+    const data = await Graphql.exec<TokenSetsQuery>(
+      Graphql.op(
+        `query TokenSets(
     $filter: TokenSetsFilterInput
     $limit: Int
     $offset: Int
@@ -84,9 +85,6 @@ async function getTokens(urn: string): Promise<AnyTokenSet | null> {
       urn
       extensions
       setUrn
-      metadata {
-          createdAt
-      }
       type
       value {
         ... on Raw_Token_scalar {
@@ -127,28 +125,31 @@ async function getTokens(urn: string): Promise<AnyTokenSet | null> {
     }
   }
 }`,
-      {
-        limit: 500,
-        project: urn,
-      },
-    ),
-  );
+        {
+          limit: 500,
+          project: urn,
+        },
+      ),
+    );
 
-  if (!data.data) {
+    if (!data.data) {
+      return null;
+    }
+
+    const returnData: Record<string, SingleToken<true>> = data.data.tokenSets.reduce((acc, tokenSet) => {
+      if (!tokenSet.name) return acc;
+      acc[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
+      // We know that name exists (required field)
+        tokenSetAcc[token.name!] = tsToToken(token);
+        return tokenSetAcc;
+      }, {});
+      return acc;
+    }, {});
+    return returnData;
+  } catch (e) {
+    console.error('Error fetching tokens', e);
     return null;
   }
-
-  const returnData: Record<string, SingleToken<true>> = data.data.tokenSets.reduce((acc, tokenSet) => {
-    if (!tokenSet.name) return acc;
-    acc[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
-      // We know that name exists (required field)
-      tokenSetAcc[token.name!] = tsToToken(token);
-      return tokenSetAcc;
-    }, {});
-    return acc;
-  }, {});
-
-  return returnData;
 }
 
 export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSaveOptions, SaveOption> {
