@@ -6,6 +6,7 @@ import {
   Raw_Token_border,
   Raw_Token_boxShadow,
 } from '@tokens-studio/sdk';
+import * as Sentry from '@sentry/react';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
@@ -147,6 +148,7 @@ async function getTokens(urn: string): Promise<AnyTokenSet | null> {
     }, {});
     return returnData;
   } catch (e) {
+    Sentry.captureException(e);
     console.error('Error fetching tokens', e);
     return null;
   }
