@@ -47,6 +47,7 @@ export default async function setValuesOnNode(
   baseFontSize = defaultBaseFontSize,
 ) {
   const stylePathSlice = ignoreFirstPartForStyles ? 1 : 0;
+
   try {
     // BORDER RADIUS
     if (
