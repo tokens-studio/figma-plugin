@@ -1,5 +1,5 @@
 import { clone } from '@figma-plugin/helpers';
-import { AsyncMessageChannelHandlers, AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { defaultNodeManager } from '../NodeManager';
@@ -13,6 +13,8 @@ import { defaultWorker } from '../Worker';
 import getAppliedVariablesFromNode from '../getAppliedVariablesFromNode';
 import { AnyTokenList } from '@/types/tokens';
 import getAppliedStylesFromNode from '../getAppliedStylesFromNode';
+import { store } from '@/app/store';
+import { activeThemeSelector, themesListSelector } from '@/selectors';
 
 const getTokenValue = (name: string, resolvedTokens: AnyTokenList) => resolvedTokens.find((token) => token.name === name);
 
@@ -30,13 +32,18 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const textStyles = figma.getLocalTextStyles();
     const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
 
-    const themeInfo = await AsyncMessageChannel.PluginInstance.message({
-      type: AsyncMessageTypes.GET_THEME_INFO,
-    });
+    const tempState = store.getState();
+    const activeTheme = activeThemeSelector(tempState);
+    const themesList = themesListSelector(tempState);
+
+    const themeInfo = {
+      activeTheme,
+      themes: themesList,
+    };
 
     const figmaStyleReferences: Record<string, string> = {};
 
-    themeInfo.themes?.forEach((theme) => {
+    themeInfo.themes?.forEash((theme) => {
       Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
         if (!figmaStyleReferences[token]) {
           figmaStyleReferences[token] = styleId;
@@ -71,55 +78,60 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
           if (Object.keys(tokens).length === 0) {
             if (getAppliedVariablesFromNode(node).length > 0) {
               const appliedVariables = getAppliedStylesFromNode(node);
-              await Promise.all(appliedVariables.map(async (variable) => {
-                const { name: variableName } = variable;
+              await Promise.all(
+                appliedVariables.map(async (variable) => {
+                  const { name: variableName } = variable;
 
-                if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
-                  const variableId = node.boundVariables?.fills?.[0].id;
-                  if (variableId) {
-                    const variable = figma.variables.getVariableById(variableId);
-                    if (variable) {
-                      const newValue = variableName.replace(oldName, newName);
-                      const resolvedValue = getTokenValue(newValue, resolvedTokens ?? []);
-                      const paint = figma.util.solidPaint(resolvedValue?.value as string);
-                      const fillsCopy = clone(node.fills);
-                      fillsCopy[0] = figma.variables.setBoundVariableForPaint(paint, 'color', variable);
-                      let newVariable;
-                      if (variablesCache.hasOwnProperty(resolvedValue?.name as string)) {
-                        newVariable = variablesCache[resolvedValue?.name as string];
-                      } else {
-                        newVariable = await figma.variables.importVariableByKeyAsync(resolvedValue?.name as string);
-                        variablesCache[resolvedValue?.name as string] = newVariable;
+                  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fills' in node && node.boundVariables) {
+                    const variableId = node.boundVariables?.fills?.[0].id;
+                    if (variableId) {
+                      const variable = figma.variables.getVariableById(variableId);
+                      if (variable) {
+                        const newValue = variableName.replace(oldName, newName);
+                        const resolvedValue = getTokenValue(newValue, resolvedTokens ?? []);
+                        const paint = figma.util.solidPaint(resolvedValue?.value as string);
+                        const fillsCopy = clone(node.fills);
+                        fillsCopy[0] = figma.variables.setBoundVariableForPaint(paint, 'color', variable);
+                        let newVariable;
+                        if (variablesCache.hasOwnProperty(resolvedValue?.name as string)) {
+                          newVariable = variablesCache[resolvedValue?.name as string];
+                        } else {
+                          newVariable = await figma.variables.importVariableByKeyAsync(resolvedValue?.name as string);
+                          variablesCache[resolvedValue?.name as string] = newVariable;
+                        }
+                        fillsCopy[0].boundVariables.color.id = newVariable.id;
+                        node.fills = fillsCopy;
                       }
-                      fillsCopy[0].boundVariables.color.id = newVariable.id;
-                      node.fills = fillsCopy;
                     }
                   }
-                }
-              }));
+                }),
+              );
             }
             if (getAppliedStylesFromNode(node).length > 0) {
               const appliedStyles = getAppliedStylesFromNode(node);
-              await Promise.all(appliedStyles.map(async (style) => {
-                const newValue = style.name.replace(oldName, newName);
+              await Promise.all(
+                appliedStyles.map(async (style) => {
+                  const newValue = style.name.replace(oldName, newName);
 
-                const styleKeyMatch = figmaStyleReferences[newValue].match(/^S:([a-zA-Z0-9_-]+),/);
+                  const styleKeyMatch = figmaStyleReferences[newValue].match(/^S:([a-zA-Z0-9_-]+),/);
 
-                if (styleKeyMatch) {
-                  const actualStyleId = await new Promise<string>((resolve) => {
-                    figma.importStyleByKeyAsync(styleKeyMatch[1])
-                      .then((remoteStyle) => resolve(remoteStyle.id))
-                      .catch(() => {
-                        const updatedNewValue = newValue.split('.').join('/');
-                        resolve(allStyles.filter((style) => style.name === updatedNewValue)[0]?.id);
-                      });
-                  });
+                  if (styleKeyMatch) {
+                    const actualStyleId = await new Promise<string>((resolve) => {
+                      figma
+                        .importStyleByKeyAsync(styleKeyMatch[1])
+                        .then((remoteStyle) => resolve(remoteStyle.id))
+                        .catch(() => {
+                          const updatedNewValue = newValue.split('.').join('/');
+                          resolve(allStyles.filter((style) => style.name === updatedNewValue)[0]?.id);
+                        });
+                    });
 
-                  if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fillStyleId' in node) {
-                    node.fillStyleId = actualStyleId;
+                    if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && 'fillStyleId' in node) {
+                      node.fillStyleId = actualStyleId;
+                    }
                   }
-                }
-              }));
+                }),
+              );
             }
           }
 
