@@ -32,10 +32,9 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     const textStyles = figma.getLocalTextStyles();
     const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
 
-    const tempState = store.getState();
-    const activeTheme = activeThemeSelector(tempState);
-    const themesList = themesListSelector(tempState);
-
+    const state = store.getState();
+    const activeTheme = activeThemeSelector(state);
+    const themesList = themesListSelector(state);
     const themeInfo = {
       activeTheme,
       themes: themesList,
@@ -43,7 +42,7 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
 
     const figmaStyleReferences: Record<string, string> = {};
 
-    themeInfo.themes?.forEash((theme) => {
+    themeInfo.themes?.forEach((theme) => {
       Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
         if (!figmaStyleReferences[token]) {
           figmaStyleReferences[token] = styleId;
