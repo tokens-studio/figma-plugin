@@ -5,6 +5,7 @@ import {
 import React from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import Input from '../Input';
 import Modal from '../Modal';
@@ -20,6 +21,8 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 
 export default function useExportSetsTab() {
+  const { t } = useTranslation('ManageStylesAndVariables');
+
   const store = useStore<RootState>();
 
   const [showChangeSets, setShowChangeSets] = React.useState(false);
@@ -82,13 +85,14 @@ export default function useExportSetsTab() {
       <StyledCard>
         <Stack direction="column" align="start" gap={6}>
           <Stack direction="column" align="start" gap={4}>
-            <Heading>Confirm Sets</Heading>
-            <p>You can use token sets to manage your styles, and variables.</p>
-            <p>Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts. </p>
-            <Link target="_blank" href={docsLinks.stylesAndVariables}>Learn more - Styles and variables</Link>
+            <Heading>{t('exportSetsTab.confirmSets')}</Heading>
+            <p>
+              {t('exportSetsTab.intro')}
+            </p>
+            <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link>
           </Stack>
           <Stack direction="column" align="start" gap={4}>
-            <Button variant="secondary" size="small" onClick={handleShowChangeSets}>Change Sets</Button>
+            <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
             <ExportThemeRow>
               <FileDirectoryIcon size="small" />
               <Label>
@@ -101,8 +105,8 @@ export default function useExportSetsTab() {
         </Stack>
       </StyledCard>
       <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Varibales / Export Sets">
-        <Heading>Enabled sets will export to Figma</Heading>
-        <Link target="_blank" href={docsLinks.sets}>Learn more - Enabled vs set as source</Link>
+        <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
+        <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
         <Stack
           direction="column"
           gap={4}
