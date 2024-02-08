@@ -320,13 +320,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return null;
   }, [internalEditToken, resolvedTokens]);
 
-  const resolvedToken = React.useMemo(() => {
-    if (editToken && checkIfContainsAlias(editToken.value) && typeof editToken?.value === 'string') {
-      return resolvedTokens.find((t) => t.name === editToken.value?.toString().replace(/[\{\}\s]/g, ""));
-    }
-    return null;
-  }, [editToken, resolvedTokens]);
-
   // @TODO update to useCallback
   const submitTokenValue = async ({
     type, value, name, $extensions,
@@ -336,6 +329,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
+ 
       const trimmedValue = trimValue(value);
       const newName = name
         .split('/')
@@ -354,7 +348,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
-      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {        
+      } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
           description: (
             internalEditToken.description

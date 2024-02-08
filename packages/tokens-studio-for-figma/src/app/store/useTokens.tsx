@@ -474,8 +474,6 @@ export default function useTokens() {
       isInfinite: true,
     });
     const multiValueFilteredTokens = filterMultiValueTokens();
-    console.log('tokens: ', tokens);
-    console.log('multiValueFilteredTokens: ', multiValueFilteredTokens);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
