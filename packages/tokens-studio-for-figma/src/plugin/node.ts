@@ -49,7 +49,6 @@ type MapValuesToTokensResult = Record<string, string | number | SingleToken['val
 // Tokens: The full tokens map
 // Values: The values applied to the node
 export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
-  console.log('got values', Object.entries(values), Object.entries(tokens));
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
 

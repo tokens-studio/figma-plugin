@@ -7,7 +7,12 @@ import { trySetStyleId } from '@/utils/trySetStyleId';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
 
-export async function applyTypographyTokenOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult, baseFontSize: string) {
+export async function applyTypographyTokenOnNode(
+  node: BaseNode,
+  data: NodeTokenRefMap,
+  values: MapValuesToTokensResult,
+  baseFontSize: string,
+) {
   if (!(node.type === 'TEXT')) return;
   if (values.typography && data.typography) {
     const resolvedToken = defaultTokenValueRetriever.get(data.typography);
@@ -19,20 +24,23 @@ export async function applyTypographyTokenOnNode(node: BaseNode, data: NodeToken
       const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'typography');
       if (nonLocalStyle) {
         if (textStyleMatchesTypographyToken(nonLocalStyle, resolvedToken.value, baseFontSize)) {
-        // Non-local style matches - use this and clear style id backup:
+          // Non-local style matches - use this and clear style id backup:
           matchingStyleId = nonLocalStyle.id;
           clearStyleIdBackup(node, styleIdBackupKey);
         } else if (resolvedToken.adjustedTokenName === nonLocalStyle.name) {
-        // Non-local style does NOT match, but style name and token path does,
-        // so we assume selected token value is an override (e.g. dark theme)
-        // Now backup up style id before overwriting with raw token value, so we
-        // can re-link the non-local style, when the token value matches again:
+          // Non-local style does NOT match, but style name and token path does,
+          // so we assume selected token value is an override (e.g. dark theme)
+          // Now backup up style id before overwriting with raw token value, so we
+          // can re-link the non-local style, when the token value matches again:
           setStyleIdBackup(node, styleIdBackupKey, nonLocalStyle.id);
         }
       }
     }
 
-    if (node.type === 'TEXT' && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))) {
+    if (
+      node.type === 'TEXT'
+      && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))
+    ) {
       if (isSingleTypographyValue(resolvedToken.value)) {
         setTextValuesOnTarget(node, { value: resolvedToken.value }, baseFontSize);
       }
@@ -40,25 +48,29 @@ export async function applyTypographyTokenOnNode(node: BaseNode, data: NodeToken
   }
   if (
     values.fontFamilies
-  || values.fontWeights
-  || values.lineHeights
-  || values.fontSizes
-  || values.letterSpacing
-  || values.paragraphSpacing
-  || values.textCase
-  || values.textDecoration
+    || values.fontWeights
+    || values.lineHeights
+    || values.fontSizes
+    || values.letterSpacing
+    || values.paragraphSpacing
+    || values.textCase
+    || values.textDecoration
   ) {
-    setTextValuesOnTarget(node, {
-      value: {
-        fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
-        fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
-        lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : undefined,
-        fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
-        letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
-        paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
-        textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
-        textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
+    setTextValuesOnTarget(
+      node,
+      {
+        value: {
+          fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
+          fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
+          lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : undefined,
+          fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
+          letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
+          paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
+          textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
+          textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
+        },
       },
-    }, baseFontSize);
+      baseFontSize,
+    );
   }
 }

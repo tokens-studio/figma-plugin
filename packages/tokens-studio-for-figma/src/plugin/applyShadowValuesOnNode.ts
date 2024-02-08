@@ -7,7 +7,12 @@ import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaU
 import { effectStyleMatchesBoxShadowToken } from './figmaUtils/styleMatchers';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
-export async function applyShadowValuesOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult, baseFontSize: string) {
+export async function applyShadowValuesOnNode(
+  node: BaseNode,
+  data: NodeTokenRefMap,
+  values: MapValuesToTokensResult,
+  baseFontSize: string,
+) {
   if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
     const resolvedToken = defaultTokenValueRetriever.get(data.boxShadow);
     let matchingStyleId = resolvedToken.styleId;
@@ -35,7 +40,6 @@ export async function applyShadowValuesOnNode(node: BaseNode, data: NodeTokenRef
 
     if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'effect', matchingStyleId)))) {
       if (isSingleBoxShadowValue(values.boxShadow)) {
-        console.log('setting shadow values directly on target');
         setEffectValuesOnTarget(node, data.boxShadow, baseFontSize);
       }
     }

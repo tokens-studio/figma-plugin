@@ -4,7 +4,12 @@ import { isCompositeBorderValue } from '@/utils/is/isCompositeBorderValue';
 import { setBorderColorValuesOnTarget } from './setBorderColorValuesOnTarget';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 
-export function applyBorderValuesOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult, baseFontSize: string) {
+export function applyBorderValuesOnNode(
+  node: BaseNode,
+  data: NodeTokenRefMap,
+  values: MapValuesToTokensResult,
+  baseFontSize: string,
+) {
   // Applies border composite tokens
   if (values.border && isCompositeBorderValue(values.border)) {
     setBorderValuesOnTarget(node, { value: values.border }, baseFontSize);
@@ -25,7 +30,9 @@ export function applyBorderValuesOnNode(node: BaseNode, data: NodeTokenRefMap, v
   // if applied border is just a string, it's the older version where border was just a color. apply color then.
   if (values.border && typeof values.border === 'string' && typeof data.border !== 'undefined') {
     setBorderColorValuesOnTarget({
-      node, data: data.border, value: values.border,
+      node,
+      data: data.border,
+      value: values.border,
     });
   }
 
@@ -33,7 +40,9 @@ export function applyBorderValuesOnNode(node: BaseNode, data: NodeTokenRefMap, v
   if (typeof values.borderColor !== 'undefined' && typeof values.borderColor === 'string') {
     if ('strokes' in node && data.borderColor) {
       setBorderColorValuesOnTarget({
-        node, data: data.borderColor, value: values.borderColor,
+        node,
+        data: data.borderColor,
+        value: values.borderColor,
       });
     }
   }

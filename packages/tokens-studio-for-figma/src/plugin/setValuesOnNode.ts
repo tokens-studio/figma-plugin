@@ -34,8 +34,6 @@ export default async function setValuesOnNode({
   data: NodeTokenRefMap; // Data on which token to apply, this is what's stored on the layer (just the token name)
   baseFontSize?: string; // The base font size to use, note that we should find a better way to pass this through
 }) {
-  console.log('Data is', data);
-  console.log('Values is', values);
   try {
     if (
       node.type !== 'CONNECTOR'
@@ -61,10 +59,10 @@ export default async function setValuesOnNode({
       applyColorTokenOnNode(node, data, values);
       applyPositionTokenOnNode(node, data, values, baseFontSize);
       applyTypographyTokenOnNode(node, data, values, baseFontSize);
-      applyAssetTokenValuesOnNode(node, values, data, baseFontSize);
+      applyAssetTokenValuesOnNode(node, values, data);
       applyDimensionTokenValuesOnNode(node, values, data, baseFontSize);
       applyNumberTokenValuesOnNode(node, values, data, baseFontSize);
-      applyBooleanTokenValuesOnNode(node, values, data, baseFontSize);
+      applyBooleanTokenValuesOnNode(node, values, data);
       applyTextCharacterValuesOnNode(node, values, data);
     }
   } catch (e) {

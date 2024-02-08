@@ -7,7 +7,6 @@ import { ProgressTracker } from './ProgressTracker';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import { NodeManagerNode } from './NodeManager';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export async function updateNodes(
@@ -30,20 +29,14 @@ export async function updateNodes(
   const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATENODES);
   const promises: Set<Promise<void>> = new Set();
 
-  const resolvedTokens = defaultTokenResolver;
-
-  console.log('Resolved tokens are', resolvedTokens.get('red'));
   const tokens = defaultTokenValueRetriever.getTokens();
 
   nodes.forEach(({ node, tokens: appliedTokens }) => {
     promises.add(
       defaultWorker.schedule(async () => {
         try {
-          console.log('tokens are', Array.from(tokens.entries()));
           const rawTokenMap = destructureTokenForAlias(tokens, appliedTokens);
-          console.log('rawTokenMap', rawTokenMap);
           const tokenValues = mapValuesToTokens(tokens, appliedTokens);
-          console.log('tokenValues', tokenValues);
           setValuesOnNode(
             {
               node,
@@ -62,7 +55,6 @@ export async function updateNodes(
     );
   });
   await Promise.all(promises);
-  defaultTokenValueRetriever.clearCache();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,

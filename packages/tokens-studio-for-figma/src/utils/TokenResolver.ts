@@ -324,7 +324,6 @@ class TokenResolver {
   }
 
   public get(tokenName: string): SingleToken | undefined {
-    console.log('Token map', this.tokenMap, tokenName);
     return this.tokenMap.get(tokenName);
   }
 }

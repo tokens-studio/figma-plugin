@@ -5,7 +5,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
   AnyTokenList,
-  SingleBoxShadowToken,
   SingleColorToken,
   SingleToken,
   SingleTypographyToken,
@@ -103,8 +102,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
         setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
-        // TODO: FIX THIS
-        setEffectValuesOnTarget(style, styleSet[style.name] as SingleBoxShadowToken, settings.baseFontSize);
+        setEffectValuesOnTarget(style, styleSet[style.name].path, settings.baseFontSize);
       }
     }
   });

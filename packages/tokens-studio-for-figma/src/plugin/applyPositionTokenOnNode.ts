@@ -4,7 +4,12 @@ import { isPrimitiveValue } from '@/utils/is';
 import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
 import { transformValue } from './helpers';
 
-export async function applyPositionTokenOnNode(node: BaseNode, data: NodeTokenRefMap, values: MapValuesToTokensResult, baseFontSize: string) {
+export async function applyPositionTokenOnNode(
+  node: BaseNode,
+  data: NodeTokenRefMap,
+  values: MapValuesToTokensResult,
+  baseFontSize: string,
+) {
   // Applies tokens for X & Y position
   if (node.type !== 'DOCUMENT' && node.type !== 'PAGE' && !isPartOfInstance(node.id)) {
     if (typeof values.x !== 'undefined' && isPrimitiveValue(values.x)) {

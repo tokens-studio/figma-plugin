@@ -22,16 +22,16 @@ export default function updateEffectStyles({
     if (effectStylesToIdMap.has(token.styleId)) {
       const effectStyle = effectStylesToIdMap.get(token.styleId)!;
       tokenToStyleMap[token.name] = effectStyle.id;
-      setEffectValuesOnTarget(effectStyle, token, baseFontSize);
+      setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
     } else if (effectStylesToKeyMap.has(token.path)) {
       const effectStyle = effectStylesToKeyMap.get(token.path)!;
       tokenToStyleMap[token.name] = effectStyle.id;
-      setEffectValuesOnTarget(effectStyle, token, baseFontSize);
+      setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
     } else if (shouldCreate) {
       const style = figma.createEffectStyle();
       style.name = token.path;
       tokenToStyleMap[token.name] = style.id;
-      setEffectValuesOnTarget(style, token, baseFontSize);
+      setEffectValuesOnTarget(style, token.name, baseFontSize);
     }
   });
 

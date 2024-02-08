@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-import { SingleBoxShadowToken } from '@/types/tokens';
 import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertTypographyNumberToFigma } from './figmaTransforms/generic';
@@ -23,6 +22,8 @@ function transformShadowKeyToFigmaVariable(key: string): VariableBindableEffectF
       return 'offsetX' as VariableBindableEffectField;
     case 'y':
       return 'offsetY' as VariableBindableEffectField;
+    case 'blur':
+      return 'radius' as VariableBindableEffectField;
     default:
       return key as VariableBindableEffectField;
   }
@@ -56,15 +57,9 @@ async function tryApplyCompositeVariable({
   };
   try {
     for (const [key, val] of Object.entries(resolvedValue)) {
-      console.log('looking at', key, val, effect);
       if (val.startsWith('{') && val.endsWith('}')) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
-        const allReferences = defaultTokenValueRetriever.getTokens();
-        console.log('ALL REFERENCES', Array.from(allReferences.entries()));
-        console.log('variable to apply is', variableToApply);
-        if (variableToApply && key !== 'blur') {
-          // NOTE: there's a bug with Figma's plugin API right now, it does not seem to let blur be something that is bindable to a node
-          console.log('Theres a variable to apply for', key);
+        if (variableToApply) {
           effect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
         }
       }
@@ -81,8 +76,8 @@ export default async function setEffectValuesOnTarget(
   baseFontSize: string,
   key: 'effects' = 'effects',
 ) {
-  const resolvedToken = defaultTokenValueRetriever.get(token);
   try {
+    const resolvedToken = defaultTokenValueRetriever.get(token);
     const { description, value } = resolvedToken;
     const resolvedValue: ResolvedShadowObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
 

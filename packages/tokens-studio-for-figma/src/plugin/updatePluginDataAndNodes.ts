@@ -70,8 +70,6 @@ export async function updatePluginDataAndNodes({
     }));
   });
   await Promise.all(promises);
-  console.log('running clear');
-  defaultTokenValueRetriever.clearCache();
 
   postToUI({
     type: MessageFromPluginTypes.COMPLETE_JOB,
