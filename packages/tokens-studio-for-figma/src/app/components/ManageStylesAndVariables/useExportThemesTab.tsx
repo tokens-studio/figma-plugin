@@ -1,9 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Button, Heading, Tabs, Link, Box, Stack, Checkbox, Label
+  Button, Heading, Tabs, Link, Box, Stack, Checkbox, Label,
 } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
+import { useTranslation } from 'react-i18next';
 import { StyledCard } from './StyledCard';
 import {
   themesListSelector,
@@ -22,6 +23,7 @@ const ProButton = styled(Button, {
 });
 
 export default function useExportThemesTab() {
+  const { t } = useTranslation('ManageStylesAndVariables');
   const themes = useSelector(themesListSelector);
   const isPro = useIsProUser();
 
@@ -58,6 +60,7 @@ export default function useExportThemesTab() {
   }, [themes, selectedThemes]);
 
   const handleManageThemes = React.useCallback(() => {
+    /* TODO: Open the manage themes modal */
     alert('MANAGE THEMES');
   }, []);
 
@@ -86,33 +89,35 @@ export default function useExportThemesTab() {
           <Stack direction="column" align="start" gap={4}>
             {isPro ? (
               <>
-                <Heading size="medium">Create Themes to get Started</Heading>
-                <p>Combinations of token sets create themes.</p>
-
-                <p>Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. </p>
-
-                <p>Or switch to Sets to export without using Themes.</p>
-
-                <Link target="_blank" href={docsLinks.themes}>Learn more - Themes</Link>
+                <Heading size="medium">{t('exportThemesTab.headingPro')}</Heading>
+                <p>{t('exportThemesTab.introPro')}</p>
+                <Link target="_blank" href={docsLinks.themes}>
+                  {' '}
+                  {t('generic.learnMore')}
+                  {' – '}
+                  {t('generic.themes')}
+                </Link>
                 <Box css={{
                   alignSelf: 'flex-end',
                 }}
                 >
-                  <Button variant="secondary" size="small">Create Themes</Button>
+                  <Button variant="secondary" size="small">{t('actions.createThemes')}</Button>
                 </Box>
               </>
             ) : (
               <>
-                <Heading size="medium">Creating Themes is a pro Feature</Heading>
-                <p>Combinations of token sets create themes.</p>
-
-                <p>Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. </p>
-                <Link target="_blank" href={docsLinks.themes}>Learn more - Themes</Link>
+                <Heading size="medium">{t('exportThemesTab.headingBasic')}</Heading>
+                <p>{t('exportThemesTab.introBasic')}</p>
+                <Link target="_blank" href={docsLinks.themes}>
+                  {t('generic.learnMore')}
+                  {' – '}
+                  {t('generic.themes')}
+                </Link>
                 <Box css={{
                   alignSelf: 'flex-end',
                 }}
                 >
-                  <Button variant="secondary" size="small">Get PRO</Button>
+                  <Button variant="secondary" size="small">{t('actions.getPRO')}</Button>
                 </Box>
               </>
             )}
@@ -122,8 +127,8 @@ export default function useExportThemesTab() {
       ) : (
         <StyledCard>
           <Stack direction="column" align="start" gap={4}>
-            <Heading>Confirm Themes</Heading>
-            <p>Combinations of token sets create themes.</p>
+            <Heading>{t('exportThemesTab.confirmThemes')}</Heading>
+            <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
             <Box css={{
               alignSelf: 'flex-start',
             }}
@@ -139,13 +144,13 @@ export default function useExportThemesTab() {
                 }}
                 onClick={isPro ? handleManageThemes : handleGetPro}
               >
-                Manage Themes
+                {t('actions.manageThemes')}
               </ProButton>
             </Box>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
                 <Checkbox id="check-all-themes" checked={selectedThemes.length === themes.length} onCheckedChange={handleSelectAllThemes} />
-                <Label htmlFor="check-all-themes">Select all themes</Label>
+                <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
               </Stack>
               {ThemeGroups.map((group) => (
                 <Stack direction="column" gap={2}>
@@ -155,7 +160,7 @@ export default function useExportThemesTab() {
               ))}
               {ungroupedThemes.length ? (
                 <Stack direction="column" gap={2}>
-                  <Heading size="small">No group</Heading>
+                  <Heading size="small">{t('generic.noGroup')}</Heading>
                   {ungroupedThemes.map((theme) => createThemeRow(theme))}
                 </Stack>
               ) : null}

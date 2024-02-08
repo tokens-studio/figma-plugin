@@ -5,13 +5,19 @@
   "import": "Import from Figma",
   "options": "Options",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "createThemes": "Create Themes",
+  "getPRO": "Get PRO",
+  "manageThemes": "Manage Themes"
 },
 "docs": {
   "exportToFigmaOptions": "Export to Figma Options"
 },
 "generic": {
-  "learnMore": "Learn more"
+  "learnMore": "Learn more",
+  "themes": "Themes",
+  "noGroup": "No Group",
+  "selectAll": "Select All"
 },
 "options": {
   "title": "Options",
@@ -37,6 +43,14 @@
   "color": "Color",
   "typography": "Typography",
   "effects": "Effects"
+},
+"exportThemesTab": {
+  "headingPro": "Create Themes to get Started",
+  "headingBasic": "Creating Themes is a pro Feature",
+  "introPro": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
+  "introBasic": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
+  "confirmTheme": "Confirm Themes",
+  "combinationsOfSetsMakeThemes": "Combinations of token sets create themes"
 }
 }
 
