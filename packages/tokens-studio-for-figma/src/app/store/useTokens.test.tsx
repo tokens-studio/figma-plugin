@@ -678,7 +678,7 @@ describe('useToken test', () => {
           { name: 'text', value: 'text value', type: TokenTypes.TEXT },
           { name: 'shadow.base', value: '#1450c8', type: TokenTypes.COLOR },
           {
-            value: '#f8fafc',
+            value: '{color.slate.50}',
             type: 'color',
             name: 'shadow.strong',
             $extensions: {
@@ -692,7 +692,7 @@ describe('useToken test', () => {
             },
           },
           {
-            value: '#f8fafc',
+            value: '{color.slate.50}',
             type: 'color',
             name: 'shadow.intense',
             $extensions: {
