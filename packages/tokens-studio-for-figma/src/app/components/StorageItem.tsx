@@ -15,6 +15,9 @@ import useConfirm from '../hooks/useConfirm';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatBadge } from './TokenFormatBadge';
 
 type Props = {
   item: StorageTypeCredentials;
@@ -31,6 +34,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { confirm } = useConfirm();
   const { setStorageType } = useStorage();
   const dispatch = useDispatch<Dispatch>();
+  const tokenFormat = useSelector(tokenFormatSelector);
+  const [isConvertModalOpen, setIsConvertModalOpen] = React.useState(false);
+
+  const openConvertModal = React.useCallback(() => {
+    setIsConvertModalOpen(true);
+  }, []);
 
   const { t } = useTranslation(['storage']);
 
@@ -66,38 +75,46 @@ const StorageItem = ({ item, onEdit }: Props) => {
   }, [item, restoreStoredProvider]);
 
   return (
-    <StyledStorageItem
-      data-testid={`storageitem-${provider}-${id}`}
-      key={`${provider}-${id}`}
-      active={isActive()}
-    >
+    <StyledStorageItem data-testid={`storageitem-${provider}-${id}`} key={`${provider}-${id}`} active={isActive()}>
       <Stack
         direction="column"
         gap={1}
         css={{
-          flexGrow: '1', overflow: 'hidden',
+          flexGrow: '1',
+          overflow: 'hidden',
         }}
       >
         <Stack
           direction="row"
           gap={3}
           css={{
-            flexGrow: '1', overflow: 'hidden', maxWidth: 'stretch',
+            flexGrow: '1',
+            overflow: 'hidden',
+            maxWidth: 'stretch',
           }}
         >
-          <Box css={{ color: '$fgDefault' }}>
-            { getProviderIcon(provider) }
-          </Box>
+          <Box css={{ color: '$fgDefault' }}>{getProviderIcon(provider)}</Box>
           <Stack direction="column" gap={0} css={{ overflow: 'hidden' }}>
-            <Box css={{
-              textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', fontSize: '$small', fontWeight: '$sansBold',
-            }}
+            <Box
+              css={{
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                fontSize: '$small',
+                fontWeight: '$sansBold',
+              }}
             >
               {name}
             </Box>
-            <Box css={{
-              whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', opacity: '0.75', fontSize: '$xsmall', maxWidth: '100%',
-            }}
+            <Box
+              css={{
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                color: '$fgMuted',
+                fontSize: '$xsmall',
+                maxWidth: '100%',
+              }}
             >
               {id}
               {' '}
@@ -108,7 +125,11 @@ const StorageItem = ({ item, onEdit }: Props) => {
         {hasErrored && isActive() && (
           <Box
             css={{
-              display: 'flex', flexDirection: 'row', color: '$dangerFg', gap: '$3', marginTop: '$3',
+              display: 'flex',
+              flexDirection: 'row',
+              color: '$dangerFg',
+              gap: '$3',
+              marginTop: '$3',
             }}
             data-testid="error-message"
           >
@@ -118,7 +139,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
         )}
       </Stack>
       <Box css={{ marginRight: '$1' }}>
-        {isActive() ? <Badge>{t('active')}</Badge> : (
+        {isActive() ? (
+          <Stack gap={2} align="center">
+            <TokenFormatBadge extended />
+            <Badge>{t('active')}</Badge>
+          </Stack>
+        ) : (
           <Button data-testid="button-storage-item-apply" variant="secondary" size="small" onClick={handleRestore}>
             {t('apply')}
           </Button>
@@ -130,8 +156,12 @@ const StorageItem = ({ item, onEdit }: Props) => {
         </DropdownMenu.Trigger>
         <DropdownMenu.Portal>
           <DropdownMenu.Content>
-            <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>{t('edit')}</DropdownMenu.Item>
-            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete}>{t('delete')}</DropdownMenu.Item>
+            <DropdownMenu.Item textValue={t('edit')} onSelect={onEdit}>
+              {t('edit')}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item textValue={t('delete')} onSelect={handleDelete} css={{ color: '$dangerFg' }}>
+              {t('delete')}
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>

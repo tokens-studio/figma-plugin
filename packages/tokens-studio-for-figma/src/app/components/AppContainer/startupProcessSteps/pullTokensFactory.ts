@@ -116,6 +116,7 @@ export function pullTokensFactory(
         dispatch.uiState.setActiveTab(Tabs.START);
       }
     } else if (params.localTokenData) {
+      if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
       dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
       const existTokens = hasTokenValues(params.localTokenData.values);
       if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
@@ -140,6 +141,7 @@ export function pullTokensFactory(
         // get API credentials
         await getApiCredentials(true);
       } else {
+        if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
         // no local changes and user did not confirm to pull tokens
         dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
         const hasTokens = Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);

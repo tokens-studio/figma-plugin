@@ -174,6 +174,7 @@ describe('editToken', () => {
           settings: {
             updateRemote: true,
             updateOnChange: true,
+            storeTokenIdInJsonEditor: false,
           },
         },
       },
@@ -674,7 +675,9 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
       },
     ];
@@ -810,8 +813,8 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -860,7 +863,9 @@ describe('editToken', () => {
     expect(tokens.global).toEqual([
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         name: '1',
         type: 'sizing',
@@ -868,7 +873,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         name: 'header',
         type: 'borderRadius',
@@ -876,7 +883,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         inheritTypeLevel: 2,
         name: 'black.100',
@@ -885,7 +894,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         inheritTypeLevel: 2,
         name: 'black.500',
@@ -925,8 +936,8 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1038,8 +1049,8 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1080,12 +1091,14 @@ describe('editToken', () => {
         value: '1',
       },
       {
-        $extensions: {
-          id: 'mock-uuid',
-        },
         name: 'primary-copy',
         value: '1',
         type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
+        },
       },
       {
         name: 'alias',
@@ -1672,7 +1685,9 @@ describe('editToken', () => {
     const expectedTokens = [
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.COLOR,
         value: '#ff0000',
@@ -1680,7 +1695,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.COLOR,
         value: '#000000',
@@ -1688,7 +1705,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',

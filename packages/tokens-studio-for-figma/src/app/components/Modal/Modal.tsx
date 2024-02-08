@@ -90,11 +90,12 @@ export function Modal({
               : { padding: 0 }
           }
         >
-          <Box css={{
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
+          <Box
+            css={{
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
           >
             {(showClose || title) && (
             <Stack
@@ -114,8 +115,8 @@ export function Modal({
               }}
             >
               {title && (
-              <Dialog.Title>
-                <Heading size="small">{title}</Heading>
+              <Dialog.Title asChild>
+                <Heading as="h6" size="small">{title}</Heading>
               </Dialog.Title>
               )}
               <IconButton

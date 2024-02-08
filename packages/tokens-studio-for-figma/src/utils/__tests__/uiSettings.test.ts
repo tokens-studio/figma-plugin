@@ -2,6 +2,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 import { mockSetAsync, mockGetAsync, mockNotify } from '../../../tests/__mocks__/figmaMock';
 import { getUISettings, updateUISettings } from '../uiSettings';
 import { UiSettingsProperty } from '@/figmaStorage';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
@@ -60,6 +61,7 @@ describe('uiSettings', () => {
       sessionRecording: false,
       shouldSwapStyles: false,
       storeTokenIdInJsonEditor: false,
+      tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     });
@@ -79,6 +81,7 @@ describe('uiSettings', () => {
       inspectDeep: false,
       shouldSwapStyles: false,
       storeTokenIdInJsonEditor: false,
+      tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     })));
@@ -97,6 +100,7 @@ describe('uiSettings', () => {
       sessionRecording: false,
       shouldSwapStyles: false,
       storeTokenIdInJsonEditor: false,
+      tokenFormat: TokenFormatOptions.Legacy,
       aliasBaseFontSize: '16',
       baseFontSize: '16',
     });

@@ -42,6 +42,7 @@ import { CompareStateType, findDifferentState } from '@/utils/findDifferentState
 import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcrossSets';
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
+import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 import { ColorModifier } from '@/types/Modifier';
 
 export interface TokenState {
@@ -64,6 +65,7 @@ export interface TokenState {
   collapsedTokens: string[];
   changedState: CompareStateType;
   remoteData: CompareStateType;
+  tokenFormat: TokenFormatOptions;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -98,6 +100,7 @@ export const tokenState = createModel<RootModel>()({
       themes: [],
       metadata: null,
     },
+    tokenFormat: TokenFormatOptions.Legacy,
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -615,6 +618,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       remoteData: data,
     }),
+    setTokenFormat: (state, data: TokenFormatOptions): TokenState => ({
+      ...state,
+      tokenFormat: data,
+    }),
     renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
       const {
         oldName, newName, type, tokenSets,
@@ -682,6 +689,9 @@ export const tokenState = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     setTokenData(payload: SetTokenDataPayload) {
+      // When tokens update we set the format to the format that we parsed
+      dispatch.tokenState.setTokenFormat(TokenFormat.format);
+
       if (payload.shouldUpdate) {
         dispatch.tokenState.updateDocument();
       }
@@ -700,6 +710,9 @@ export const tokenState = createModel<RootModel>()({
     },
     createToken() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+    },
+    setTokenFormat(payload: TokenFormatOptions) {
+      setFormat(payload);
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
       const {
@@ -755,6 +768,7 @@ export const tokenState = createModel<RootModel>()({
             collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
             storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
             dispatch,
+            tokenFormat: rootState.tokenState.tokenFormat,
           });
         });
       } catch (e) {
