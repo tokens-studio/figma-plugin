@@ -158,7 +158,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 
   return (
     <Modal
-      size="large"
+      size="fullscreen"
       title={title}
       backArrow
       isOpen={isOpen}
