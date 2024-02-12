@@ -489,6 +489,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedMultiple',
     rawValue: unResolvedMultipleShadowToken.value,
+    resolvedValueWithReferences: unResolvedMultipleShadowToken.value,
     value: [
       {
         ...unResolvedMultipleShadowToken.value[0],

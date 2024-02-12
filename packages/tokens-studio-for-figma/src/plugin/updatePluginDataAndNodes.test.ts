@@ -40,24 +40,20 @@ describe('updatePluginDataAndNodes', () => {
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'fill', '"red"');
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'spacing', '');
     expect(setValuesOnNodeSpy).toBeCalledWith(
-      node,
       {
-        fill: {
-          type: 'color',
-          value: '#ff0000',
+        node,
+        values: {
+          fill: {
+            type: 'color',
+            value: '#ff0000',
+          },
+        },
+        data: {
+          borderRadius: 'none',
+          fill: 'red',
+          spacing: 'delete',
         },
       },
-      {
-        borderRadius: 'none',
-        fill: 'red',
-        spacing: 'delete',
-      },
-      figmaStyleMaps,
-      {},
-      new Map(),
-      undefined,
-      undefined,
-      undefined,
     );
   });
 });
