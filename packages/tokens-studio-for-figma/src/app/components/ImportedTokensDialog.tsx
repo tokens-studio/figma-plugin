@@ -87,8 +87,8 @@ function NewOrExistingToken({
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton data-testid="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
-        <IconButton data-testid="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
+        <IconButton variant="invisible" size="small" data-testid="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
+        <IconButton variant="invisible" size="small" data-testid="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
       </Stack>
     </Stack>
   );
@@ -179,11 +179,11 @@ export default function ImportedTokensDialog() {
       close={handleClose}
       stickyFooter
       footer={(
-        <Stack direction="row" gap={2}>
-          <Button variant="secondary" id="button-import-close" onClick={handleClose}>
+        <Stack direction="row" justify="end" gap={2}>
+          <Button variant="secondary" data-testid="button-import-close" onClick={handleClose}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" id="button-import-all" onClick={handleImportAllClick}>
+          <Button variant="primary" data-testid="button-import-all" onClick={handleImportAllClick}>
             {t('importAll')}
           </Button>
         </Stack>
@@ -192,13 +192,13 @@ export default function ImportedTokensDialog() {
       <Stack direction="column" gap={6}>
         {newTokens.length > 0 && (
           <Accordion
-            label="New Tokens"
+            label={t('newTokens', { ns: 'tokens' })}
             isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
                 <Count count={newTokens.length} />
                 {' '}
-                <Button variant="secondary" id="button-import-create-all" onClick={handleCreateAllClick}>
+                <Button variant="secondary" data-testid="button-import-create-all" onClick={handleCreateAllClick}>
                   {t('createAll', { ns: 'tokens' })}
                 </Button>
               </Stack>
@@ -237,13 +237,13 @@ export default function ImportedTokensDialog() {
         )}
         {updatedTokens.length > 0 && (
           <Accordion
-            label="Updated Tokens"
+            label={t('existingTokens', { ns: 'tokens' })}
             isOpenByDefault
             extra={(
               <Stack direction="row" gap={2} align="center">
                 <Count count={updatedTokens.length} />
                 {' '}
-                <Button variant="secondary" id="button-import-update-all" onClick={handleUpdateAllClick}>
+                <Button variant="secondary" data-testid="button-import-update-all" onClick={handleUpdateAllClick}>
                   {t('updateAll')}
                 </Button>
               </Stack>

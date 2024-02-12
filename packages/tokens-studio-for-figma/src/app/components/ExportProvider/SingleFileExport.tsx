@@ -140,12 +140,14 @@ export default function SingleFileExport({ onClose }: Props) {
         rows={10}
         disabled
         value={exportData}
+        css={{ fontFamily: '$mono', fontSize: '$xxsmall', lineHeight: '140%' }}
       />
       <Stack width="full" direction="row" justify="end" gap={4}>
         <Button variant="secondary" onClick={onClose}>
           Cancel
         </Button>
         <Button
+          as="a"
           href={`data:text/json;charset=utf-8,${encodeURIComponent(exportData)}`}
           // @ts-ignore Exception to allow setting the download prop here
           download="tokens.json"

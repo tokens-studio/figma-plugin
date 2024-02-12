@@ -3,6 +3,8 @@ import { expand } from '@/utils/expand';
 import { AnyTokenList } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import removeTokenId from './removeTokenId';
+import { convertTokenToFormat } from './convertTokenToFormat';
+import { getGroupTypeName } from './stringifyTokens';
 
 type Options = {
   tokens: Record<string, AnyTokenList>;
@@ -14,7 +16,7 @@ type Options = {
   expandShadow?: boolean;
   expandComposition?: boolean;
   expandBorder?: boolean;
-  storeTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor?: boolean
 };
 
 export default function formatTokens({
@@ -34,6 +36,13 @@ export default function formatTokens({
   tokenSets.forEach((tokenSet) => {
     tokens[tokenSet]?.forEach((token) => {
       const { name, ...tokenWithoutName } = removeTokenId(token, !storeTokenIdInJsonEditor);
+
+      const convertedToFormat = convertTokenToFormat(tokenWithoutName);
+      // set type of group level
+      if (token.inheritTypeLevel) {
+        const nameToSet = getGroupTypeName(token.name, token.inheritTypeLevel);
+        set(tokenObj, nestUnderParent ? [tokenSet, nameToSet].join('.') : nameToSet, token.type, { merge: true });
+      }
       if (
         (token.type === TokenTypes.TYPOGRAPHY && expandTypography)
         || (token.type === TokenTypes.BOX_SHADOW && expandShadow)
@@ -44,20 +53,23 @@ export default function formatTokens({
           const resolvedToken = resolvedTokens.find((t) => t.name === name);
           if (resolvedToken) {
             if (typeof resolvedToken.value === 'string') {
-              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
             } else {
               const expanded = expand(resolvedToken?.value);
-              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+              const expandedToFormat = convertTokenToFormat(expanded, true);
+              set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedToFormat });
             }
           } else {
-            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+            set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
           }
         } else {
           const expanded = expand(tokenWithoutName.value);
-          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expanded });
+          const expandedToFormat = convertTokenToFormat(expanded, true);
+
+          set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, { ...expandedToFormat });
         }
       } else {
-        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, tokenWithoutName);
+        set(tokenObj, nestUnderParent ? [tokenSet, token.name].join('.') : token.name, convertedToFormat);
       }
     });
   });

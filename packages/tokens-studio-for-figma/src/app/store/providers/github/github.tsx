@@ -20,7 +20,7 @@ import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { PushOverrides } from '../../remoteTokens';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -54,39 +54,10 @@ export function useGitHub() {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToGitHub = useCallback(async (context: GithubCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToGitHub = useCallback(async (context: GithubCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        themes,
-        tokens,
-        metadata: {
-          tokenSetOrder: Object.keys(tokens),
-        },
-      };
-    }
-
     dispatch.uiState.setLocalApiState({ ...context });
-    dispatch.tokenState.setRemoteData({
-      tokens: content?.tokens ?? {},
-      themes: content?.themes ?? [],
-      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
-    });
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -103,7 +74,6 @@ export function useGitHub() {
           storeTokenIdInJsonEditor,
         });
         const commitSha = await storage.getCommitSha();
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch, ...(commitSha ? { commitSha } : {}) });
         dispatch.tokenState.setTokenData({
@@ -111,8 +81,9 @@ export function useGitHub() {
           themes,
           usedTokenSet,
           activeTheme,
+          hasChangedRemote: true,
         });
-        pushDialog('success');
+        pushDialog({ state: 'success' });
         return {
           status: 'success',
           tokens,
@@ -235,12 +206,12 @@ export function useGitHub() {
           if (userDecision) {
             const commitSha = await storage.getCommitSha();
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
               activeTheme,
               usedTokenSet,
+              hasChangedRemote: true,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });

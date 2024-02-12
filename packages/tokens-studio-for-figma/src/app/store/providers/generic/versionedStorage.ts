@@ -20,7 +20,6 @@ import {
   GenericVersionedStorageType,
 } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
 export async function updateGenericVersionedTokens({
@@ -82,7 +81,6 @@ export async function updateGenericVersionedTokens({
     const success = await storage.save(payload, { storeTokenIdInJsonEditor });
 
     if (success) {
-      saveLastSyncedState(dispatch, payload.tokens, payload.themes, { tokenSetOrder });
       return {
         status: 'success',
         ...payload,
@@ -262,12 +260,12 @@ export function useGenericVersionedStorage() {
           },
           shouldSetInDocument: true,
         });
-        saveLastSyncedState(dispatch, content.tokens, content?.themes, content.metadata);
         dispatch.tokenState.setTokenData({
           values: content.tokens,
           themes: content.themes,
           usedTokenSet: usedTokenSets,
           activeTheme,
+          hasChangedRemote: true,
         });
         return content;
       }

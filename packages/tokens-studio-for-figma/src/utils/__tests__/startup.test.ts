@@ -62,6 +62,7 @@ describe('startup', () => {
         checkForChanges: null,
         collapsedTokenSets: null,
         themes: [],
+        tokenFormat: null,
         updatedAt: '',
         usedTokenSet: null,
         version: '',

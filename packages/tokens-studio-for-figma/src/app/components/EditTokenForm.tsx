@@ -329,7 +329,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-
       const trimmedValue = trimValue(value);
       const newName = name
         .split('/')

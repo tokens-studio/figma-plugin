@@ -18,3 +18,4 @@ export * from './LicenseKeyProperty';
 export * from './AuthDataProperty';
 export * from './CollapsedTokenSetsProperty';
 export * from './InitialLoadProperty';
+export * from './TokenFormatProperty';

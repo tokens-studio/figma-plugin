@@ -13,6 +13,7 @@ import Box from './Box';
 import { activeTabSelector } from '@/selectors';
 import PluginResizerWrapper from './PluginResizer';
 import LoadingBar from './LoadingBar';
+import { ConvertToDTCGModal } from './ConvertToDTCGModal';
 
 function App() {
   const activeTab = useSelector(activeTabSelector);
@@ -56,8 +57,12 @@ function App() {
             </Box>
             {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
           </Box>
-        </PluginResizerWrapper>
 
+        </PluginResizerWrapper>
+          {activeTab !== 'loading' && activeTab !== 'start' && <Footer />}
+          <ConvertToDTCGModal />
+        </Box>
+      </PluginResizerWrapper>
       </IconoirProvider>
     </Box>
   );

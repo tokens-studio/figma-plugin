@@ -16,6 +16,34 @@ export type SelectionStyle = {
   type: Properties
 };
 
+function getStyleFromNode(node: BaseNode, styleIdBackupKey: string, styleType: 'fills' | 'strokes'): SelectionStyle[] {
+  const localStyles: SelectionStyle[] = [];
+
+  const localStyle = getLocalStyle(node, styleIdBackupKey, styleType);
+  if (localStyle) {
+    const paint = localStyle.paints[0];
+    let styleObject: SingleColorToken | null = {} as SingleColorToken;
+    if (paint.type === 'SOLID') {
+      const { r, g, b } = paint.color;
+      const a = paint.opacity;
+      styleObject.value = figmaRGBToHex({
+        r, g, b, a,
+      });
+    } else if (paint.type === 'GRADIENT_LINEAR') {
+      styleObject.value = convertFigmaGradientToString(paint);
+    } else {
+      styleObject = null;
+    }
+    const normalizedName = localStyle.name.split('/').map((section) => section.trim()).join('.');
+    if (styleObject) {
+      const styleTypeConstant = styleType === 'fills' ? Properties.fill : Properties.borderColor;
+      localStyles.push({ ...styleObject, name: normalizedName, type: styleTypeConstant });
+    }
+  }
+
+  return localStyles;
+}
+
 export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle[] {
   const localStyles: SelectionStyle[] = [];
   if ('effects' in node) {
@@ -57,36 +85,12 @@ export default function getAppliedStylesFromNode(node: BaseNode): SelectionStyle
 
   if ('fills' in node) {
     const styleIdBackupKey = 'fillStyleId_original';
-    const localStyle = getLocalStyle(node, styleIdBackupKey, 'fills');
-    if (localStyle) {
-      const paint = localStyle.paints[0];
-      let styleObject: SingleColorToken | null = {} as SingleColorToken;
-      if (paint.type === 'SOLID') {
-        const { r, g, b } = paint.color;
-        const a = paint.opacity;
-        styleObject.value = figmaRGBToHex({
-          r,
-          g,
-          b,
-          a,
-        });
-      } else if (paint.type === 'GRADIENT_LINEAR') {
-        styleObject.value = convertFigmaGradientToString(paint);
-      } else {
-        styleObject = null;
-      }
-      const normalizedName = localStyle.name
-        .split('/')
-        .map((section) => section.trim())
-        .join('.');
-      if (styleObject) {
-        localStyles.push({
-          ...styleObject,
-          name: normalizedName,
-          type: Properties.fill,
-        });
-      }
-    }
+    localStyles.push(...getStyleFromNode(node, styleIdBackupKey, 'fills'));
+  }
+
+  if ('strokes' in node) {
+    const styleIdBackupKey = 'strokeStyleId_original';
+    localStyles.push(...getStyleFromNode(node, styleIdBackupKey, 'strokes'));
   }
 
   if (node.type === 'TEXT') {

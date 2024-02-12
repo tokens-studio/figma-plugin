@@ -622,8 +622,8 @@ describe('GithubTokenStorage', () => {
             'data/tokens.json': JSON.stringify({
               global: {
                 red: {
-                  type: TokenTypes.COLOR,
                   value: '#ff0000',
+                  type: TokenTypes.COLOR,
                 },
               },
               $themes: [

@@ -8,6 +8,36 @@ describe('pluginData', () => {
       name: 'color/red/600',
     });
 
+    figma.getStyleById = jest.fn().mockReturnValue({
+      id: 'S:09f8a236c57aa2109cd257ebde4c8fc07800a2a3,',
+      boundVariables: {},
+      consumers: [
+        {
+          fields: ['strokeStyleId'],
+        },
+      ],
+      description: '',
+      documentationLinks: [],
+      key: '09f8a236c57aa2109cd257ebde4c8fc07800a2a3',
+      name: 'semantic/fg/accent',
+      paints: [
+        {
+          blendMode: 'NORMAL',
+          boundVariables: {},
+          type: 'SOLID',
+          color: {
+            r: 0.545098066329956,
+            g: 0.45490196347236633,
+            b: 0.3921568691730499,
+          },
+          opacity: 1,
+          visible: true,
+        },
+      ],
+      remote: false,
+      type: 'PAINT',
+    });
+
     const pluginData = [
       {
         id: '5989:3',
@@ -22,33 +52,28 @@ describe('pluginData', () => {
         },
       } as NodeManagerNode,
       {
-        id: '1:2',
+        id: '5989:4',
         node: {
           name: 'Frame 1',
           type: 'FRAME',
-          boundVariables: {
-            strokes: [
-              {
-                id: 'VariableID:1:1',
-                type: 'VARIABLE_ALIAS',
-              },
-            ],
-          },
           strokes: [
             {
-              id: 'VariableID:1:1',
+              blendMode: 'NORMAL',
+              boundVariables: {},
               type: 'SOLID',
               color: {
                 r: 0.545098066329956,
                 g: 0.45490196347236633,
                 b: 0.3921568691730499,
               },
-              opacity: 0.2,
+              opacity: 1,
+              visible: true,
             },
           ],
+          strokeStyleId: 'S:09f8a236c57aa2109cd257ebde4c8fc07800a2a3,',
         } as unknown as FrameNode,
         tokens: { },
-      },
+      } as NodeManagerNode,
     ];
     const selectionValues = transformPluginDataToSelectionValues(pluginData);
 
@@ -84,16 +109,16 @@ describe('pluginData', () => {
         type: 'opacity',
         value: 'opacity.60',
       }, {
-        appliedType: 'variable',
+        appliedType: 'style',
         category: 'borderColor',
         nodes: [{
-          id: '1:2',
+          id: '5989:4',
           name: 'Frame 1',
           type: 'FRAME',
         }],
-        resolvedValue: '#8b746433',
+        resolvedValue: '#8b7464',
         type: 'borderColor',
-        value: 'color.red.600',
+        value: 'semantic.fg.accent',
       },
     ]);
   });

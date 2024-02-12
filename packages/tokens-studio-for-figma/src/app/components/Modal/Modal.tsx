@@ -60,9 +60,12 @@ const StyledDialogContent = styled(Dialog.Content, {
         maxHeight: '100vh',
         borderRadius: 0,
         boxShadow: 'none',
-      },
+      }
     },
   },
+defaultVariants: {
+  padding: 0
+}
 });
 
 export function Modal({
@@ -140,8 +143,8 @@ export function Modal({
                 />
               )}
               {title && (
-              <Dialog.Title>
-                <Heading size="small">{title}</Heading>
+              <Dialog.Title asChild>
+                <Heading as="h6" size="small">{title}</Heading>
               </Dialog.Title>
               )}
               {showClose && (

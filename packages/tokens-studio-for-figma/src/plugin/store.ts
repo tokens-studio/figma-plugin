@@ -1,6 +1,6 @@
 type State = {
-  inspectDeep: boolean
-  shouldSendSelectionValues: boolean
+  inspectDeep: boolean;
+  shouldSendSelectionValues: boolean;
 };
 
 const store: State = {

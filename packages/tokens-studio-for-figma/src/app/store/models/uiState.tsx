@@ -13,6 +13,8 @@ import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/ty
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { PushOverrides } from '../remoteTokens';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -73,7 +75,7 @@ export interface UIState {
   showEditForm: boolean;
   tokenFilter: string;
   confirmState: ConfirmProps;
-  showPushDialog: string | false;
+  showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
@@ -83,6 +85,7 @@ export interface UIState {
   figmaFonts: Font[]
   secondScreenEnabled: boolean;
   showAutoSuggest: boolean;
+  showConvertTokenFormatModal: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -113,6 +116,7 @@ export const uiState = createModel<RootModel>()({
     localApiState: {
       provider: StorageProviderType.LOCAL,
       new: false,
+      format: TokenFormatOptions.Legacy,
     },
     lastUpdatedAt: null,
     changelog: [],
@@ -128,7 +132,7 @@ export const uiState = createModel<RootModel>()({
     tokenFilter: '',
     tokenFilterVisible: false,
     confirmState: defaultConfirmState,
-    showPushDialog: false,
+    showPushDialog: { state: false },
     showPullDialog: false,
     showEmptyGroups: true,
     collapsed: false,
@@ -138,9 +142,14 @@ export const uiState = createModel<RootModel>()({
     figmaFonts: [],
     secondScreenEnabled: false,
     showAutoSuggest: false,
+    showConvertTokenFormatModal: false,
   } as unknown as UIState,
   reducers: {
-    setShowPushDialog: (state, data: string | false) => ({
+    setShowConvertTokenFormatModal: (state, data: boolean) => ({
+      ...state,
+      showConvertTokenFormatModal: data,
+    }),
+    setShowPushDialog: (state, data: { state: string | false, overrides?: PushOverrides }) => ({
       ...state,
       showPushDialog: data,
     }),
