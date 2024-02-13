@@ -223,7 +223,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
             layoutScroll
             values={treeItems}
             onReorder={handleReorder}
-            checkReorder={handleCheckReorder}
+            checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
           >
             {
             treeItems.map((item) => (

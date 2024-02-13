@@ -62,7 +62,7 @@ const StyledDialogContent = styled(Dialog.Content, {
         boxShadow: 'none',
       },
       regular: {
-        padding: 0,
+        padding: '0 0 0 $4',
       },
     },
   },

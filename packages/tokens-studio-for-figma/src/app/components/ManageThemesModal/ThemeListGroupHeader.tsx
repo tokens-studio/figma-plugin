@@ -54,20 +54,17 @@ export function ThemeListGroupHeader({
     setCurrentGroupName(event.target.value);
   }, []);
 
-  const StyledDragGrabber = styled(DragGrabber, {
-    gridArea: 'handle',
-  });
-
   return (
     <StyledDragButton
       type="button"
       css={{
+        backgroundColor: '$bgDefault',
         display: 'grid',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
       }}
     >
-      <StyledDragGrabber
+      <DragGrabber
         item={groupName}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
@@ -75,7 +72,7 @@ export function ThemeListGroupHeader({
       <Box css={{
         display: 'inherit',
         alignItems: 'center',
-        gridTemplateColumns: 'min-content min-content',
+        gridTemplateColumns: 'max-content min-content',
         '& > div > button ': {
           display: 'none',
         },
