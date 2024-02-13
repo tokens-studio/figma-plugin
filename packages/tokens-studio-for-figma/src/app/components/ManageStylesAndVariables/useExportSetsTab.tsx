@@ -21,7 +21,7 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 
 export default function useExportSetsTab() {
-  const { t } = useTranslation('ManageStylesAndVariables');
+  const { t } = useTranslation(['manageStylesAndVariables']);
 
   const store = useStore<RootState>();
 

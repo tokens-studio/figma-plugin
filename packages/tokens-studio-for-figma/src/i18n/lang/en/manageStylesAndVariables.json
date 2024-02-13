@@ -1,5 +1,6 @@
 {
 "modalTitle": "Manage Styles and Variables",
+"buttonLabel": "Styles and Variables",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",
@@ -18,9 +19,13 @@
 },
 "generic": {
   "learnMore": "Learn more",
-  "themes": "Themes",
+  "themes": "Themes", 
   "noGroup": "No Group",
   "selectAll": "Select All"
+},
+"tabs": {
+  "exportThemes": "Themes",
+  "exportSets": "Token Sets"
 },
 "options": {
   "title": "Options",

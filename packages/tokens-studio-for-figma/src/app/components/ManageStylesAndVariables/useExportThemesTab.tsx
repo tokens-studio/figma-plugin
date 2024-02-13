@@ -23,7 +23,7 @@ const ProButton = styled(Button, {
 });
 
 export default function useExportThemesTab() {
-  const { t } = useTranslation('ManageStylesAndVariables');
+  const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
   const isPro = useIsProUser();
 

@@ -60,12 +60,15 @@ const StyledDialogContent = styled(Dialog.Content, {
         maxHeight: '100vh',
         borderRadius: 0,
         boxShadow: 'none',
-      }
+      },
+      regular: {
+        padding: 0,
+      },
     },
   },
-defaultVariants: {
-  padding: 0
-}
+  defaultVariants: {
+    size: 'regular',
+  },
 });
 
 export function Modal({

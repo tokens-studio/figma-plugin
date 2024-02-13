@@ -36,8 +36,6 @@ function Settings() {
     url: 'https://docs.tokens.studio/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
-  const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
-  const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -153,42 +151,7 @@ function Settings() {
               width: '100%',
             }}
           >
-            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
-              <Stack direction="column">
-                <Stack direction="row" gap={1} align="center">
-                  <Label htmlFor="ignoreFirstPartForStyles">{t('ignorePrefix')}</Label>
-                  <ExplainerModal title={t('ignorePrefix')}>
-                    <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
-                    <Box>{t('usefulIgnore')}</Box>
-                  </ExplainerModal>
-                </Stack>
-              </Stack>
-              <Switch
-                data-testid="ignoreFirstPartForStyles"
-                id="ignoreFirstPartForStyles"
-                checked={!!ignoreFirstPartForStyles}
-                defaultChecked={ignoreFirstPartForStyles}
-                onCheckedChange={handleIgnoreChange}
-              />
-            </Stack>
-            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
-              <Stack direction="column">
-                <Stack direction="row" gap={1} align="center">
-                  <Label htmlFor="prefixStylesWithThemeName">{t('prefixStyles')}</Label>
-                  <ExplainerModal title={t('prefixStyles')}>
-                    <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
-                    <Box>{t('prefixStylesExplanation')}</Box>
-                  </ExplainerModal>
-                </Stack>
-              </Stack>
-              <Switch
-                data-testid="prefixStylesWithThemeName"
-                id="prefixStylesWithThemeName"
-                checked={!!prefixStylesWithThemeName}
-                defaultChecked={prefixStylesWithThemeName}
-                onCheckedChange={handlePrefixWithThemeNameChange}
-              />
-            </Stack>
+
             {idStorage && (
               <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
                 <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>

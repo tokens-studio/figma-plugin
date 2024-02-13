@@ -162,7 +162,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     <Modal
       isOpen
       full
-      size="fullscreen"
       title="Themes"
       stickyFooter
       showClose

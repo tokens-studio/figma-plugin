@@ -15,7 +15,7 @@ import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
 
 export default function ManageStylesAndVariables() {
-  const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);
+  const { t } = useTranslation(['manageStylesAndVariables']);
 
   const [showModal, setShowModal] = React.useState(false);
 
@@ -94,10 +94,10 @@ export default function ManageStylesAndVariables() {
         <Tabs defaultValue="useThemes">
           <Tabs.List>
             <Tabs.Trigger value="useThemes">
-              Themes
+              {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
-            <Tabs.Trigger value="useSets">Token Sets</Tabs.Trigger>
+            <Tabs.Trigger value="useSets">{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
           <ExportThemesTab />
           <ExportSetsTab />
@@ -105,7 +105,7 @@ export default function ManageStylesAndVariables() {
       </Modal>
 
       <Button variant="secondary" size="small" onClick={handleOpen}>
-        {t('stylesAndVariables', { ns: 'tokens' })}
+        {t('buttonLabel')}
       </Button>
       <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
     </>
