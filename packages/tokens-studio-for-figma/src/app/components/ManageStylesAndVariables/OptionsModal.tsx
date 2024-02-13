@@ -151,7 +151,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
-    console.log('preventing defualt in options');
   };
 
   const { t } = useTranslation(['manageStylesAndVariables', 'tokens']);

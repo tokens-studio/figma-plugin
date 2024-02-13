@@ -61,7 +61,6 @@ export default function ManageStylesAndVariables() {
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
-    console.log('preventing default - main modal');
   };
 
   return (
