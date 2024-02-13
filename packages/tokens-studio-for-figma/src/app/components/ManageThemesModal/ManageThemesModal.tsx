@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, {
   useCallback, useMemo, useState,
 } from 'react';
@@ -220,7 +218,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <Box className="manageThemeGrid" css={{ padding: '$3 $2 $3 0' }}>
+        <Box css={{ padding: '$3 $2 $3 0' }}>
           <StyledReorderGroup
             layoutScroll
             values={treeItems}
@@ -232,10 +230,9 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               <DragItem<TreeItem> key={item.key} item={item}>
                 {
                   item.isLeaf && typeof item.value === 'object' ? (
-                    <ThemeListItemContent className="themeListItem" item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
+                    <ThemeListItemContent item={item.value} isActive={activeTheme?.[item.parent as string] === item.value.id} onOpen={handleToggleThemeEditor} groupName={item.parent as string} />
                   ) : (
                     <ThemeListGroupHeader
-                      className="themeGroupHeader"
                       label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                       groupName={item.value as string}
                       setIsGroupEditing={handleUpdateIsEditing}
