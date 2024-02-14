@@ -27,17 +27,22 @@ export interface SettingsState {
   updateOnChange?: boolean;
   updateStyles?: boolean;
   tokenType?: TokenModeType;
-  ignoreFirstPartForStyles?: boolean;
-  prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   /**
    * Whether the user has opted in for session recording in Sentry
-   */
+  */
   sessionRecording: boolean;
   storeTokenIdInJsonEditor: boolean;
+  /*
+   * Export styles and variables options
+  */
+  ignoreFirstPartForStyles?: boolean;
+  prefixStylesWithThemeName?: boolean;
+  scopeVariablesByTokenType?: boolean;
+  overwriteExistingStylesAndVariables?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -185,6 +190,18 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         ignoreFirstPartForStyles: payload,
+      };
+    },
+    setOverwriteExistingStylesAndVariables(state, payload: boolean) {
+      return {
+        ...state,
+        overwriteExistingStylesAndVariables: payload,
+      };
+    },
+    setScopeVariablesByTokenType(state, payload: boolean) {
+      return {
+        ...state,
+        scopeVariablesByTokenType: payload,
       };
     },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {

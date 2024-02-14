@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import {
-  Button, Box, Stack, Select,
+  Button, Box, Stack, Select, ToggleGroup, Tooltip,
 } from '@tokens-studio/ui';
+import { Check, Xmark, CodeBrackets } from 'iconoir-react';
+import { styled } from '@stitches/react';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -14,9 +16,9 @@ type Props = {
 };
 
 const tokenSetStatusValues = Object.values(TokenSetStatus);
-const tokenSetSatusLabels = {
+const tokenSetStatusLabels = {
   [TokenSetStatus.DISABLED]: 'Disabled',
-  [TokenSetStatus.SOURCE]: 'Source',
+  [TokenSetStatus.SOURCE]: 'Reference Only',
   [TokenSetStatus.ENABLED]: 'Enabled',
 };
 
@@ -50,6 +52,16 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
     return 'disabled';
   }, [tokenSetStatus]);
 
+  const statusIcon = (status) => {
+    if (status === TokenSetStatus.ENABLED) {
+      return <Check />;
+    }
+    if (status === TokenSetStatus.SOURCE) {
+      return <CodeBrackets />;
+    }
+    return <Xmark />;
+  };
+
   return (
     (
       <Stack direction="row" align="center" css={{ width: '100%' }}>
@@ -76,22 +88,25 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           align="center"
           css={{ width: '100%' }}
         >
-          <Button size="small" variant="invisible" onClick={handleCycleValue}>
-            <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
-              <TokenSetStatusIcon status={mapStatus} />
-              {item.label}
-            </StyledThemeLabel>
-          </Button>
-          <Select value={tokenSetStatus} onValueChange={handleValueChange}>
-            <Select.Trigger value={tokenSetSatusLabels[tokenSetStatus]} data-testid={`tokensettheme-item--select-trigger--${item.key}`} />
-            <Select.Content>
-              {tokenSetStatusValues.map((status) => (
-                <Select.Item key={status} value={status} data-testid={`tokensettheme-item--select-content--${status}`}>
-                  {tokenSetSatusLabels[status]}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select>
+
+          <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
+            {item.label}
+          </StyledThemeLabel>
+          <ToggleGroup
+            type="single"
+            size="small"
+            value={tokenSetStatus}
+            onValueChange={handleValueChange}
+            defaultValue={tokenSetStatus}
+          >
+            {tokenSetStatusValues.map((status) => (
+
+              <ToggleGroup.Item key={status} tooltip={tokenSetStatusLabels[status]} tooltipSide="top" value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${status}`}>
+                {statusIcon(status)}
+              </ToggleGroup.Item>
+
+            ))}
+          </ToggleGroup>
         </Stack>
         )}
       </Stack>

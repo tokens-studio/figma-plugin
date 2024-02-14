@@ -10,7 +10,7 @@ import zhTranslations from './lang/zh';
 
 const isSBX = process.env.NODE_ENV === 'sbx';
 
-export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onBoarding', 'settings', 'storage', 'sync', 'tokens'];
+export const namespaces = ['branch', 'error', 'footer', 'general', 'inspect', 'licence', 'navbar', 'onBoarding', 'settings', 'storage', 'sync', 'tokens', 'variables'];
 
 export const resources = {
   en: enTranslations,

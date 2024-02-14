@@ -44,7 +44,7 @@ export default function DuplicateTokenGroupModal({
       title={t('duplicateGroup') as string}
       isOpen={isOpen}
       close={onClose}
-      large
+      size="large"
       footer={(
         <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>

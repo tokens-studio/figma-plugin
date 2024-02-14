@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
-import { Button, IconButton } from '@tokens-studio/ui';
+import { Button, IconButton, Stack } from '@tokens-studio/ui';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
@@ -149,13 +149,13 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {activeTab === ThemeFormTabs.SETS && (
-        <Box css={{ padding: '$4 $3', paddingTop: '$4' }}>
+        <Stack direction="column" css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
             keyPosition="end"
           />
-        </Box>
+        </Stack>
       )}
       {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
         <Box css={{ padding: '$4 $3', paddingTop: '$4' }}>

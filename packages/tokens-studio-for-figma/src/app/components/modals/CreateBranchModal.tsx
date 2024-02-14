@@ -98,7 +98,7 @@ export default function CreateBranchModal({
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);
 
   return (
-    <Modal title={`Create a new branch from ${isCurrentChanges ? 'current changes' : startBranch}`} large isOpen={isOpen} close={handleModalClose}>
+    <Modal title={`Create a new branch from ${isCurrentChanges ? 'current changes' : startBranch}`} size="large" isOpen={isOpen} close={handleModalClose}>
       <form onSubmit={handleSubmit}>
         <Stack direction="column" gap={4}>
           <Input

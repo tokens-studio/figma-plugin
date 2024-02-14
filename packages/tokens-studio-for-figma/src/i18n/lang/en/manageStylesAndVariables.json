@@ -1,0 +1,69 @@
+{
+"modalTitle": "Manage Styles and Variables",
+"buttonLabel": "Styles and Variables",
+"actions": {
+  "export": "Export to Figma",
+  "import": "Import from Figma",
+  "options": "Options",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "createThemes": "Create Themes",
+  "getPRO": "Get PRO",
+  "manageThemes": "Manage Themes",
+  "changeSets": "Change Sets"
+},
+"docs": {
+  "exportToFigmaOptions": "Export to Figma Options",
+  "stylesAndVariables": "Styles and Variables",
+  "referenceOnlyMode": "Enabled versus Reference Only Mode"
+},
+"generic": {
+  "learnMore": "Learn more",
+  "themes": "Themes", 
+  "noGroup": "No Group",
+  "selectAll": "Select All"
+},
+"tabs": {
+  "exportThemes": "Themes",
+  "exportSets": "Token Sets"
+},
+"options": {
+  "title": "Options",
+  "whichVariablesShouldBeCreatedAndUpdated": "Which variables should be created and updated?",
+  "whichStylesShouldBeCreatedAndUpdated": "Which styles should be created and updated?",
+  "tokensExportedToFigmaShould": "Tokens exported to Figma should:",
+  "ignorePrefix": "Ignore first part of token name for styles",
+  "ignorePrefixExplanation": "Useful if you want to ignore 'colors' in a token called 'colors.blue.500' for your styles",
+  "prefixStyles": "Prefix styles with active theme name",
+  "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
+  "overwriteExistingStylesAndVariables": "Overwrite existing styles and variables",
+  "overwriteExistingStylesAndVariablesExplanation": "Existing styles and variables with the same name will be overwritten",
+  "scopeVariablesByTokenType": "Scope Variables by token type",
+  "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage"
+},
+"variables": {
+  "color": "Color",
+  "number": "Number",
+  "boolean": "Boolean",
+  "string": "String"
+},
+"styles": {
+  "color": "Color",
+  "typography": "Typography",
+  "effects": "Effects"
+},
+"exportThemesTab": {
+  "headingPro": "Create Themes to get Started",
+  "headingBasic": "Creating Themes is a pro Feature",
+  "introPro": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
+  "introBasic": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
+  "confirmThemes": "Confirm Themes",
+  "combinationsOfSetsMakeThemes": "Combinations of token sets create themes"
+},
+"exportSetsTab": {
+  "changeSetsHeading": "Enabled sets will export to Figma",
+  "confirmSets": "Confirm Sets",
+  "intro": "You can use token sets to manage your styles, and variables. Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts."
+}
+}
+
