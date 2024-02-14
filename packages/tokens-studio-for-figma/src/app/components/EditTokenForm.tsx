@@ -86,7 +86,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && internalEditToken.name && !Boolean(error);
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -129,7 +129,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasPriorTokenName = React.useMemo(
     () => resolvedTokens
       .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
+      .find((t) => internalEditToken.name?.startsWith(`${t.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -360,6 +360,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
           value: trimmedValue as SingleToken['value'],
           ...($extensions ? { $extensions } : {}),
         });
+
+        // TODO: Move this to the hook, should not live inside the edit token form
         if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
           updateVariablesFromToken({
             parent: activeTokenSet,
@@ -370,6 +372,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             ...($extensions ? { $extensions } : {}),
           });
         }
+        // TODO: Move to the edit token hook
         // When users change token names the applied tokens on layers are still pointing to the old name, ask user to remap
         if (oldName && oldName !== newName) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
