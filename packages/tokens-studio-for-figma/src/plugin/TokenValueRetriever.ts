@@ -22,7 +22,7 @@ export class TokenValueRetriever {
 
   public initiate({
     tokens, variableReferences, styleReferences, stylePathPrefix, ignoreFirstPartForStyles = false,
-  }: { tokens: AnyTokenList, variableReferences: RawVariableReferenceMap, styleReferences: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; }) {
+  }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
     this.styleReferences = styleReferences;
@@ -30,10 +30,10 @@ export class TokenValueRetriever {
     this.cachedVariableReferences = new Map();
 
     this.tokens = new Map<string, any>(tokens.map((token) => {
-      const variableId = variableReferences.get(token.name);
+      const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
       const adjustedTokenName = this.getAdjustedTokenName(token.name);
-      const styleId = styleReferences.get(adjustedTokenName);
+      const styleId = styleReferences?.get(adjustedTokenName);
       return [token.name, {
         ...token, variableId, styleId, adjustedTokenName,
       }];

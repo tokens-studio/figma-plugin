@@ -1,5 +1,8 @@
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { mockImportVariableByKeyAsync } from '../../tests/__mocks__/figmaMock';
 import { ColorPaintType, tryApplyColorVariableId } from './tryApplyColorVariableId';
+import { SingleToken } from '@/types/tokens';
+import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 
 describe('tryApplyColorVariableId', () => {
   const mockSetBoundVariable = jest.fn();
@@ -16,8 +19,12 @@ describe('tryApplyColorVariableId', () => {
   } as unknown as SceneNode;
 
   it('when there is no matching variable, should not apply variable and return false', async () => {
-    const variableReferences = new Map();
-    expect(await tryApplyColorVariableId(node, 'token', variableReferences, ColorPaintType.FILLS)).toBe(false);
+    const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
+    const figmaVariableReferences: RawVariableReferenceMap = new Map([]);
+    await defaultTokenValueRetriever.initiate({
+      tokens, variableReferences: figmaVariableReferences,
+    });
+    expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(false);
   });
 
   it('when there is a matching variable, should try to apply variable', async () => {
@@ -31,7 +38,7 @@ describe('tryApplyColorVariableId', () => {
     mockImportVariableByKeyAsync.mockImplementationOnce(() => mockVariable);
     const variableReferences = new Map();
     variableReferences.set('token', 'VariableID:519:32875');
-    expect(await tryApplyColorVariableId(node, 'token', variableReferences, ColorPaintType.FILLS)).toBe(true);
+    expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');
   });
 });

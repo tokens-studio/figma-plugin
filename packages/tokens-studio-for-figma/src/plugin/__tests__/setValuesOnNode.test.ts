@@ -5,14 +5,10 @@ import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { mockCreateImage } from '../../../tests/__mocks__/figmaMock';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 describe('Can set values on node', () => {
-  const emptyStylesMap = {
-    effectStyles: new Map(),
-    paintStyles: new Map(),
-    textStyles: new Map(),
-  };
-
   const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
   const setColorValuesOnTargetSpy = jest.spyOn(setColorValuesOnTarget, 'default');
@@ -22,6 +18,9 @@ describe('Can set values on node', () => {
   let frameNodeMock: FrameNode;
 
   beforeEach(() => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [],
+    });
     textNodeMock = ({
       id: '123:456',
       type: 'TEXT',
@@ -99,7 +98,7 @@ describe('Can set values on node', () => {
       opacity: 'opacity-50',
     };
 
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: solidNodeMock, values, data });
 
     expect(solidNodeMock.cornerRadius).toEqual(10);
     expect(solidNodeMock.topLeftRadius).toEqual(10);
@@ -131,14 +130,7 @@ describe('Can set values on node', () => {
       resize: mockResize,
     } as unknown) as RectangleNode;
 
-    await setValuesOnNode(
-      mockNode,
-      {
-        sizing: '100px',
-      },
-      { sizing: 'size.10' },
-      emptyStylesMap,
-    );
+    await setValuesOnNode({ node: mockNode, values: { sizing: '100px' }, data: { sizing: 'size.10' } });
     expect(mockResize).toBeCalledWith(100, 100);
   });
 
@@ -150,12 +142,13 @@ describe('Can set values on node', () => {
     } as unknown) as RectangleNode;
 
     await setValuesOnNode(
-      mockNode,
       {
-        width: '100px',
+        node: mockNode,
+        values: {
+          width: '100px',
+        },
+        data: { width: 'size.100' },
       },
-      { width: 'size.100' },
-      emptyStylesMap,
     );
     expect(mockResize).toBeCalledWith(100, 50);
   });
@@ -168,84 +161,99 @@ describe('Can set values on node', () => {
     } as unknown) as RectangleNode;
 
     await setValuesOnNode(
-      mockNode,
       {
-        height: '100px',
+        node: mockNode,
+        values: {
+          height: '100px',
+        },
+        data: { height: 'size.100' },
       },
-      { height: 'size.100' },
-      emptyStylesMap,
     );
     expect(mockResize).toBeCalledWith(50, 100);
   });
 
   it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', () => {
     setValuesOnNode(
-      textNodeMock,
       {
-        textCase: 'TITLE',
-        textDecoration: 'STRIKETHROUGH',
+        node: textNodeMock,
+        values: {
+          textCase: 'TITLE',
+          textDecoration: 'STRIKETHROUGH',
+        },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+        },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      emptyStylesMap,
     );
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('doesnt call setTextValuesOnTarget if no text node', () => {
     setValuesOnNode(
-      solidNodeMock,
       {
-        textCase: 'TITLE',
-        textDecoration: 'STRIKETHROUGH',
+        node: solidNodeMock,
+        values: {
+          textCase: 'TITLE',
+          textDecoration: 'STRIKETHROUGH',
+        },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+        },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      emptyStylesMap,
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
   it('calls setTextValuesOnTarget if text node and composite typography tokens are given', () => {
     setValuesOnNode(
-      textNodeMock,
       {
-        typography: {
-          fontFamily: 'Inter',
-          fontWeight: 'Bold',
-          fontSize: '24',
+        node: textNodeMock,
+        values: {
+          typography: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
+        },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
         },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      emptyStylesMap,
     );
     expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('sets textstyle if matching Style is found', async () => {
-    await setValuesOnNode(
-      textNodeMock,
-      {
-        typography: {
-          fontFamily: 'Inter',
-          fontWeight: 'Bold',
-          fontSize: '24',
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'type.heading.h1',
+          type: TokenTypes.TYPOGRAPHY,
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
         },
-      },
+      ],
+      styleReferences: new Map([['type/heading/h1', '123']]),
+    });
+    await setValuesOnNode(
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      {
-        ...emptyStylesMap,
-        textStyles: new Map([['type/heading/h1', { name: 'type/heading/h1', id: '123' } as TextStyle]]),
+        node: textNodeMock,
+        values: {
+          typography: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
+        },
+        data: {
+          typography: 'type.heading.h1',
+        },
       },
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
@@ -253,52 +261,74 @@ describe('Can set values on node', () => {
   });
 
   it('sets textstyle if matching Style is found and first part is ignored', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'type.heading.h1',
+          type: TokenTypes.TYPOGRAPHY,
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
+        },
+      ],
+      styleReferences: new Map([['type/heading/h1', '123']]),
+      ignoreFirstPartForStyles: true,
+    });
     await setValuesOnNode(
-      textNodeMock,
       {
-        typography: {
-          fontFamily: 'Inter',
-          fontWeight: 'Bold',
-          fontSize: '24',
+        node: textNodeMock,
+        values: {
+          typography: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
+        },
+        data: {
+          typography: 'type.heading.h1',
         },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      {
-        ...emptyStylesMap,
-        textStyles: new Map([['heading/h1', { name: 'heading/h1', id: '456' } as TextStyle]]),
-      },
-      {},
-      new Map(),
-      null,
-      true,
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
 
   it('sets effectStyle if matching Style is found', async () => {
-    await setValuesOnNode(
-      solidNodeMock,
-      {
-        boxShadow: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          color: '#00000080',
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'shadows.default',
+          type: TokenTypes.BOX_SHADOW,
+          value: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
         },
-      },
+      ],
+      styleReferences: new Map([['shadows/default', '123']]),
+    });
+    await setValuesOnNode(
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      {
-        ...emptyStylesMap,
-        effectStyles: new Map([['shadows/default', { name: 'shadows/default', id: '123' } as EffectStyle]]),
+        node: solidNodeMock,
+        values: {
+          boxShadow: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+        },
+        data: {
+          boxShadow: 'shadows.default',
+        },
       },
     );
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
@@ -306,72 +336,105 @@ describe('Can set values on node', () => {
   });
 
   it('calls setEffectValuesOnTarget if effect node and effects are given', async () => {
-    await setValuesOnNode(
-      solidNodeMock,
-      {
-        boxShadow: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          color: '#00000080',
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'shadows.default',
+          type: TokenTypes.BOX_SHADOW,
+          value: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
         },
-      },
+      ],
+    });
+    await setValuesOnNode(
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      {
-        ...emptyStylesMap,
-        effectStyles: new Map([['shadows/other', { name: 'shadows/other', id: '123' } as EffectStyle]]),
+        node: solidNodeMock,
+        values: {
+          boxShadow: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+        },
+        data: {
+          boxShadow: 'shadows.default',
+        },
       },
     );
     expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('should be able to find a theme prefixed style', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'shadows.default',
+          type: TokenTypes.BOX_SHADOW,
+          value: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+        },
+      ],
+      styleReferences: new Map([['light/shadows/default', '123']]),
+      stylePathPrefix: 'light',
+    });
     await setValuesOnNode(
-      solidNodeMock,
       {
-        boxShadow: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          color: '#00000080',
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
+        node: solidNodeMock,
+        values: {
+          boxShadow: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+        },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
         },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      {
-        ...emptyStylesMap,
-        effectStyles: new Map([['light/shadows/default', { name: 'light/shadows/default', id: '123' } as EffectStyle]]),
-      },
-      {},
-      new Map(),
-      'light',
-      false,
     );
     expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
   });
 
   it('sets fillStyle if matching Style', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'colors.red',
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+        },
+      ],
+      styleReferences: new Map([['colors/red', '123']]),
+    });
     await setValuesOnNode(
-      solidNodeMock,
       {
-        fill: '#ff0000',
-      },
-      {
-        fill: 'colors.red',
-      },
-      {
-        ...emptyStylesMap,
-        paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
+        node: solidNodeMock,
+        values: {
+          fill: '#ff0000',
+        },
+        data: {
+          fill: 'colors.red',
+        },
       },
     );
     expect(setColorValuesOnTargetSpy).not.toHaveBeenCalled();
@@ -380,30 +443,39 @@ describe('Can set values on node', () => {
 
   it('calls setColorValuesOnTarget if fill node and fill is given', async () => {
     await setValuesOnNode(
-      solidNodeMock,
       {
-        fill: '#ff0000',
+        node: solidNodeMock,
+        values: {
+          fill: '#ff0000',
+        },
+        data: {
+          fill: 'colors.red',
+        },
       },
-      {
-        fill: 'colors.red',
-      },
-      emptyStylesMap,
     );
     expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'fills');
   });
 
   it('sets strokeStyleId if matching Style', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'colors.red',
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+        },
+      ],
+      styleReferences: new Map([['colors/red', '123']]),
+    });
     await setValuesOnNode(
-      solidNodeMock,
       {
-        borderColor: '#ff0000',
-      },
-      {
-        borderColor: 'colors.red',
-      },
-      {
-        ...emptyStylesMap,
-        paintStyles: new Map([['colors/red', { name: 'colors/red', id: '123' } as PaintStyle]]),
+        node: solidNodeMock,
+        values: {
+          borderColor: '#ff0000',
+        },
+        data: {
+          borderColor: 'colors.red',
+        },
       },
     );
     expect(setColorValuesOnTargetSpy).not.toHaveBeenCalled();
@@ -412,28 +484,30 @@ describe('Can set values on node', () => {
 
   it('calls setColorValuesOnTarget if border node and border is given', async () => {
     await setValuesOnNode(
-      solidNodeMock,
       {
-        borderColor: '#ff0000',
+        node: solidNodeMock,
+        values: {
+          borderColor: '#ff0000',
+        },
+        data: {
+          borderColor: 'colors.red',
+        },
       },
-      {
-        borderColor: 'colors.red',
-      },
-      emptyStylesMap,
     );
     expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'strokes');
   });
 
   it('can set padding and spacing if spacing is defined', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        spacing: 20,
+        node: frameNodeMock,
+        values: {
+          spacing: 20,
+        },
+        data: {
+          spacing: 'spacing.lg',
+        },
       },
-      {
-        spacing: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
     expect(frameNodeMock.paddingRight).toBe(20);
@@ -443,14 +517,15 @@ describe('Can set values on node', () => {
 
   it('can set horizontalPadding', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        horizontalPadding: 20,
+        node: frameNodeMock,
+        values: {
+          horizontalPadding: 20,
+        },
+        data: {
+          horizontalPadding: 'spacing.lg',
+        },
       },
-      {
-        horizontalPadding: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
     expect(frameNodeMock.paddingRight).toBe(20);
@@ -458,14 +533,15 @@ describe('Can set values on node', () => {
 
   it('can set verticalPadding', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        verticalPadding: 20,
+        node: frameNodeMock,
+        values: {
+          verticalPadding: 20,
+        },
+        data: {
+          verticalPadding: 'spacing.lg',
+        },
       },
-      {
-        verticalPadding: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingTop).toBe(20);
     expect(frameNodeMock.paddingBottom).toBe(20);
@@ -473,84 +549,90 @@ describe('Can set values on node', () => {
 
   it('can set itemSpacing', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        itemSpacing: 20,
+        node: frameNodeMock,
+        values: {
+          itemSpacing: 20,
+        },
+        data: {
+          itemSpacing: 'spacing.lg',
+        },
       },
-      {
-        itemSpacing: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.itemSpacing).toBe(20);
   });
 
   it('can set paddingTop', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        paddingTop: 20,
+        node: frameNodeMock,
+        values: {
+          paddingTop: 20,
+        },
+        data: {
+          paddingTop: 'spacing.lg',
+        },
       },
-      {
-        paddingTop: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingTop).toBe(20);
   });
 
   it('can set paddingRight', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        paddingRight: 20,
+        node: frameNodeMock,
+        values: {
+          paddingRight: 20,
+        },
+        data: {
+          paddingRight: 'spacing.lg',
+        },
       },
-      {
-        paddingRight: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingRight).toBe(20);
   });
 
   it('can set paddingBottom', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        paddingBottom: 20,
+        node: frameNodeMock,
+        values: {
+          paddingBottom: 20,
+        },
+        data: {
+          paddingBottom: 'spacing.lg',
+        },
       },
-      {
-        paddingBottom: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingBottom).toBe(20);
   });
 
   it('can set paddingLeft', async () => {
     await setValuesOnNode(
-      frameNodeMock,
       {
-        paddingLeft: 20,
+        node: frameNodeMock,
+        values: {
+          paddingLeft: 20,
+        },
+        data: {
+          paddingLeft: 'spacing.lg',
+        },
       },
-      {
-        paddingLeft: 'spacing.lg',
-      },
-      emptyStylesMap,
     );
     expect(frameNodeMock.paddingLeft).toBe(20);
   });
 
   it('changes fill if needed', async () => {
     await setValuesOnNode(
-      textNodeMock,
-      { fill: '#ff0000' },
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-        fill: 'fg.default',
+        node: textNodeMock,
+        values: { fill: '#ff0000' },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+          fill: 'fg.default',
+        },
       },
-      emptyStylesMap,
     );
     expect(textNodeMock.fills).toEqual([
       {
@@ -567,43 +649,46 @@ describe('Can set values on node', () => {
 
   it('changes characters if needed', async () => {
     await setValuesOnNode(
-      textNodeMock,
-      { fill: '#ff0000', value: 'My new content' },
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-        fill: 'default',
+        node: textNodeMock,
+        values: { fill: '#ff0000', value: 'My new content' },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+          fill: 'default',
+        },
       },
-      emptyStylesMap,
     );
     expect(textNodeMock.characters).toEqual('My new content');
   });
 
   it('doesnt change characters if not needed', async () => {
     await setValuesOnNode(
-      textNodeMock,
-      { fill: '#00ff00' },
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-        fill: 'fg.default',
+        node: textNodeMock,
+        values: { fill: '#00ff00' },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+          fill: 'fg.default',
+        },
       },
-      emptyStylesMap,
     );
     expect(textNodeMock.characters).toEqual('foobar');
   });
 
   it('should change characters when the value is 0', async () => {
     await setValuesOnNode(
-      textNodeMock,
       {
-        value: 0,
+        node: textNodeMock,
+        values: {
+          value: 0,
+        },
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+        },
       },
-      {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
-      },
-      emptyStylesMap,
     );
     expect(figma.loadFontAsync).toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('0');
@@ -611,13 +696,14 @@ describe('Can set values on node', () => {
 
   it('should not change characters when the value is undefined', async () => {
     await setValuesOnNode(
-      textNodeMock,
-      {},
       {
-        typography: 'type.heading.h1',
-        boxShadow: 'shadows.default',
+        node: textNodeMock,
+        values: {},
+        data: {
+          typography: 'type.heading.h1',
+          boxShadow: 'shadows.default',
+        },
       },
-      emptyStylesMap,
     );
     expect(figma.loadFontAsync).not.toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('foobar');
@@ -635,7 +721,7 @@ describe('Can set values on node', () => {
     mockCreateImage.mockImplementation(() => ({
       hash: '1234',
     }));
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: solidNodeMock, values, data });
     expect(solidNodeMock.fills).toEqual([
       {
         type: 'IMAGE',
@@ -655,7 +741,7 @@ describe('Can set values on node', () => {
       dimension: '12px',
     };
     const data = { dimension: 'dimension.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: mockNode, values, data });
     expect(mockResize).toBeCalledWith(12, 12);
   });
 
@@ -671,7 +757,7 @@ describe('Can set values on node', () => {
       dimension: '12px',
     };
     const data = { dimension: 'dimension.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: mockNode, values, data });
     expect(mockResize).toBeCalledTimes(0);
     expect(mockNode.itemSpacing).toEqual(12);
   });
@@ -684,23 +770,24 @@ describe('Can set values on node', () => {
       },
     };
     const data = { border: 'border.regular' };
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: solidNodeMock, values, data });
     expect(solidNodeMock.strokeWeight).toEqual(12);
     expect(solidNodeMock.dashPattern).toEqual([0, 0]);
   });
 
   it('apply token with none value', async () => {
     await setValuesOnNode(
-      solidNodeMock,
       {
-        borderColor: 'none',
-        borderRadius: 'none',
+        node: solidNodeMock,
+        values: {
+          borderColor: 'none',
+          borderRadius: 'none',
+        },
+        data: {
+          borderColor: 'border-color.none',
+          borderRadius: 'border-radius.none',
+        },
       },
-      {
-        borderColor: 'border-color.none',
-        borderRadius: 'border-radius.none',
-      },
-      emptyStylesMap,
     );
     expect(solidNodeMock).toEqual({ ...solidNodeMock, strokes: [], cornerRadius: 0 });
   });
@@ -710,7 +797,7 @@ describe('Can set values on node', () => {
       visibility: 'false',
     };
     const data = { visibility: 'boolean-false' };
-    await setValuesOnNode(solidNodeMock, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: solidNodeMock, values, data });
     expect(solidNodeMock.visible).toEqual(false);
   });
 
@@ -724,7 +811,7 @@ describe('Can set values on node', () => {
       number: '12px',
     };
     const data = { number: 'number.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: mockNode, values, data });
     expect(mockResize).toBeCalledWith(12, 12);
   });
 
@@ -740,7 +827,7 @@ describe('Can set values on node', () => {
       number: '12px',
     };
     const data = { number: 'number.regular' };
-    await setValuesOnNode(mockNode, values, data, emptyStylesMap);
+    await setValuesOnNode({ node: mockNode, values, data });
     expect(mockResize).toBeCalledTimes(0);
     expect(mockNode.itemSpacing).toEqual(12);
   });

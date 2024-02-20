@@ -15,7 +15,8 @@ export async function applyShadowValuesOnNode(
 ) {
   if ('effects' in node && typeof values.boxShadow !== 'undefined' && data.boxShadow) {
     const resolvedToken = defaultTokenValueRetriever.get(data.boxShadow);
-    let matchingStyleId = resolvedToken.styleId;
+    if (!resolvedToken) return;
+    let matchingStyleId = resolvedToken?.styleId;
 
     // Note: We should remove "backup style id" logic from here (this part). This was relevant before we had Themes, where style ids could not be saved to a token yet.
     if (!matchingStyleId) {

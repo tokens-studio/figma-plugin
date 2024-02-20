@@ -78,8 +78,10 @@ export default async function setEffectValuesOnTarget(
 ) {
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
+    if (typeof resolvedToken === 'undefined') return;
     const { description, value } = resolvedToken;
     const resolvedValue: ResolvedShadowObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
+    if (typeof resolvedValue === 'undefined') return;
 
     if (Array.isArray(value)) {
       const effectsArray = await Promise.all(value.map(async (v, i) => {
