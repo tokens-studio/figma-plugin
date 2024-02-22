@@ -12,7 +12,7 @@ but it will be used in the future to show the theme details in the theme list.
 
 */
 
-export const ThemeDetails = () => (
+export const ThemeDetails = ({ created, removed, changed, issued }: { created?: number, removed?: number, changed?: number, issued?: number }) => (
   <Stack
     direction="row"
     gap={4}
@@ -25,19 +25,19 @@ export const ThemeDetails = () => (
   >
     <Label css={{ color: '$successFg', fontSize: '$xxsmall' }}>
       <DiffAddedIcon size="small" />
-      9999
+      { created ?? 0 }
     </Label>
     <Label css={{ color: '$dangerFg', fontSize: '$xxsmall' }}>
       <DiffRemovedIcon size="small" />
-      9999
+      { removed ?? 0 }
     </Label>
     <Label css={{ color: '$accentEmphasis', fontSize: '$xxsmall' }}>
       <PencilIcon size="small" />
-      9999
+      { changed ?? 0 }
     </Label>
     <Label css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
       <AlertFillIcon size="small" />
-      9999
+      { issued ?? 0 }
     </Label>
   </Stack>
 );
