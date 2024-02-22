@@ -19,6 +19,7 @@ import { RootState } from '@/app/store';
 import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
+import { ThemeDetails } from './ThemeDetails';
 
 export default function useExportSetsTab() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -100,6 +101,7 @@ export default function useExportSetsTab() {
                 {' of '}
                 {allSets.length}
               </Label>
+              <ThemeDetails />
             </ExportThemeRow>
           </Stack>
         </Stack>
