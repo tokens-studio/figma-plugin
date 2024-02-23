@@ -31,8 +31,9 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
     allWithData.forEach(({ node, tokens }) => {
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
-          if (value.includes(oldName)) {
-            const newValue = value.replace(oldName, newName);
+          const pattern = (/^\/.*\/$/.test(oldName)) ? new RegExp(oldName.slice(1, -1)) : new RegExp(oldName);
+          if (pattern.test(value)) {
+            const newValue = value.replace(pattern, newName);
             const jsonValue = JSON.stringify(newValue);
             node.setSharedPluginData(namespace, key, jsonValue);
           }
