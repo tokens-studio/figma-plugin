@@ -152,8 +152,8 @@ export default function useExportThemesTab() {
                 <Checkbox id="check-all-themes" checked={selectedThemes.length === themes.length} onCheckedChange={handleSelectAllThemes} />
                 <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
               </Stack>
-              {ThemeGroups.map((group) => (
-                <Stack direction="column" gap={2}>
+              {ThemeGroups.map((group, index) => (
+                <Stack direction="column" gap={2} key={index}>
                   <Heading size="small">{group}</Heading>
                   {themes.filter((theme) => theme.group === group).map((theme) => createThemeRow(theme))}
                 </Stack>

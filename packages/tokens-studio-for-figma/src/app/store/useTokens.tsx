@@ -487,6 +487,7 @@ export default function useTokens() {
       tokens: multiValueFilteredTokens,
       settings,
     }));
+    console.log('createVariableResult: ', createVariableResult);
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);

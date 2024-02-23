@@ -22,6 +22,7 @@ export default function ManageStylesAndVariables() {
   const isPro = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>('useThemes');
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
@@ -59,6 +60,11 @@ export default function ManageStylesAndVariables() {
     }
   }, [setShowOptions, showOptions]);
 
+  const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
+    setActiveTab(tab);
+    console.log('tab change: ', tab);
+  }, []);
+
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
   };
@@ -90,13 +96,13 @@ export default function ManageStylesAndVariables() {
   )}
         stickyFooter
       >
-        <Tabs defaultValue="useThemes">
+        <Tabs defaultValue={activeTab}>
           <Tabs.List>
-            <Tabs.Trigger value="useThemes">
+            <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
-            <Tabs.Trigger value="useSets">{t('tabs.exportSets')}</Tabs.Trigger>
+            <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
           <ExportThemesTab />
           <ExportSetsTab />
