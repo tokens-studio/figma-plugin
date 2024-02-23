@@ -27,11 +27,14 @@ export const bulkRemapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.BULK
 
     const tracker = new ProgressTracker(BackgroundJobs.PLUGIN_UPDATEPLUGINDATA);
     const promises: Set<Promise<void>> = new Set();
+    const regexPattern = /^\/(.*)\/([gimsuy]*)$/;
 
     allWithData.forEach(({ node, tokens }) => {
       promises.add(defaultWorker.schedule(async () => {
         Object.entries(tokens).forEach(([key, value]) => {
-          const pattern = (/^\/.*\/$/.test(oldName)) ? new RegExp(oldName.slice(1, -1)) : new RegExp(oldName);
+          const regexTest = oldName.match(regexPattern);
+          // If the pattern passed is a regex, use it, otherwise use the old name with a global flag
+          const pattern = regexTest ? new RegExp(regexTest[1], regexTest[2]) : new RegExp(oldName, 'g');
           if (pattern.test(value)) {
             const newValue = value.replace(pattern, newName);
             const jsonValue = JSON.stringify(newValue);

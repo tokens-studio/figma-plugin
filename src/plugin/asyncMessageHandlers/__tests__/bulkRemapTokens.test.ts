@@ -95,7 +95,7 @@ describe('bulkRemapTokens', () => {
     ]));
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
-      oldName: 'old-size.*',
+      oldName: '/old-size.*/g',
       newName: 'new-size.1000',
       updateMode: UpdateMode.SELECTION,
     });
