@@ -9,6 +9,7 @@ import {
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import useTokens from '@/app/store/useTokens';
 
 import useExportThemesTab from './useExportThemesTab';
 import useExportSetsTab from './useExportSetsTab';
@@ -26,6 +27,7 @@ export default function ManageStylesAndVariables() {
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
+  const { createVariables } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -40,6 +42,7 @@ export default function ManageStylesAndVariables() {
     alert('TODO: Export to Figma - check the console for export options');
     console.log('Selected themes:', selectedThemes);
     console.log('Selected sets:', selectedSets);
+    createVariables();
   }, []);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
