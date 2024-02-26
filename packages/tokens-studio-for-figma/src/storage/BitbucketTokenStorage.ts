@@ -1,8 +1,18 @@
+/* eslint-disable @typescript-eslint/indent */
 /* eslint "@typescript-eslint/no-unused-vars": off */
-// @TODO this needs to be finalized
 import { Bitbucket } from 'bitbucket';
-import { RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { GitTokenStorage } from './GitTokenStorage';
+import axios from 'axios';
+import compact from 'just-compact';
+import {
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
+  RemoteTokenstorageErrorMessage,
+} from './RemoteTokenStorage';
+import { GitMultiFileObject, GitTokenStorage } from './GitTokenStorage';
+import { AnyTokenSet } from '@/types/tokens';
+import { ThemeObjectsList } from '@/types';
+import { ErrorMessages } from '@/constants/ErrorMessages';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -24,7 +34,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       multiFileEnabled: false,
     };
 
-    // eslint-disable-next-line
     this.bitbucketClient = new Bitbucket({
       auth: {
         username: this.owner,
@@ -42,7 +51,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       repo_slug: this.repository,
     });
 
-    if (!branches.data) {
+    if (!branches || !branches.data) {
       return ['No data'];
     }
     // README we'll have to account for paginated branches somehow, this only returns
@@ -50,28 +59,42 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     return branches.data!.values!.map((branch) => branch.name) as string[];
   }
 
-  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createBranch OR
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post
+  /**
+   * Creates a new branch in the repository.
+   *
+   * [Bibucket API reference](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post)
+   * [bitbucketjs API reference](https://bitbucketjs.netlify.app/#api-repositories-repositories_createBranch)
+   *
+   * @param branch - The name of the new branch to create.
+   * @param source - The name of the branch to create the new branch from. If not provided, the current branch is used.
+   *
+   * @returns A promise that resolves to a boolean indicating whether the branch was successfully created.
+   *
+   * @throws Will throw an error if the origin branch could not be retrieved.
+   */
   public async createBranch(branch: string, source?: string) {
     try {
       const originRef = `refs/${source || this.branch}`;
       const newRef = `refs/${branch}`;
-      const originBranch = await this.bitbucketClient.listRefs({
+
+      const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
-        ref: originRef,
       });
-      // TODO: createRef is not implemented on Bitbucket Cloud
-      // const newBranch = await this.bitbucketClient.git.createRef({
-      //   workspace: this.owner,
-      //   repo_slug: this.repository,
-      //   ref: newRef,
-      // });
+
+      if (!originBranch.data.values || !originBranch.data.values[0] || !originBranch.data.values[0].target) {
+        throw new Error('Could not retrieve origin branch');
+      }
 
       const newBranch = await this.bitbucketClient.refs.createBranch({
         workspace: this.owner,
-        _body: undefined,
-        repo_slug: '',
+        _body: {
+          name: branch, // branch name
+          target: {
+            hash: originBranch.data.values[0].target.hash, // hash of the commit the new branch should point to
+          },
+        },
+        repo_slug: this.repository,
       });
 
       return !!newBranch.data.ref;
@@ -98,35 +121,119 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
   }
 
-  // https://bitbucketjs.netlify.app/#api-source-source_readRoot OR
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-commit-path-get
-  // Equivalent to directly hitting /2.0/repositories/{username}/{repo_slug}/src/{commit}/{path} without having to know the name or SHA1 of the repo's main branch.
-  public async read(): Promise<RemoteTokenStorageFile[]> {
+  /**
+   * Reads the content of the files in a Bitbucket repository.
+   *
+   * Fetches the content of the files in a Bitbucket repository specified by the `owner`, `repository`, and `branch` properties.
+   * Filters out the JSON files and processes their content.
+   *
+   * Returns a promise that resolves to an array of `RemoteTokenStorageFile` objects, if successful.
+   * Each `RemoteTokenStorageFile` object represents a file in the repository and contains the file's path, name, type, and data.
+   *
+   * @returns A promise that resolves to an array of `RemoteTokenStorageFile` objects or a `RemoteTokenstorageErrorMessage` object.
+   * @throws Will throw an error if the operation fails.
+   */
+  public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+    const normalizedPath = compact(this.path.split('/')).join('/');
+
     try {
-      const response = await this.bitbucketClient.repositories.get({
-        workspace: this.owner,
-        repo_slug: this.repository,
-        // path: this.path,
-        // ref: this.branch,
+      const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+
+      const response = await axios.get(url, {
+        auth: {
+          username: this.owner,
+          password: this.secret,
+        },
       });
 
-      // TODO: create a tree structure and read the directory
-      // the Bitbucket cloud API doesn't have a method like `createTree`
+      if (/^application\/json(;.*)?$/.test(response.headers['content-type'])) {
+        const { data } = response;
+        if (data.values && Array.isArray(data.values)) {
+          // Filter out the JSON files
+          const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
 
-      // read entire directory
+          // Fetch the content of each JSON file
+          const jsonFileContents = await Promise.all(
+            jsonFiles.map((file: any) => fetch(file.links.self.href).then((response) => response.text())),
+          );
+          // Process the content of each JSON file
+          return jsonFileContents.map((fileContent, index) => {
+            const { path } = jsonFiles[index];
+            const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
+            let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+            name = name.replace('.json', '');
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path: filePath,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path: filePath,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
+            return {
+              path: filePath,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
+            };
+          });
+        }
+        return {
+          errorMessage: ErrorMessages.VALIDATION_ERROR,
+        };
+      }
+      console.error('Unexpected file type:', response.headers['content-type']);
       return [];
     } catch (e) {
-      // Raise error (usually this is an auth error)
-      console.log('Error', e);
+      console.error('Error', e);
       return [];
     }
   }
 
-  // https://bitbucketjs.netlify.app/#api-repositories-repositories_createSrcFileCommit
-  // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post
+  /**
+   * Create or update files in a Bitbucket repository.
+   *
+   * [Bitbucket API reference](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-source/#api-repositories-workspace-repo-slug-src-post)
+   *
+   * @param {Object} params - The parameters for creating or updating files.
+   * @param {string} params.owner - The owner of the repository.
+   * @param {string} params.repo - The repository where the files will be created or updated.
+   * @param {string} params.branch - The branch where the files will be created or updated.
+   * @param {Array} params.changes - An array of changes to be made. Each change is an object that includes a message and files.
+   * @param {string} params.changes[].message - The commit message for the change.
+   * @param {Object} params.changes[].files - The files to be created or updated. This is a Record<string, string> where the key is the filename and the value is the new content.
+   *
+   * @returns {Promise} A promise that resolves to the response from the Bitbucket API.
+   *
+   * @example
+   * const params = {
+   *   owner: 'owner',
+   *   repo: 'repo',
+   *   branch: 'branch',
+   *   changes: [
+   *     {
+   *       message: 'Initial commit',
+   *       files: {
+   *         'data/tokens.json': JSON.stringify(data),
+   *       },
+   *     },
+   *   ],
+   * };
+   * const response = await createOrUpdateFiles(params);
+   */
   public async createOrUpdateFiles({
-    owner, repo, branch, changes,
-  }: CreatedOrUpdatedFileType) {
+ owner, repo, branch, changes,
+}: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
 
     const data = new FormData();
@@ -139,8 +246,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       data.append(file, content);
 
       // we will also add all the "files" parameters so we can perform deletions later down the line
-      // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData
-      // will be deleted
+      // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData will be deleted
       // @NOTE we can actually add the files parameter multiple times - this is fine and Bitbucket will pick this up correctly
       data.append('files', file);
     });

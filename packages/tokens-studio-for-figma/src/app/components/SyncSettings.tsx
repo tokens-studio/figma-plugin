@@ -44,6 +44,10 @@ const SyncSettings = () => {
       type: StorageProviderType.ADO,
     },
     {
+      text: 'BitBucket',
+      type: StorageProviderType.BITBUCKET,
+    },
+    {
       text: 'Supernova',
       type: StorageProviderType.SUPERNOVA,
     },
