@@ -139,36 +139,34 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content alignOffset={5} collisionPadding={30}>
-          <ContextMenu.Sub>
-            {visibleProperties.map((property) => (property.childProperties ? (
-              <>
-                <ContextMenu.SubTrigger>
-                  {property.label}
-                  <RightSlot>
-                    <ChevronRightIcon />
-                  </RightSlot>
-                </ContextMenu.SubTrigger>
-                <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-                  {property.childProperties.map((childProperty) => (
-                    <MoreButtonProperty
-                      key={childProperty.name}
-                      value={token.name}
-                      property={childProperty}
-                      onClick={handleClick}
-                    />
-                  ))}
-                </ContextMenu.Content>
-              </>
-            ) : (
-              <MoreButtonProperty
-                key={property.name}
-                value={token.name}
-                property={property}
-                onClick={handleClick}
-                disabled={property.disabled}
-              />
-            )))}
-          </ContextMenu.Sub>
+          {visibleProperties.map((property) => (property.childProperties ? (
+            <ContextMenu.Sub>
+              <ContextMenu.SubTrigger>
+                {property.label}
+                <RightSlot>
+                  <ChevronRightIcon />
+                </RightSlot>
+              </ContextMenu.SubTrigger>
+              <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
+                {property.childProperties.map((childProperty) => (
+                  <MoreButtonProperty
+                    key={childProperty.name}
+                    value={token.name}
+                    property={childProperty}
+                    onClick={handleClick}
+                  />
+                ))}
+              </ContextMenu.Content>
+            </ContextMenu.Sub>
+          ) : (
+            <MoreButtonProperty
+              key={property.name}
+              value={token.name}
+              property={property}
+              onClick={handleClick}
+              disabled={property.disabled}
+            />
+          )))}
           <ContextMenu.Sub>
             <ContextMenu.SubTrigger>
               Documentation Tokens
