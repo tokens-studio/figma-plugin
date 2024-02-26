@@ -487,6 +487,34 @@ export default function useTokens() {
       tokens: multiValueFilteredTokens,
       settings,
     }));
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
+  const createVariablesFromThemes = useCallback(async (selectedThemes) => {
+
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
+  const createVariablesFromSets = useCallback(async (selectedSets) => {
+    const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      if (selectedSets.includes(tokenSetKey)) {
+        tempTokens[tokenSetKey] = tokenList;
+      }
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      tokens: selectedSetsTokens,
+      settings,
+    }));
     console.log('createVariableResult: ', createVariableResult);
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -561,6 +589,8 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromSets,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
@@ -586,6 +616,8 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromSets,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
