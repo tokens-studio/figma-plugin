@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
+import { ToggleGroup, Box, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Stack from '../Stack';
-import LoadProviderItem from '../LoadProviderSelector';
 import { LoadProviderType } from '@/constants/LoadProviderType';
 import DefaultPreset from '../PresetProvider/DefaultPreset';
 import FilePreset from '../PresetProvider/FilePreset';
@@ -10,33 +9,25 @@ type Props = {
   onClose: () => void
 };
 
-export default function ExportModal({ onClose }: Props) {
-  const [loadProvider, setLoadProvider] = useState<string>(LoadProviderType.FILE);
+export default function PresetModal({ onClose }: Props) {
+  const [importMode, setImportMode] = useState<string>(LoadProviderType.FILE);
 
-  const handleProviderClick = React.useCallback((provider: string) => {
-    setLoadProvider(provider);
+  const handleValueChange = React.useCallback((provider: LoadProviderType) => {
+    setImportMode(provider);
   }, []);
 
   return (
     <Modal showClose isOpen close={onClose} title="Import">
       <Stack direction="column" justify="center" gap={4}>
         <Stack direction="column" gap={4}>
-          <Stack direction="row" gap={2}>
-            <LoadProviderItem
-              isActive={loadProvider === LoadProviderType.FILE}
-              onClick={handleProviderClick}
-              text="File"
-              id={LoadProviderType.FILE}
-            />
-            <LoadProviderItem
-              isActive={loadProvider === LoadProviderType.PRESET}
-              onClick={handleProviderClick}
-              text="Preset"
-              id={LoadProviderType.PRESET}
-            />
-          </Stack>
+          <Box>
+            <ToggleGroup type="single" value={importMode} onValueChange={handleValueChange}>
+              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.FILE}>File or Folder</ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value={LoadProviderType.PRESET}>Preset</ToggleGroup.Item>
+            </ToggleGroup>
+          </Box>
           {
-            loadProvider === LoadProviderType.PRESET
+            importMode === LoadProviderType.PRESET
               ? <DefaultPreset onCancel={onClose} />
               : <FilePreset onCancel={onClose} />
           }
