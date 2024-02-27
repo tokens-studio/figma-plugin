@@ -19,6 +19,7 @@ import { RootState } from '@/app/store';
 import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export default function useExportSetsTab() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -58,7 +59,7 @@ export default function useExportSetsTab() {
     setShowChangeSets(true);
   }, []);
 
-  const { control } = useForm<FormValues>({
+  const { control, formState: { isDirty }, getValues, reset } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
@@ -79,6 +80,13 @@ export default function useExportSetsTab() {
       )}
     />
   ), [control]);
+
+  React.useEffect(() => {
+    if (!showChangeSets) {
+      const currentSelectedSets = getValues();
+      setSelectedSets(Object.keys(currentSelectedSets.tokenSets).filter((key) => currentSelectedSets.tokenSets[key] !== TokenSetStatus.DISABLED));
+    }
+  }, [showChangeSets]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">

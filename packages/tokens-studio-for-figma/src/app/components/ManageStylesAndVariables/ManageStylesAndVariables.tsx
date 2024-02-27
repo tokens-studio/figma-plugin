@@ -9,6 +9,7 @@ import {
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import useTokens from '@/app/store/useTokens';
 
 import useExportThemesTab from './useExportThemesTab';
 import useExportSetsTab from './useExportSetsTab';
@@ -22,9 +23,12 @@ export default function ManageStylesAndVariables() {
   const isPro = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>('useThemes');
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
+
+  const { createVariablesFromSets, createVariablesFromThemes } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -37,9 +41,12 @@ export default function ManageStylesAndVariables() {
 
   const handleExportToFigma = React.useCallback(() => {
     alert('TODO: Export to Figma - check the console for export options');
-    console.log('Selected themes:', selectedThemes);
-    console.log('Selected sets:', selectedSets);
-  }, []);
+    if (activeTab === 'useSets') {
+      createVariablesFromSets(selectedSets);
+    } else if (activeTab === 'useThemes') {
+      createVariablesFromThemes(selectedThemes);
+    }
+  }, [activeTab]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 
@@ -49,6 +56,10 @@ export default function ManageStylesAndVariables() {
 
   const handleOpen = React.useCallback(() => {
     setShowModal(true);
+  }, []);
+
+  const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
+    setActiveTab(tab);
   }, []);
 
   const handleClose = React.useCallback(() => {
@@ -92,11 +103,11 @@ export default function ManageStylesAndVariables() {
       >
         <Tabs defaultValue="useThemes">
           <Tabs.List>
-            <Tabs.Trigger value="useThemes">
+            <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
-            <Tabs.Trigger value="useSets">{t('tabs.exportSets')}</Tabs.Trigger>
+            <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
           <ExportThemesTab />
           <ExportSetsTab />
