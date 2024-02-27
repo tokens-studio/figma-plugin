@@ -44,7 +44,7 @@ const SyncSettings = () => {
       type: StorageProviderType.ADO,
     },
     {
-      text: 'BitBucket',
+      text: 'BitBucket (Beta)',
       type: StorageProviderType.BITBUCKET,
     },
     {
@@ -56,7 +56,7 @@ const SyncSettings = () => {
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
     },
     {
-      text: 'Tokens Studio',
+      text: 'Tokens Studio (Beta)',
       type: StorageProviderType.TOKENS_STUDIO,
     },
   ], [t]);
