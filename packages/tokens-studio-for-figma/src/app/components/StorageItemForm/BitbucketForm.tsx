@@ -127,10 +127,9 @@ export default function BitbucketForm({
         </FormField>
 
         <Stack direction="row" justify="end" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
             {t('save')}
           </Button>

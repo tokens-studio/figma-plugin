@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 /* eslint "@typescript-eslint/no-unused-vars": off */
 import { Bitbucket } from 'bitbucket';
-import axios from 'axios';
 import compact from 'just-compact';
 import {
   RemoteTokenStorageFile,
@@ -97,7 +96,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         repo_slug: this.repository,
       });
 
-      return !!newBranch.data.ref;
+      return newBranch.status === 201;
     } catch (err) {
       console.error(err);
       return false;
@@ -139,22 +138,29 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     try {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
 
-      const response = await axios.get(url, {
-        auth: {
-          username: this.owner,
-          password: this.secret,
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
         },
       });
 
-      if (/^application\/json(;.*)?$/.test(response.headers['content-type'])) {
-        const { data } = response;
+      if (!response.ok) {
+        throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
         if (data.values && Array.isArray(data.values)) {
           // Filter out the JSON files
           const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
 
           // Fetch the content of each JSON file
           const jsonFileContents = await Promise.all(
-            jsonFiles.map((file: any) => fetch(file.links.self.href).then((response) => response.text())),
+            jsonFiles.map((file: any) => fetch(file.links.self.href, {
+              headers: {
+                Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
+              },
+            }).then((response) => response.text())),
           );
           // Process the content of each JSON file
           return jsonFileContents.map((fileContent, index) => {
@@ -191,9 +197,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         return {
           errorMessage: ErrorMessages.VALIDATION_ERROR,
         };
-      }
-      console.error('Unexpected file type:', response.headers['content-type']);
-      return [];
     } catch (e) {
       console.error('Error', e);
       return [];
