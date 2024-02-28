@@ -123,13 +123,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleTokenClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const isMacBrowser = /Mac/.test(navigator.platform);
-      if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
+      if (!editProhibited && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
         handleClick(properties[0]);
       }
     },
-    [properties, handleClick, handleEditClick],
+    [properties, handleClick, handleEditClick, editProhibited],
   );
 
   return (
@@ -189,7 +189,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
           <ContextMenu.Item onSelect={handleDuplicateClick} disabled={editProhibited}>
             Duplicate Token
           </ContextMenu.Item>
-          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
+          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)}>
             Copy Token Path
           </ContextMenu.Item>
           <ContextMenu.Item onSelect={handleDeleteClick} disabled={editProhibited}>
