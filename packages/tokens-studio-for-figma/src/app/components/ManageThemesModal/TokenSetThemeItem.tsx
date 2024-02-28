@@ -101,7 +101,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           >
             {tokenSetStatusValues.map((status) => (
 
-              <ToggleGroup.Item key={status} tooltip={tokenSetStatusLabels[status]} tooltipSide="top" value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${status}`}>
+              <ToggleGroup.Item key={status} tooltip={tokenSetStatusLabels[status]} tooltipSide="top" value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${item.label}--${status}`}>
                 {statusIcon(status)}
               </ToggleGroup.Item>
 

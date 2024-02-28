@@ -24,7 +24,7 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByText('tools');
+    const toolsButton = await result.findByLabelText('tools');
     await userEvent.click(toolsButton);
     const loadButton = await result.findByText('loadFromFileOrPreset');
     await userEvent.click(loadButton, { pointerEventsCheck: 0 });
@@ -46,7 +46,7 @@ describe('TokenBottomBar', () => {
       </Provider>,
     );
 
-    const toolsButton = await result.findByText('tools');
+    const toolsButton = await result.findByLabelText('tools');
     await userEvent.click(toolsButton);
     const exportButton = await result.findByText('exportToFile');
     await userEvent.click(exportButton, { pointerEventsCheck: 0 });

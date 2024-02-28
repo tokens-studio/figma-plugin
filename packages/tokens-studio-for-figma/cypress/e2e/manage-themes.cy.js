@@ -111,12 +111,9 @@ describe('TokenListing', () => {
     cy.get('[data-testid="button-manage-themes-modal-new-group"]').click();
     cy.get('[data-testid="create-or-edit-theme-form--group--name"]').type('GroupA');
     cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('My first theme');
-    cy.get('[data-testid="tokensettheme-item--select-trigger--token-source-set"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-content--source"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-trigger--token-enabled-set"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-content--enabled"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-trigger--token-disabled-set"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-content--disabled"]').click();
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-source--source"]').click();
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-enabled--enabled"]').click();
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--token-disabled--disabled"]').click();
     cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click({ force: true });
     cy.get('[data-testid="close-button"]').click();
     createTokenSet({ name: 'token-extra' });

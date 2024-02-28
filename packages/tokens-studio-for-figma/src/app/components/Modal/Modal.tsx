@@ -62,7 +62,7 @@ const StyledDialogContent = styled(Dialog.Content, {
         boxShadow: 'none',
       },
       regular: {
-        padding: '0 0 0 $4',
+        padding: '0',
       },
     },
   },
@@ -168,7 +168,7 @@ export function Modal({
               data-testid={id}
               css={{
                 scrollPaddingBlockEnd: footer ? '$8' : 0,
-                paddingBlockEnd: footer ? '$8' : 0,
+                paddingBlockEnd: footer ? '$8' : '$4',
               }}
             >
               {children}
