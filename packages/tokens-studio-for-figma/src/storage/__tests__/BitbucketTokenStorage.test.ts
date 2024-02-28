@@ -2,7 +2,7 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable function-paren-newline */
 /* eslint-disable implicit-arrow-linebreak */
-import axios from 'axios';
+import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { BitbucketTokenStorage } from '../BitbucketTokenStorage';
@@ -31,7 +31,6 @@ global.FormData = jest.fn().mockImplementation(() => {
     getData: jest.fn().mockImplementation(() => data),
   };
 });
-jest.mock('axios');
 // mock the bitbucket-node module
 jest.mock('bitbucket', () => {
   return {
@@ -107,39 +106,10 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
-    // Mock axios.get to return a list of JSON files
-    const getMock = jest.spyOn(axios, 'get').mockResolvedValue({
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: {
-        values: [
-          {
-            mimetype: 'application/json',
-            links: {
-              self: {
-                href: 'https://api.bitbucket.org/2.0/repositories/MattOliver/figma-tokens-testing/src/main/data/core.json',
-              },
-            },
-          },
-        ],
-      },
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    global.fetch = jest.fn().mockImplementation((url) => {
-      switch (url) {
-        case 'https://api.bitbucket.org/2.0/repositories/MattOliver/figma-tokens-testing/src/main/data/core.json':
-          return Promise.resolve({
-            text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
-          });
-        // Add more cases if there are other URLs you want to mock
-        default:
-          return Promise.resolve({
-            text: () => Promise.resolve(''),
-          });
-      }
-    });
+    mockFetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+    }));
 
     const result = await storageProvider.read();
     console.log('result: ', result);
@@ -175,12 +145,11 @@ describe('BitbucketTokenStorage', () => {
     //   },
     // ]);
 
-    expect(getMock).toBeCalledWith(
+    expect(mockFetch).toBeCalledWith(
       `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
       {
-        auth: {
-          username: 'MattOliver',
-          password: 'mock-secret',
+        headers: {
+          Authorization: `Basic ${btoa('MattOliver:mock-secret')}`,
         },
       },
     );

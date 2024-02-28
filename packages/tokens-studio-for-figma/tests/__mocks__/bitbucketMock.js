@@ -68,9 +68,7 @@ export const mockGetAuthedUser = jest.fn().mockImplementation(() => {
   export const mockFetchBranches = jest.fn();
   export const mockCreateBranch = jest.fn().mockImplementation((_args) => {
     return Promise.resolve({
-      data: {
-        ref: 'refs/simple-branch',
-      },
+      status: 201,
     });
   });
   
