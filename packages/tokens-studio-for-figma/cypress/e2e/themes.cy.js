@@ -71,8 +71,7 @@ describe('Themes', () => {
     cy.get('[data-testid="button-manage-themes-modal-new-group"]').click();
     cy.get('[data-testid="create-or-edit-theme-form--group--name"]').type('GroupA');
     cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('My first theme');
-    cy.get('[data-testid="tokensettheme-item--select-trigger--global-set"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-content--source"]').click();
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--global--source"]').click();
     cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click();
     cy.get('[data-testid="singlethemeentry"]').should('have.length', 1)
   });
