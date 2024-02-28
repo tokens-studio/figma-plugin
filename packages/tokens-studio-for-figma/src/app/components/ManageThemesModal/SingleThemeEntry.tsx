@@ -30,10 +30,7 @@ const StyledCountLabel = styled('span', {
   gap: '$2',
   fontSize: '$xsmall',
   fontVariantNumeric: 'tabular-nums',
-  svg: {
-    width: '$4',
-    height: '$4',
-  },
+  color: '$fgMuted',
 });
 
 export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
@@ -94,24 +91,27 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
       <StyledCountLabel>
         {tokenSetCount > 0 && (
         <>
-          <FileDirectoryIcon />
           {tokenSetCount}
+          {' '}
+          sets
         </>
         )}
       </StyledCountLabel>
       <StyledCountLabel>
         {stylesCount > 0 && (
         <>
-          <StyleIcon />
           {tokenSetCount}
+          {' '}
+          {stylesCount === 1 ? 'style' : 'styles'}
         </>
         )}
       </StyledCountLabel>
       <StyledCountLabel>
         {variablesCount > 0 && (
         <>
-          <VariableIcon />
           {tokenSetCount}
+          {' '}
+          variables
         </>
         )}
       </StyledCountLabel>

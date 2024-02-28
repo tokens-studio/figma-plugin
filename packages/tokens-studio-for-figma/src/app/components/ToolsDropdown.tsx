@@ -35,7 +35,7 @@ export default function ToolsDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
-          <IconButton size="small" variant="invisible" icon={<FileZipIcon />} />
+          <IconButton tooltip={t('tools')} aria-label={t('tools')} size="small" variant="invisible" icon={<FileZipIcon />} />
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Content side="top">
