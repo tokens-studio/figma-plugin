@@ -13,6 +13,7 @@ import { useIsProUser } from '@/app/hooks/useIsProUser';
 import useExportThemesTab from './useExportThemesTab';
 import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
+import useTokens from '@/app/store/useTokens';
 
 export default function ManageStylesAndVariables() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -25,6 +26,7 @@ export default function ManageStylesAndVariables() {
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
+  const { createVariablesFromThemes, createVariables } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -39,7 +41,9 @@ export default function ManageStylesAndVariables() {
     alert('TODO: Export to Figma - check the console for export options');
     console.log('Selected themes:', selectedThemes);
     console.log('Selected sets:', selectedSets);
-  }, []);
+    createVariablesFromThemes(selectedThemes);
+    // createVariables();
+  }, [selectedThemes, selectedSets]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 

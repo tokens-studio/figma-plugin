@@ -17,6 +17,7 @@ import {
   uiStateSelector,
   updateModeSelector,
   usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -34,6 +35,7 @@ import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { theme } from '@/stitches.config';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -64,6 +66,7 @@ export default function useTokens() {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
@@ -442,7 +445,9 @@ export default function useTokens() {
   }, [store]);
 
   const filterMultiValueTokens = useCallback(() => {
+    console.log('tokenContext: ', tokensContext);
     const tempTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      console.log('tokenSetKey: ', tokenSetKey);
       const filteredTokenList = tokenList.reduce((acc, tokenItem) => {
         const resolvedValue = getAliasValue(tokenItem, tokensContext.resolvedTokens) || '';
         // If extension data exists, it is likely that the token is a complex token containing color modifier data, etc
@@ -489,6 +494,43 @@ export default function useTokens() {
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
+  const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    track('createVariables');
+    console.log('tokens: ', tokens);
+    console.log('themes: ', themes);
+    const filteredSelectedThemes = themes.filter((theme) => selectedThemes.includes(theme.id));
+    const selectedThemesSets = filteredSelectedThemes.map((theme) => {
+      const selectedSets = theme.selectedTokenSets;
+      const sets: string[] = Object.keys(selectedSets).reduce((acc: string[], set: string) => {
+        if (selectedSets[set] === TokenSetStatus.ENABLED) {
+          acc.push(set);
+        }
+        return acc;
+      }, []);
+      return sets;
+    }).flat();
+    console.log('selectedThemesSets: ', selectedThemesSets);
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    // const createVariableResult = await wrapTransaction({
+    //   name: 'createVariables',
+    //   statExtractor: async (result, transaction) => {
+    //     const data = await result;
+    //     if (data) {
+    //       transaction.setMeasurement('variables', data.totalVariables, '');
+    //     }
+    //   },
+    // }, async () => await AsyncMessageChannel.ReactInstance.message({
+    //   type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+    //   tokens: multiValueFilteredTokens,
+    //   settings,
+    // }));
+    // dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    // dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
@@ -560,6 +602,7 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
@@ -585,6 +628,7 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,

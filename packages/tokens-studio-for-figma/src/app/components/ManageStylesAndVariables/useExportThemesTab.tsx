@@ -44,6 +44,7 @@ export default function useExportThemesTab() {
   const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
 
   const handleSelectTheme = React.useCallback((themeId: string) => {
+    console.log('themeId: ', themeId);
     if (selectedThemes.includes(themeId)) {
       setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
     } else {
