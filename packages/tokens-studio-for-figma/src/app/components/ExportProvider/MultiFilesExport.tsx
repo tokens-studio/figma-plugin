@@ -52,7 +52,7 @@ export default function MultiFilesExport({ onClose }: Props) {
 
   return (
     <Stack direction="column" gap={4}>
-      <Heading size="medium">Preview</Heading>
+      <Heading size="small">Preview</Heading>
       <Stack direction="column" gap={3} className="content scroll-container" css={{ maxHeight: '200px' }}>
         {
           Object.keys(filesChangeset)?.map((key, index) => (
