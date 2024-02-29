@@ -499,23 +499,6 @@ export default function useTokens() {
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-    const filteredSelectedThemes = themes.filter((theme) => selectedThemes.includes(theme.id));
-    const selectedThemesSets = filteredSelectedThemes.map((theme) => {
-      const selectedSets = theme.selectedTokenSets;
-      const sets: string[] = Object.keys(selectedSets).reduce((acc: string[], set: string) => {
-        if (selectedSets[set] !== TokenSetStatus.DISABLED) {
-          acc.push(set);
-        }
-        return acc;
-      }, []);
-      return sets;
-    }).flat();
-    const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
-      if (selectedThemesSets.includes(tokenSetKey)) {
-        tempTokens[tokenSetKey] = tokenList;
-      }
-      return tempTokens;
-    }, {} as Record<string, AnyTokenList>);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -526,8 +509,9 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: selectedSetsTokens,
+      tokens: tokens,
       settings,
+      selectedThemes
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
