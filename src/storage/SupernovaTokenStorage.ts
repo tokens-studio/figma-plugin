@@ -26,15 +26,16 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     // Deconstruct url to WS ID / DS ID
     const parsedURL = new URL(url);
     const fragments = parsedURL.pathname.split('/');
-    if (fragments.length < 5 || fragments[1] !== 'ws' || fragments[3] !== 'ds') {
+    const isCloud = url.match(/\/\/(cloud|app).(dev\.|demo\.|staging\.|)supernova.io/)?.[1] === 'cloud';
+    if (fragments.length < 5 || isCloud && (fragments[1] !== 'ws' || fragments[3] !== 'ds')) {
       throw new Error(
         'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
       );
     } else {
       // eslint-disable-next-line prefer-destructuring
-      this.workspaceHandle = fragments[2];
+      this.workspaceHandle = isCloud ? fragments[2] : fragments[1].split('-')[0];
       // eslint-disable-next-line prefer-destructuring
-      this.designSystemId = fragments[4].split('-')[0];
+      this.designSystemId = isCloud ? fragments[4].split('-')[0] : fragments[2].split('-')[0];
       this.secret = secret;
       this.mapping = mapping;
       this.sdkInstance = new Supernova(this.secret, this.networkInstanceFromURL(url), null);
@@ -129,16 +130,16 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
   }
 
   private networkInstanceFromURL(url: string): string {
-    if (url.includes('cloud.supernova.io')) {
+    if (url.includes('cloud.supernova.io') || url.includes('app.supernova.io')) {
       return 'https://api.supernova.io/api';
     }
-    if (url.includes('cloud.dev.supernova.io')) {
-      return 'https://dev.api2.supernova.io/api';
+    if (url.includes('cloud.dev.supernova.io') || url.includes('app.dev.supernova.io')) {
+      return 'https://api.dev.supernova.io/api';
     }
-    if (url.includes('cloud.demo.supernova.io')) {
+    if (url.includes('cloud.demo.supernova.io') || url.includes('app.demo.supernova.io')) {
       return 'https://api.demo.supernova.io/api';
     }
-    if (url.includes('cloud.staging.supernova.io')) {
+    if (url.includes('cloud.staging.supernova.io') || url.includes('app.staging.supernova.io')) {
       return 'https://api.staging.supernova.io/api';
     }
     throw new Error('Unsupported Supernova URL');
