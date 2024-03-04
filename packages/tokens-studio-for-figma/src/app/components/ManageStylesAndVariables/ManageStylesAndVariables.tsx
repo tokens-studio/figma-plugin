@@ -26,7 +26,7 @@ export default function ManageStylesAndVariables() {
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
-  const { createVariables } = useTokens();
+  const { createVariablesFromSets } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -41,7 +41,7 @@ export default function ManageStylesAndVariables() {
     alert('TODO: Export to Figma - check the console for export options');
     console.log('Selected themes:', selectedThemes);
     console.log('Selected sets:', selectedSets);
-    createVariables();
+    createVariablesFromSets();
   }, []);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);

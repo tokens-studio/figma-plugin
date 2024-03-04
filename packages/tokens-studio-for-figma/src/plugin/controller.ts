@@ -58,6 +58,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_N
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, asyncHandlers.createLocalVariablesWithoutModes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
