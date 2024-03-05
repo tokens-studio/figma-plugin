@@ -1,0 +1,111 @@
+{
+  "shadows": {
+    "multiple": {
+      "value": [
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "{colors.gray.900}",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "single": {
+      "value": {
+        "color": "{colors.gray.900}",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    },
+    "reference-multiple": {
+      "value": [
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "reference-single": {
+      "value": {
+        "color": "#1B1F24",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    }
+  },
+  "theme": {
+    "background": {
+      "value": "{colors.gray.900}",
+      "type": "color",
+      "description": "Alias value"
+    },
+    "backgroundSubtle": {
+      "value": "rgba({colors.gray.900}, 0.5)",
+      "type": "color",
+      "description": "Nested color value"
+    },
+    "backgroundDark": {
+      "value": "{colors.gray.500}",
+      "type": "color",
+      "description": "Darkened color value",
+      "$extensions": {
+        "modify": {
+          "type": "darken",
+          "amount": 0.5,
+          "space": "hsl"
+        }
+      }
+    },
+    "size": {
+      "default": {
+        "value": "{sizing.base}",
+        "type": "sizing",
+        "description": "Sizing value"
+      }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "value": {
+            "borderRadius": "{sizing.base}",
+            "fill": "{theme.backgroundSubtle}",
+            "border": "{theme.background}"
+          },
+          "type": "composition"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "theme": {
+    "background": {
+      "value": "#1B1F24",
+      "type": "color",
+      "description": "Alias value"
+    },
+    "backgroundSubtle": {
+      "value": "#1b1f2480",
+      "type": "color",
+      "description": "Nested color value"
+    },
+    "backgroundDark": {
+      "value": "#949DA7",
+      "type": "color",
+      "description": "Darkened color value"
+    },
+    "size": {
+      "default": {
+        "value": 4,
+        "type": "sizing",
+        "description": "Sizing value"
+      }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "value": {
+            "borderRadius": 4,
+            "fill": "#1b1f2480",
+            "border": "#1B1F24"
+          },
+          "type": "composition"
+        }
+      }
+    }
+  },
+  "shadows": {
+    "multiple": {
+      "value": [
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "single": {
+      "value": {
+        "color": "#1B1F24",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    },
+    "reference-multiple": {
+      "value": [
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 4,
+          "blur": 2,
+          "spread": 0
+        },
+        {
+          "color": "#1B1F24",
+          "type": "dropShadow",
+          "x": 0,
+          "y": 0,
+          "blur": 6,
+          "spread": 0
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "reference-single": {
+      "value": {
+        "color": "#1B1F24",
+        "type": "dropShadow",
+        "x": 0,
+        "y": 4,
+        "blur": 2,
+        "spread": 0
+      },
+      "type": "boxShadow"
+    }
+  }
+}

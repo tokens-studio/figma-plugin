@@ -1,0 +1,73 @@
+{
+  "setToDocumentStorage": "Prêt à stocker des documents ?",
+  "youCanAlwaysGoBack": "Vous pouvez toujours revenir au stockage distant.",
+  "addNewSyncProvider": "Ajouter un nouveau fournisseur de synchronisation",
+  "editCredentials": "Modifier les informations d'identification du fournisseur de synchronisation",
+  "name": "Nom",
+  "pat": "Jeton d'accès personnel",
+  "gitExplained": "Lisez vos jetons stockés sur votre référentiel, à proximité de votre code.",
+  "readMore": "En savoir plus",
+  "cancel": "Annuler",
+  "repo": "Dépôt (propriétaire/repo)",
+  "branch": "Bifurquer",
+  "baseUrl": "URL de base (facultatif)",
+  "secret": "Secrète",
+  "filePath": "Chemin du fichier",
+  "filePathCaption": "src/tokens pour la synchronisation avec un dossier, ajoutez .json à la fin pour synchroniser avec un seul fichier",
+  "syncProviders": "Fournisseurs de synchronisation",
+  "providers": {
+    "generic": {
+      "title": "Version générique",
+      "url": "URL",
+      "description": "Jetons d'accès stockés sur votre propre fournisseur de stockage, permettant des opérations de synchronisation bidirectionnelle, de création et de lecture seule.",
+      "flowType": "Type de flux",
+      "readOnly": "Lecture seulement",
+      "readWrite": "Lire écrire",
+      "readWriteCreate": "Lire / Écrire / Créer",
+      "additionalHeaders": "En-têtes supplémentaires",
+      "name": "Nom",
+      "value": "Valeur"
+    },
+    "url": {
+      "title": "URL",
+      "description": "Les jetons stockés sur un serveur vous permettent de les ajouter en tant que fournisseur en lecture seule.",
+      "url": "URL",
+      "headers": "En-têtes"
+    },
+    "jsonbin": {
+      "title": "JSONBIN",
+      "description": "Jetons d'accès stockés sur JSONBin.io, un service de stockage JSON gratuit pour une synchronisation bidirectionnelle."
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Jeton d'accès Supernova",
+      "dsUrl": "URL du système de conception",
+      "description": "Vous permet d'insérer des jetons dans une marque et un thème spécifiques dans un système de conception sélectionné."
+    },
+    "ado": {
+      "description": "Accédez aux jetons stockés sur votre référentiel, poussez et extrayez les jetons dans une synchronisation bidirectionnelle.",
+      "pat": "Jeton d'accès personnel",
+      "orgUrl": "URL de l’organisation",
+      "repositoryName": "Nom du référentiel",
+      "projectName": "Nom du projet (facultatif)"
+    },
+    "bitbucket": {
+      "appPassword": "Mot de passe de l'application",
+      "projectName": "Nom du projet (facultatif)",
+      "repository": "Dépôt (espace de travail/dépôt)"
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Sélectionnez un calque pour voir les jetons appliqués",
+  "localDocument": "Document local",
+  "apply": "Appliquer",
+  "confirmDelete": "Voulez-vous vraiment supprimer ceci ?",
+  "active": "Actif",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "save": "Sauvegarder"
+}

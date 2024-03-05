@@ -1,0 +1,12 @@
+{
+  "pro": "Pro",
+  "getPro": "Get Pro",
+  "removeKey": "Remove key",
+  "licenseKey": "License key",
+  "upgradeToPro": "Upgrade to Pro",
+  "manageSubscription": "Manage subscription",
+  "addLicenseKey": "Add license key",
+  "keepLicenseSafe": "Make sure you saved a copy of the license key somewhere, as it won’t be stored on this device after you deleted it.",
+  "confirmRemove": "Are you sure you want to remove your license key?",
+  "removeLicenseKey": "Remove key"
+}
