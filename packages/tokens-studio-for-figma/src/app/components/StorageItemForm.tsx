@@ -27,8 +27,6 @@ type Props = {
 export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const { bitBucketSync } = useFlags();
-
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
@@ -44,7 +42,7 @@ export default function StorageItemForm({
       );
     }
     case StorageProviderType.BITBUCKET: {
-      return bitBucketSync ? (
+      return (
         <BitbucketForm
           onChange={onChange}
           onSubmit={onSubmit}
@@ -53,7 +51,7 @@ export default function StorageItemForm({
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />
-      ) : null;
+      );
     }
     case StorageProviderType.ADO: {
       return (
