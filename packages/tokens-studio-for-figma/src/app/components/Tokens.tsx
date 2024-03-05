@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, IconButton } from '@tokens-studio/ui';
+import { ToggleGroup, IconButton, Label } from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -16,7 +16,6 @@ import EditTokenFormModal from './EditTokenFormModal';
 import JSONEditor from './JSONEditor';
 import Box from './Box';
 import IconListing from '@/icons/listing.svg';
-import IconJSON from '@/icons/json.svg';
 import useTokens from '../store/useTokens';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
@@ -33,6 +32,7 @@ import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -85,6 +85,7 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
 
 function Tokens({ isActive }: { isActive: boolean }) {
   const tokens = useSelector(tokensSelector);
+  const tokenFormat = useSelector(tokenFormatSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const activeTokensTab = useSelector(activeTokensTabSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
@@ -173,7 +174,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     // because of specific logic requirements
     setError(null);
     dispatch.tokenState.setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenType, dispatch.tokenState, getStringTokens]);
+  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState, getStringTokens]);
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -183,7 +184,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     } else {
       dispatch.tokenState.setHasUnsavedChanges(false);
     }
-  }, [dispatch, tokens, stringTokens, activeTokenSet]);
+  }, [dispatch, tokens, stringTokens, activeTokenSet, getStringTokens]);
 
   React.useEffect(() => {
     const newBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
@@ -246,8 +247,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               <ToggleGroup.Item value="list">
                 <IconListing />
               </ToggleGroup.Item>
-              <ToggleGroup.Item value="json">
-                <IconJSON />
+              <ToggleGroup.Item value="json" iconOnly={false}>
+                JSON
               </ToggleGroup.Item>
             </ToggleGroup>
           </Box>

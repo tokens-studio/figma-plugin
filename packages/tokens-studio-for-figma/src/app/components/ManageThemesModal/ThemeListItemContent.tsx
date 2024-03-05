@@ -2,6 +2,7 @@ import React, {
   useCallback, useContext,
 } from 'react';
 import { useSelector } from 'react-redux';
+import { styled } from '@stitches/react';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -15,6 +16,10 @@ type Props = React.PropsWithChildren<{
   groupName: string
   onOpen: (theme?: ThemeObject) => void;
 }>;
+
+const StyledDragGrabber = styled(DragGrabber, {
+  gridArea: 'handle',
+});
 
 export function ThemeListItemContent({
   item,
@@ -32,10 +37,11 @@ export function ThemeListItemContent({
   return (
     <StyledDragButton
       type="button"
-      style={{ cursor: 'inherit' }}
-      css={{ padding: 0 }}
+      css={{
+        padding: 0, width: '100%', display: 'inherit', cursor: 'inherit',
+      }}
     >
-      <DragGrabber<ThemeObject>
+      <StyledDragGrabber<ThemeObject>
         item={item}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
@@ -46,6 +52,7 @@ export function ThemeListItemContent({
         isActive={isActive}
         groupName={groupName}
         onOpen={onOpen}
+
       />
     </StyledDragButton>
   );

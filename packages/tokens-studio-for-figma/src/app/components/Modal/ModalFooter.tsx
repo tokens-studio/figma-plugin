@@ -15,5 +15,14 @@ export const ModalFooter = styled('footer', {
         zIndex: 1,
       },
     },
+    fullscreen: {
+      true: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1,
+      },
+    },
   },
 });

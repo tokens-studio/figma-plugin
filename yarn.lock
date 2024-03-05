@@ -5985,10 +5985,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
   integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
 
-"@tokens-studio/ui@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.0.tgz#4a525f7c6c792db4d4e9fa92f52a61df4d87f4d1"
-  integrity sha512-9PG13SkpcuKZ6Zv+ZoBEA64B+TeRyjdNmzMkhFfkY3Lh95/YHANmIgvrUeMWqGyZavnn66m/mJUnMf5xBqXgVg==
+"@tokens-studio/ui@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.2.tgz#c05c1d261d4d5fdc5807b935e7633b36e2976492"
+  integrity sha512-DiwzqhyzadtOjtAJd8zROKmupiIJ6ID+3gUbpqO4NigWd3FjfpjXYc+u9WGAsTEx0eFBXRseoCC/6vn5anURxA==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -13167,6 +13167,11 @@ i18next@^23.2.3:
   dependencies:
     "@babel/runtime" "^7.22.5"
 
+iconoir-react@^7.3.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/iconoir-react/-/iconoir-react-7.3.0.tgz#44812128d72ba6bc4bf6feaa99cb22aa1a0a93ba"
+  integrity sha512-vdljknLaUT3aGbRbsWkGfqqyJ8roPcXqayJmUjHnJgeolmupVWVo/EVA3OtmjlKvvZmQRu9radmMYS0NmfUAsw==
+
 iconv-lite@0.4.24, iconv-lite@^0.4.24:
   version "0.4.24"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
@@ -17938,7 +17943,7 @@ react-window@^1.8.8:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
 
-react@^18, react@^18.2.0:
+react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==

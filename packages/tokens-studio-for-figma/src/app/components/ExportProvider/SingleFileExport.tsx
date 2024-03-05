@@ -151,6 +151,7 @@ export default function SingleFileExport({ onClose }: Props) {
           Cancel
         </Button>
         <Button
+          as="a"
           href={`data:text/json;charset=utf-8,${encodeURIComponent(exportData)}`}
           // @ts-ignore Exception to allow setting the download prop here
           download="tokens.json"

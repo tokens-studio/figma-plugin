@@ -16,7 +16,6 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 
 export async function updateJSONBinTokens({
@@ -52,9 +51,6 @@ export async function updateJSONBinTokens({
       const comparison = await compareUpdatedAt(oldUpdatedAt, remoteTokens?.metadata?.updatedAt ?? '');
       if (comparison === 'remote_older') {
         if (await storage.save(payload, { storeTokenIdInJsonEditor })) {
-          saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
-            tokenSetOrder: Object.keys(tokens),
-          });
           return payload;
         }
       } else {
@@ -64,9 +60,6 @@ export async function updateJSONBinTokens({
         notifyToUI('Error updating tokens as remote is newer, please update first', { error: true });
       }
     } else if (await storage.save(payload, { storeTokenIdInJsonEditor })) {
-      saveLastSyncedState(dispatch, payload.tokens, payload.themes, {
-        tokenSetOrder: Object.keys(tokens),
-      });
       return payload;
     }
   } catch (e) {
@@ -212,12 +205,12 @@ export function useJSONbin() {
         },
         shouldSetInDocument: true,
       });
-      saveLastSyncedState(dispatch, content.tokens, content.themes, content.metadata);
       dispatch.tokenState.setTokenData({
         values: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
         themes: content.themes,
         usedTokenSet: usedTokenSets,
         activeTheme,
+        hasChangedRemote: true,
       });
       return content;
     }

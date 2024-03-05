@@ -43,8 +43,9 @@ export default function WindowResizer() {
     }
   }, [dispatch.settings]);
 
+  // @TODO: Fix this when modals are open
   return (
-    <div id="corner" onPointerDown={onDown} onPointerUp={onUp} ref={cornerRef}>
+    <div id="corner" onPointerDown={onDown} onPointerUp={onUp} ref={cornerRef} style={{ zIndex: 999 }}>
       <IconResizeWindow />
     </div>
   );

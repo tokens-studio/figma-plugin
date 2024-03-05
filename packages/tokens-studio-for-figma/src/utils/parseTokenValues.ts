@@ -2,6 +2,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { SetTokenDataPayload } from '@/types/payloads';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
 import convertToTokenArray from './convertTokens';
+import { detectFormat } from './detectFormat';
 
 export default function parseTokenValues(tokens: SetTokenDataPayload['values']): TokenStore['values'] {
   // If we receive an array of tokens, move them all to the global set
@@ -23,6 +24,8 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
     }
 
     if (typeof parsedGroup === 'object') {
+      detectFormat(parsedGroup, true);
+
       const convertedToArray = convertToTokenArray({ tokens: parsedGroup });
       prev.push([group[0], convertedToArray]);
       return prev;

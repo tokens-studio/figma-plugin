@@ -32,7 +32,7 @@ function PullDialog() {
           title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
           showClose
           full
-          large
+          size="fullscreen"
           isOpen
           close={onCancel}
           stickyFooter
@@ -58,7 +58,7 @@ function PullDialog() {
     }
     case 'loading': {
       return (
-        <Modal large isOpen close={onCancel} title={`Pull from ${transformProviderName(storageType.provider)}`}>
+        <Modal size="large" isOpen close={onCancel} title={`Pull from ${transformProviderName(storageType.provider)}`}>
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">{t('pullFrom', { provider: transformProviderName(storageType.provider) })}</Heading>

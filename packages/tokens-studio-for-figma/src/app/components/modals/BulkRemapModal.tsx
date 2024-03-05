@@ -43,7 +43,7 @@ export default function BulkRemapModal({ isOpen, onClose }: Props) {
   }, [shouldRemapDocument]);
 
   return (
-    <Modal large showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
+    <Modal size="large" showClose isOpen={isOpen} close={handleClose} title="Bulk remap">
       <form
         onSubmit={onConfirm}
       >

@@ -1,23 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '@tokens-studio/ui';
-import { Dispatch } from '../store';
 import * as pjs from '../../../package.json';
 import Box from './Box';
-import Text from './Text';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import {
   localApiStateSelector,
   editProhibitedSelector,
-  lastSyncedStateSelector,
   storageTypeSelector,
-  tokensSelector,
   usedTokenSetSelector,
-  themesListSelector,
   projectURLSelector,
   activeThemeSelector,
 } from '@/selectors';
@@ -29,38 +24,23 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
-import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
+import { useChangedState } from '@/hooks/useChangedState';
+import { docUrls } from '@/constants/docUrls';
+import { TokenFormatBadge } from './TokenFormatBadge';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
   const storageType = useSelector(storageTypeSelector);
-  const tokens = useSelector(tokensSelector);
-  const themes = useSelector(themesListSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
-  const dispatch = useDispatch<Dispatch>();
   const projectURL = useSelector(projectURLSelector);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
-
-  const checkForChanges = React.useCallback(() => {
-    const tokenSetOrder = Object.keys(tokens);
-    const defaultMetadata = storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {};
-    const hasChanged = !compareLastSyncedState(
-      tokens,
-      themes,
-      defaultMetadata,
-      lastSyncedState,
-      [{}, [], defaultMetadata],
-    );
-    dispatch.tokenState.updateCheckForChanges(hasChanged);
-    return hasChanged;
-  }, [lastSyncedState, storageType, tokens, themes, dispatch.tokenState]);
+  const { hasChanges } = useChangedState();
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -70,8 +50,6 @@ export default function Footer() {
     }, 60000);
     return () => clearInterval(interval);
   }, [checkRemoteChange]);
-
-  const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
@@ -92,9 +70,10 @@ export default function Footer() {
     >
 
       <Stack direction="row" align="center" gap={2}>
-        {isGitProvider(localApiState) && localApiState.branch && (
+        {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />
+            <TokenFormatBadge />
             <DirtyStateBadgeWrapper badge={hasRemoteChange}>
               <IconButton
                 data-testid="footer-pull-button"
@@ -118,40 +97,7 @@ export default function Footer() {
                 variant="invisible"
                 size="small"
                 tooltipSide="top"
-                disabled={editProhibited}
-                tooltip={
-                  t('pushTo', {
-                    provider: transformProviderName(storageType.provider),
-                  }) as string
-                }
-              />
-            </DirtyStateBadgeWrapper>
-          </>
-        )}
-        {storageType.provider === StorageProviderType.SUPERNOVA && (
-          <>
-            <IconButton
-              data-testid="footer-pull-button"
-              icon={<DownloadIcon />}
-              onClick={onPullButtonClicked}
-              variant="invisible"
-              size="small"
-              tooltipSide="top"
-              tooltip={
-                t('pullFrom', {
-                  provider: transformProviderName(storageType.provider),
-                }) as string
-              }
-            />
-            <DirtyStateBadgeWrapper badge={hasChanges}>
-              <IconButton
-                data-testid="footer-push-button"
-                icon={<UploadIcon />}
-                onClick={onPushButtonClicked}
-                variant="invisible"
-                size="small"
-                tooltipSide="top"
-                disabled={editProhibited}
+                disabled={editProhibited || !hasChanges}
                 tooltip={
                   t('pushTo', {
                     provider: transformProviderName(storageType.provider),
@@ -196,18 +142,22 @@ export default function Footer() {
         <Stack direction="row" gap={1}>
           <ProBadge />
           <IconButton
-            href="https://docs.tokens.studio/?ref=pf"
+            as="a"
+            href={docUrls.root}
             icon={<DocsIcon />}
             variant="invisible"
             size="small"
             tooltip={t('docs') as string}
+            target="_blank"
           />
           <IconButton
+            as="a"
             href="https://github.com/tokens-studio/figma-plugin"
             icon={<FeedbackIcon />}
             variant="invisible"
             size="small"
             tooltip={t('feedback') as string}
+            target="_blank"
           />
         </Stack>
       </Stack>

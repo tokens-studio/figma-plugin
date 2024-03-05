@@ -4,6 +4,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import { Button, EmptyState } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -25,6 +26,17 @@ import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
 
 type Props = unknown;
+
+const StyledReorderGroup = styled(ReorderGroup, {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gridAutoFlow: 'row',
+  '> li > button': {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr min-content',
+    gridAutoFlow: 'column',
+  },
+});
 
 export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
   const dispatch = useDispatch<Dispatch>();
@@ -148,7 +160,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     <Modal
       isOpen
       full
-      large
       title="Themes"
       stickyFooter
       showClose
@@ -208,11 +219,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       )}
       {!!themes.length && !themeEditorOpen && (
         <Box css={{ padding: '$3 $2 $3 0' }}>
-          <ReorderGroup
+          <StyledReorderGroup
             layoutScroll
             values={treeItems}
             onReorder={handleReorder}
-            checkReorder={handleCheckReorder}
+            checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
           >
             {
             treeItems.map((item) => (
@@ -231,7 +242,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               </DragItem>
             ))
           }
-          </ReorderGroup>
+          </StyledReorderGroup>
         </Box>
       )}
       {themeEditorOpen && (

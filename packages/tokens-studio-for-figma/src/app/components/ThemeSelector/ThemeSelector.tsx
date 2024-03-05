@@ -122,18 +122,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           data-testid="themeselector-dropdown-content"
           side="bottom"
           css={{ minWidth: '180px' }}
+          align="end"
         >
-          {availableThemes.length === 0 && (
-          <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
-            <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
-          </DropdownMenu.RadioItem>
-          )}
-          {availableThemeOptions}
-          <DropdownMenu.Separator />
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
-            css={{
-              paddingLeft: '$7', display: 'flex', justifyContent: 'space-between',
+            css={{ display: 'flex', justifyContent: 'space-between',
             }}
             disabled={!tokenThemes}
             onSelect={handleManageThemes}
@@ -141,6 +134,14 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
             <span>{t('manageThemes')}</span>
             {!tokenThemes && <ProBadge compact />}
           </DropdownMenu.Item>
+          <DropdownMenu.Separator />
+          {availableThemes.length === 0 && (
+          <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
+            <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
+          </DropdownMenu.RadioItem>
+          )}
+          {availableThemeOptions}
+
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu>

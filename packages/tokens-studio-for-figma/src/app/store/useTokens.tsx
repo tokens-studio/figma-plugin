@@ -1,10 +1,6 @@
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo, useContext } from 'react';
-import {
-  AnyTokenList,
-  SingleToken,
-  TokenToRename,
-} from '@/types/tokens';
+import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
@@ -37,10 +33,9 @@ import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariable
 import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { getFormat } from '@/plugin/TokenFormatStoreClass';
 
-type ConfirmResult =
-  ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
-  | string;
+type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -59,8 +54,8 @@ export type SyncOption = 'removeStyle' | 'renameStyle';
 export type SyncVariableOption = 'removeVariable' | 'renameVariable';
 
 export type TokensToRenamePayload = {
-  oldName: string,
-  newName: string
+  oldName: string;
+  newName: string;
 };
 
 export default function useTokens() {
@@ -76,6 +71,7 @@ export default function useTokens() {
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
   const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
+  const tokenFormat = getFormat();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -88,20 +84,37 @@ export default function useTokens() {
   ), []);
 
   // Returns formatted tokens for style dictionary
-  const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
-    const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
-    } = opts;
-    const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
-    return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
-    });
-  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
+  const getFormattedTokens = useCallback(
+    (opts: GetFormattedTokensOptions) => {
+      const {
+        includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
+      } = opts;
+      const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
+      return formatTokens({
+        tokens,
+        tokenSets,
+        resolvedTokens: tokensContext.resolvedTokens,
+        includeAllTokens,
+        includeParent,
+        expandTypography,
+        expandShadow,
+        expandComposition,
+        expandBorder,
+        storeTokenIdInJsonEditor,
+      });
+    },
+    // Adding tokenFormat as a dependency to cause a change when format changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat],
+  );
 
   // Returns stringified tokens for the JSON editor
-  const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
-  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
+  const getStringTokens = useCallback(
+    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor),
+    // Adding tokenFormat as a dependency to cause a change when format changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
+  );
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {
@@ -437,7 +450,6 @@ export default function useTokens() {
         if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
           // We don't want to change the actual value as this could cause unintended side effects
           tokenItem = { ...tokenItem };
-          // @ts-ignore
           tokenItem.value = resolvedValue;
         }
         if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {

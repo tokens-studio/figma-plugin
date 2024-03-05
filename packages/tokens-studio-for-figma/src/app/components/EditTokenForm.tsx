@@ -86,7 +86,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if (internalEditToken.type === TokenTypes.COLOR) {
       return isValidColorToken;
     }
-    return internalEditToken?.value && internalEditToken.name && !Boolean(error);
+    return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
   const hasNameThatExistsAlready = React.useMemo(
@@ -329,7 +329,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
         oldName = internalEditToken.initialName;
       }
-
       const trimmedValue = trimValue(value);
       const newName = name
         .split('/')

@@ -1,4 +1,4 @@
-//@ts-ignore This is due to weird @types/node issues based on hoistng
+// @ts-ignore This is due to weird @types/node issues based on hoistng
 require('dotenv').config();
 
 /*
@@ -180,10 +180,10 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-//   transform: {
-//     "node_modules/(react-dnd|dnd-core|@react-dnd)/.+\\.(j|t)sx?$": "ts-jest",
-//     "^.+\\.js$": "babel-jest",
-// },
+  //   transform: {
+  //     "node_modules/(react-dnd|dnd-core|@react-dnd)/.+\\.(j|t)sx?$": "ts-jest",
+  //     "^.+\\.js$": "babel-jest",
+  // },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|@react-dnd)/)', '\\.pnp\\.[^\\/]+$'],
 
