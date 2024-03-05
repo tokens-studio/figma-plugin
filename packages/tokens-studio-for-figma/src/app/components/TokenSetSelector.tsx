@@ -54,6 +54,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     e.preventDefault();
     track('Created token set', { name: newTokenSetName });
     dispatch.tokenState.addTokenSet(newTokenSetName.trim());
+    dispatch.tokenState.setActiveTokenSet(newTokenSetName.trim());
     handleNewTokenSetNameChange('');
   }, [dispatch, newTokenSetName]);
 

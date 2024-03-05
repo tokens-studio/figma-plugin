@@ -1,8 +1,7 @@
 import React from 'react';
+import { ToggleGroup, Box, Stack } from '@tokens-studio/ui';
 import { ExportProviderType } from '@/constants/ExportProviderType';
 import Modal from '../Modal';
-import Stack from '../Stack';
-import LoadProviderItem from '../LoadProviderSelector';
 import SingleFileExport from '../ExportProvider/SingleFileExport';
 import MultiFilesExport from '../ExportProvider/MultiFilesExport';
 
@@ -11,31 +10,23 @@ type Props = {
 };
 
 export default function ExportModal({ onClose }: Props) {
-  const [exportProvider, setExportProvider] = React.useState<string>(ExportProviderType.SINGLE);
+  const [exportMode, setExportMode] = React.useState<string>(ExportProviderType.SINGLE);
 
-  const handleProviderClick = React.useCallback((provider: string) => {
-    setExportProvider(provider);
+  const handleModeChange = React.useCallback((mode: ExportProviderType.SINGLE | ExportProviderType.MULTIPLE) => {
+    setExportMode(mode);
   }, []);
 
   return (
     <Modal size="large" isOpen close={onClose} title="Export tokens">
       <Stack gap={4} direction="column">
-        <Stack direction="row" gap={1}>
-          <LoadProviderItem
-            isActive={exportProvider === ExportProviderType.SINGLE}
-            onClick={handleProviderClick}
-            text="Single file"
-            id={ExportProviderType.SINGLE}
-          />
-          <LoadProviderItem
-            isActive={exportProvider === ExportProviderType.MULTIPLE}
-            onClick={handleProviderClick}
-            text="Multiple files"
-            id={ExportProviderType.MULTIPLE}
-          />
-        </Stack>
+        <Box>
+          <ToggleGroup type="single" value={exportMode} onValueChange={handleModeChange}>
+            <ToggleGroup.Item iconOnly={false} value={ExportProviderType.SINGLE}>Single file</ToggleGroup.Item>
+            <ToggleGroup.Item iconOnly={false} value={ExportProviderType.MULTIPLE}>Multiple files</ToggleGroup.Item>
+          </ToggleGroup>
+        </Box>
         {
-          exportProvider === ExportProviderType.SINGLE
+          exportMode === ExportProviderType.SINGLE
             ? <SingleFileExport onClose={onClose} />
             : <MultiFilesExport onClose={onClose} />
         }
