@@ -1,7 +1,7 @@
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string) {
-  const variable = defaultTokenValueRetriever.get(token)?.variableId;
+  const variable = await defaultTokenValueRetriever.getVariableReference(token);
 
   if (variable && type in node) {
     try {

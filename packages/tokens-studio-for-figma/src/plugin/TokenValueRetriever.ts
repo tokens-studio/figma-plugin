@@ -15,7 +15,7 @@ export class TokenValueRetriever {
   private ignoreFirstPartForStyles;
 
   private getAdjustedTokenName(tokenName: string): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles ? tokenName.split('.')[1] : tokenName;
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles ? tokenName.split('.').slice(1).join('.') : tokenName;
     const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
     return withPrefix;
   }
@@ -25,8 +25,8 @@ export class TokenValueRetriever {
   }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
-    this.styleReferences = styleReferences;
-    this.variableReferences = variableReferences;
+    this.styleReferences = styleReferences || new Map();
+    this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
 
     this.tokens = new Map<string, any>(tokens.map((token) => {

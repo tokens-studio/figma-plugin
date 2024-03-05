@@ -1,3 +1,4 @@
+import { TokenTypes } from '@/constants/TokenTypes';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import setValuesOnNode from './setValuesOnNode';
 
@@ -6,7 +7,15 @@ describe('setValuesOnNode', () => {
   let frameNodeMock: FrameNode;
   beforeEach(() => {
     defaultTokenValueRetriever.initiate({
-      tokens: [],
+      tokens: [{
+        name: 'border-radius.3',
+        value: '10px',
+        type: TokenTypes.BORDER_RADIUS,
+      }, {
+        name: 'spacing.10',
+        value: '10px',
+        type: TokenTypes.SPACING,
+      }],
     });
     textNodeMock = {
       cornerRadius: 3,
@@ -24,6 +33,11 @@ describe('setValuesOnNode', () => {
       id: '123:457',
     } as FrameNode;
   });
+
+  afterEach(() => {
+    defaultTokenValueRetriever.clearCache();
+  });
+
   const data = {
     borderRadius: 'border-radius.3',
     spacing: 'spacing.10',

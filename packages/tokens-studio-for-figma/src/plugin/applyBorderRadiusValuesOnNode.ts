@@ -104,4 +104,5 @@ export async function applyBorderRadiusValuesOnNode(
       }
     }
   }
+  console.log('Node is', node);
 }

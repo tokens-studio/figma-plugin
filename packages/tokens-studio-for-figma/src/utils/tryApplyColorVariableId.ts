@@ -8,6 +8,7 @@ export enum ColorPaintType {
 
 export async function tryApplyColorVariableId(node: SceneNode, token: string, type: ColorPaintType) {
   const variable = await defaultTokenValueRetriever.getVariableReference(token);
+  if (!variable) return false;
 
   try {
     const defaultPaint: SolidPaint = { type: 'SOLID', color: { r: 0, g: 0, b: 0 } };

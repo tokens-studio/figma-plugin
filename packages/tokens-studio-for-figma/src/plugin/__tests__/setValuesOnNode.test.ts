@@ -2,6 +2,7 @@ import setValuesOnNode from '../setValuesOnNode';
 import * as setTextValuesOnTarget from '../setTextValuesOnTarget';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
+import * as setBorderColorValuesOnTarget from '../setBorderColorValuesOnTarget';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import { mockFetch } from '../../../tests/__mocks__/fetchMock';
 import { mockCreateImage } from '../../../tests/__mocks__/figmaMock';
@@ -12,6 +13,7 @@ describe('Can set values on node', () => {
   const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
   const setColorValuesOnTargetSpy = jest.spyOn(setColorValuesOnTarget, 'default');
+  const setBorderColorValuesOnTargetSpy = jest.spyOn(setBorderColorValuesOnTarget, 'setBorderColorValuesOnTarget');
 
   let textNodeMock: TextNode;
   let solidNodeMock: RectangleNode;
@@ -19,7 +21,31 @@ describe('Can set values on node', () => {
 
   beforeEach(() => {
     defaultTokenValueRetriever.initiate({
-      tokens: [],
+      tokens: [{
+        name: 'fg.default',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+      },
+      {
+        name: 'shadows.lg',
+        value: {
+          color: '#000000',
+          type: BoxShadowTypes.DROP_SHADOW,
+          x: '2',
+          y: '4',
+          blur: '10',
+          spread: '4',
+        },
+        resolvedValueWithReferences: {
+          color: '#000000',
+          type: BoxShadowTypes.DROP_SHADOW,
+          x: '2',
+          y: '4',
+          blur: '10',
+          spread: '4',
+        },
+        type: TokenTypes.BOX_SHADOW,
+      }],
     });
     textNodeMock = ({
       id: '123:456',
@@ -172,8 +198,8 @@ describe('Can set values on node', () => {
     expect(mockResize).toBeCalledWith(50, 100);
   });
 
-  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', () => {
-    setValuesOnNode(
+  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', async () => {
+    await setValuesOnNode(
       {
         node: textNodeMock,
         values: {
@@ -206,8 +232,21 @@ describe('Can set values on node', () => {
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', () => {
-    setValuesOnNode(
+  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'type.heading.h1',
+          type: TokenTypes.TYPOGRAPHY,
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+            fontSize: '24',
+          },
+        },
+      ],
+    });
+    await setValuesOnNode(
       {
         node: textNodeMock,
         values: {
@@ -239,7 +278,7 @@ describe('Can set values on node', () => {
           },
         },
       ],
-      styleReferences: new Map([['type/heading/h1', '123']]),
+      styleReferences: new Map([['type.heading.h1', '123']]),
     });
     await setValuesOnNode(
       {
@@ -273,7 +312,7 @@ describe('Can set values on node', () => {
           },
         },
       ],
-      styleReferences: new Map([['type/heading/h1', '123']]),
+      styleReferences: new Map([['heading.h1', '456']]),
       ignoreFirstPartForStyles: true,
     });
     await setValuesOnNode(
@@ -311,7 +350,7 @@ describe('Can set values on node', () => {
           },
         },
       ],
-      styleReferences: new Map([['shadows/default', '123']]),
+      styleReferences: new Map([['shadows.default', '123']]),
     });
     await setValuesOnNode(
       {
@@ -389,7 +428,7 @@ describe('Can set values on node', () => {
           },
         },
       ],
-      styleReferences: new Map([['light/shadows/default', '123']]),
+      styleReferences: new Map([['light.shadows.default', '123']]),
       stylePathPrefix: 'light',
     });
     await setValuesOnNode(
@@ -424,7 +463,7 @@ describe('Can set values on node', () => {
           value: '#ff0000',
         },
       ],
-      styleReferences: new Map([['colors/red', '123']]),
+      styleReferences: new Map([['colors.red', '123']]),
     });
     await setValuesOnNode(
       {
@@ -442,6 +481,15 @@ describe('Can set values on node', () => {
   });
 
   it('calls setColorValuesOnTarget if fill node and fill is given', async () => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [
+        {
+          name: 'colors.red',
+          type: TokenTypes.COLOR,
+          value: '#ff0000',
+        },
+      ],
+    });
     await setValuesOnNode(
       {
         node: solidNodeMock,
@@ -465,7 +513,7 @@ describe('Can set values on node', () => {
           value: '#ff0000',
         },
       ],
-      styleReferences: new Map([['colors/red', '123']]),
+      styleReferences: new Map([['colors.red', '123']]),
     });
     await setValuesOnNode(
       {
@@ -494,7 +542,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'strokes');
+    expect(setBorderColorValuesOnTargetSpy).toHaveBeenCalledWith({ node: solidNodeMock, data: 'colors.red', value: '#ff0000' });
   });
 
   it('can set padding and spacing if spacing is defined', async () => {

@@ -22,7 +22,6 @@ import { applyShadowValuesOnNode } from './applyShadowValuesOnNode';
 import removeValuesFromNode from './removeValuesFromNode';
 
 // Various logic to apply token values to nodes
-// Node
 export default async function setValuesOnNode({
   node,
   values,
@@ -47,23 +46,23 @@ export default async function setValuesOnNode({
           delete values[key];
         }
       });
-      applyBorderValuesOnNode(node, data, values, baseFontSize);
-      applyBorderRadiusValuesOnNode(node, data, values, baseFontSize);
-      applyShadowValuesOnNode(node, data, values, baseFontSize);
-      applyBackgroundBlurValuesOnNode(node, data, values, baseFontSize);
-      applyBorderWidthValuesOnNode(node, data, values, baseFontSize);
-      applyOpacityValuesOnNode(node, data, values, baseFontSize);
-      applySizingValuesOnNode(node, data, values, baseFontSize);
-      applySpacingValuesOnNode(node, data, values, baseFontSize);
-      applyRotationValuesOnNode(node, data, values, baseFontSize);
-      applyColorTokenOnNode(node, data, values);
-      applyPositionTokenOnNode(node, data, values, baseFontSize);
-      applyTypographyTokenOnNode(node, data, values, baseFontSize);
-      applyAssetTokenValuesOnNode(node, values, data);
-      applyDimensionTokenValuesOnNode(node, values, data, baseFontSize);
-      applyNumberTokenValuesOnNode(node, values, data, baseFontSize);
-      applyBooleanTokenValuesOnNode(node, values, data);
-      applyTextCharacterValuesOnNode(node, values, data);
+      await applyBorderValuesOnNode(node, data, values, baseFontSize);
+      await applyBorderRadiusValuesOnNode(node, data, values, baseFontSize);
+      await applyShadowValuesOnNode(node, data, values, baseFontSize);
+      await applyBackgroundBlurValuesOnNode(node, data, values, baseFontSize);
+      await applyBorderWidthValuesOnNode(node, data, values, baseFontSize);
+      await applyOpacityValuesOnNode(node, data, values, baseFontSize);
+      await applySizingValuesOnNode(node, data, values, baseFontSize);
+      await applySpacingValuesOnNode(node, data, values, baseFontSize);
+      await applyRotationValuesOnNode(node, data, values, baseFontSize);
+      await applyColorTokenOnNode(node, data, values);
+      await applyPositionTokenOnNode(node, data, values, baseFontSize);
+      await applyTypographyTokenOnNode(node, data, values, baseFontSize);
+      await applyAssetTokenValuesOnNode(node, data, values);
+      await applyDimensionTokenValuesOnNode(node, data, values, baseFontSize);
+      await applyNumberTokenValuesOnNode(node, data, values, baseFontSize);
+      await applyBooleanTokenValuesOnNode(node, data, values);
+      await applyTextCharacterValuesOnNode(node, data, values);
     }
   } catch (e) {
     console.log('Error setting data on node', e);

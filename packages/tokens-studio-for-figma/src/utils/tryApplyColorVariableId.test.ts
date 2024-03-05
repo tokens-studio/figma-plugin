@@ -3,6 +3,7 @@ import { mockImportVariableByKeyAsync } from '../../tests/__mocks__/figmaMock';
 import { ColorPaintType, tryApplyColorVariableId } from './tryApplyColorVariableId';
 import { SingleToken } from '@/types/tokens';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 describe('tryApplyColorVariableId', () => {
   const mockSetBoundVariable = jest.fn();
@@ -38,6 +39,9 @@ describe('tryApplyColorVariableId', () => {
     mockImportVariableByKeyAsync.mockImplementationOnce(() => mockVariable);
     const variableReferences = new Map();
     variableReferences.set('token', 'VariableID:519:32875');
+    defaultTokenValueRetriever.initiate({
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.COLOR }], variableReferences,
+    });
     expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');
   });
