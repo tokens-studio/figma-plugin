@@ -53,7 +53,7 @@ export default async function updateStyles(
   const allStyleIds = {
     ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),
     ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
-    ...(effectTokens.length > 0 ? updateEffectStyles({
+    ...(effectTokens.length > 0 ? await updateEffectStyles({
       effectTokens, baseFontSize: settings.baseFontSize, shouldCreate,
     }) : {}),
   };
