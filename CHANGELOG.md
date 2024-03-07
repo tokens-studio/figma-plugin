@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 1.38.9
+
+### Patch Changes
+
+- ff11c7c2: Support Supernova new app URL
+
 ## 1.38.8
 
 ### Patch Changes
