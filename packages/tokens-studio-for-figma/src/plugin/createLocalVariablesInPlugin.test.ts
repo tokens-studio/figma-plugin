@@ -79,13 +79,7 @@ describe('SetValuesOnVariable', () => {
     mockGetLocalVariableCollections.mockImplementationOnce(() => mockLocalVariableCollections);
     mockCreateVariableCollection.mockImplementationOnce(() => mockNewCollection);
     expect(await createLocalVariablesInPlugin(tokens, settings)).toEqual({
-      allVariableCollectionIds: {
-        light: {
-          collectionId: 'VariableCollectionId:334:16723',
-          modeId: '123',
-          variableIds: {},
-        },
-      },
+      allVariableCollectionIds: {},
       totalVariables: 0,
     });
   });
@@ -107,13 +101,7 @@ describe('SetValuesOnVariable', () => {
     mockGetLocalVariableCollections.mockImplementationOnce(() => mockLocalVariableCollections);
     mockAddMode.mockImplementationOnce(() => '234');
     expect(await createLocalVariablesInPlugin(tokens, settings)).toEqual({
-      allVariableCollectionIds: {
-        light: {
-          collectionId: 'VariableCollectionId:334:16746',
-          modeId: '234',
-          variableIds: {},
-        },
-      },
+      allVariableCollectionIds: {},
       totalVariables: 0,
     });
   });

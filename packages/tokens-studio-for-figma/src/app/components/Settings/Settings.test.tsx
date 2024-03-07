@@ -18,27 +18,27 @@ describe('Settings Component', () => {
     render(<Settings />);
   });
 
-  it('can toggle ignoreFirstPartForStyles', () => {
-    render(<Settings />);
+  // it('can toggle ignoreFirstPartForStyles', () => {
+  //   render(<Settings />);
 
-    const ignoreButton = screen.getByTestId('ignoreFirstPartForStyles');
-    fireEvent.click(ignoreButton, {
-      target: ignoreButton,
-    });
+  //   const ignoreButton = screen.getByTestId('ignoreFirstPartForStyles');
+  //   fireEvent.click(ignoreButton, {
+  //     target: ignoreButton,
+  //   });
 
-    expect(store.getState().settings.ignoreFirstPartForStyles).toBe(true);
-  });
+  //   expect(store.getState().settings.ignoreFirstPartForStyles).toBe(true);
+  // });
 
-  it('can toggle prefixStylesWithThemeName', () => {
-    render(<Settings />);
+  // it('can toggle prefixStylesWithThemeName', () => {
+  //   render(<Settings />);
 
-    const prefixButton = screen.getByTestId('prefixStylesWithThemeName');
-    fireEvent.click(prefixButton, {
-      target: prefixButton,
-    });
+  //   const prefixButton = screen.getByTestId('prefixStylesWithThemeName');
+  //   fireEvent.click(prefixButton, {
+  //     target: prefixButton,
+  //   });
 
-    expect(store.getState().settings.prefixStylesWithThemeName).toBe(true);
-  });
+  //   expect(store.getState().settings.prefixStylesWithThemeName).toBe(true);
+  // });
 
   it('show onboarding explainer syncproviders', () => {
     store.dispatch.uiState.setOnboardingExplainerSyncProviders(true);

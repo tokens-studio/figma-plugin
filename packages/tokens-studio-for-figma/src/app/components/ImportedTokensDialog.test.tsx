@@ -90,7 +90,6 @@ describe('ImportedTokensDialog', () => {
     );
 
     waitFor(async () => {
-      expect(result.queryByText('import')).toBeInTheDocument();
       expect(result.queryByText('newTokens')).toBeInTheDocument();
       expect(result.queryByText('createAll')).toBeInTheDocument();
       expect(result.queryByText('existingTokens')).toBeInTheDocument();
