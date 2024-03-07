@@ -6,17 +6,13 @@ import { useTranslation } from 'react-i18next';
 import {
   Box, Link, Text, Button, Heading, Label, Stack, Switch,
 } from '@tokens-studio/ui';
-// import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
-// import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
 import { Dispatch } from '../../store';
 import {
-  // ignoreFirstPartForStylesSelector,
   storeTokenIdInJsonEditorSelector,
-  // prefixStylesWithThemeNameSelector,
-  uiStateSelector,
+  uiStateSelector
 } from '@/selectors';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
@@ -79,27 +75,10 @@ function Settings() {
     }
     getSessionId();
   });
-  // const handleIgnoreChange = React.useCallback(
-  //   (state: CheckedState) => {
-  //     track('setIgnoreFirstPartForStyles', { value: state });
-  //     dispatch.settings.setIgnoreFirstPartForStyles(!!state);
-  //   },
-  //   [dispatch.settings],
-  // );
-
-  // const handlePrefixWithThemeNameChange = React.useCallback(
-  //   (state: CheckedState) => {
-  //     track('setPrefixStylesWithThemeName', { value: state });
-
-  //     dispatch.settings.setPrefixStylesWithThemeName(!!state);
-  //   },
-  //   [dispatch.settings],
-  // );
 
   const handleStoreTokenIdInJsonEditorChange = React.useCallback(
     (state: CheckedState) => {
       track('setStoreTokenIdInJsonEditorSelector', { value: state });
-
       dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
     },
     [dispatch.settings],
