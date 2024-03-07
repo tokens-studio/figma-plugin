@@ -17,6 +17,7 @@ import {
   uiStateSelector,
   updateModeSelector,
   usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -34,6 +35,7 @@ import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { theme } from '@/stitches.config';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -64,6 +66,7 @@ export default function useTokens() {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
@@ -491,6 +494,29 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
+  const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      tokens: tokens,
+      settings,
+      selectedThemes
+    }));
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
 
@@ -560,6 +586,7 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
@@ -585,6 +612,7 @@ export default function useTokens() {
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,
