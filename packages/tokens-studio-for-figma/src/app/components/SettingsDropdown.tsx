@@ -54,7 +54,7 @@ export default function SettingsDropdown() {
             <CheckIcon />
           </DropdownMenu.ItemIndicator>
           {t('update.onChange.title')}
-          <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
             {t('update.onChange.description')}
           </Box>
         </DropdownMenu.CheckboxItem>
@@ -68,7 +68,7 @@ export default function SettingsDropdown() {
               <CheckIcon />
             </DropdownMenu.ItemIndicator>
             {t('update.remoteJSONBin.title')}
-            <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
               {t('update.remoteJSONBin.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
@@ -82,7 +82,7 @@ export default function SettingsDropdown() {
             <CheckIcon />
           </DropdownMenu.ItemIndicator>
           {t('update.styles.title')}
-          <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
             {t('update.styles.description')}
           </Box>
         </DropdownMenu.CheckboxItem>
@@ -95,7 +95,7 @@ export default function SettingsDropdown() {
             <CheckIcon />
           </DropdownMenu.ItemIndicator>
           {t('update.swapStyles.title')}
-          <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
             {t('update.swapStyles.description')}
           </Box>
         </DropdownMenu.CheckboxItem>

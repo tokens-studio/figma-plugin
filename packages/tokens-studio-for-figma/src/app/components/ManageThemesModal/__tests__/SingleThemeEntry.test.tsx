@@ -32,7 +32,7 @@ describe('SingleThemeEntry', () => {
     );
 
     expect(result.queryByText('Light')).not.toBeNull();
-    expect(result.queryByText('1 sets, 1 styles, 0 variables')).toBeNull();
+    expect(result.queryByText('1 style')).not.toBeNull();
 
     const openButton = await result.findByTestId('singlethemeentry-light');
     openButton.click();

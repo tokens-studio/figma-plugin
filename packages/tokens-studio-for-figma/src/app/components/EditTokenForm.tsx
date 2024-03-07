@@ -92,7 +92,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const hasNameThatExistsAlready = React.useMemo(
     () => {
       const editToken = resolvedTokens
-        .filter((t) => t.internal__Parent === activeTokenSet)
+        .filter((t) => selectedTokenSets.includes(t.internal__Parent ?? ''))
         .find((t) => t.name === internalEditToken?.name);
 
       if (editToken) {
@@ -101,7 +101,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
       return editToken;
     },
-    [internalEditToken, resolvedTokens, activeTokenSet],
+    [internalEditToken, resolvedTokens, activeTokenSet, selectedTokenSets],
   );
 
   const hasAnotherTokenThatStartsWithName = React.useMemo(
@@ -127,9 +127,17 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const hasPriorTokenName = React.useMemo(
-    () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .find((t) => t.type === internalEditToken.type && internalEditToken.name?.startsWith(`${t.name}.`)),
+    () => {
+      const tokensWithSameParent = resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet);
+      if (internalEditToken?.status === EditTokenFormStatus.CREATE) {
+        // If we are creating a new token, disallow naming it as a prefix of an existing token
+        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
+      } else if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
+        // If we are editing a token, only disallow the name if it's prefix matches another token and it is not the token we are currently editing
+        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`) && internalEditToken.initialName !== t.name);
+      }
+      return false;
+    },
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -153,7 +161,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasCurlyBraces) {
       setError(t('tokenNamesCantContainCurlyBraces', { ns: 'errors' }));
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasPriorTokenName, hasAnotherTokenThatStartsWithName]);
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasAnotherTokenThatStartsWithName]);
 
   const handleChange = React.useCallback(
     (property: string, value: string) => {
@@ -477,6 +485,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
     setSelectedTokenSets(selectedItems);
+    if (selectedItems.length > 0) setError(null);
   }, []);
 
   const renderTokenForm = () => {
