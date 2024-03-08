@@ -56,6 +56,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
     }
   });
+  console.log('referenceVariableCandidates', referenceVariableCandidates);
   const figmaVariables = figma.variables.getLocalVariables();
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (figmaVariables.length === 0) {

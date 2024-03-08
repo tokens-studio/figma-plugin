@@ -1,5 +1,7 @@
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { mockImportVariableByKeyAsync } from '../../tests/__mocks__/figmaMock';
 import { tryApplyVariableId } from './tryApplyVariableId';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 describe('tryApplyVariableId', () => {
   const mockSetBoundVariable = jest.fn();
@@ -15,9 +17,16 @@ describe('tryApplyVariableId', () => {
     },
   } as unknown as SceneNode;
 
+  afterEach(() => {
+    defaultTokenValueRetriever.clearCache();
+  });
+
   it('when there is no matching variable, should not apply variable and return false', async () => {
     const variableReferences = new Map();
-    expect(await tryApplyVariableId(node, 'width', 'token', variableReferences)).toBe(false);
+    defaultTokenValueRetriever.initiate({
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences,
+    });
+    expect(await tryApplyVariableId(node, 'width', 'token')).toBe(false);
   });
 
   it('when there is a matching variable, should try to apply variable', async () => {
@@ -33,7 +42,10 @@ describe('tryApplyVariableId', () => {
     mockResolveForConsumer.mockImplementationOnce(() => mockVariable);
     const variableReferences = new Map();
     variableReferences.set('token', 'VariableID:519:32875');
-    expect(await tryApplyVariableId(node, 'width', 'token', variableReferences)).toBe(true);
+    defaultTokenValueRetriever.initiate({
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences,
+    });
+    expect(await tryApplyVariableId(node, 'width', 'token')).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');
     expect(mockSetBoundVariable).toBeCalledWith('width', 'VariableID:519:32875');
   });
