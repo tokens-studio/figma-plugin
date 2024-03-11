@@ -279,7 +279,8 @@ export type SetUsedEmailMessageResult = AsyncMessage<AsyncMessageTypes.SET_USED_
 
 export type CreateLocalVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   tokens: Record<string, AnyTokenList>;
-  settings: SettingsState
+  settings: SettingsState,
+  selectedThemes?: string[]
 }>;
 export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES, {
   variableIds: Record<string, LocalVariableInfo>

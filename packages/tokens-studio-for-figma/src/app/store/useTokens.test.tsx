@@ -20,6 +20,7 @@ import { NodeInfo } from '@/types/NodeInfo';
 import { Properties } from '@/constants/Properties';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { TokensContext } from '@/context';
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -443,53 +444,57 @@ describe('useToken test', () => {
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
 
+      const tokens = [
+        {
+          internal__Parent: 'light',
+          name: 'bg.default',
+          rawValue: '#ffffff',
+          type: 'color',
+          value: '#ffffff',
+        },
+        {
+          internal__Parent: 'global',
+          name: 'white',
+          rawValue: '#ffffff',
+          type: 'color',
+          value: '#ffffff',
+        },
+        {
+          internal__Parent: 'global',
+          name: 'headline',
+          rawValue: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+          resolvedValueWithReferences: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+          type: 'typography',
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Bold',
+          },
+        },
+        {
+          failedToResolve: true,
+          internal__Parent: 'global',
+          name: 'shadow',
+          rawValue: '{shadows.default}',
+          type: 'boxShadow',
+          value: '{shadows.default}',
+        },
+      ];
+
+      defaultTokenValueRetriever.initiate({ tokens });
+
       await act(async () => {
         await result.current.createStylesFromTokens();
       });
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: [
-          {
-            internal__Parent: 'light',
-            name: 'bg.default',
-            rawValue: '#ffffff',
-            type: 'color',
-            value: '#ffffff',
-          },
-          {
-            internal__Parent: 'global',
-            name: 'white',
-            rawValue: '#ffffff',
-            type: 'color',
-            value: '#ffffff',
-          },
-          {
-            internal__Parent: 'global',
-            name: 'headline',
-            rawValue: {
-              fontFamily: 'Inter',
-              fontWeight: 'Bold',
-            },
-            resolvedValueWithReferences: {
-              fontFamily: 'Inter',
-              fontWeight: 'Bold',
-            },
-            type: 'typography',
-            value: {
-              fontFamily: 'Inter',
-              fontWeight: 'Bold',
-            },
-          },
-          {
-            failedToResolve: true,
-            internal__Parent: 'global',
-            name: 'shadow',
-            rawValue: '{shadows.default}',
-            type: 'boxShadow',
-            value: '{shadows.default}',
-          },
-        ],
+        tokens,
         settings: store.getState().settings,
       });
     });

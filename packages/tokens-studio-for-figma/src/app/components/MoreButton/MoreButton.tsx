@@ -123,13 +123,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleTokenClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const isMacBrowser = /Mac/.test(navigator.platform);
-      if ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey)) {
+      if (!editProhibited && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
         handleClick(properties[0]);
       }
     },
-    [properties, handleClick, handleEditClick],
+    [properties, handleClick, handleEditClick, editProhibited],
   );
 
   return (
@@ -139,36 +139,34 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content alignOffset={5} collisionPadding={30}>
-          <ContextMenu.Sub>
-            {visibleProperties.map((property) => (property.childProperties ? (
-              <>
-                <ContextMenu.SubTrigger>
-                  {property.label}
-                  <RightSlot>
-                    <ChevronRightIcon />
-                  </RightSlot>
-                </ContextMenu.SubTrigger>
-                <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-                  {property.childProperties.map((childProperty) => (
-                    <MoreButtonProperty
-                      key={childProperty.name}
-                      value={token.name}
-                      property={childProperty}
-                      onClick={handleClick}
-                    />
-                  ))}
-                </ContextMenu.Content>
-              </>
-            ) : (
-              <MoreButtonProperty
-                key={property.name}
-                value={token.name}
-                property={property}
-                onClick={handleClick}
-                disabled={property.disabled}
-              />
-            )))}
-          </ContextMenu.Sub>
+          {visibleProperties.map((property) => (property.childProperties ? (
+            <ContextMenu.Sub>
+              <ContextMenu.SubTrigger>
+                {property.label}
+                <RightSlot>
+                  <ChevronRightIcon />
+                </RightSlot>
+              </ContextMenu.SubTrigger>
+              <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
+                {property.childProperties.map((childProperty) => (
+                  <MoreButtonProperty
+                    key={childProperty.name}
+                    value={token.name}
+                    property={childProperty}
+                    onClick={handleClick}
+                  />
+                ))}
+              </ContextMenu.Content>
+            </ContextMenu.Sub>
+          ) : (
+            <MoreButtonProperty
+              key={property.name}
+              value={token.name}
+              property={property}
+              onClick={handleClick}
+              disabled={property.disabled}
+            />
+          )))}
           <ContextMenu.Sub>
             <ContextMenu.SubTrigger>
               Documentation Tokens
@@ -189,7 +187,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
           <ContextMenu.Item onSelect={handleDuplicateClick} disabled={editProhibited}>
             Duplicate Token
           </ContextMenu.Item>
-          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)} disabled={editProhibited}>
+          <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)}>
             Copy Token Path
           </ContextMenu.Item>
           <ContextMenu.Item onSelect={handleDeleteClick} disabled={editProhibited}>

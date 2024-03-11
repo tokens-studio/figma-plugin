@@ -9,11 +9,11 @@ import {
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
-import useTokens from '@/app/store/useTokens';
 
 import useExportThemesTab from './useExportThemesTab';
 import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
+import useTokens from '@/app/store/useTokens';
 
 export default function ManageStylesAndVariables() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -27,6 +27,7 @@ export default function ManageStylesAndVariables() {
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
+  const { createVariablesFromThemes } = useTokens();
 
   const { createVariablesFromSets, createVariablesFromThemes } = useTokens();
 
@@ -40,7 +41,6 @@ export default function ManageStylesAndVariables() {
   }, []);
 
   const handleExportToFigma = React.useCallback(() => {
-    alert('TODO: Export to Figma - check the console for export options');
     if (activeTab === 'useSets') {
       createVariablesFromSets(selectedSets);
     } else if (activeTab === 'useThemes') {

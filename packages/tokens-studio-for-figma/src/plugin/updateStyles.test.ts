@@ -121,23 +121,24 @@ describe('updateStyles', () => {
       false,
     );
     expect(effectSpy).toHaveBeenCalledWith(
-      [{
-        name: 'shadow.large',
-        path: 'large',
-        type: 'boxShadow',
-        description: 'the one with one shadow',
-        value: {
-          type: 'dropShadow',
-          color: '#00000080',
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
-        },
-        styleId: '',
-      }],
-      undefined,
-      false,
+      {
+        effectTokens: [{
+          name: 'shadow.large',
+          path: 'large',
+          type: 'boxShadow',
+          description: 'the one with one shadow',
+          value: {
+            type: 'dropShadow',
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+          styleId: '',
+        }],
+        shouldCreate: false,
+      },
     );
   });
 
@@ -213,9 +214,10 @@ describe('updateStyles', () => {
       prefixStylesWithThemeName: true,
     } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
-      effectTokens,
-      undefined,
-      false,
+      {
+        effectTokens,
+        shouldCreate: false,
+      },
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();

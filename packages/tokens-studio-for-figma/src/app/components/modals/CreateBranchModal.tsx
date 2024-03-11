@@ -93,6 +93,9 @@ export default function CreateBranchModal({
     pushTokens,
     onSuccess,
     startBranch,
+    activeTheme,
+    pullTokens,
+    usedTokenSet,
   ]);
 
   const handleModalClose = React.useCallback(() => onClose(false), [onClose]);

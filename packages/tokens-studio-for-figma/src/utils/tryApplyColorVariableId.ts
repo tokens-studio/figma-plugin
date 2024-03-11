@@ -1,33 +1,14 @@
 import { clone } from '@figma-plugin/helpers';
-import { resolvedVariableReferences } from '@/plugin/setValuesOnNode';
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 export enum ColorPaintType {
   FILLS = 'fills',
   STROKES = 'strokes',
 }
 
-export async function tryApplyColorVariableId(node: SceneNode, token: string, figmaVariableReferences: Map<string, string>, type: ColorPaintType) {
-  let variable;
-  const hasCachedVariable = resolvedVariableReferences.has(token);
-  if (hasCachedVariable) {
-    variable = resolvedVariableReferences.get(token);
-  }
-  const variableMapped = figmaVariableReferences.get(token);
-  if (!variableMapped) return false;
-  if (!hasCachedVariable && typeof variableMapped === 'string') {
-    try {
-      const foundVariable = await figma.variables.importVariableByKeyAsync(variableMapped);
-      if (foundVariable) {
-        resolvedVariableReferences.set(token, foundVariable);
-        variable = foundVariable;
-      }
-    } catch (e) {
-      console.log('error importing variable', e);
-      Promise.reject(e);
-    }
-  }
-
-  if (variable === undefined) return false;
+export async function tryApplyColorVariableId(node: SceneNode, token: string, type: ColorPaintType) {
+  const variable = await defaultTokenValueRetriever.getVariableReference(token);
+  if (!variable) return false;
 
   try {
     const defaultPaint: SolidPaint = { type: 'SOLID', color: { r: 0, g: 0, b: 0 } };

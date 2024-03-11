@@ -6,6 +6,7 @@ import ADOIcon from '@/icons/azure.svg';
 import JSONBinIcon from '@/icons/jsonbin.svg';
 import SupernovaIcon from '@/icons/supernova.svg';
 import TokensStudioIcon from '@/icons/tokensstudio.svg';
+import BitBucketIcon from '@/icons/bitbucket.svg';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function getProviderIcon(provider: StorageProviderType) {
@@ -21,7 +22,7 @@ export function getProviderIcon(provider: StorageProviderType) {
     case StorageProviderType.ADO:
       return <ADOIcon />;
     case StorageProviderType.BITBUCKET:
-      return <Link2Icon />;
+      return <BitBucketIcon />;
     case StorageProviderType.JSONBIN:
       return <JSONBinIcon />;
     case StorageProviderType.SUPERNOVA:

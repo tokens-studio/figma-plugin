@@ -2,17 +2,17 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
-import { resolvedVariableReferences } from '../setValuesOnNode';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
-  resolvedVariableReferences.clear();
+  defaultTokenValueRetriever.clearCache();
   const figmaStyleMaps = getAllFigmaStyleMaps();
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
 
-  const figmaStyleReferences: Record<string, string> = {};
+  const figmaStyleReferences: Map<string, string> = new Map();
   const figmaVariableReferences: RawVariableReferenceMap = new Map();
 
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
@@ -25,8 +25,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
       }
     });
     Object.entries(theme.$figmaStyleReferences ?? {}).forEach(([token, styleId]) => {
-      if (!figmaStyleReferences[token]) {
-        figmaStyleReferences[token] = styleId;
+      if (!figmaStyleReferences.has(token)) {
+        figmaStyleReferences.set(token, styleId);
       }
     });
   });

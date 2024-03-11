@@ -4,6 +4,7 @@ import { tokenArrayGroupToMap } from '@/utils/tokenArrayGroupToMap';
 import { updatePluginDataAndNodes } from '../updatePluginDataAndNodes';
 import { sendSelectionChange } from '../sendSelectionChange';
 import { getThemeReferences } from './getThemeReferences';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE_DATA] = async (msg) => {
   try {
@@ -11,11 +12,15 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
       const tokensMap = tokenArrayGroupToMap(msg.tokens);
       const nodes = figma.currentPage.selection;
       const {
-        figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+        figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
       } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
 
+      await defaultTokenValueRetriever.initiate({
+        tokens: msg.tokens, variableReferences: figmaVariableReferences, styleReferences: figmaStyleReferences, stylePathPrefix, ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+      });
+
       await updatePluginDataAndNodes({
-        entries: nodes, values: msg.values, tokensMap, figmaStyleMaps, figmaVariableReferences, figmaStyleReferences, stylePathPrefix, settings: msg.settings,
+        entries: nodes, values: msg.values, tokensMap, settings: msg.settings,
       });
       sendSelectionChange();
     }

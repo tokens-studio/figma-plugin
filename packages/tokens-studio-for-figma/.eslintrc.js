@@ -2,7 +2,8 @@ module.exports = {
   extends: ['airbnb', 'airbnb-typescript', 'plugin:react-hooks/recommended'],
   plugins: ["validate-jsx-nesting"],
   parserOptions: {
-    project: './tsconfig.json',
+    // Extending tsconfig for tests, the `*.mock.d.ts` files were not being recognized
+    project: ['./tsconfig.json', './tsconfig.test.json'],
     tsconfigRootDir: __dirname,
   },
   ignorePatterns: ['**/*.js'],
