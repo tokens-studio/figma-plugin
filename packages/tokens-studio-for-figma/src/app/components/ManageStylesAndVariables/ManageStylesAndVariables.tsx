@@ -27,7 +27,6 @@ export default function ManageStylesAndVariables() {
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
-  const { createVariablesFromThemes } = useTokens();
 
   const { createVariablesFromSets, createVariablesFromThemes } = useTokens();
 
