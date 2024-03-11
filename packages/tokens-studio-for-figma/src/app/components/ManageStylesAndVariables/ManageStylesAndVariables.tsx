@@ -45,7 +45,7 @@ export default function ManageStylesAndVariables() {
     } else if (activeTab === 'useThemes') {
       createVariablesFromThemes(selectedThemes);
     }
-  }, [activeTab]);
+  }, [activeTab, selectedSets, selectedThemes]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 

@@ -494,13 +494,12 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const createVariablesFromThemes = useCallback(async (selectedThemes) => {
-    track('createVariables');
+  const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    track('createVariablesFromThemes', { selectedThemes });
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-    const multiValueFilteredTokens = filterMultiValueTokens();
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -511,7 +510,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: multiValueFilteredTokens,
+      tokens: tokens,
       settings,
       selectedThemes
     }));
