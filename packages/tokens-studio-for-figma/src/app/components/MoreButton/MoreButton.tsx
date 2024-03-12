@@ -76,8 +76,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   };
 
   const handleDeleteClick = React.useCallback(() => {
-    deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
-  }, [activeTokenSet, deleteSingleToken, token.name, token.type]);
+    deleteSingleToken({
+      parent: activeTokenSet,
+      path: token.name,
+      type: token.type,
+      sourceId: token.$extensions?.id,
+    });
+  }, [activeTokenSet, deleteSingleToken, token.$extensions, token.name, token.type]);
 
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
