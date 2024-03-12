@@ -669,7 +669,7 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument({ shouldUpdateNodes: rootState.settings.updateOnChange });
       }
 
-      if (payload.shouldUpdate && rootState.uiState.api.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'EDIT_TOKEN',
@@ -683,7 +683,7 @@ export const tokenState = createModel<RootModel>()({
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'DELETE_TOKEN',
@@ -735,7 +735,7 @@ export const tokenState = createModel<RootModel>()({
     async createToken(payload: UpdateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         const token = await pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'CREATE_TOKEN',
