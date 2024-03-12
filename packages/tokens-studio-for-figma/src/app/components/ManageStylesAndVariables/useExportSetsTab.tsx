@@ -84,7 +84,7 @@ export default function useExportSetsTab() {
   React.useEffect(() => {
     if (!showChangeSets) {
       const currentSelectedSets = getValues();
-      setSelectedSets(Object.keys(currentSelectedSets.tokenSets).filter((key) => currentSelectedSets.tokenSets[key] !== TokenSetStatus.DISABLED));
+      setSelectedSets(Object.keys(currentSelectedSets.tokenSets).filter((key) => currentSelectedSets.tokenSets[key] === TokenSetStatus.ENABLED));
     }
   }, [showChangeSets]);
 
