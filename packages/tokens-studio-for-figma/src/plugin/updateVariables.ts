@@ -24,7 +24,14 @@ export default function updateVariables({
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
-      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
+      if (
+        (token.type === 'color' && settings.variablesColor) ||
+        (token.type === 'number' && settings.variablesNumber) ||
+        (token.type === 'text' && settings.variablesString) ||
+        (token.type === 'boolean' && settings.variablesBoolean)
+      ) {
+        variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
+      }
     }
   });
   const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
