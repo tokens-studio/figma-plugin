@@ -46,6 +46,13 @@ export type UiSettingsFromPluginMessage = {
     updateRemote: boolean;
     updateOnChange: boolean;
     updateStyles: boolean;
+    variablesColor: boolean;
+    variablesString: boolean;
+    variablesNumber: boolean;
+    variablesBoolean: boolean;
+    stylesColor: boolean;
+    stylesTypography: boolean;
+    stylesEffect: boolean;
     ignoreFirstPartForStyles: boolean;
     prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;

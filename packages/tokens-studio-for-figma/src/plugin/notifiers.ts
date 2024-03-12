@@ -61,6 +61,13 @@ export type SavedSettings = {
   updateRemote: boolean;
   updateOnChange: boolean;
   updateStyles: boolean;
+  variablesColor: boolean;
+  variablesNumber: boolean;
+  variablesString: boolean;
+  variablesBoolean: boolean;
+  stylesColor: boolean;
+  stylesTypography: boolean;
+  stylesEffect: boolean;
   ignoreFirstPartForStyles: boolean;
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
@@ -81,6 +88,13 @@ export function notifyUISettings(
     updateOnChange,
     updateStyles,
     showEmptyGroups,
+    variablesColor,
+    variablesNumber,
+    variablesString,
+    variablesBoolean,
+    stylesColor,
+    stylesTypography,
+    stylesEffect,
     ignoreFirstPartForStyles,
     prefixStylesWithThemeName,
     updateRemote = true,
@@ -106,6 +120,13 @@ export function notifyUISettings(
       updateRemote,
       updateOnChange,
       updateStyles,
+      variablesColor,
+      variablesBoolean,
+      variablesNumber,
+      variablesString,
+      stylesColor,
+      stylesEffect,
+      stylesTypography,
       ignoreFirstPartForStyles,
       prefixStylesWithThemeName,
       inspectDeep,
