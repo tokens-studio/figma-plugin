@@ -39,6 +39,13 @@ export interface SettingsState {
   /*
    * Export styles and variables options
   */
+  variablesColor: boolean;
+  variablesString: boolean;
+  variablesNumber: boolean;
+  variablesBoolean: boolean;
+  stylesColor: boolean;
+  stylesTypography: boolean;
+  stylesEffect: boolean;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   scopeVariablesByTokenType?: boolean;
@@ -73,6 +80,13 @@ export const settings = createModel<RootModel>()({
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
     storeTokenIdInJsonEditor: false,
+    variablesColor: true,
+    variablesString: true,
+    variablesNumber: true,
+    variablesBoolean: true,
+    stylesColor: true,
+    stylesTypography: true,
+    stylesEffect: true,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -210,6 +224,48 @@ export const settings = createModel<RootModel>()({
         storeTokenIdInJsonEditor: payload,
       };
     },
+    setVariablesColor(state, payload: boolean) {
+      return {
+        ...state,
+        variablesColor: payload,
+      };
+    },
+    setVariablesString(state, payload: boolean) {
+      return {
+        ...state,
+        variablesString: payload,
+      };
+    },
+    setVariablesNumber(state, payload: boolean) {
+      return {
+        ...state,
+        variablesNumber: payload,
+      };
+    },
+    setVariablesBoolean(state, payload: boolean) {
+      return {
+        ...state,
+        variablesBoolean: payload,
+      };
+    },
+    setStylesColor(state, payload: boolean) {
+      return {
+        ...state,
+        stylesColor: payload,
+      };
+    },
+    setStylesTypography(state, payload: boolean) {
+      return {
+        ...state,
+        stylesTypography: payload,
+      };
+    },
+    setStylesEffect(state, payload: boolean) {
+      return {
+        ...state,
+        stylesEffect: payload,
+      };
+    }
   },
   effects: (dispatch) => ({
     setLanguage: (payload: string, rootState) => {

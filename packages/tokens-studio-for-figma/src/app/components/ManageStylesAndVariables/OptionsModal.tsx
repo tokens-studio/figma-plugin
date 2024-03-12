@@ -17,6 +17,13 @@ import {
   overwriteExistingStylesAndVariablesSelector,
   scopeVariablesByTokenTypeSelector,
   prefixStylesWithThemeNameSelector,
+  variablesColorSelector,
+  variablesNumberSelector,
+  variablesBooleanSelector,
+  variablesStringSelector,
+  stylesColorSelector,
+  stylesEffectSelector,
+  stylesTypographySelector
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -45,17 +52,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
-
-  // TODO: This is the state that needs to be saved, it should be stored on the document.
-  // If a user cancels this dialog, the state should be reverted to the last saved state.
-  const [variablesColor, setVariablesColor] = React.useState(true);
-  const [variablesString, setVariablesString] = React.useState(true);
-  const [variablesNumber, setVariablesNumber] = React.useState(true);
-  const [variablesBoolean, setVariablesBoolean] = React.useState(true);
-
-  const [stylesColor, setStylesColor] = React.useState(true);
-  const [stylesTypography, setStylesTypography] = React.useState(true);
-  const [stylesEffect, setStylesEffect] = React.useState(true);
+  const variablesColor = useSelector(variablesColorSelector);
+  const variablesNumber = useSelector(variablesNumberSelector);
+  const variablesBoolean = useSelector(variablesBooleanSelector);
+  const variablesString = useSelector(variablesStringSelector);
+  const stylesColor = useSelector(stylesColorSelector);
+  const stylesEffect = useSelector(stylesEffectSelector);
+  const stylesTypography = useSelector(stylesTypographySelector);
 
   const exportOptions: ExportOptions = {
     variablesColor,
@@ -103,51 +106,51 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
-      setVariablesColor(!!state);
+      dispatch.settings.setVariablesColor(!!state);
     },
     [],
   );
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
-      setVariablesNumber(!!state);
+      dispatch.settings.setVariablesNumber(!!state);
     },
     [],
   );
   const handleExportVariablesBoolean = React.useCallback(
     (state: CheckedState) => {
-      setVariablesBoolean(!!state);
+      dispatch.settings.setVariablesBoolean(!!state);
     },
     [],
   );
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
-      setVariablesString(!!state);
+      dispatch.settings.setVariablesString(!!state);
     },
     [],
   );
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
-      setStylesColor(!!state);
+      dispatch.settings.setStylesColor(!!state);
     },
     [],
   );
   const handleExportStylesTypography = React.useCallback(
     (state: CheckedState) => {
-      setStylesTypography(!!state);
+      dispatch.settings.setStylesTypography(!!state);
     },
     [],
   );
   const handleExportStylesEffect = React.useCallback(
     (state: CheckedState) => {
-      setStylesEffect(!!state);
+      dispatch.settings.setStylesEffect(!!state);
     },
     [],
   );
 
   const handleSaveOptions = React.useCallback(() => {
-    alert('TODO: Save options');
-  }, []);
+    console.log('exportOptions: ', exportOptions);
+  }, [exportOptions]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
