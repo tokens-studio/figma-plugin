@@ -35,9 +35,9 @@ jobs:
           method: jwt
           namespace: admin
           secrets: |
-           ${{ vars.TECHDOCS_VAULT_PATH }}  access_key | AWS_ACCESS_KEY_ID ;
-           ${{ vars.TECHDOCS_VAULT_PATH }}  secret_key | AWS_SECRET_ACCESS_KEY ;
-           ${{ vars.TECHDOCS_VAULT_PATH }}  security_token | AWS_SESSION_TOKEN ;
+            aws/${{ inputs.environment  || 'dev' }}/creds/${{ vars.STUDIO_DEPLOY_ROLE }} access_key | AWS_ACCESS_KEY_ID ;
+            aws/${{ inputs.environment  || 'dev' }}/creds/${{ vars.STUDIO_DEPLOY_ROLE }} secret_key | AWS_SECRET_ACCESS_KEY ;
+            aws/${{ inputs.environment  || 'dev' }}/creds/${{ vars.STUDIO_DEPLOY_ROLE }} security_token |  AWS_SESSION_TOKEN;
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
