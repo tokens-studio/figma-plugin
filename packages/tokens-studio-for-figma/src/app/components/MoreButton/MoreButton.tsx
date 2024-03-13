@@ -132,8 +132,10 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
     [properties, handleClick, handleEditClick, editProhibited],
   );
 
+
   return (
     <ContextMenu>
+
       <ContextMenu.Trigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
@@ -147,16 +149,18 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
                   <ChevronRightIcon />
                 </RightSlot>
               </ContextMenu.SubTrigger>
-              <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-                {property.childProperties.map((childProperty) => (
-                  <MoreButtonProperty
-                    key={childProperty.name}
-                    value={token.name}
-                    property={childProperty}
-                    onClick={handleClick}
-                  />
-                ))}
-              </ContextMenu.Content>
+              <ContextMenu.Portal>
+                <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+                  {property.childProperties.map((childProperty) => (
+                    <MoreButtonProperty
+                      key={childProperty.name}
+                      value={token.name}
+                      property={childProperty}
+                      onClick={handleClick}
+                    />
+                  ))}
+                </ContextMenu.SubContent>
+              </ContextMenu.Portal>
             </ContextMenu.Sub>
           ) : (
             <MoreButtonProperty
@@ -174,11 +178,11 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
                 <ChevronRightIcon />
               </RightSlot>
             </ContextMenu.SubTrigger>
-            <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-              {DocumentationProperties.map((property) => (
-                <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
-              ))}
-            </ContextMenu.Content>
+            <ContextMenu.Portal>
+              <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+                {DocumentationProperties.map((property) => <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />)}
+              </ContextMenu.SubContent>
+            </ContextMenu.Portal>
           </ContextMenu.Sub>
           <ContextMenu.Separator />
           <ContextMenu.Item onSelect={handleEditClick} disabled={editProhibited}>
