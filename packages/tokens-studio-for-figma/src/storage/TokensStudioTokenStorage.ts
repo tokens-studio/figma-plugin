@@ -1,16 +1,34 @@
 import {
   Graphql,
   Configuration,
+  CreateTokenMutation,
+  UpdateTokenMutation,
+  DeleteTokenMutation,
   TokenSetsQuery,
   RawToken,
   Raw_Token_border,
   Raw_Token_boxShadow,
 } from '@tokens-studio/sdk';
+import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import { notifyToUI } from '@/plugin/notifiers';
+import {
+  RemoteTokenStorage,
+  RemoteTokenstorageErrorMessage,
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
+} from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
+import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+import {
+  GET_TOKENS_QUERY,
+  CREATE_TOKEN_MUTATION,
+  UPDATE_TOKEN_MUTATION,
+  DELETE_TOKEN_MUTATION,
+} from './tokensStudio/graphql';
+import { track } from '@/utils/analytics';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -20,6 +38,7 @@ interface Token {
   description?: string | null | undefined;
   type: string | null | undefined;
   value: any;
+  $extensions?: SingleToken['$extensions'];
 }
 
 const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([key, v]) => v !== null));
@@ -31,6 +50,9 @@ const tsToToken = (raw: RawToken) => {
   const combined: Token = {
     type: raw.type,
     value: null,
+    $extensions: {
+      id: raw.urn!,
+    },
   };
 
   if (raw.description) {
@@ -39,7 +61,7 @@ const tsToToken = (raw: RawToken) => {
 
   if (raw.extensions) {
     // @ts-ignore
-    combined.$extensions = JSON.parse(raw.extensions);
+    combined.$extensions = deepmerge(JSON.parse(raw.extensions), combined.$extensions);
   }
 
   // @ts-ignore
@@ -61,91 +83,41 @@ const tsToToken = (raw: RawToken) => {
   return combined;
 };
 
-async function getTokens(urn: string): Promise<AnyTokenSet | null> {
+type TokensData = {
+  tokens: AnyTokenSet | null | undefined;
+  tokenSets: {
+    [tokenSetName: string]: { id: string };
+  };
+} | null;
+
+async function getTokens(urn: string): Promise<TokensData> {
   try {
     const data = await Graphql.exec<TokenSetsQuery>(
-      Graphql.op(
-        `query TokenSets(
-    $filter: TokenSetsFilterInput
-    $limit: Int
-    $offset: Int
-    $project: String!
-) {
-    tokenSets(
-    filter: $filter
-    limit: $limit
-    offset: $offset
-    project: $project
-    ) {
-    urn
-    name
-    projectUrn
-    tokens(limit: 400) {
-      description
-      name
-      urn
-      extensions
-      setUrn
-      type
-      value {
-        ... on Raw_Token_scalar {
-            value
-        }
-        ... on Raw_Token_typography {
-          value
-          typography {
-            textDecoration
-            textCase
-            lineHeight
-            letterSpacing
-            fontSize
-            fontFamily
-            fontWeight
-            paragraphIndent
-            paragraphSpacing
-          }
-        }
-        ... on Raw_Token_border {
-            border {
-              width
-              style
-              color
-            }
-        }
-        ... on Raw_Token_boxShadow {
-            boxShadow {
-              x
-              y
-              blur
-              spread
-              color
-              type
-            }
-        }
-      }
-    }
-  }
-}`,
-        {
-          limit: 500,
-          project: urn,
-        },
-      ),
+      Graphql.op(GET_TOKENS_QUERY, {
+        limit: 500,
+        project: urn,
+      }),
     );
 
     if (!data.data) {
       return null;
     }
 
-    const returnData: Record<string, SingleToken<true>> = data.data.tokenSets.reduce((acc, tokenSet) => {
-      if (!tokenSet.name) return acc;
-      acc[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
-      // We know that name exists (required field)
-        tokenSetAcc[token.name!] = tsToToken(token);
-        return tokenSetAcc;
-      }, {});
-      return acc;
-    }, {});
+    const returnData: TokensData = data.data.tokenSets.reduce(
+      (acc, tokenSet) => {
+        if (!tokenSet.name) return acc;
+        acc.tokens[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
+          // We know that name exists (required field)
+          tokenSetAcc[token.name!] = tsToToken(token);
+          return tokenSetAcc;
+        }, {});
+
+        acc.tokenSets[tokenSet.name] = { id: tokenSet.urn };
+
+        return acc;
+      },
+      { tokens: {}, tokenSets: {} },
+    );
     return returnData;
   } catch (e) {
     Sentry.captureException(e);
@@ -168,10 +140,16 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    let payload: AnyTokenSet | null = {};
+    let payload: AnyTokenSet | null | undefined = {};
+    const metadata: RemoteTokenStorageMetadata = {};
 
     try {
-      payload = await getTokens(this.id);
+      const tokensData = await getTokens(this.id);
+      payload = tokensData?.tokens;
+
+      if (tokensData?.tokenSets) {
+        metadata.tokenSetsData = tokensData?.tokenSets ?? {};
+      }
     } catch (error) {
       // We get errors in a slightly changed format from the backend
       if (payload?.errors) console.log('Error is', payload.errors[0].message);
@@ -187,6 +165,15 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         path: filename,
         data,
       }));
+
+      if (metadata) {
+        returnPayload.push({
+          type: 'metadata',
+          path: 'metadata',
+          data: metadata,
+        });
+      }
+
       return returnPayload;
     }
     return {
@@ -201,7 +188,120 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     saveOptions?: SaveOption | undefined,
   ): Promise<boolean> {
-    console.log('WRITE NOT IMPLEMENTED');
+    console.log('WRITE NOT IMPLEMENTED', files, saveOptions);
     return undefined as any;
+  }
+
+  public async push({
+    action,
+    data,
+    metadata,
+  }: {
+    action: TokensStudioAction;
+    data: any;
+    metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+  }) {
+    switch (action) {
+      case 'CREATE_TOKEN': {
+        try {
+          const setId = metadata?.[data.parent]?.id;
+
+          if (!setId) {
+            return null;
+          }
+
+          const responseData = await Graphql.exec<CreateTokenMutation>(
+            Graphql.op(CREATE_TOKEN_MUTATION, {
+              set: setId,
+              input: {
+                name: data.name,
+                type: data.type,
+                description: data.description,
+                value: data.value,
+                extensions: JSON.stringify(data.$extensions),
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create token in Tokens Studio');
+          notifyToUI('Token pushed to Tokens Studio', { error: false });
+
+          return responseData.data.createToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating token in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'EDIT_TOKEN': {
+        const tokenId = data.$extensions?.id;
+
+        if (!tokenId) {
+          console.error('No token ID found for token. Cannot update Tokens Studio', data);
+          return null;
+        }
+
+        try {
+          const responseData = await Graphql.exec<UpdateTokenMutation>(
+            Graphql.op(UPDATE_TOKEN_MUTATION, {
+              urn: tokenId,
+              input: {
+                name: data.name,
+                description: data.description,
+                value: data.value,
+                extensions: JSON.stringify(data.$extensions),
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Edit token in Tokens Studio');
+          notifyToUI('Token updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_TOKEN': {
+        if (!data.sourceId) {
+          console.error('No token ID found for token. Cannot remove from Tokens Studio', data);
+          return null;
+        }
+
+        try {
+          const responseData = await Graphql.exec<DeleteTokenMutation>(
+            Graphql.op(DELETE_TOKEN_MUTATION, {
+              urn: data.sourceId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete token from Tokens Studio');
+          notifyToUI('Token removed from Tokens Studio', { error: false });
+
+          return responseData.data.deleteToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error removing token from Tokens Studio', e);
+          return null;
+        }
+        break;
+      }
+      default:
+        throw new Error(`Unimplemented storage provider for ${action}`);
+    }
   }
 }

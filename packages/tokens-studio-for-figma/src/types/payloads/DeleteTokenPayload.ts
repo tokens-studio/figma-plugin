@@ -4,4 +4,5 @@ export type DeleteTokenPayload = {
   parent: string;
   path: string;
   type?: TokenTypes;
+  sourceId?: string;
 };
