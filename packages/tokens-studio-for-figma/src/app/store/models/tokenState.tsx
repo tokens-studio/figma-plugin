@@ -46,6 +46,7 @@ import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormat
 import { ColorModifier } from '@/types/Modifier';
 import { pushToTokensStudio } from '../providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
+import { createTokenInTokensStudio } from '@/storage/tokensStudio/createTokenInTokensStudio';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -281,14 +282,14 @@ export const tokenState = createModel<RootModel>()({
             existingTokens.splice(existingTokenIndex + 1, 0, {
               ...omit(state.tokens[tokenSet][existingTokenIndex], 'description', '$extensions'),
               ...updateTokenPayloadToSingleToken({
-                  parent: data.parent,
-                  name: data.newName,
-                  type: data.type,
-                  value: data.value,
-                  description: data.description,
-                  oldName: data.oldName,
-                  $extensions: data.$extensions,
-                } as UpdateTokenPayload, uuidv4()),
+                parent: data.parent,
+                name: data.newName,
+                type: data.type,
+                value: data.value,
+                description: data.description,
+                oldName: data.oldName,
+                $extensions: data.$extensions,
+              } as UpdateTokenPayload, uuidv4()),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
@@ -296,12 +297,12 @@ export const tokenState = createModel<RootModel>()({
           const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
           if (existingTokenIndex < 0) {
             const newToken = updateTokenPayloadToSingleToken({
-                name: data.newName,
-                type: data.type,
-                value: data.value,
-                description: data.description,
-                $extensions: data.$extensions,
-              } as UpdateTokenPayload, uuidv4());
+              name: data.newName,
+              type: data.type,
+              value: data.value,
+              description: data.description,
+              $extensions: data.$extensions,
+            } as UpdateTokenPayload, uuidv4());
             newTokens[tokenSet] = [
               ...state.tokens[tokenSet], newToken as SingleToken,
             ];
@@ -494,28 +495,28 @@ export const tokenState = createModel<RootModel>()({
     updateAliases: (state, data: TokenToRename) => {
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
         (acc, [key, values]) => {
-        const newValues = values.map<SingleToken>((token) => {
-          if (Array.isArray(token.value)) {
-            return {
-              ...token,
-              value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+          const newValues = values.map<SingleToken>((token) => {
+            if (Array.isArray(token.value)) {
+              return {
+                ...token,
+                value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
                   a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
                   return a;
                 }, {})),
-            } as SingleToken;
-          }
-          if (typeof token.value === 'object') {
-            return {
-              ...token,
-              value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
-                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                return a;
-              }, {}),
-            } as SingleToken;
-          }
+              } as SingleToken;
+            }
+            if (typeof token.value === 'object') {
+              return {
+                ...token,
+                value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
+                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+                  return a;
+                }, {}),
+              } as SingleToken;
+            }
 
-          if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens']?.modify && token.$extensions?.['studio.tokens'].modify.value) {
-            const updatedModify = Object.entries(token.$extensions?.['studio.tokens'].modify).reduce<ColorModifier>((modify, [key, value]: string[]) => {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens']?.modify && token.$extensions?.['studio.tokens'].modify.value) {
+              const updatedModify = Object.entries(token.$extensions?.['studio.tokens'].modify).reduce<ColorModifier>((modify, [key, value]: string[]) => {
                 modify = {
                   ...modify,
                   [key]: value.replace(data.oldName, data.newName),
@@ -523,29 +524,29 @@ export const tokenState = createModel<RootModel>()({
                 return modify;
               }, {} as ColorModifier);
 
-            return {
-              ...token,
-              $extensions: {
-                ...token.$extensions,
-                'studio.tokens': {
-                  ...token.$extensions['studio.tokens'],
-                  modify: {
-                    ...updatedModify,
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...updatedModify,
+                    },
                   },
                 },
-              },
+              } as SingleToken;
+            }
+
+            return {
+              ...token,
+              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
             } as SingleToken;
-          }
+          });
 
-          return {
-            ...token,
-            value: replaceReferences(token.value.toString(), data.oldName, data.newName),
-          } as SingleToken;
-        });
-
-        acc[key] = newValues;
-        return acc;
-      },
+          acc[key] = newValues;
+          return acc;
+        },
         {},
       );
 
@@ -558,29 +559,29 @@ export const tokenState = createModel<RootModel>()({
       const [oldName, newName] = data;
       const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
         (acc, [key, values]) => {
-        const newValues = values.map<SingleToken>((token) => {
-          if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
-            return {
-              ...token,
-              $extensions: {
-                ...token.$extensions,
-                'studio.tokens': {
-                  ...token.$extensions['studio.tokens'],
-                  modify: {
-                    ...token.$extensions['studio.tokens'].modify,
-                    value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
+          const newValues = values.map<SingleToken>((token) => {
+            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
+              return {
+                ...token,
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...token.$extensions['studio.tokens'],
+                    modify: {
+                      ...token.$extensions['studio.tokens'].modify,
+                      value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
+                    },
                   },
                 },
-              },
-            } as SingleToken;
-          }
+              } as SingleToken;
+            }
 
-          return token;
-        });
+            return token;
+          });
 
-        acc[key] = newValues;
-        return acc;
-      },
+          acc[key] = newValues;
+          return acc;
+        },
         {},
       );
 
@@ -732,24 +733,15 @@ export const tokenState = createModel<RootModel>()({
     duplicateToken() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    async createToken(payload: UpdateTokenPayload, rootState) {
+    createToken(payload: UpdateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        const token = await pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'CREATE_TOKEN',
-          data: payload,
-          metadata: rootState.tokenState.tokenSetMetadata,
+        createTokenInTokensStudio({
+          rootState,
+          payload,
+          onTokenCreated: dispatch.tokenState.editToken,
         });
-
-        if (token?.urn) {
-          dispatch.tokenState.editToken({
-            ...payload,
-            $extensions: deepmerge(payload.$extensions, { id: token.urn }),
-            shouldUpdate: false,
-          });
-        }
       }
     },
     setTokenFormat(payload: TokenFormatOptions) {
@@ -762,8 +754,8 @@ export const tokenState = createModel<RootModel>()({
 
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
       tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
-          dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
-        });
+        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
+      });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
@@ -780,38 +772,38 @@ export const tokenState = createModel<RootModel>()({
       const params = { ...defaults, ...options };
       try {
         wrapTransaction({
-            name: 'updateDocument',
-            statExtractor: (result, transaction) => {
-              transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
-                  acc += tokens.length;
-                  return acc;
-                }, 0), '');
-              transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
-              transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
-            },
-          }, () => {
-            updateTokensOnSources({
-              tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-              tokenValues: rootState.tokenState.tokens,
-              usedTokenSet: rootState.tokenState.usedTokenSet,
-              themes: rootState.tokenState.themes,
-              activeTheme: rootState.tokenState.activeTheme,
-              settings: rootState.settings,
-              updatedAt: new Date().toISOString(),
-              lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
-              isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-              editProhibited: rootState.tokenState.editProhibited,
-              api: rootState.uiState.api,
-              storageType: rootState.uiState.storageType,
-              shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-              checkForChanges: rootState.tokenState.checkForChanges,
-              shouldSwapStyles: rootState.settings.shouldSwapStyles,
-              collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
-              storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
-              dispatch,
-              tokenFormat: rootState.tokenState.tokenFormat,
-            });
+          name: 'updateDocument',
+          statExtractor: (result, transaction) => {
+            transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
+              acc += tokens.length;
+              return acc;
+            }, 0), '');
+            transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
+            transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+          },
+        }, () => {
+          updateTokensOnSources({
+            tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
+            tokenValues: rootState.tokenState.tokens,
+            usedTokenSet: rootState.tokenState.usedTokenSet,
+            themes: rootState.tokenState.themes,
+            activeTheme: rootState.tokenState.activeTheme,
+            settings: rootState.settings,
+            updatedAt: new Date().toISOString(),
+            lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
+            isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+            editProhibited: rootState.tokenState.editProhibited,
+            api: rootState.uiState.api,
+            storageType: rootState.uiState.storageType,
+            shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+            checkForChanges: rootState.tokenState.checkForChanges,
+            shouldSwapStyles: rootState.settings.shouldSwapStyles,
+            collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+            storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
+            dispatch,
+            tokenFormat: rootState.tokenState.tokenFormat,
           });
+        });
       } catch (e) {
         console.error('Error updating document', e);
       }

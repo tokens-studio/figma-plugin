@@ -27,7 +27,8 @@ import {
   CREATE_TOKEN_MUTATION,
   UPDATE_TOKEN_MUTATION,
   DELETE_TOKEN_MUTATION,
-} from './tokensStudio';
+} from './tokensStudio/graphql';
+import { track } from '@/utils/analytics';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -226,6 +227,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
+          track('Create token in Tokens Studio', { token: data });
           notifyToUI('Token pushed to Tokens Studio', { error: false });
 
           return responseData.data.createToken;
@@ -260,6 +262,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
+          track('Edit token in Tokens Studio', { token: data });
           notifyToUI('Token updated in Tokens Studio', { error: false });
 
           return responseData.data.updateToken;
@@ -286,6 +289,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
+          track('Delete token from Tokens Studio', { token: data });
           notifyToUI('Token removed from Tokens Studio', { error: false });
 
           return responseData.data.deleteToken;
