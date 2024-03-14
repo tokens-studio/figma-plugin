@@ -227,7 +227,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Create token in Tokens Studio', { token: data });
+          track('Create token in Tokens Studio');
           notifyToUI('Token pushed to Tokens Studio', { error: false });
 
           return responseData.data.createToken;
@@ -262,7 +262,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Edit token in Tokens Studio', { token: data });
+          track('Edit token in Tokens Studio');
           notifyToUI('Token updated in Tokens Studio', { error: false });
 
           return responseData.data.updateToken;
@@ -289,7 +289,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Delete token from Tokens Studio', { token: data });
+          track('Delete token from Tokens Studio');
           notifyToUI('Token removed from Tokens Studio', { error: false });
 
           return responseData.data.deleteToken;
