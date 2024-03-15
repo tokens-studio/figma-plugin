@@ -17,6 +17,32 @@ const singleShadowToken = {
 const multipleShadowToken = {
   type: TokenTypes.BOX_SHADOW,
   description: 'the one with multiple shadow',
+  resolvedValueWithReferences: [
+    {
+      type: 'dropShadow',
+      color: 'rgba({colors.red.500}, 0.5)',
+      x: 0,
+      y: 0,
+      blur: 2,
+      spread: 4,
+    },
+    {
+      type: 'dropShadow',
+      color: '{theme.accent.subtle}',
+      x: 0,
+      y: 4,
+      blur: 4,
+      spread: 4,
+    },
+    {
+      type: 'dropShadow',
+      color: '#000000',
+      x: 0,
+      y: 8,
+      blur: 16,
+      spread: 4,
+    },
+  ],
   value: [
     {
       type: 'dropShadow',
@@ -489,6 +515,7 @@ const output = [
     failedToResolve: true,
     name: 'shadow.unResolvedMultiple',
     rawValue: unResolvedMultipleShadowToken.value,
+    resolvedValueWithReferences: unResolvedMultipleShadowToken.value,
     value: [
       {
         ...unResolvedMultipleShadowToken.value[0],

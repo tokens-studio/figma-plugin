@@ -1,35 +1,24 @@
-import { convertTokenNameToPath } from '@/utils/convertTokenNameToPath';
-import { matchStyleName } from '@/utils/matchStyleName';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { paintStyleMatchesColorToken } from './figmaUtils/styleMatchers';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
-import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 type Props = {
   data: string;
   value: string;
   node: BaseNode;
-  stylePathPrefix: string | null;
-  stylePathSlice: number;
-  styleReferences: Record<string, string>;
-  paintStyles: Map<string, EffectStyle | PaintStyle | TextStyle>
-  figmaVariableReferences: RawVariableReferenceMap,
 };
 
 export async function setBorderColorValuesOnTarget({
-  data, value, node, stylePathPrefix = null, stylePathSlice, styleReferences, paintStyles, figmaVariableReferences,
+  data, value, node,
 }: Props) {
   if ('strokes' in node) {
-    if (!(await tryApplyColorVariableId(node, data, figmaVariableReferences, ColorPaintType.STROKES))) {
-      const pathname = convertTokenNameToPath(data, stylePathPrefix, stylePathSlice);
-      let matchingStyleId = matchStyleName(
-        data,
-        pathname,
-        styleReferences,
-        paintStyles,
-      );
+    if (!(await tryApplyColorVariableId(node, data, ColorPaintType.STROKES))) {
+      const resolvedToken = defaultTokenValueRetriever.get(data);
+      if (!resolvedToken) return;
+      let matchingStyleId = resolvedToken?.styleId;
 
       if (!matchingStyleId) {
         // Local style not found - look for matching non-local style:
@@ -40,7 +29,7 @@ export async function setBorderColorValuesOnTarget({
             // Non-local style matches - use this and clear style id backup:
             matchingStyleId = nonLocalStyle.id;
             clearStyleIdBackup(node, styleIdBackupKey);
-          } else if (pathname === nonLocalStyle.name) {
+          } else if (resolvedToken?.adjustedTokenName === nonLocalStyle.name) {
             // Non-local style does NOT match, but style name and token path does,
             // so we assume selected token value is an override (e.g. dark theme)
             // Now backup up style id before overwriting with raw token value, so we

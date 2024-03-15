@@ -17,6 +17,7 @@ import {
   uiStateSelector,
   updateModeSelector,
   usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -34,6 +35,7 @@ import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { theme } from '@/stitches.config';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -64,6 +66,7 @@ export default function useTokens() {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
@@ -491,13 +494,18 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const createVariablesFromSets = useCallback(async () => {
+  const createVariablesFromSets = useCallback(async (selectedSets: string[]) => {
     track('createVariables');
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
     });
-    const multiValueFilteredTokens = filterMultiValueTokens();
+    const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      if (selectedSets.includes(tokenSetKey)) {
+        tempTokens[tokenSetKey] = tokenList;
+      }
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
     const createVariableResult = await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
@@ -508,8 +516,31 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: multiValueFilteredTokens,
+      tokens: selectedSetsTokens,
       settings,
+    }));
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
+  const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      tokens: tokens,
+      settings,
+      selectedThemes
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -586,6 +617,7 @@ export default function useTokens() {
     createVariables,
     createVariablesFromSets,
     renameVariablesFromToken,
+    createVariablesFromThemes,
     syncVariables,
     updateVariablesFromToken,
     filterMultiValueTokens,
@@ -611,6 +643,7 @@ export default function useTokens() {
     handleJSONUpdate,
     createVariables,
     createVariablesFromSets,
+    createVariablesFromThemes,
     renameVariablesFromToken,
     syncVariables,
     updateVariablesFromToken,

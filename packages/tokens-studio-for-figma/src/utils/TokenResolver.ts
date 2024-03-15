@@ -11,11 +11,11 @@ import { getPathName } from './getPathName';
 import { ResolveTokenValuesResult } from './tokenHelpers';
 
 class TokenResolver {
-  private tokens: SingleToken[];
+  public tokens: SingleToken[];
 
-  private tokenMap: TokenMap;
+  public tokenMap: TokenMap;
 
-  private memo: Map<string, ResolveTokenValuesResult>;
+  public memo: Map<string, ResolveTokenValuesResult>;
 
   constructor(tokens: SingleToken[]) {
     this.tokens = tokens;
@@ -109,7 +109,7 @@ class TokenResolver {
     return token.value;
   }
 
-  private resolveReferences(token: SingleToken, resolvedReferences: Set<string> = new Set()): ResolveTokenValuesResult {
+  public resolveReferences(token: SingleToken, resolvedReferences: Set<string> = new Set()): ResolveTokenValuesResult {
     // We use the name as the memo key, if it exists
     const memoKey = token.name || undefined;
 
@@ -179,7 +179,7 @@ class TokenResolver {
 
         if (foundToken) {
           // For composite tokens that are being referenced, we need to store the value of the found token so that we have something between raw value of a string and the final resolved token
-          if (typeof token.value === 'string' && typeof foundToken.value === 'object') {
+          if (typeof token.value === 'string' && (typeof foundToken.value === 'object' || Array.isArray(foundToken.value))) {
             resolvedValueWithReferences = foundToken.value;
           }
           // We add the already resolved references to the new set, so we can check for circular references
@@ -281,6 +281,8 @@ class TokenResolver {
         this.memo.set(memoKey, resolvedToken);
       }
 
+      resolvedToken.resolvedValueWithReferences = token.value;
+
       return resolvedToken;
     }
 
@@ -319,6 +321,10 @@ class TokenResolver {
     }
 
     return token;
+  }
+
+  public get(tokenName: string): SingleToken | undefined {
+    return this.tokenMap.get(tokenName);
   }
 }
 

@@ -2,10 +2,17 @@ import updateEffectStyles from '../updateEffectStyles';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mockCreateEffectStyle, mockGetLocalEffectStyles } from '../../../tests/__mocks__/figmaMock';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
+import { SingleBoxShadowToken } from '@/types/tokens';
+
+type ExtendedShadowTokenArray = SingleBoxShadowToken<true, { path: string; styleId: string }>[];
 
 describe('updateEffectStyles', () => {
+  afterEach(() => {
+    defaultTokenValueRetriever.clearCache();
+  });
   const baseFontSize = '16';
-  it('Can create styles', () => {
+  it('Can create styles', async () => {
     const createdStyle = {
       id: '1234',
       name: 'shadows/lg',
@@ -13,24 +20,33 @@ describe('updateEffectStyles', () => {
     };
     mockCreateEffectStyle.mockImplementationOnce(() => createdStyle);
 
-    updateEffectStyles(
-      [{
-        name: 'shadows.lg',
-        value: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
-          color: '#000000',
-        },
-        type: TokenTypes.BOX_SHADOW,
-        path: 'shadows/lg',
-        styleId: '',
-      }],
+    const tokenValue = {
+      type: BoxShadowTypes.DROP_SHADOW,
+      x: 0,
+      y: 0,
+      blur: 10,
+      spread: 0,
+      color: '#000000',
+    };
+
+    const existingTokens: ExtendedShadowTokenArray = [{
+      name: 'shadows.lg',
+      value: tokenValue,
+      resolvedValueWithReferences: tokenValue,
+      type: TokenTypes.BOX_SHADOW,
+      path: 'shadows/lg',
+      styleId: '',
+    }];
+
+    defaultTokenValueRetriever.initiate({
+      tokens: existingTokens,
+    });
+
+    await updateEffectStyles({
+      effectTokens: existingTokens,
       baseFontSize,
-      true,
-    );
+      shouldCreate: true,
+    });
 
     expect(createdStyle.effects).toEqual([
       {
@@ -48,7 +64,7 @@ describe('updateEffectStyles', () => {
     ]);
   });
 
-  it('Can find style by styleId and update an existing style', () => {
+  it('Can find style by styleId and update an existing style', async () => {
     const existingStyles = [
       {
         type: 'EFFECT',
@@ -71,24 +87,33 @@ describe('updateEffectStyles', () => {
     ];
     mockGetLocalEffectStyles.mockImplementation(() => existingStyles);
 
-    updateEffectStyles(
-      [{
-        name: 'shadows.lg',
-        value: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          x: 0,
-          y: 0,
-          blur: 100,
-          spread: 0,
-          color: '#000000',
-        },
-        type: TokenTypes.BOX_SHADOW,
-        path: 'shadows/lg',
-        styleId: '1234',
-      }],
+    const tokenValue = {
+      type: BoxShadowTypes.DROP_SHADOW,
+      x: 0,
+      y: 0,
+      blur: 100,
+      spread: 0,
+      color: '#000000',
+    };
+
+    const existingTokens: ExtendedShadowTokenArray = [{
+      name: 'shadows.lg',
+      value: tokenValue,
+      resolvedValueWithReferences: tokenValue,
+      type: TokenTypes.BOX_SHADOW,
+      path: 'shadows/lg',
+      styleId: '1234',
+    }];
+
+    defaultTokenValueRetriever.initiate({
+      tokens: existingTokens,
+    });
+
+    await updateEffectStyles({
+      effectTokens: existingTokens,
       baseFontSize,
-      true,
-    );
+      shouldCreate: true,
+    });
 
     expect(existingStyles[0].effects).toEqual([
       {
@@ -106,7 +131,24 @@ describe('updateEffectStyles', () => {
     ]);
   });
 
-  it('Can find style by name and update an existing style', () => {
+  it('Can find style by name and update an existing style', async () => {
+    const tokenValue = {
+      type: BoxShadowTypes.DROP_SHADOW,
+      x: 0,
+      y: 0,
+      blur: 100,
+      spread: 0,
+      color: '#000000',
+    };
+    const existingTokens: ExtendedShadowTokenArray = [{
+      name: 'shadows.lg',
+      value: tokenValue,
+      resolvedValueWithReferences: tokenValue,
+      type: TokenTypes.BOX_SHADOW,
+      path: 'shadows/lg',
+      styleId: '',
+    }];
+
     const existingStyles = [
       {
         type: 'EFFECT',
@@ -127,26 +169,19 @@ describe('updateEffectStyles', () => {
         }],
       },
     ];
+
+    defaultTokenValueRetriever.initiate({
+      tokens: existingTokens,
+      styleReferences: new Map([['shadows/lg', '1234']]),
+    });
+
     mockGetLocalEffectStyles.mockImplementation(() => existingStyles);
 
-    updateEffectStyles(
-      [{
-        name: 'shadows.lg',
-        value: {
-          type: BoxShadowTypes.DROP_SHADOW,
-          x: 0,
-          y: 0,
-          blur: 100,
-          spread: 0,
-          color: '#000000',
-        },
-        type: TokenTypes.BOX_SHADOW,
-        path: 'shadows/lg',
-        styleId: '',
-      }],
+    await updateEffectStyles({
+      effectTokens: existingTokens,
       baseFontSize,
-      true,
-    );
+      shouldCreate: true,
+    });
 
     expect(existingStyles[0].effects).toEqual([
       {
