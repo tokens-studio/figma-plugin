@@ -507,7 +507,7 @@ export default function useTokens() {
         }
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
       tokens: multiValueFilteredTokens,
       settings,
     }));

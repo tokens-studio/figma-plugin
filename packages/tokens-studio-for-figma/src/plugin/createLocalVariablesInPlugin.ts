@@ -20,6 +20,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   });
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
+  console.log('themeInfo: ', themeInfo);
   themeInfo.themes.forEach((theme) => {
     const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
     if (collection) {
