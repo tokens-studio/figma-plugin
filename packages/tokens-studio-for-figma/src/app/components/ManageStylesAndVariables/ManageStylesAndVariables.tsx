@@ -101,7 +101,7 @@ export default function ManageStylesAndVariables() {
       >
         <Tabs defaultValue="useThemes">
           <Tabs.List>
-            <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
+            <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')} disabled={!isPro}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
