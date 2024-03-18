@@ -15,12 +15,16 @@ import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
 
-export default function ManageStylesAndVariables() {
+export default function ManageStylesAndVariables({ isOpen }: { isOpen: boolean }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
 
-  const [showModal, setShowModal] = React.useState(false);
-
   const isPro = useIsProUser();
+
+  const [showModal, setShowModal] = React.useState(isOpen);
+
+  useEffect(() => {
+    setShowModal(isOpen);
+  }, [isOpen]);
 
   const [showOptions, setShowOptions] = React.useState(false);
 
@@ -47,15 +51,12 @@ export default function ManageStylesAndVariables() {
     setCanExportToFigma(selectedThemes.length > 0);
   }, [selectedThemes]);
 
-  const handleOpen = React.useCallback(() => {
-    setShowModal(true);
-  }, []);
-
   const handleClose = React.useCallback(() => {
     if (showOptions) {
       setShowOptions(false);
     } else {
       setShowModal(false);
+      isOpenRef.current = false;
     }
   }, [setShowOptions, showOptions]);
 
@@ -87,7 +88,7 @@ export default function ManageStylesAndVariables() {
               </Button>
             </Stack>
           </Stack>
-  )}
+        )}
         stickyFooter
       >
         <Tabs defaultValue="useThemes">
@@ -102,10 +103,6 @@ export default function ManageStylesAndVariables() {
           <ExportSetsTab />
         </Tabs>
       </Modal>
-
-      <Button variant="secondary" size="small" onClick={handleOpen}>
-        {t('buttonLabel')}
-      </Button>
       <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
     </>
   );

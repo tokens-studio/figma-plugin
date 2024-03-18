@@ -22,6 +22,7 @@ export type ModalProps = {
   close: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
+  onOpenChange?: (open: boolean) => void; // I tried adding in custom onOpenChange handlers. but it didn't fire.
 };
 
 const StyledBody = styled('div', {
@@ -86,6 +87,7 @@ export function Modal({
   modal = true,
   backArrow = false,
   onInteractOutside,
+  onOpenChange,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -101,7 +103,7 @@ export function Modal({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOnOpenChange} modal={modal}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange || handleOnOpenChange} modal={modal}>
       <Dialog.Portal>
         <Dialog.Overlay />
         <Box
