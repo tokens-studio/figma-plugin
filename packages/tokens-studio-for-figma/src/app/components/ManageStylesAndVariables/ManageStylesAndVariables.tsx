@@ -99,7 +99,7 @@ export default function ManageStylesAndVariables() {
   )}
         stickyFooter
       >
-        <Tabs defaultValue="useThemes">
+        <Tabs defaultValue={isPro? 'useThemes': 'useSets'}>
           <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')} disabled={!isPro}>
               {t('tabs.exportThemes')}
