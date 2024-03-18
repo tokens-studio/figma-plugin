@@ -515,9 +515,10 @@ export default function useTokens() {
         }
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
       tokens: selectedSetsTokens,
       settings,
+      selectedSets
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);

@@ -40,6 +40,7 @@ export default function ManageStylesAndVariables() {
 
   const handleExportToFigma = React.useCallback(() => {
     if (activeTab === 'useSets') {
+      console.log('selectedSets: ', selectedSets);
       createVariablesFromSets(selectedSets);
     } else if (activeTab === 'useThemes') {
       createVariablesFromThemes(selectedThemes);

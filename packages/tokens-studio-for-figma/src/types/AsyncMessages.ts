@@ -290,7 +290,8 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
 
 export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   tokens: Record<string, AnyTokenList>;
-  settings: SettingsState
+  settings: SettingsState,
+  selectedSets: string[]
 }>;
 export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   variableIds: Record<string, LocalVariableInfo>
