@@ -23,7 +23,7 @@ export default function ManageStylesAndVariables() {
   const isPro = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>('useThemes');
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro? 'useThemes': 'useSets');
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
