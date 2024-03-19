@@ -5966,16 +5966,16 @@
   resolved "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.5.1.tgz"
   integrity sha512-UCcUKrUYGj7ClomOo2SpNVvx4/fkd/2BbIHDCle8A0ax+P3bU7yJwDBDrS6ZwdTMARWTGODX1hEsCcO+7beJjg==
 
-"@tokens-studio/sdk@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.0.0.tgz#7d6018c95794c1bb3c8ac622224129446283facc"
-  integrity sha512-x0q/DSuHhXSxBJ2lXw+JIBouVmEk5Nx+2zVQwxViOTfbKAZbbcky5IQozJ++0LifmR6yEOh4YM4yShlF+BCh9A==
+"@tokens-studio/sdk@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.2.tgz#6ac301ffee69b4e34faa06c1309c1770552c2447"
+  integrity sha512-MzvFsfouksoUKQEUTAnoFDMO6bY+GW9saIQKwwWJrczvlg98elrG3poP6I7CBeMIkI2dS2IC20fN1SeTQlwv1w==
   dependencies:
     "@aws-amplify/api" "^5.0.19"
     "@aws-amplify/auth" "^5.1.13"
     "@aws-amplify/core" "^5.1.2"
     "@aws-amplify/pubsub" "^5.1.2"
-    is-ci "^3.0.1"
+    "@tokens-studio/types" "^0.3.0"
   optionalDependencies:
     eslint "^8.31.0"
     prettier "^2.8.3"
@@ -5984,6 +5984,11 @@
   version "0.0.24"
   resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
   integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
+
+"@tokens-studio/types@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
+  integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
 "@tokens-studio/ui@0.5.2":
   version "0.5.2"
