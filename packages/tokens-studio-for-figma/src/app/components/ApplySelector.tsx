@@ -37,6 +37,7 @@ export default function ApplySelector() {
       <Button
         data-testid="update-button"
         variant="primary"
+        size="small"
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
@@ -55,7 +56,7 @@ export default function ApplySelector() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '$controlMedium',
+            width: '$controlSmall',
             borderLeft: '1px solid $borderSubtle',
             boxShadow: '$buttonPrimaryShadow',
             color: '$buttonPrimaryFg',
