@@ -132,18 +132,16 @@ const SyncSettings = () => {
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
           <Heading size="medium">{t('syncProviders')}</Heading>
-          {apiProviders.length > 0 && (
-            <Stack direction="column" gap={2} width="full" align="start">
-              <LocalStorageItem />
-              {apiProviders.map((item) => (
-                <StorageItem
-                  key={item?.internalId || `${item.provider}-${item.id}`}
-                  onEdit={handleEditClick(item)}
-                  item={item}
-                />
-              ))}
-            </Stack>
-          )}
+          <Stack direction="column" gap={2} width="full" align="start">
+            <LocalStorageItem />
+            {apiProviders.length > 0 && apiProviders.map((item) => (
+              <StorageItem
+                key={item?.internalId || `${item.provider}-${item.id}`}
+                onEdit={handleEditClick(item)}
+                item={item}
+              />
+            ))}
+          </Stack>
           <DropdownMenu>
             <DropdownMenu.Trigger asChild data-testid="add-storage-item-dropdown">
               <Button asDropdown>

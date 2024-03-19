@@ -74,7 +74,11 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
                 ))}
             </Stack>
           )
-          : renderBlankslate()}
+          : (
+            <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
+              {renderBlankslate()}
+            </Stack>
+          )}
       </Stack>
     </Box>
   );

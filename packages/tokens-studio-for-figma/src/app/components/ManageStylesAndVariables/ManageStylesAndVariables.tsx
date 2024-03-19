@@ -15,17 +15,15 @@ import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
 
-export default function ManageStylesAndVariables() {
+export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
-
-  const [showModal, setShowModal] = React.useState(false);
 
   const isPro = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(false);
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
-  const { ExportSetsTab, selectedSets } = useExportSetsTab();
+  const { ExportSetsTab } = useExportSetsTab();
   const { createVariablesFromThemes } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
@@ -39,7 +37,7 @@ export default function ManageStylesAndVariables() {
 
   const handleExportToFigma = React.useCallback(() => {
     createVariablesFromThemes(selectedThemes);
-  }, [selectedThemes, selectedSets]);
+  }, [createVariablesFromThemes, selectedThemes]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 
@@ -47,17 +45,13 @@ export default function ManageStylesAndVariables() {
     setCanExportToFigma(selectedThemes.length > 0);
   }, [selectedThemes]);
 
-  const handleOpen = React.useCallback(() => {
-    setShowModal(true);
-  }, []);
-
   const handleClose = React.useCallback(() => {
     if (showOptions) {
       setShowOptions(false);
     } else {
       setShowModal(false);
     }
-  }, [setShowOptions, showOptions]);
+  }, [setShowModal, showOptions]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
@@ -102,10 +96,6 @@ export default function ManageStylesAndVariables() {
           <ExportSetsTab />
         </Tabs>
       </Modal>
-
-      <Button variant="secondary" size="small" onClick={handleOpen}>
-        {t('buttonLabel')}
-      </Button>
       <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
     </>
   );

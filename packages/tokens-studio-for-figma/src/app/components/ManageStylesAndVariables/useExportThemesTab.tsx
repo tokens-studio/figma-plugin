@@ -97,12 +97,6 @@ export default function useExportThemesTab() {
                   {' – '}
                   {t('generic.themes')}
                 </Link>
-                <Box css={{
-                  alignSelf: 'flex-end',
-                }}
-                >
-                  <Button variant="secondary" size="small">{t('actions.createThemes')}</Button>
-                </Box>
               </>
             ) : (
               <>

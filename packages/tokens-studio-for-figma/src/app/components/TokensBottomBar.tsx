@@ -5,7 +5,6 @@ import { Button } from '@tokens-studio/ui';
 import ApplySelector from './ApplySelector';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
-import ManageStylesAndVariables from './ManageStylesAndVariables/ManageStylesAndVariables';
 import { hasUnsavedChangesSelector } from '@/selectors';
 import Stack from './Stack';
 import SettingsDropdown from './SettingsDropdown';
@@ -67,7 +66,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
           >
             <Stack direction="row" gap={1} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
               <ToolsDropdown />
-              <ManageStylesAndVariables />
+              <StylesDropdown />
             </Stack>
             <Stack direction="row" gap={1}>
               <ApplySelector />

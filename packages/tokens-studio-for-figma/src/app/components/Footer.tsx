@@ -57,8 +57,9 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
-  return (
+  console.log(localApiState, isGitProvider(localApiState), storageType.provider);
 
+  return (
     <Box
       css={{
         display: 'flex',
