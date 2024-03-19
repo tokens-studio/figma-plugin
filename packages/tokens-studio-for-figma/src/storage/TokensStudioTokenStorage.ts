@@ -8,6 +8,9 @@ import {
   RawToken,
   Raw_Token_border,
   Raw_Token_boxShadow,
+  CreateTokenSetMutation,
+  UpdateTokenSetMutation,
+  DeleteTokenSetMutation,
 } from '@tokens-studio/sdk';
 import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
@@ -27,6 +30,9 @@ import {
   CREATE_TOKEN_MUTATION,
   UPDATE_TOKEN_MUTATION,
   DELETE_TOKEN_MUTATION,
+  CREATE_TOKEN_SET_MUTATION,
+  UPDATE_TOKEN_SET_MUTATION,
+  DELETE_TOKEN_SET_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 
@@ -196,10 +202,12 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     action,
     data,
     metadata,
+    projectUrn,
   }: {
     action: TokensStudioAction;
     data: any;
     metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+    projectUrn?: string;
   }) {
     switch (action) {
       case 'CREATE_TOKEN': {
@@ -207,7 +215,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           const setId = metadata?.[data.parent]?.id;
 
           if (!setId) {
-            return null;
+            throw new Error('Invalid data');
           }
 
           const responseData = await Graphql.exec<CreateTokenMutation>(
@@ -241,8 +249,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         const tokenId = data.$extensions?.id;
 
         if (!tokenId) {
-          console.error('No token ID found for token. Cannot update Tokens Studio', data);
-          return null;
+          throw new Error('Invalid data');
         }
 
         try {
@@ -274,8 +281,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       }
       case 'DELETE_TOKEN': {
         if (!data.sourceId) {
-          console.error('No token ID found for token. Cannot remove from Tokens Studio', data);
-          return null;
+          throw new Error('Invalid data');
         }
 
         try {
@@ -298,7 +304,94 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           console.error('Error removing token from Tokens Studio', e);
           return null;
         }
-        break;
+      }
+      case 'CREATE_TOKEN_SET': {
+        try {
+          if (!data.name || !projectUrn) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<CreateTokenSetMutation>(
+            Graphql.op(CREATE_TOKEN_SET_MUTATION, {
+              project: projectUrn,
+              input: {
+                name: data.name,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create token set in Tokens Studio');
+          notifyToUI('Token set added in Tokens Studio', { error: false });
+
+          return responseData.data.createTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating token set in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_TOKEN_SET': {
+        try {
+          const setId = metadata?.[data.oldName]?.id;
+
+          if (!setId || !data.newName) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<UpdateTokenSetMutation>(
+            Graphql.op(UPDATE_TOKEN_SET_MUTATION, {
+              urn: setId,
+              input: {
+                name: data.newName,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update token set in Tokens Studio');
+          notifyToUI('Token set updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token set in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_TOKEN_SET': {
+        try {
+          const setId = metadata?.[data.name]?.id;
+
+          if (!setId) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<DeleteTokenSetMutation>(
+            Graphql.op(DELETE_TOKEN_SET_MUTATION, {
+              urn: setId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete token set in Tokens Studio');
+          notifyToUI('Token set deleted from Tokens Studio', { error: false });
+
+          return responseData.data.deleteTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error deleting token set in Tokens Studio', e);
+          return null;
+        }
       }
       default:
         throw new Error(`Unimplemented storage provider for ${action}`);

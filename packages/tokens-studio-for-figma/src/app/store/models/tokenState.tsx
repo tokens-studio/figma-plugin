@@ -46,7 +46,13 @@ import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormat
 import { ColorModifier } from '@/types/Modifier';
 import { pushToTokensStudio } from '../providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
-import { createTokenInTokensStudio } from '@/storage/tokensStudio/createTokenInTokensStudio';
+import {
+  createTokenInTokensStudio,
+  duplicateTokenInTokensStudio,
+  createTokenSetInTokensStudio,
+  updateTokenSetInTokensStudio,
+} from '@/storage/tokensStudio';
+import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -695,8 +701,16 @@ export const tokenState = createModel<RootModel>()({
     deleteTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    addTokenSet() {
+    addTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        createTokenSetInTokensStudio({
+          rootState,
+          name,
+          onTokenSetCreated: dispatch.tokenState.setTokenSetMetadata,
+        });
+      }
     },
     duplicateTokenSet() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -704,11 +718,27 @@ export const tokenState = createModel<RootModel>()({
     duplicateTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    renameTokenSet() {
+    renameTokenSet(data: { oldName: string, newName: string }, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        updateTokenSetInTokensStudio({
+          rootState,
+          data,
+          onTokenSetUpdated: dispatch.tokenState.setTokenSetMetadata,
+        });
+      }
     },
-    deleteTokenSet() {
+    deleteTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        deleteTokenSetFromTokensStudio({
+          rootState,
+          name,
+          onTokenSetDeleted: dispatch.tokenState.setTokenSetMetadata,
+        });
+      }
     },
     setTokenSetOrder() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
@@ -730,8 +760,16 @@ export const tokenState = createModel<RootModel>()({
     toggleTreatAsSource() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },
-    duplicateToken() {
+    duplicateToken(payload: DuplicateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      if (rootState.uiState.api.provider === StorageProviderType.TOKENS_STUDIO) {
+        duplicateTokenInTokensStudio({
+          rootState,
+          payload,
+          onTokenDuplicated: dispatch.tokenState.editToken,
+        });
+      }
     },
     createToken(payload: UpdateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });

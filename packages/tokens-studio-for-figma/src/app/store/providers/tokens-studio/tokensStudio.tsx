@@ -24,22 +24,30 @@ import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 
-export type TokensStudioAction = 'CREATE_TOKEN' | 'EDIT_TOKEN' | 'DELETE_TOKEN';
+export type TokensStudioAction =
+  | 'CREATE_TOKEN'
+  | 'EDIT_TOKEN'
+  | 'DELETE_TOKEN'
+  | 'CREATE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET'
+  | 'DELETE_TOKEN_SET';
 
 interface PushToTokensStudio {
   context: TokensStudioCredentials;
   action: TokensStudioAction;
   data: any;
   metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+  projectUrn?: string;
 }
 
-export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
+export const pushToTokensStudio = async ({ context, action, data, metadata, projectUrn }: PushToTokensStudio) => {
   const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
 
   return storageClient.push({
     action,
     data,
     metadata,
+    projectUrn,
   });
 };
 
