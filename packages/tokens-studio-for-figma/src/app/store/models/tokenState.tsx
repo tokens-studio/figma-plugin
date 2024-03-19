@@ -763,7 +763,7 @@ export const tokenState = createModel<RootModel>()({
     duplicateToken(payload: DuplicateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         duplicateTokenInTokensStudio({
           rootState,
           payload,
