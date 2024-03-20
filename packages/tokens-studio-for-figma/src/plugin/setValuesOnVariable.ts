@@ -38,12 +38,7 @@ export default function setValuesOnVariable(
             break;
           case 'COLOR':
             if (typeof t.value === 'string') {
-              console.log('=============================');
-              console.log('variable: ', variable);
-              console.log('mode: ', mode);
-              console.log('t.value: ', t.value);
               setColorValuesOnVariable(variable, mode, t.value);
-              console.log('=============================');
             }
             break;
           case 'FLOAT':

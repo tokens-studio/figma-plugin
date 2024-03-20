@@ -12,7 +12,6 @@ export function assignVariableIdsToTheme(state: TokenState, variableIds: Record<
       }),
     }
   ));
-  console.log('updatedThemes: ', updatedThemes);
   return {
     ...state,
     themes: updatedThemes,
