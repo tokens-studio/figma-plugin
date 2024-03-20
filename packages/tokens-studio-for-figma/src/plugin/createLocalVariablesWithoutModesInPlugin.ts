@@ -23,7 +23,9 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set);
     if (collection) {
       const mode = collection.modes.find((m) => m.name === set);
+      console.log('mode: ', mode);
       const modeId: string = mode?.modeId ?? createVariableMode(collection, set);
+      console.log('modeId: ', modeId);
       if (modeId) {
         const theme = {
           selectedTokenSets: {
@@ -33,6 +35,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         const allVariableObj = updateVariables({
           collection, mode: modeId, theme, tokens, settings,
         });
+        console.log('allVariableObj in second', allVariableObj);
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
             collectionId: collection.id,
@@ -53,6 +56,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       const allVariableObj = updateVariables({
         collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings
       });
+      console.log('allVariableObj in first', allVariableObj);
       allVariableCollectionIds[index] = {
         collectionId: newCollection.id,
         modeId: newCollection.modes[0].modeId,
