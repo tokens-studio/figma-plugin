@@ -24,7 +24,13 @@ import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 
-export type TokensStudioAction = 'CREATE_TOKEN' | 'EDIT_TOKEN' | 'DELETE_TOKEN';
+export type TokensStudioAction =
+  | 'CREATE_TOKEN'
+  | 'EDIT_TOKEN'
+  | 'DELETE_TOKEN'
+  | 'CREATE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET'
+  | 'DELETE_TOKEN_SET';
 
 interface PushToTokensStudio {
   context: TokensStudioCredentials;
