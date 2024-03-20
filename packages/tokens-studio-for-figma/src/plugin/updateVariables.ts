@@ -19,9 +19,9 @@ export type CreateVariableTypes = {
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default function updateVariables({
-  collection, mode, theme, tokens, settings, currentSet
+  collection, mode, theme, tokens, settings
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable, currentSet);
+  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
