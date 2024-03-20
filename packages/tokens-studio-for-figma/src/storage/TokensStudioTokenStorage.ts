@@ -202,12 +202,10 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     action,
     data,
     metadata,
-    projectUrn,
   }: {
     action: TokensStudioAction;
     data: any;
     metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
-    projectUrn?: string;
   }) {
     switch (action) {
       case 'CREATE_TOKEN': {
@@ -307,13 +305,13 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       }
       case 'CREATE_TOKEN_SET': {
         try {
-          if (!data.name || !projectUrn) {
+          if (!data.name) {
             throw new Error('Invalid data');
           }
 
           const responseData = await Graphql.exec<CreateTokenSetMutation>(
             Graphql.op(CREATE_TOKEN_SET_MUTATION, {
-              project: projectUrn,
+              project: this.id,
               input: {
                 name: data.name,
               },

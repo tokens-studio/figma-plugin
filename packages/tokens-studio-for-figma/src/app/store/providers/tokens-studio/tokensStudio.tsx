@@ -37,17 +37,15 @@ interface PushToTokensStudio {
   action: TokensStudioAction;
   data: any;
   metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
-  projectUrn?: string;
 }
 
-export const pushToTokensStudio = async ({ context, action, data, metadata, projectUrn }: PushToTokensStudio) => {
+export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
   const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
 
   return storageClient.push({
     action,
     data,
     metadata,
-    projectUrn,
   });
 };
 

@@ -19,7 +19,6 @@ export async function createTokenSetInTokensStudio({
     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
     action: 'CREATE_TOKEN_SET',
     data: { name },
-    projectUrn: rootState.uiState.api.id,
   });
 
   if (tokenSet?.urn) {
