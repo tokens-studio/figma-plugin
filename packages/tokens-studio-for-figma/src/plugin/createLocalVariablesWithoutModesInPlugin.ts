@@ -16,8 +16,8 @@ export type LocalVariableInfo = {
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: string[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
-  let referenceVariableCandidates: ReferenceVariableType[] = [];
-  let createdVariablesCount: number = 0;
+  const initialVariablesCount = figma.variables.getLocalVariables().length;
+  const initialVariableCollectionsCount = figma.variables.getLocalVariableCollections().length;
   selectedSets.forEach((set: string, index) => {
     const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set);
     if (collection) {
@@ -38,8 +38,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
             modeId,
             variableIds: allVariableObj.variableIds,
           };
-          createdVariablesCount += Object.keys(allVariableObj.variableIds).length;
-          referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
         }
       }
     } else {
@@ -58,8 +56,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         modeId: newCollection.modes[0].modeId,
         variableIds: allVariableObj.variableIds,
       };
-      createdVariablesCount += Object.keys(allVariableObj.variableIds).length;
-      referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
     }
   });
   const figmaVariables = figma.variables.getLocalVariables();
@@ -67,7 +63,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   if (figmaVariables.length === 0) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${selectedSets.length} collections and ${createdVariablesCount} variables created`);
+    notifyUI(`${Number(figma.variables.getLocalVariableCollections()) - initialVariableCollectionsCount} collections and ${Number(figma.variables.getLocalVariables()) - initialVariablesCount} variables created`);
   }
   return {
     allVariableCollectionIds,
