@@ -19,8 +19,6 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const initialVariablesCount = figma.variables.getLocalVariables().length;
   const initialVariableCollectionsCount = figma.variables.getLocalVariableCollections().length;
-  console.log('initialVariablesCount: ', initialVariablesCount);
-  console.log('initialVariableCollectionsCount: ', initialVariableCollectionsCount);
   selectedSets.forEach((set: string, index) => {
     const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set);
     if (collection) {
