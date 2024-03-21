@@ -7,7 +7,6 @@ import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
 import { ThemeObject } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { useTranslation } from 'react-i18next';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -15,10 +14,10 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: string[]) {
-  const { t } = useTranslation(['tokens']);
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
+  let createdVariablesCount: number = 0;
   selectedSets.forEach((set: string, index) => {
     const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set);
     if (collection) {
@@ -39,6 +38,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
             modeId,
             variableIds: allVariableObj.variableIds,
           };
+          createdVariablesCount += Object.keys(allVariableObj.variableIds).length;
           referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
         }
       }
@@ -58,15 +58,16 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         modeId: newCollection.modes[0].modeId,
         variableIds: allVariableObj.variableIds,
       };
+      createdVariablesCount += Object.keys(allVariableObj.variableIds).length;
       referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
     }
   });
   const figmaVariables = figma.variables.getLocalVariables();
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (figmaVariables.length === 0) {
-    notifyUI(t('noVariablesCreated'));
+    notifyUI('No variables were created');
   } else {
-    notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
+    notifyUI(`${selectedSets.length} collections and ${createdVariablesCount} variables created`);
   }
   return {
     allVariableCollectionIds,
