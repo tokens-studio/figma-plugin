@@ -1,5 +1,3 @@
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AnyTokenList } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
@@ -9,6 +7,7 @@ import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
 import { ThemeObject } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { useTranslation } from 'react-i18next';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -16,6 +15,7 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: string[]) {
+  const { t } = useTranslation(['tokens']);
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -64,7 +64,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   const figmaVariables = figma.variables.getLocalVariables();
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (figmaVariables.length === 0) {
-    notifyUI('No variables were created');
+    notifyUI(t('noVariablesCreated'));
   } else {
     notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
   }
