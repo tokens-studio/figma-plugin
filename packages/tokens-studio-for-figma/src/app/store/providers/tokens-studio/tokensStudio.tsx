@@ -19,9 +19,35 @@ import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { PushOverrides } from '../../remoteTokens';
+import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
+
+export type TokensStudioAction =
+  | 'CREATE_TOKEN'
+  | 'EDIT_TOKEN'
+  | 'DELETE_TOKEN'
+  | 'CREATE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET'
+  | 'DELETE_TOKEN_SET';
+
+interface PushToTokensStudio {
+  context: TokensStudioCredentials;
+  action: TokensStudioAction;
+  data: any;
+  metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+}
+
+export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
+  const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
+
+  return storageClient.push({
+    action,
+    data,
+    metadata,
+  });
+};
 
 export function useTokensStudio() {
   const tokens = useSelector(tokensSelector);
@@ -119,9 +145,6 @@ export function useTokensStudio() {
           };
         }
         if (content) {
-          // We're doing read-only for now, so no editing.
-          dispatch.tokenState.setEditProhibited(true);
-
           return content;
         }
       } catch (e) {
@@ -132,7 +155,7 @@ export function useTokensStudio() {
       }
       return null;
     },
-    [storageClientFactory, dispatch.tokenState],
+    [storageClientFactory],
   );
 
   const syncTokensWithTokensStudio = useCallback(
@@ -155,8 +178,7 @@ export function useTokensStudio() {
           tokens: data.tokens,
           // TODO: Add support for resolvers which are our theme configs
           themes: [],
-          // TODO: We dont have metadata yet, but we'll likely need it in the form of token set ordering
-          metadata: {},
+          metadata: data.metadata ?? {},
         };
       } catch (e) {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });

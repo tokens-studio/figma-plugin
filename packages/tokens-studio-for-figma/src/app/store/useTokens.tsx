@@ -494,6 +494,36 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
+  const createVariablesFromSets = useCallback(async (selectedSets: string[]) => {
+    track('createVariables');
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      if (selectedSets.includes(tokenSetKey)) {
+        tempTokens[tokenSetKey] = tokenList;
+      }
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+      tokens: selectedSetsTokens,
+      settings,
+      selectedSets
+    }));
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
   const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
     track('createVariablesFromThemes', { selectedThemes });
     dispatch.uiState.startJob({
@@ -518,29 +548,29 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
-  const createVariablesFromSets = useCallback(async (selectedSets) => {
-    const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
-      if (selectedSets.includes(tokenSetKey)) {
-        tempTokens[tokenSetKey] = tokenList;
-      }
-      return tempTokens;
-    }, {} as Record<string, AnyTokenList>);
-    const createVariableResult = await wrapTransaction({
-      name: 'createVariables',
-      statExtractor: async (result, transaction) => {
-        const data = await result;
-        if (data) {
-          transaction.setMeasurement('variables', data.totalVariables, '');
-        }
-      },
-    }, async () => await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: selectedSetsTokens,
-      settings,
-    }));
-    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
-    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+  // const createVariablesFromSets = useCallback(async (selectedSets) => {
+  //   const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+  //     if (selectedSets.includes(tokenSetKey)) {
+  //       tempTokens[tokenSetKey] = tokenList;
+  //     }
+  //     return tempTokens;
+  //   }, {} as Record<string, AnyTokenList>);
+  //   const createVariableResult = await wrapTransaction({
+  //     name: 'createVariables',
+  //     statExtractor: async (result, transaction) => {
+  //       const data = await result;
+  //       if (data) {
+  //         transaction.setMeasurement('variables', data.totalVariables, '');
+  //       }
+  //     },
+  //   }, async () => await AsyncMessageChannel.ReactInstance.message({
+  //     type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+  //     tokens: selectedSetsTokens,
+  //     settings,
+  //   }));
+  //   dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+  //   dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+  // }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
@@ -612,8 +642,8 @@ export default function useTokens() {
     handleJSONUpdate,
     createVariables,
     createVariablesFromSets,
-    createVariablesFromThemes,
     renameVariablesFromToken,
+    createVariablesFromThemes,
     syncVariables,
     updateVariablesFromToken,
     filterMultiValueTokens,

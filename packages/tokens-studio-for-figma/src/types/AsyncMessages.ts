@@ -63,6 +63,7 @@ export enum AsyncMessageTypes {
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
+  CREATE_LOCAL_VARIABLES_WITHOUT_MODES = 'async/create-local-variables-without-modes',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
@@ -287,6 +288,16 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
   totalVariables: number
 }>;
 
+export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+  tokens: Record<string, AnyTokenList>;
+  settings: SettingsState,
+  selectedSets: string[]
+}>;
+export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+  variableIds: Record<string, LocalVariableInfo>
+  totalVariables: number
+}>;
+
 export type ResolveVariableInfo = AsyncMessage<AsyncMessageTypes.RESOLVE_VARIABLE_INFO, {
   variableIds: string[]
 }>;
@@ -376,6 +387,7 @@ export type AsyncMessages =
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
+  | CreateLocalVariablesWithoutModesAsyncMessage
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
@@ -421,6 +433,7 @@ export type AsyncMessageResults =
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult
+  | CreateLocalVariablesWithoutModesAsyncMessageResult
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult

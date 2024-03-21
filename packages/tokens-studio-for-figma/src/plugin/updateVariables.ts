@@ -13,12 +13,13 @@ export type CreateVariableTypes = {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
+  currentSet?: string;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default function updateVariables({
-  collection, mode, theme, tokens, settings,
+  collection, mode, theme, tokens, settings
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];

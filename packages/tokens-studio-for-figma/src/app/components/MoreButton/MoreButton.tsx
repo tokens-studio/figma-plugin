@@ -76,8 +76,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   };
 
   const handleDeleteClick = React.useCallback(() => {
-    deleteSingleToken({ parent: activeTokenSet, path: token.name, type: token.type });
-  }, [activeTokenSet, deleteSingleToken, token.name, token.type]);
+    deleteSingleToken({
+      parent: activeTokenSet,
+      path: token.name,
+      type: token.type,
+      sourceId: token.$extensions?.id,
+    });
+  }, [activeTokenSet, deleteSingleToken, token.$extensions, token.name, token.type]);
 
   const handleDuplicateClick = React.useCallback(() => {
     showForm({ name: `${token.name}-copy`, token, status: EditTokenFormStatus.DUPLICATE });
@@ -132,8 +137,10 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
     [properties, handleClick, handleEditClick, editProhibited],
   );
 
+
   return (
     <ContextMenu>
+
       <ContextMenu.Trigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
@@ -147,16 +154,18 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
                   <ChevronRightIcon />
                 </RightSlot>
               </ContextMenu.SubTrigger>
-              <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-                {property.childProperties.map((childProperty) => (
-                  <MoreButtonProperty
-                    key={childProperty.name}
-                    value={token.name}
-                    property={childProperty}
-                    onClick={handleClick}
-                  />
-                ))}
-              </ContextMenu.Content>
+              <ContextMenu.Portal>
+                <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+                  {property.childProperties.map((childProperty) => (
+                    <MoreButtonProperty
+                      key={childProperty.name}
+                      value={token.name}
+                      property={childProperty}
+                      onClick={handleClick}
+                    />
+                  ))}
+                </ContextMenu.SubContent>
+              </ContextMenu.Portal>
             </ContextMenu.Sub>
           ) : (
             <MoreButtonProperty
@@ -174,11 +183,11 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
                 <ChevronRightIcon />
               </RightSlot>
             </ContextMenu.SubTrigger>
-            <ContextMenu.Content alignOffset={-5} collisionPadding={30}>
-              {DocumentationProperties.map((property) => (
-                <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />
-              ))}
-            </ContextMenu.Content>
+            <ContextMenu.Portal>
+              <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
+                {DocumentationProperties.map((property) => <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />)}
+              </ContextMenu.SubContent>
+            </ContextMenu.Portal>
           </ContextMenu.Sub>
           <ContextMenu.Separator />
           <ContextMenu.Item onSelect={handleEditClick} disabled={editProhibited}>
