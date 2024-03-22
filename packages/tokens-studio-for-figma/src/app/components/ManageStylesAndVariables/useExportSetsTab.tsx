@@ -30,7 +30,6 @@ export default function useExportSetsTab() {
   const [showChangeSets, setShowChangeSets] = React.useState(false);
 
   const allSets = useSelector(allTokenSetsSelector);
-  // const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
   const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
     const tokenSet = {
       set,
@@ -67,7 +66,7 @@ export default function useExportSetsTab() {
     setShowChangeSets(true);
   }, []);
 
-  const { control, formState: { isDirty }, getValues, reset } = useForm<FormValues>({
+  const { control, getValues } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
