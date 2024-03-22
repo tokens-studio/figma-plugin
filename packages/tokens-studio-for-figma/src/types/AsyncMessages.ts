@@ -22,6 +22,7 @@ import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
 import { RenameVariableToken } from '@/app/store/models/reducers/tokenState';
 import { UpdateTokenVariablePayload } from './payloads/UpdateTokenVariablePayload';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { ExportTokenSet } from './ExportTokenSet';
 
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
@@ -291,7 +292,7 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
 export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
-  selectedSets: string[]
+  selectedSets: ExportTokenSet[]
 }>;
 export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   variableIds: Record<string, LocalVariableInfo>

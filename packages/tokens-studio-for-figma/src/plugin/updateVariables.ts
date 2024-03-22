@@ -13,7 +13,6 @@ export type CreateVariableTypes = {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
-  currentSet?: string;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;

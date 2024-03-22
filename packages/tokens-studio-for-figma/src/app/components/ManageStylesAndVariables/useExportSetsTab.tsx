@@ -2,7 +2,7 @@ import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
   Tabs, Stack, Heading, Button, Link, Label,
 } from '@tokens-studio/ui';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import { tokenSetListToTree, TreeItem } from '@/utils/tokenset';
 import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
 
 export default function useExportSetsTab() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -29,7 +30,14 @@ export default function useExportSetsTab() {
   const [showChangeSets, setShowChangeSets] = React.useState(false);
 
   const allSets = useSelector(allTokenSetsSelector);
-  const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
+  // const [selectedSets, setSelectedSets] = React.useState<string[]>(allSets.map((set) => set));
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
+    const tokenSet = {
+      set,
+      status: TokenSetStatus.ENABLED,
+    }
+    return tokenSet;
+  }));
 
   const selectedTokenSets = React.useMemo(() => (
     usedTokenSetSelector(store.getState())
@@ -81,10 +89,24 @@ export default function useExportSetsTab() {
     />
   ), [control]);
 
+  const selectedEnabledSets = useMemo(() => {
+    return selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED);
+  }, [selectedSets]);
+
   React.useEffect(() => {
     if (!showChangeSets) {
       const currentSelectedSets = getValues();
-      setSelectedSets(Object.keys(currentSelectedSets.tokenSets).filter((key) => currentSelectedSets.tokenSets[key] === TokenSetStatus.ENABLED));
+      const selectedTokenSets: ExportTokenSet[] = Object.keys(currentSelectedSets.tokenSets).reduce((acc: ExportTokenSet[], curr: string) => {
+        if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
+          const tokenSet = {
+            set: curr,
+            status: currentSelectedSets.tokenSets[curr]
+          } as ExportTokenSet;
+          acc.push(tokenSet);
+        }
+        return acc;
+      }, [] as ExportTokenSet[]);
+      setSelectedSets([...selectedTokenSets]);
     }
   }, [showChangeSets]);
 
@@ -104,7 +126,7 @@ export default function useExportSetsTab() {
             <ExportThemeRow>
               <FileDirectoryIcon size="small" />
               <Label>
-                {selectedSets.length}
+                {selectedEnabledSets.length}
                 {' of '}
                 {allSets.length}
               </Label>
