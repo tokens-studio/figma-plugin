@@ -24,6 +24,7 @@ export const stitchesInstance = createStitches({
       xxsmall: '11px !important',
       xsmall: '12px !important',
       small: '13px !important',
+      base: '14px !important',
       medium: '14px !important',
       large: '16px !important',
     },

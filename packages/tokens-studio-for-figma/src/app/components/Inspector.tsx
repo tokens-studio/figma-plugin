@@ -36,8 +36,10 @@ function Inspector() {
   ), [tokens, usedTokenSet]);
 
   const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
-    track('setInspectView', { view });
-    setInspectView(view);
+    if (view) {
+      track('setInspectView', { view });
+      setInspectView(view);
+    }
   }, []);
 
   function renderInspectView() {
@@ -60,7 +62,7 @@ function Inspector() {
     }}
     >
       <Box css={{
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted',
+        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$3', borderBottom: '1px solid $borderMuted',
       }}
       >
         <Box
@@ -98,7 +100,11 @@ function Inspector() {
               </Label>
             </Tooltip>
           </Stack>
-          <ToggleGroup type="single" value={inspectView} onValueChange={handleSetInspectView}>
+          <ToggleGroup
+            type="single"
+            value={inspectView}
+            onValueChange={handleSetInspectView}
+          >
             {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
             <ToggleGroup.Item value="multi" tooltip={t('inspectLayers') as string} tooltipSide="bottom"> */}
             <ToggleGroup.Item value="multi">

@@ -58,7 +58,6 @@ export default function Footer() {
   }, [pullTokens, usedTokenSet, activeTheme]);
 
   return (
-
     <Box
       css={{
         display: 'flex',

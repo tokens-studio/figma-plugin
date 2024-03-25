@@ -41,7 +41,7 @@ export default function SettingsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild data-testid="bottom-bar-settings">
-        <IconButton variant="invisible" icon={<GearIcon />} />
+        <IconButton variant="invisible" size="small" icon={<GearIcon />} />
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>

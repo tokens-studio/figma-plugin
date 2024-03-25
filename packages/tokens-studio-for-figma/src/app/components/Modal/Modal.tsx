@@ -59,6 +59,7 @@ const StyledDialogContent = styled(Dialog.Content, {
         height: '100vh',
         maxHeight: '100vh',
         borderRadius: 0,
+        border: 'none',
         boxShadow: 'none',
       },
       regular: {
@@ -167,8 +168,7 @@ export function Modal({
               full={full}
               data-testid={id}
               css={{
-                scrollPaddingBlockEnd: footer ? '$8' : 0,
-                paddingBlockEnd: footer ? '$8' : '$4',
+                scrollPaddingBlockEnd: footer ? '$4' : 0,
               }}
             >
               {children}
