@@ -7,7 +7,7 @@ import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
   const uiSettingsWriteSpy = jest.spyOn(UiSettingsProperty, 'write');
-
+  
   it('can update the UI settings', async () => {
     await updateUISettings({
       width: 400,
@@ -55,6 +55,13 @@ describe('uiSettings', () => {
       updateRemote: true,
       updateOnChange: true,
       updateStyles: true,
+      variablesColor: true,
+      variablesNumber: true,
+      variablesString: true,
+      variablesBoolean: true,
+      stylesEffect: true,
+      stylesTypography: true,
+      stylesColor: true,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
@@ -76,6 +83,13 @@ describe('uiSettings', () => {
       updateRemote: true,
       updateOnChange: true,
       updateStyles: true,
+      variablesColor: true,
+      variablesNumber: true,
+      variablesString: true,
+      variablesBoolean: true,
+      stylesEffect: true,
+      stylesTypography: true,
+      stylesColor: true,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
@@ -94,6 +108,13 @@ describe('uiSettings', () => {
       updateRemote: true,
       updateOnChange: true,
       updateStyles: true,
+      variablesColor: true,
+      variablesNumber: true,
+      variablesString: true,
+      variablesBoolean: true,
+      stylesEffect: true,
+      stylesTypography: true,
+      stylesColor: true,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
