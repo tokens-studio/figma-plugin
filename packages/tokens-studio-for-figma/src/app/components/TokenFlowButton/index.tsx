@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { IconButton } from '@tokens-studio/ui';
 import FlowIcon from '@/icons/flow.svg';
@@ -30,18 +29,27 @@ export default function TokenFlowButton() {
     setLoading(true);
     track('Open visualization');
     const tokenData = JSON.stringify(tokens, null, 2);
-    const response = await axios({
-      method: 'post',
-      url: `${process.env.TOKEN_FLOW_APP_URL}/api/tokens`,
-      data: {
-        tokenData,
-        activeTheme,
-        availableThemes,
-        usedTokenSet,
-        themeObjects,
-      },
-    });
-    if (response.status === 200) window.open(`${process.env.TOKEN_FLOW_APP_URL}?id=${response.data.result}`);
+    try {
+      const response = await fetch(`${process.env.TOKEN_FLOW_APP_URL}/api/tokens`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokenData,
+          activeTheme,
+          availableThemes,
+          usedTokenSet,
+          themeObjects,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        window.open(`${process.env.TOKEN_FLOW_APP_URL}?id=${data.result}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
     setLoading(false);
   }, [activeTheme, availableThemes, themeObjects, tokens, usedTokenSet]);
 
