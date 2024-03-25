@@ -32,6 +32,7 @@ export * from './setNoneValuesOnNode';
 export * from './getFigmaFonts';
 export * from './setUsedEmail';
 export * from './createLocalVariables';
+export * from './createLocalVariablesWithoutModes';
 export * from './resolveVariableInfo';
 export * from './attachLocalVariablesToTheme';
 export * from './renameVariables';
