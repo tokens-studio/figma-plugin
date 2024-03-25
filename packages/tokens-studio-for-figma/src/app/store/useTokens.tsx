@@ -325,56 +325,43 @@ export default function useTokens() {
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromTokens = useCallback(async () => {
-    const userDecision = await confirm({
-      text: 'Create styles',
-      description: 'What styles should be created?',
-      confirmAction: 'Create',
-      choices: [
-        { key: 'colorStyles', label: 'Color', enabled: true },
-        { key: 'textStyles', label: 'Text', enabled: true },
-        { key: 'effectStyles', label: 'Shadows', enabled: true },
-      ],
+    track('createStyles', {
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
     });
 
-    if (userDecision && Array.isArray(userDecision.data) && userDecision.data.length) {
-      track('createStyles', {
-        textStyles: userDecision.data.includes('textStyles'),
-        colorStyles: userDecision.data.includes('colorStyles'),
-        effectStyles: userDecision.data.includes('effectStyles'),
-      });
-
-      const enabledTokenSets = Object.entries(usedTokenSet)
-        .filter(([, status]) => status === TokenSetStatus.ENABLED)
-        .map(([tokenSet]) => tokenSet);
-      if (enabledTokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure token sets are active.', { error: true });
-        return;
-      }
-      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
-        ...usedTokenSet,
-        [activeTokenSet]: TokenSetStatus.ENABLED,
-      }));
-      const withoutSourceTokens = resolved.filter((token) => (
-        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-      ));
-
-      const tokensToCreate = withoutSourceTokens.filter((token) => (
-        [
-          userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
-          userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
-          userDecision.data.includes('effectStyles') && token.type === TokenTypes.BOX_SHADOW,
-        ].some((isEnabled) => isEnabled)
-      ));
-
-      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        settings,
-      }));
-
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+    const enabledTokenSets = Object.entries(usedTokenSet)
+      .filter(([, status]) => status === TokenSetStatus.ENABLED)
+      .map(([tokenSet]) => tokenSet);
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure token sets are active.', { error: true });
+      return;
     }
-  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
+    const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
+      ...usedTokenSet,
+      [activeTokenSet]: TokenSetStatus.ENABLED,
+    }));
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
+
+    const tokensToCreate = withoutSourceTokens.filter((token) => (
+      [
+        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && token.type === TokenTypes.COLOR,
+        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled)
+    ));
+
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
+
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  }, [usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
