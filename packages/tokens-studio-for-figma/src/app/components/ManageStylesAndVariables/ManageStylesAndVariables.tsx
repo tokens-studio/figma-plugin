@@ -23,10 +23,11 @@ export default function ManageStylesAndVariables() {
   const isPro = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro? 'useThemes': 'useSets');
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
-  const { createVariablesFromThemes } = useTokens();
+  const { createVariablesFromSets, createVariablesFromThemes } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -38,14 +39,22 @@ export default function ManageStylesAndVariables() {
   }, []);
 
   const handleExportToFigma = React.useCallback(() => {
-    createVariablesFromThemes(selectedThemes);
-  }, [selectedThemes, selectedSets]);
+    if (activeTab === 'useSets') {
+      createVariablesFromSets(selectedSets);
+    } else if (activeTab === 'useThemes') {
+      createVariablesFromThemes(selectedThemes);
+    }
+  }, [activeTab, selectedThemes, selectedSets]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 
   useEffect(() => {
-    setCanExportToFigma(selectedThemes.length > 0);
-  }, [selectedThemes]);
+    setCanExportToFigma(activeTab === 'useSets'? true: selectedThemes.length > 0);
+  }, [selectedThemes, activeTab]);
+
+  const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
+    setActiveTab(tab);
+  }, []);
 
   const handleOpen = React.useCallback(() => {
     setShowModal(true);
@@ -90,13 +99,13 @@ export default function ManageStylesAndVariables() {
   )}
         stickyFooter
       >
-        <Tabs defaultValue="useThemes">
+        <Tabs defaultValue={isPro? 'useThemes': 'useSets'}>
           <Tabs.List>
-            <Tabs.Trigger value="useThemes">
+            <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
-            <Tabs.Trigger value="useSets">{t('tabs.exportSets')}</Tabs.Trigger>
+            <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
           <ExportThemesTab />
           <ExportSetsTab />
