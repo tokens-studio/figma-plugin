@@ -26,6 +26,7 @@ export function setActiveTheme(state: TokenState, { newActiveTheme }: { newActiv
         [tokenSet, TokenSetStatus.DISABLED]
       )),
     );
+
   return {
     ...state,
     usedTokenSet: usedTokenSetsMap,
