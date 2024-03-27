@@ -324,24 +324,25 @@ export default function useTokens() {
   }, [dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
-  const createStylesFromTokens = useCallback(async () => {
+  const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
     track('createStyles', {
       textStyles: settings.stylesTypography,
       colorStyles: settings.stylesColor,
       effectStyles: settings.stylesEffect,
     });
 
-    const enabledTokenSets = Object.entries(usedTokenSet)
-      .filter(([, status]) => status === TokenSetStatus.ENABLED)
-      .map(([tokenSet]) => tokenSet);
+    const enabledTokenSets = selectedSets
+      .filter((set) => set.status === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet.set);
+
     if (enabledTokenSets.length === 0) {
       notifyToUI('No styles created. Make sure token sets are active.', { error: true });
       return;
     }
-    const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
-      ...usedTokenSet,
-      [activeTokenSet]: TokenSetStatus.ENABLED,
-    }));
+
+    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }))
+
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
     const withoutSourceTokens = resolved.filter((token) => (
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
@@ -590,7 +591,7 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
     pullStyles,
     pullVariables,
     remapToken,
@@ -617,7 +618,7 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
     pullStyles,
     pullVariables,
     remapToken,
