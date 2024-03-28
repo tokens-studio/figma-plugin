@@ -10,6 +10,7 @@ import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { notifyUI } from './notifiers';
+import set from 'set-value';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
@@ -51,9 +52,9 @@ export default async function updateStyles(
   if (!colorTokens && !textTokens && !effectTokens) return {};
 
   const allStyleIds = {
-    ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),
-    ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
-    ...(effectTokens.length > 0 ? await updateEffectStyles({
+    ...(colorTokens.length > 0 && settings.stylesColor ? updateColorStyles(colorTokens, shouldCreate) : {}),
+    ...(textTokens.length > 0 && settings.stylesTypography ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
+    ...(effectTokens.length > 0 && settings.stylesEffect ? await updateEffectStyles({
       effectTokens, baseFontSize: settings.baseFontSize, shouldCreate,
     }) : {}),
   };
