@@ -5980,20 +5980,20 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.0.24":
-  version "0.0.24"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.0.24.tgz#1063825e87cd07492b2aedd6dcd6ffb207ac3e7c"
-  integrity sha512-0fuuYAmR5LuaMQelsliuPAvBJ29Aa7pw5fCF6WJd0wpOoLqSV3ttap0D6YRbi67cCmWsKH57mM7jn0jAbEqm4A==
+"@tokens-studio/tokens@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.1.tgz#59b73bf435a3365f9d493af794b15c9a0b78f2ee"
+  integrity sha512-s71KqzAHSZAwcYRtA497jAwXKJu79F0Dmwu4zk8CYmmcREH5fUVO+pdy8IINVuTIzX+8WPgA4ZKsNy0SslL4jg==
 
 "@tokens-studio/types@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
   integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
-"@tokens-studio/ui@0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.2.tgz#c05c1d261d4d5fdc5807b935e7633b36e2976492"
-  integrity sha512-DiwzqhyzadtOjtAJd8zROKmupiIJ6ID+3gUbpqO4NigWd3FjfpjXYc+u9WGAsTEx0eFBXRseoCC/6vn5anURxA==
+"@tokens-studio/ui@0.5.4":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.4.tgz#ee971e4ec74d35545d63962121a796d912523815"
+  integrity sha512-q7Mln4I50AWZCoJiDlqPTn17Rx/XRfSJDKV/Y910rS5YFFytmYd31XUnZgXk28vnOP1J9P8B/RaPCSyKg2XW3w==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
