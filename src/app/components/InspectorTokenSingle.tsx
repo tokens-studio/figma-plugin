@@ -46,6 +46,10 @@ export default function InspectorTokenSingle({
 
   const tokenToDisplay = React.useMemo(() => {
     if (token.resolvedValue) {
+      const resolvedToken = getTokenValue(token.value, resolvedTokens);
+      if (resolvedToken && token.appliedType === 'variable') {
+        return { name: token.value, value: resolvedToken.value, type: property };
+      }
       return { name: token.value, value: token.resolvedValue, type: property };
     }
     const resolvedToken = getTokenValue(token.value, resolvedTokens);

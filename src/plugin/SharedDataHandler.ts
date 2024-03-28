@@ -23,6 +23,7 @@ class SharedDataHandler {
   getAll<Result = string>(node: BaseNode) {
     const keys = this.keys(node);
     const result: Record<string, Result> = {};
+
     keys.forEach((key) => {
       if (key in Properties) {
         const value = this.get(node, key);
