@@ -37,6 +37,7 @@ import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { theme } from '@/stitches.config';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { ThemeObject } from '@/types';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -362,7 +363,57 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-  }, [usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
+  }, [tokens, settings, dispatch.tokenState, activeTokenSet]);
+
+  const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
+    track('createStyles', {
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
+    });
+
+    const selectedSets = themes.reduce((acc, curr) => {
+      if (selectedThemes.includes(curr.id)) {
+        acc = {
+          ...acc,
+          ...curr.selectedTokenSets
+        }
+      }
+      return acc;
+    }, {});
+
+    const enabledTokenSets = Object.keys(selectedSets)
+      .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet);
+
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure themes are active.', { error: true });
+      return;
+    }
+
+    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }))
+
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
+
+    const tokensToCreate = withoutSourceTokens.filter((token) => (
+      [
+        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && token.type === TokenTypes.COLOR,
+        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled)
+    ));
+
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
+
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  }, [dispatch.tokenState, tokens, settings]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
@@ -592,6 +643,7 @@ export default function useTokens() {
     getFormattedTokens,
     getStringTokens,
     createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,
@@ -619,6 +671,7 @@ export default function useTokens() {
     getFormattedTokens,
     getStringTokens,
     createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,

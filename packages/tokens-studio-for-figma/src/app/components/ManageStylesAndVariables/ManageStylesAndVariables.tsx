@@ -25,7 +25,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
-  const { createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets } = useTokens();
+  const { createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -42,6 +42,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
       createVariablesFromThemes(selectedThemes);
+      createStylesFromSelectedThemes(selectedThemes);
     }
   }, [activeTab, selectedThemes, selectedSets]);
 
