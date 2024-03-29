@@ -21,7 +21,7 @@ export async function createTokenSetInTokensStudio({
     data: { name },
   });
 
-  if (tokenSet?.urn) {
+  if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
     onTokenSetCreated({
       ...rootState.tokenState.tokenSetMetadata,
       [name]: {

@@ -20,6 +20,7 @@ import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { PushOverrides } from '../../remoteTokens';
 import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
@@ -30,7 +31,8 @@ export type TokensStudioAction =
   | 'DELETE_TOKEN'
   | 'CREATE_TOKEN_SET'
   | 'UPDATE_TOKEN_SET'
-  | 'DELETE_TOKEN_SET';
+  | 'DELETE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET_ORDER';
 
 interface PushToTokensStudio {
   context: TokensStudioCredentials;
@@ -145,7 +147,11 @@ export function useTokensStudio() {
           };
         }
         if (content) {
-          return content;
+          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
         }
       } catch (e) {
         return {
@@ -176,8 +182,7 @@ export function useTokensStudio() {
         return {
           status: 'success',
           tokens: data.tokens,
-          // TODO: Add support for resolvers which are our theme configs
-          themes: [],
+          themes: data.themes,
           metadata: data.metadata ?? {},
         };
       } catch (e) {

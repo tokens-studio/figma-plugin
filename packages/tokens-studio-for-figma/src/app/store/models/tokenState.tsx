@@ -740,8 +740,16 @@ export const tokenState = createModel<RootModel>()({
         });
       }
     },
-    setTokenSetOrder() {
+    setTokenSetOrder(data: string[], rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        pushToTokensStudio({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+          action: 'UPDATE_TOKEN_SET_ORDER',
+          data: data.map((name, index) => ({ orderIndex: `${index}`, urn: rootState.tokenState.tokenSetMetadata[name].id })),
+        });
+      }
     },
     setTokenData(payload: SetTokenDataPayload) {
       // When tokens update we set the format to the format that we parsed
