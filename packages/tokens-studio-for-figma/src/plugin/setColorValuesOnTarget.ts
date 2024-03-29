@@ -61,6 +61,5 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
     Promise.resolve();
   } catch (e) {
     console.error('Error setting color', e);
-    Promise.reject();
   }
 }
