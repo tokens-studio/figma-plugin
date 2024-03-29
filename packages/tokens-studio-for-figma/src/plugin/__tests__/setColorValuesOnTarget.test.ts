@@ -1,17 +1,34 @@
+import { TokenTypes } from '@/constants/TokenTypes';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import setColorValuesOnTarget from '../setColorValuesOnTarget';
 
 describe('setColorValuesOnTarget', () => {
-  it('should be able to update the paints on a style', () => {
+  beforeEach(() => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [{
+        name: 'red',
+        type: TokenTypes.COLOR,
+        value: '#ff0000',
+        rawValue: '#ff0000',
+        description: 'Red',
+      },
+      {
+        name: 'gradient',
+        type: TokenTypes.COLOR,
+        value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
+        rawValue: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
+
+      }],
+    });
+  });
+  it('should be able to update the paints on a style', async () => {
     const mockStyle = {
       type: 'PAINT',
       paints: [],
       description: '',
     } as unknown as PaintStyle;
 
-    setColorValuesOnTarget(mockStyle, {
-      value: '#ff0000',
-      description: 'Red',
-    }, 'paints');
+    await setColorValuesOnTarget(mockStyle, 'red', 'paints');
 
     expect(mockStyle.description).toEqual('Red');
 
@@ -22,15 +39,13 @@ describe('setColorValuesOnTarget', () => {
     }]);
   });
 
-  it('should be able to update the fills on a node', () => {
+  it('should be able to update the fills on a node', async () => {
     const mockNode = {
       type: 'RECTANGLE',
       fills: [],
     } as unknown as RectangleNode;
 
-    setColorValuesOnTarget(mockNode, {
-      value: '#ff0000',
-    }, 'fills');
+    await setColorValuesOnTarget(mockNode, 'red', 'fills');
 
     expect(mockNode.fills).toEqual([{
       type: 'SOLID',
@@ -39,15 +54,13 @@ describe('setColorValuesOnTarget', () => {
     }]);
   });
 
-  it('should be able to update the strokes on a node', () => {
+  it('should be able to update the strokes on a node', async () => {
     const mockNode = {
       type: 'RECTANGLE',
       strokes: [],
     } as unknown as RectangleNode;
 
-    setColorValuesOnTarget(mockNode, {
-      value: '#ff0000',
-    }, 'strokes');
+    await setColorValuesOnTarget(mockNode, 'red', 'strokes');
 
     expect(mockNode.strokes).toEqual([{
       type: 'SOLID',
@@ -56,15 +69,13 @@ describe('setColorValuesOnTarget', () => {
     }]);
   });
 
-  it('should be able to handle a linear gradient', () => {
+  it('should be able to handle a linear gradient', async () => {
     const mockNode = {
       type: 'RECTANGLE',
       fills: [],
     } as unknown as RectangleNode;
 
-    setColorValuesOnTarget(mockNode, {
-      value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
-    }, 'fills');
+    await setColorValuesOnTarget(mockNode, 'gradient', 'fills');
 
     expect(mockNode.fills).toMatchSnapshot();
   });
