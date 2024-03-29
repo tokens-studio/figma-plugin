@@ -363,7 +363,7 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-  }, [tokens, settings, dispatch.tokenState, activeTokenSet]);
+  }, [tokens, settings, dispatch.tokenState]);
 
   const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
     track('createStyles', {
@@ -413,7 +413,7 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-  }, [dispatch.tokenState, tokens, settings]);
+  }, [dispatch.tokenState, tokens, settings, themes]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
