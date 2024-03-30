@@ -10,7 +10,6 @@ import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { notifyUI } from './notifiers';
-import set from 'set-value';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
