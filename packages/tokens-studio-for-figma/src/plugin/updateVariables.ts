@@ -6,7 +6,7 @@ import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
-import { TokenTypes } from '@/constants/TokenTypes';
+import { ExportNumberVariablesTokenTypes, TokenTypes } from '@/constants/TokenTypes';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -27,7 +27,7 @@ export default function updateVariables({
     if (checkIfTokenCanCreateVariable(token)) {
       if (
         (token.type === TokenTypes.COLOR && settings.variablesColor) ||
-        (token.type === TokenTypes.NUMBER && settings.variablesNumber) ||
+        (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber) ||
         (token.type === TokenTypes.TEXT && settings.variablesString) ||
         (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
       ) {
