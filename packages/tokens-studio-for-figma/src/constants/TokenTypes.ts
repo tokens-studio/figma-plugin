@@ -25,12 +25,3 @@ export enum TokenTypes {
   BOOLEAN = 'boolean',
   NUMBER = 'number',
 };
-
-export const ExportNumberTokenType = [
-  TokenTypes.SIZING,
-  TokenTypes.SPACING,
-  TokenTypes.BORDER_WIDTH,
-  TokenTypes.DIMENSION,
-  TokenTypes.NUMBER,
-  TokenTypes.DIMENSION
-];
