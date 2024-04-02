@@ -140,7 +140,7 @@ export const userState = createModel<RootModel>()({
       if (licenseKey && !licenseError) {
         const { error } = await removeLicense(licenseKey, userId);
         if (error) {
-          notifyToUI('Error removing license, please contact support', { error: true });
+          notifyToUI('Error removing license, please contact support@tokens.studio', { error: true });
         }
       }
       // clear license key related state
