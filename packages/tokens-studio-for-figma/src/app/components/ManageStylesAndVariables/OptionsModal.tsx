@@ -158,7 +158,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     dispatch.settings.setStylesTypography(stylesTypography);
     dispatch.settings.setStylesColor(stylesColor);
     closeAction();
-  }, [exportOptions]);
+  }, [closeAction, dispatch.settings, variablesColor, variablesNumber, variablesString, variablesBoolean, stylesEffect, stylesTypography, stylesColor]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
