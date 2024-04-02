@@ -37,6 +37,7 @@ import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { theme } from '@/stitches.config';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { ThemeObject } from '@/types';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -182,8 +183,8 @@ export default function useTokens() {
       text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
-        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
-        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: false },
       ],
       confirmAction: 'Import',
     });
@@ -324,57 +325,95 @@ export default function useTokens() {
   }, [dispatch.tokenState]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
-  const createStylesFromTokens = useCallback(async () => {
-    const userDecision = await confirm({
-      text: 'Create styles',
-      description: 'What styles should be created?',
-      confirmAction: 'Create',
-      choices: [
-        { key: 'colorStyles', label: 'Color', enabled: true },
-        { key: 'textStyles', label: 'Text', enabled: true },
-        { key: 'effectStyles', label: 'Shadows', enabled: true },
-      ],
+  const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
+    track('createStyles', {
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
     });
 
-    if (userDecision && Array.isArray(userDecision.data) && userDecision.data.length) {
-      track('createStyles', {
-        textStyles: userDecision.data.includes('textStyles'),
-        colorStyles: userDecision.data.includes('colorStyles'),
-        effectStyles: userDecision.data.includes('effectStyles'),
-      });
+    const enabledTokenSets = selectedSets
+      .filter((set) => set.status === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet.set);
 
-      const enabledTokenSets = Object.entries(usedTokenSet)
-        .filter(([, status]) => status === TokenSetStatus.ENABLED)
-        .map(([tokenSet]) => tokenSet);
-      if (enabledTokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure token sets are active.', { error: true });
-        return;
-      }
-      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
-        ...usedTokenSet,
-        [activeTokenSet]: TokenSetStatus.ENABLED,
-      }));
-      const withoutSourceTokens = resolved.filter((token) => (
-        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-      ));
-
-      const tokensToCreate = withoutSourceTokens.filter((token) => (
-        [
-          userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
-          userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
-          userDecision.data.includes('effectStyles') && token.type === TokenTypes.BOX_SHADOW,
-        ].some((isEnabled) => isEnabled)
-      ));
-
-      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        settings,
-      }));
-
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure token sets are active.', { error: true });
+      return;
     }
-  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
+
+    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }))
+
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
+
+    const tokensToCreate = withoutSourceTokens.filter((token) => (
+      [
+        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && token.type === TokenTypes.COLOR,
+        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled)
+    ));
+
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
+
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  }, [tokens, settings, dispatch.tokenState]);
+
+  const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
+    track('createStyles', {
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
+    });
+
+    const selectedSets = themes.reduce((acc, curr) => {
+      if (selectedThemes.includes(curr.id)) {
+        acc = {
+          ...acc,
+          ...curr.selectedTokenSets
+        }
+      }
+      return acc;
+    }, {});
+
+    const enabledTokenSets = Object.keys(selectedSets)
+      .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet);
+
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure themes are active.', { error: true });
+      return;
+    }
+
+    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }))
+
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
+
+    const tokensToCreate = withoutSourceTokens.filter((token) => (
+      [
+        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && token.type === TokenTypes.COLOR,
+        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled)
+    ));
+
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
+
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  }, [dispatch.tokenState, tokens, settings, themes]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
@@ -520,7 +559,7 @@ export default function useTokens() {
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
       tokens: selectedSetsTokens,
       settings,
-      selectedSets: selectedSets
+      selectedSets,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -542,9 +581,9 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: tokens,
+      tokens,
       settings,
-      selectedThemes
+      selectedThemes,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -603,7 +642,8 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,
@@ -630,7 +670,8 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,

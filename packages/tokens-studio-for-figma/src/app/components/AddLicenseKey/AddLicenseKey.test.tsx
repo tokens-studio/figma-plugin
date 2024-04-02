@@ -238,7 +238,7 @@ describe('Add license key', () => {
 
     await waitFor(() => {
       notifyToUISpy.mockReturnValueOnce();
-      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support', { error: true });
+      expect(notifyToUISpy).toBeCalledWith('Error removing license, please contact support@tokens.studio', { error: true });
     });
   });
 
