@@ -4,14 +4,10 @@ import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 import useTokens from './useTokens';
-import {
-  AnyTokenList, SingleToken,
-} from '@/types/tokens';
+import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import {
-  createStyles, renameStyles, removeStyles, syncStyles,
-} from '@/plugin/asyncMessageHandlers';
+import { createStyles, renameStyles, removeStyles, syncStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -21,6 +17,8 @@ import { Properties } from '@/constants/Properties';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { TokensContext } from '@/context';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { boolean } from 'zod';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -239,9 +237,9 @@ const resolvedTokens: AnyTokenList = [
 ];
 
 const mockConfirm = jest.fn();
-const mockPullStylesHandler = jest.fn(async () => { });
-const mockRemapTokensHandler = jest.fn(async () => { });
-const mockRemoveTokensByValueHandler = jest.fn(async () => { });
+const mockPullStylesHandler = jest.fn(async () => {});
+const mockRemapTokensHandler = jest.fn(async () => {});
+const mockRemoveTokensByValueHandler = jest.fn(async () => {});
 jest.mock('../hooks/useConfirm', () => ({
   __esModule: true,
   default: () => ({
@@ -306,6 +304,7 @@ describe('useToken test', () => {
     });
     await expect(result.current.pullStyles()).resolves.not.toThrow();
   });
+
   it('pullVariables test', async () => {
     mockConfirm.mockImplementation(() => Promise.resolve());
     await act(async () => {
@@ -316,9 +315,11 @@ describe('useToken test', () => {
 
   it('should send message to pull styles from figma', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-    mockConfirm.mockImplementation(() => Promise.resolve({
-      data: ['textStyles', 'colorStyles', 'effectStyles'],
-    }));
+    mockConfirm.mockImplementation(() =>
+      Promise.resolve({
+        data: ['textStyles', 'colorStyles', 'effectStyles'],
+      }),
+    );
     await act(async () => {
       await result.current.pullStyles();
     });
@@ -334,13 +335,17 @@ describe('useToken test', () => {
 
   it('removeTokensByValue test', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-    const data = [{
-      property: Properties.fill,
-      nodes: [{
-        id: '12',
-        type: 'RECTANGLE',
-      } as NodeInfo],
-    }];
+    const data = [
+      {
+        property: Properties.fill,
+        nodes: [
+          {
+            id: '12',
+            type: 'RECTANGLE',
+          } as NodeInfo,
+        ],
+      },
+    ];
     await act(async () => {
       await result.current.removeTokensByValue(data);
     });
@@ -354,7 +359,9 @@ describe('useToken test', () => {
   it('handleRemap test', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
     await act(async () => {
-      await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [{ name: 'sizing.small', value: 3, type: TokenTypes.SIZING }]);
+      await result.current.handleRemap(TokenTypes.SIZING, 'sizing.small', 'sizing.sm', [
+        { name: 'sizing.small', value: 3, type: TokenTypes.SIZING },
+      ]);
     });
 
     expect(messageSpy).toBeCalledWith({
@@ -392,7 +399,11 @@ describe('useToken test', () => {
       },
     ];
     await act(async () => {
-      await result.current.remapTokensInGroup({ oldGroupName: 'old.', newGroupName: 'new.', tokensToRename: mockTokensToRename });
+      await result.current.remapTokensInGroup({
+        oldGroupName: 'old.',
+        newGroupName: 'new.',
+        tokensToRename: mockTokensToRename,
+      });
     });
     expect(messageSpy).toBeCalledWith({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
@@ -409,11 +420,20 @@ describe('useToken test', () => {
         activeTheme: {
           [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
-        themes: [{
-          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
-        }],
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
         tokens: {
-          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          global: [
+            { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
+            { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
+            { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW },
+          ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
       },
@@ -421,7 +441,9 @@ describe('useToken test', () => {
     beforeEach(() => {
       resetStore();
       result = renderHook(() => useTokens(), {
-        wrapper: ({ children }: { children?: React.ReactNode }) => <Provider store={tokenMockStore}>{children}</Provider>,
+        wrapper: ({ children }: { children?: React.ReactNode }) => (
+          <Provider store={tokenMockStore}>{children}</Provider>
+        ),
       }).result;
     });
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
@@ -431,11 +453,14 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, mockRemoveTokensByValueHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMAP_TOKENS, mockRemapTokensHandler);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, mockPullStylesHandler);
-    AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, async (): Promise<GetThemeInfoMessageResult> => ({
-      type: AsyncMessageTypes.GET_THEME_INFO,
-      activeTheme: {},
-      themes: [],
-    }));
+    AsyncMessageChannel.ReactInstance.handle(
+      AsyncMessageTypes.GET_THEME_INFO,
+      async (): Promise<GetThemeInfoMessageResult> => ({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+        activeTheme: {},
+        themes: [],
+      }),
+    );
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
@@ -486,49 +511,129 @@ describe('useToken test', () => {
         },
       ];
 
+      const tokensToCreate = [
+        {
+          name: 'white',
+          value: '#ffffff',
+          type: 'color',
+          internal__Parent: 'global',
+          rawValue: '#ffffff',
+        },
+        {
+          name: 'headline',
+          value: { fontFamily: 'Inter', fontWeight: 'Bold' },
+          type: 'typography',
+          internal__Parent: 'global',
+          resolvedValueWithReferences: { fontFamily: 'Inter', fontWeight: 'Bold' },
+          rawValue: { fontFamily: 'Inter', fontWeight: 'Bold' },
+        },
+        {
+          name: 'shadow',
+          value: '{shadows.default}',
+          type: 'boxShadow',
+          internal__Parent: 'global',
+          rawValue: '{shadows.default}',
+          failedToResolve: true,
+        },
+        {
+          name: 'bg.default',
+          value: '#ffffff',
+          type: 'color',
+          internal__Parent: 'light',
+          rawValue: '#ffffff',
+        },
+      ];
+
       defaultTokenValueRetriever.initiate({ tokens });
 
+      const selectedSets: ExportTokenSet[] = [
+        {
+          set: 'global',
+          status: TokenSetStatus.ENABLED,
+        },
+        {
+          set: 'light',
+          status: TokenSetStatus.ENABLED,
+        },
+      ];
+
       await act(async () => {
-        await result.current.createStylesFromTokens();
+        await result.current.createStylesFromSelectedTokenSets(selectedSets);
       });
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
-        tokens,
+        tokens: tokensToCreate,
         settings: store.getState().settings,
       });
     });
 
     it('respects decision to only create text styles', async () => {
-      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
+      // mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
+
+      const mockStore = createMockStore({
+        settings: {
+          stylesColor: false,
+          stylesEffect: false,
+          stylesTypography: true,
+        },
+      });
+
+      const selectedSets: ExportTokenSet[] = [
+        {
+          set: 'global',
+          status: TokenSetStatus.ENABLED,
+        },
+        {
+          set: 'light',
+          status: TokenSetStatus.ENABLED,
+        },
+      ];
 
       await act(async () => {
-        await result.current.createStylesFromTokens();
+        await result.current.createStylesFromSelectedTokenSets(selectedSets);
       });
+
+      const tokensToCreate = [
+        {
+          name: 'white',
+          value: '#ffffff',
+          type: 'color',
+          internal__Parent: 'global',
+          rawValue: '#ffffff'
+        },
+        {
+          name: 'headline',
+          value: { fontFamily: 'Inter', fontWeight: 'Bold' },
+          type: 'typography',
+          internal__Parent: 'global',
+          resolvedValueWithReferences: { fontFamily: 'Inter', fontWeight: 'Bold' },
+          rawValue: { fontFamily: 'Inter', fontWeight: 'Bold' }
+        },
+        {
+          name: 'shadow',
+          value: '{shadows.default}',
+          type: 'boxShadow',
+          internal__Parent: 'global',
+          rawValue: '{shadows.default}',
+          failedToResolve: true
+        },
+        {
+          name: 'bg.default',
+          value: '#ffffff',
+          type: 'color',
+          internal__Parent: 'light',
+          rawValue: '#ffffff'
+        }
+      ];
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: [{
-          internal__Parent: 'global',
-          name: 'headline',
-          rawValue: {
-            fontFamily: 'Inter',
-            fontWeight: 'Bold',
-          },
-          resolvedValueWithReferences: {
-            fontFamily: 'Inter',
-            fontWeight: 'Bold',
-          },
-          type: 'typography',
-          value: {
-            fontFamily: 'Inter',
-            fontWeight: 'Bold',
-          },
-        },
-        ],
-        settings: store.getState().settings,
+        tokens: tokensToCreate,
+        settings: store.getState().settings
       });
     });
+
     it('rename styles from current theme', async () => {
       await act(async () => {
         await result.current.renameStylesFromTokens([{ oldName: 'old', newName: 'new' }], 'global');
@@ -579,7 +684,11 @@ describe('useToken test', () => {
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.SYNC_STYLES,
         tokens: {
-          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          global: [
+            { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
+            { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
+            { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW },
+          ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
         options: {
@@ -598,11 +707,20 @@ describe('useToken test', () => {
         activeTheme: {
           [INTERNAL_THEMES_NO_GROUP]: 'light',
         },
-        themes: [{
-          id: 'light', name: 'Light', selectedTokenSets: {}, $figmaStyleReferences: {},
-        }],
+        themes: [
+          {
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {},
+            $figmaStyleReferences: {},
+          },
+        ],
         tokens: {
-          global: [{ name: 'white', value: '#ffffff', type: TokenTypes.COLOR }, { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY }, { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          global: [
+            { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
+            { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
+            { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW },
+          ],
           light: [
             { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
             { name: 'borderRadius-1', value: '{base.base-0} {base.base-25}', type: TokenTypes.BORDER_RADIUS },
@@ -611,8 +729,16 @@ describe('useToken test', () => {
             { name: 'spacing-1', value: '{base.base-50} {base.base-150}', type: TokenTypes.SPACING },
             { name: 'spacing-2', value: '{base.base-125} {base.base-50}', type: TokenTypes.SPACING },
             { name: 'spacing-3', value: '{base.base-50}', type: TokenTypes.SPACING },
-            { name: 'borderWidth-1', value: '{base.base-350} {base.base-187} {base.base-50}', type: TokenTypes.BORDER_WIDTH },
-            { name: 'borderWidth-2', value: '{base.base-50} {base.base-187} {base.base-150}', type: TokenTypes.BORDER_WIDTH },
+            {
+              name: 'borderWidth-1',
+              value: '{base.base-350} {base.base-187} {base.base-50}',
+              type: TokenTypes.BORDER_WIDTH,
+            },
+            {
+              name: 'borderWidth-2',
+              value: '{base.base-50} {base.base-187} {base.base-150}',
+              type: TokenTypes.BORDER_WIDTH,
+            },
             { name: 'borderWidth-3', value: '{base.base-187}', type: TokenTypes.BORDER_WIDTH },
             { name: 'text', value: 'text value', type: TokenTypes.TEXT },
             { name: 'shadow.base', value: '#1450c8', type: TokenTypes.COLOR },
@@ -658,10 +784,7 @@ describe('useToken test', () => {
       result = renderHook(() => useTokens(), {
         wrapper: ({ children }: { children?: React.ReactNode }) => (
           <Provider store={tokenMockStore}>
-            <TokensContext.Provider value={customTokens}>
-              {children}
-            </TokensContext.Provider>
-            ,
+            <TokensContext.Provider value={customTokens}>{children}</TokensContext.Provider>,
           </Provider>
         ),
       }).result;
@@ -674,7 +797,8 @@ describe('useToken test', () => {
         global: [
           { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
           { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
-          { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW }],
+          { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW },
+        ],
         light: [
           { name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR },
           { name: 'borderRadius-3', value: '{base.base-150}', type: TokenTypes.BORDER_RADIUS },
@@ -719,23 +843,30 @@ describe('useToken test', () => {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const mockStore = createMockStore({
       uiState: {
-        selectionValues: [{
-          category: Properties.fill,
-          type: 'fill',
-          value: 'color.slate.800',
-          nodes: [{
-            id: '12',
-            type: 'RECTANGLE',
-          } as NodeInfo],
-        }, {
-          category: Properties.borderRadius,
-          type: 'borderRadius',
-          value: 'border-radius.8',
-          nodes: [{
-            id: '12',
-            type: 'RECTANGLE',
-          } as NodeInfo],
-        }],
+        selectionValues: [
+          {
+            category: Properties.fill,
+            type: 'fill',
+            value: 'color.slate.800',
+            nodes: [
+              {
+                id: '12',
+                type: 'RECTANGLE',
+              } as NodeInfo,
+            ],
+          },
+          {
+            category: Properties.borderRadius,
+            type: 'borderRadius',
+            value: 'border-radius.8',
+            nodes: [
+              {
+                id: '12',
+                type: 'RECTANGLE',
+              } as NodeInfo,
+            ],
+          },
+        ],
       },
       inspectState: {
         selectedTokens: ['fill-color.slate.800', 'borderRadius-border-radius.8'],
@@ -756,20 +887,26 @@ describe('useToken test', () => {
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.SET_NONE_VALUES_ON_NODE,
-        tokensToSet: [{
-          nodes: [{
-            id: '12',
-            type: 'RECTANGLE',
-          }],
-          property: 'fill',
-        },
-        {
-          nodes: [{
-            id: '12',
-            type: 'RECTANGLE',
-          }],
-          property: 'borderRadius',
-        }],
+        tokensToSet: [
+          {
+            nodes: [
+              {
+                id: '12',
+                type: 'RECTANGLE',
+              },
+            ],
+            property: 'fill',
+          },
+          {
+            nodes: [
+              {
+                id: '12',
+                type: 'RECTANGLE',
+              },
+            ],
+            property: 'borderRadius',
+          },
+        ],
         tokens: resolvedTokens,
       });
     });

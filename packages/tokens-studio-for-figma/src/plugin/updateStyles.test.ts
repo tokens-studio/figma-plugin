@@ -51,6 +51,47 @@ describe('updateStyles', () => {
     expect(effectSpy).not.toHaveBeenCalled();
   });
 
+  it('calls update functions with correct tokens and theme prefix', async () => {
+    const colorTokens = [
+      {
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: 'color',
+        styleId: '1234',
+        internal__Parent: 'global',
+      },
+    ] as ExtendedSingleToken[];
+
+    mockGetThemeInfo.mockImplementationOnce(() => (
+      Promise.resolve({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
+        themes: [{
+          id: 'light',
+          name: 'light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
+        }],
+      })
+    ));
+
+    await updateStyles([...colorTokens], {
+      prefixStylesWithThemeName: true,
+      stylesColor: true
+    } as SettingsState, false);
+    expect(colorSpy).toHaveBeenCalledWith(
+      colorTokens,
+      false,
+    );
+  });
+
   it('calls update functions with correct tokens when all tokens are given', async () => {
     const colorTokens = [
       {
@@ -94,6 +135,9 @@ describe('updateStyles', () => {
     await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens], {
       prefixStylesWithThemeName: true,
       ignoreFirstPartForStyles: true,
+      stylesColor: true,
+      stylesEffect: true,
+      stylesTypography: true
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       [{
@@ -155,6 +199,7 @@ describe('updateStyles', () => {
 
     await updateStyles(colorTokens, {
       prefixStylesWithThemeName: true,
+      stylesColor: true
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
@@ -181,6 +226,7 @@ describe('updateStyles', () => {
 
     await updateStyles(typographyTokens, {
       prefixStylesWithThemeName: true,
+      stylesTypography: true
     } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
@@ -212,6 +258,9 @@ describe('updateStyles', () => {
 
     await updateStyles(effectTokens, {
       prefixStylesWithThemeName: true,
+      stylesColor: false,
+      stylesEffect: true,
+      stylesTypography: false
     } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
       {
@@ -221,45 +270,5 @@ describe('updateStyles', () => {
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
-  });
-
-  it('calls update functions with correct tokens and theme prefix', async () => {
-    const colorTokens = [
-      {
-        name: 'primary.500',
-        path: 'light/primary/500',
-        value: '#ff0000',
-        type: 'color',
-        styleId: '1234',
-        internal__Parent: 'global',
-      },
-    ] as ExtendedSingleToken[];
-
-    mockGetThemeInfo.mockImplementationOnce(() => (
-      Promise.resolve({
-        type: AsyncMessageTypes.GET_THEME_INFO,
-        activeTheme: {
-          [INTERNAL_THEMES_NO_GROUP]: 'light',
-        },
-        themes: [{
-          id: 'light',
-          name: 'light',
-          selectedTokenSets: {
-            global: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {
-            'primary.500': '1234',
-          },
-        }],
-      })
-    ));
-
-    await updateStyles([...colorTokens], {
-      prefixStylesWithThemeName: true,
-    } as SettingsState, false);
-    expect(colorSpy).toHaveBeenCalledWith(
-      colorTokens,
-      false,
-    );
   });
 });
