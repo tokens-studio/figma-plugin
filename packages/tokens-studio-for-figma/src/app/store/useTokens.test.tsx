@@ -569,7 +569,6 @@ describe('useToken test', () => {
     });
 
     it('respects decision to only create text styles', async () => {
-      // mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles'] }));
 
       const mockStore = createMockStore({
         settings: {
