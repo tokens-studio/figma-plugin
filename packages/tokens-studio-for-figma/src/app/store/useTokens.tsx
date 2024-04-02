@@ -182,8 +182,8 @@ export default function useTokens() {
       text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
-        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
-        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: false },
       ],
       confirmAction: 'Import',
     });
@@ -520,7 +520,7 @@ export default function useTokens() {
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
       tokens: selectedSetsTokens,
       settings,
-      selectedSets: selectedSets
+      selectedSets,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
@@ -542,9 +542,9 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens: tokens,
+      tokens,
       settings,
-      selectedThemes
+      selectedThemes,
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
