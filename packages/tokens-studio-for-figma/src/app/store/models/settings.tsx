@@ -48,6 +48,7 @@ export interface SettingsState {
   stylesEffect: boolean;
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
+  createStylesWithVariableReferences?: boolean;
   scopeVariablesByTokenType?: boolean;
   overwriteExistingStylesAndVariables?: boolean;
 }
@@ -75,6 +76,7 @@ export const settings = createModel<RootModel>()({
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
+    createStylesWithVariableReferences: false,
     inspectDeep: false,
     shouldSwapStyles: false,
     baseFontSize: defaultBaseFontSize,
@@ -218,6 +220,12 @@ export const settings = createModel<RootModel>()({
         scopeVariablesByTokenType: payload,
       };
     },
+    setCreateStylesWithVariableReferences(state, payload: boolean) {
+      return {
+        ...state,
+        createStylesWithVariableReferences: payload,
+      };
+    },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
       return {
         ...state,
@@ -265,7 +273,7 @@ export const settings = createModel<RootModel>()({
         ...state,
         stylesEffect: payload,
       };
-    }
+    },
   },
   effects: (dispatch) => ({
     setLanguage: (payload: string, rootState) => {
@@ -318,6 +326,9 @@ export const settings = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setCreateStylesWithVariableReferences: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {

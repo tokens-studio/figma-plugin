@@ -54,6 +54,7 @@ export type UiSettingsFromPluginMessage = {
     stylesTypography: boolean;
     stylesEffect: boolean;
     ignoreFirstPartForStyles: boolean;
+    createStylesWithVariableReferences: boolean;
     prefixStylesWithThemeName: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
