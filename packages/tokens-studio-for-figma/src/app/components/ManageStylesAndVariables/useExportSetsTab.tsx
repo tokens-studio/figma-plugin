@@ -135,7 +135,7 @@ export default function useExportSetsTab() {
           </Stack>
         </Stack>
       </StyledCard>
-      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Varibales / Export Sets">
+      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Variables / Export Sets">
         <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
         <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
         <Stack
