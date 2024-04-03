@@ -14,6 +14,8 @@ export class TokenValueRetriever {
 
   private ignoreFirstPartForStyles;
 
+  public createStylesWithVariableReferences;
+
   private getAdjustedTokenName(tokenName: string): string {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles ? tokenName.split('.').slice(1).join('.') : tokenName;
     const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
@@ -21,10 +23,11 @@ export class TokenValueRetriever {
   }
 
   public initiate({
-    tokens, variableReferences, styleReferences, stylePathPrefix, ignoreFirstPartForStyles = false,
-  }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; }) {
+    tokens, variableReferences, styleReferences, stylePathPrefix, ignoreFirstPartForStyles = false, createStylesWithVariableReferences = false,
+  }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; createStylesWithVariableReferences?: boolean }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
+    this.createStylesWithVariableReferences = createStylesWithVariableReferences;
     this.styleReferences = styleReferences || new Map();
     this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
@@ -82,6 +85,7 @@ export class TokenValueRetriever {
     if (this.styleReferences) this.styleReferences.clear();
     if (this.stylePathPrefix) this.stylePathPrefix = undefined;
     if (this.ignoreFirstPartForStyles) this.ignoreFirstPartForStyles = undefined;
+    if (this.createStylesWithVariableReferences) this.createStylesWithVariableReferences = undefined;
   }
 }
 

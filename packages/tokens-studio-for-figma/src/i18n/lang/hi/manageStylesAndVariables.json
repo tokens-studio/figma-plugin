@@ -1,0 +1,70 @@
+{
+"modalTitle": "स्टाइल और वेरिएबल प्रबंधित करें",
+"buttonLabel": "स्टाइल और वेरिएबल",
+"actions": {
+  "export": "Figma में निर्यात करें",
+  "import": "Figma से आयात करें",
+  "options": "विकल्प",
+  "cancel": "रद्द करें",
+  "confirm": "पुष्टि करें",
+  "createThemes": "थीम बनाएं",
+  "getPRO": "PRO प्राप्त करें",
+  "manageThemes": "थीम प्रबंधित करें",
+  "changeSets": "सेट बदलें"
+},
+"docs": {
+  "exportToFigmaOptions": "Figma में निर्यात करने के विकल्प",
+  "stylesAndVariables": "स्टाइल और वेरिएबल",
+  "referenceOnlyMode": "संदर्भ केवल मोड"
+},
+"generic": {
+  "learnMore": "और अधिक जानें",
+  "themes": "थीमें", 
+  "noGroup": "कोई समूह नहीं",
+  "selectAll": "सभी का चयन करें"
+},
+"tabs": {
+  "exportThemes": "थीमें",
+  "exportSets": "टोकन सेट"
+},
+"options": {
+  "title": "विकल्प",
+  "whichVariablesShouldBeCreatedAndUpdated": "कौन से वेरिएबल बनाएं और अपडेट करें?",
+  "whichStylesShouldBeCreatedAndUpdated": "कौन से स्टाइल बनाएं और अपडेट करें?",
+  "tokensExportedToFigmaShould": "Figma में निर्यात किए गए टोकन:",
+  "ignorePrefix": "स्टाइल के लिए टोकन नाम के पहले हिस्से को अनदेखा करें",
+  "ignorePrefixExplanation": "यदि आप अपने स्टाइल के लिए 'रंग' में नामित टोकन 'रंग.blue.500' को अनदेखा करना चाहते हैं तो उपयोगी हो सकता है",
+  "prefixStyles": "सक्रिय थीम नाम के साथ स्टाइल प्रतिष्ठान करें",
+  "prefixStylesExplanation": "निर्मित किए गए किसी भी स्टाइल में सक्रिय थीम नाम जोड़ता है। ध्यान दें: इसे बहु-आयामी थीम के साथ उपयोग करने से अप्रत्याशित परिणाम हो सकते हैं।",
+  "overwriteExistingStylesAndVariables": "मौजूदा स्टाइल और वेरिएबल को अधिलेखित करें",
+  "overwriteExistingStylesAndVariablesExplanation": "समान नाम वाले मौजूदा स्टाइल और वेरिएबल को अधिलेखित किया जाएगा",
+  "scopeVariablesByTokenType": "टोकन प्रकार द्वारा वेरिएबल क्षेत्र",
+  "scopeVariablesByTokenTypeExplanation": "वेरिएबल क्षेत्र टोकन प्रकार और उपयोग के अनुरूप निर्धारित होंगे",
+  "createStylesWithVariableReferences": "वेरिएबल संदर्भों के साथ स्टाइल बनाएं",
+  "createStylesWithVariableReferencesExplanation": "संदर्भों के साथ स्टाइल बनाए जाएंगे"
+},
+"variables": {
+  "color": "रंग",
+  "number": "संख्या",
+  "boolean": "बूलियन",
+  "string": "स्ट्रिंग"
+},
+"styles": {
+  "color": "रंग",
+  "typography": "टाइपोग्राफी",
+  "effects": "प्रभाव"
+},
+"exportThemesTab": {
+  "headingPro": "शुरू करने के लिए थीमें बनाएं",
+  "headingBasic": "थीमें बनाना प्रो फ़ीचर है",
+  "introPro": "टोकन सेट के संयोजन से थीमें बनाई जाती हैं। थीमें का उपयोग डिजाइन कॉन्सेप्ट के बीच आसानी से स्विच करने के लिए किया जाता है, जैसे प्रकाश या अंधेरे रंग मोड, कई ब्रांड, उत्पाद या प्लेटफ़ॉर्म। या सेट का उपयोग किए बिना निर्यात करने के लिए सेट पर स्विच करें",
+  "introBasic": "टोकन सेट के संयोजन से थीमें बनाई जाती हैं। थीमें का उपयोग डिजाइन कॉन्सेप्ट के बीच आसानी से स्विच करने के लिए किया जाता है, जैसे प्रकाश या अंधेरे रंग मोड, कई ब्रांड, उत्पाद या प्लेटफ़ॉर्म।",
+  "confirmThemes": "थीमें पुष्टि करें",
+  "combinationsOfSetsMakeThemes": "टोकन सेट के संयोजन से थीमें बनाई जाती हैं"
+},
+"exportSetsTab": {
+  "changeSetsHeading": "सक्रिय सेट Figma में निर्यात करेंगे",
+  "confirmSets": "सेट पुष्टि करें",
+  "intro": "आप अपने स्टाइल और वेरिएबल प्रबंधित करने के लिए टोकन सेट का उपयोग कर सकते हैं। डिजाइन कॉन्सेप्ट के बीच आसानी से स्विच करने के लिए थीमें (प्रो) का उपयोग करें।"
+}
+}

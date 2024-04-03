@@ -1,0 +1,70 @@
+{
+  "modalTitle": "Beheer Stijlen en Variabelen",
+  "buttonLabel": "Stijlen en Variabelen",
+  "actions": {
+    "export": "Exporteren naar Figma",
+    "import": "Importeren vanuit Figma",
+    "options": "Opties",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "createThemes": "Thema's maken",
+    "getPRO": "PRO krijgen",
+    "manageThemes": "Thema's beheren",
+    "changeSets": "Sets wijzigen"
+  },
+  "docs": {
+    "exportToFigmaOptions": "Exporteer naar Figma Opties",
+    "stylesAndVariables": "Stijlen en Variabelen",
+    "referenceOnlyMode": "Ingeschakelde versus Alleen Referentie Modus"
+  },
+  "generic": {
+    "learnMore": "Meer informatie",
+    "themes": "Thema's",
+    "noGroup": "Geen Groep",
+    "selectAll": "Alles selecteren"
+  },
+  "tabs": {
+    "exportThemes": "Thema's",
+    "exportSets": "Token Sets"
+  },
+  "options": {
+    "title": "Opties",
+    "whichVariablesShouldBeCreatedAndUpdated": "Welke variabelen moeten worden aangemaakt en bijgewerkt?",
+    "whichStylesShouldBeCreatedAndUpdated": "Welke stijlen moeten worden aangemaakt en bijgewerkt?",
+    "tokensExportedToFigmaShould": "Tokens geëxporteerd naar Figma moeten:",
+    "ignorePrefix": "Negeer het eerste deel van de tokennaam voor stijlen",
+    "ignorePrefixExplanation": "Handig als je 'colors' wilt negeren in een token genaamd 'colors.blue.500' voor je stijlen",
+    "prefixStyles": "Voeg voorvoegsel toe aan stijlen met actieve themanaam",
+    "prefixStylesExplanation": "Voegt de actieve themanaam toe aan alle aangemaakte stijlen. Let op: Het gebruik hiervan met multidimensionale thema's kan onverwachte resultaten opleveren.",
+    "overwriteExistingStylesAndVariables": "Bestaande stijlen en variabelen overschrijven",
+    "overwriteExistingStylesAndVariablesExplanation": "Bestaande stijlen en variabelen met dezelfde naam worden overschreven",
+    "scopeVariablesByTokenType": "Variabelen beperken op basis van tokentype",
+    "scopeVariablesByTokenTypeExplanation": "Variabelen worden beperkt op basis van het tokentype en het beoogde gebruik",
+    "createStylesWithVariableReferences": "Stijlen maken met variabelenreferenties",
+    "createStylesWithVariableReferencesExplanation": "Stijlen worden aangemaakt met verwijzingen naar variabelen"
+  },
+  "variables": {
+    "color": "Kleur",
+    "number": "Nummer",
+    "boolean": "Boolean",
+    "string": "Tekst"
+  },
+  "styles": {
+    "color": "Kleur",
+    "typography": "Typografie",
+    "effects": "Effecten"
+  },
+  "exportThemesTab": {
+    "headingPro": "Maak Thema's om te beginnen",
+    "headingBasic": "Het maken van Thema's is een pro-functie",
+    "introPro": "Combinaties van token sets creëren thema's. Gebruik Thema's om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten zoals lichte of donkere kleurmodi, meerdere merken, producten of platforms. Of schakel over naar Sets om te exporteren zonder gebruik te maken van Thema's",
+    "introBasic": "Combinaties van token sets creëren thema's. Gebruik Thema's om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten zoals lichte of donkere kleurmodi, meerdere merken, producten of platforms.",
+    "confirmThemes": "Thema's bevestigen",
+    "combinationsOfSetsMakeThemes": "Combinaties van token sets creëren thema's"
+  },
+  "exportSetsTab": {
+    "changeSetsHeading": "Ingeschakelde sets worden geëxporteerd naar Figma",
+    "confirmSets": "Sets bevestigen",
+    "intro": "Je kunt token sets gebruiken om je stijlen en variabelen te beheren. Gebruik Thema's (Pro) om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten."
+  }
+}

@@ -29,7 +29,12 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
     defaultTokenValueRetriever.initiate({
-      tokens: msg.tokens, variableReferences: figmaVariableReferences, styleReferences: figmaStyleReferences, stylePathPrefix, ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+      tokens: msg.tokens,
+      variableReferences: figmaVariableReferences,
+      styleReferences: figmaStyleReferences,
+      stylePathPrefix,
+      ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
+      createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
     });
     if (msg.settings.updateStyles) {
       receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);

@@ -19,6 +19,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
       updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
+      createStylesWithVariableReferences: uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
       inspectDeep: uiSettings.inspectDeep ?? data?.inspectDeep,
       shouldSwapStyles: uiSettings.shouldSwapStyles ?? data?.shouldSwapStyles,
@@ -52,6 +53,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let stylesEffect: boolean;
     let stylesTypography: boolean;
     let ignoreFirstPartForStyles: boolean;
+    let createStylesWithVariableReferences: boolean;
     let prefixStylesWithThemeName: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
@@ -79,6 +81,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
+      createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? false : data.createStylesWithVariableReferences;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
@@ -105,6 +108,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         stylesEffect,
         stylesTypography,
         ignoreFirstPartForStyles,
+        createStylesWithVariableReferences,
         prefixStylesWithThemeName,
         inspectDeep,
         shouldSwapStyles,

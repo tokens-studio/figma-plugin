@@ -69,6 +69,7 @@ export type SavedSettings = {
   stylesTypography: boolean;
   stylesEffect: boolean;
   ignoreFirstPartForStyles: boolean;
+  createStylesWithVariableReferences: boolean;
   prefixStylesWithThemeName: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -96,6 +97,7 @@ export function notifyUISettings(
     stylesTypography,
     stylesEffect,
     ignoreFirstPartForStyles,
+    createStylesWithVariableReferences,
     prefixStylesWithThemeName,
     updateRemote = true,
     inspectDeep,
@@ -128,6 +130,7 @@ export function notifyUISettings(
       stylesEffect,
       stylesTypography,
       ignoreFirstPartForStyles,
+      createStylesWithVariableReferences,
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,

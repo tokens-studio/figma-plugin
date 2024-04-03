@@ -96,7 +96,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   allStyles.forEach((style) => {
     if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name], settings.baseFontSize)) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
-        setColorValuesOnTarget(style, styleSet[style.name] as SingleColorToken);
+        setColorValuesOnTarget(style, styleSet[style.name].name);
       }
       if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
         setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);

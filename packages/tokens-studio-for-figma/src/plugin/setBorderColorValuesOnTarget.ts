@@ -40,7 +40,7 @@ export async function setBorderColorValuesOnTarget({
       }
 
       if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
-        setColorValuesOnTarget(node, { value }, 'strokes');
+        setColorValuesOnTarget(node, data, 'strokes');
       }
     }
   }

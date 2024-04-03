@@ -17,13 +17,14 @@ import {
   overwriteExistingStylesAndVariablesSelector,
   scopeVariablesByTokenTypeSelector,
   prefixStylesWithThemeNameSelector,
+  createStylesWithVariableReferencesSelector,
   variablesColorSelector,
   variablesNumberSelector,
   variablesBooleanSelector,
   variablesStringSelector,
   stylesColorSelector,
   stylesEffectSelector,
-  stylesTypographySelector
+  stylesTypographySelector,
 } from '@/selectors';
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
@@ -52,6 +53,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
+  const rulesCreateStylesWithVariableReferences = useSelector(createStylesWithVariableReferencesSelector);
 
   const [variablesColor, setVariablesColor] = React.useState<boolean>(useSelector(variablesColorSelector));
   const [variablesNumber, setvariablesNumber] = React.useState<boolean>(useSelector(variablesNumberSelector));
@@ -87,6 +89,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handlePrefixWithThemeNameChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setPrefixStylesWithThemeName(!!state);
+    },
+    [dispatch.settings],
+  );
+
+  const handleCreateStylesWithVariableReferencesChange = React.useCallback(
+    (state: CheckedState) => {
+      dispatch.settings.setCreateStylesWithVariableReferences(!!state);
     },
     [dispatch.settings],
   );
@@ -213,7 +222,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
             </StyledCheckboxGrid>
             <Box css={{
-              display: 'grid', gridAutoRows: 'auto', gridTemplateColumns: 'min-content max-content min-content', width: '100%', gridColumnGap: '$4', gridRowGap: '$5',
+              display: 'grid',
+              alignItems: 'center',
+              gridAutoRows: 'auto',
+              gridTemplateColumns: 'min-content max-content min-content',
+              width: '100%',
+              gridColumnGap: '$4',
+              gridRowGap: '$5',
             }}
             >
               <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
@@ -274,6 +289,17 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 <Box>{t('options.prefixStylesExplanation')}</Box>
               </ExplainerModal>
 
+              <Switch
+                data-testid="createStylesWithVariableReferences"
+                id="createStylesWithVariableReferences"
+                checked={!!rulesCreateStylesWithVariableReferences}
+                defaultChecked={rulesCreateStylesWithVariableReferences}
+                onCheckedChange={handleCreateStylesWithVariableReferencesChange}
+              />
+              <Label htmlFor="createStylesWithVariableReferences">{t('options.createStylesWithVariableReferences')}</Label>
+              <ExplainerModal title={t('options.createStylesWithVariableReferences')}>
+                <Box>{t('options.createStylesWithVariableReferencesExplanation')}</Box>
+              </ExplainerModal>
             </Box>
           </Stack>
         </form>
