@@ -23,7 +23,7 @@ export async function createTokenInTokensStudio({
     metadata: rootState.tokenState.tokenSetMetadata,
   });
 
-  if (token?.urn) {
+  if (typeof token !== 'boolean' && token?.urn) {
     onTokenCreated({
       ...payload,
       $extensions: deepmerge(payload.$extensions, { id: token.urn }),

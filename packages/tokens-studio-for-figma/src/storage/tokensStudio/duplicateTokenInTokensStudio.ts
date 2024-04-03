@@ -40,7 +40,7 @@ export async function duplicateTokenInTokensStudio({
   );
 
   tokens.forEach((token, index) => {
-    if (token?.urn) {
+    if (typeof token !== 'boolean' && token?.urn) {
       onTokenDuplicated({
         ...tokenData,
         parent: payload.tokenSets[index],

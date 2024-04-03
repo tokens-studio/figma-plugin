@@ -22,7 +22,7 @@ export async function updateTokenSetInTokensStudio({
     metadata: rootState.tokenState.tokenSetMetadata,
   });
 
-  if (tokenSet?.urn) {
+  if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
     const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
     delete tokenSetMetadata[data.oldName];
 

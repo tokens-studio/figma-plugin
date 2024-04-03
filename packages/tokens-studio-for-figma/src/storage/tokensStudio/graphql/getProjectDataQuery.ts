@@ -1,18 +1,11 @@
-export const GET_TOKENS_QUERY = `query TokenSets(
-    $filter: TokenSetsFilterInput
-    $limit: Int
-    $offset: Int
-    $project: String!
-  ) {
-    tokenSets(
-      filter: $filter
-      limit: $limit
-      offset: $offset
-      project: $project
-    ) {
+export const GET_PROJECT_DATA_QUERY = `
+query Project($urn: String!) {
+  project(urn: $urn) {
+    sets {
       urn
       name
       projectUrn
+      orderIndex
       tokens(limit: 400) {
         description
         name
@@ -58,5 +51,17 @@ export const GET_TOKENS_QUERY = `query TokenSets(
         }
       }
     }
+    themeGroups {
+      urn
+      name
+      options {
+        urn
+        name
+        selectedTokenSets
+        figmaStyleReferences
+        figmaVariableReferences
+      }
+    }
   }
-  `;
+}
+`;

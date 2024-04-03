@@ -80,7 +80,7 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       parent: activeTokenSet,
       path: token.name,
       type: token.type,
-      sourceId: token.$extensions?.id,
+      sourceId: token.$extensions?.['studio.tokens']?.urn,
     });
   }, [activeTokenSet, deleteSingleToken, token.$extensions, token.name, token.type]);
 
