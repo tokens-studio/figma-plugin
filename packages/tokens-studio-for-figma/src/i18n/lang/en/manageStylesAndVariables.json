@@ -39,7 +39,9 @@
   "overwriteExistingStylesAndVariables": "Overwrite existing styles and variables",
   "overwriteExistingStylesAndVariablesExplanation": "Existing styles and variables with the same name will be overwritten",
   "scopeVariablesByTokenType": "Scope Variables by token type",
-  "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage"
+  "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage",
+  "createStylesWithVariableReferences": "Create styles with variable references",
+  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables"
 },
 "variables": {
   "color": "Color",
