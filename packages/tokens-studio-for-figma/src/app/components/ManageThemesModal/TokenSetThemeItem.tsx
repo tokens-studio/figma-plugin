@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { SetStateAction, useCallback, useMemo } from 'react';
 import {
   Button, Box, Stack, Select, ToggleGroup, Tooltip,
 } from '@tokens-studio/ui';
@@ -29,28 +29,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
     value?.[item.path] ?? TokenSetStatus.DISABLED
   ), [item.path, value]);
 
-  const handleValueChange = useCallback((status: string) => {
-    onChange({
-      ...value,
-      [item.path]: status as TokenSetStatus,
-    });
-  }, [item, value, onChange]);
-
-  const handleCycleValue = useCallback(() => {
-    const currentIndex = tokenSetStatusValues.indexOf(tokenSetStatus);
-    const nextIndex = (currentIndex + 1) % tokenSetStatusValues.length;
-    handleValueChange(tokenSetStatusValues[nextIndex]);
-  }, [tokenSetStatus, handleValueChange]);
-
-  const mapStatus = useMemo(() => {
-    if (tokenSetStatus === TokenSetStatus.ENABLED) {
-      return 'enabled';
-    }
-    if (tokenSetStatus === TokenSetStatus.SOURCE) {
-      return 'source';
-    }
-    return 'disabled';
-  }, [tokenSetStatus]);
+  const [statusValue, setStatusValue] = React.useState(tokenSetStatus);
 
   const statusIcon = (status) => {
     if (status === TokenSetStatus.ENABLED) {
@@ -89,14 +68,17 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           css={{ width: '100%' }}
         >
 
-          <StyledThemeLabel variant="leaf" ignored={tokenSetStatus === TokenSetStatus.DISABLED}>
+          <StyledThemeLabel variant="leaf" ignored={statusValue === TokenSetStatus.DISABLED}>
             {item.label}
           </StyledThemeLabel>
           <ToggleGroup
             type="single"
             size="small"
-            value={tokenSetStatus}
-            onValueChange={handleValueChange}
+            value={statusValue}
+            // eslint-disable-next-line react/jsx-no-bind
+            onValueChange={(val) => {
+              if (val) setStatusValue(val as SetStateAction<TokenSetStatus>);
+            }}
             defaultValue={tokenSetStatus}
           >
             {tokenSetStatusValues.map((status) => (
