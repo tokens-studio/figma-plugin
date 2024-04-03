@@ -18,24 +18,26 @@ export type CreateVariableTypes = {
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
-export default function updateVariables({
-  collection, mode, theme, tokens, settings
+export default async function updateVariables({
+  collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
       if (
-        (token.type === TokenTypes.COLOR && settings.variablesColor) ||
-        (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber) ||
-        (token.type === TokenTypes.TEXT && settings.variablesString) ||
-        (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
+        (token.type === TokenTypes.COLOR && settings.variablesColor)
+        || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
+        || (token.type === TokenTypes.TEXT && settings.variablesString)
+        || (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
       ) {
         variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
       }
     }
   });
-  const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
+  console.log('variables to create', variablesToCreate);
+  const variableObj = await setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
+  console.log('variableObj', variableObj);
   return {
     variableIds: variableObj.variableKeyMap,
     referenceVariableCandidate: variableObj.referenceVariableCandidates,

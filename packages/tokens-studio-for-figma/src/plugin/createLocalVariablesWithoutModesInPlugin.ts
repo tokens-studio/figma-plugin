@@ -15,6 +15,7 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+  console.log('creating local variables in plugin without modes');
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -25,19 +26,19 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const theme = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
-        [curr.set]: curr.status
-      }
+        [curr.set]: curr.status,
+      };
       return acc;
     }, {} as ThemeObject);
-    selectedSets.forEach((set: ExportTokenSet, index) => {
+    selectedSets.forEach(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set.set);
         if (collection) {
           const mode = collection.modes.find((m) => m.name === set.set);
           const modeId: string = mode?.modeId ?? createVariableMode(collection, set.set);
           if (modeId) {
-            const allVariableObj = updateVariables({
-              collection, mode: modeId, theme, tokens, settings
+            const allVariableObj = await updateVariables({
+              collection, mode: modeId, theme, tokens, settings,
             });
             if (Object.keys(allVariableObj.variableIds).length > 0) {
               allVariableCollectionIds[index] = {
@@ -51,8 +52,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         } else {
           const newCollection = figma.variables.createVariableCollection(set.set);
           newCollection.renameMode(newCollection.modes[0].modeId, set.set);
-          const allVariableObj = updateVariables({
-            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings
+          const allVariableObj = await updateVariables({
+            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings,
           });
           allVariableCollectionIds[index] = {
             collectionId: newCollection.id,

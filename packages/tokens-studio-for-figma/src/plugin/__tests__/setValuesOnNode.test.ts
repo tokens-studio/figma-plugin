@@ -1,5 +1,5 @@
 import setValuesOnNode from '../setValuesOnNode';
-import * as setTextValuesOnTarget from '../setTextValuesOnTarget';
+import * as setTextValuesOnTarget from '../setTypographyCompositeValuesOnTarget';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import * as setBorderColorValuesOnTarget from '../setBorderColorValuesOnTarget';

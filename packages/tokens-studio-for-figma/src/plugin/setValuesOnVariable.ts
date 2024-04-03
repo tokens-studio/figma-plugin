@@ -12,16 +12,18 @@ export type ReferenceVariableType = {
   referenceVariable: string;
 };
 
-export default function setValuesOnVariable(
+export default async function setValuesOnVariable(
   variablesInFigma: Variable[],
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
   mode: string,
 ) {
+  console.log('setting values on variable');
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
-    tokens.forEach((t) => {
+    await Promise.all(tokens.map(async (t) => {
+      console.log('setting values on variable', t);
       const variableType = convertTokenTypeToVariableType(t.type);
       // Find the connected variable
       let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
@@ -60,6 +62,7 @@ export default function setValuesOnVariable(
         }
         variableKeyMap[t.name] = variable.key;
         if (checkCanReferenceVariable(t)) {
+          console.log('referenceVariableCandidates', referenceTokenName);
           referenceVariableCandidates.push({
             variable,
             modeId: mode,
@@ -67,7 +70,7 @@ export default function setValuesOnVariable(
           });
         }
       }
-    });
+    }));
   } catch (e) {
     console.error('Setting values on variable is failed', e);
   }
