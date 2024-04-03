@@ -1,4 +1,4 @@
-import * as setTextValuesOnTarget from './setTextValuesOnTarget';
+import * as setTextValuesOnTarget from './setTypographyCompositeValuesOnTarget';
 import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
 

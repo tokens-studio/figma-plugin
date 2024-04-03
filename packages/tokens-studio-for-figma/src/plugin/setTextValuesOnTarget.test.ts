@@ -1,4 +1,4 @@
-import setTextValuesOnTarget from './setTextValuesOnTarget';
+import setTypographyCompositeValuesOnTarget from './setTypographyCompositeValuesOnTarget';
 
 describe('setTextValuesOnTarget', () => {
   let textNodeMock;
@@ -23,17 +23,17 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('sets fontSize if only fontSize is given', async () => {
-    await setTextValuesOnTarget(textNodeMock, { value: { fontSize: 24 } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontSize: 24 } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontSize: 24 });
   });
 
   it('sets fontFamily if that is given', async () => {
-    await setTextValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto' } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto' } });
   });
 
   it('sets fontWeight if that is given', async () => {
-    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: 'Bold' } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontWeight: 'Bold' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
@@ -44,7 +44,7 @@ describe('setTextValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.resolve()
     ));
-    await setTextValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto', fontWeight: 'Bold' } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontFamily: 'Roboto', fontWeight: 'Bold' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, family: 'Roboto', style: 'Bold' } });
   });
 
@@ -55,7 +55,7 @@ describe('setTextValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.resolve()
     ));
-    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Medium' } });
   });
 
@@ -63,12 +63,12 @@ describe('setTextValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.reject()
     ));
-    await setTextValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { fontWeight: '500' } });
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName } });
   });
 
   it('sets textCase, textDecoration and description if those are given', async () => {
-    await setTextValuesOnTarget(textNodeMock, {
+    await setTypographyCompositeValuesOnTarget(textNodeMock, {
       description: 'Use with care',
       value: { textDecoration: 'STRIKETHROUGH', textCase: 'TITLE' },
     });
@@ -81,7 +81,7 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('it throws error, when there is no value in token', async () => {
-    await setTextValuesOnTarget(textNodeMock, {
+    await setTypographyCompositeValuesOnTarget(textNodeMock, {
       description: 'Use with care',
     });
     expect(textNodeMock).toEqual({
@@ -90,7 +90,7 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('it does nothing when the type of value is string', async () => {
-    await setTextValuesOnTarget(textNodeMock, {
+    await setTypographyCompositeValuesOnTarget(textNodeMock, {
       description: 'Use with care',
       value: 'string',
     });
@@ -100,7 +100,7 @@ describe('setTextValuesOnTarget', () => {
   });
 
   it('sets paragraphIndent if that is given', async () => {
-    await setTextValuesOnTarget(textNodeMock, { value: { paragraphIndent: 5 } });
+    await setTypographyCompositeValuesOnTarget(textNodeMock, { value: { paragraphIndent: 5 } });
     expect(textNodeMock).toEqual({ ...textNodeMock, paragraphIndent: 5 });
   });
 });

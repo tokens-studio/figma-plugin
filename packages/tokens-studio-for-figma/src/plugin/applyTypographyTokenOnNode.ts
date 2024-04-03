@@ -2,10 +2,11 @@ import { isPrimitiveValue, isSingleTypographyValue } from '@/utils/is';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
-import setTextValuesOnTarget from './setTextValuesOnTarget';
+import setTypographyCompositeValuesOnTarget from './setTypographyCompositeValuesOnTarget';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
+import setTypographyParticlesOnTarget from './setTypographyParticlesOnTarget';
 
 export async function applyTypographyTokenOnNode(
   node: BaseNode,
@@ -42,7 +43,7 @@ export async function applyTypographyTokenOnNode(
       && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))
     ) {
       if (isSingleTypographyValue(resolvedToken.value)) {
-        setTextValuesOnTarget(node, { value: resolvedToken.value }, baseFontSize);
+        setTypographyCompositeValuesOnTarget(node, data.typography, baseFontSize);
       }
     }
   }
@@ -56,9 +57,8 @@ export async function applyTypographyTokenOnNode(
     || values.textCase
     || values.textDecoration
   ) {
-    setTextValuesOnTarget(
-      node,
-      {
+    if (data.fontFamilies) {
+      setTypographyParticlesOnTarget(node, {
         value: {
           fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
           fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
@@ -69,8 +69,7 @@ export async function applyTypographyTokenOnNode(
           textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
           textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
         },
-      },
-      baseFontSize,
-    );
+      }, baseFontSize);
+    }
   }
 }

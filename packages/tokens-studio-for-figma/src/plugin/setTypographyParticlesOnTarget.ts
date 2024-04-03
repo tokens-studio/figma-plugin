@@ -2,8 +2,21 @@
 import { SingleTypographyToken } from '@/types/tokens';
 import { transformValue } from './helpers';
 import { notifyUI } from './notifiers';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
-export default async function setTextValuesOnTarget(
+type ResolvedTypographyObject = {
+  fontFamily: string;
+  fontWeight: string;
+  fontSize: string;
+  lineHeight?: string;
+  letterSpacing?: string;
+  paragraphSpacing?: string;
+  paragraphIndent?: string;
+  textCase?: string;
+  textDecoration?: string;
+};
+
+export default async function setTypographyParticlesOnTarget(
   target: TextNode | TextStyle,
   token: Pick<SingleTypographyToken, 'value' | 'description'>,
   baseFontSize: string,
@@ -22,6 +35,7 @@ export default async function setTextValuesOnTarget(
         textCase,
         textDecoration,
       } = value;
+
       const family = fontFamily?.toString() || (target.fontName !== figma.mixed ? target.fontName.family : '');
       const style = fontWeight?.toString() || (target.fontName !== figma.mixed ? target.fontName.style : '');
 
