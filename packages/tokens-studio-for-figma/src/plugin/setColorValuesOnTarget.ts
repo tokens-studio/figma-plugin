@@ -3,8 +3,10 @@ import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
+import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 
 export default async function setColorValuesOnTarget(target: BaseNode | PaintStyle, token: string, key: 'paints' | 'fills' | 'strokes' = 'paints') {
+  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences;
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
     if (typeof resolvedToken === 'undefined') return;
@@ -36,7 +38,7 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
     } else {
       // If the raw value is a pure reference to another token, we first should try to apply that reference as a variable if it exists.
       let successfullyAppliedVariable = false;
-      if (resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}')) {
+      if (resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}') && shouldCreateStylesWithVariables) {
         try {
           successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
         } catch (e) {
@@ -46,8 +48,8 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
       // If we didnt find a variable to apply, we should apply the color directly.
       if (!successfullyAppliedVariable) {
         const { color, opacity } = convertToFigmaColor(value);
-        await tryApplyColorVariableId(target, resolvedValue, ColorPaintType.FILLS);
         const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+        await unbindVariableFromTarget(target, key, newPaint);
         if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
           if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
           if (key === 'fills' && 'fills' in target) target.fills = [newPaint];

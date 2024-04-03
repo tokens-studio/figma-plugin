@@ -9,7 +9,12 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
     figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
   } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
   defaultTokenValueRetriever.initiate({
-    tokens: msg.tokens, variableReferences: figmaVariableReferences, styleReferences: figmaStyleReferences, stylePathPrefix, ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+    tokens: msg.tokens,
+    variableReferences: figmaVariableReferences,
+    styleReferences: figmaStyleReferences,
+    stylePathPrefix,
+    ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
+    createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
   });
   try {
     return {
