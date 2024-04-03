@@ -124,11 +124,13 @@ export default function useExportSetsTab() {
             <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
             <ExportThemeRow>
               <FileDirectoryIcon size="small" />
-              <Label>
+              <span>
                 {selectedEnabledSets.length}
                 {' of '}
                 {allSets.length}
-              </Label>
+                {' '}
+                {t('exportSetsTab.setsSelectedForExport')}
+              </span>
             </ExportThemeRow>
           </Stack>
         </Stack>
