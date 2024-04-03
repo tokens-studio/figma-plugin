@@ -7,7 +7,7 @@ import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
   const uiSettingsWriteSpy = jest.spyOn(UiSettingsProperty, 'write');
-  
+
   it('can update the UI settings', async () => {
     await updateUISettings({
       width: 400,
@@ -18,6 +18,7 @@ describe('uiSettings', () => {
       updateOnChange: true,
       updateStyles: true,
       ignoreFirstPartForStyles: false,
+      createStylesWithVariableReferences: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
@@ -33,6 +34,7 @@ describe('uiSettings', () => {
       updateOnChange: true,
       updateStyles: true,
       ignoreFirstPartForStyles: false,
+      createStylesWithVariableReferences: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
       shouldSwapStyles: false,
@@ -62,6 +64,7 @@ describe('uiSettings', () => {
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
+      createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
@@ -90,6 +93,7 @@ describe('uiSettings', () => {
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
+      createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,
@@ -115,6 +119,7 @@ describe('uiSettings', () => {
       stylesEffect: true,
       stylesTypography: true,
       stylesColor: true,
+      createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
       inspectDeep: false,

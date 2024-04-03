@@ -26,6 +26,7 @@ describe('setColorValuesOnTarget', () => {
         description: 'Referenced Red',
       }],
       variableReferences: new Map([['red', '123']]),
+      createStylesWithVariableReferences: true,
     });
   });
 
