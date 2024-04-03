@@ -128,7 +128,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
           return tokenSetAcc;
         }, {});
 
-        acc.tokenSets[tokenSet.name] = { id: tokenSet.urn };
+        acc.tokenSets[tokenSet.name] = { id: tokenSet.urn, isDynamic: tokenSet.type === 'DYNAMIC' };
 
         return acc;
       },

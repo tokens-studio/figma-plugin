@@ -75,7 +75,7 @@ export interface TokenState {
   changedState: CompareStateType;
   remoteData: CompareStateType;
   tokenFormat: TokenFormatOptions;
-  tokenSetMetadata: Record<string, { id: string }>;
+  tokenSetMetadata: Record<string, { id: string, isDynamic?: boolean }>;
 }
 
 export const tokenState = createModel<RootModel>()({

@@ -4,6 +4,7 @@ query Project($urn: String!) {
     sets {
       urn
       name
+      type
       projectUrn
       orderIndex
       tokens(limit: 400) {
