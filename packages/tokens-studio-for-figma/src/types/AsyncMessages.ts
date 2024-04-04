@@ -33,6 +33,7 @@ export enum AsyncMessageTypes {
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
+  SET_ONBOARDINGEXPLAINEREXPORTSETS = 'async/set-onboardingExplainerExportSets',
   SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
   SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',

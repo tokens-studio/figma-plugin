@@ -302,6 +302,12 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       };
     },
+    setOnboardingExplainerExportSets(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingExplainerExportSets: payload,
+      };
+    },
     setOnboardingExplainerSyncProviders(state, payload: boolean) {
       return {
         ...state,
@@ -406,6 +412,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
         onboardingExplainerSets: payload,
+      });
+    },
+    setOnboardingExplainerExportSets: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINEEXPORTSETS,
+        onboardingExplainerExportSets: payload,
       });
     },
     setOnboardingExplainerSyncProviders: (payload) => {
