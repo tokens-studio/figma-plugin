@@ -156,6 +156,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
             <EmptyState title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
+            {/* FIXME: Use selectors - this rerenders */}
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
             )}

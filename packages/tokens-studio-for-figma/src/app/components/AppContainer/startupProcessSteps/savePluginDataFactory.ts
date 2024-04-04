@@ -32,6 +32,7 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.userState.setUserName(user.name);
       dispatch.uiState.setLastOpened(params.lastOpened);
       dispatch.uiState.setOnboardingExplainerSets(params.onboardingExplainer.sets);
+      dispatch.uiState.setOnboardingExplainerExportSets(params.onboardingExplainer.exportSets);
       dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainer.syncProviders);
       dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainer.inspect);
       dispatch.settings.setUISettings(settings);

@@ -69,6 +69,7 @@ export interface UIState {
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   onboardingExplainerSets: boolean;
+  onboardingExplainerExportSets: boolean;
   onboardingExplainerSyncProviders: boolean;
   onboardingExplainerInspect: boolean;
   editToken: EditTokenObject;
@@ -122,6 +123,7 @@ export const uiState = createModel<RootModel>()({
     changelog: [],
     lastOpened: '',
     onboardingExplainerSets: null,
+    onboardingExplainerExportSets: null,
     onboardingExplainerSyncProviders: null,
     onboardingExplainerInspect: null,
     editToken: {
@@ -414,9 +416,10 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       });
     },
+    // TODO: onboarding - export sets
     setOnboardingExplainerExportSets: (payload) => {
       AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINEEXPORTSETS,
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
         onboardingExplainerExportSets: payload,
       });
     },
