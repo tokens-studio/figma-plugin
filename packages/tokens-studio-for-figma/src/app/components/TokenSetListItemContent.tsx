@@ -8,6 +8,7 @@ import {
   activeTokenSetSelector,
   editProhibitedSelector,
   hasUnsavedChangesSelector,
+  tokenSetMetadataSelector,
   usedTokenSetSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -31,6 +32,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
+  const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const dispatch = useDispatch<Dispatch>();
 
@@ -74,6 +76,7 @@ export function TokenSetListItemContent({ item }: Parameters<TreeRenderFunction>
       item={item}
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}
+      canDuplicate={!tokenSetMetadata[item.path]?.isDynamic}
       canReorder={!editProhibited}
       canDelete={!editProhibited || Object.keys(item.tokenSets).length > 1}
       onRename={item.onRename}
