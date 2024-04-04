@@ -30,8 +30,6 @@ export default function useExportSetsTab() {
 
   const store = useStore<RootState>();
 
-  const [showChangeSets, setShowChangeSets] = React.useState(false);
-
   const allSets = useSelector(allTokenSetsSelector);
   const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
     const tokenSet = {
@@ -51,6 +49,7 @@ export default function useExportSetsTab() {
 
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
+  // TODO: filter search with this input
   const handleFilterTree = React.useCallback(
     (event) => {
       const value = event?.target.value;
@@ -59,15 +58,6 @@ export default function useExportSetsTab() {
     },
     [setsTree],
   );
-
-  const handleCancelChangeSets = React.useCallback(() => {
-    // DO NOT SAVE THE SET CHANGES
-    setShowChangeSets(false);
-  }, []);
-
-  const handleShowChangeSets = React.useCallback(() => {
-    setShowChangeSets(true);
-  }, []);
 
   const { control, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -93,6 +83,7 @@ export default function useExportSetsTab() {
 
   const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
+  // FIXME: This no longer works now that it's not inside the secondary modal @Hiroshi
   React.useEffect(() => {
     if (!showChangeSets) {
       const currentSelectedSets = getValues();
@@ -133,7 +124,8 @@ export default function useExportSetsTab() {
               {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
-          <Input placeholder="filter sets"></Input>
+          {/* TODO: filter search with this input */}
+          <Input placeholder="Filter sets" />
           <Stack direction="column" gap={3} justify="between" width="full">
             <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
           </Stack>
