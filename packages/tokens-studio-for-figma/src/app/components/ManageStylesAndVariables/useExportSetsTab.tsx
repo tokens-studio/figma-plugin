@@ -107,6 +107,10 @@ export default function useExportSetsTab() {
   //   }
   // }, [showChangeSets]);
 
+  React.useEffect(() => {
+    console.log('filteredItems: ', filteredItems);
+  }, [filteredItems]);
+
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
       <StyledCard>
