@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Stack } from '@tokens-studio/ui';
 import { IconExpandArrow } from '@/icons';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';

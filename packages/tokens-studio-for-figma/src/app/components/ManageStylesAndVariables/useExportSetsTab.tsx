@@ -144,7 +144,7 @@ export default function useExportSetsTab() {
           </Stack>
           {/* TODO: filter search with this input */}
           <Input placeholder="Filter sets" />
-          <Stack direction="column" gap={3} justify="between" width="full">
+          <Stack direction="column" justify="between" width="full">
             <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
           </Stack>
         </Stack>

@@ -52,7 +52,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
               key={`${item.path}-indicator-${index}`}
               css={{
                 marginLeft: '$3',
-                height: '$7',
+                height: 'calc($7 + $2)',
                 width: '$4',
                 borderLeft: '1px solid $borderMuted',
               }}
