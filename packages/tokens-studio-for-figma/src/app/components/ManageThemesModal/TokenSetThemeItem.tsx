@@ -78,6 +78,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
             // eslint-disable-next-line react/jsx-no-bind
             onValueChange={(val) => {
               if (val) setStatusValue(val as SetStateAction<TokenSetStatus>);
+              onChange({ [val]: val as TokenSetStatus });
             }}
             defaultValue={tokenSetStatus}
           >

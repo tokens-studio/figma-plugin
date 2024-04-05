@@ -20,6 +20,7 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { ExplainerModal } from '../ExplainerModal';
 import OnboardingExplainer from '../OnboardingExplainer';
@@ -55,17 +56,13 @@ export default function useExportSetsTab() {
 
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
-  // TODO: filter search with this input
-  const handleFilterTree = React.useCallback(
-    (event) => {
-      const value = event?.target.value;
-      const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
-      setFilteredItems(filtered);
-    },
-    [setsTree],
-  );
+  const handleFilterTree = useDebouncedCallback((event) => {
+    const value = event?.target.value;
+    const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
+    setFilteredItems(filtered);
+  }, 250);
 
-  const { control, getValues } = useForm<FormValues>({
+  const { control, getValues, formState: { isDirty } } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
@@ -89,6 +86,13 @@ export default function useExportSetsTab() {
 
   const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
+  React.useEffect(() => {
+    if (isDirty) {
+      console.log('values: ', getValues());
+
+    }
+  }, [isDirty, getValues]);
+
   // FIXME: This no longer works now that it's not inside the secondary modal @Hiroshi
   // React.useEffect(() => {
   //   if (!showChangeSets) {
@@ -106,10 +110,6 @@ export default function useExportSetsTab() {
   //     setSelectedSets([...selectedTokenSets]);
   //   }
   // }, [showChangeSets]);
-
-  React.useEffect(() => {
-    console.log('filteredItems: ', filteredItems);
-  }, [filteredItems]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
@@ -147,7 +147,7 @@ export default function useExportSetsTab() {
             </span>
           </Stack>
           {/* TODO: filter search with this input */}
-          <Input placeholder="Filter sets" />
+          <Input placeholder="Filter sets" onChange={handleFilterTree} />
           <Stack direction="column" gap={3} justify="between" width="full">
             <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
           </Stack>
