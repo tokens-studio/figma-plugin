@@ -62,11 +62,15 @@ export default function useExportSetsTab() {
     setFilteredItems(filtered);
   }, 250);
 
-  const { control, getValues, formState: { isDirty } } = useForm<FormValues>({
+  const { control, getValues, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
   });
+
+  const handleSetStatusChange = () => {
+
+  }
 
   const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
     <Controller
@@ -86,13 +90,6 @@ export default function useExportSetsTab() {
 
   const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
-  React.useEffect(() => {
-    if (isDirty) {
-      console.log('values: ', getValues());
-
-    }
-  }, [isDirty, getValues]);
-
   // FIXME: This no longer works now that it's not inside the secondary modal @Hiroshi
   // React.useEffect(() => {
   //   if (!showChangeSets) {
@@ -110,6 +107,17 @@ export default function useExportSetsTab() {
   //     setSelectedSets([...selectedTokenSets]);
   //   }
   // }, [showChangeSets]);
+
+  // React.useEffect(() => {
+  //   console.log('formValues: ', formValues);
+  // }, [formValues]);
+
+  // React.useEffect(() => {
+  //   if (selectedTokenSets) {
+  //     console.log('set default values: ', selectedTokenSets);
+  //     setValue('tokenSets', selectedTokenSets);
+  //   }
+  // }, [selectedTokenSets, setValue]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
