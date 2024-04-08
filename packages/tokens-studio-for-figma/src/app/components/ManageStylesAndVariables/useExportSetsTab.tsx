@@ -68,10 +68,6 @@ export default function useExportSetsTab() {
     },
   });
 
-  const handleSetStatusChange = () => {
-
-  }
-
   const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
     <Controller
       name="tokenSets"
@@ -154,7 +150,6 @@ export default function useExportSetsTab() {
               {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
-          {/* TODO: filter search with this input */}
           <Input placeholder="Filter sets" onChange={handleFilterTree} />
           <Stack direction="column" gap={3} justify="between" width="full">
             <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />

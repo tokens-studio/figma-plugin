@@ -7,7 +7,6 @@ import { styled } from '@stitches/react';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import TokenSetStatusIcon from './TokenSetStatusIcon';
 
 type Props = {
   item: TreeItem
