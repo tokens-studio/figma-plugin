@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useDebouncedCallback } from 'use-debounce';
 
 import Input from '../Input';
 import Modal from '../Modal';
@@ -25,6 +26,7 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
+
 
 export default function useExportSetsTab() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -56,16 +58,15 @@ export default function useExportSetsTab() {
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
+  const [filterQuery, setFilterQuery] = React.useState('');
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
-  const handleFilterTree = React.useCallback(
-    (event) => {
-      const value = event?.target.value;
-      const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
-      setFilteredItems(filtered);
-    },
-    [setsTree],
-  );
+  const handleFilterTree = useDebouncedCallback((event) => {
+    const value = event?.target.value;
+    const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
+    setFilteredItems(filtered);
+    setFilterQuery(value);
+  }, 250);
 
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
@@ -76,7 +77,7 @@ export default function useExportSetsTab() {
     setShowChangeSets(true);
   }, []);
 
-  const { control, getValues } = useForm<FormValues>({
+  const { control, getValues, setValue } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
@@ -117,6 +118,12 @@ export default function useExportSetsTab() {
       setSelectedSets([...selectedTokenSets]);
     }
   }, [showChangeSets, getValues]);
+
+  React.useEffect(() => {
+    if (selectedTokenSets) {
+      setValue('tokenSets', selectedTokenSets);
+    }
+  }, [selectedTokenSets, setValue]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
@@ -165,7 +172,7 @@ export default function useExportSetsTab() {
             marginBlockStart: '$4',
           }}
         >
-          <Input placeholder="Search sets" onInput={handleFilterTree} />
+          <Input placeholder="Search sets" onInput={handleFilterTree} value={filterQuery} />
           <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
         </Stack>
       </Modal>
