@@ -1,6 +1,7 @@
+
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
-  Tabs, Stack, Heading, Button, Link, Label, Accordion, IconButton,
+  Tabs, Stack, Heading, Button, Link,
 } from '@tokens-studio/ui';
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
@@ -8,9 +9,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import Input from '../Input';
-
+import Modal from '../Modal';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { StyledCard } from './StyledCard';
+
+import { ExplainerModal } from '../ExplainerModal';
+import OnboardingExplainer from '../OnboardingExplainer';
+import { Dispatch } from '../../store';
 
 import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
 import { docsLinks } from './docsLinks';
@@ -20,10 +25,6 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-
-import { ExplainerModal } from '../ExplainerModal';
-import OnboardingExplainer from '../OnboardingExplainer';
-import { Dispatch } from '../../store';
 
 export default function useExportSetsTab() {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -35,6 +36,8 @@ export default function useExportSetsTab() {
     dispatch.uiState.setOnboardingExplainerExportSets(false);
   }, [dispatch]);
   const onboardingExplainerExportSets = useSelector((state: RootState) => state.uiState.onboardingExplainerExportSets);
+
+  const [showChangeSets, setShowChangeSets] = React.useState(false);
 
   const allSets = useSelector(allTokenSetsSelector);
   const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
@@ -55,7 +58,6 @@ export default function useExportSetsTab() {
 
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
-  // TODO: filter search with this input
   const handleFilterTree = React.useCallback(
     (event) => {
       const value = event?.target.value;
@@ -64,6 +66,15 @@ export default function useExportSetsTab() {
     },
     [setsTree],
   );
+
+  const handleCancelChangeSets = React.useCallback(() => {
+    // DO NOT SAVE THE SET CHANGES
+    setShowChangeSets(false);
+  }, []);
+
+  const handleShowChangeSets = React.useCallback(() => {
+    setShowChangeSets(true);
+  }, []);
 
   const { control, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -89,23 +100,23 @@ export default function useExportSetsTab() {
 
   const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
-  // FIXME: This no longer works now that it's not inside the secondary modal @Hiroshi
-  // React.useEffect(() => {
-  //   if (!showChangeSets) {
-  //     const currentSelectedSets = getValues();
-  //     const selectedTokenSets: ExportTokenSet[] = Object.keys(currentSelectedSets.tokenSets).reduce((acc: ExportTokenSet[], curr: string) => {
-  //       if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
-  //         const tokenSet = {
-  //           set: curr,
-  //           status: currentSelectedSets.tokenSets[curr],
-  //         } as ExportTokenSet;
-  //         acc.push(tokenSet);
-  //       }
-  //       return acc;
-  //     }, [] as ExportTokenSet[]);
-  //     setSelectedSets([...selectedTokenSets]);
-  //   }
-  // }, [showChangeSets]);
+  // FIXME: This doesn't seem to be working at all?
+  React.useEffect(() => {
+    if (!showChangeSets) {
+      const currentSelectedSets = getValues();
+      const selectedTokenSets: ExportTokenSet[] = Object.keys(currentSelectedSets.tokenSets).reduce((acc: ExportTokenSet[], curr: string) => {
+        if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
+          const tokenSet = {
+            set: curr,
+            status: currentSelectedSets.tokenSets[curr],
+          } as ExportTokenSet;
+          acc.push(tokenSet);
+        }
+        return acc;
+      }, [] as ExportTokenSet[]);
+      setSelectedSets([...selectedTokenSets]);
+    }
+  }, [showChangeSets, getValues]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
@@ -142,14 +153,22 @@ export default function useExportSetsTab() {
               {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
-          {/* TODO: filter search with this input */}
-          <Input placeholder="Filter sets" />
-          <Stack direction="column" justify="between" width="full">
-            <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
-          </Stack>
+          <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
         </Stack>
       </StyledCard>
-
+      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Variables / Export Sets">
+        <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
+        <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
+        <Stack
+          direction="column"
+          css={{
+            marginBlockStart: '$4',
+          }}
+        >
+          <Input placeholder="Search sets" onInput={handleFilterTree} />
+          <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
+        </Stack>
+      </Modal>
     </Tabs.Content>
   );
   return {
