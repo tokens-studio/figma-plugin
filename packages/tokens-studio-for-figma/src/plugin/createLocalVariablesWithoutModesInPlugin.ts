@@ -8,6 +8,7 @@ import { notifyUI } from './notifiers';
 import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { mergeVariableReferences } from './mergeVariableReferences';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -15,14 +16,17 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
-  console.log('creating local variables in plugin without modes');
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
-  const initialVariablesCount = figma.variables.getLocalVariables().length;
-  const initialVariableCollectionsCount = figma.variables.getLocalVariableCollections().length;
+  const updatedVariableCollections: VariableCollection[] = [];
+  let updatedVariables;
+
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
+    const figmaVariables = await figma.variables.getLocalVariablesAsync();
+    const existingVariables = await mergeVariableReferences({ localVariables: figmaVariables });
+
     const theme = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
@@ -64,16 +68,15 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         }
       }
     });
+    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
-  const figmaVariables = figma.variables.getLocalVariables();
-  updateVariablesToReference(figmaVariables, referenceVariableCandidates);
-  if (figmaVariables.length === 0) {
+  if (updatedVariables.length === 0) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${figma.variables.getLocalVariableCollections().length - initialVariableCollectionsCount} collections and ${figma.variables.getLocalVariables().length - initialVariablesCount} variables created`);
+    notifyUI(`${updatedVariableCollections.length} collections and ${updatedVariables.length} variables created`);
   }
   return {
     allVariableCollectionIds,
-    totalVariables: figmaVariables.length,
+    totalVariables: updatedVariables.length,
   };
 }

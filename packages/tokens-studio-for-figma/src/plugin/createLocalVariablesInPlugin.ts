@@ -7,6 +7,7 @@ import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
 import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
+import { mergeVariableReferences } from './mergeVariableReferences';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -14,20 +15,21 @@ export type LocalVariableInfo = {
   variableIds: Record<string, string>
 };
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[]) {
-  console.log('creating local variables in plugin');
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
-  let updatedVariableCollections;
+  const updatedVariableCollections: VariableCollection[] = [];
+  let updatedVariables;
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
-    themeInfo.themes.forEach(async (theme) => {
-      if (!selectedThemes || (selectedThemes && selectedThemes.includes(theme.id))) {
-        console.log('Creating variables for theme', theme.name);
+    const figmaVariables = await figma.variables.getLocalVariablesAsync();
+    const existingVariables = await mergeVariableReferences({ themes: themeInfo.themes, localVariables: figmaVariables });
+    await Promise.all(themeInfo.themes.map(async (theme) => {
+      if (selectedThemes && selectedThemes.includes(theme.id)) {
         const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
         if (collection) {
           const mode = collection.modes.find((m) => m.name === theme.name);
@@ -63,11 +65,9 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           updatedVariableCollections.push(newCollection);
         }
       }
-    });
+    }));
+    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
-  const figmaVariables = figma.variables.getLocalVariables();
-
-  const updatedVariables = await updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (updatedVariables.length === 0) {
     notifyUI('No variables were created');
   } else {

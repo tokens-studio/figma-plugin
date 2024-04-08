@@ -18,61 +18,58 @@ export default async function setValuesOnVariable(
   collection: VariableCollection,
   mode: string,
 ) {
-  console.log('setting values on variable');
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
-    await Promise.all(tokens.map(async (t) => {
-      console.log('setting values on variable', t);
-      const variableType = convertTokenTypeToVariableType(t.type);
+    await Promise.all(tokens.map(async (token) => {
+      const variableType = convertTokenTypeToVariableType(token.type);
       // Find the connected variable
-      let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
+      let variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path);
       if (!variable) {
-        variable = figma.variables.createVariable(t.path, collection.id, variableType);
+        variable = figma.variables.createVariable(token.path, collection.id, variableType);
       }
       if (variable) {
-        variable.description = t.description ?? '';
+        variable.description = token.description ?? '';
         switch (variableType) {
           case 'BOOLEAN':
-            if (typeof t.value === 'string') {
-              setBooleanValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'COLOR':
-            if (typeof t.value === 'string') {
-              setColorValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setColorValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'FLOAT':
-            setNumberValuesOnVariable(variable, mode, Number(t.value));
+            setNumberValuesOnVariable(variable, mode, Number(token.value));
             break;
           case 'STRING':
-            if (typeof t.value === 'string') {
-              setStringValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setStringValuesOnVariable(variable, mode, token.value);
             }
             break;
           default:
             break;
         }
         let referenceTokenName: string = '';
-        if (t.rawValue && t.rawValue?.toString().startsWith('{')) {
-          referenceTokenName = t.rawValue?.toString().slice(1, t.rawValue.toString().length - 1);
+        if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
+          referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
         } else {
-          referenceTokenName = t.rawValue!.toString().substring(1);
+          referenceTokenName = token.rawValue!.toString().substring(1);
         }
-        variableKeyMap[t.name] = variable.key;
-        if (checkCanReferenceVariable(t)) {
-          console.log('referenceVariableCandidates', referenceTokenName);
+        variableKeyMap[token.name] = variable.key;
+        if (token && checkCanReferenceVariable(token)) {
           referenceVariableCandidates.push({
             variable,
             modeId: mode,
-            referenceVariable: referenceTokenName.split('.').join('/'),
+            referenceVariable: referenceTokenName,
           });
         }
       }
     }));
   } catch (e) {
-    console.error('Setting values on variable is failed', e);
+    console.error('Setting values on variable failed', e);
   }
 
   return {
