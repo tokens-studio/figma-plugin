@@ -1,4 +1,3 @@
-
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
   Tabs, Stack, Heading, Button, Link,
@@ -27,17 +26,16 @@ import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 
-
 export default function useExportSetsTab() {
-  const { t } = useTranslation(['manageStylesAndVariables']);
-
-  const store = useStore<RootState>();
-
   const dispatch = useDispatch<Dispatch>();
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerExportSets(false);
   }, [dispatch]);
   const onboardingExplainerExportSets = useSelector((state: RootState) => state.uiState.onboardingExplainerExportSets);
+
+  const { t } = useTranslation(['manageStylesAndVariables']);
+
+  const store = useStore<RootState>();
 
   const [showChangeSets, setShowChangeSets] = React.useState(false);
 
@@ -46,7 +44,7 @@ export default function useExportSetsTab() {
     const tokenSet = {
       set,
       status: TokenSetStatus.ENABLED,
-    };
+    }
     return tokenSet;
   }));
 
@@ -58,15 +56,17 @@ export default function useExportSetsTab() {
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
-  const [filterQuery, setFilterQuery] = React.useState('');
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
+  const [filterQuery, setFilterQuery] = React.useState(''); // eslint-disable-line
 
-  const handleFilterTree = useDebouncedCallback((event) => {
-    const value = event?.target.value;
-    const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
-    setFilteredItems(filtered);
-    setFilterQuery(value);
-  }, 250);
+  const handleFilterTree = React.useCallback(
+    (event) => {
+      const value = event?.target.value;
+      const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
+      setFilteredItems(filtered);
+    },
+    [setsTree],
+  );
 
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
@@ -77,7 +77,7 @@ export default function useExportSetsTab() {
     setShowChangeSets(true);
   }, []);
 
-  const { control, getValues, setValue } = useForm<FormValues>({
+  const { control, getValues } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
     },
@@ -99,9 +99,10 @@ export default function useExportSetsTab() {
     />
   ), [control]);
 
-  const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
+  const selectedEnabledSets = useMemo(() => {
+    return selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED);
+  }, [selectedSets]);
 
-  // FIXME: This doesn't seem to be working at all?
   React.useEffect(() => {
     if (!showChangeSets) {
       const currentSelectedSets = getValues();
@@ -109,7 +110,7 @@ export default function useExportSetsTab() {
         if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
           const tokenSet = {
             set: curr,
-            status: currentSelectedSets.tokenSets[curr],
+            status: currentSelectedSets.tokenSets[curr]
           } as ExportTokenSet;
           acc.push(tokenSet);
         }
@@ -117,13 +118,7 @@ export default function useExportSetsTab() {
       }, [] as ExportTokenSet[]);
       setSelectedSets([...selectedTokenSets]);
     }
-  }, [showChangeSets, getValues]);
-
-  React.useEffect(() => {
-    if (selectedTokenSets) {
-      setValue('tokenSets', selectedTokenSets);
-    }
-  }, [selectedTokenSets, setValue]);
+  }, [showChangeSets]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
