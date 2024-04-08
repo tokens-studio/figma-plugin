@@ -73,7 +73,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
               key={`${item.path}-indicator-${index}`}
               css={{
                 marginLeft: '$3',
-                height: 'calc($7 + $2)',
+                height: '$7',
                 width: '$4',
                 borderLeft: '1px solid $borderMuted',
               }}
@@ -111,5 +111,4 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
         )}
       </Stack>
     )
-  );
-};
+  )
