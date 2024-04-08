@@ -111,4 +111,6 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
         )}
       </Stack>
     )
-  )
+  );
+};
+    
