@@ -759,7 +759,6 @@ describe('useToken test', () => {
         wrapper: ({ children }: { children?: React.ReactNode }) => (
           <Provider store={tokenMockStore}>
             <TokensContext.Provider value={customTokens}>{children}</TokensContext.Provider>
-            ,
           </Provider>
         ),
       }).result;

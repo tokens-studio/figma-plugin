@@ -35,9 +35,7 @@ export default async function updateVariables({
       }
     }
   });
-  console.log('variables to create', variablesToCreate);
   const variableObj = await setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
-  console.log('variableObj', variableObj);
   return {
     variableIds: variableObj.variableKeyMap,
     referenceVariableCandidate: variableObj.referenceVariableCandidates,
