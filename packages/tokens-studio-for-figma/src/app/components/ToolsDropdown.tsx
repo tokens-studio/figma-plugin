@@ -38,7 +38,7 @@ export default function ToolsDropdown() {
           <IconButton tooltip={t('tools')} aria-label={t('tools')} size="small" variant="invisible" icon={<FileZipIcon />} />
         </DropdownMenu.Trigger>
 
-        <DropdownMenu.Content side="top">
+        <DropdownMenu.Content side="top" css={{ zIndex: 100 }}>
           <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
           <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
         </DropdownMenu.Content>
