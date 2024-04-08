@@ -7,7 +7,6 @@ import {
 } from '@/types/tokens';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
-import updateVariablesToReference from './updateVariablesToReference';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 
 export default async function syncVariables(tokens: Record<string, AnyTokenList>, options: Record<SyncVariableOption, boolean>, settings: SettingsState) {
@@ -17,7 +16,7 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
   });
   const connectedVariablesMap: Record<string, Variable> = {};
   const variableMap = getVariablesMap();
-  let referenceVariableCandidates: ReferenceVariableType[] = [];
+  const referenceVariableCandidates: ReferenceVariableType[] = [];
   themeInfo.themes.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([tokenName, variableId]) => {
       const variable = variableMap[variableId];
@@ -36,13 +35,14 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
         const allVariableObj = updateVariables({
           collection, mode: theme.$figmaModeId, theme, tokens, settings,
         });
-        referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
+        // referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
     }
   });
 
   const figmaVariables = figma.variables.getLocalVariables();
-  updateVariablesToReference(figmaVariables, referenceVariableCandidates);
+  // TODO in a followup PR: delete any trace of syncVariables and syncStyles
+  // updateVariablesToReference(figmaVariables, referenceVariableCandidates);
 
   // remove
   if (options.removeVariable) {

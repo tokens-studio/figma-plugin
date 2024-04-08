@@ -14,14 +14,15 @@ export type CreateVariableTypes = {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
+  filterByTokenSet?: string;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default async function updateVariables({
-  collection, mode, theme, tokens, settings,
+  collection, mode, theme, tokens, settings, filterByTokenSet,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
+  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable, filterByTokenSet);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {

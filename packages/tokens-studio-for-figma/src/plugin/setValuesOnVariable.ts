@@ -26,7 +26,7 @@ export default async function setValuesOnVariable(
       // Find the connected variable
       let variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path);
       if (!variable) {
-        variable = figma.variables.createVariable(token.path, collection.id, variableType);
+        variable = figma.variables.createVariable(token.path, collection, variableType);
       }
       if (variable) {
         variable.description = token.description ?? '';

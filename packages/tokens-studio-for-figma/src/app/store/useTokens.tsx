@@ -341,7 +341,7 @@ export default function useTokens() {
       return;
     }
 
-    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }))
+    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
 
     const resolved = defaultTokenResolver.setTokens(tokensToResolve);
     const withoutSourceTokens = resolved.filter((token) => (
@@ -376,8 +376,8 @@ export default function useTokens() {
       if (selectedThemes.includes(curr.id)) {
         acc = {
           ...acc,
-          ...curr.selectedTokenSets
-        }
+          ...curr.selectedTokenSets,
+        };
       }
       return acc;
     }, {});
@@ -391,7 +391,7 @@ export default function useTokens() {
       return;
     }
 
-    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }))
+    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
 
     const resolved = defaultTokenResolver.setTokens(tokensToResolve);
     const withoutSourceTokens = resolved.filter((token) => (
@@ -556,7 +556,7 @@ export default function useTokens() {
         }
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS,
       tokens: selectedSetsTokens,
       settings,
       selectedSets,

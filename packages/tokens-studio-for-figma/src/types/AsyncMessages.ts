@@ -64,7 +64,7 @@ export enum AsyncMessageTypes {
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
-  CREATE_LOCAL_VARIABLES_WITHOUT_MODES = 'async/create-local-variables-without-modes',
+  CREATE_LOCAL_VARIABLES_FROM_SETS = 'async/create-local-variables-from-sets',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
@@ -289,12 +289,12 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
   totalVariables: number
 }>;
 
-export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+export type CreateLocalVariablesFromSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS, {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedSets: ExportTokenSet[]
 }>;
-export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+export type CreateLocalVariablesFromSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS, {
   variableIds: Record<string, LocalVariableInfo>
   totalVariables: number
 }>;
@@ -388,7 +388,7 @@ export type AsyncMessages =
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
-  | CreateLocalVariablesWithoutModesAsyncMessage
+  | CreateLocalVariablesFromSetsAsyncMessage
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
@@ -434,7 +434,7 @@ export type AsyncMessageResults =
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult
-  | CreateLocalVariablesWithoutModesAsyncMessageResult
+  | CreateLocalVariablesFromSetsAsyncMessageResult
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult

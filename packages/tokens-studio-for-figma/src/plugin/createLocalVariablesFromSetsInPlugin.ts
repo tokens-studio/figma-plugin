@@ -9,13 +9,10 @@ import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { mergeVariableReferences } from './mergeVariableReferences';
+import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 
-export type LocalVariableInfo = {
-  collectionId: string;
-  modeId: string;
-  variableIds: Record<string, string>
-};
-export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+// This function is used to create variables based on token sets, without the use of themes
+export default async function createLocalVariablesFromSetsInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
@@ -24,50 +21,42 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
-    const figmaVariables = await figma.variables.getLocalVariablesAsync();
-    const existingVariables = await mergeVariableReferences({ localVariables: figmaVariables });
-
-    const theme = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
+    const themeContainer = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
         [curr.set]: curr.status,
       };
       return acc;
     }, {} as ThemeObject);
-    selectedSets.forEach(async (set: ExportTokenSet, index) => {
+    await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
-        const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set.set);
+        const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+        let collection = allCollections.find((vr) => vr.name === set.set);
+        let modeId;
         if (collection) {
           const mode = collection.modes.find((m) => m.name === set.set);
-          const modeId: string = mode?.modeId ?? createVariableMode(collection, set.set);
-          if (modeId) {
-            const allVariableObj = await updateVariables({
-              collection, mode: modeId, theme, tokens, settings,
-            });
-            if (Object.keys(allVariableObj.variableIds).length > 0) {
-              allVariableCollectionIds[index] = {
-                collectionId: collection.id,
-                modeId,
-                variableIds: allVariableObj.variableIds,
-              };
-              referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
-            }
-          }
+          modeId = mode?.modeId ?? createVariableMode(collection, set.set);
         } else {
-          const newCollection = figma.variables.createVariableCollection(set.set);
-          newCollection.renameMode(newCollection.modes[0].modeId, set.set);
-          const allVariableObj = await updateVariables({
-            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings,
-          });
+          collection = figma.variables.createVariableCollection(set.set);
+          collection.renameMode(collection.modes[0].modeId, set.set);
+          modeId = collection.modes[0].modeId;
+        }
+
+        const allVariableObj = await updateVariables({
+          collection, mode: modeId, theme: themeContainer, tokens, settings, filterByTokenSet: set.set,
+        });
+        if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
-            collectionId: newCollection.id,
-            modeId: newCollection.modes[0].modeId,
+            collectionId: collection.id,
+            modeId,
             variableIds: allVariableObj.variableIds,
           };
           referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
         }
       }
-    });
+    }));
+    const figmaVariables = await figma.variables.getLocalVariablesAsync();
+    const existingVariables = await mergeVariableReferences({ localVariables: figmaVariables });
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
   if (updatedVariables.length === 0) {
