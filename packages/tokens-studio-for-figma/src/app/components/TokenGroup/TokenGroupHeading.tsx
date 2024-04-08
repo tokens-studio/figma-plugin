@@ -7,7 +7,7 @@ import {
 } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
-import { editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -30,6 +30,7 @@ export function TokenGroupHeading({
 }: Props) {
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
@@ -37,6 +38,8 @@ export function TokenGroupHeading({
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup, remapTokensWithOtherReference } = useTokens();
+
+  const canEdit = !editProhibited && !activeTokenSetReadOnly;
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
@@ -96,13 +99,13 @@ export function TokenGroupHeading({
           </ContextMenu.Trigger>
           <ContextMenu.Portal>
             <ContextMenu.Content>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleRename}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
                 {t('rename')}
               </ContextMenu.Item>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleDuplicate}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleDuplicate}>
                 {t('duplicate')}
               </ContextMenu.Item>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleDelete}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleDelete}>
                 {t('delete')}
               </ContextMenu.Item>
             </ContextMenu.Content>
@@ -133,7 +136,7 @@ export function TokenGroupHeading({
         tooltip={t('addNew', { ns: 'tokens' })}
         tooltipSide="left"
         onClick={handleShowNewForm}
-        disabled={editProhibited}
+        disabled={!canEdit}
         data-testid="button-add-new-token-in-group"
         size="small"
         variant="invisible"

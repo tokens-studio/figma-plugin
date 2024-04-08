@@ -24,6 +24,7 @@ export type TokenSetItemProps = {
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
   canEdit: boolean;
+  canDuplicate?: boolean;
   canDelete: boolean;
   canReorder?: boolean;
   extraBefore?: React.ReactNode;
@@ -44,6 +45,7 @@ export function TokenSetItem({
   isChecked,
   onCheck,
   canEdit,
+  canDuplicate = true,
   canDelete,
   canReorder = false,
   extraBefore,
@@ -160,7 +162,7 @@ export function TokenSetItem({
               <>
                 {canEdit && (
                   <>
-                    <ContextMenu.Item onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
+                    <ContextMenu.Item disabled={!canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
                     <ContextMenu.Item disabled={!canDelete} onSelect={handleDelete}>
                       {t('delete')}
                     </ContextMenu.Item>

@@ -24,6 +24,7 @@ describe('Can set values on node', () => {
       tokens: [{
         name: 'fg.default',
         value: '#ff0000',
+        rawValue: '#ff0000',
         type: TokenTypes.COLOR,
       },
       {
@@ -501,7 +502,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, { value: '#ff0000' }, 'fills');
+    expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, 'colors.red', 'fills');
   });
 
   it('sets strokeStyleId if matching Style', async () => {

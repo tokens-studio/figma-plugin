@@ -37,6 +37,8 @@ async function tryApplyCompositeVariable({
   baseFontSize: string;
   resolvedValue: ResolvedShadowObject;
 }) {
+  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences;
+
   const { color, opacity: a } = convertToFigmaColor(value.color);
   const { r, g, b } = color;
 
@@ -57,7 +59,7 @@ async function tryApplyCompositeVariable({
   };
   try {
     for (const [key, val] of Object.entries(resolvedValue)) {
-      if (val.toString().startsWith('{') && val.toString().endsWith('}')) {
+      if (val.toString().startsWith('{') && val.toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
         if (variableToApply) {
           effect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);

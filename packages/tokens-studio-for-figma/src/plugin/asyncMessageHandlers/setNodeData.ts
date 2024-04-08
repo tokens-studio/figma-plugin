@@ -16,7 +16,11 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
       } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
 
       await defaultTokenValueRetriever.initiate({
-        tokens: msg.tokens, variableReferences: figmaVariableReferences, styleReferences: figmaStyleReferences, stylePathPrefix, ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+        tokens: msg.tokens,
+        variableReferences: figmaVariableReferences,
+        styleReferences: figmaStyleReferences,
+        stylePathPrefix,
+        ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
       });
 
       await updatePluginDataAndNodes({
