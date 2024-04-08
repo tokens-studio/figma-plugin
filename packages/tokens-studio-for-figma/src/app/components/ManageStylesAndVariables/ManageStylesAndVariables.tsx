@@ -20,12 +20,14 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const isPro = useIsProUser();
 
-  const [showOptions, setShowOptions] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro? 'useThemes': 'useSets');
+  const [showOptions, setShowOptions] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro ? 'useThemes' : 'useSets');
 
   const { ExportThemesTab, selectedThemes } = useExportThemesTab();
   const { ExportSetsTab, selectedSets } = useExportSetsTab();
-  const { createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes } = useTokens();
+  const {
+    createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
+  } = useTokens();
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);
@@ -49,7 +51,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 
   useEffect(() => {
-    setCanExportToFigma(activeTab === 'useSets'? true: selectedThemes.length > 0);
+    setCanExportToFigma(activeTab === 'useSets' ? true : selectedThemes.length > 0);
   }, [selectedThemes, activeTab]);
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
@@ -95,7 +97,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   )}
         stickyFooter
       >
-        <Tabs defaultValue={isPro? 'useThemes': 'useSets'}>
+        <Tabs defaultValue={isPro ? 'useThemes' : 'useSets'}>
           <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
@@ -107,7 +109,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
           <ExportSetsTab />
         </Tabs>
       </Modal>
-      <OptionsModal isOpen={showOptions} title="Manage / Export Options" closeAction={handleCancelOptions} />
+      <OptionsModal isOpen={showModal && showOptions} title="Export to Figma: Options" closeAction={handleCancelOptions} />
     </>
   );
 }
