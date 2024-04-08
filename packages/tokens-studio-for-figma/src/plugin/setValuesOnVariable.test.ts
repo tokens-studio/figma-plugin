@@ -49,6 +49,6 @@ describe('SetValuesOnVariable', () => {
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode);
-    expect(mockCreateVariable).toBeCalledWith('button/primary/width', 'VariableCollectionId:309:16430', 'FLOAT');
+    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 });

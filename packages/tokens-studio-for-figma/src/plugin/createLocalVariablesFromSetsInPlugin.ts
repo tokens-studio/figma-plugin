@@ -17,7 +17,7 @@ export default async function createLocalVariablesFromSetsInPlugin(tokens: Recor
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
-  let updatedVariables;
+  let updatedVariables: Variable[] = [];
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {

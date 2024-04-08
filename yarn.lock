@@ -3025,10 +3025,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.85.0":
-  version "1.85.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.85.0.tgz#dfbe722ebffd3e84e070b3a75c62ba0a932c7c56"
-  integrity sha512-o6oJ4FrjBIVbwteJ6DbCvjU8UXbN9QzA5FgjNosTE+HpwntPSEbpVFPkgEFuI1G/GhJXrhXR8/QcuBabwZ+JLw==
+"@figma/plugin-typings@^1.90.0":
+  version "1.90.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.90.0.tgz#b69d9cf6605ab3050d4076ea0e28671be0531889"
+  integrity sha512-RvZrSkuV0SABRaYuRFO/S30u9+RGKJm6+CPjSG7MaMo60p8S1sX5YOWT+zDWZC6mqNEaxLkrbXdiyqWXsfdHQg==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"
@@ -5966,10 +5966,10 @@
   resolved "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.5.1.tgz"
   integrity sha512-UCcUKrUYGj7ClomOo2SpNVvx4/fkd/2BbIHDCle8A0ax+P3bU7yJwDBDrS6ZwdTMARWTGODX1hEsCcO+7beJjg==
 
-"@tokens-studio/sdk@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.2.tgz#6ac301ffee69b4e34faa06c1309c1770552c2447"
-  integrity sha512-MzvFsfouksoUKQEUTAnoFDMO6bY+GW9saIQKwwWJrczvlg98elrG3poP6I7CBeMIkI2dS2IC20fN1SeTQlwv1w==
+"@tokens-studio/sdk@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.3.tgz#acdc3ed52308f692b320005aadb73378f73637c1"
+  integrity sha512-t8bTglnzQJjYo6rB8S9AK4MEJrETY6PWc7X2HZvJc+wjXcdusutuK9Y4EpOq9pEna9rNJU4DyJIsg4k0gZjx5w==
   dependencies:
     "@aws-amplify/api" "^5.0.19"
     "@aws-amplify/auth" "^5.1.13"
