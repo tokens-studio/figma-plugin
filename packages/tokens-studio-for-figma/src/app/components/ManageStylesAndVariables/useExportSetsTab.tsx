@@ -54,12 +54,14 @@ export default function useExportSetsTab() {
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
+  const [filterQuery, setFilterQuery] = React.useState('');
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
 
   const handleFilterTree = useDebouncedCallback((event) => {
     const value = event?.target.value;
     const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
     setFilteredItems(filtered);
+    setFilterQuery(value);
   }, 250);
 
   const { control, getValues, watch, setValue } = useForm<FormValues>({
@@ -150,7 +152,7 @@ export default function useExportSetsTab() {
               {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
-          <Input placeholder="Filter sets" onChange={handleFilterTree} />
+          <Input defaultValue={filterQuery} placeholder="Filter sets" onChange={handleFilterTree} />
           <Stack direction="column" gap={3} justify="between" width="full">
             <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
           </Stack>
