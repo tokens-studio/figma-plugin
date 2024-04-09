@@ -4,7 +4,6 @@ import Box from '../Box';
 export const StyledThemeLabel = styled(Box, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  height: '1em',
   userSelect: 'none',
   cursor: 'pointer',
   display: 'flex',
