@@ -3,9 +3,8 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  ContextMenu,
+  Checkbox, ContextMenu,
 } from '@tokens-studio/ui';
-import Checkbox from '../Checkbox';
 import Box from '../Box';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
