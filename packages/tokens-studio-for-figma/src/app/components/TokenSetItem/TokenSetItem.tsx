@@ -146,11 +146,16 @@ export function TokenSetItem({
               <Box
                 css={{
                   overflow: 'hidden',
+                  height: '1.5em',
+                  maxWidth: 'calc(100% - $izes$6)',
+                  whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   userSelect: 'none',
                 }}
               >
-                {item.label}
+                <Tooltip label={item.label} side="right">
+                  <span>{item.label}</span>
+                </Tooltip>
               </Box>
             </StyledDragButton>
           </ContextMenu.Trigger>

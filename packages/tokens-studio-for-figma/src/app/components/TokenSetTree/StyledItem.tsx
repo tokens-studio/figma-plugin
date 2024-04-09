@@ -9,4 +9,5 @@ export const StyledItem = styled(Box, {
   fontWeight: '$sansBold',
   fontSize: '$xsmall',
   width: '100%',
+  textOverflow: 'ellipsis',
 });
