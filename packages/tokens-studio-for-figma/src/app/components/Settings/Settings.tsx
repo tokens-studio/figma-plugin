@@ -12,7 +12,7 @@ import { LanguageSelector } from '../LanguageSelector';
 import { Dispatch } from '../../store';
 import {
   storeTokenIdInJsonEditorSelector,
-  uiStateSelector
+  uiStateSelector,
 } from '@/selectors';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
 import { Divider } from '../Divider';
@@ -170,7 +170,7 @@ function Settings() {
                       {' '}
                       {t('forMoreInformationPleaseSeeOur')}
                       {' '}
-                      <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
+                      <Link href="https://tokens.studio/privacy" target="_blank">{t('privacyPolicy')}</Link>
                     </Box>
                   </ExplainerModal>
                   <Box
