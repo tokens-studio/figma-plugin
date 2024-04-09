@@ -416,7 +416,6 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       });
     },
-    // TODO: onboarding - export sets
     setOnboardingExplainerExportSets: (payload) => {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
