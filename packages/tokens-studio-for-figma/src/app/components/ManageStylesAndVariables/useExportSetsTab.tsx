@@ -57,7 +57,7 @@ export default function useExportSetsTab() {
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
-  const [filterQuery, setFilterQuery] = React.useState(''); // eslint-disable-line
+
 
   const handleFilterTree = React.useCallback(
     (event) => {
@@ -167,7 +167,7 @@ export default function useExportSetsTab() {
             marginBlockStart: '$4',
           }}
         >
-          <Input placeholder="Search sets" onInput={handleFilterTree} value={filterQuery} />
+          <Input placeholder="Search sets" onInput={handleFilterTree} />
           <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
         </Stack>
       </Modal>
