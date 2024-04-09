@@ -10,7 +10,7 @@ import {
   ContextMenu,
 } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import { activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
 import { MoreButtonProperty } from './MoreButtonProperty';
 import { DocumentationProperties } from '@/constants/DocumentationProperties';
@@ -54,8 +54,11 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const setNodeData = useSetNodeData();
   const dispatch = useDispatch<Dispatch>();
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const { deleteSingleToken } = useManageTokens();
+
+  const canEdit = !editProhibited && !activeTokenSetReadOnly;
 
   const resolvedValue = useMemo(
     () => getAliasValue(token, tokensContext.resolvedTokens),
@@ -128,13 +131,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const handleTokenClick = React.useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const isMacBrowser = /Mac/.test(navigator.platform);
-      if (!editProhibited && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
+      if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
         handleClick(properties[0]);
       }
     },
-    [properties, handleClick, handleEditClick, editProhibited],
+    [canEdit, handleEditClick, handleClick, properties],
   );
 
 
@@ -190,16 +193,16 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
             </ContextMenu.Portal>
           </ContextMenu.Sub>
           <ContextMenu.Separator />
-          <ContextMenu.Item onSelect={handleEditClick} disabled={editProhibited}>
+          <ContextMenu.Item onSelect={handleEditClick} disabled={!canEdit}>
             Edit Token
           </ContextMenu.Item>
-          <ContextMenu.Item onSelect={handleDuplicateClick} disabled={editProhibited}>
+          <ContextMenu.Item onSelect={handleDuplicateClick} disabled={!canEdit}>
             Duplicate Token
           </ContextMenu.Item>
           <ContextMenu.Item onSelect={(event) => handleCopyTokenName(event, token.name)}>
             Copy Token Path
           </ContextMenu.Item>
-          <ContextMenu.Item onSelect={handleDeleteClick} disabled={editProhibited}>
+          <ContextMenu.Item onSelect={handleDeleteClick} disabled={!canEdit}>
             Delete Token
           </ContextMenu.Item>
         </ContextMenu.Content>

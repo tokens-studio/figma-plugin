@@ -189,21 +189,23 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                 </Button>
                 )}
               </Box>
-              <Button
-                data-testid="button-manage-themes-modal-cancel"
-                variant="secondary"
-                onClick={handleToggleOpenThemeEditor}
-              >
-                Cancel
-              </Button>
-              <Button
-                data-testid="button-manage-themes-modal-save-theme"
-                variant="primary"
-                type="submit"
-                form="form-create-or-edit-theme"
-              >
-                Save theme
-              </Button>
+              <Stack direction="row" gap={4}>
+                <Button
+                  data-testid="button-manage-themes-modal-cancel"
+                  variant="secondary"
+                  onClick={handleToggleOpenThemeEditor}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  data-testid="button-manage-themes-modal-save-theme"
+                  variant="primary"
+                  type="submit"
+                  form="form-create-or-edit-theme"
+                >
+                  Save theme
+                </Button>
+              </Stack>
             </>
           )}
         </Stack>

@@ -3,9 +3,8 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  ContextMenu,
+  Checkbox, ContextMenu,
 } from '@tokens-studio/ui';
-import Checkbox from '../Checkbox';
 import Box from '../Box';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
@@ -24,6 +23,7 @@ export type TokenSetItemProps = {
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
   canEdit: boolean;
+  canDuplicate?: boolean;
   canDelete: boolean;
   canReorder?: boolean;
   extraBefore?: React.ReactNode;
@@ -44,6 +44,7 @@ export function TokenSetItem({
   isChecked,
   onCheck,
   canEdit,
+  canDuplicate = true,
   canDelete,
   canReorder = false,
   extraBefore,
@@ -160,7 +161,7 @@ export function TokenSetItem({
               <>
                 {canEdit && (
                   <>
-                    <ContextMenu.Item onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
+                    <ContextMenu.Item disabled={!canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
                     <ContextMenu.Item disabled={!canDelete} onSelect={handleDelete}>
                       {t('delete')}
                     </ContextMenu.Item>

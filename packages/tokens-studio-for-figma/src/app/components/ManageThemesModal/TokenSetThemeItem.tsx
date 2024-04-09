@@ -30,10 +30,12 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
   ), [item.path, value]);
 
   const handleValueChange = useCallback((status: string) => {
-    onChange({
-      ...value,
-      [item.path]: status as TokenSetStatus,
-    });
+    if (status) {
+      onChange({
+        ...value,
+        [item.path]: status as TokenSetStatus,
+      });
+    }
   }, [item, value, onChange]);
 
   const handleCycleValue = useCallback(() => {
