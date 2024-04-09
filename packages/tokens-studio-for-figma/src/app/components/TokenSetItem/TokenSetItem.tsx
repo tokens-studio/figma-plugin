@@ -147,7 +147,7 @@ export function TokenSetItem({
                 css={{
                   overflow: 'hidden',
                   height: '1.5em',
-                  maxWidth: 'calc(100% - $izes$6)',
+                  maxWidth: 'calc(100% - $sizes$6)',
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   userSelect: 'none',
