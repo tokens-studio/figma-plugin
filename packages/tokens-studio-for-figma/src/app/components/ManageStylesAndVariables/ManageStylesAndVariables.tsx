@@ -109,7 +109,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
           <ExportSetsTab />
         </Tabs>
       </Modal>
-      <OptionsModal isOpen={showModal && showOptions} title="Export to Figma: Options" closeAction={handleCancelOptions} />
+      <OptionsModal isOpen={showModal && showOptions} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
     </>
   );
 }

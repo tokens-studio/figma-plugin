@@ -1,6 +1,7 @@
 {
 "modalTitle": "Export to Figma",
 "buttonLabel": "Styles and Variables",
+"optionsModalTitle": "Export to Figma Options",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",
