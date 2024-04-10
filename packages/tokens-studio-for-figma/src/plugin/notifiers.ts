@@ -108,6 +108,8 @@ export function notifyUISettings(
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
     tokenFormat,
+    overwriteExistingStylesAndVariables,
+    scopeVariablesByTokenType,
   }: SavedSettings,
 ) {
   postToUI({
@@ -140,6 +142,8 @@ export function notifyUISettings(
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
       tokenFormat,
+      overwriteExistingStylesAndVariables,
+      scopeVariablesByTokenType,
     },
   });
   postToUI({
