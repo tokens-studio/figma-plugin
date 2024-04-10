@@ -9,10 +9,10 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
   const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences;
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
-    if (typeof resolvedToken === 'undefined') return;
+    if (typeof resolvedToken === 'undefined') throw new Error(`Token ${token} not found in token map`);
     const { description, value } = resolvedToken;
     const resolvedValue = defaultTokenValueRetriever.get(token)?.rawValue;
-    if (typeof resolvedValue === 'undefined') return;
+    if (typeof resolvedValue === 'undefined') throw new Error(`Token ${token} has no resolved value`);
     let existingPaint: Paint | null = null;
     if (key === 'paints' && 'paints' in target) {
       existingPaint = target.paints[0] ?? null;
@@ -21,6 +21,8 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
     } else if (key === 'strokes' && 'strokes' in target) {
       existingPaint = target.strokes[0] ?? null;
     }
+
+   
 
     if (value.startsWith('linear-gradient')) {
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
@@ -62,6 +64,26 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
     }
     Promise.resolve();
   } catch (e) {
-    console.error('Error setting color', e);
+    // It's not a token value, it's actually a color value
+    try{
+      const value = token // the token is not a token, it's a misnomer
+      if(value.startsWith('linear-gradient')) {
+        const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
+        const newPaint: GradientPaint = {
+          type: 'GRADIENT_LINEAR',
+          gradientTransform,
+          gradientStops,
+        };
+        target[key] = [newPaint]
+      } else {
+        const { color, opacity } = convertToFigmaColor(value)
+        const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
+        target[key] = [newPaint]
+      }
+      
+
+    } catch (e) {
+      console.error('Error setting color', e)
+    }
   }
 }
