@@ -22,8 +22,6 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
       existingPaint = target.strokes[0] ?? null;
     }
 
-   
-
     if (value.startsWith('linear-gradient')) {
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
       const newPaint: GradientPaint = {
@@ -65,25 +63,23 @@ export default async function setColorValuesOnTarget(target: BaseNode | PaintSty
     Promise.resolve();
   } catch (e) {
     // It's not a token value, it's actually a color value
-    try{
-      const value = token // the token is not a token, it's a misnomer
-      if(value.startsWith('linear-gradient')) {
+    try {
+      const value = token; // the token is not a token, it's a misnomer
+      if (value.startsWith('linear-gradient')) {
         const { gradientStops, gradientTransform } = convertStringToFigmaGradient(value);
         const newPaint: GradientPaint = {
           type: 'GRADIENT_LINEAR',
           gradientTransform,
           gradientStops,
         };
-        target[key] = [newPaint]
+        target[key] = [newPaint];
       } else {
-        const { color, opacity } = convertToFigmaColor(value)
+        const { color, opacity } = convertToFigmaColor(value);
         const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-        target[key] = [newPaint]
+        target[key] = [newPaint];
       }
-      
-
     } catch (e) {
-      console.error('Error setting color', e)
+      console.error('Error setting color', e);
     }
   }
 }
