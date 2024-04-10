@@ -71,6 +71,8 @@ export type SavedSettings = {
   ignoreFirstPartForStyles: boolean;
   createStylesWithVariableReferences: boolean;
   prefixStylesWithThemeName: boolean;
+  overwriteExistingStylesAndVariables: boolean;
+  scopeVariablesByTokenType: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
