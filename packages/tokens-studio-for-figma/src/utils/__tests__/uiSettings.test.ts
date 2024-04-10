@@ -3,6 +3,7 @@ import { mockSetAsync, mockGetAsync, mockNotify } from '../../../tests/__mocks__
 import { getUISettings, updateUISettings } from '../uiSettings';
 import { UiSettingsProperty } from '@/figmaStorage';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { overwriteExistingStylesAndVariablesSelector, scopeVariablesByTokenTypeSelector } from '@/selectors';
 
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
@@ -20,6 +21,15 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       createStylesWithVariableReferences: false,
       prefixStylesWithThemeName: false,
+      scopeVariablesByTokenType: false,
+      overwriteExistingStylesAndVariables: false,
+      variablesBoolean: false,
+      variablesColor: false,
+      variablesNumber: false,
+      variablesString: false,
+      stylesColor: false,
+      stylesEffect: false,
+      stylesTypography: false,
       inspectDeep: false,
       shouldSwapStyles: false,
       baseFontSize: '16',
@@ -36,6 +46,15 @@ describe('uiSettings', () => {
       ignoreFirstPartForStyles: false,
       createStylesWithVariableReferences: false,
       prefixStylesWithThemeName: false,
+      overwriteExistingStylesAndVariables: false,
+      scopeVariablesByTokenType: false,
+      variablesBoolean: false,
+      variablesColor: false,
+      variablesNumber: false,
+      variablesString: false,
+      stylesColor: false,
+      stylesEffect: false,
+      stylesTypography: false,
       inspectDeep: false,
       shouldSwapStyles: false,
       baseFontSize: '16',
@@ -67,6 +86,8 @@ describe('uiSettings', () => {
       createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
+      scopeVariablesByTokenType: false,
+      overwriteExistingStylesAndVariables: false,
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,
@@ -96,6 +117,8 @@ describe('uiSettings', () => {
       createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
+      scopeVariablesByTokenType: false,
+      overwriteExistingStylesAndVariables: false,
       inspectDeep: false,
       shouldSwapStyles: false,
       storeTokenIdInJsonEditor: false,
@@ -122,6 +145,8 @@ describe('uiSettings', () => {
       createStylesWithVariableReferences: false,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
+      scopeVariablesByTokenType: false,
+      overwriteExistingStylesAndVariables: false,
       inspectDeep: false,
       sessionRecording: false,
       shouldSwapStyles: false,

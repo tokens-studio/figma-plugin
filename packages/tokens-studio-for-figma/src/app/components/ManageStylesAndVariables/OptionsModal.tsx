@@ -55,13 +55,13 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const rulesCreateStylesWithVariableReferences = useSelector(createStylesWithVariableReferencesSelector);
 
-  const [variablesColor, setVariablesColor] = React.useState<boolean>(useSelector(variablesColorSelector));
-  const [variablesNumber, setvariablesNumber] = React.useState<boolean>(useSelector(variablesNumberSelector));
-  const [variablesString, setvariablesString] = React.useState<boolean>(useSelector(variablesStringSelector));
-  const [variablesBoolean, setvariablesBoolean] = React.useState<boolean>(useSelector(variablesBooleanSelector));
-  const [stylesEffect, setstylesEffect] = React.useState<boolean>(useSelector(stylesEffectSelector));
-  const [stylesTypography, setstylesTypography] = React.useState<boolean>(useSelector(stylesTypographySelector));
-  const [stylesColor, setstylesColor] = React.useState<boolean>(useSelector(stylesColorSelector));
+  const variablesColor = useSelector(variablesColorSelector);
+  const variablesNumber = useSelector(variablesNumberSelector);
+  const variablesBoolean = useSelector(variablesBooleanSelector);
+  const variablesString = useSelector(variablesStringSelector);
+  const stylesColor = useSelector(stylesColorSelector);
+  const stylesTypography = useSelector(stylesTypographySelector);
+  const stylesEffect = useSelector(stylesEffectSelector);
 
   const exportOptions: ExportOptions = {
     variablesColor,
@@ -116,58 +116,51 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
-      setVariablesColor(!!state);
+      dispatch.settings.setVariablesColor(!!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
-      setvariablesNumber(!!state);
+      dispatch.settings.setVariablesNumber(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesBoolean = React.useCallback(
     (state: CheckedState) => {
-      setvariablesBoolean(!!state);
+      dispatch.settings.setVariablesBoolean(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
-      setvariablesString(!!state);
+      dispatch.settings.setVariablesString(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
-      setstylesColor(!!state);
+      dispatch.settings.setStylesColor(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesTypography = React.useCallback(
     (state: CheckedState) => {
-      setstylesTypography(!!state);
+      dispatch.settings.setStylesTypography(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesEffect = React.useCallback(
     (state: CheckedState) => {
-      setstylesEffect(!!state);
+      dispatch.settings.setStylesEffect(!!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleSaveOptions = React.useCallback(() => {
-    dispatch.settings.setVariablesColor(variablesColor);
-    dispatch.settings.setVariablesNumber(variablesNumber);
-    dispatch.settings.setVariablesString(variablesString);
-    dispatch.settings.setVariablesBoolean(variablesBoolean);
-    dispatch.settings.setStylesEffect(stylesEffect);
-    dispatch.settings.setStylesTypography(stylesTypography);
-    dispatch.settings.setStylesColor(stylesColor);
     closeAction();
-  }, [closeAction, dispatch.settings, variablesColor, variablesNumber, variablesString, variablesBoolean, stylesEffect, stylesTypography, stylesColor]);
+  }, [closeAction]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
