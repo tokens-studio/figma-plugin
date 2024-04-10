@@ -20,9 +20,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
 
@@ -47,9 +47,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       # 4: Run tests
@@ -65,9 +65,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       - name: Run test coverage report
@@ -75,7 +75,7 @@ jobs:
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
-          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles ' 
+          runCommand: "cd packages/tokens-studio-for-figma && npm run test:coverage:ci"
           afterSwitchCommand: yarn
           useSameComment: true
   test-transform:
@@ -87,9 +87,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
 
@@ -116,9 +116,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       - name: Cypress run
@@ -137,9 +137,9 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           cache: yarn
-          cache-dependency-path: '**/yarn.lock'
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       # 4: Build package
