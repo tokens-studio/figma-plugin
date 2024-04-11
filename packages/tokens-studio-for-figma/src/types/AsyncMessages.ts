@@ -33,6 +33,7 @@ export enum AsyncMessageTypes {
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
+  SET_ONBOARDINGEXPLAINEREXPORTSETS = 'async/set-onboardingExplainerExportSets',
   SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
   SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
@@ -85,6 +86,9 @@ export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANG
 
 export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: boolean; }>;
 export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
+
+export type SetOnboardingExplainerExportSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS, { onboardingExplainerExportSets: boolean; }>;
+export type SetOnboardingExplainerExportSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS>;
 
 export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: boolean; }>;
 export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
@@ -360,6 +364,7 @@ export type AsyncMessages =
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
   | SetOnboardingExplainerSetsAsyncMessage
+  | SetOnboardingExplainerExportSetsAsyncMessage
   | SetOnboardingExplainerInspectAsyncMessage
   | SetOnboardingExplainerSyncProvidersAsyncMessage
   | SetNodeDataAsyncMessage
@@ -406,6 +411,7 @@ export type AsyncMessageResults =
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
   | SetOnboardingExplainerSetsAsyncMessageResult
+  | SetOnboardingExplainerExportSetsAsyncMessageResult
   | SetOnboardingExplainerSyncProvidersAsyncMessageResult
   | SetOnboardingExplainerInspectAsyncMessageResult
   | SetNodeDataAsyncMessageResult

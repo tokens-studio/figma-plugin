@@ -1,4 +1,4 @@
-import { QuestionMarkCircledIcon } from '@radix-ui/react-icons';
+import { HelpCircle } from 'iconoir-react';
 import { IconButton, Stack } from '@tokens-studio/ui';
 import React from 'react';
 import Modal from './Modal';
@@ -14,7 +14,7 @@ export function ExplainerModal({ title, children, ...props }: { title: string, c
           {children}
         </Stack>
       </Modal>
-      <IconButton icon={<QuestionMarkCircledIcon />} variant="invisible" size="small" onClick={handleOpen} />
+      <IconButton icon={<HelpCircle />} variant="invisible" size="small" onClick={handleOpen} />
     </>
   );
 }

@@ -3,6 +3,7 @@ export * from './changedTabs';
 export * from './removeSingleCredential';
 export * from './setStorageType';
 export * from './setOnboardingExplainerSets';
+export * from './setOnboardingExplainerExportSets';
 export * from './setOnboardingExplainerSyncProviders';
 export * from './setOnboardingExplainerInspect';
 export * from './setNodeData';

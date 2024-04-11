@@ -58,8 +58,9 @@ describe('Navbar', () => {
     mockStore.dispatch.userState.setLicenseKey('test-key-123');
 
     const tokenFlowButton = await result.findByTestId('token-flow-button');
-    await act(async () => userEvent.click(tokenFlowButton));
-
-    expect(global.open).toHaveBeenCalledWith(`${process.env.TOKEN_FLOW_APP_URL}?id=test-id`);
+    waitFor(() => {
+      userEvent.click(tokenFlowButton);
+      expect(global.open).toHaveBeenCalledWith(`${process.env.TOKEN_FLOW_APP_URL}?id=test-id`);
+    });
   });
 });

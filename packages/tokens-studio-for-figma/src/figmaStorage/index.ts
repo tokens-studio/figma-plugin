@@ -10,6 +10,7 @@ export * from './StorageTypeProperty';
 export * from './UsedTokenSetProperty';
 export * from './LastOpenedProperty';
 export * from './OnboardingExplainerSetsProperty';
+export * from './OnboardingExplainerExportSetsProperty';
 export * from './OnboardingExplainerSyncProvidersProperty';
 export * from './OnboardingExplainerInspectProperty';
 export * from './CheckForChangesProperty';

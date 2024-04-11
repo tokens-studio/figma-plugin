@@ -1,18 +1,22 @@
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
-  Tabs, Stack, Heading, Button, Link, Label,
+  Tabs, Stack, Heading, Button, Link,
 } from '@tokens-studio/ui';
 import React, { useMemo } from 'react';
-import { useSelector, useStore } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useDebouncedCallback } from 'use-debounce';
 
 import Input from '../Input';
 import Modal from '../Modal';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { StyledCard } from './StyledCard';
 
-import { ExportThemeRow } from './ExportThemeRow';
+import { ExplainerModal } from '../ExplainerModal';
+import OnboardingExplainer from '../OnboardingExplainer';
+import { Dispatch } from '../../store';
+
 import { allTokenSetsSelector, usedTokenSetSelector } from '@/selectors';
 import { docsLinks } from './docsLinks';
 import { RootState } from '@/app/store';
@@ -23,6 +27,12 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 
 export default function useExportSetsTab() {
+  const dispatch = useDispatch<Dispatch>();
+  const closeOnboarding = React.useCallback(() => {
+    dispatch.uiState.setOnboardingExplainerExportSets(false);
+  }, [dispatch]);
+  const onboardingExplainerExportSets = useSelector((state: RootState) => state.uiState.onboardingExplainerExportSets);
+
   const { t } = useTranslation(['manageStylesAndVariables']);
 
   const store = useStore<RootState>();
@@ -34,7 +44,7 @@ export default function useExportSetsTab() {
     const tokenSet = {
       set,
       status: TokenSetStatus.ENABLED,
-    }
+    };
     return tokenSet;
   }));
 
@@ -88,9 +98,7 @@ export default function useExportSetsTab() {
     />
   ), [control]);
 
-  const selectedEnabledSets = useMemo(() => {
-    return selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED);
-  }, [selectedSets]);
+  const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
   React.useEffect(() => {
     if (!showChangeSets) {
@@ -99,7 +107,7 @@ export default function useExportSetsTab() {
         if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
           const tokenSet = {
             set: curr,
-            status: currentSelectedSets.tokenSets[curr]
+            status: currentSelectedSets.tokenSets[curr],
           } as ExportTokenSet;
           acc.push(tokenSet);
         }
@@ -107,38 +115,51 @@ export default function useExportSetsTab() {
       }, [] as ExportTokenSet[]);
       setSelectedSets([...selectedTokenSets]);
     }
-  }, [showChangeSets]);
+  }, [showChangeSets, getValues]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
       <StyledCard>
         <Stack direction="column" align="start" gap={6}>
           <Stack direction="column" align="start" gap={4}>
-            <Heading>{t('exportSetsTab.confirmSets')}</Heading>
-            <p>
-              {t('exportSetsTab.intro')}
-            </p>
-            <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link>
+            {!onboardingExplainerExportSets && (
+              <Stack direction="row" align="center" gap={2}>
+                <Heading>{t('exportSetsTab.confirmSets')}</Heading>
+                <ExplainerModal title={t('exportSetsTab.confirmSets')}>
+                  {t('exportSetsTab.intro')}
+                  <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link>
+                </ExplainerModal>
+              </Stack>
+            )}
+            {onboardingExplainerExportSets && (
+            <OnboardingExplainer
+              data={{
+                text: t('exportSetsTab.intro'),
+                title: t('exportSetsTab.confirmSets'),
+                url: docsLinks.stylesAndVariables,
+              }}
+              closeOnboarding={closeOnboarding}
+            />
+            )}
           </Stack>
-          <Stack direction="column" align="start" gap={4}>
-            <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
-            <ExportThemeRow>
-              <FileDirectoryIcon size="small" />
-              <Label>
-                {selectedEnabledSets.length}
-                {' of '}
-                {allSets.length}
-              </Label>
-            </ExportThemeRow>
+          <Stack direction="row" align="start" gap={2}>
+            <FileDirectoryIcon size="small" />
+            <span>
+              {selectedEnabledSets.length}
+              {' of '}
+              {allSets.length}
+              {' '}
+              {t('exportSetsTab.setsSelectedForExport')}
+            </span>
           </Stack>
+          <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
         </Stack>
       </StyledCard>
-      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Varibales / Export Sets">
+      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Variables / Export Sets">
         <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
         <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
         <Stack
           direction="column"
-          gap={4}
           css={{
             marginBlockStart: '$4',
           }}

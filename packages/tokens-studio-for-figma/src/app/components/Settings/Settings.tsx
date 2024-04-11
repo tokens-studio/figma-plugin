@@ -90,6 +90,7 @@ function Settings() {
 
   const handleResetButton = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSets(true);
+    dispatch.uiState.setOnboardingExplainerExportSets(true);
     dispatch.uiState.setOnboardingExplainerInspect(true);
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     dispatch.uiState.setLastOpened(0);
