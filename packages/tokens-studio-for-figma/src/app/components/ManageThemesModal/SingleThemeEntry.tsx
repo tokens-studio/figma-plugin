@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton, Label, Stack } from '@tokens-studio/ui';
+import {
+  IconButton, Label, Stack, Switch, Box,
+} from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
-import Box from '../Box';
 import { ThemeObject } from '@/types';
 import IconDiveInto from '@/icons/dive-into.svg';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { Switch, SwitchThumb } from '../Switch';
 import { Dispatch } from '@/app/store';
 import { activeThemeSelector } from '@/selectors';
 
@@ -79,9 +79,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
       }}
     >
 
-      <Switch checked={isActive} onCheckedChange={handleToggle}>
-        <SwitchThumb />
-      </Switch>
+      <Switch checked={isActive} onCheckedChange={handleToggle} />
       <Label>
         {' '}
         {theme.name}
