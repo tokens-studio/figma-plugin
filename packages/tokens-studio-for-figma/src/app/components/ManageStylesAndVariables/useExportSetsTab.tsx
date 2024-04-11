@@ -44,7 +44,7 @@ export default function useExportSetsTab() {
     const tokenSet = {
       set,
       status: TokenSetStatus.ENABLED,
-    }
+    };
     return tokenSet;
   }));
 
@@ -57,7 +57,6 @@ export default function useExportSetsTab() {
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
   const [filteredItems, setFilteredItems] = React.useState(setsTree);
-
 
   const handleFilterTree = React.useCallback(
     (event) => {
@@ -99,9 +98,7 @@ export default function useExportSetsTab() {
     />
   ), [control]);
 
-  const selectedEnabledSets = useMemo(() => {
-    return selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED);
-  }, [selectedSets]);
+  const selectedEnabledSets = useMemo(() => selectedSets.filter((set) => set.status === TokenSetStatus.ENABLED), [selectedSets]);
 
   React.useEffect(() => {
     if (!showChangeSets) {
@@ -110,7 +107,7 @@ export default function useExportSetsTab() {
         if (currentSelectedSets.tokenSets[curr] !== TokenSetStatus.DISABLED) {
           const tokenSet = {
             set: curr,
-            status: currentSelectedSets.tokenSets[curr]
+            status: currentSelectedSets.tokenSets[curr],
           } as ExportTokenSet;
           acc.push(tokenSet);
         }
@@ -118,7 +115,7 @@ export default function useExportSetsTab() {
       }, [] as ExportTokenSet[]);
       setSelectedSets([...selectedTokenSets]);
     }
-  }, [showChangeSets]);
+  }, [showChangeSets, getValues]);
 
   const ExportSetsTab = () => (
     <Tabs.Content value="useSets">
