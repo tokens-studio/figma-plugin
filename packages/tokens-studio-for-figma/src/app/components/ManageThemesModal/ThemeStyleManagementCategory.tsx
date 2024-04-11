@@ -70,7 +70,6 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
       )}
       extra={(
         <Button
-          variant="invisible"
           size="small"
           disabled={isAttachingLocalStyles}
           onClick={onAttachLocalStyles}

@@ -140,7 +140,6 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
     [canEdit, handleEditClick, handleClick, properties],
   );
 
-
   return (
     <ContextMenu>
 
