@@ -21,6 +21,11 @@ AsyncMessageChannel.PluginInstance.handle(
   asyncHandlers.setOnboardingExplainerSets,
 );
 AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
+  asyncHandlers.setOnboardingExplainerExportSets,
+);
+
+AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
   asyncHandlers.setOnboardingExplainerSyncProviders,
 );

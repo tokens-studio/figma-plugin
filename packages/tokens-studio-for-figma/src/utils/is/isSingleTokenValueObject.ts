@@ -1,7 +1,7 @@
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleToken } from '@/types/tokens';
 
-type SingleTokenValueObject = Pick<SingleToken, 'value'>;
+export type SingleTokenValueObject = Pick<SingleToken, 'value'>;
 
 export function isSingleTokenValueObject(token: SingleTokenValueObject | any): token is SingleTokenValueObject {
   return !!(

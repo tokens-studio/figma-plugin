@@ -11,8 +11,9 @@ describe('startup', () => {
       authData: null,
       lastOpened: 0,
       onboardingExplainer: {
-        sets: true,
+        exportSets: true,
         inspect: true,
+        sets: true,
         syncProviders: true,
       },
       storageType: { provider: 'local' },
@@ -49,8 +50,9 @@ describe('startup', () => {
       authData: null,
       lastOpened: 0,
       onboardingExplainer: {
-        sets: true,
+        exportSets: true,
         inspect: true,
+        sets: true,
         syncProviders: true,
       },
       storageType: { provider: 'local' },

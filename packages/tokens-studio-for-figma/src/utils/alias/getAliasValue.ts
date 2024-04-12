@@ -10,6 +10,7 @@ import { isSingleTokenValueObject } from '../is';
 import { checkAndEvaluateMath } from '../math';
 // eslint-disable-next-line import/no-cycle
 import { checkIfAlias } from './checkIfAlias';
+import { isSingleInternalTokenValueObject } from '../is/isSingleInternalTokenValueObject';
 
 type TokenNameNodeType = string | undefined;
 
@@ -17,7 +18,7 @@ function getReturnedValue(token: SingleToken | string | number) {
   if (typeof token === 'object' && typeof token.value === 'object' && (token?.type === TokenTypes.BOX_SHADOW || token?.type === TokenTypes.TYPOGRAPHY || token?.type === TokenTypes.BORDER)) {
     return token.value;
   }
-  if (isSingleTokenValueObject(token)) {
+  if (isSingleInternalTokenValueObject(token)) {
     return token.value.toString();
   }
   return token.toString();

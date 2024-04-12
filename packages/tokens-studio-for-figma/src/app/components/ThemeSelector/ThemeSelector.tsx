@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
+import { NavArrowRight } from 'iconoir-react';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
-
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
@@ -126,13 +126,15 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         >
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
-            css={{ display: 'flex', justifyContent: 'space-between',
-            }}
+            css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             disabled={!tokenThemes}
             onSelect={handleManageThemes}
           >
             <span>{t('manageThemes')}</span>
             {!tokenThemes && <ProBadge compact />}
+            <DropdownMenu.TrailingVisual>
+              <NavArrowRight />
+            </DropdownMenu.TrailingVisual>
           </DropdownMenu.Item>
           <DropdownMenu.Separator />
           {availableThemes.length === 0 && (
