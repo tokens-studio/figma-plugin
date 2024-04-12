@@ -43,7 +43,6 @@ function replaceAliasWithResolvedReference(
 export function getAliasValue(token: SingleToken | string | number, tokens: SingleToken[] = [], isResolved: boolean = true, previousCount: number = 0): string | number | TokenTypographyValue | TokenBoxshadowValue | TokenBorderValue | Array<TokenBoxshadowValue> | null {
   // Big O((n ^ 3) (n = amount of tokens)
   let returnedValue: ReturnType<typeof getReturnedValue> | null = getReturnedValue(token);
-  console.log('returnedValue: ', returnedValue);
   try {
     const tokenReferences: string[] | null = typeof returnedValue === 'string' ? getRootReferences(returnedValue) : null;
     if (tokenReferences?.length) {
