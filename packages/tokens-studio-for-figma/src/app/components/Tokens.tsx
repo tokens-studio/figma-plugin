@@ -234,8 +234,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
             variant="invisible"
             tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
           />
-          <ThemeSelector />
           <TokenFilter />
+          <ThemeSelector />
           <Box
             css={{
               display: 'flex',
