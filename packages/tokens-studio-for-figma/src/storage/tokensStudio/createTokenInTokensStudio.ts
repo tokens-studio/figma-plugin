@@ -26,7 +26,7 @@ export async function createTokenInTokensStudio({
   if (typeof token !== 'boolean' && token?.urn) {
     onTokenCreated({
       ...payload,
-      $extensions: deepmerge(payload.$extensions, { id: token.urn }),
+      $extensions: deepmerge(payload.$extensions, { 'studio.tokens': { urn: token.urn } }),
       shouldUpdate: false,
     });
   }

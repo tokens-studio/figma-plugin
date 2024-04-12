@@ -14,6 +14,9 @@ import {
   UpdateTokenSetOrderMutation,
   ThemeGroup,
   TokenSet,
+  UpdateThemeGroupMutation,
+  CreateThemeGroupMutation,
+  DeleteThemeGroupMutation,
 } from '@tokens-studio/sdk';
 import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
@@ -37,6 +40,9 @@ import {
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_ORDER_MUTATION,
+  UPDATE_THEME_GROUP_MUTATION,
+  CREATE_THEME_GROUP_MUTATION,
+  DELETE_THEME_GROUP_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
@@ -146,7 +152,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
     const themeGroups = data.data.project.themeGroups as ThemeGroup[];
 
     if (themeGroups) {
-      themeGroups.forEach(({ name: group, options }) => {
+      themeGroups.forEach(({ name: group, urn: groupUrn, options }) => {
         if (!options) {
           return;
         }
@@ -160,6 +166,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
               id: theme?.urn as string,
               name: theme?.name as string,
               group,
+              groupId: groupUrn,
               selectedTokenSets,
               $figmaStyleReferences: JSON.parse(JSON.parse(theme?.figmaStyleReferences || '{}')),
               $figmaVariableReferences: JSON.parse(JSON.parse(theme?.figmaVariableReferences || '{}')),
@@ -306,6 +313,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       }
       case 'EDIT_TOKEN': {
         const tokenId = data.$extensions?.['studio.tokens']?.urn;
+        console.log('EDIT_TOKEN', data);
 
         if (!tokenId) {
           throw new Error('Invalid data');
@@ -471,6 +479,78 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         } catch (e) {
           Sentry.captureException(e);
           console.error('Error updating token set order in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'CREATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<CreateThemeGroupMutation>(
+            Graphql.op(CREATE_THEME_GROUP_MUTATION, {
+              project: this.id,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create theme group in Tokens Studio');
+          notifyToUI('Theme group created in Tokens Studio', { error: false });
+
+          return responseData.data.createThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<UpdateThemeGroupMutation>(
+            Graphql.op(UPDATE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update theme group in Tokens Studio');
+          notifyToUI('Theme group updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<DeleteThemeGroupMutation>(
+            Graphql.op(DELETE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete theme group in Tokens Studio');
+          return responseData.data.deleteThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error deleting theme group in Tokens Studio', e);
           return null;
         }
       }
