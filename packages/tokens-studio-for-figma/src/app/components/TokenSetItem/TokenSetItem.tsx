@@ -3,9 +3,8 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Checkbox, ContextMenu,
+  Checkbox, ContextMenu, Tooltip, Box,
 } from '@tokens-studio/ui';
-import Box from '../Box';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
@@ -15,7 +14,6 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
-import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;

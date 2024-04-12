@@ -6,9 +6,7 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useDebouncedCallback } from 'use-debounce';
 
-import Input from '../Input';
 import Modal from '../Modal';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { StyledCard } from './StyledCard';
@@ -55,17 +53,6 @@ export default function useExportSetsTab() {
   const availableTokenSets = useSelector(allTokenSetsSelector);
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
-
-  const [filteredItems, setFilteredItems] = React.useState(setsTree);
-
-  const handleFilterTree = React.useCallback(
-    (event) => {
-      const value = event?.target.value;
-      const filtered = setsTree.filter((item) => item.path.toLowerCase().includes(value.toLowerCase()));
-      setFilteredItems(filtered);
-    },
-    [setsTree],
-  );
 
   const handleCancelChangeSets = React.useCallback(() => {
     // DO NOT SAVE THE SET CHANGES
@@ -160,12 +147,12 @@ export default function useExportSetsTab() {
         <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
         <Stack
           direction="column"
+          gap={2}
           css={{
             marginBlockStart: '$4',
           }}
         >
-          <Input placeholder="Search sets" onInput={handleFilterTree} />
-          <TokenSetTreeContent items={filteredItems} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
+          <TokenSetTreeContent items={setsTree} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
         </Stack>
       </Modal>
     </Tabs.Content>

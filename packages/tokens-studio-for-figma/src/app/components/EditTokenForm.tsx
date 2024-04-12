@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Heading, Textarea, Label,
+  Button, Heading, Textarea, Label, Stack,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
@@ -23,7 +23,6 @@ import {
 } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
-import Stack from './Stack';
 import DownshiftInput from './DownshiftInput';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -630,7 +629,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             </Box>
           )
         }
-      <Stack direction="row" justify="end" gap={4}>
+      <Stack direction="row" justify="end" gap={3}>
         <Button variant="secondary" type="button" onClick={handleReset}>
           {t('cancel')}
         </Button>

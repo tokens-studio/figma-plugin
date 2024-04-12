@@ -132,7 +132,6 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
       )}
       extra={(
         <Button
-          variant="invisible"
           size="small"
           disabled={isAttachingLocalVariables}
           onClick={handleAttachLocalVariables}
@@ -162,7 +161,7 @@ export const ThemeVariableManagement: React.FC<React.PropsWithChildren<React.Pro
               </Label>
             </Box>
             <Box css={{ display: 'flex', flexDirection: 'row', gap: '$1' }}>
-              <Button onClick={handleDisconnectSelectedVariables} disabled={selectedVariables.length === 0} variant="invisible" size="small">
+              <Button onClick={handleDisconnectSelectedVariables} disabled={selectedVariables.length === 0} variant="danger" size="small">
                 Detach selected
               </Button>
             </Box>
