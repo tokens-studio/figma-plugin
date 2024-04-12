@@ -1,19 +1,19 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Label, Button } from '@tokens-studio/ui';
+import {
+  Box, Stack, Label, Button, TextInput,
+} from '@tokens-studio/ui';
+import { Resizable } from 're-resizable';
 import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import IconAdd from '@/icons/add.svg';
-import Input from './Input';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
-import Box from './Box';
 import {
   editProhibitedSelector, tokensSelector, uiStateSelector,
 } from '@/selectors';
-import Stack from './Stack';
 import OnboardingExplainer from './OnboardingExplainer';
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
@@ -131,102 +131,107 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   }, []);
 
   return (
-    <Box
-      css={{
-        display: 'flex',
+    <Resizable
+      defaultSize={{
+        width: 150,
         height: '100%',
-        flexDirection: 'column',
-        width: '150px',
-        borderRight: '1px solid',
-        borderColor: '$borderMuted',
-        overflowY: 'auto',
       }}
-      className="content"
+      minWidth={100}
+      maxWidth="50vw"
     >
-      <TokenSetTree
-        tokenSets={allTokenSets}
-        onRename={handleRenameTokenSet}
-        onDelete={handleDelete}
-        onDuplicate={handleDuplicateTokenSet}
-        onReorder={handleReorder}
-        saveScrollPositionSet={saveScrollPositionSet}
-      />
-      <Modal
-        title={`${isDuplicate ? t('duplicate') : t('rename')} ${oldTokenSetName}`}
-        isOpen={showRenameTokenSetFields}
-        close={handleCloseRenameModal}
+      <Box
+        css={{
+          display: 'flex',
+          height: '100%',
+          flexDirection: 'column',
+          width: '100%',
+          borderRight: '1px solid',
+          borderColor: '$borderMuted',
+          overflowY: 'auto',
+        }}
+        className="content"
       >
-        <form onSubmit={handleRenameTokenSetSubmit}>
-          <Stack direction="column" gap={4}>
-            <Stack direction="column" gap={2}>
-              <Label htmlFor="tokensetname">Name</Label>
-              <Input
-                full
-                autofocus
-                value={newTokenSetName}
-                onChange={handleChangeName}
-                type="text"
-                name="tokensetname"
-                data-testid="rename-set-input"
-                required
-                size="large"
-              />
-            </Stack>
-            <Stack direction="row" gap={4} justify="end">
-              <Button variant="secondary" onClick={handleCloseRenameModal}>
-                {t('cancel')}
-              </Button>
-              <Button type="submit" variant="primary" disabled={!newTokenSetName}>
-                {
+        <TokenSetTree
+          tokenSets={allTokenSets}
+          onRename={handleRenameTokenSet}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicateTokenSet}
+          onReorder={handleReorder}
+          saveScrollPositionSet={saveScrollPositionSet}
+        />
+        <Modal
+          title={`${isDuplicate ? t('duplicate') : t('rename')} ${oldTokenSetName}`}
+          isOpen={showRenameTokenSetFields}
+          close={handleCloseRenameModal}
+        >
+          <form onSubmit={handleRenameTokenSetSubmit}>
+            <Stack direction="column" gap={4}>
+              <Stack direction="column" gap={2}>
+                <Label htmlFor="tokensetname">Name</Label>
+                <TextInput
+                  autoFocus
+                  value={newTokenSetName}
+                  onChange={handleChangeName}
+                  type="text"
+                  name="tokensetname"
+                  data-testid="rename-set-input"
+                  required
+                />
+              </Stack>
+              <Stack direction="row" gap={4} justify="end">
+                <Button variant="secondary" onClick={handleCloseRenameModal}>
+                  {t('cancel')}
+                </Button>
+                <Button type="submit" variant="primary" disabled={!newTokenSetName}>
+                  {
                   isDuplicate ? t('save') : t('change')
                 }
-              </Button>
+                </Button>
+              </Stack>
             </Stack>
-          </Stack>
-        </form>
-      </Modal>
-      <Modal
-        title={t('sets.new') as string}
-        data-testid="new-set-modal"
-        isOpen={showNewTokenSetFields}
-        close={handleCloseNewTokenSetModal}
-      >
-        <form onSubmit={handleNewTokenSetSubmit}>
-          <Stack direction="column" gap={4}>
-            <Stack direction="column" gap={2}>
-              <Label htmlFor="tokensetname">Name</Label>
-              <Input
-                full
-                value={newTokenSetName}
-                onChange={handleChangeName}
-                type="text"
-                name="tokensetname"
-                required
-                data-testid="token-set-input"
-                autofocus
-                placeholder="Enter a name"
-                size="large"
-              />
+          </form>
+        </Modal>
+        <Modal
+          title={t('sets.new') as string}
+          data-testid="new-set-modal"
+          isOpen={showNewTokenSetFields}
+          close={handleCloseNewTokenSetModal}
+        >
+          <form onSubmit={handleNewTokenSetSubmit}>
+            <Stack direction="column" gap={4}>
+              <Stack direction="column" gap={2}>
+                <Label htmlFor="tokensetname">Name</Label>
+                <TextInput
+                  value={newTokenSetName}
+                  onChange={handleChangeName}
+                  type="text"
+                  name="tokensetname"
+                  required
+                  data-testid="token-set-input"
+                  autoFocus
+                  placeholder="Enter a name"
+                />
+              </Stack>
+              <Stack direction="row" gap={4} justify="end">
+                <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
+                  {t('cancel')}
+                </Button>
+                <Button data-testid="create-token-set" type="submit" variant="primary">
+                  {t('create')}
+                </Button>
+              </Stack>
             </Stack>
-            <Stack direction="row" gap={4} justify="end">
-              <Button variant="secondary" onClick={handleCloseNewTokenSetModal}>
-                {t('cancel')}
-              </Button>
-              <Button data-testid="create-token-set" type="submit" variant="primary">
-                {t('create')}
-              </Button>
-            </Stack>
-          </Stack>
-        </form>
-      </Modal>
-      <Stack direction="column" css={{ padding: '$3' }}>
-        <Button icon={<IconAdd />} size="small" data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
-          {t('sets.new')}
-        </Button>
-      </Stack>
-      {uiState.onboardingExplainerSets && (
+          </form>
+        </Modal>
+        <Stack direction="column" css={{ padding: '$3' }}>
+          <Button icon={<IconAdd />} size="small" data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+            {t('sets.new')}
+          </Button>
+        </Stack>
+        {uiState.onboardingExplainerSets && (
         <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
-      )}
-    </Box>
+        )}
+      </Box>
+    </Resizable>
   );
 }

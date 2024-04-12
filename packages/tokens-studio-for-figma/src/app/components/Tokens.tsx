@@ -234,8 +234,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
             variant="invisible"
             tooltip={tokenSetsVisible ? 'Collapse sidebar' : 'Expand sidebar'}
           />
-          <TokenFilter />
           <ThemeSelector />
+          <TokenFilter />
           <Box
             css={{
               display: 'flex',
@@ -270,9 +270,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           {tokenSetsVisible && (
-            <Box>
-              <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
-            </Box>
+            <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
           )}
           <Box
             css={{
