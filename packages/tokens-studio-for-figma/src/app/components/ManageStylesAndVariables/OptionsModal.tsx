@@ -14,8 +14,6 @@ import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
 import {
   ignoreFirstPartForStylesSelector,
-  overwriteExistingStylesAndVariablesSelector,
-  scopeVariablesByTokenTypeSelector,
   prefixStylesWithThemeNameSelector,
   createStylesWithVariableReferencesSelector,
   variablesColorSelector,
@@ -42,15 +40,11 @@ type ExportOptions = {
   stylesColor: boolean,
   stylesTypography: boolean,
   stylesEffect: boolean,
-  rulesOverwriteExistingStylesAndVariables: boolean | undefined,
-  rulesScopeVariablesByTokenType: boolean | undefined,
   rulesIgnoreFirstPartForStyles: boolean | undefined,
   rulesPrefixStylesWithThemeName: boolean | undefined,
 };
 
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
-  const rulesOverwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
-  const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const rulesCreateStylesWithVariableReferences = useSelector(createStylesWithVariableReferencesSelector);
@@ -71,8 +65,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     stylesColor,
     stylesTypography,
     stylesEffect,
-    rulesOverwriteExistingStylesAndVariables,
-    rulesScopeVariablesByTokenType,
     rulesIgnoreFirstPartForStyles,
     rulesPrefixStylesWithThemeName,
   };
@@ -96,20 +88,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleCreateStylesWithVariableReferencesChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setCreateStylesWithVariableReferences(!!state);
-    },
-    [dispatch.settings],
-  );
-
-  const handleScopeChange = React.useCallback(
-    (state: CheckedState) => {
-      dispatch.settings.setScopeVariablesByTokenType(!!state);
-    },
-    [dispatch.settings],
-  );
-
-  const handleOverwriteChange = React.useCallback(
-    (state: CheckedState) => {
-      dispatch.settings.setOverwriteExistingStylesAndVariables(!!state);
     },
     [dispatch.settings],
   );
@@ -178,7 +156,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       /* eslint-disable-next-line react/jsx-no-bind */
       onInteractOutside={(event) => onInteractOutside(event)}
       footer={(
-        <Stack direction="row" justify="between">
+        <Stack direction="row" justify="between" gap={4}>
           <Button variant="invisible" id="manageStyles-button-close" onClick={closeAction} icon={<ChevronLeftIcon />}>
             {t('actions.cancel')}
           </Button>
@@ -225,36 +203,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
             }}
             >
               <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
-
-              <Switch
-                data-testid="overwriteExistingStylesAndVariables"
-                id="overwriteExistingStylesAndVariables"
-                checked={!!rulesOverwriteExistingStylesAndVariables}
-                defaultChecked={rulesOverwriteExistingStylesAndVariables}
-                onCheckedChange={handleOverwriteChange}
-              />
-              <Label htmlFor="overwriteExistingStylesAndVariables">{t('options.overwriteExistingStylesAndVariables')}</Label>
-              <ExplainerModal title={t('options.overwriteExistingStylesAndVariables')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.overwriteExistingStylesAndVariablesExplanation')}
-                </Box>
-              </ExplainerModal>
-
-              <Switch
-                data-testid="scopeVariablesByTokenType"
-                id="scopeVariablesByTokenType"
-                checked={!!rulesScopeVariablesByTokenType}
-                defaultChecked={rulesScopeVariablesByTokenType}
-                onCheckedChange={handleScopeChange}
-              />
-              <Label htmlFor="scopeVariablesByTokenType">{t('options.scopeVariablesByTokenType')}</Label>
-              <ExplainerModal title={t('options.scopeVariablesByTokenType')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.scopeVariablesByTokenTypeExplanation')}
-                </Box>
-              </ExplainerModal>
 
               <Switch
                 data-testid="ignoreFirstPartForStyles"
