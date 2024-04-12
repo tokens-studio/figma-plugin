@@ -25,10 +25,10 @@ export class TokenFormatStoreClass {
   }
 
   public setFormat = (format: TokenFormatOptions) => {
-    this.format = format;
-    this.tokenValueKey = format === TokenFormatOptions.DTCG ? '$value' : 'value';
-    this.tokenTypeKey = format === TokenFormatOptions.DTCG ? '$type' : 'type';
-    this.tokenDescriptionKey = format === TokenFormatOptions.DTCG ? '$description' : 'description';
+    // this.format = format;
+    // this.tokenValueKey = format === TokenFormatOptions.DTCG ? '$value' : 'value';
+    // this.tokenTypeKey = format === TokenFormatOptions.DTCG ? '$type' : 'type';
+    // this.tokenDescriptionKey = format === TokenFormatOptions.DTCG ? '$description' : 'description';
   };
 
   public getFormat = () => this.format;
