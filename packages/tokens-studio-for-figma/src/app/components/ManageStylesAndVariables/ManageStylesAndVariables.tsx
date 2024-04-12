@@ -46,7 +46,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       createVariablesFromThemes(selectedThemes);
       createStylesFromSelectedThemes(selectedThemes);
     }
-  }, [activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+    setShowModal(false);
+  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 

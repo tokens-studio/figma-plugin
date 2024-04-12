@@ -92,7 +92,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
-      createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? false : data.createStylesWithVariableReferences;
+      createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? true : data.createStylesWithVariableReferences;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
       overwriteExistingStylesAndVariables = typeof data.overwriteExistingStylesAndVariables === 'undefined' ? false : data.overwriteExistingStylesAndVariables;
       scopeVariablesByTokenType = typeof data.scopeVariablesByTokenType === 'undefined' ? false : data.scopeVariablesByTokenType;

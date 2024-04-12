@@ -104,7 +104,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
               </Label>
             </Stack>
             <Stack gap={1}>
-              <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="invisible" size="small">
+              <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="danger" size="small">
                 Detach selected
               </Button>
             </Stack>
