@@ -132,7 +132,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken?.status === EditTokenFormStatus.CREATE) {
         // If we are creating a new token, disallow naming it as a prefix of an existing token
         return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
-      } else if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
+      } if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
         // If we are editing a token, only disallow the name if it's prefix matches another token and it is not the token we are currently editing
         return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`) && internalEditToken.initialName !== t.name);
       }
@@ -630,7 +630,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             </Box>
           )
         }
-      <Stack direction="row" justify="end" gap={2}>
+      <Stack direction="row" justify="end" gap={4}>
         <Button variant="secondary" type="button" onClick={handleReset}>
           {t('cancel')}
         </Button>
