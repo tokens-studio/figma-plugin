@@ -130,12 +130,14 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
     setShowNewTokenSetFields(true);
   }, []);
 
+  const handleResize = useCallback((e, direction, ref, d) => {
+    dispatch.uiState.setSidebarWidth(uiState.sidebarWidth + d.width);
+  }, [uiState, dispatch.uiState]);
+
   return (
     <Resizable
-      defaultSize={{
-        width: 150,
-        height: '100%',
-      }}
+      size={{ width: uiState.sidebarWidth, height: '100%' }}
+      onResizeStop={handleResize}
       minWidth={100}
       maxWidth="50vw"
     >
