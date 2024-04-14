@@ -22,16 +22,17 @@ export default function setValuesOnVariable(
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
-    console.log('vars in fig', variablesInFigma, tokens);
     tokens.forEach((t) => {
       const variableType = convertTokenTypeToVariableType(t.type, t.value);
-      // Find the connected variable
+      // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
+      // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
+      // In that case, we should delete the variable and re-create it.
       let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
       if (!variable) {
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
       }
       if (variable) {
-        console.log('Existing variable', variable, t, variableType);
+        console.log('Variable type that we need', variableType, 'variable type we got', variable?.resolvedType);
         variable.description = t.description ?? '';
 
         switch (variableType) {
@@ -51,6 +52,8 @@ export default function setValuesOnVariable(
           case 'STRING':
             if (typeof t.value === 'string') {
               setStringValuesOnVariable(variable, mode, t.value);
+              // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
+              // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
             } else if (t.type === TokenTypes.FONT_WEIGHTS && Array.isArray(t.value)) {
               setStringValuesOnVariable(variable, mode, t.value[0]);
             }

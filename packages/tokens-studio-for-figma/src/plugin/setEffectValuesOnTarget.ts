@@ -38,6 +38,7 @@ async function tryApplyCompositeVariable({
   resolvedValue: ResolvedShadowObject;
 }) {
   // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
+  // 'consumers' only exists in styles, so we can use that to determine if we're creating a style or applying to a layer
   const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
 
   const { color, opacity: a } = convertToFigmaColor(value.color);

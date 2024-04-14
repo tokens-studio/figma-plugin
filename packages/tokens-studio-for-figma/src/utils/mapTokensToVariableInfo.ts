@@ -5,7 +5,6 @@ import { VariableToken } from '@/plugin/updateVariables';
 import { ThemeObject } from '@/types';
 
 export function mapTokensToVariableInfo(token: ResolveTokenValuesResult, theme: ThemeObject, settings: SettingsState) {
-  console.log('Mapping', token, { value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings?.baseFontSize, true) : token.value });
   return {
     ...token,
     value: typeof token.value === 'string' ? transformValue(token.value, token.type, settings?.baseFontSize, true) : token.value,

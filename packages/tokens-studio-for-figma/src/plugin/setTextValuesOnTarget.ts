@@ -8,14 +8,11 @@ export async function setTextValuesOnTarget(
   baseFontSize: string = '16',
 ) {
   try {
-    console.log('setTextValuesOnTarget', target, token);
     const resolvedToken = defaultTokenValueRetriever.get(token);
-    console.log('resolvedToken', resolvedToken);
     if (typeof resolvedToken === 'undefined') return;
     const { value, description } = resolvedToken;
     const resolvedValue: ResolvedTypographyObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
     if (typeof resolvedValue === 'undefined') return;
-    console.log('resolvedValue', resolvedValue);
 
     if (typeof resolvedValue !== 'string') {
       await tryApplyTypographyCompositeVariable({

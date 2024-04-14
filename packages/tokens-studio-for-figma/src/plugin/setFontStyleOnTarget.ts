@@ -3,7 +3,6 @@ import { notifyUI } from './notifiers';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 
 export async function setFontStyleOnTarget({ target, value, baseFontSize }: { target: BaseNode | TextStyle; value: Pick<ResolvedTypographyObject, 'fontFamily' | 'fontWeight'>; baseFontSize: string }) {
-  console.log('setFontStyleOnTarget', target, value);
   if (!('fontName' in target)) return;
   const {
     fontFamily, fontWeight,
@@ -23,7 +22,6 @@ export async function setFontStyleOnTarget({ target, value, baseFontSize }: { ta
   } catch (e) {
     const splitFontFamily = family.split(',');
     const candidateStyles = transformValue(style, 'fontWeights', baseFontSize);
-    console.log('candidate styles', candidateStyles);
     const candidateFonts: { family: string; style: string; }[] = [];
     splitFontFamily?.forEach((candidateFontFamily) => {
       const normalizedFontFamily = candidateFontFamily?.replace(/['"]/g, '').trim();
