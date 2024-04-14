@@ -1,6 +1,6 @@
 import { convertTypographyNumberToFigma } from './generic';
 
-export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: string): LetterSpacing | null {
+export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: string, shouldOutputForVariables = false): number | LetterSpacing | null {
   let letterSpacing: LetterSpacing | null = null;
   const value = inputValue.toString();
   const numbers = /^-?\d+(\.\d+)?$/;
@@ -10,6 +10,9 @@ export function convertLetterSpacingToFigma(inputValue: string, baseFontSize: st
       value: Number(value.slice(0, -1)),
     };
   } else if (value.match(numbers) || value.endsWith('px')) {
+    if (shouldOutputForVariables) {
+      return convertTypographyNumberToFigma(value, baseFontSize);
+    }
     letterSpacing = {
       unit: 'PIXELS',
       value: convertTypographyNumberToFigma(value, baseFontSize),

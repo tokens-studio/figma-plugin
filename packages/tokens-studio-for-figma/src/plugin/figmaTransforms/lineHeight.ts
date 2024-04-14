@@ -1,15 +1,18 @@
 import { convertTypographyNumberToFigma } from './generic';
 
-export function convertLineHeightToFigma(inputValue: string, baseFontSize: string): LineHeight | null {
+export function convertLineHeightToFigma(inputValue: string, baseFontSize: string, shouldOutputForVariables = false): number | LineHeight | null {
   let lineHeight: LineHeight | null = null;
   const value = inputValue.toString();
   const numbers = /^\d+(\.\d+)?$/;
   if (value.match(numbers) || value.endsWith('px') || value.endsWith('rem')) {
+    if (shouldOutputForVariables) {
+      return convertTypographyNumberToFigma(value, baseFontSize);
+    }
     lineHeight = {
       unit: 'PIXELS',
       value: convertTypographyNumberToFigma(value, baseFontSize),
     };
-  } else if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
+  } if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
     lineHeight = {
       unit: 'PERCENT',
       value: Number(value.slice(0, -1)),
