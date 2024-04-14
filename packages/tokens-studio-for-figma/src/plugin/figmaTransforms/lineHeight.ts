@@ -12,7 +12,7 @@ export function convertLineHeightToFigma(inputValue: string, baseFontSize: strin
       unit: 'PIXELS',
       value: convertTypographyNumberToFigma(value, baseFontSize),
     };
-  } if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
+  } else if (value.trim().slice(-1) === '%' && value.trim().slice(0, -1).match(numbers)) {
     lineHeight = {
       unit: 'PERCENT',
       value: Number(value.slice(0, -1)),

@@ -2,13 +2,13 @@ import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { tryApplyTypographyCompositeVariable } from './tryApplyTypographyCompositeVariable';
 
-export async function setTypographyCompositeValuesOnTarget(
+export async function setTextValuesOnTarget(
   target: TextNode | TextStyle,
   token: string,
   baseFontSize: string = '16',
 ) {
   try {
-    console.log('setTypographyCompositeValuesOnTarget', target, token);
+    console.log('setTextValuesOnTarget', target, token);
     const resolvedToken = defaultTokenValueRetriever.get(token);
     console.log('resolvedToken', resolvedToken);
     if (typeof resolvedToken === 'undefined') return;

@@ -6,7 +6,6 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
-import { useSelector } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
@@ -39,6 +38,17 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
+  const handleExportToFigma = React.useCallback(async () => {
+    setShowModal(false);
+    if (activeTab === 'useSets') {
+      await createVariablesFromSets(selectedSets);
+      createStylesFromSelectedTokenSets(selectedSets);
+    } else if (activeTab === 'useThemes') {
+      await createVariablesFromThemes(selectedThemes);
+      createStylesFromSelectedThemes(selectedThemes);
+    }
+  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
+
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
 
   useEffect(() => {
@@ -56,19 +66,6 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       setShowModal(false);
     }
   }, [setShowModal, showOptions]);
-
-  const handleExportToFigma = React.useCallback(async () => {
-    setShowModal(false);
-    if (activeTab === 'useSets') {
-      const variablesCreated = await createVariablesFromSets(selectedSets);
-      console.log('variables created', variablesCreated);
-      createStylesFromSelectedTokenSets(selectedSets);
-    } else if (activeTab === 'useThemes') {
-      const variablesCreated = await createVariablesFromThemes(selectedThemes);
-      console.log('variables created', variablesCreated);
-      createStylesFromSelectedThemes(selectedThemes);
-    }
-  }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();

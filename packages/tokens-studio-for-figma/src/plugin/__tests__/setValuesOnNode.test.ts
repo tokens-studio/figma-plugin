@@ -1,5 +1,5 @@
 import setValuesOnNode from '../setValuesOnNode';
-import * as setTypographyCompositeValuesOnTargetModule from '../setTypographyCompositeValuesOnTarget';
+import * as setTextValuesOnTargetModule from '../setTextValuesOnTarget';
 import * as tryApplyTypographyCompositeVariableModule from '../tryApplyTypographyCompositeVariable';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
@@ -11,7 +11,7 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 describe('Can set values on node', () => {
-  const setTypographyCompositeValuesOnTargetSpy = jest.spyOn(setTypographyCompositeValuesOnTargetModule, 'setTypographyCompositeValuesOnTarget');
+  const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
   const tryApplyTypographyCompositeVariableSpy = jest.spyOn(tryApplyTypographyCompositeVariableModule, 'tryApplyTypographyCompositeVariable');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
   const setColorValuesOnTargetSpy = jest.spyOn(setColorValuesOnTarget, 'default');
@@ -218,7 +218,7 @@ describe('Can set values on node', () => {
     expect(tryApplyTypographyCompositeVariableSpy).toHaveBeenCalled();
   });
 
-  it('doesnt call setTypographyCompositeValuesOnTarget if no text node', () => {
+  it('doesnt call setTextValuesOnTarget if no text node', () => {
     setValuesOnNode(
       {
         node: solidNodeMock,
@@ -232,10 +232,10 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTypographyCompositeValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTypographyCompositeValuesOnTarget if text node and composite typography tokens are given', async () => {
+  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
     defaultTokenValueRetriever.initiate({
       tokens: [
         {
@@ -265,7 +265,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTypographyCompositeValuesOnTargetSpy).toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
   });
 
   it('sets textstyle if matching Style is found', async () => {
@@ -298,7 +298,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTypographyCompositeValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '123' });
   });
 
@@ -333,7 +333,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTypographyCompositeValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
 

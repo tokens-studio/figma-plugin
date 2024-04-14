@@ -1,10 +1,10 @@
-import * as setTypographyCompositeValuesOnTargetModule from './setTypographyCompositeValuesOnTarget';
+import * as setTextValuesOnTargetModule from './setTextValuesOnTarget';
 import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
 
 type ExtendedSingleToken = SingleTypographyToken<true, { path: string, styleId: string }>;
 
-const setTypographyCompositeValuesOnTargetSpy = jest.spyOn(setTypographyCompositeValuesOnTargetModule, 'setTypographyCompositeValuesOnTarget');
+const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
 
 const typographyTokens = [
   {
@@ -56,8 +56,8 @@ describe('updateTextStyles', () => {
     figma.getLocalTextStyles.mockReturnValue([]);
     figma.createTextStyle.mockReturnValue(newStyle);
     updateTextStyles(typographyTokens, baseFontSize, true);
-    expect(setTypographyCompositeValuesOnTargetSpy).toHaveBeenCalledTimes(2);
-    expect(setTypographyCompositeValuesOnTargetSpy).toHaveBeenLastCalledWith(
+    expect(setTextValuesOnTargetSpy).toHaveBeenCalledTimes(2);
+    expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
       { ...newStyle, name: 'H1/withValueDescription' },
       'H1.withValueDescription',
       baseFontSize,
@@ -68,7 +68,7 @@ describe('updateTextStyles', () => {
     const baseFontSize = '16';
     figma.getLocalTextStyles.mockReturnValue([matchingFigmaStyle]);
     updateTextStyles(typographyTokens, baseFontSize);
-    expect(setTypographyCompositeValuesOnTargetSpy).toHaveBeenCalledWith(
+    expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
       'H1.withValue',
       baseFontSize,

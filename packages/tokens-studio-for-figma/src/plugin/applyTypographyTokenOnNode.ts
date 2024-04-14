@@ -2,7 +2,7 @@ import { isPrimitiveValue, isSingleTypographyValue } from '@/utils/is';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
-import { setTypographyCompositeValuesOnTarget } from './setTypographyCompositeValuesOnTarget';
+import { setTextValuesOnTarget } from './setTextValuesOnTarget';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
@@ -43,7 +43,7 @@ export async function applyTypographyTokenOnNode(
       && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))
     ) {
       if (isSingleTypographyValue(resolvedToken.value)) {
-        setTypographyCompositeValuesOnTarget(node, data.typography, baseFontSize);
+        setTextValuesOnTarget(node, data.typography, baseFontSize);
       }
     }
   }

@@ -1,6 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
-import { setTypographyCompositeValuesOnTarget } from './setTypographyCompositeValuesOnTarget';
+import { setTextValuesOnTarget } from './setTextValuesOnTarget';
 import { SingleToken } from '@/types/tokens';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
 
@@ -92,7 +92,7 @@ const tokenWithStringValue: SingleToken = {
 
 const tokens: SingleToken[] = [typographyToken, typographyTokenWithReferences, fontSizeLarge, lineHeightLarge, letterSpacingLarge, numericalWeightToken, tokenWithoutValue, tokenWithStringValue, typographyTokenWithNumericalWeight, typographyTokenWithNumericalWeightReference];
 
-describe('setTypographyCompositeValuesOnTarget', () => {
+describe('setTextValuesOnTarget', () => {
   let textNodeMock;
   const loadFontAsyncSpy = jest.spyOn(figma, 'loadFontAsync');
 
@@ -118,7 +118,7 @@ describe('setTypographyCompositeValuesOnTarget', () => {
   });
 
   it('sets text properties if those are given', async () => {
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'text.large');
+    await setTextValuesOnTarget(textNodeMock, 'text.large');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { family: 'Baskerville', style: 'Bold' } });
   });
 
@@ -129,7 +129,7 @@ describe('setTypographyCompositeValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.resolve()
     ));
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'text.largeWithReferences');
+    await setTextValuesOnTarget(textNodeMock, 'text.largeWithReferences');
     expect(textNodeMock).toEqual({
       ...textNodeMock,
       fontName: { ...textNodeMock.fontName, family: 'Baskerville', style: 'Bold' },
@@ -149,7 +149,7 @@ describe('setTypographyCompositeValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.resolve()
     ));
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'type.withNumericalWeightReference');
+    await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeightReference');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: '700' } });
   });
 
@@ -161,7 +161,7 @@ describe('setTypographyCompositeValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.resolve()
     ));
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
+    await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName, style: 'Bold' } });
   });
 
@@ -169,19 +169,19 @@ describe('setTypographyCompositeValuesOnTarget', () => {
     loadFontAsyncSpy.mockImplementation(() => (
       Promise.reject()
     ));
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
+    await setTextValuesOnTarget(textNodeMock, 'type.withNumericalWeight');
     expect(textNodeMock).toEqual({ ...textNodeMock, fontName: { ...textNodeMock.fontName } });
   });
 
   it('it throws error, when there is no value in token', async () => {
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'type.withoutvalue');
+    await setTextValuesOnTarget(textNodeMock, 'type.withoutvalue');
     expect(textNodeMock).toEqual({
       ...textNodeMock,
     });
   });
 
   it('it does nothing when the type of value is string', async () => {
-    await setTypographyCompositeValuesOnTarget(textNodeMock, 'text.withStringValue');
+    await setTextValuesOnTarget(textNodeMock, 'text.withStringValue');
     expect(textNodeMock).toEqual({
       ...textNodeMock,
     });

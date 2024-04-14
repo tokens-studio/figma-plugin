@@ -1,5 +1,5 @@
 import { SingleTypographyToken } from '@/types/tokens';
-import { setTypographyCompositeValuesOnTarget } from './setTypographyCompositeValuesOnTarget';
+import { setTextValuesOnTarget } from './setTextValuesOnTarget';
 import { getTextStylesIdMap } from '@/utils/getTextStylesIdMap';
 import { getTextStylesKeyMap } from '@/utils/getTextStylesKeyMap';
 
@@ -15,16 +15,16 @@ export default async function updateTextStyles(textTokens: SingleTypographyToken
     if (textStylesToIdMap.has(token.styleId)) {
       const textStyle = textStylesToIdMap.get(token.styleId)!;
       tokenToStyleMap[token.name] = textStyle.id;
-      await setTypographyCompositeValuesOnTarget(textStyle, token.name, baseFontSize);
+      await setTextValuesOnTarget(textStyle, token.name, baseFontSize);
     } else if (textStylesToKeyMap.has(token.path)) {
       const textStyle = textStylesToKeyMap.get(token.path)!;
       tokenToStyleMap[token.name] = textStyle.id;
-      await setTypographyCompositeValuesOnTarget(textStyle, token.name, baseFontSize);
+      await setTextValuesOnTarget(textStyle, token.name, baseFontSize);
     } else if (shouldCreate) {
       const style = figma.createTextStyle();
       style.name = token.path;
       tokenToStyleMap[token.name] = style.id;
-      await setTypographyCompositeValuesOnTarget(style, token.name, baseFontSize);
+      await setTextValuesOnTarget(style, token.name, baseFontSize);
     }
   }));
 
