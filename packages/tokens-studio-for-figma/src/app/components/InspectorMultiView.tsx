@@ -1,12 +1,11 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button, EmptyState } from '@tokens-studio/ui';
+import {
+  Box, Checkbox, Label, Stack, Button, EmptyState,
+} from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
-import Box from './Box';
-import Checkbox from './Checkbox';
-import Label from './Label';
 import InspectorTokenGroup from './InspectorTokenGroup';
 import { SingleToken } from '@/types/tokens';
 import { inspectStateSelector, uiStateSelector } from '@/selectors';
@@ -17,7 +16,6 @@ import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
-import Stack from './Stack';
 import BulkRemapModal from './modals/BulkRemapModal';
 
 export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {

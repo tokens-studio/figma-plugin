@@ -10,5 +10,9 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
   if (token.type === TokenTypes.COLOR && typeof token.value === 'string' && token.value.startsWith('linear-gradient')) {
     return false;
   }
+  // Ignore AUTO values on lineHeight
+  if (token.type === TokenTypes.LINE_HEIGHTS && typeof token.value === 'string' && token.value === 'AUTO') {
+    return false;
+  }
   return true;
 }

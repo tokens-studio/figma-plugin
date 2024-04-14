@@ -33,6 +33,7 @@ export default async function setValuesOnNode({
   data: NodeTokenRefMap; // Data on which token to apply, this is what's stored on the layer (just the token name)
   baseFontSize?: string; // The base font size to use, note that we should find a better way to pass this through
 }) {
+  console.log('setting', node, values, data);
   try {
     if (
       node.type !== 'CONNECTOR'

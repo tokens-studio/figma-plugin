@@ -3025,10 +3025,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.89.0":
-  version "1.89.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.89.0.tgz#90a48f377ec9f65d2c22fe1b37c92c3d83ad9547"
-  integrity sha512-79L6UQTbb5MEfL6QeVqKTgLW1rYRPNvb1Dt+zt4XJ/vy89zgY69jYUYVAlEm+sLiYFzJqofyH5k+7xPXy9Wwhw==
+"@figma/plugin-typings@^1.90.0":
+  version "1.90.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.90.0.tgz#b69d9cf6605ab3050d4076ea0e28671be0531889"
+  integrity sha512-RvZrSkuV0SABRaYuRFO/S30u9+RGKJm6+CPjSG7MaMo60p8S1sX5YOWT+zDWZC6mqNEaxLkrbXdiyqWXsfdHQg==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"

@@ -1,5 +1,5 @@
 import { SingleTypographyToken } from '@/types/tokens';
-import setTypographyCompositeValuesOnTarget from './setTypographyCompositeValuesOnTarget';
+import { setTypographyCompositeValuesOnTarget } from './setTypographyCompositeValuesOnTarget';
 import { getTextStylesIdMap } from '@/utils/getTextStylesIdMap';
 import { getTextStylesKeyMap } from '@/utils/getTextStylesKeyMap';
 

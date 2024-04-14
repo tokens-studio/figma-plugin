@@ -19,6 +19,6 @@ export function convertFontWeightToFigma(value: string) {
     case '900':
       return ['Black', 'Heavy'];
     default:
-      return [];
+      return [value];
   }
 }

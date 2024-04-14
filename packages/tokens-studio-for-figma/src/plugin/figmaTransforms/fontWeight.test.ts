@@ -40,7 +40,7 @@ describe('fontWeight', () => {
     },
     {
       input: '450',
-      output: [],
+      output: ['450'],
     },
   ];
   it('should convert numerical font weight to figma font weight', () => {

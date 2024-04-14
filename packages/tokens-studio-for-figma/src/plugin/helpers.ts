@@ -64,13 +64,16 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case 'paragraphSpacing':
     case 'paragraphIndent':
     case 'fontSizes':
+    case 'fontSize':
     case 'dimension':
       return convertTypographyNumberToFigma(value, baseFontSize);
     case 'fontWeights':
+    case 'fontWeight':
       return convertFontWeightToFigma(value);
     case 'letterSpacing':
       return convertLetterSpacingToFigma(value, baseFontSize);
     case 'lineHeights':
+    case 'lineHeight':
       return convertLineHeightToFigma(value, baseFontSize);
     case 'opacity':
       return convertOpacityToFigma(value.toString());

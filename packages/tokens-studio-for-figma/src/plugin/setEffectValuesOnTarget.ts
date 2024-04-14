@@ -37,7 +37,8 @@ async function tryApplyCompositeVariable({
   baseFontSize: string;
   resolvedValue: ResolvedShadowObject;
 }) {
-  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences;
+  // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
+  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
 
   const { color, opacity: a } = convertToFigmaColor(value.color);
   const { r, g, b } = color;

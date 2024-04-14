@@ -5,6 +5,7 @@ import setNumberValuesOnVariable from './setNumberValuesOnVariable';
 import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -21,15 +22,18 @@ export default function setValuesOnVariable(
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   try {
+    console.log('vars in fig', variablesInFigma, tokens);
     tokens.forEach((t) => {
-      const variableType = convertTokenTypeToVariableType(t.type);
+      const variableType = convertTokenTypeToVariableType(t.type, t.value);
       // Find the connected variable
       let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
       if (!variable) {
         variable = figma.variables.createVariable(t.path, collection.id, variableType);
       }
       if (variable) {
+        console.log('Existing variable', variable, t, variableType);
         variable.description = t.description ?? '';
+
         switch (variableType) {
           case 'BOOLEAN':
             if (typeof t.value === 'string') {
@@ -47,6 +51,8 @@ export default function setValuesOnVariable(
           case 'STRING':
             if (typeof t.value === 'string') {
               setStringValuesOnVariable(variable, mode, t.value);
+            } else if (t.type === TokenTypes.FONT_WEIGHTS && Array.isArray(t.value)) {
+              setStringValuesOnVariable(variable, mode, t.value[0]);
             }
             break;
           default:
