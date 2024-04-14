@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
-import { editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import useTokens from '../store/useTokens';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 
@@ -17,6 +17,7 @@ function JSONEditor({
   handleChange,
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const { handleJSONUpdate } = useTokens();
   const { isDarkTheme } = useFigmaTheme();
   const monaco = useMonaco();
@@ -64,7 +65,7 @@ function JSONEditor({
           fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,
-          readOnly: editProhibited,
+          readOnly: editProhibited || activeTokenSetReadOnly,
         }}
       />
     </Box>

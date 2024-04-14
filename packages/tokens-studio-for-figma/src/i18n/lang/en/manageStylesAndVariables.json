@@ -1,6 +1,7 @@
 {
-"modalTitle": "Manage Styles and Variables",
+"modalTitle": "Export to Figma",
 "buttonLabel": "Styles and Variables",
+"optionsModalTitle": "Export to Figma Options",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",
@@ -61,11 +62,13 @@
   "introBasic": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
   "confirmThemes": "Confirm Themes",
   "combinationsOfSetsMakeThemes": "Combinations of token sets create themes"
+
 },
 "exportSetsTab": {
   "changeSetsHeading": "Enabled sets will export to Figma",
   "confirmSets": "Confirm Sets",
-  "intro": "You can use token sets to manage your styles, and variables. Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts."
+  "intro": "You can use token sets to manage your styles, and variables. Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts.",
+  "setsSelectedForExport": "Sets selected for export"
 }
 }
 

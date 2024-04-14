@@ -7,7 +7,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
-  tokenSetsData?: Record<string, { id: string }>;
+  tokenSetsData?: Record<string, { id: string, isDynamic?: boolean }>;
 };
 
 export type RemoteTokenStorageData<Metadata> = {

@@ -18,6 +18,18 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
 
+  figmaStyleMaps.paintStyles.forEach((style) => {
+    if (!figmaStyleReferences.has(style.name)) {
+      figmaStyleReferences.set(style.name, style.id);
+    }
+  });
+
+  figmaStyleMaps.paintStyles.forEach((style) => {
+    if (!figmaStyleReferences.has(style.name)) {
+      figmaStyleReferences.set(style.name, style.id);
+    }
+  });
+
   activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
       if (!figmaVariableReferences.has(token)) {

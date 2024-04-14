@@ -5,7 +5,7 @@ import { IconButton, Heading } from '@tokens-studio/ui';
 import {
   IconCollapseArrow, IconExpandArrow, IconList, IconGrid, IconAdd,
 } from '@/icons';
-import { displayTypeSelector, editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, displayTypeSelector, editProhibitedSelector } from '@/selectors';
 import ProBadge from './ProBadge';
 
 import { useFlags } from './LaunchDarkly';
@@ -38,6 +38,8 @@ export default function TokenListingHeading({
   const dispatch = useDispatch<Dispatch>();
 
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
+
   const displayType = useSelector(displayTypeSelector);
   const handleShowNewForm = React.useCallback(() => showNewForm({}), [showNewForm]);
 
@@ -82,7 +84,7 @@ export default function TokenListingHeading({
         <IconButton
           data-testid="button-add-new-token"
           // TODO: Add proper logic to disable adding a token type depending on flags
-          disabled={editProhibited || (isPro && !gitBranchSelector)}
+          disabled={editProhibited || activeTokenSetReadOnly || (isPro && !gitBranchSelector)}
           icon={<IconAdd />}
           tooltip={t('addNew')}
           onClick={handleShowNewForm}

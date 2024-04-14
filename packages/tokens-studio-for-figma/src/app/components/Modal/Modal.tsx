@@ -169,7 +169,7 @@ export function Modal({
               data-testid={id}
               css={{
                 scrollPaddingBlockEnd: footer ? '$4' : 0,
-                marginBottom: footer ? 'calc(var(--sizes-controlMedium) + var(--space-5))' : 0, // Size of the fixed footer incl default sized buttons
+                marginBottom: footer && size === 'fullscreen' ? 'calc(var(--sizes-controlMedium) + var(--space-6))' : 0, // Size of the fixed footer incl default sized buttons
               }}
             >
               {children}

@@ -1,14 +1,13 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, Tooltip, IconButton } from '@tokens-studio/ui';
+import { Checkbox, ToggleGroup, Tooltip } from '@tokens-studio/ui';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
 import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
 import { Dispatch } from '../store';
-import Checkbox from './Checkbox';
 import Label from './Label';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';

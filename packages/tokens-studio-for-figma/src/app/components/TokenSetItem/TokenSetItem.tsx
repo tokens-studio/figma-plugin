@@ -3,10 +3,8 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  ContextMenu,
+  Checkbox, ContextMenu, Tooltip, Box,
 } from '@tokens-studio/ui';
-import Checkbox from '../Checkbox';
-import Box from '../Box';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
 import { tokenSetStatusSelector } from '@/selectors';
@@ -16,7 +14,6 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
-import Tooltip from '../Tooltip';
 
 export type TokenSetItemProps = {
   item: TreeItem;
@@ -24,6 +21,7 @@ export type TokenSetItemProps = {
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
   canEdit: boolean;
+  canDuplicate?: boolean;
   canDelete: boolean;
   canReorder?: boolean;
   extraBefore?: React.ReactNode;
@@ -44,6 +42,7 @@ export function TokenSetItem({
   isChecked,
   onCheck,
   canEdit,
+  canDuplicate = true,
   canDelete,
   canReorder = false,
   extraBefore,
@@ -144,11 +143,16 @@ export function TokenSetItem({
               <Box
                 css={{
                   overflow: 'hidden',
+                  height: '1.5em',
+                  maxWidth: 'calc(100% - $sizes$6)',
+                  whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   userSelect: 'none',
                 }}
               >
-                {item.label}
+                <Tooltip label={item.label} side="right">
+                  <span>{item.label}</span>
+                </Tooltip>
               </Box>
             </StyledDragButton>
           </ContextMenu.Trigger>
@@ -160,7 +164,7 @@ export function TokenSetItem({
               <>
                 {canEdit && (
                   <>
-                    <ContextMenu.Item onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
+                    <ContextMenu.Item disabled={!canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
                     <ContextMenu.Item disabled={!canDelete} onSelect={handleDelete}>
                       {t('delete')}
                     </ContextMenu.Item>

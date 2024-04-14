@@ -14,8 +14,6 @@ import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
 import {
   ignoreFirstPartForStylesSelector,
-  overwriteExistingStylesAndVariablesSelector,
-  scopeVariablesByTokenTypeSelector,
   prefixStylesWithThemeNameSelector,
   createStylesWithVariableReferencesSelector,
   variablesColorSelector,
@@ -42,26 +40,22 @@ type ExportOptions = {
   stylesColor: boolean,
   stylesTypography: boolean,
   stylesEffect: boolean,
-  rulesOverwriteExistingStylesAndVariables: boolean | undefined,
-  rulesScopeVariablesByTokenType: boolean | undefined,
   rulesIgnoreFirstPartForStyles: boolean | undefined,
   rulesPrefixStylesWithThemeName: boolean | undefined,
 };
 
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
-  const rulesOverwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
-  const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const rulesCreateStylesWithVariableReferences = useSelector(createStylesWithVariableReferencesSelector);
 
-  const [variablesColor, setVariablesColor] = React.useState<boolean>(useSelector(variablesColorSelector));
-  const [variablesNumber, setvariablesNumber] = React.useState<boolean>(useSelector(variablesNumberSelector));
-  const [variablesString, setvariablesString] = React.useState<boolean>(useSelector(variablesStringSelector));
-  const [variablesBoolean, setvariablesBoolean] = React.useState<boolean>(useSelector(variablesBooleanSelector));
-  const [stylesEffect, setstylesEffect] = React.useState<boolean>(useSelector(stylesEffectSelector));
-  const [stylesTypography, setstylesTypography] = React.useState<boolean>(useSelector(stylesTypographySelector));
-  const [stylesColor, setstylesColor] = React.useState<boolean>(useSelector(stylesColorSelector));
+  const variablesColor = useSelector(variablesColorSelector);
+  const variablesNumber = useSelector(variablesNumberSelector);
+  const variablesBoolean = useSelector(variablesBooleanSelector);
+  const variablesString = useSelector(variablesStringSelector);
+  const stylesColor = useSelector(stylesColorSelector);
+  const stylesTypography = useSelector(stylesTypographySelector);
+  const stylesEffect = useSelector(stylesEffectSelector);
 
   const exportOptions: ExportOptions = {
     variablesColor,
@@ -71,8 +65,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     stylesColor,
     stylesTypography,
     stylesEffect,
-    rulesOverwriteExistingStylesAndVariables,
-    rulesScopeVariablesByTokenType,
     rulesIgnoreFirstPartForStyles,
     rulesPrefixStylesWithThemeName,
   };
@@ -100,74 +92,53 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     [dispatch.settings],
   );
 
-  const handleScopeChange = React.useCallback(
-    (state: CheckedState) => {
-      dispatch.settings.setScopeVariablesByTokenType(!!state);
-    },
-    [dispatch.settings],
-  );
-
-  const handleOverwriteChange = React.useCallback(
-    (state: CheckedState) => {
-      dispatch.settings.setOverwriteExistingStylesAndVariables(!!state);
-    },
-    [dispatch.settings],
-  );
-
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
-      setVariablesColor(!!state);
+      dispatch.settings.setVariablesColor(!!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
-      setvariablesNumber(!!state);
+      dispatch.settings.setVariablesNumber(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesBoolean = React.useCallback(
     (state: CheckedState) => {
-      setvariablesBoolean(!!state);
+      dispatch.settings.setVariablesBoolean(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
-      setvariablesString(!!state);
+      dispatch.settings.setVariablesString(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
-      setstylesColor(!!state);
+      dispatch.settings.setStylesColor(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesTypography = React.useCallback(
     (state: CheckedState) => {
-      setstylesTypography(!!state);
+      dispatch.settings.setStylesTypography(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesEffect = React.useCallback(
     (state: CheckedState) => {
-      setstylesEffect(!!state);
+      dispatch.settings.setStylesEffect(!!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleSaveOptions = React.useCallback(() => {
-    dispatch.settings.setVariablesColor(variablesColor);
-    dispatch.settings.setVariablesNumber(variablesNumber);
-    dispatch.settings.setVariablesString(variablesString);
-    dispatch.settings.setVariablesBoolean(variablesBoolean);
-    dispatch.settings.setStylesEffect(stylesEffect);
-    dispatch.settings.setStylesTypography(stylesTypography);
-    dispatch.settings.setStylesColor(stylesColor);
     closeAction();
-  }, [closeAction, dispatch.settings, variablesColor, variablesNumber, variablesString, variablesBoolean, stylesEffect, stylesTypography, stylesColor]);
+  }, [closeAction]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
@@ -185,7 +156,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       /* eslint-disable-next-line react/jsx-no-bind */
       onInteractOutside={(event) => onInteractOutside(event)}
       footer={(
-        <Stack direction="row" justify="between">
+        <Stack direction="row" justify="between" gap={4}>
           <Button variant="invisible" id="manageStyles-button-close" onClick={closeAction} icon={<ChevronLeftIcon />}>
             {t('actions.cancel')}
           </Button>
@@ -232,36 +203,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
             }}
             >
               <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
-
-              <Switch
-                data-testid="overwriteExistingStylesAndVariables"
-                id="overwriteExistingStylesAndVariables"
-                checked={!!rulesOverwriteExistingStylesAndVariables}
-                defaultChecked={rulesOverwriteExistingStylesAndVariables}
-                onCheckedChange={handleOverwriteChange}
-              />
-              <Label htmlFor="overwriteExistingStylesAndVariables">{t('options.overwriteExistingStylesAndVariables')}</Label>
-              <ExplainerModal title={t('options.overwriteExistingStylesAndVariables')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.overwriteExistingStylesAndVariablesExplanation')}
-                </Box>
-              </ExplainerModal>
-
-              <Switch
-                data-testid="scopeVariablesByTokenType"
-                id="scopeVariablesByTokenType"
-                checked={!!rulesScopeVariablesByTokenType}
-                defaultChecked={rulesScopeVariablesByTokenType}
-                onCheckedChange={handleScopeChange}
-              />
-              <Label htmlFor="scopeVariablesByTokenType">{t('options.scopeVariablesByTokenType')}</Label>
-              <ExplainerModal title={t('options.scopeVariablesByTokenType')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.scopeVariablesByTokenTypeExplanation')}
-                </Box>
-              </ExplainerModal>
 
               <Switch
                 data-testid="ignoreFirstPartForStyles"

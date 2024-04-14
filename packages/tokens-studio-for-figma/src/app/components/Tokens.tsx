@@ -161,8 +161,13 @@ function Tokens({ isActive }: { isActive: boolean }) {
     setTokenSetsVisible(!tokenSetsVisible);
   }, [tokenSetsVisible]);
 
+  const [activeTokensTabToggleState, setActiveTokensTabToggleState] = React.useState<'list' | 'json'>(activeTokensTab);
+
   const handleSetTokensTab = React.useCallback((tab: 'list' | 'json') => {
-    dispatch.uiState.setActiveTokensTab(tab);
+    if (tab === 'list' || tab === 'json') {
+      setActiveTokensTabToggleState(tab);
+      dispatch.uiState.setActiveTokensTab(tab);
+    }
   }, [dispatch.uiState]);
 
   const tokensContextValue = React.useMemo(() => ({
@@ -241,7 +246,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           >
             <ToggleGroup
               type="single"
-              value={activeTokensTab}
+              value={activeTokensTabToggleState}
               onValueChange={handleSetTokensTab}
             >
               <ToggleGroup.Item value="list">

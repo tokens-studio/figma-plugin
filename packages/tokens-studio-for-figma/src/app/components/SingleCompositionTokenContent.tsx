@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { useSelector } from 'react-redux';
 import { useUIDSeed } from 'react-uid';
-import { editProhibitedSelector } from '@/selectors';
+import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import SingleCompositionTokenForm from './SingleCompositionTokenForm';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -40,6 +40,7 @@ export function SingleCompositionTokenContent({
 }: Props) {
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
   const seed = useUIDSeed();
 
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
@@ -55,7 +56,7 @@ export function SingleCompositionTokenContent({
     >
       <DragGrabber<string>
         item={property}
-        canReorder={!editProhibited}
+        canReorder={!editProhibited && !activeTokenSetReadOnly}
         onDragStart={handleDragStart}
       />
       <SingleCompositionTokenForm

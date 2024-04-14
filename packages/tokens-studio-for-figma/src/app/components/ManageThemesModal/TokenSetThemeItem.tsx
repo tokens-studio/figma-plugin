@@ -1,13 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 import {
-  Button, Box, Stack, Select, ToggleGroup, Tooltip,
+  Box, Stack, ToggleGroup,
 } from '@tokens-studio/ui';
 import { Check, Xmark, CodeBrackets } from 'iconoir-react';
-import { styled } from '@stitches/react';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import TokenSetStatusIcon from './TokenSetStatusIcon';
 
 type Props = {
   item: TreeItem
@@ -30,27 +28,13 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
   ), [item.path, value]);
 
   const handleValueChange = useCallback((status: string) => {
-    onChange({
-      ...value,
-      [item.path]: status as TokenSetStatus,
-    });
+    if (status) {
+      onChange({
+        ...value,
+        [item.path]: status as TokenSetStatus,
+      });
+    }
   }, [item, value, onChange]);
-
-  const handleCycleValue = useCallback(() => {
-    const currentIndex = tokenSetStatusValues.indexOf(tokenSetStatus);
-    const nextIndex = (currentIndex + 1) % tokenSetStatusValues.length;
-    handleValueChange(tokenSetStatusValues[nextIndex]);
-  }, [tokenSetStatus, handleValueChange]);
-
-  const mapStatus = useMemo(() => {
-    if (tokenSetStatus === TokenSetStatus.ENABLED) {
-      return 'enabled';
-    }
-    if (tokenSetStatus === TokenSetStatus.SOURCE) {
-      return 'source';
-    }
-    return 'disabled';
-  }, [tokenSetStatus]);
 
   const statusIcon = (status) => {
     if (status === TokenSetStatus.ENABLED) {

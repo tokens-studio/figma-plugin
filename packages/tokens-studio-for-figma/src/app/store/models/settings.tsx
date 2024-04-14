@@ -202,76 +202,10 @@ export const settings = createModel<RootModel>()({
         tokenType: payload,
       };
     },
-    setIgnoreFirstPartForStyles(state, payload: boolean) {
-      return {
-        ...state,
-        ignoreFirstPartForStyles: payload,
-      };
-    },
-    setOverwriteExistingStylesAndVariables(state, payload: boolean) {
-      return {
-        ...state,
-        overwriteExistingStylesAndVariables: payload,
-      };
-    },
-    setScopeVariablesByTokenType(state, payload: boolean) {
-      return {
-        ...state,
-        scopeVariablesByTokenType: payload,
-      };
-    },
-    setCreateStylesWithVariableReferences(state, payload: boolean) {
-      return {
-        ...state,
-        createStylesWithVariableReferences: payload,
-      };
-    },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
       return {
         ...state,
         storeTokenIdInJsonEditor: payload,
-      };
-    },
-    setVariablesColor(state, payload: boolean) {
-      return {
-        ...state,
-        variablesColor: payload,
-      };
-    },
-    setVariablesString(state, payload: boolean) {
-      return {
-        ...state,
-        variablesString: payload,
-      };
-    },
-    setVariablesNumber(state, payload: boolean) {
-      return {
-        ...state,
-        variablesNumber: payload,
-      };
-    },
-    setVariablesBoolean(state, payload: boolean) {
-      return {
-        ...state,
-        variablesBoolean: payload,
-      };
-    },
-    setStylesColor(state, payload: boolean) {
-      return {
-        ...state,
-        stylesColor: payload,
-      };
-    },
-    setStylesTypography(state, payload: boolean) {
-      return {
-        ...state,
-        stylesTypography: payload,
-      };
-    },
-    setStylesEffect(state, payload: boolean) {
-      return {
-        ...state,
-        stylesEffect: payload,
       };
     },
   },
@@ -309,9 +243,6 @@ export const settings = createModel<RootModel>()({
     setUpdateOnChange: (payload, rootState) => {
       setUI(rootState.settings);
     },
-    setIgnoreFirstPartForStyles: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
@@ -326,9 +257,6 @@ export const settings = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
-    setCreateStylesWithVariableReferences: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
