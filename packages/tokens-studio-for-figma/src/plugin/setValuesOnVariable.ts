@@ -27,12 +27,14 @@ export default function setValuesOnVariable(
       // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
       // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
       // In that case, we should delete the variable and re-create it.
-      let variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path);
-      if (!variable) {
-        variable = figma.variables.createVariable(t.path, collection.id, variableType);
-      }
+      const variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path) || figma.variables.createVariable(t.path, collection.id, variableType);
+
       if (variable) {
-        console.log('Variable type that we need', variableType, 'variable type we got', variable?.resolvedType);
+        if (variableType !== variable?.resolvedType) {
+          // TODO: DISCUSS IF THIS BEHAVIOR IS WANTED. It leads to many broken variables applied.. we cant change the type of a variable we have to re-create it
+          // variable.remove();
+          // variable = figma.variables.createVariable(t.path, collection.id, variableType);
+        }
         variable.description = t.description ?? '';
 
         switch (variableType) {
