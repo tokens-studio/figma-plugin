@@ -6,7 +6,9 @@ import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVa
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 
 export default async function setColorValuesOnTarget(target: BaseNode | PaintStyle, token: string, key: 'paints' | 'fills' | 'strokes' = 'paints') {
-  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences;
+  // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
+  // 'consumers' only exists in styles, so we can use that to determine if we're creating a style or applying to a layer
+  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target);
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
     if (typeof resolvedToken === 'undefined') return;
