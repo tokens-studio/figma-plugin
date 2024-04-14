@@ -326,7 +326,7 @@ export default function useTokens() {
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
-    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0);
+    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
     if (!shouldCreateStyles) return;
 
     track('createStyles', {
@@ -587,7 +587,7 @@ export default function useTokens() {
   }, [dispatch.uiState, tokens, settings]);
 
   const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
-    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedSets.length > 0));
+    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedThemes.length > 0));
     if (!shouldCreateVariables) return;
 
     track('createVariablesFromThemes', { selectedThemes });
