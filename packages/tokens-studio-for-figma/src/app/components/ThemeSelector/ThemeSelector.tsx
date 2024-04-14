@@ -122,9 +122,8 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         <DropdownMenu.Content
           data-testid="themeselector-dropdown-content"
           side="bottom"
-          css={{ minWidth: '180px', maxWidth: '70vw' }}
+          css={{ minWidth: '180px' }}
           align="end"
-          className="content scroll-container"
         >
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
