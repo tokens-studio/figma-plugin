@@ -1,7 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, ToggleGroup, Tooltip } from '@tokens-studio/ui';
+import {
+  Checkbox, TextInput, ToggleGroup, Tooltip,
+} from '@tokens-studio/ui';
+import { Search } from 'iconoir-react';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
@@ -72,13 +75,12 @@ function Inspector() {
             gap: '$3',
           }}
         >
-          <Input
-            full
+          <TextInput
             value={searchInputValue}
             onChange={handleSearchInputChange}
             type="text"
-            autofocus
-            placeholder={`${t('search')}...`}
+            placeholder={`${t('search')}…`}
+            leadingVisual={<Search />}
           />
         </Box>
         <Stack direction="row" align="center" gap={2}>

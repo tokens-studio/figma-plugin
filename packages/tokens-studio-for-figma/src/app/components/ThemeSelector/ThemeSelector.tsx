@@ -105,10 +105,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild data-testid="themeselector-dropdown">
-        <Button size="small" variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
+        <Button variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
           <Box css={{
             marginRight: '$2',
             color: '$fgSubtle',
+            fontWeight: '$sansRegular',
           }}
           >
             {t('theme')}
