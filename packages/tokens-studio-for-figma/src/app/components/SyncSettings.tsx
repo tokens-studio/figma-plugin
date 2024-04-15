@@ -148,10 +148,12 @@ const SyncSettings = () => {
                 {t('addNewSyncProvider')}
               </Button>
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              side="bottom"
-            >
-              {
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                side="bottom"
+                className="content scroll-container"
+              >
+                {
                 providers.map((provider) => (
                   <DropdownMenu.Item key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
                     <Box css={{ color: '$fgSubtle' }}>{getProviderIcon(provider.type)}</Box>
@@ -159,7 +161,8 @@ const SyncSettings = () => {
                   </DropdownMenu.Item>
                 ))
               }
-            </DropdownMenu.Content>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
           </DropdownMenu>
         </Stack>
       </Box>

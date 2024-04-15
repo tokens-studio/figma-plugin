@@ -53,7 +53,7 @@ export function ConvertToDTCGModal() {
       <Stack direction="column" align="start" gap={4} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
         <Box as="img" src={w3cConvertImage} css={{ borderRadius: '$small' }} />
         <Box>
-          {isDTCG ? t('legacyformatmodaldescription') : t('w3cformatmodaldescription')}
+          {isDTCG ? t('w3cformatmodaldescription') : t('legacyformatmodaldescription')}
         </Box>
         <Stack gap={4} align="center">
           <Button variant="primary" onClick={handleConvert} disabled={hasRemoteChanges}>

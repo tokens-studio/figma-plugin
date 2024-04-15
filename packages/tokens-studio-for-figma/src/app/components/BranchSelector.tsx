@@ -171,7 +171,7 @@ export default function BranchSelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top" sideOffset={0}>
+          <DropdownMenu.Content side="top" sideOffset={0} className="content scroll-container">
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger
                 data-testid="branch-selector-create-new-branch-trigger"
