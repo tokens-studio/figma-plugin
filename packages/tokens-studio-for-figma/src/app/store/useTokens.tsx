@@ -348,18 +348,17 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreateWithStatus = withoutSourceTokens.filter((token) => (
-      [
-        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && token.type === TokenTypes.COLOR,
-        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled)
-    ));
-
-    const tokensToCreate = tokensToCreateWithStatus.reduce((acc: SingleToken[], curr) => {
-      const accNames = acc.map((token) => token.name);
-      if (!accNames.includes(curr.name)) {
-        acc.push(curr);
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const condition = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (condition) {
+        const accNames = acc.map((token) => token.name);
+        if (!accNames.includes(curr.name)) {
+          acc.push(curr);
+        }
       }
       return acc;
     }, []);
@@ -406,18 +405,17 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreateWithStatus = withoutSourceTokens.filter((token) => (
-      [
-        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && token.type === TokenTypes.COLOR,
-        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled)
-    ));
-
-    const tokensToCreate = tokensToCreateWithStatus.reduce((acc: SingleToken[], curr) => {
-      const accNames = acc.map((token) => token.name);
-      if (!accNames.includes(curr.name)) {
-        acc.push(curr);
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const condition = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (condition) {
+        const accNames = acc.map((token) => token.name);
+        if (!accNames.includes(curr.name)) {
+          acc.push(curr);
+        }
       }
       return acc;
     }, []);

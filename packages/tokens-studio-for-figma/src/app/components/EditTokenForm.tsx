@@ -212,6 +212,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleTypographyValueChange = React.useCallback(
     (property: string, value: string) => {
+      console.log('property: ', property);
+      console.log('value: ', value);
       if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
         if (value) {
           setInternalEditToken({
@@ -460,6 +462,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
       return;
     }
+    console.log('internalEditToken: ', internalEditToken);
     if (isValid && internalEditToken) {
       submitTokenValue(internalEditToken);
       dispatch.uiState.setShowEditForm(false);

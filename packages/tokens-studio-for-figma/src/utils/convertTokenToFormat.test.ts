@@ -17,9 +17,9 @@ describe('convertTokenToFormat', () => {
 
     expect(result).toEqual({
       extra: 'extra value',
-      value: '12px',
-      type: 'sizing',
-      description: 'Size for small text',
+      $value: '12px',
+      $type: 'sizing',
+      $description: 'Size for small text',
     });
   });
 });

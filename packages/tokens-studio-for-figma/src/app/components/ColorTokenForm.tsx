@@ -6,7 +6,7 @@ import {
 } from '@tokens-studio/ui';
 import IconPlus from '@/icons/plus.svg';
 import IconMinus from '@/icons/minus.svg';
-import { EditTokenObject, SingleToken } from '@/types/tokens';
+import { EditTokenObject } from '@/types/tokens';
 import Box from './Box';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';

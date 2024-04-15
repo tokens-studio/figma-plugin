@@ -117,69 +117,69 @@ describe('formatTokens', () => {
         {
           global: {
             withValue: {
-              value: 'bar',
+              $value: 'bar',
             },
             basic: {
-              value: '#ff0000',
+              $value: '#ff0000',
             },
             typography: {
               heading: {
                 h1: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
+                    $value: 'Bold',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
+                    $value: 36,
+                    $type: 'fontSizes',
                   },
                 },
                 h2: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Regular',
-                    type: 'fontWeights',
+                    $value: 'Regular',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 24,
-                    type: 'fontSizes',
+                    $value: 24,
+                    $type: 'fontSizes',
                   },
                 },
                 alias: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
+                    $value: 'Bold',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
+                    $value: 36,
+                    $type: 'fontSizes',
                   },
                 },
                 non_resolved: {
-                  value: '{typography.heading.new}',
-                  type: TokenTypes.TYPOGRAPHY,
-                  description: 'Use for headings',
+                  $value: '{typography.heading.new}',
+                  $type: TokenTypes.TYPOGRAPHY,
+                  $description: 'Use for headings',
                 },
                 no_matching: {
-                  value: '{typography.heading.no_matching}',
-                  type: TokenTypes.TYPOGRAPHY,
+                  $value: '{typography.heading.no_matching}',
+                  $type: TokenTypes.TYPOGRAPHY,
                 },
               },
             },
             shadows: {
               md: {
-                value: [
+                $value: [
                   {
                     type: 'dropShadow',
                     color: 'rgba({colors.red.500}, 0.5)',
@@ -189,11 +189,11 @@ describe('formatTokens', () => {
                     spread: 4,
                   },
                 ],
-                type: TokenTypes.BOX_SHADOW,
+                $type: TokenTypes.BOX_SHADOW,
               },
               alias: {
-                value: '{shadows.md}',
-                type: TokenTypes.BOX_SHADOW,
+                $value: '{shadows.md}',
+                $type: TokenTypes.BOX_SHADOW,
               },
             },
           },
@@ -218,44 +218,44 @@ describe('formatTokens', () => {
         {
           global: {
             withValue: {
-              value: 'bar',
+              $value: 'bar',
             },
             basic: {
-              value: '#ff0000',
+              $value: '#ff0000',
             },
             typography: {
               heading: {
                 h1: {
-                  value: {
+                  $value: {
                     fontFamily: 'Inter',
                     fontWeight: 'Bold',
                     fontSize: 36,
                   },
-                  type: 'typography',
-                  description: 'Use for bold headings',
+                  $type: 'typography',
+                  $description: 'Use for bold headings',
                 },
                 h2: {
-                  value: {
+                  $value: {
                     fontFamily: 'Inter',
                     fontWeight: 'Regular',
                     fontSize: 24,
                   },
-                  type: 'typography',
-                  description: 'Use for headings',
+                  $type: 'typography',
+                  $description: 'Use for headings',
                 },
                 alias: {
-                  value: '{typography.heading.h1}',
-                  type: 'typography',
-                  description: 'Use for headings',
+                  $value: '{typography.heading.h1}',
+                  $type: 'typography',
+                  $description: 'Use for headings',
                 },
                 non_resolved: {
-                  value: '{typography.heading.new}',
-                  type: TokenTypes.TYPOGRAPHY,
-                  description: 'Use for headings',
+                  $value: '{typography.heading.new}',
+                  $type: TokenTypes.TYPOGRAPHY,
+                  $description: 'Use for headings',
                 },
                 no_matching: {
-                  value: '{typography.heading.no_matching}',
-                  type: TokenTypes.TYPOGRAPHY,
+                  $value: '{typography.heading.no_matching}',
+                  $type: TokenTypes.TYPOGRAPHY,
                 },
               },
             },
@@ -263,56 +263,56 @@ describe('formatTokens', () => {
               md: {
                 0: {
                   type: {
-                    value: 'dropShadow',
-                    type: 'type',
+                    $value: 'dropShadow',
+                    $type: 'type',
                   },
                   color: {
-                    value: 'rgba({colors.red.500}, 0.5)',
-                    type: 'color',
+                    $value: 'rgba({colors.red.500}, 0.5)',
+                    $type: 'color',
                   },
                   x: {
-                    value: 0,
-                    type: 'x',
+                    $value: 0,
+                    $type: 'x',
                   },
                   y: {
-                    value: 0,
-                    type: 'y',
+                    $value: 0,
+                    $type: 'y',
                   },
                   blur: {
-                    value: 2,
-                    type: 'blur',
+                    $value: 2,
+                    $type: 'blur',
                   },
                   spread: {
-                    value: 4,
-                    type: 'spread',
+                    $value: 4,
+                    $type: 'spread',
                   },
                 },
               },
               alias: {
                 0: {
                   type: {
-                    value: 'dropShadow',
-                    type: 'type',
+                    $value: 'dropShadow',
+                    $type: 'type',
                   },
                   color: {
-                    value: 'rgba({colors.red.500}, 0.5)',
-                    type: 'color',
+                    $value: 'rgba({colors.red.500}, 0.5)',
+                    $type: 'color',
                   },
                   x: {
-                    value: 0,
-                    type: 'x',
+                    $value: 0,
+                    $type: 'x',
                   },
                   y: {
-                    value: 0,
-                    type: 'y',
+                    $value: 0,
+                    $type: 'y',
                   },
                   blur: {
-                    value: 2,
-                    type: 'blur',
+                    $value: 2,
+                    $type: 'blur',
                   },
                   spread: {
-                    value: 4,
-                    type: 'spread',
+                    $value: 4,
+                    $type: 'spread',
                   },
                 },
               },

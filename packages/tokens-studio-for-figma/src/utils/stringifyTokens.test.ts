@@ -76,44 +76,44 @@ describe('stringfyTokens', () => {
       JSON.stringify(
         {
           scale: {
-            value: '1',
-            type: 'sizing',
+            $value: '1',
+            $type: 'sizing',
           },
           font: {
-            type: 'sizing',
+            $type: 'sizing',
             small: {
-              value: '2',
+              $value: '2',
             },
             big: {
-              value: '3',
+              $value: '3',
             },
             medium: {
-              value: '3',
-              type: 'dimension',
+              $value: '3',
+              $type: 'dimension',
             },
           },
           typography: {
-            type: 'typography',
+            $type: 'typography',
             headline: {
-              value: {
+              $value: {
                 fontFamily: 'aria',
                 fontWeight: 'bold',
                 lineHeight: '12',
               },
             },
             content: {
-              value: {
+              $value: {
                 fontFamily: 'aria',
                 fontWeight: 'light',
                 lineHeight: '3',
               },
-              type: 'typography',
+              $type: 'typography',
             },
           },
           box: {
-            type: 'boxShadow',
+            $type: 'boxShadow',
             default: {
-              value: {
+              $value: {
                 blur: '2',
                 color: '#000000',
                 spread: '0',
@@ -123,9 +123,9 @@ describe('stringfyTokens', () => {
               },
             },
           },
-          type: 'sizing',
+          $type: 'sizing',
           mx: {
-            value: '4',
+            $value: '4',
           },
         },
         null,
