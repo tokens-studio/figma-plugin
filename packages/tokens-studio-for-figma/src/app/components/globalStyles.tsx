@@ -71,6 +71,7 @@ export const globalStyles = globalCss({
     right: 0,
     bottom: 0,
     cursor: 'nwse-resize',
+    pointerEvents: 'all',
   },
   '.color-picker .react-colorful': {
     width: '100%',

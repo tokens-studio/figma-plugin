@@ -226,7 +226,15 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
           </form>
         </Modal>
         <Stack direction="column" css={{ padding: '$3' }}>
-          <Button icon={<IconAdd />} size="small" data-testid="button-new-token-set" type="button" disabled={editProhibited} onClick={handleOpenNewTokenSetModal}>
+          <Button
+            icon={<IconAdd />}
+            size="small"
+            data-testid="button-new-token-set"
+            type="button"
+            disabled={editProhibited}
+            onClick={handleOpenNewTokenSetModal}
+            css={{ justifyContent: 'center' }}
+          >
             {t('sets.new')}
           </Button>
         </Stack>
