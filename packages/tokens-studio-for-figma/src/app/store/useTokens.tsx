@@ -356,13 +356,19 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreate = withoutSourceTokens.filter((token) => (
-      [
-        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && token.type === TokenTypes.COLOR,
-        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled)
-    ));
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const shouldCreate = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (shouldCreate) {
+        if (!acc.find((token) => curr.name === token.name)) {
+          acc.push(curr);
+        }
+      }
+      return acc;
+    }, []);
 
     const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
@@ -415,13 +421,19 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreate = withoutSourceTokens.filter((token) => (
-      [
-        settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && token.type === TokenTypes.COLOR,
-        settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled)
-    ));
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const shouldCreate = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (shouldCreate) {
+        if (!acc.find((token) => curr.name === token.name)) {
+          acc.push(curr);
+        }
+      }
+      return acc;
+    }, []);
 
     const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,

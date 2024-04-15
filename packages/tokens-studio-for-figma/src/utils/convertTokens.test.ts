@@ -111,7 +111,6 @@ describe('convertToTokenArray', () => {
       },
       { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
     ]);
-
     expect(
       convertToTokenArray({
         tokens: basicTokens,
