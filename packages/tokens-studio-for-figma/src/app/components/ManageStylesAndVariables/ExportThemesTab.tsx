@@ -13,9 +13,8 @@ import { ThemeObject } from '@/types';
 import { ExportThemeRow } from './ExportThemeRow';
 import { docsLinks } from './docsLinks';
 import { LabelledCheckbox } from './LabelledCheckbox';
-import useExportThemesTab from './useExportThemesTab';
 
-export default function ExportThemesTab() {
+export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
   const isPro = useIsProUser();
@@ -31,7 +30,6 @@ export default function ExportThemesTab() {
   }, [themes]);
 
   const ungroupedThemes = React.useMemo(() => themes.filter((theme) => !theme.group), [themes]);
-  const { selectedThemes, setSelectedThemes } = useExportThemesTab();
 
   // TODO: Remeber selected themes in document storage
   // Reloading the plugin shouldn't forget the selected themes
