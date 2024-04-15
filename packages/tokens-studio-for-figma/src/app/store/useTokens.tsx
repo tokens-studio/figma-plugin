@@ -326,10 +326,18 @@ export default function useTokens() {
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
+    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
+    if (!shouldCreateStyles) return;
+
     track('createStyles', {
       textStyles: settings.stylesTypography,
       colorStyles: settings.stylesColor,
       effectStyles: settings.stylesEffect,
+    });
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
     });
 
     const enabledTokenSets = selectedSets
@@ -341,7 +349,7 @@ export default function useTokens() {
       return;
     }
 
-    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }))
+    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
 
     const resolved = defaultTokenResolver.setTokens(tokensToResolve);
     const withoutSourceTokens = resolved.filter((token) => (
@@ -363,21 +371,30 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-  }, [tokens, settings, dispatch.tokenState]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+  }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
 
   const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
+    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0);
+    if (!shouldCreateStyles) return;
+
     track('createStyles', {
       textStyles: settings.stylesTypography,
       colorStyles: settings.stylesColor,
       effectStyles: settings.stylesEffect,
     });
 
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
+    });
+
     const selectedSets = themes.reduce((acc, curr) => {
       if (selectedThemes.includes(curr.id)) {
         acc = {
           ...acc,
-          ...curr.selectedTokenSets
-        }
+          ...curr.selectedTokenSets,
+        };
       }
       return acc;
     }, {});
@@ -391,7 +408,7 @@ export default function useTokens() {
       return;
     }
 
-    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }))
+    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
 
     const resolved = defaultTokenResolver.setTokens(tokensToResolve);
     const withoutSourceTokens = resolved.filter((token) => (
@@ -413,7 +430,8 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-  }, [dispatch.tokenState, tokens, settings, themes]);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+  }, [dispatch.tokenState, tokens, settings, themes, dispatch.uiState]);
 
   const syncStyles = useCallback(async () => {
     const userConfirmation = await confirm({
@@ -535,6 +553,9 @@ export default function useTokens() {
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const createVariablesFromSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
+    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedSets.length > 0));
+    if (!shouldCreateVariables) return;
+
     track('createVariables');
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
@@ -547,7 +568,7 @@ export default function useTokens() {
       }
       return tempTokens;
     }, {} as Record<string, AnyTokenList>);
-    const createVariableResult = await wrapTransaction({
+    await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
         const data = await result;
@@ -561,11 +582,14 @@ export default function useTokens() {
       settings,
       selectedSets,
     }));
-    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
-  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+    Promise.resolve();
+  }, [dispatch.uiState, tokens, settings]);
 
   const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedThemes.length > 0));
+    if (!shouldCreateVariables) return;
+
     track('createVariablesFromThemes', { selectedThemes });
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
@@ -587,6 +611,7 @@ export default function useTokens() {
     }));
     dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+    Promise.resolve();
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {

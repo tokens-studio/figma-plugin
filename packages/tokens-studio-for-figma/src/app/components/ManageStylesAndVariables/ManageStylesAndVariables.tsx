@@ -38,15 +38,15 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
-  const handleExportToFigma = React.useCallback(() => {
+  const handleExportToFigma = React.useCallback(async () => {
+    setShowModal(false);
     if (activeTab === 'useSets') {
-      createVariablesFromSets(selectedSets);
+      await createVariablesFromSets(selectedSets);
       createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
-      createVariablesFromThemes(selectedThemes);
+      await createVariablesFromThemes(selectedThemes);
       createStylesFromSelectedThemes(selectedThemes);
     }
-    setShowModal(false);
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
 
   const [canExportToFigma, setCanExportToFigma] = React.useState(false);
