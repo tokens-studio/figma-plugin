@@ -349,14 +349,13 @@ export default function useTokens() {
     ));
 
     const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-      const condition = [
+      const shouldCreate = [
         settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
         settings.stylesColor && curr.type === TokenTypes.COLOR,
         settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled);
-      if (condition) {
-        const accNames = acc.map((token) => token.name);
-        if (!accNames.includes(curr.name)) {
+      if (shouldCreate) {
+        if (!acc.find((token) => curr.name === token.name)) {
           acc.push(curr);
         }
       }
@@ -406,14 +405,13 @@ export default function useTokens() {
     ));
 
     const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-      const condition = [
+      const shouldCreate = [
         settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
         settings.stylesColor && curr.type === TokenTypes.COLOR,
         settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled);
-      if (condition) {
-        const accNames = acc.map((token) => token.name);
-        if (!accNames.includes(curr.name)) {
+      if (shouldCreate) {
+        if (!acc.find((token) => curr.name === token.name)) {
           acc.push(curr);
         }
       }
