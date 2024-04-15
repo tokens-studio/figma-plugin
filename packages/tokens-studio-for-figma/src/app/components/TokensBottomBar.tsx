@@ -32,7 +32,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
 
   return (
     <Box css={{
-      width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
+      width: '100%', backgroundColor: '$bgDefault',
     }}
     >
       {hasUnsavedChanges ? (

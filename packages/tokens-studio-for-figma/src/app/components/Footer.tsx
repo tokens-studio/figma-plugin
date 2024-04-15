@@ -57,6 +57,8 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
+  
+
   return (
     <Box
       css={{
@@ -65,6 +67,7 @@ export default function Footer() {
         justifyContent: 'space-between',
         flexShrink: 0,
         padding: '$3',
+        borderTop: '1px solid $borderMuted',
       }}
     >
 
