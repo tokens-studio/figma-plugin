@@ -91,27 +91,47 @@ describe('convertToTokenArray', () => {
     };
 
     expect(convertToTokenArray({ tokens: basicTokens })).toEqual([
-      { name: 'global.withValue', value: 'bar', type: 'other' },
-      { name: 'global.basic', value: '#ff0000' },
-      { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
-      { name: 'global.opacity.50', value: '50%', type: 'opacity' },
-      { ...compositionTokens.output, name: 'global.composition.heading' },
+      { value: 'bar', name: 'global.withValue.$value' },
+      { value: 'other', name: 'global.withValue.$type' },
+      { value: '#ff0000', name: 'global.basic' },
       {
-        name: 'global.groupWithType.small',
-        value: '12px',
-        type: 'sizing',
-        inheritTypeLevel: 3,
+        value: 'Inter',
+        name: 'global.typography.heading.h2.$value.fontFamily'
       },
-      { name: 'global.groupWithType.big', value: '24px', type: 'dimension' },
       {
-        name: 'global.nestGroupWithType.font.small',
-        value: '12px',
-        type: 'sizing',
-        inheritTypeLevel: 3,
+        value: 'Regular',
+        name: 'global.typography.heading.h2.$value.fontWeight'
       },
-      { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
+      { value: 24, name: 'global.typography.heading.h2.$value.fontSize' },
+      { value: 'typography', name: 'global.typography.heading.h2.$type' },
+      {
+        value: 'Use for headings',
+        name: 'global.typography.heading.h2.$description'
+      },
+      { value: 'opacity', name: 'global.opacity.50.$type' },
+      { value: '50%', name: 'global.opacity.50.$value' },
+      {
+        value: '{global.groupWithType.small}',
+        name: 'global.composition.heading.$value.sizing'
+      },
+      {
+        value: '{global.opacity.50}',
+        name: 'global.composition.heading.$value.opacity'
+      },
+      { value: 'composition', name: 'global.composition.heading.$type' },
+      { value: 'sizing', name: 'global.groupWithType.$type' },
+      { value: '12px', name: 'global.groupWithType.small.$value' },
+      { value: '24px', name: 'global.groupWithType.big.$value' },
+      { value: 'dimension', name: 'global.groupWithType.big.$type' },
+      { value: 'sizing', name: 'global.nestGroupWithType.$type' },
+      { value: '12px', name: 'global.nestGroupWithType.font.small.$value' },
+      { value: '24px', name: 'global.nestGroupWithType.font.big.$value' },
+      {
+        value: 'dimension',
+        name: 'global.nestGroupWithType.font.big.$type'
+      }
     ]);
-
+    
     expect(
       convertToTokenArray({
         tokens: basicTokens,
@@ -121,25 +141,45 @@ describe('convertToTokenArray', () => {
         expandBorder: true,
       }),
     ).toEqual([
-      { name: 'global.withValue', value: 'bar', type: 'other' },
-      { name: 'global.basic', value: '#ff0000' },
-      { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
-      { name: 'global.opacity.50', value: '50%', type: 'opacity' },
-      { ...compositionTokens.output, name: 'global.composition.heading' },
+      { value: 'bar', name: 'global.withValue.$value' },
+      { value: 'other', name: 'global.withValue.$type' },
+      { value: '#ff0000', name: 'global.basic' },
       {
-        name: 'global.groupWithType.small',
-        value: '12px',
-        type: 'sizing',
-        inheritTypeLevel: 3,
+        value: 'Inter',
+        name: 'global.typography.heading.h2.$value.fontFamily'
       },
-      { name: 'global.groupWithType.big', value: '24px', type: 'dimension' },
       {
-        name: 'global.nestGroupWithType.font.small',
-        value: '12px',
-        type: 'sizing',
-        inheritTypeLevel: 3,
+        value: 'Regular',
+        name: 'global.typography.heading.h2.$value.fontWeight'
       },
-      { name: 'global.nestGroupWithType.font.big', value: '24px', type: 'dimension' },
+      { value: 24, name: 'global.typography.heading.h2.$value.fontSize' },
+      { value: 'typography', name: 'global.typography.heading.h2.$type' },
+      {
+        value: 'Use for headings',
+        name: 'global.typography.heading.h2.$description'
+      },
+      { value: 'opacity', name: 'global.opacity.50.$type' },
+      { value: '50%', name: 'global.opacity.50.$value' },
+      {
+        value: '{global.groupWithType.small}',
+        name: 'global.composition.heading.$value.sizing'
+      },
+      {
+        value: '{global.opacity.50}',
+        name: 'global.composition.heading.$value.opacity'
+      },
+      { value: 'composition', name: 'global.composition.heading.$type' },
+      { value: 'sizing', name: 'global.groupWithType.$type' },
+      { value: '12px', name: 'global.groupWithType.small.$value' },
+      { value: '24px', name: 'global.groupWithType.big.$value' },
+      { value: 'dimension', name: 'global.groupWithType.big.$type' },
+      { value: 'sizing', name: 'global.nestGroupWithType.$type' },
+      { value: '12px', name: 'global.nestGroupWithType.font.small.$value' },
+      { value: '24px', name: 'global.nestGroupWithType.font.big.$value' },
+      {
+        value: 'dimension',
+        name: 'global.nestGroupWithType.font.big.$type'
+      }
     ]);
   });
 });
