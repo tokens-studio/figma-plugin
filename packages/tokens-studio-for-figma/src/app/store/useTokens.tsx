@@ -348,13 +348,21 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreate = withoutSourceTokens.filter((token) => (
+    const tokensToCreateWithStatus = withoutSourceTokens.filter((token) => (
       [
         settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
         settings.stylesColor && token.type === TokenTypes.COLOR,
         settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled)
     ));
+
+    const tokensToCreate = tokensToCreateWithStatus.reduce((acc: SingleToken[], curr) => {
+      const accNames = acc.map((token) => token.name);
+      if (!accNames.includes(curr.name)) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
 
     const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
@@ -398,13 +406,21 @@ export default function useTokens() {
       !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
     ));
 
-    const tokensToCreate = withoutSourceTokens.filter((token) => (
+    const tokensToCreateWithStatus = withoutSourceTokens.filter((token) => (
       [
         settings.stylesTypography && token.type === TokenTypes.TYPOGRAPHY,
         settings.stylesColor && token.type === TokenTypes.COLOR,
         settings.stylesEffect && token.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled)
     ));
+
+    const tokensToCreate = tokensToCreateWithStatus.reduce((acc: SingleToken[], curr) => {
+      const accNames = acc.map((token) => token.name);
+      if (!accNames.includes(curr.name)) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
 
     const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
