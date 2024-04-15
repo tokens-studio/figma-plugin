@@ -15,6 +15,7 @@ export type ImportTheme = ThemeObject & {
 
 export function findDifferentState(baseState: CompareStateType, compareState: CompareStateType): CompareStateType {
   const entries: [string, ImportToken[]][] = [];
+  console.log('Finding different state', baseState, compareState);
   Object.entries(compareState.tokens)?.forEach(([tokenSet, values]) => {
     const newTokens: ImportToken[] = [];
     const updatedTokens: ImportToken[] = [];
@@ -77,6 +78,12 @@ export function findDifferentState(baseState: CompareStateType, compareState: Co
     if (!compareState.themes.find((t) => t.id === theme.id)) {
       removedThemes.push({ ...theme, importType: 'REMOVE' });
     }
+  });
+
+  console.log('has different state', {
+    tokens: Object.fromEntries(entries.filter(([_, tokens]) => tokens.length > 0)),
+    themes: [...newThemes, ...changedThemes, ...removedThemes],
+    metadata: !isEqual(baseState.metadata, compareState.metadata) ? compareState.metadata : null,
   });
 
   return {

@@ -23,21 +23,18 @@ export default function stringifyTokens(
     const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
       const {
-        type, inheritTypeLevel, description, value, ...tokenWithoutTypeAndValue
+        inheritTypeLevel, ...tokenWithoutTypeAndValue
       } = tokenWithoutName;
       // set type of group level
       set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
-      set(tokenObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
-      set(tokenObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
+      tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+      tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
       set(tokenObj, token.name, tokenWithoutTypeAndValue, { merge: true });
     } else {
-      const {
-        type, value, description, ...tokenWithoutTypeAndValue
-      } = tokenWithoutName;
-      set(tokenObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
-      set(tokenObj, `${token.name}.${TokenFormat.tokenTypeKey}`, type);
-      set(tokenObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
-      set(tokenObj, token.name, tokenWithoutTypeAndValue, { merge: true });
+      tokenWithoutName[TokenFormat.tokenTypeKey] = tokenWithoutName.type;
+      tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+      tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
+      set(tokenObj, token.name, tokenWithoutName, { merge: true });
     }
   });
 

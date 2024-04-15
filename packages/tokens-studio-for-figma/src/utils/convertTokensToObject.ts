@@ -5,6 +5,7 @@ import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
+// TODO: Change this so it doesnt change order
 export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
     const tokenGroupObj: AnyTokenSet<false> = {};
@@ -13,20 +14,20 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
       const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
       if (tokenWithoutName.inheritTypeLevel) {
         const {
-          type, inheritTypeLevel, description, value, ...tokenWithoutTypeAndValue
+          inheritTypeLevel, ...tokenWithoutTypeAndValue
         } = tokenWithoutName;
         // set type of group level
+        tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+        tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
         set(tokenGroupObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
         set(tokenGroupObj, token.name, tokenWithoutTypeAndValue, { merge: true });
       } else {
         const {
           type, value, description, ...tokenWithoutTypeAndValue
         } = tokenWithoutName;
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenValueKey}`, value);
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenTypeKey}`, type);
-        set(tokenGroupObj, `${token.name}.${TokenFormat.tokenDescriptionKey}`, description);
+        tokenWithoutTypeAndValue[TokenFormat.tokenTypeKey] = type;
+        tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = value;
+        tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = description;
         set(tokenGroupObj, token.name, tokenWithoutTypeAndValue, { merge: true });
       }
     });

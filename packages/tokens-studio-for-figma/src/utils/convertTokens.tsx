@@ -66,49 +66,46 @@ function checkForTokens({
   currentTypeLevel?: number;
 }): [SingleToken[], SingleToken | undefined] {
   let returnValue:
-  | Pick<SingleToken<false>, 'name' | 'value' | 'description'>
+  | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
   | {
     type: TokenTypes;
     value: Record<string, SingleToken['value']>;
     description?: string;
+    inheritTypeLevel?: number;
   }
   | undefined;
   if (isSingleTokenInJSON(token)) {
-    const {
-      [TokenFormat.tokenValueKey]: value,
-      [TokenFormat.tokenTypeKey]: type,
-      [TokenFormat.tokenDescriptionKey]: description,
-      ...remainingTokenProperties
-    } = token;
-    returnValue = {
-      value,
-      ...(!type && inheritType
-        ? { type: inheritType as TokenTypes, inheritTypeLevel: currentTypeLevel }
-        : { type: type as TokenTypes }),
-      ...(description && typeof description === 'string' ? { description } : {}),
-      ...remainingTokenProperties,
-    };
+    returnValue = token as SingleToken<false>;
+    returnValue.value = token[TokenFormat.tokenValueKey];
+    if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
+      returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
+    }
+    if (!token[TokenFormat.tokenTypeKey] && inheritType) {
+      returnValue.type = inheritType as TokenTypes;
+      returnValue.inheritTypeLevel = currentTypeLevel as number;
+    } else {
+      returnValue.type = token[TokenFormat.tokenTypeKey];
+    }
   } else if (
     isSingleTypographyToken(token)
     || isSingleBoxShadowToken(token)
     || isSingleCompositionToken(token)
     || isSingleBorderToken(token)
   ) {
-    const {
-      [TokenFormat.tokenValueKey]: value,
-      [TokenFormat.tokenTypeKey]: type,
-      [TokenFormat.tokenDescriptionKey]: description,
-      ...remainingTokenProperties
-    } = token;
-    returnValue = {
-      type: type as TokenTypes,
-      value: Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
-        acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
-        return acc;
-      }, {}),
-      ...(description && typeof description === 'string' ? { description } : {}),
-      ...remainingTokenProperties,
-    };
+    returnValue = token as SingleToken<false>;
+    returnValue.value = Object.entries(token).reduce<Record<string, SingleToken['value']>>((acc, [key, val]) => {
+      acc[key] = isSingleTokenValueObject(val) && returnValuesOnly ? val[TokenFormat.tokenValueKey] : val;
+      return acc;
+    }, {});
+    if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
+      returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
+    }
+    if (!token[TokenFormat.tokenTypeKey] && inheritType) {
+      returnValue.type = inheritType as TokenTypes;
+      returnValue.inheritTypeLevel = currentTypeLevel as number;
+    } else {
+      returnValue.type = token[TokenFormat.tokenTypeKey] as TokenTypes;
+    }
   } else if (typeof token === 'object') {
     // We dont have a single token value key yet, so it's likely a group which we need to iterate over
     // This would be where we push a `group` entity to the array, once we do want to tackle group descriptions or group metadata
@@ -148,6 +145,7 @@ function checkForTokens({
     // If all else fails, we just return the token as the value, and type as other
     returnValue = {
       value: token,
+      type: TokenTypes.OTHER,
     };
   }
 
