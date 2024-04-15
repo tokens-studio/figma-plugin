@@ -4,6 +4,10 @@ import { pushToTokensStudio } from '@/app/store/providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
 import { RootModel } from '@/types/RootModel';
 import { ThemeObject, ThemeObjectsList } from '@/types';
+import { getThemeGroupsToUpdate } from './getThemeGroupsToUpdate';
+import { updateThemeGroupName } from './updateThemeGroupName';
+import { saveTheme } from './saveTheme';
+import { deleteTheme } from './deleteTheme';
 
 interface UpdateThemeGroupsInTokensStudioPayload {
   prevState: RematchRootState<RootModel, Record<string, never>>;
@@ -11,19 +15,6 @@ interface UpdateThemeGroupsInTokensStudioPayload {
   dispatch: RematchDispatch<RootModel>;
   action: any;
 }
-
-const getThemeGroupsToUpdate = (themes: ThemeObjectsList, groupIdsMap: Record<string, string>) => {
-  const themeGroupsToUpdate: Record<string, ThemeObjectsList> = {};
-
-  themes.forEach((theme) => {
-    if (theme.group && groupIdsMap[theme.group]) {
-      themeGroupsToUpdate[groupIdsMap[theme.group]] = themeGroupsToUpdate[groupIdsMap[theme.group]] || [];
-      themeGroupsToUpdate[groupIdsMap[theme.group]].push(theme);
-    }
-  });
-
-  return themeGroupsToUpdate;
-};
 
 export async function updateThemeGroupsInTokensStudio({
   prevState,
@@ -50,70 +41,27 @@ export async function updateThemeGroupsInTokensStudio({
 
   switch (action.type) {
     case 'tokenState/updateThemeGroupName': {
-      const { meta: newName } = action;
-
-      themes
-        .filter((theme) => theme.group === newName)
-        .forEach((theme) => {
-          if (theme.groupId && theme.group) {
-            themeGroupsToUpdate[theme.groupId] = themeGroupsToUpdate[theme.groupId] || [];
-            themeGroupsToUpdate[theme.groupId].push(theme);
-          }
-        });
+      updateThemeGroupName({ action, themes, themeGroupsToUpdate });
       break;
     }
     case 'tokenState/saveTheme': {
-      const {
-        payload: { id, name, group },
-      } = action;
-
-      if (id) {
-        if (groupIdsMap[group]) { // theme value updated and/or moved to an existing group
-          themeGroupsToUpdate = getThemeGroupsToUpdate(themes, groupIdsMap);
-          themeGroupsToDelete = Object.values(groupIdsMap).filter((groupId) => !themeGroupsToUpdate[groupId]);
-        } else { // theme moved to a new group
-          // Create new group with the moved theme
-          const movedTheme = themes.find((theme) => theme.id === id);
-          if (movedTheme) {
-            themeToCreate = movedTheme;
-          }
-
-          // remove the theme from the old group or remove the group if there are no themes left
-          const movedThemePrevGroupId = prevThemes.find((theme) => theme.id === id)?.groupId;
-          if (movedThemePrevGroupId) {
-            const themesToUpdate = themes.filter(({ groupId }) => groupId === movedThemePrevGroupId);
-
-            if (themesToUpdate.length) {
-              themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate, groupIdsMap);
-            } else {
-              themeGroupsToDelete.push(movedThemePrevGroupId);
-            }
-          }
-        }
-      } else if (groupIdsMap[group]) { // theme created in an existing group
-        themeGroupsToUpdate = getThemeGroupsToUpdate(themes, groupIdsMap);
-      } else { // theme created in a new group
-        const newTheme = themes.find((theme) => theme.name === name);
-        if (newTheme) {
-          themeToCreate = newTheme;
-        }
-      }
+      const themeGroupsToAlter = saveTheme({
+        action,
+        themes,
+        prevThemes,
+        groupIdsMap,
+      });
+      themeToCreate = themeGroupsToAlter.themeToCreate;
+      themeGroupsToDelete = themeGroupsToAlter.themeGroupsToDelete;
+      themeGroupsToUpdate = themeGroupsToAlter.themeGroupsToUpdate;
       break;
     }
     case 'tokenState/deleteTheme': {
-      const { payload: themeUrn } = action;
-
-      const themeGroupId = prevThemes.find((theme) => theme.id === themeUrn)?.groupId;
-
-      if (themeGroupId) {
-        const themesToUpdate = themes.filter(({ groupId }) => groupId === themeGroupId);
-
-        if (themesToUpdate.length) {
-          themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate, groupIdsMap);
-        } else {
-          themeGroupsToDelete.push(themeGroupId);
-        }
-      }
+      const themeGroupsToAlter = deleteTheme({
+        action, themes, prevThemes, groupIdsMap,
+      });
+      themeGroupsToDelete = themeGroupsToAlter.themeGroupsToDelete;
+      themeGroupsToUpdate = themeGroupsToAlter.themeGroupsToUpdate;
       break;
     }
     case 'tokenState/assignVariableIdsToCurrentTheme':

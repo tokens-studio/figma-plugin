@@ -313,7 +313,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       }
       case 'EDIT_TOKEN': {
         const tokenId = data.$extensions?.['studio.tokens']?.urn;
-        console.log('EDIT_TOKEN', data);
 
         if (!tokenId) {
           throw new Error('Invalid data');
