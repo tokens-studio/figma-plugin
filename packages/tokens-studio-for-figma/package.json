@@ -32,7 +32,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@tokens-studio/ui": "0.5.4",
+    "@tokens-studio/ui": "0.5.5",
     "@tokens-studio/tokens": "0.1.1",
     "@tokens-studio/sdk": "1.1.3",
     "@figma-plugin/helpers": "^0.15.2",

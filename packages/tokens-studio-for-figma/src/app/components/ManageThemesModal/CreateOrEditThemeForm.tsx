@@ -149,7 +149,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {activeTab === ThemeFormTabs.SETS && (
-        <Stack direction="column" css={{ padding: '$4 $3', paddingTop: '$4' }}>
+        <Stack direction="column" gap={1} css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}

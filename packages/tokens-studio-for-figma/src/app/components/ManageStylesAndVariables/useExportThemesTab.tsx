@@ -59,11 +59,6 @@ export default function useExportThemesTab() {
     }
   }, [themes, selectedThemes]);
 
-  const handleManageThemes = React.useCallback(() => {
-    /* TODO: Open the manage themes modal */
-    alert('MANAGE THEMES');
-  }, []);
-
   const handleGetPro = React.useCallback(() => {
     window.open('https://tokens.studio/#pricing-1', '_blank');
   }, []);
@@ -123,24 +118,6 @@ export default function useExportThemesTab() {
           <Stack direction="column" align="start" gap={4}>
             <Heading>{t('exportThemesTab.confirmThemes')}</Heading>
             <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
-            <Box css={{
-              alignSelf: 'flex-start',
-            }}
-            >
-              <ProButton
-                as="a"
-                icon={<StyledProBadge>{isPro ? 'PRO' : 'GET PRO'}</StyledProBadge>}
-                variant="secondary"
-                size="small"
-                css={{
-                  alignContent: 'center',
-                  gap: '$2',
-                }}
-                onClick={isPro ? handleManageThemes : handleGetPro}
-              >
-                {t('actions.manageThemes')}
-              </ProButton>
-            </Box>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
                 <Checkbox id="check-all-themes" checked={selectedThemes.length === themes.length} onCheckedChange={handleSelectAllThemes} />
