@@ -29,6 +29,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       }
       return acc;
     }, {} as ThemeObject);
+    console.log('theme: ', theme);
     selectedSets.forEach((set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set.set);

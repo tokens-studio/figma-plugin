@@ -574,12 +574,14 @@ export default function useTokens() {
       isInfinite: true,
     });
     const selectedSetNames = selectedSets.map((set) => set.set);
+    console.log('selectedSets: ', selectedSets);
     const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       if (selectedSetNames.includes(tokenSetKey)) {
         tempTokens[tokenSetKey] = tokenList;
       }
       return tempTokens;
     }, {} as Record<string, AnyTokenList>);
+    console.log('selectedSetsTokens: ', selectedSetsTokens);
     await wrapTransaction({
       name: 'createVariables',
       statExtractor: async (result, transaction) => {
