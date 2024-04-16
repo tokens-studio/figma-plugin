@@ -30,6 +30,13 @@ const StyledCountLabel = styled('span', {
     marginRight: '$1',
     color: '$fgSubtle',
   },
+  variants: {
+    variant: {
+      danger: {
+        color: '$dangerFg',
+      },
+    },
+  },
 });
 
 export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
@@ -86,13 +93,13 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
       </Label>
 
       <Stack>
-        {tokenSetCount > 0 && (
-        <StyledCountLabel>
-          {tokenSetCount}
-          {' '}
-          {tokenSetCount === 1 ? 'set' : 'sets'}
-        </StyledCountLabel>
-        )}
+        {tokenSetCount > 0 ? (
+          <StyledCountLabel>
+            {tokenSetCount}
+            {' '}
+            {tokenSetCount === 1 ? 'set' : 'sets'}
+          </StyledCountLabel>
+        ) : <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>}
         {stylesCount > 0 && (
         <StyledCountLabel>
           {stylesCount}

@@ -270,9 +270,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           }}
         >
           {tokenSetsVisible && (
-            <Box>
-              <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
-            </Box>
+            <TokenSetSelector saveScrollPositionSet={saveScrollPositionSet} />
           )}
           <Box
             css={{

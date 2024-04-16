@@ -11,7 +11,6 @@ import { removePluginData, setNonePluginData } from './pluginData';
 import { SettingsState } from '@/app/store/models/settings';
 import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import setValuesOnNode from './setValuesOnNode';
-import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export async function updatePluginDataAndNodes({
   entries: nodes, values: tokenValues, tokensMap, settings,
