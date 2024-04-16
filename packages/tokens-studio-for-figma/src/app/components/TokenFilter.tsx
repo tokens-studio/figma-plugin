@@ -1,29 +1,31 @@
 import React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useDispatch, useSelector } from 'react-redux';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { XCircleFillIcon } from '@primer/octicons-react';
-import { IconButton } from '@tokens-studio/ui';
+import { Box, IconButton } from '@tokens-studio/ui';
+import { Search } from 'iconoir-react';
 import { Dispatch } from '../store';
-import Box from './Box';
 import { styled } from '@/stitches.config';
 import { tokenFilterSelector } from '@/selectors';
 
 const StyledInput = styled('input', {
   background: 'transparent',
   border: 'none',
+  borderRadius: '$small',
   color: '$fgDefault',
   fontSize: '$small',
   width: '100%',
-  padding: '$3 $5',
+  height: '$controlMedium',
   paddingLeft: '$6',
   paddingRight: '$1',
   gap: '$2',
-  '&:focus, &:hover': {
-    outline: 'none',
-    boxShadow: 'none',
+  '&:hover': {
     backgroundColor: '$bgSubtle',
+  },
+  '&:focus-visible': {
+    outline: 'none',
+    boxShadow: '$focus',
   },
 });
 
@@ -60,7 +62,7 @@ const TokenFilter = () => {
         position: 'relative',
       }}
     >
-      <Box css={{ position: 'absolute', left: '$2' }}><MagnifyingGlassIcon /></Box>
+      <Box css={{ position: 'absolute', left: '$2' }}><Search /></Box>
       <StyledInput
         spellCheck={false}
         type="text"

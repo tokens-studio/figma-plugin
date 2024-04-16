@@ -95,6 +95,8 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesColor(!!state);
+      // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
+      if (state) dispatch.settings.setStylesColor(!state);
     },
     [dispatch.settings],
   );
@@ -120,6 +122,8 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setStylesColor(!!state);
+      // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
+      if (state) dispatch.settings.setVariablesColor(!state);
     },
     [dispatch.settings],
   );
@@ -169,80 +173,77 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 )}
       stickyFooter
     >
-      <Stack direction="column" align="start" gap={6} css={{ overflowY: 'scroll' }}>
-        <Stack direction="column" align="start" gap={4}>
-          <Stack direction="row" align="center" gap={2}>
-            <SlidersIcon />
-            <Heading size="medium">{t('options.title')}</Heading>
-          </Stack>
+      <Stack direction="column" align="start" gap={4}>
+        <Stack direction="column" align="start" gap={3}>
+          <Text>{t('options.intro')}</Text>
           <Link target="_blank" href="https://docs.tokens.studio/">{`${t('generic.learnMore')} – ${t('docs.exportToFigmaOptions')}`}</Link>
         </Stack>
         <form>
-          <Stack direction="column" justify="between" gap={5} align="start" css={{ width: '100%' }}>
+          <Stack direction="row" justify="start" gap={5} align="start" css={{ width: '100%', marginBottom: '$6' }}>
             <StyledCheckboxGrid>
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichVariablesShouldBeCreatedAndUpdated')}</Text>
+              <Text bold css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichVariablesShouldBeCreatedAndUpdated')}</Text>
               <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={exportOptions.variablesColor} label={t('variables.color')} />
               <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={exportOptions.variablesString} label={t('variables.string')} />
               <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={exportOptions.variablesNumber} label={t('variables.number')} />
               <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={exportOptions.variablesBoolean} label={t('variables.boolean')} />
             </StyledCheckboxGrid>
+            <Box css={{ alignSelf: 'stretch', width: '1px', border: '1px solid $colors$borderSubtle' }} />
             <StyledCheckboxGrid>
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichStylesShouldBeCreatedAndUpdated')}</Text>
+              <Text bold css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichStylesShouldBeCreatedAndUpdated')}</Text>
               <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={exportOptions.stylesColor} label={t('styles.color')} />
               <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={exportOptions.stylesTypography} label={t('styles.typography')} />
               <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
             </StyledCheckboxGrid>
-            <Box css={{
-              display: 'grid',
-              alignItems: 'center',
-              gridAutoRows: 'auto',
-              gridTemplateColumns: 'min-content max-content min-content',
-              width: '100%',
-              gridColumnGap: '$4',
-              gridRowGap: '$5',
-            }}
-            >
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
-
-              <Switch
-                data-testid="ignoreFirstPartForStyles"
-                id="ignoreFirstPartForStyles"
-                checked={!!rulesIgnoreFirstPartForStyles}
-                defaultChecked={rulesIgnoreFirstPartForStyles}
-                onCheckedChange={handleIgnoreChange}
-              />
-              <Label htmlFor="ignoreFirstPartForStyles">{t('options.ignorePrefix')}</Label>
-              <ExplainerModal title={t('options.ignorePrefix')}>
-                <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
-                <Box>{t('options.ignorePrefixExplanation')}</Box>
-              </ExplainerModal>
-
-              <Switch
-                data-testid="prefixStylesWithThemeName"
-                id="prefixStylesWithThemeName"
-                checked={!!rulesPrefixStylesWithThemeName}
-                defaultChecked={rulesPrefixStylesWithThemeName}
-                onCheckedChange={handlePrefixWithThemeNameChange}
-              />
-              <Label htmlFor="prefixStylesWithThemeName">{t('options.prefixStyles')}</Label>
-              <ExplainerModal title={t('options.prefixStyles')}>
-                <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
-                <Box>{t('options.prefixStylesExplanation')}</Box>
-              </ExplainerModal>
-
-              <Switch
-                data-testid="createStylesWithVariableReferences"
-                id="createStylesWithVariableReferences"
-                checked={!!rulesCreateStylesWithVariableReferences}
-                defaultChecked={rulesCreateStylesWithVariableReferences}
-                onCheckedChange={handleCreateStylesWithVariableReferencesChange}
-              />
-              <Label htmlFor="createStylesWithVariableReferences">{t('options.createStylesWithVariableReferences')}</Label>
-              <ExplainerModal title={t('options.createStylesWithVariableReferences')}>
-                <Box>{t('options.createStylesWithVariableReferencesExplanation')}</Box>
-              </ExplainerModal>
-            </Box>
           </Stack>
+          <Box css={{
+            display: 'grid',
+            alignItems: 'center',
+            gridAutoRows: 'auto',
+            gridTemplateColumns: 'min-content max-content min-content',
+            width: '100%',
+            gridColumnGap: '$2',
+            gridRowGap: '$3',
+          }}
+          >
+            <Text bold css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
+            <Switch
+              data-testid="ignoreFirstPartForStyles"
+              id="ignoreFirstPartForStyles"
+              checked={!!rulesIgnoreFirstPartForStyles}
+              defaultChecked={rulesIgnoreFirstPartForStyles}
+              onCheckedChange={handleIgnoreChange}
+            />
+            <Label css={{ fontWeight: '$sansRegular' }} htmlFor="ignoreFirstPartForStyles">{t('options.ignorePrefix')}</Label>
+            <ExplainerModal title={t('options.ignorePrefix')}>
+              <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
+              <Box>{t('options.ignorePrefixExplanation')}</Box>
+            </ExplainerModal>
+
+            <Switch
+              data-testid="prefixStylesWithThemeName"
+              id="prefixStylesWithThemeName"
+              checked={!!rulesPrefixStylesWithThemeName}
+              defaultChecked={rulesPrefixStylesWithThemeName}
+              onCheckedChange={handlePrefixWithThemeNameChange}
+            />
+            <Label css={{ fontWeight: '$sansRegular' }} htmlFor="prefixStylesWithThemeName">{t('options.prefixStyles')}</Label>
+            <ExplainerModal title={t('options.prefixStyles')}>
+              <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
+              <Box>{t('options.prefixStylesExplanation')}</Box>
+            </ExplainerModal>
+
+            <Switch
+              data-testid="createStylesWithVariableReferences"
+              id="createStylesWithVariableReferences"
+              checked={!!rulesCreateStylesWithVariableReferences}
+              defaultChecked={rulesCreateStylesWithVariableReferences}
+              onCheckedChange={handleCreateStylesWithVariableReferencesChange}
+            />
+            <Label css={{ fontWeight: '$sansRegular' }} htmlFor="createStylesWithVariableReferences">{t('options.createStylesWithVariableReferences')}</Label>
+            <ExplainerModal title={t('options.createStylesWithVariableReferences')}>
+              <Box>{t('options.createStylesWithVariableReferencesExplanation')}</Box>
+            </ExplainerModal>
+          </Box>
         </form>
       </Stack>
     </Modal>
