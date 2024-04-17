@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button, Stack, Tabs,
@@ -6,16 +6,18 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
+import { useSelector } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 
-import useExportThemesTab from './useExportThemesTab';
-import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
+import { allTokenSetsSelector, themesListSelector } from '@/selectors';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -25,8 +27,19 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const [showOptions, setShowOptions] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro ? 'useThemes' : 'useSets');
 
-  const { selectedThemes, setSelectedThemes } = useExportThemesTab();
-  const { selectedSets, setSelectedSets } = useExportSetsTab();
+  const allSets = useSelector(allTokenSetsSelector);
+  const themes = useSelector(themesListSelector);
+
+  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
+
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
+    const tokenSet = {
+      set,
+      status: TokenSetStatus.ENABLED,
+    };
+    return tokenSet;
+  }));
+
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
   } = useTokens();
@@ -50,12 +63,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
       createStylesFromSelectedThemes(selectedThemes);
     }
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
-
-  const [canExportToFigma, setCanExportToFigma] = React.useState(false);
-
-  useEffect(() => {
-    setCanExportToFigma(activeTab === 'useSets' ? true : selectedThemes.length > 0);
-  }, [selectedThemes, activeTab]);
+  const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
     setActiveTab(tab);

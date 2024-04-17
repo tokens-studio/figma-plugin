@@ -24,7 +24,7 @@ import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 
-export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selectedSets: ExportTokenSet[], setSelectedSets: (sets: ExportTokenSet[]) => void}) {
+export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selectedSets: ExportTokenSet[], setSelectedSets: (sets: ExportTokenSet[]) => void }) {
   const dispatch = useDispatch<Dispatch>();
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerExportSets(false);
