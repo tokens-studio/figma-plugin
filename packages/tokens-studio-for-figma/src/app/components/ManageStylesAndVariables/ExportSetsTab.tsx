@@ -23,9 +23,8 @@ import { TokenSetThemeItem } from '../ManageThemesModal/TokenSetThemeItem';
 import { FormValues } from '../ManageThemesModal/CreateOrEditThemeForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import useExportSetsTab from './useExportSetsTab';
 
-export default function ExportSetsTab() {
+export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selectedSets: ExportTokenSet[], setSelectedSets: (sets: ExportTokenSet[]) => void}) {
   const dispatch = useDispatch<Dispatch>();
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerExportSets(false);
@@ -33,7 +32,6 @@ export default function ExportSetsTab() {
   const onboardingExplainerExportSets = useSelector((state: RootState) => state.uiState.onboardingExplainerExportSets);
 
   const { t } = useTranslation(['manageStylesAndVariables']);
-  const { selectedSets, setSelectedSets } = useExportSetsTab();
 
   const store = useStore<RootState>();
 

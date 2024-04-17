@@ -25,8 +25,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const [showOptions, setShowOptions] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro ? 'useThemes' : 'useSets');
 
-  const { selectedThemes } = useExportThemesTab();
-  const { selectedSets } = useExportSetsTab();
+  const { selectedThemes, setSelectedThemes } = useExportThemesTab();
+  const { selectedSets, setSelectedSets } = useExportSetsTab();
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
   } = useTokens();
@@ -107,8 +107,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
             </Tabs.Trigger>
             <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
-          <ExportThemesTab />
-          <ExportSetsTab />
+          <ExportThemesTab selectedThemes={selectedThemes} setSelectedThemes={setSelectedThemes} />
+          <ExportSetsTab selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
         </Tabs>
       </Modal>
       <OptionsModal isOpen={showModal && showOptions} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />
