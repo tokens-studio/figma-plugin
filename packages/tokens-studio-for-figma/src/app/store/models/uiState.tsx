@@ -87,6 +87,7 @@ export interface UIState {
   secondScreenEnabled: boolean;
   showAutoSuggest: boolean;
   showConvertTokenFormatModal: boolean;
+  sidebarWidth: number;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -145,6 +146,7 @@ export const uiState = createModel<RootModel>()({
     secondScreenEnabled: false,
     showAutoSuggest: false,
     showConvertTokenFormatModal: false,
+    sidebarWidth: 150,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -402,6 +404,10 @@ export const uiState = createModel<RootModel>()({
     setShowAutoSuggest: (state, data: boolean) => ({
       ...state,
       showAutoSuggest: data,
+    }),
+    setSidebarWidth: (state, data: number) => ({
+      ...state,
+      sidebarWidth: data,
     }),
   },
   effects: (dispatch) => ({

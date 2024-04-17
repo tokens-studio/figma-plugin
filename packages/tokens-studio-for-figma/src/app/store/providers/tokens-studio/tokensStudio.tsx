@@ -32,7 +32,10 @@ export type TokensStudioAction =
   | 'CREATE_TOKEN_SET'
   | 'UPDATE_TOKEN_SET'
   | 'DELETE_TOKEN_SET'
-  | 'UPDATE_TOKEN_SET_ORDER';
+  | 'UPDATE_TOKEN_SET_ORDER'
+  | 'CREATE_THEME_GROUP'
+  | 'UPDATE_THEME_GROUP'
+  | 'DELETE_THEME_GROUP';
 
 interface PushToTokensStudio {
   context: TokensStudioCredentials;
@@ -41,7 +44,9 @@ interface PushToTokensStudio {
   metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
 }
 
-export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
+export const pushToTokensStudio = async ({
+  context, action, data, metadata,
+}: PushToTokensStudio) => {
   const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
 
   return storageClient.push({

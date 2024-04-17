@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button, Stack, Tabs,
@@ -6,14 +6,18 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
+import { useSelector } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 
-import useExportThemesTab from './useExportThemesTab';
-import useExportSetsTab from './useExportSetsTab';
 import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
+import ExportSetsTab from './ExportSetsTab';
+import ExportThemesTab from './ExportThemesTab';
+import { allTokenSetsSelector, themesListSelector } from '@/selectors';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -23,8 +27,19 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const [showOptions, setShowOptions] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro ? 'useThemes' : 'useSets');
 
-  const { ExportThemesTab, selectedThemes } = useExportThemesTab();
-  const { ExportSetsTab, selectedSets } = useExportSetsTab();
+  const allSets = useSelector(allTokenSetsSelector);
+  const themes = useSelector(themesListSelector);
+
+  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
+
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
+    const tokenSet = {
+      set,
+      status: TokenSetStatus.ENABLED,
+    };
+    return tokenSet;
+  }));
+
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
   } = useTokens();
@@ -38,22 +53,17 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowOptions(false);
   }, []);
 
-  const handleExportToFigma = React.useCallback(() => {
+  const handleExportToFigma = React.useCallback(async () => {
+    setShowModal(false);
     if (activeTab === 'useSets') {
-      createVariablesFromSets(selectedSets);
+      await createVariablesFromSets(selectedSets);
       createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
-      createVariablesFromThemes(selectedThemes);
+      await createVariablesFromThemes(selectedThemes);
       createStylesFromSelectedThemes(selectedThemes);
     }
-    setShowModal(false);
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
-
-  const [canExportToFigma, setCanExportToFigma] = React.useState(false);
-
-  useEffect(() => {
-    setCanExportToFigma(activeTab === 'useSets' ? true : selectedThemes.length > 0);
-  }, [selectedThemes, activeTab]);
+  const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
 
   const handleTabChange = React.useCallback((tab: 'useThemes' | 'useSets') => {
     setActiveTab(tab);
@@ -67,9 +77,9 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     }
   }, [setShowModal, showOptions]);
 
-  const onInteractOutside = (event: Event) => {
+  const onInteractOutside = React.useCallback((event: Event) => {
     event.preventDefault();
-  };
+  }, []);
 
   return (
     <>
@@ -79,8 +89,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         showClose
         isOpen={showModal}
         close={handleClose}
-        // eslint-disable-next-line react/jsx-no-bind
-        onInteractOutside={(event: Event) => onInteractOutside(event)}
+        onInteractOutside={onInteractOutside}
         footer={(
           <Stack direction="row" gap={4} justify="between">
             <Button variant="invisible" id="manageStyles-button-close" onClick={handleClose} icon={<ChevronLeftIcon />}>
@@ -106,8 +115,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
             </Tabs.Trigger>
             <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
-          <ExportThemesTab />
-          <ExportSetsTab />
+          <ExportThemesTab selectedThemes={selectedThemes} setSelectedThemes={setSelectedThemes} />
+          <ExportSetsTab selectedSets={selectedSets} setSelectedSets={setSelectedSets} />
         </Tabs>
       </Modal>
       <OptionsModal isOpen={showModal && showOptions} title={t('optionsModalTitle')} closeAction={handleCancelOptions} />

@@ -23,7 +23,9 @@ export default function SingleTypographyDownShiftInput({
   setInputValue: (newInputValue: string, property: string) => void;
   onSubmit: () => void
 }) {
-  const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
+  const handleBoxshadowDownShiftInputChange = React.useCallback((newInputValue: string) => {
+    setInputValue(newInputValue, name);
+  }, [name, setInputValue]);
 
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
 
