@@ -1,5 +1,6 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ResolveTokenValuesResult } from './tokenHelpers';
+import { numberMatchesPercentage } from '@/plugin/figmaTransforms/numberMatchesPercentage';
 
 export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesResult): boolean {
   // Ignore multi value spacing and multi value borderRadius tokens
@@ -12,6 +13,10 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
   }
   // Ignore AUTO values on lineHeight
   if (token.type === TokenTypes.LINE_HEIGHTS && typeof token.value === 'string' && token.value === 'AUTO') {
+    return false;
+  }
+  // Ignore percentage values, except on text type tokens
+  if (token.type !== TokenTypes.TEXT && typeof token.value === 'string' && numberMatchesPercentage(token.value)) {
     return false;
   }
   return true;
