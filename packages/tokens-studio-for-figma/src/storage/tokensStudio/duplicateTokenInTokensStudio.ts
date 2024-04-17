@@ -44,7 +44,7 @@ export async function duplicateTokenInTokensStudio({
       onTokenDuplicated({
         ...tokenData,
         parent: payload.tokenSets[index],
-        $extensions: deepmerge(tokenData.$extensions, { id: token.urn }),
+        $extensions: deepmerge(tokenData.$extensions, { 'studio.tokens': { urn: token.urn } }),
         shouldUpdate: false,
       });
     }

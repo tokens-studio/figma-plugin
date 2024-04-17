@@ -31,13 +31,16 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     }, {} as ThemeObject);
     selectedSets.forEach((set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
+        const setTokens: Record<string, AnyTokenList> = {
+          [set.set]: tokens[set.set]
+        };
         const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set.set);
         if (collection) {
           const mode = collection.modes.find((m) => m.name === set.set);
           const modeId: string = mode?.modeId ?? createVariableMode(collection, set.set);
           if (modeId) {
             const allVariableObj = updateVariables({
-              collection, mode: modeId, theme, tokens, settings
+              collection, mode: modeId, theme, tokens: setTokens, settings
             });
             if (Object.keys(allVariableObj.variableIds).length > 0) {
               allVariableCollectionIds[index] = {
@@ -52,7 +55,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
           const newCollection = figma.variables.createVariableCollection(set.set);
           newCollection.renameMode(newCollection.modes[0].modeId, set.set);
           const allVariableObj = updateVariables({
-            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings
+            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens: setTokens, settings
           });
           allVariableCollectionIds[index] = {
             collectionId: newCollection.id,

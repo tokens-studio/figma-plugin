@@ -299,7 +299,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                                   isFocused={highlightedIndex === index}
                                   style={style}
                                   // eslint-disable-next-line react/jsx-no-bind
-                                  onMouseDown={() => handleSelect(value)}
+                                  onMouseDown={() => handleSelect(filteredValue)}
                                 >
                                   <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
                                 </StyledItem>
