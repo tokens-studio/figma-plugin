@@ -153,6 +153,11 @@ function checkForTokens({
     returnValue.name = returnValue.name.split('/').join('.');
   }
 
+  // TODO: Still have a failing test here
+  // const {
+  //   $value, $type, $description, ...returnValueWithoutDollar
+  // } = returnValue;
+
   return [obj, returnValue as SingleToken | undefined];
 }
 

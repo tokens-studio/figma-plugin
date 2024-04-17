@@ -68,18 +68,18 @@
   "theme": {
     "background": {
       "value": "{colors.gray.900}",
-      "type": "color",
-      "description": "Alias value"
+      "description": "Alias value",
+      "type": "color"
     },
     "backgroundSubtle": {
       "value": "rgba({colors.gray.900}, 0.5)",
-      "type": "color",
-      "description": "Nested color value"
+      "description": "Nested color value",
+      "type": "color"
     },
     "backgroundDark": {
       "value": "{colors.gray.500}",
-      "type": "color",
       "description": "Darkened color value",
+      "type": "color",
       "$extensions": {
         "modify": {
           "type": "darken",
@@ -91,19 +91,19 @@
     "size": {
       "default": {
         "value": "{sizing.base}",
-        "type": "sizing",
-        "description": "Sizing value"
+        "description": "Sizing value",
+        "type": "sizing"
       }
     },
     "components": {
       "cards": {
         "default": {
+          "type": "composition",
           "value": {
             "borderRadius": "{sizing.base}",
             "fill": "{theme.backgroundSubtle}",
             "border": "{theme.background}"
           },
-          "type": "composition"
         }
       }
     }

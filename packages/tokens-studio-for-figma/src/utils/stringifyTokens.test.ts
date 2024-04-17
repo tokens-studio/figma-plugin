@@ -76,8 +76,8 @@ describe('stringfyTokens', () => {
       JSON.stringify(
         {
           scale: {
-            $value: '1',
             $type: 'sizing',
+            $value: '1',
           },
           font: {
             $type: 'sizing',
@@ -88,8 +88,8 @@ describe('stringfyTokens', () => {
               $value: '3',
             },
             medium: {
-              $value: '3',
               $type: 'dimension',
+              $value: '3',
             },
           },
           typography: {
@@ -102,12 +102,12 @@ describe('stringfyTokens', () => {
               },
             },
             content: {
+              $type: 'typography',
               $value: {
                 fontFamily: 'aria',
                 fontWeight: 'light',
                 lineHeight: '3',
               },
-              $type: 'typography',
             },
           },
           box: {

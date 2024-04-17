@@ -68,8 +68,8 @@
   "theme": {
     "background": {
       "value": "#1B1F24",
-      "type": "color",
-      "description": "Alias value"
+      "description": "Alias value",
+      "type": "color"
     },
     "backgroundSubtle": {
       "value": "#1b1f2480",
@@ -78,25 +78,25 @@
     },
     "backgroundDark": {
       "value": "#949DA7",
-      "type": "color",
-      "description": "Darkened color value"
+      "description": "Darkened color value",
+      "type": "color"
     },
     "size": {
       "default": {
         "value": 4,
-        "type": "sizing",
-        "description": "Sizing value"
+        "description": "Sizing value",
+        "type": "sizing"
       }
     },
     "components": {
       "cards": {
         "default": {
+          "type": "composition",
           "value": {
             "borderRadius": 4,
             "fill": "#1b1f2480",
             "border": "#1B1F24"
-          },
-          "type": "composition"
+          }
         }
       }
     }

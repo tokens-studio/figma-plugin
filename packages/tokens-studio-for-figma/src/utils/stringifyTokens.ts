@@ -1,8 +1,9 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import { AnyTokenList } from '@/types/tokens';
+import { AnyTokenList, SingleToken } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { TokenInJSON } from './convertTokens';
 
 export function getGroupTypeName(tokenName: string, groupLevel: number): string {
   if (tokenName.includes('.')) {
@@ -23,18 +24,30 @@ export default function stringifyTokens(
     const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
       const {
-        inheritTypeLevel, ...tokenWithoutTypeAndValue
+        inheritTypeLevel, ...tokenWithoutInheritTypeLevel
       } = tokenWithoutName;
+      const tokenInJSON: TokenInJSON = tokenWithoutInheritTypeLevel;
       // set type of group level
-      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
-      tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = tokenWithoutName.value;
-      tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
-      set(tokenObj, token.name, tokenWithoutTypeAndValue, { merge: true });
+      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenInJSON.type);
+      tokenInJSON[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+      tokenInJSON[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
+      if (TokenFormat.format === TokenFormatOptions.DTCG) {
+        delete tokenInJSON.type;
+        delete tokenInJSON.value;
+        delete tokenInJSON.description;
+      }
+      set(tokenObj, token.name, tokenInJSON, { merge: true });
     } else {
-      tokenWithoutName[TokenFormat.tokenTypeKey] = tokenWithoutName.type;
-      tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
-      tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
-      set(tokenObj, token.name, tokenWithoutName, { merge: true });
+      const tokenInJSON: TokenInJSON = tokenWithoutName;
+      tokenInJSON[TokenFormat.tokenTypeKey] = tokenInJSON.type;
+      tokenInJSON[TokenFormat.tokenValueKey] = tokenInJSON.value;
+      tokenInJSON[TokenFormat.tokenDescriptionKey] = tokenInJSON.description;
+      if (TokenFormat.format === TokenFormatOptions.DTCG) {
+        delete tokenInJSON.type;
+        delete tokenInJSON.value;
+        delete tokenInJSON.description;
+      }
+      set(tokenObj, token.name, tokenInJSON, { merge: true });
     }
   });
 
