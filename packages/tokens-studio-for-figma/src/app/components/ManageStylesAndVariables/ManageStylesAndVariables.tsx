@@ -43,7 +43,6 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const handleExportToFigma = React.useCallback(async () => {
     setShowModal(false);
     if (activeTab === 'useSets') {
-      console.log('selectedSets in ManageStylesAndVarialbes: ', selectedSets);
       await createVariablesFromSets(selectedSets);
       createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
