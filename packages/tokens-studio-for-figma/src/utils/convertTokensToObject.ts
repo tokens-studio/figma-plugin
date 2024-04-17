@@ -5,7 +5,6 @@ import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
-// TODO: Change this so it doesnt change order
 export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
     const tokenGroupObj: AnyTokenSet<false> = {};
