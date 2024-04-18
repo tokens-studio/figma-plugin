@@ -9,6 +9,7 @@ import { convertFontWeightToFigma } from './figmaTransforms/fontWeight';
 import { UserIdProperty } from '@/figmaStorage';
 import { generateId } from '@/utils/generateId';
 import { Properties } from '@/constants/Properties';
+import { convertFontFamilyToFigma } from './figmaTransforms/convertFontFamilyToFigma';
 
 export async function getUserId() {
   let userId = generateId(24);
@@ -83,6 +84,9 @@ export function transformValue(value: string, type: string, baseFontSize: string
       return convertTextCaseToFigma(value.toString());
     case 'textDecoration':
       return convertTextDecorationToFigma(value.toString());
+    case 'fontFamily':
+    case 'fontFamilies':
+      return convertFontFamilyToFigma(value, shouldOutputForVariables);
     default:
       return value;
   }
