@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { settingsStateSelector } from './settingsStateSelector';
 
-export const overwriteExistingStylesAndVariablesSelector = createSelector(
+export const renameExistingStylesAndVariablesSelector = createSelector(
   settingsStateSelector,
-  (state) => state.overwriteExistingStylesAndVariables,
+  (state) => state.renameExistingStylesAndVariables,
 );

@@ -9,5 +9,4 @@ export * from './setVariablesNumber';
 export * from './setVariablesString';
 export * from './setCreateStylesWithVariableReferences';
 export * from './setIgnoreFirstPartForStyles';
-export * from './setOverwriteExistingStylesAndVariables';
-export * from './setScopeVariablesByTokenType';
+export * from './setRenameExistingStylesAndVariables';
