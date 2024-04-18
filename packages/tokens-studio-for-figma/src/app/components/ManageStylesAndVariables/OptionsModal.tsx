@@ -239,7 +239,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               />
               <Label css={{ fontWeight: '$sansRegular' }} htmlFor="renameExisting">{t('options.renameExisting')}</Label>
               <ExplainerModal title={t('options.renameExisting')}>
-                <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
                 <Box>{t('options.renameExistingExplanation')}</Box>
               </ExplainerModal>
               <Switch
@@ -251,8 +250,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               />
               <Label css={{ fontWeight: '$sansRegular' }} htmlFor="removeWithoutConnection">{t('options.removeWithoutConnection')}</Label>
               <ExplainerModal title={t('options.removeWithoutConnection')}>
-                <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
-                <Box>{t('options.removeWithoutExplanation')}</Box>
+                <Box>{t('options.removeWithoutConnectionExplanation')}</Box>
               </ExplainerModal>
               <Text bold css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
               <Switch
