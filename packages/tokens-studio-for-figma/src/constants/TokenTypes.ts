@@ -38,4 +38,5 @@ export const ExportNumberVariablesTokenTypes = [
   TokenTypes.LINE_HEIGHTS,
   TokenTypes.PARAGRAPH_INDENT,
   TokenTypes.PARAGRAPH_SPACING,
+  TokenTypes.OPACITY,
 ];

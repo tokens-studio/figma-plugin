@@ -1,6 +1,7 @@
 import { TokenTypes } from './TokenTypes';
 
-export const tokenTypesToCreateVariable = [TokenTypes.DIMENSION,
+export const tokenTypesToCreateVariable = [
+  TokenTypes.DIMENSION,
   TokenTypes.BORDER_RADIUS,
   TokenTypes.BORDER_WIDTH,
   TokenTypes.SPACING,
@@ -15,4 +16,6 @@ export const tokenTypesToCreateVariable = [TokenTypes.DIMENSION,
   TokenTypes.LINE_HEIGHTS,
   TokenTypes.LETTER_SPACING,
   TokenTypes.PARAGRAPH_SPACING,
-  TokenTypes.PARAGRAPH_INDENT];
+  TokenTypes.PARAGRAPH_INDENT,
+  TokenTypes.OPACITY,
+];

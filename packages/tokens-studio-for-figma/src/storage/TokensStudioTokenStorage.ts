@@ -17,6 +17,8 @@ import {
   UpdateThemeGroupMutation,
   CreateThemeGroupMutation,
   DeleteThemeGroupMutation,
+  TokenType,
+  TokenInput,
 } from '@tokens-studio/sdk';
 import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
@@ -46,6 +48,7 @@ import {
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -94,6 +97,8 @@ const tsToToken = (raw: RawToken) => {
   } else if (raw.value.boxShadow) {
     // @ts-ignore
     combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
+  } else if (raw.type === TokenType.composition) {
+    combined.value = raw.value?.value && JSON.parse(raw.value.value);
   } else {
     combined.value = raw.value!.value;
   }
@@ -284,16 +289,29 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             throw new Error('Invalid data');
           }
 
+          const input: TokenInput = {
+            name: data.name,
+            type: data.type,
+            description: data.description,
+            extensions: JSON.stringify(data.$extensions),
+          };
+
+          if (data.type === TokenTypes.BOX_SHADOW) {
+            input.boxShadow = data.value;
+          } else if (data.type === TokenTypes.BORDER) {
+            input.border = data.value;
+          } else if (data.type === TokenTypes.TYPOGRAPHY) {
+            input.typography = data.value;
+          } else if (data.type === TokenTypes.COMPOSITION) {
+            input.value = JSON.stringify(data.value);
+          } else {
+            input.value = data.value;
+          }
+
           const responseData = await Graphql.exec<CreateTokenMutation>(
             Graphql.op(CREATE_TOKEN_MUTATION, {
               set: setId,
-              input: {
-                name: data.name,
-                type: data.type,
-                description: data.description,
-                value: data.value,
-                extensions: JSON.stringify(data.$extensions),
-              },
+              input,
             }),
           );
 
