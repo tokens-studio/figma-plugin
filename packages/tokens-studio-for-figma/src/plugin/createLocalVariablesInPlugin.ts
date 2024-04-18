@@ -21,7 +21,6 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
-  console.log('Creating', tokens);
   if (!checkSetting) {
     themeInfo.themes.forEach((theme) => {
       if (!selectedThemes || (selectedThemes && selectedThemes.includes(theme.id))) {
