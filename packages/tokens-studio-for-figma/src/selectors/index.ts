@@ -15,6 +15,7 @@ export * from './mainNodeSelectionValuesSelector';
 export * from './storageTypeSelector';
 export * from './ignoreFirstPartForStylesSelector';
 export * from './apiProvidersSelector';
+export * from './activeApiProviderSelector';
 export * from './hasUnsavedChangesSelector';
 export * from './activeTabSelector';
 export * from './changelogSelector';

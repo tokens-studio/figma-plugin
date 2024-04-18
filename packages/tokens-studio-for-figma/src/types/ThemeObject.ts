@@ -6,6 +6,7 @@ export type ThemeObject = {
   id: string
   name: string
   group?: string
+  groupId?: string
   // @README these are the token sets inside the theme
   selectedTokenSets: Record<string, TokenSetStatus>
   // @README these are the style IDs from Figma

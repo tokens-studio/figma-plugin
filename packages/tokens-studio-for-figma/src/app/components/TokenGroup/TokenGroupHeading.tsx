@@ -7,7 +7,7 @@ import {
 } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
-import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
+import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -16,6 +16,7 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export type Props = {
   id: string
@@ -31,6 +32,7 @@ export function TokenGroupHeading({
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
+  const activeApiProvider = useSelector(activeApiProviderSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
@@ -38,8 +40,9 @@ export function TokenGroupHeading({
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup, remapTokensWithOtherReference } = useTokens();
+  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
 
-  const canEdit = !editProhibited && !activeTokenSetReadOnly;
+  const canEdit = !editProhibited && !activeTokenSetReadOnly && !isTokensStudioProvider;
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
