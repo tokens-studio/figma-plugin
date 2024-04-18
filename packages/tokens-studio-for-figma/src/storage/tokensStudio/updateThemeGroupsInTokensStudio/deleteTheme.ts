@@ -8,7 +8,9 @@ type Props = {
   groupIdsMap: Record<string, string>;
 };
 
-export const deleteTheme = ({ action, themes, prevThemes, groupIdsMap }: Props) => {
+export const deleteTheme = ({
+  action, themes, prevThemes, groupIdsMap,
+}: Props) => {
   const { payload: themeUrn } = action;
 
   let themeGroupsToUpdate: Record<string, ThemeObjectsList> = {};

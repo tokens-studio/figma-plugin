@@ -4,12 +4,14 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { TokenSetItem } from './TokenSetItem';
 import {
+  activeApiProviderSelector,
   activeTokenSetSelector,
   editProhibitedSelector,
   tokenSetMetadataSelector,
 } from '@/selectors';
 import { TreeItem } from '@/utils/tokenset';
 import { DragControlsContext } from '@/context';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -35,6 +37,9 @@ export function TokenSetTreeItemContent({
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
+  const activeApiProvider = useSelector(activeApiProviderSelector);
+
+  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
 
   const handleClick = useCallback((set: TreeItem) => {
     if (set.isLeaf) {
@@ -69,7 +74,7 @@ export function TokenSetTreeItemContent({
       item={item}
       onCheck={handleCheckedChange}
       canEdit={!editProhibited}
-      canDuplicate={!tokenSetMetadata[item.path]?.isDynamic}
+      canDuplicate={!isTokensStudioProvider && !tokenSetMetadata[item.path]?.isDynamic}
       canReorder={!editProhibited}
       canDelete={item.canDelete}
       extraBefore={children}
