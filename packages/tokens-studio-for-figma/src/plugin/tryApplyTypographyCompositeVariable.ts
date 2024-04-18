@@ -31,7 +31,6 @@ export async function tryApplyTypographyCompositeVariable({
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.toString().slice(1, -1));
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
         if (variableToApply) {
-          // @ts-expect-error - expected as plugin typings need to be updated
           target.setBoundVariable(key, variableToApply);
           successfullyAppliedVariable = true;
         }
