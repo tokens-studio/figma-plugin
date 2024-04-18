@@ -32,5 +32,6 @@ export const ExportNumberVariablesTokenTypes = [
   TokenTypes.SPACING,
   TokenTypes.BORDER_WIDTH,
   TokenTypes.DIMENSION,
-  TokenTypes.NUMBER
+  TokenTypes.NUMBER,
+  TokenTypes.OPACITY
 ];
