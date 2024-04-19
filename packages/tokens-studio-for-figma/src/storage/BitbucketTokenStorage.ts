@@ -121,11 +121,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   }
 
   /**
-   * Fetches the current user and stores it on the object.
+   * Fetches the current user's username.
    *
-   * @returns A promise that resolves to the current user object.
+   * @returns A promise that resolves to the current username.
    */
-  public async fetchCurrentUser(): Promise<any> {
+  public async fetchCurrentUser(): Promise<string> {
     try {
       const currentUser = await this.bitbucketClient.users.getAuthedUser({});
       return currentUser.data.username;
