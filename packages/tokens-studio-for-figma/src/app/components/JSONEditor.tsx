@@ -3,9 +3,10 @@ import { useSelector } from 'react-redux';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import Box from './Box';
 import { useShortcut } from '@/hooks/useShortcut';
-import { activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
+import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import useTokens from '../store/useTokens';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type Props = {
   stringTokens: string;
@@ -18,6 +19,9 @@ function JSONEditor({
 }: Props) {
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
+  const activeApiProvider = useSelector(activeApiProviderSelector);
+  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
+
   const { handleJSONUpdate } = useTokens();
   const { isDarkTheme } = useFigmaTheme();
   const monaco = useMonaco();
@@ -65,7 +69,7 @@ function JSONEditor({
           fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,
-          readOnly: editProhibited || activeTokenSetReadOnly,
+          readOnly: editProhibited || activeTokenSetReadOnly || isTokensStudioProvider,
         }}
       />
     </Box>

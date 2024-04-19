@@ -8,7 +8,9 @@ type Props = {
   groupIdsMap: Record<string, string>;
 };
 
-export const saveTheme = ({ action, themes, prevThemes, groupIdsMap }: Props) => {
+export const saveTheme = ({
+  action, themes, prevThemes, groupIdsMap,
+}: Props) => {
   const {
     payload: { id, name, group },
   } = action;
