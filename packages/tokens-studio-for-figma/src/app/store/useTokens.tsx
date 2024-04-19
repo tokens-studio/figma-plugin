@@ -330,6 +330,8 @@ export default function useTokens() {
       removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection
     });
 
+    console.log('settings.renameExistingStylesAndVariables: ', settings.renameExistingStylesAndVariables);
+
     const syncStyleResult = await wrapTransaction({ name: 'syncStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SYNC_STYLES,
       tokens,

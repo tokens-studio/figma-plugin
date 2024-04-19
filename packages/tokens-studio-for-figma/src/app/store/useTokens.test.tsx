@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -19,6 +19,7 @@ import { TokensContext } from '@/context';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { boolean } from 'zod';
+import { settings } from './models/settings';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -436,7 +437,7 @@ describe('useToken test', () => {
           ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
-      },
+      }
     });
     beforeEach(() => {
       resetStore();
@@ -675,8 +676,17 @@ describe('useToken test', () => {
     });
 
     it('syncStyles', async () => {
-      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['renameStyles', 'removeStyles'] }));
-      await act(async () => {
+      const mock = createMockStore({
+        settings: {
+          renameExistingStylesAndVariables: true,
+          removeStylesAndVariablesWithoutConnection: true,  
+        }
+      });
+
+      // store.dispatch({ type: 'settings/setRenameExistingStylesAndVariables', payload: mock.getState().settings.renameExistingStylesAndVariables });
+      // store.dispatch({ type: 'settings/setRemoveStylesAndVariablesWithoutConnection', payload: mock.getState().settings.removeStylesAndVariablesWithoutConnection });
+
+      await waitFor(async () => {
         await result.current.syncStyles();
       });
 
@@ -692,7 +702,7 @@ describe('useToken test', () => {
         },
         options: {
           renameStyle: true,
-          removeStyle: true,
+          removeStyle: true
         },
         settings: store.getState().settings,
       });
