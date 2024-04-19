@@ -33,6 +33,7 @@ query Project($urn: String!) {
             }
           }
           ... on Raw_Token_border {
+            value
             border {
               width
               style
@@ -40,6 +41,7 @@ query Project($urn: String!) {
             }
           }
           ... on Raw_Token_boxShadow {
+            value
             boxShadow {
               x
               y
