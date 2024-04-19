@@ -107,8 +107,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
   // https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/?utm_source=%2Fbitbucket%2Fapi%2F2%2Freference%2Fresource%2Fuser&utm_medium=302#api-user-get
   // this would be best: https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-permissions-config-users-selected-user-id-get
   public async canWrite(): Promise<boolean> {
-    const currentUser = await this.bitbucketClient.users.getAuthedUser({});
-    if (!currentUser.data.account_id) return false;
+    const currentUser = await this.fetchCurrentUser();
+    if (!currentUser) return false;
     try {
       const { data } = await this.bitbucketClient.repositories.listPermissions({});
       const permission = data.values?.[0]?.permission;
@@ -117,6 +117,21 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       return !!canWrite;
     } catch (e) {
       return false;
+    }
+  }
+
+  /**
+   * Fetches the current user and stores it on the object.
+   *
+   * @returns A promise that resolves to the current user object.
+   */
+  public async fetchCurrentUser(): Promise<any> {
+    try {
+      const currentUser = await this.bitbucketClient.users.getAuthedUser({});
+      return currentUser.data.username;
+    } catch (err) {
+      console.error(err);
+      return null;
     }
   }
 
@@ -133,6 +148,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * @throws Will throw an error if the operation fails.
    */
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
+    const user = await this.fetchCurrentUser();
+
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
@@ -140,7 +157,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       const response = await fetch(url, {
         headers: {
-          Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
+          Authorization: `Basic ${btoa(`${user}:${this.secret}`)}`,
         },
       });
 
@@ -158,7 +175,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           const jsonFileContents = await Promise.all(
             jsonFiles.map((file: any) => fetch(file.links.self.href, {
               headers: {
-                Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
+                Authorization: `Basic ${btoa(`${user}:${this.secret}`)}`,
               },
             }).then((response) => response.text())),
           );
