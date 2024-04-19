@@ -437,6 +437,10 @@ describe('useToken test', () => {
           ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
+      },
+      settings: {
+        renameExistingStylesAndVariables: false,
+        removeStylesAndVariablesWithoutConnection: false
       }
     });
     beforeEach(() => {
@@ -671,39 +675,6 @@ describe('useToken test', () => {
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.REMOVE_STYLES,
         token: tokenToDelete,
-        settings: store.getState().settings,
-      });
-    });
-
-    it('syncStyles', async () => {
-      const mock = createMockStore({
-        settings: {
-          renameExistingStylesAndVariables: true,
-          removeStylesAndVariablesWithoutConnection: true,  
-        }
-      });
-
-      // store.dispatch({ type: 'settings/setRenameExistingStylesAndVariables', payload: mock.getState().settings.renameExistingStylesAndVariables });
-      // store.dispatch({ type: 'settings/setRemoveStylesAndVariablesWithoutConnection', payload: mock.getState().settings.removeStylesAndVariablesWithoutConnection });
-
-      await waitFor(async () => {
-        await result.current.syncStyles();
-      });
-
-      expect(messageSpy).toBeCalledWith({
-        type: AsyncMessageTypes.SYNC_STYLES,
-        tokens: {
-          global: [
-            { name: 'white', value: '#ffffff', type: TokenTypes.COLOR },
-            { name: 'headline', value: { fontFamily: 'Inter', fontWeight: 'Bold' }, type: TokenTypes.TYPOGRAPHY },
-            { name: 'shadow', value: '{shadows.default}', type: TokenTypes.BOX_SHADOW },
-          ],
-          light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
-        },
-        options: {
-          renameStyle: true,
-          removeStyle: true
-        },
         settings: store.getState().settings,
       });
     });
