@@ -437,10 +437,6 @@ describe('useToken test', () => {
           ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
-      },
-      settings: {
-        renameExistingStylesAndVariables: false,
-        removeStylesAndVariablesWithoutConnection: false
       }
     });
     beforeEach(() => {
