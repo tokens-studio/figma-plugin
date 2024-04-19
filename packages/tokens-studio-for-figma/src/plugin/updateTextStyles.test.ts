@@ -1,10 +1,10 @@
-import * as setTextValuesOnTarget from './setTextValuesOnTarget';
+import * as setTextValuesOnTargetModule from './setTextValuesOnTarget';
 import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
 
 type ExtendedSingleToken = SingleTypographyToken<true, { path: string, styleId: string }>;
 
-const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
+const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
 
 const typographyTokens = [
   {
@@ -59,7 +59,7 @@ describe('updateTextStyles', () => {
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledTimes(2);
     expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
       { ...newStyle, name: 'H1/withValueDescription' },
-      typographyTokens.find((t) => t.name === 'H1.withValueDescription'),
+      'H1.withValueDescription',
       baseFontSize,
     );
   });
@@ -70,7 +70,7 @@ describe('updateTextStyles', () => {
     updateTextStyles(typographyTokens, baseFontSize);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
-      typographyTokens.find((t) => t.name === 'H1.withValue'),
+      'H1.withValue',
       baseFontSize,
     );
   });

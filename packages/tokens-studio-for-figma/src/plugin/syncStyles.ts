@@ -16,7 +16,7 @@ import { generateTokensToCreate } from './generateTokensToCreate';
 import { transformValue } from './helpers';
 import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
-import setTextValuesOnTarget from './setTextValuesOnTarget';
+// import setTextValuesOnTarget from './setTextValuesOnTarget';
 
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, options: Record<SyncOption, boolean>, settings: SettingsState) {
   const effectStyles = figma.getLocalEffectStyles();
@@ -99,7 +99,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
         setColorValuesOnTarget(style, styleSet[style.name].name);
       }
       if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
-        setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
+        // setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
         setEffectValuesOnTarget(style, styleSet[style.name].path, settings.baseFontSize);
