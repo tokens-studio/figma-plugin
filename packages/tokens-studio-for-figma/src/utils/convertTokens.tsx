@@ -39,6 +39,12 @@ export type Tokens =
   | Partial<Record<string, Partial<Record<TokenTypes, Record<string, TokenInJSON>>>>>
   | TokenGroupInJSON;
 
+  type OptionalDTCGKeys = {
+    $type?: TokenTypes;
+    $value?: SingleToken['value'];
+    $description?: string;
+  };
+
 // @TODO fix typings
 function checkForTokens({
   obj,
@@ -64,7 +70,7 @@ function checkForTokens({
   inheritType?: string;
   groupLevel?: number;
   currentTypeLevel?: number;
-}): [SingleToken[], SingleToken | undefined] {
+}): [(SingleToken & SingleToken & OptionalDTCGKeys)[], SingleToken & OptionalDTCGKeys | undefined] {
   let returnValue:
   | Pick<SingleToken<false>, 'name' | 'value' | 'type' | 'description' | 'inheritTypeLevel'>
   | {
@@ -77,6 +83,7 @@ function checkForTokens({
   if (isSingleTokenInJSON(token)) {
     returnValue = token as SingleToken<false>;
     returnValue.value = token[TokenFormat.tokenValueKey];
+
     if (token[TokenFormat.tokenDescriptionKey] && typeof token[TokenFormat.tokenDescriptionKey] === 'string') {
       returnValue.description = token[TokenFormat.tokenDescriptionKey] as string;
     }
@@ -153,11 +160,6 @@ function checkForTokens({
     returnValue.name = returnValue.name.split('/').join('.');
   }
 
-  // TODO: Still have a failing test here
-  // const {
-  //   $value, $type, $description, ...returnValueWithoutDollar
-  // } = returnValue;
-
   return [obj, returnValue as SingleToken | undefined];
 }
 
@@ -167,5 +169,12 @@ export default function convertToTokenArray({ tokens }: { tokens: Tokens }) {
     root: null,
     token: tokens,
   });
-  return Object.values(result);
+
+  // Internally we dont care about $value or value, we always use value, so remove it
+  return Object.values(result).map((token) => {
+    if ('$value' in token) delete token.$value;
+    if ('$description' in token) delete token.$description;
+    if ('$type' in token) delete token.$type;
+    return token;
+  });
 }
