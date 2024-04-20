@@ -136,7 +136,7 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
+            <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab} css={{ marginLeft: '$3', marginTop: '$3' }}>
               <ToggleGroup.Item iconOnly={false} value="commit">
                 {t('commit')}
               </ToggleGroup.Item>
