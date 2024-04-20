@@ -29,19 +29,6 @@ import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.pn
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { Dispatch } from '../../store';
 
-type ExportOptions = {
-  variablesColor: boolean,
-  variablesString: boolean,
-  variablesNumber: boolean,
-  variablesBoolean: boolean,
-  stylesColor: boolean,
-  stylesTypography: boolean,
-  stylesEffect: boolean,
-  rulesIgnoreFirstPartForStyles: boolean | undefined,
-  rulesPrefixStylesWithThemeName: boolean | undefined,
-  rulesCreateStylesWithVariableReferences: boolean | undefined,
-};
-
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
   const rulesRemoveStylesAndVariablesWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
   const rulesRenameExisting = useSelector(renameExistingStylesAndVariablesSelector);
@@ -57,19 +44,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesColor = useSelector(stylesColorSelector);
   const stylesTypography = useSelector(stylesTypographySelector);
   const stylesEffect = useSelector(stylesEffectSelector);
-
-  const exportOptions: ExportOptions = {
-    variablesColor,
-    variablesString,
-    variablesNumber,
-    variablesBoolean,
-    stylesColor,
-    stylesTypography,
-    stylesEffect,
-    rulesIgnoreFirstPartForStyles,
-    rulesPrefixStylesWithThemeName,
-    rulesCreateStylesWithVariableReferences,
-  };
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -205,17 +179,17 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
               >
                 <Stack direction="column" gap={3}>
                   <Text css={{ fontSize: '$small' }}>{t('generic.variables')}</Text>
-                  <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={exportOptions.variablesColor} label={t('variables.color')} />
-                  <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={exportOptions.variablesString} label={t('variables.string')} />
-                  <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={exportOptions.variablesNumber} label={t('variables.number')} />
-                  <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={exportOptions.variablesBoolean} label={t('variables.boolean')} />
+                  <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={!!variablesColor} label={t('variables.color')} />
+                  <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={!!variablesString} label={t('variables.string')} />
+                  <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={!!variablesNumber} label={t('variables.number')} />
+                  <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={!!variablesBoolean} label={t('variables.boolean')} />
                 </Stack>
                 <Box css={{ alignSelf: 'stretch', width: '1px', border: '1px solid $colors$borderSubtle' }} />
                 <Stack direction="column" gap={3}>
                   <Text css={{ fontSize: '$small' }}>{t('generic.styles')}</Text>
-                  <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={exportOptions.stylesColor} label={t('styles.color')} />
-                  <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={exportOptions.stylesTypography} label={t('styles.typography')} />
-                  <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
+                  <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={!!stylesColor} label={t('styles.color')} />
+                  <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={!!stylesTypography} label={t('styles.typography')} />
+                  <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={!!stylesEffect} label={t('styles.effects')} />
                 </Stack>
               </Box>
             </Stack>
