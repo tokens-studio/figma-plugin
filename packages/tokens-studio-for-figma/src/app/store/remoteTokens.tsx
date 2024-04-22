@@ -312,7 +312,6 @@ export default function useRemoteTokens() {
 
   const pushTokens = useCallback(
     async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
-      console.log('PUSH TOKENS');
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       track('pushTokens', { provider: context.provider, isFolder });
       switch (context.provider) {
