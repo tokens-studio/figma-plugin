@@ -5,9 +5,6 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
   AnyTokenList,
 } from '@/types/tokens';
-import updateVariables from './updateVariables';
-import { ReferenceVariableType } from './setValuesOnVariable';
-import updateVariablesToReference from './updateVariablesToReference';
 import { getVariablesMap } from '@/utils/getVariablesMap';
 
 export default async function syncVariables(tokens: Record<string, AnyTokenList>, options: Record<SyncVariableOption, boolean>, settings: SettingsState) {
@@ -17,7 +14,6 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
   });
   const connectedVariablesMap: Record<string, Variable> = {};
   const variableMap = getVariablesMap();
-  let referenceVariableCandidates: ReferenceVariableType[] = [];
   themeInfo.themes.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([tokenName, variableId]) => {
       const variable = variableMap[variableId];
@@ -26,23 +22,15 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
       if (variable) {
         connectedVariablesMap[variableId] = variable;
         if (options.renameVariable && variable.name !== path) {
-          variable.name = path;
+          const variableModes = variable.valuesByMode;
+          Object.keys(variableModes).forEach((mode) => {            
+          });
         }
       }
     });
-    if (theme.$figmaCollectionId && theme.$figmaModeId) {
-      const collection = figma.variables.getVariableCollectionById(theme.$figmaCollectionId);
-      if (collection) {
-        const allVariableObj = updateVariables({
-          collection, mode: theme.$figmaModeId, theme, tokens, settings,
-        });
-        referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
-      }
-    }
   });
 
   const figmaVariables = figma.variables.getLocalVariables();
-  updateVariablesToReference(figmaVariables, referenceVariableCandidates);
 
   // remove
   if (options.removeVariable) {
