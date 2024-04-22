@@ -103,7 +103,7 @@
             "borderRadius": "{sizing.base}",
             "fill": "{theme.backgroundSubtle}",
             "border": "{theme.background}"
-          },
+          }
         }
       }
     }
