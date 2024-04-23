@@ -22,9 +22,11 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
       if (variable) {
         connectedVariablesMap[variableId] = variable;
         if (options.renameVariable && variable.name !== path) {
-          const variableModes = variable.valuesByMode;
-          Object.keys(variableModes).forEach((mode) => {            
-          });
+          variable.name = path;
+          const figmaVariable = figma.variables.getVariableById(variableId);
+          if (figmaVariable) {
+            figmaVariable.name = path;
+          }
         }
       }
     });
