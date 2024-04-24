@@ -2,10 +2,11 @@ import { isPrimitiveValue, isSingleTypographyValue } from '@/utils/is';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
 import { textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
-import setTextValuesOnTarget from './setTextValuesOnTarget';
+import { setTextValuesOnTarget } from './setTextValuesOnTarget';
 import { trySetStyleId } from '@/utils/trySetStyleId';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
+import { tryApplyTypographyCompositeVariable } from './tryApplyTypographyCompositeVariable';
 
 export async function applyTypographyTokenOnNode(
   node: BaseNode,
@@ -42,7 +43,7 @@ export async function applyTypographyTokenOnNode(
       && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))
     ) {
       if (isSingleTypographyValue(resolvedToken.value)) {
-        setTextValuesOnTarget(node, { value: resolvedToken.value }, baseFontSize);
+        setTextValuesOnTarget(node, data.typography, baseFontSize);
       }
     }
   }
@@ -56,21 +57,21 @@ export async function applyTypographyTokenOnNode(
     || values.textCase
     || values.textDecoration
   ) {
-    setTextValuesOnTarget(
-      node,
-      {
-        value: {
-          fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
-          fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
-          lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : undefined,
-          fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
-          letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
-          paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
-          textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
-          textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
-        },
-      },
+    const valueObject = {
+      fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
+      fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
+      lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : undefined,
+      fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : undefined,
+      letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : undefined,
+      paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : undefined,
+      textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : undefined,
+      textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : undefined,
+    };
+    await tryApplyTypographyCompositeVariable({
+      target: node,
+      value: valueObject,
+      resolvedValue: valueObject,
       baseFontSize,
-    );
+    });
   }
 }

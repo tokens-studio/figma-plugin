@@ -57,6 +57,7 @@
       "projectName": "Project Name (optional)"
     },
     "bitbucket": {
+      "username": "Bitbucket username",
       "appPassword": "App Password",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"

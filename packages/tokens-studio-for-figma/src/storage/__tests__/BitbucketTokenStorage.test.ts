@@ -58,7 +58,7 @@ describe('BitbucketTokenStorage', () => {
 
   beforeEach(() => {
     // Reset the Bitbucket mock and create a new instance of BitbucketTokenStorage
-    storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing');
+    storageProvider = new BitbucketTokenStorage('mock-secret', 'MattOliver', 'figma-tokens-testing', '', 'myusername');
     storageProvider.selectBranch('main');
     jest.clearAllMocks();
     storageProvider.selectBranch('main');
@@ -149,7 +149,7 @@ describe('BitbucketTokenStorage', () => {
       `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
       {
         headers: {
-          Authorization: `Basic ${btoa('MattOliver:mock-secret')}`,
+          Authorization: `Basic ${btoa('myusername:mock-secret')}`,
         },
       },
     );

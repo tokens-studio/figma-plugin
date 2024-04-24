@@ -1,5 +1,6 @@
 import setValuesOnNode from '../setValuesOnNode';
-import * as setTextValuesOnTarget from '../setTextValuesOnTarget';
+import * as setTextValuesOnTargetModule from '../setTextValuesOnTarget';
+import * as tryApplyTypographyCompositeVariableModule from '../tryApplyTypographyCompositeVariable';
 import * as setEffectValuesOnTarget from '../setEffectValuesOnTarget';
 import * as setColorValuesOnTarget from '../setColorValuesOnTarget';
 import * as setBorderColorValuesOnTarget from '../setBorderColorValuesOnTarget';
@@ -10,7 +11,8 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenTypes } from '@/constants/TokenTypes';
 
 describe('Can set values on node', () => {
-  const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
+  const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
+  const tryApplyTypographyCompositeVariableSpy = jest.spyOn(tryApplyTypographyCompositeVariableModule, 'tryApplyTypographyCompositeVariable');
   const setEffectValuesOnTargetSpy = jest.spyOn(setEffectValuesOnTarget, 'default');
   const setColorValuesOnTargetSpy = jest.spyOn(setColorValuesOnTarget, 'default');
   const setBorderColorValuesOnTargetSpy = jest.spyOn(setBorderColorValuesOnTarget, 'setBorderColorValuesOnTarget');
@@ -199,7 +201,7 @@ describe('Can set values on node', () => {
     expect(mockResize).toBeCalledWith(50, 100);
   });
 
-  it('calls setTextValuesOnTarget if text node and atomic typography tokens are given', async () => {
+  it('calls tryApplyTypographyCompositeVariable if text node and atomic typography tokens are given', async () => {
     await setValuesOnNode(
       {
         node: textNodeMock,
@@ -213,7 +215,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(tryApplyTypographyCompositeVariableSpy).toHaveBeenCalled();
   });
 
   it('doesnt call setTextValuesOnTarget if no text node', () => {
