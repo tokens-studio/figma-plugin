@@ -13,6 +13,7 @@ import Tooltip from './Tooltip';
 import Box from './Box';
 import Stack from './Stack';
 import { StyledTokenGroupHeadingButton } from './TokenGroup/StyledTokenGroupHeading';
+import { useIsProUser } from '../hooks/useIsProUser';
 
 type Props = {
   isCollapsed: boolean;
@@ -34,6 +35,7 @@ export default function TokenListingHeading({
   onCollapse,
 }: Props) {
   const dispatch = useDispatch<Dispatch>();
+  const isProUser = useIsProUser();
 
   const editProhibited = useSelector(editProhibitedSelector);
   const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
@@ -82,7 +84,7 @@ export default function TokenListingHeading({
         <IconButton
           data-testid="button-add-new-token"
           // TODO: Add proper logic to disable adding a token type depending on flags
-          disabled={editProhibited || activeTokenSetReadOnly || !isPro}
+          disabled={editProhibited || activeTokenSetReadOnly || (isPro && !isProUser)}
           icon={<IconAdd />}
           tooltip={t('addNew')}
           onClick={handleShowNewForm}

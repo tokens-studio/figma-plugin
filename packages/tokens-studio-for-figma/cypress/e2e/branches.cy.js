@@ -24,7 +24,7 @@ describe('Branch switcher', () => {
       syncProviders: true,
     },
     localApiProviders: [provider],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,

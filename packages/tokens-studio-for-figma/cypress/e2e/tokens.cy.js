@@ -2,6 +2,7 @@ import {
   StorageProviderType
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
+import MockEnv from '../support/mockEnv';
 
 const fillTokenForm = ({
   name,
@@ -59,7 +60,7 @@ describe('TokenListing', () => {
       syncProviders: true,
     },
     localApiProviders: [],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -97,6 +98,7 @@ describe('TokenListing', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('can add a new token', () => {
