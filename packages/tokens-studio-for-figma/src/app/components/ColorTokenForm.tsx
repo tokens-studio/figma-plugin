@@ -21,7 +21,7 @@ import { modifyColor } from '@/utils/modifyColor';
 import { convertModifiedColorToHex } from '@/utils/convertModifiedColorToHex';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 import ProBadge from './ProBadge';
-import { useFlags } from './LaunchDarkly';
+import { useIsProUser } from '../hooks/useIsProUser';
 
 const defaultValue = '0';
 
@@ -51,7 +51,7 @@ export default function ColorTokenForm({
   const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
   const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
-  const { colorModifier } = useFlags();
+  const isProUser = useIsProUser();
 
   React.useEffect(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
@@ -235,7 +235,7 @@ export default function ColorTokenForm({
               tooltip={t('addNewModifier')}
               data-testid="button-add-new-modify"
               onClick={addModify}
-              disabled={!colorModifier}
+              disabled={!isProUser}
               icon={<IconPlus />}
               variant="invisible"
             />
@@ -244,7 +244,7 @@ export default function ColorTokenForm({
               tooltip={t('removeModifier')}
               data-testid="button-remove=modify"
               onClick={removeModify}
-              disabled={!colorModifier}
+              disabled={!isProUser}
               icon={<IconMinus />}
               variant="invisible"
             />
@@ -252,7 +252,7 @@ export default function ColorTokenForm({
         }
       </Box>
       {
-        modifyVisible && colorModifier && (
+        modifyVisible && isProUser && (
           <>
             <Box css={{
               display: 'flex',

@@ -16,11 +16,11 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -31,7 +31,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
-  const { multiFileSync } = useFlags();
+  const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closePushDialog } = usePushDialog();
@@ -42,9 +42,9 @@ export function useGitHub() {
 
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (multiFileSync) storageClient.enableMultiFile();
+    if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, [multiFileSync]);
+  }, [isProUser]);
 
   const askUserIfPull = useCallback(async () => {
     const confirmResult = await confirm({

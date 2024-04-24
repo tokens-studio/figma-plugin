@@ -22,10 +22,10 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
 
-  const isPro = useIsProUser();
+  const isProUser = useIsProUser();
 
   const [showOptions, setShowOptions] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isPro ? 'useThemes' : 'useSets');
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isProUser ? 'useThemes' : 'useSets');
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
@@ -107,11 +107,11 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   )}
         stickyFooter
       >
-        <Tabs defaultValue={isPro ? 'useThemes' : 'useSets'}>
+        <Tabs defaultValue={isProUser ? 'useThemes' : 'useSets'}>
           <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
-              <StyledProBadge css={{ marginInlineStart: '$2' }}>{isPro ? 'PRO' : 'Get PRO'}</StyledProBadge>
+              <StyledProBadge css={{ marginInlineStart: '$2' }}>{isProUser ? 'PRO' : 'Get PRO'}</StyledProBadge>
             </Tabs.Trigger>
             <Tabs.Trigger value="useSets" onClick={() => handleTabChange('useSets')}>{t('tabs.exportSets')}</Tabs.Trigger>
           </Tabs.List>
