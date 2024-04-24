@@ -361,7 +361,7 @@ describe('TokenListing', () => {
     cy.get('[data-testid=tokenlisting-sizing-content]').should('be.hidden');
   });
 
-  it.only('can add a new composition token', () => {
+  it('can add a new composition token', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({

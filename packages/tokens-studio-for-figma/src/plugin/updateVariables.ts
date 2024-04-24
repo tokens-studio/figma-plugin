@@ -19,17 +19,19 @@ export type CreateVariableTypes = {
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default function updateVariables({
-  collection, mode, theme, tokens, settings
+  collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
       if (
-        (token.type === TokenTypes.COLOR && settings.variablesColor) ||
-        (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber) ||
-        (token.type === TokenTypes.TEXT && settings.variablesString) ||
-        (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
+        (token.type === TokenTypes.COLOR && settings.variablesColor)
+        || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
+        || ([TokenTypes.TEXT, TokenTypes.FONT_FAMILIES].includes(token.type) && settings.variablesString)
+        || (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
+        || (token.type === TokenTypes.FONT_WEIGHTS && Boolean(parseFloat(token.value)) && settings.variablesNumber)
+        || (token.type === TokenTypes.FONT_WEIGHTS && !parseFloat(token.value) && settings.variablesString)
       ) {
         variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
       }

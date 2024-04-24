@@ -75,12 +75,12 @@ describe('transformValue', () => {
     {
       input: 'bold',
       type: 'fontWeights',
-      output: [],
+      output: ['bold'],
     },
   ];
   it('transforms non-conform values into their required formats', () => {
     tokens.forEach((token) => {
-      expect(transformValue(token.input, token.type)).toEqual(token.output);
+      expect(transformValue(token.input, token.type, '16')).toEqual(token.output);
     });
   });
 });

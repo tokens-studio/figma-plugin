@@ -92,7 +92,7 @@ describe('convertToTokenArray', () => {
 
     expect(convertToTokenArray({ tokens: basicTokens })).toEqual([
       { name: 'global.withValue', value: 'bar', type: 'other' },
-      { name: 'global.basic', value: '#ff0000' },
+      { name: 'global.basic', value: '#ff0000', type: 'other' },
       { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
       { name: 'global.opacity.50', value: '50%', type: 'opacity' },
       { ...compositionTokens.output, name: 'global.composition.heading' },
@@ -121,7 +121,7 @@ describe('convertToTokenArray', () => {
       }),
     ).toEqual([
       { name: 'global.withValue', value: 'bar', type: 'other' },
-      { name: 'global.basic', value: '#ff0000' },
+      { name: 'global.basic', value: '#ff0000', type: 'other' },
       { ...typographyTokens.withValue.output, name: 'global.typography.heading.h2' },
       { name: 'global.opacity.50', value: '50%', type: 'opacity' },
       { ...compositionTokens.output, name: 'global.composition.heading' },

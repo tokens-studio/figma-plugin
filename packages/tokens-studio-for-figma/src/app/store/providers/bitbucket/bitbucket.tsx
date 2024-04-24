@@ -18,7 +18,6 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
-import { useChangedState } from '@/hooks/useChangedState';
 import { PushOverrides } from '../../remoteTokens';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
@@ -45,6 +44,7 @@ export function useBitbucket() {
         owner ?? splitContextId[0],
         repo ?? splitContextId[1],
         context.baseUrl ?? '',
+        context.username,
       );
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);

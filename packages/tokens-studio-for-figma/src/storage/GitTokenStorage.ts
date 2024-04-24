@@ -44,17 +44,21 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     multiFileEnabled: false,
   };
 
+  protected username: string | undefined = undefined;
+
   constructor(
     secret: string,
     owner: string,
     repository: string,
     baseUrl?: string,
+    username?: string,
   ) {
     super();
     this.secret = secret;
     this.owner = owner;
     this.repository = repository;
     this.baseUrl = baseUrl;
+    this.username = username;
   }
 
   public selectBranch(branch: string) {
