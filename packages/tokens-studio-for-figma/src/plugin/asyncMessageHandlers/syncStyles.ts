@@ -7,6 +7,7 @@ export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYL
     const styleIds = await syncStylesFn(msg.tokens, msg.options, msg.settings);
     return {
       styleIdsToRemove: styleIds.styleIdsToRemove,
+      renamedTokenNames: styleIds.renamedTokenNames
     };
   } catch (e) {
     console.error(e);
@@ -14,5 +15,6 @@ export const syncStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_STYL
 
   return {
     styleIdsToRemove: [],
+    renamedTokenNames: []
   };
 };

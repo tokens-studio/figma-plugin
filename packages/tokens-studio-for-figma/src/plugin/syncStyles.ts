@@ -5,7 +5,6 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import {
   AnyTokenList,
-  SingleColorToken,
   SingleToken,
   SingleTypographyToken,
 } from '@/types/tokens';
@@ -23,6 +22,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   const paintStyles = figma.getLocalPaintStyles();
   const textStyles = figma.getLocalTextStyles();
   let allStyles = [...effectStyles, ...paintStyles, ...textStyles];
+  const renamedTokenNames: string[] = [];
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -97,16 +97,20 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
     if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name], settings.baseFontSize)) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
         setColorValuesOnTarget(style, styleSet[style.name].name);
+        renamedTokenNames.push(styleSet[style.name].name);
       }
       if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
         setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
+        renamedTokenNames.push(styleSet[style.name].name);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
         setEffectValuesOnTarget(style, styleSet[style.name].path, settings.baseFontSize);
+        renamedTokenNames.push(styleSet[style.name].name);
       }
     }
   });
   return {
     styleIdsToRemove,
+    renamedTokenNames
   };
 }

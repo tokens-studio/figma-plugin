@@ -208,6 +208,7 @@ export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES,
 }>;
 export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
   styleIdsToRemove: string[];
+  renamedTokenNames: string[];
 }>;
 
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
@@ -338,7 +339,9 @@ export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIA
   options: Record<SyncVariableOption, boolean>;
   settings: SettingsState;
 }>;
-export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
+export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES, {
+  renamedTokenNames: string[]
+}>;
 
 export type RemoveRelaunchDataMessage = AsyncMessage<
 AsyncMessageTypes.REMOVE_RELAUNCH_DATA,

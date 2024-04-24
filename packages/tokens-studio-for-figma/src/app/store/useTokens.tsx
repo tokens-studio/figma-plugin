@@ -324,7 +324,7 @@ export default function useTokens() {
     dispatch.tokenState.updateOtherAliases([oldName, newName]);
   }, [dispatch.tokenState]);
 
-  const syncStyles = useCallback(async () => {
+  const syncStyles = useCallback(async (): Promise<string[]> => {
     track('syncStyles', {
       renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection
@@ -341,6 +341,7 @@ export default function useTokens() {
     }));
 
     dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
+    return syncStyleResult.renamedTokenNames;
   }, [tokens, dispatch.tokenState, settings]);
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
@@ -348,8 +349,10 @@ export default function useTokens() {
     const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
     if (!shouldCreateStyles) return;
 
+    let renamedTokenNames: string[] = [];
+
     if (settings.renameExistingStylesAndVariables || settings.removeStylesAndVariablesWithoutConnection) {
-      await syncStyles();
+      renamedTokenNames = await syncStyles();
     }
 
     track('createStyles', {
@@ -386,7 +389,7 @@ export default function useTokens() {
         settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled);
       if (shouldCreate) {
-        if (!acc.find((token) => curr.name === token.name)) {
+        if (!acc.find((token) => curr.name === token.name && !renamedTokenNames.includes(token.name))) {
           acc.push(curr);
         }
       }
@@ -407,8 +410,10 @@ export default function useTokens() {
     const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0);
     if (!shouldCreateStyles) return;
 
+    let renamedTokenNames: string[] = [];
+
     if (settings.renameExistingStylesAndVariables || settings.removeStylesAndVariablesWithoutConnection) {
-      await syncStyles();
+      renamedTokenNames = await syncStyles();
     }
 
     track('createStyles', {
@@ -455,7 +460,7 @@ export default function useTokens() {
         settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled);
       if (shouldCreate) {
-        if (!acc.find((token) => curr.name === token.name)) {
+        if (!acc.find((token) => curr.name === token.name && !renamedTokenNames.includes(token.name))) {
           acc.push(curr);
         }
       }
@@ -540,13 +545,13 @@ export default function useTokens() {
     return tempTokens;
   }, [tokens]);
 
-  const syncVariables = useCallback(async () => {
+  const syncVariables = useCallback(async (): Promise<string[]> => {
     track('syncStyles', {
       renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection
     });
 
-    await wrapTransaction({ name: 'syncVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
+    const syncVariablesResult = await wrapTransaction({ name: 'syncVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SYNC_VARIABLES,
       tokens,
       options: {
@@ -555,6 +560,7 @@ export default function useTokens() {
       },
       settings,
     }));
+    return syncVariablesResult.renamedTokenNames;
   }, [confirm, tokens, settings]);
 
   const createVariables = useCallback(async () => {
@@ -585,8 +591,10 @@ export default function useTokens() {
     const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedSets.length > 0));
     if (!shouldCreateVariables) return;
 
+    let renamedTokenNames: string[] = [];
+
     if (settings.renameExistingStylesAndVariables || settings.removeStylesAndVariablesWithoutConnection) {
-      await syncVariables();
+      renamedTokenNames = await syncVariables();
     }
 
     track('createVariables');
@@ -597,7 +605,7 @@ export default function useTokens() {
     const selectedSetNames = selectedSets.map((set) => set.set);
     const selectedSetsTokens = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
       if (selectedSetNames.includes(tokenSetKey)) {
-        tempTokens[tokenSetKey] = tokenList;
+        tempTokens[tokenSetKey] = tokenList.filter((token) => !renamedTokenNames.includes(token.name));
       }
       return tempTokens;
     }, {} as Record<string, AnyTokenList>);
@@ -623,11 +631,19 @@ export default function useTokens() {
     const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedThemes.length > 0));
     if (!shouldCreateVariables) return;
 
+    let renamedTokenNames: string[] = [];
+    
     if (settings.renameExistingStylesAndVariables || settings.removeStylesAndVariablesWithoutConnection) {
-      await syncVariables();
+      renamedTokenNames = await syncVariables();
     }
 
     track('createVariablesFromThemes', { selectedThemes });
+
+    const tokensToCreate = Object.entries(tokens).reduce((tempTokens, [tokenSetKey, tokenList]) => {
+      tempTokens[tokenSetKey] = tokenList.filter((token) => !renamedTokenNames.includes(token.name));
+      return tempTokens;
+    }, {} as Record<string, AnyTokenList>);
+
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
@@ -642,7 +658,7 @@ export default function useTokens() {
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
-      tokens,
+      tokens: tokensToCreate,
       settings,
       selectedThemes,
     }));
