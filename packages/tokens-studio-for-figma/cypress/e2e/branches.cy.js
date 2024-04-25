@@ -60,7 +60,7 @@ describe('Branch switcher', () => {
         cy.spy(win, 'postMessage').as('postMessage');
       },
     });
-    cy.waitForReact(1000);
+    cy.waitForReact(2000);
     MockEnv();
   });
 
