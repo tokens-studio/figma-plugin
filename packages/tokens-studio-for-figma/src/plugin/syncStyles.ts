@@ -65,6 +65,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
             const newPath = tokenName.split('.').map((part) => part.trim()).join('/');
             const styleNameWithoutTheme = style.name.slice(style.name.indexOf('/') + 1);
             style.name = style.name.replace(styleNameWithoutTheme, newPath);
+            renamedTokenNames.push(style.name);
           }
         });
       }
@@ -97,15 +98,12 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
     if (styleSet[style.name] && !compareStyleValueWithTokenValue(style, styleSet[style.name], settings.baseFontSize)) {
       if (style.type === 'PAINT' && styleSet[style.name].type === TokenTypes.COLOR) {
         setColorValuesOnTarget(style, styleSet[style.name].name);
-        renamedTokenNames.push(styleSet[style.name].name);
       }
       if (style.type === 'TEXT' && styleSet[style.name].type === TokenTypes.TYPOGRAPHY) {
         // setTextValuesOnTarget(style, styleSet[style.name] as SingleTypographyToken, settings.baseFontSize);
-        renamedTokenNames.push(styleSet[style.name].name);
       }
       if (style.type === 'EFFECT' && styleSet[style.name].type === TokenTypes.BOX_SHADOW) {
         setEffectValuesOnTarget(style, styleSet[style.name].path, settings.baseFontSize);
-        renamedTokenNames.push(styleSet[style.name].name);
       }
     }
   });

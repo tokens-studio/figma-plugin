@@ -546,7 +546,7 @@ export default function useTokens() {
   }, [tokens]);
 
   const syncVariables = useCallback(async (): Promise<string[]> => {
-    track('syncStyles', {
+    track('syncVariables', {
       renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
       removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection
     });

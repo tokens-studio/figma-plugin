@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack, Label, Box, Link, Button, Switch, Text,
+  Stack, Label, Box, Link, Button, Switch, Text
 } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import {
   ChevronLeftIcon,
 } from '@primer/octicons-react';
@@ -28,6 +29,10 @@ import {
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { Dispatch } from '../../store';
+
+const StyledCheckboxGrid = styled(Box, {
+  display: 'gird', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center'
+});
 
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
   const rulesRemoveStylesAndVariablesWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
@@ -171,7 +176,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
         <form>
           <Stack direction="column" gap={6}>
 
-            <Stack direction="column" gap={3}>
+            <StyledCheckboxGrid>
               <Text bold css={{ fontSize: '$medium' }}>{t('options.createAndUpdate')}</Text>
               <Box css={{
                 width: '100%', display: 'grid', gridTemplateColumns: '1fr 1px 1fr', columnGap: '$5',
@@ -192,7 +197,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                   <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={!!stylesEffect} label={t('styles.effects')} />
                 </Stack>
               </Box>
-            </Stack>
+            </StyledCheckboxGrid>
             <Box css={{
               display: 'grid',
               alignItems: 'center',
