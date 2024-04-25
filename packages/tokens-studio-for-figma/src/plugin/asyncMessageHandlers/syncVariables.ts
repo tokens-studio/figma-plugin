@@ -4,7 +4,7 @@ import syncVariablesFn from '../syncVariables';
 
 export const syncVariables: AsyncMessageChannelHandlers[AsyncMessageTypes.SYNC_VARIABLES] = async (msg) => {
   try {
-    const tokenNames = await syncVariablesFn(msg.options);
+    const tokenNames = await syncVariablesFn(msg.tokens, msg.options);
     return {
       renamedTokenNames: tokenNames.renamedTokenNames,
     };
