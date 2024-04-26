@@ -8,10 +8,10 @@ import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
-import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type AvailableTheme = {
   value: string
@@ -20,7 +20,7 @@ type AvailableTheme = {
 };
 
 export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
-  const { tokenThemes } = useFlags();
+  const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['tokens']);
   const activeTheme = useSelector(activeThemeSelector);
@@ -129,11 +129,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           <DropdownMenu.Item
             data-testid="themeselector-managethemes"
             css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-            disabled={!tokenThemes}
+            disabled={!isProUser}
             onSelect={handleManageThemes}
           >
             <span>{t('manageThemes')}</span>
-            {!tokenThemes && <ProBadge compact />}
+            {!isProUser && <ProBadge compact />}
             <DropdownMenu.TrailingVisual>
               <NavArrowRight />
             </DropdownMenu.TrailingVisual>

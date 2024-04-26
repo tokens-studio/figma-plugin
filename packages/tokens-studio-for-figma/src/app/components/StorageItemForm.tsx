@@ -6,7 +6,6 @@ import URLForm from './StorageItemForm/URLForm';
 import GenericVersionedForm from './StorageItemForm/GenericVersioned';
 import BitbucketForm from './StorageItemForm/BitbucketForm';
 
-import { useFlags } from './LaunchDarkly';
 import { ChangeEventHandler } from './StorageItemForm/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
