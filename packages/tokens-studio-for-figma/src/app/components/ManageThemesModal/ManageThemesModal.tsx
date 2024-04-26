@@ -80,7 +80,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
-      const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?' });
+      const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?', variant: 'danger' });
       if (confirmDelete) {
         track('Delete theme', { id: themeEditorOpen });
         dispatch.tokenState.deleteTheme(themeEditorOpen);
