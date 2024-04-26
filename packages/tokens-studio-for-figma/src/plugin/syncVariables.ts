@@ -45,7 +45,7 @@ export default async function syncVariables(tokens: Record<string, AnyTokenList>
   // remove
   if (options.removeVariable) {
     figmaVariables.forEach((localVariable) => {
-      if (!connectedVariablesMap[localVariable.key] || checkTokenToRemoved(tokens, localVariable.name)) { 
+      if (checkTokenToRemoved(tokens, localVariable.name)) { 
         localVariable.remove();
       }
     });

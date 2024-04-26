@@ -17,6 +17,15 @@ import setColorValuesOnTarget from './setColorValuesOnTarget';
 import setEffectValuesOnTarget from './setEffectValuesOnTarget';
 // import setTextValuesOnTarget from './setTextValuesOnTarget';
 
+function checkStyleToRenamed(tokens: Record<string, AnyTokenList>, styleName: string) {
+  for (const key of Object.keys(tokens)) {
+    for (const token of tokens[key]) {
+      if (token.name.split('.').join('/') === styleName) return false;
+    }
+  }
+  return true;
+}
+
 export default async function syncStyles(tokens: Record<string, AnyTokenList>, options: Record<SyncOption, boolean>, settings: SettingsState) {
   const effectStyles = figma.getLocalEffectStyles();
   const paintStyles = figma.getLocalPaintStyles();
@@ -56,20 +65,22 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
   });
 
   // rename styles
-  if (options.renameStyle && activeThemes.length > 0) {
+  if (options.renameStyle) {
     // Filter styles whose name starts with one of activeTheme (e.g light/color/black,  desktop/color/black, we ignore dark/color/black)
-    allStyles.filter((style) => activeThemes.map((theme) => `${theme.name}/`).some((n) => style.name.startsWith(n))).forEach((style) => {
-      if (figmaStyleReferences) {
-        Object.entries(figmaStyleReferences).forEach(([tokenName, styleIds]) => {
-          if (styleIds.includes(style.id) && style.name !== tokenName) {
-            const newPath = tokenName.split('.').map((part) => part.trim()).join('/');
-            const styleNameWithoutTheme = style.name.slice(style.name.indexOf('/') + 1);
-            style.name = style.name.replace(styleNameWithoutTheme, newPath);
-            renamedTokenNames.push(style.name);
-          }
-        });
-      }
-    });
+    if (activeThemes.length > 0) {
+      allStyles.filter((style) => activeThemes.map((theme) => `${theme.name}/`).some((n) => style.name.startsWith(n))).forEach((style) => {
+        if (figmaStyleReferences) {
+          Object.entries(figmaStyleReferences).forEach(([tokenName, styleIds]) => {
+            if (styleIds.includes(style.id) && style.name !== tokenName) {
+              const newPath = tokenName.split('.').map((part) => part.trim()).join('/');
+              const styleNameWithoutTheme = style.name.slice(style.name.indexOf('/') + 1);
+              style.name = style.name.replace(styleNameWithoutTheme, newPath);
+              renamedTokenNames.push(style.name);
+            }
+          });
+        }
+      });
+    }
   }
 
   // Remove any styles that do not have a token that matches its name
@@ -107,6 +118,7 @@ export default async function syncStyles(tokens: Record<string, AnyTokenList>, o
       }
     }
   });
+
   return {
     styleIdsToRemove,
     renamedTokenNames
