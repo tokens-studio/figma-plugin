@@ -185,7 +185,7 @@ export default {
   //     "^.+\\.js$": "babel-jest",
   // },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|@react-dnd)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|@react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|culori|dot-prop)/)', '\\.pnp\\.[^\\/]+$'],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
