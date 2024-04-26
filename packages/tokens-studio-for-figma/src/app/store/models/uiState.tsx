@@ -27,6 +27,7 @@ export type ConfirmProps = {
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
   cancelAction?: string;
+  variant?: 'danger';
   input?: {
     type: 'text';
     placeholder: string;
@@ -169,6 +170,7 @@ export const uiState = createModel<RootModel>()({
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
         cancelAction?: string;
+        variant?: 'danger';
         input?: {
           type: 'text';
           placeholder: string;
@@ -184,6 +186,7 @@ export const uiState = createModel<RootModel>()({
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
         cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
         input: data.input,
+        variant: data.variant,
       },
     }),
     setSelectedLayers: (state, data: number) => ({

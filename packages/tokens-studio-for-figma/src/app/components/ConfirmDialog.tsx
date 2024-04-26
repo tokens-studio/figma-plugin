@@ -82,6 +82,8 @@ function ConfirmDialog() {
     }
   }, [confirmState.show, confirmButton, confirmState.choices, firstInput]);
 
+  const isDangerVariant = confirmState?.variant === 'danger';
+
   return confirmState.show ? (
     <Modal isOpen close={onCancel} title={confirmState?.text && confirmState.text}>
       <form onSubmit={handleConfirm}>
@@ -120,11 +122,11 @@ function ConfirmDialog() {
               </Stack>
             ) : null}
           </Stack>
-          <Stack direction="row" gap={3} justify="end">
+          <Stack direction="row" gap={3} justify={isDangerVariant ? 'between' : 'end'}>
             <Button variant="secondary" onClick={onCancel}>
               {confirmState?.cancelAction}
             </Button>
-            <Button type="submit" variant="primary" ref={confirmButton}>
+            <Button type="submit" variant={isDangerVariant ? 'danger' : 'primary'} ref={confirmButton}>
               {confirmState?.confirmAction}
             </Button>
           </Stack>

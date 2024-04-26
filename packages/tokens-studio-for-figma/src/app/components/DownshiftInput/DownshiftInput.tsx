@@ -226,7 +226,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                 <Popover.Content side="bottom" align="end" sideOffset={4} style={{ pointerEvents: 'all', width: 'var(--radix-popover-trigger-width)' }}>
                   <Box
                     css={{
-                      backgroundColor: '$bgDefault',
+                      backgroundColor: '$bgCanvas',
                       border: '1px solid',
                       borderColor: '$borderSubtle',
                       borderRadius: '$medium',
