@@ -3,6 +3,7 @@ import {
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
 import MockEnv from '../support/mockEnv'
+import { fillTokenForm } from './helpers/utils';
 
 describe('Branch switcher', () => {
   const provider = {
@@ -24,7 +25,7 @@ describe('Branch switcher', () => {
       syncProviders: true,
     },
     localApiProviders: [provider],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -101,6 +102,13 @@ describe('Branch switcher', () => {
         }],
       },
     });
+    cy.get('[data-testid=tokenlisting-sizing] [data-testid=button-add-new-token]').click({
+      timeout: 1000
+    });
+    fillTokenForm({
+      name: 'sizing.sm',
+      value: '4',
+    });
     cy.get('[data-testid=branch-selector-menu-trigger]').click();
     cy.get('[data-testid=branch-selector-create-new-branch-trigger]').click();
     cy.get('[data-testid=branch-selector-create-new-branch-from-current-change]').click();
@@ -136,6 +144,13 @@ describe('Branch switcher', () => {
           type: 'sizing'
         }],
       },
+    });
+    cy.get('[data-testid=tokenlisting-sizing] [data-testid=button-add-new-token]').click({
+      timeout: 1000
+    });
+    fillTokenForm({
+      name: 'sizing.sm',
+      value: '4',
     });
     cy.get('[data-testid=footer-push-button]').click();
     cy.get('[data-testid=push-dialog-commit-message]').type('push changes');

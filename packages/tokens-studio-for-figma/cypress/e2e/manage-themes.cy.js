@@ -2,6 +2,7 @@ import {
   StorageProviderType
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
+import MockEnv from '../support/mockEnv';
 
 const createTokenSet = ({ name }) => {
   cy.get('[data-testid="button-new-token-set"]').click({ timeout: 1000 })
@@ -19,7 +20,7 @@ describe('TokenListing', () => {
       syncProviders: true,
     },
     localApiProviders: [],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -56,6 +57,7 @@ describe('TokenListing', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('create token set', () => {

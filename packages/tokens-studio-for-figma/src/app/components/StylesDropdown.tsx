@@ -38,7 +38,7 @@ export default function StylesDropdown() {
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
-      <ManageStylesAndVariables showModal={showModal} setShowModal={setShowModal} />
+      {showModal && <ManageStylesAndVariables showModal={showModal} setShowModal={setShowModal} />}
     </>
   );
 }

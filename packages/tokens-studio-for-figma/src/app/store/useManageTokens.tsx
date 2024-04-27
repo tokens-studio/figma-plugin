@@ -140,6 +140,8 @@ export default function useManageTokens() {
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
       choices,
+      confirmAction: 'Delete',
+      variant: 'danger',
     });
     if (userConfirmation) {
       dispatch.uiState.startJob({
@@ -160,6 +162,8 @@ export default function useManageTokens() {
     const userConfirmation = await confirm({
       text: 'Delete group?',
       description: 'Are you sure you want to delete this group?',
+      variant: 'danger',
+      confirmAction: 'Delete',
     });
     if (userConfirmation) {
       const activeTokenSet = activeTokenSetSelector(store.getState());

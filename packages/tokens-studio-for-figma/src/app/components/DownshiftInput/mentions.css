@@ -71,7 +71,7 @@
   border: 1px solid var(--colors-borderSubtle);
   border-radius: var(--radii-medium);
   box-shadow: var(--shadows-contextMenu);
-  background: var(--colors-bgDefault);
+  background: var(--colors-bgCanvas);
   cursor: pointer;
   z-index: 10;
 }
@@ -99,7 +99,7 @@
 
 /* Track */
 .rc-mentions-dropdown-menu::-webkit-scrollbar-track {
-  background: var(--bgDefault);
+  background: var(--colors-bgCanvas);
 }
 
 /* Handle */

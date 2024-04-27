@@ -34,7 +34,7 @@ export const StyledList = styled(List as ComponentType<any>, {
   zIndex: '10',
   maxHeight: '30vh',
   overflowY: 'auto',
-  backgroundColor: '$bgDefault',
+  backgroundColor: '$bgCanvas',
   cursor: 'pointer',
   padding: '$2',
 });
