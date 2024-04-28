@@ -22,6 +22,7 @@ export default function setValuesOnVariable(
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
+  const renamedVariableKeys: string[] = [];
   try {
     tokens.forEach((t) => {
       const variableType = convertTokenTypeToVariableType(t.type, t.value);
@@ -33,6 +34,7 @@ export default function setValuesOnVariable(
       if (variable) {
         // First, rename all variables that should be renamed (if the user choose to do so)
         if (variable.name !== t.path && shouldRename) {
+          renamedVariableKeys.push(variable.key);
           variable.name = t.path;
         }
         if (variableType !== variable?.resolvedType) {
@@ -91,6 +93,7 @@ export default function setValuesOnVariable(
   }
 
   return {
+    renamedVariableKeys,
     variableKeyMap,
     referenceVariableCandidates,
   };
