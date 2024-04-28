@@ -12,9 +12,10 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
+const mockRemove = jest.fn();
 
 describe('updateStyles', () => {
-  const colorSpy = jest.spyOn(updateColorStyles, 'default');
+  const colorSpy = jest.spyOn(updateColorStyles, 'default').mockReturnValue({ 'primary.500': '1234' });
   const textSpy = jest.spyOn(updateTextStyles, 'default');
   const effectSpy = jest.spyOn(updateEffectStyles, 'default');
 
@@ -34,6 +35,20 @@ describe('updateStyles', () => {
       disconnectPluginInstance();
       disconnectReactInstance();
     };
+    figma.getLocalPaintStylesAsync = jest.fn(() => Promise.resolve([{
+      name: 'other',
+      key: 'removekey',
+      id: 'removeid',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    },
+    {
+      name: 'primary/500',
+      key: '1234',
+      id: '1234',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    }]));
   });
 
   afterAll(() => {
@@ -275,5 +290,43 @@ describe('updateStyles', () => {
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
+  });
+
+  it('removes styles that arent connected if setting is on', async () => {
+    const tokens = [
+      {
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: 'color',
+        styleId: '1234',
+        internal__Parent: 'global',
+      },
+    ] as ExtendedSingleToken[];
+
+    mockGetThemeInfo.mockImplementationOnce(() => (
+      Promise.resolve({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
+        themes: [{
+          id: 'light',
+          name: 'light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
+        }],
+      })
+    ));
+
+    await updateStyles(tokens, {
+      removeStylesAndVariablesWithoutConnection: true,
+      stylesColor: true,
+    } as SettingsState, false);
+    expect(mockRemove).toHaveBeenCalledTimes(1);
   });
 });
