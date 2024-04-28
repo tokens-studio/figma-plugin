@@ -318,12 +318,6 @@ export default function useTokens() {
     }
   }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]);
 
-  const remapTokensWithOtherReference = useCallback(async ({
-    oldName, newName,
-  }: { oldName: string, newName:string }) => {
-    dispatch.tokenState.updateOtherAliases([oldName, newName]);
-  }, [dispatch.tokenState]);
-
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
     const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
@@ -685,7 +679,6 @@ export default function useTokens() {
     pullVariables,
     remapToken,
     remapTokensInGroup,
-    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
@@ -713,7 +706,6 @@ export default function useTokens() {
     pullVariables,
     remapToken,
     remapTokensInGroup,
-    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
