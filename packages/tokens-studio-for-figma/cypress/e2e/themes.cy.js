@@ -2,6 +2,7 @@ import {
   StorageProviderType
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
+import MockEnv from '../support/mockEnv';
 
 describe('Themes', () => {
   const mockStartupParams = {
@@ -13,7 +14,7 @@ describe('Themes', () => {
       syncProviders: true,
     },
     localApiProviders: [],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -61,6 +62,7 @@ describe('Themes', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('Can create a new theme', () => {

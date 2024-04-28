@@ -14,11 +14,11 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -31,7 +31,7 @@ export const useADO = () => {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const dispatch = useDispatch<Dispatch>();
-  const { multiFileSync } = useFlags();
+  const isProUser = useIsProUser();
   const { confirm } = useConfirm();
   const { pushDialog, closePushDialog } = usePushDialog();
 
@@ -39,9 +39,9 @@ export const useADO = () => {
     const storageClient = new ADOTokenStorage(context);
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (multiFileSync) storageClient.enableMultiFile();
+    if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, [multiFileSync]);
+  }, [isProUser]);
 
   const askUserIfPull = React.useCallback(async () => {
     const confirmResult = await confirm({

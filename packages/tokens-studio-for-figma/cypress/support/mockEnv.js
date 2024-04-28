@@ -7,6 +7,30 @@ const MockEnv = () => {
     email: 'example@domain.com',
   }).as('getUser');
 
+  cy.intercept('POST', `https://api-eu.mixpanel.com/**`, {
+    success: true
+  }).as('mixpanel')
+
+  cy.intercept('GET', `https://api.storyblok.com/**`, {
+    success: true
+  }).as('storyblok')
+
+  cy.intercept('GET', `https://app.launchdarkly.com/**`, {
+    success: true
+  }).as('app-launchdarkly')
+
+  cy.intercept('POST', `https://events.launchdarkly.com/**`, {
+    success: true
+  }).as('events-launchdarkly')
+
+  cy.intercept('GET', `**/get-license*`, {
+    plan: 'pro'
+  }).as('getLicense')
+
+  cy.intercept('GET', `**/validate-license*`, {
+    plan: 'pro'
+  }).as('validateLicense')
+
   cy.intercept('GET', 'http://localhost:58630/six7/repos/122/figma-tokens/collaborators/six7/permission', {
     permission: 'admin',
     role_name: 'admin'

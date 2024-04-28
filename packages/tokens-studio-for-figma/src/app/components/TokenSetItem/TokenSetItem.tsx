@@ -159,18 +159,14 @@ export function TokenSetItem({
         )}
         <ContextMenu.Portal>
           <ContextMenu.Content>
-            {canEdit && <ContextMenu.Item onSelect={handleRename}>{t('rename')}</ContextMenu.Item>}
+            <ContextMenu.Item onSelect={handleRename} disabled={!canEdit}>{t('rename')}</ContextMenu.Item>
             {item.isLeaf && (
               <>
-                {canEdit && (
-                  <>
-                    <ContextMenu.Item disabled={!canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
-                    <ContextMenu.Item disabled={!canDelete} onSelect={handleDelete}>
-                      {t('delete')}
-                    </ContextMenu.Item>
-                    <ContextMenu.Separator />
-                  </>
-                )}
+                <ContextMenu.Item disabled={!canEdit || !canDuplicate} onSelect={handleDuplicate}>{t('duplicate')}</ContextMenu.Item>
+                <ContextMenu.Item disabled={!canEdit || !canDelete} onSelect={handleDelete}>
+                  {t('delete')}
+                </ContextMenu.Item>
+                <ContextMenu.Separator />
                 <ContextMenu.CheckboxItem
                   checked={tokenSetStatus === TokenSetStatus.SOURCE}
                   onSelect={handleTreatAsSource}
