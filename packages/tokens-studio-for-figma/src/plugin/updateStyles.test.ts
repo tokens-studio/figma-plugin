@@ -84,11 +84,12 @@ describe('updateStyles', () => {
 
     await updateStyles([...colorTokens], {
       prefixStylesWithThemeName: true,
-      stylesColor: true
+      stylesColor: true,
     } as SettingsState, false);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
+      undefined,
     );
   });
 
@@ -137,7 +138,7 @@ describe('updateStyles', () => {
       ignoreFirstPartForStyles: true,
       stylesColor: true,
       stylesEffect: true,
-      stylesTypography: true
+      stylesTypography: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       [{
@@ -148,6 +149,7 @@ describe('updateStyles', () => {
         styleId: '',
       }],
       false,
+      undefined,
     );
     expect(textSpy).toHaveBeenCalledWith(
       [{
@@ -163,6 +165,7 @@ describe('updateStyles', () => {
       }],
       undefined,
       false,
+      undefined,
     );
     expect(effectSpy).toHaveBeenCalledWith(
       {
@@ -199,11 +202,12 @@ describe('updateStyles', () => {
 
     await updateStyles(colorTokens, {
       prefixStylesWithThemeName: true,
-      stylesColor: true
+      stylesColor: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
+      undefined,
     );
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
@@ -226,12 +230,13 @@ describe('updateStyles', () => {
 
     await updateStyles(typographyTokens, {
       prefixStylesWithThemeName: true,
-      stylesTypography: true
+      stylesTypography: true,
     } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
       undefined,
       false,
+      undefined,
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
@@ -260,7 +265,7 @@ describe('updateStyles', () => {
       prefixStylesWithThemeName: true,
       stylesColor: false,
       stylesEffect: true,
-      stylesTypography: false
+      stylesTypography: false,
     } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
       {

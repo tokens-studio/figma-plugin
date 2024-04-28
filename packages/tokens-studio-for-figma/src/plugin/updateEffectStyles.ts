@@ -9,10 +9,12 @@ export default async function updateEffectStyles({
   effectTokens,
   baseFontSize,
   shouldCreate = false,
+  shouldRename = false,
 }: {
   effectTokens: SingleBoxShadowToken<true, { path: string; styleId: string }>[];
   baseFontSize: string;
   shouldCreate?: boolean;
+  shouldRename?: boolean;
 }) {
   const effectStylesToIdMap = getEffectStylesIdMap();
   const effectStylesToKeyMap = getEffectStylesKeyMap();
@@ -21,6 +23,9 @@ export default async function updateEffectStyles({
   await Promise.all(effectTokens.map(async (token) => {
     if (effectStylesToIdMap.has(token.styleId)) {
       const effectStyle = effectStylesToIdMap.get(token.styleId)!;
+      if (shouldRename) {
+        effectStyle.name = token.path;
+      }
       tokenToStyleMap[token.name] = effectStyle.id;
       await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
     } else if (effectStylesToKeyMap.has(token.path)) {

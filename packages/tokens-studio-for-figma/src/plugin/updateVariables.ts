@@ -22,6 +22,7 @@ export default function updateVariables({
   collection, mode, theme, tokens, settings,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
+  const variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token)) {
@@ -37,7 +38,17 @@ export default function updateVariables({
       }
     }
   });
-  const variableObj = setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
+  const variableObj = setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.renameExistingStylesAndVariables);
+
+  // Remove variables not handled in the current theme
+  if (settings.removeStylesAndVariablesWithoutConnection) {
+    variablesInCollection
+      .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
+      .forEach((variable) => {
+        variable.remove();
+      });
+  }
+
   return {
     variableIds: variableObj.variableKeyMap,
     referenceVariableCandidate: variableObj.referenceVariableCandidates,
