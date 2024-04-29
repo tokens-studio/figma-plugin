@@ -224,7 +224,6 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenFormat: TokenFormatOptions;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
-  styleIds: Record<string, string>;
   nodes: number
 }>;
 

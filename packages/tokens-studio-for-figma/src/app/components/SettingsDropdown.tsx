@@ -15,11 +15,11 @@ export default function SettingsDropdown() {
   const { t } = useTranslation(['tokens']);
 
   const {
-    updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
+    updateRemote, updateOnChange, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setUpdateStyles, setShouldSwapStyles,
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -29,10 +29,6 @@ export default function SettingsDropdown() {
   const handleUpdateRemote = React.useCallback(() => {
     setUpdateRemote(!updateRemote);
   }, [updateRemote, setUpdateRemote]);
-
-  const handleUpdateStyles = React.useCallback(() => {
-    setUpdateStyles(!updateStyles);
-  }, [updateStyles, setUpdateStyles]);
 
   const handleShouldSwapStyles = React.useCallback(() => {
     setShouldSwapStyles(!shouldSwapStyles);
@@ -74,19 +70,6 @@ export default function SettingsDropdown() {
               </Box>
             </DropdownMenu.CheckboxItem>
           ) : null}
-          <DropdownMenu.CheckboxItem
-            data-testid="update-styles"
-            checked={updateStyles}
-            onCheckedChange={handleUpdateStyles}
-          >
-            <DropdownMenu.ItemIndicator>
-              <CheckIcon />
-            </DropdownMenu.ItemIndicator>
-            {t('update.styles.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.styles.description')}
-            </Box>
-          </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="swap-styles"
             checked={shouldSwapStyles}

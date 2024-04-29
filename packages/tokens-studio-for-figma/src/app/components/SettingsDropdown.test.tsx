@@ -72,18 +72,6 @@ describe('SettingsDropdown', () => {
       expect(updateRemoteSpy).toBeCalledTimes(1);
     });
   });
-  it('should call updateStyles', async () => {
-    const updateStylesSpy = jest.spyOn(mockStore.dispatch.settings, 'setUpdateStyles');
-    const result = renderStore();
-
-    const trigger = await result.getByTestId('bottom-bar-settings');
-    waitFor(async () => {
-      await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('update-styles');
-      await userEvent.click(updateChanges, { pointerEventsCheck: 0 });
-      expect(updateStylesSpy).toBeCalledTimes(1);
-    });
-  });
 
   it('should call swapStyles', async () => {
     const shouldSwapStylesSpy = jest.spyOn(mockStore.dispatch.settings, 'setShouldSwapStyles');

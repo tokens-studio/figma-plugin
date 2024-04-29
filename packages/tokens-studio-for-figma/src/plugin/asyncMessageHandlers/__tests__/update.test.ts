@@ -56,7 +56,6 @@ describe('update', () => {
       updateMode: UpdateMode.PAGE,
       updateOnChange: false,
       updateRemote: true,
-      updateStyles: true,
       shouldSwapStyles: true,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
