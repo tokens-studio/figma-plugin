@@ -14,16 +14,16 @@ export default async function updateColorStyles(colorTokens: SingleColorToken<tr
     if (paintToIdMap.has(token.styleId)) {
       const paint = paintToIdMap.get(token.styleId)!;
       tokenToStyleMap[token.name] = paint.id;
-      await setColorValuesOnTarget(paint, token.name);
+      await setColorValuesOnTarget({ target: paint, token: token.name, key: 'paints' });
     } else if (paintToKeyMap.has(token.path)) {
       const paint = paintToKeyMap.get(token.path)!;
       tokenToStyleMap[token.name] = paint.id;
-      await setColorValuesOnTarget(paint, token.name);
+      await setColorValuesOnTarget({ target: paint, token: token.name, key: 'paints' });
     } else if (shouldCreate) {
       const style = figma.createPaintStyle();
       style.name = token.path;
       tokenToStyleMap[token.name] = style.id;
-      await setColorValuesOnTarget(style, token.name);
+      await setColorValuesOnTarget({ target: style, token: token.name, key: 'paints' });
     }
   }));
   return tokenToStyleMap;

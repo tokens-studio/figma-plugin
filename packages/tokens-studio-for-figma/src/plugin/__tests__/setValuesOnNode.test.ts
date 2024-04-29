@@ -504,7 +504,9 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith(solidNodeMock, 'colors.red', 'fills');
+    expect(setColorValuesOnTargetSpy).toHaveBeenCalledWith({
+      target: solidNodeMock, token: 'colors.red', key: 'fills', givenValue: '#ff0000',
+    });
   });
 
   it('sets strokeStyleId if matching Style', async () => {
