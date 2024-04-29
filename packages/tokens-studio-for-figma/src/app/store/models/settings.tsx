@@ -25,7 +25,6 @@ export interface SettingsState {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
-  updateStyles?: boolean;
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -72,7 +71,6 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
-    updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
@@ -184,12 +182,6 @@ export const settings = createModel<RootModel>()({
         updateOnChange: payload,
       };
     },
-    setUpdateStyles(state, payload: boolean) {
-      return {
-        ...state,
-        updateStyles: payload,
-      };
-    },
     setShouldSwapStyles(state, payload: boolean) {
       return {
         ...state,
@@ -227,9 +219,6 @@ export const settings = createModel<RootModel>()({
         width: payload.isMinimized ? 50 : payload.width,
         height: payload.isMinimized ? 50 : payload.height,
       });
-    },
-    setUpdateStyles: (payload, rootState) => {
-      setUI(rootState.settings);
     },
     setShouldSwapStyles: (payload, rootState) => {
       setUI(rootState.settings);
