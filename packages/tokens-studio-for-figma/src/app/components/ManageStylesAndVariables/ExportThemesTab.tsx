@@ -17,7 +17,7 @@ import { LabelledCheckbox } from './LabelledCheckbox';
 export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
-  const isPro = useIsProUser();
+  const isProUser = useIsProUser();
 
   const ThemeGroups = React.useMemo(() => {
     const uniqueGroups: string[] = themes.reduce((unique: string[], theme) => {
@@ -69,7 +69,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
       {themes.length === 0 ? (
         <StyledCard>
           <Stack direction="column" align="start" gap={4}>
-            {isPro ? (
+            {isProUser ? (
               <>
                 <Heading size="medium">{t('exportThemesTab.headingPro')}</Heading>
                 <p>{t('exportThemesTab.introPro')}</p>

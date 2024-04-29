@@ -31,12 +31,12 @@ export default function AnnotationBuilder() {
   }, [uiState]);
 
   return Object.entries(uiState.mainNodeSelectionValues).length > 0 ? (
-    <Box css={{ borderBottom: '1px solid $borderDefault', paddingBottom: '$4', marginBottom: '$4' }}>
+    <Box css={{ borderBottom: '1px solid $borderMuted', paddingBottom: '$4', marginBottom: '$4' }}>
       <Stack direction="row" align="center" justify="between">
         <Text bold>{t('addAnnotation')}</Text>
-        <Stack direction="row" align="center" gap={0}>
+        <Stack direction="row" align="center" gap={2}>
           <IconButton onClick={createAnnotationLeft} icon="←" />
-          <Stack direction="column">
+          <Stack direction="column" gap={2}>
             <IconButton onClick={createAnnotationTop} icon="↑" />
             <IconButton onClick={createAnnotationBottom} icon="↓" />
           </Stack>

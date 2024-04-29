@@ -33,16 +33,18 @@ export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildre
 
   return (
     <DropdownMenu>
-      <DropdownMenu.Trigger asChild css={{ width: '100%' }}>
+      <DropdownMenu.Trigger asChild>
         <Button asDropdown>
           {selectedItemsString}
         </Button>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content side="bottom" className="content content-dark scroll-container" css={{ maxHeight: '$dropdownMaxHeight' }}>
-        {
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content side="bottom" className="content scroll-container" css={{ maxHeight: 'clamp(100px, 30vh, 500px)' }}>
+          {
           menuItems.map((menuItem, index) => <MultiSelectCheckboxItem key={`multi_checkbox_${seed(index)}`} item={menuItem} isSelected={selectedItems.includes(menuItem)} onItemSelected={handleSelectedItem} />)
         }
-      </DropdownMenu.Content>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu>
   );
 };
