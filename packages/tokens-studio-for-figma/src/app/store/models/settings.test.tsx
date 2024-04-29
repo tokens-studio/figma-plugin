@@ -33,7 +33,6 @@ describe('settings', () => {
             updateMode: UpdateMode.PAGE,
             updateRemote: true,
             updateOnChange: true,
-            updateStyles: true,
             tokenType: 'object',
             ignoreFirstPartForStyles: false,
             prefixStylesWithThemeName: false,
@@ -65,7 +64,6 @@ describe('settings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      updateStyles: true,
       tokenType: 'object',
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
@@ -101,11 +99,6 @@ describe('settings', () => {
     });
   });
 
-  it('should be able to set update styles', () => {
-    store.dispatch.settings.setUpdateStyles(true);
-    expect(store.getState().settings.updateStyles).toBe(true);
-  });
-
   it('should be able to set UI settings', () => {
     store.dispatch.settings.setUISettings({
       uiWindow: {
@@ -116,7 +109,6 @@ describe('settings', () => {
       updateMode: UpdateMode.DOCUMENT,
       updateRemote: false,
       updateOnChange: false,
-      updateStyles: true,
       tokenType: 'object',
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
@@ -131,7 +123,6 @@ describe('settings', () => {
       updateMode: UpdateMode.DOCUMENT,
       updateRemote: false,
       updateOnChange: false,
-      updateStyles: true,
       tokenType: 'object',
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
@@ -150,7 +141,6 @@ describe('settings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      updateStyles: true,
       tokenType: 'object',
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
@@ -166,7 +156,6 @@ describe('settings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      updateStyles: true,
       tokenType: 'object',
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,
