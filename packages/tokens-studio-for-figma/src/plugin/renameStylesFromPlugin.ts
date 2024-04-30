@@ -9,9 +9,11 @@ export default async function renameStylesFromPlugin(
   tokensToRename: TokensToRenamePayload[],
   parent: string,
 ) {
-  const effectStyles = figma.getLocalEffectStyles();
-  const paintStyles = figma.getLocalPaintStyles();
-  const textStyles = figma.getLocalTextStyles();
+  const [effectStyles, paintStyles, textStyles] = await Promise.all([
+    figma.getLocalEffectStylesAsync(),
+    figma.getLocalPaintStylesAsync(),
+    figma.getLocalTextStylesAsync(),
+  ]);
   const allStyles = [...effectStyles, ...paintStyles, ...textStyles];
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -22,15 +24,18 @@ export default async function renameStylesFromPlugin(
   let oldPathNames: string[] = [];
   let newPathNames: string[] = [];
 
+  // TODO: This behavior feels so weird. We should refactor this to be more readable, also this can lead to unexpected side-effects.
   tokensToRename.forEach((token) => {
     oldPathNames = oldPathNames
-      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.oldName, theme))
-        .concat(themesToContainToken.map(() => convertTokenNameToPath(token.oldName, null, 1)))
-        .concat(convertTokenNameToPath(token.oldName)));
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.oldName, theme)))
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.oldName, theme, 1)))
+      .concat(themesToContainToken.map(() => convertTokenNameToPath(token.oldName, null, 1)))
+      .concat(convertTokenNameToPath(token.oldName));
     newPathNames = newPathNames
-      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.newName, theme))
-        .concat(themesToContainToken.map(() => convertTokenNameToPath(token.newName, null, 1)))
-        .concat(convertTokenNameToPath(token.newName)));
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.newName, theme)))
+      .concat(themesToContainToken.map((theme) => convertTokenNameToPath(token.newName, theme, 1)))
+      .concat(themesToContainToken.map(() => convertTokenNameToPath(token.newName, null, 1)))
+      .concat(convertTokenNameToPath(token.newName));
   });
   const allStyleIds = allStyles.filter((style) => oldPathNames.some((oldPathName) => {
     if (isMatchingStyle(oldPathName, style)) {

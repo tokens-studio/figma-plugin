@@ -3,14 +3,12 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updateLocalTokensData } from '@/utils/figma';
 import { updateNodes } from '../updateNodes';
 import { NodeManagerNode, defaultNodeManager } from '../NodeManager';
-import updateStyles from '../updateStyles';
 import { swapStyles } from './swapStyles';
 import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenFormatOptions } from '../TokenFormatStoreClass';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
-  let receivedStyleIds: Record<string, string> = {};
   let allWithData: NodeManagerNode[] = [];
   if (msg.tokenValues && msg.updatedAt) {
     await updateLocalTokensData({
@@ -36,9 +34,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
     });
-    if (msg.settings.updateStyles) {
-      receivedStyleIds = await updateStyles(msg.tokens, msg.settings, false);
-    }
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
@@ -50,7 +45,6 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   }
 
   return {
-    styleIds: receivedStyleIds,
     nodes: allWithData.length,
   };
 };

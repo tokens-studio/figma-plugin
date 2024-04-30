@@ -198,4 +198,50 @@ describe('updateEffectStyles', () => {
       },
     ]);
   });
+
+  it('renames if option is true and style is found', async () => {
+    const existingStyles = [
+      {
+        id: '1234',
+        name: 'type/h1',
+        effects: [{
+          type: 'DROP_SHADOW',
+          blendMode: 'NORMAL',
+          color: {
+            r: 0, g: 0, b: 0, a: 1,
+          },
+          offset: { x: 0, y: 0 },
+          radius: 10,
+          showShadowBehindNode: false,
+          spread: 0,
+          opacity: 1,
+          visible: true,
+        }],
+      },
+    ];
+    mockGetLocalEffectStyles.mockImplementation(() => existingStyles);
+
+    await updateEffectStyles(
+      {
+        effectTokens: [{
+          name: 'shadows.large-RENAMED',
+          value: {
+            type: BoxShadowTypes.DROP_SHADOW,
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+            color: '#000000',
+          },
+          type: TokenTypes.BOX_SHADOW,
+          path: 'shadows/large-RENAMED',
+          styleId: '1234',
+        }],
+        baseFontSize: '16',
+        shouldRename: true,
+      },
+    );
+
+    expect(existingStyles[0].name).toEqual('shadows/large-RENAMED');
+  });
 });

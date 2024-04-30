@@ -122,8 +122,11 @@ module.exports.figma = {
     setBoundVariableForPaint: module.exports.mockSetBoundVariableForPaint
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
+  getLocalPaintStylesAsync: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
+  getLocalTextStylesAsync: module.exports.mockGetLocalTextStyles,
   getLocalEffectStyles: module.exports.mockGetLocalEffectStyles,
+  getLocalEffectStylesAsync: module.exports.mockGetLocalEffectStyles,
   loadFontAsync: module.exports.mockLoadFontAsync,
   getStyleById: module.exports.mockGetStyleById,
   createTextStyle: module.exports.mockCreateTextStyle,
