@@ -41,7 +41,6 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GOTO_NODE, asyncHand
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SELECT_NODES, asyncHandlers.selectNodes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, asyncHandlers.pullStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_VARIABLES, asyncHandlers.pullVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, asyncHandlers.syncStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.NOTIFY, asyncHandlers.notify);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESIZE_WINDOW, asyncHandlers.resizeWindow);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CANCEL_OPERATION, asyncHandlers.cancelOperation);
@@ -70,7 +69,6 @@ AsyncMessageChannel.PluginInstance.handle(
   asyncHandlers.attachLocalVariablesToTheme,
 );
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
@@ -7,7 +7,7 @@ import useTokens from './useTokens';
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
-import { createStyles, renameStyles, removeStyles, syncStyles } from '@/plugin/asyncMessageHandlers';
+import { createStyles, renameStyles, removeStyles } from '@/plugin/asyncMessageHandlers';
 import { AllTheProviders, createMockStore, resetStore } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -18,8 +18,6 @@ import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { TokensContext } from '@/context';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import { boolean } from 'zod';
-import { settings } from './models/settings';
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -316,11 +314,9 @@ describe('useToken test', () => {
 
   it('should send message to pull styles from figma', async () => {
     const messageSpy = jest.spyOn(AsyncMessageChannel.ReactInstance, 'message');
-    mockConfirm.mockImplementation(() =>
-      Promise.resolve({
-        data: ['textStyles', 'colorStyles', 'effectStyles'],
-      }),
-    );
+    mockConfirm.mockImplementation(() => Promise.resolve({
+      data: ['textStyles', 'colorStyles', 'effectStyles'],
+    }));
     await act(async () => {
       await result.current.pullStyles();
     });
@@ -437,7 +433,7 @@ describe('useToken test', () => {
           ],
           light: [{ name: 'bg.default', value: '#ffffff', type: TokenTypes.COLOR }],
         },
-      }
+      },
     });
     beforeEach(() => {
       resetStore();
@@ -465,7 +461,6 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_STYLES, createStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_STYLES, renameStyles);
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
-    AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, syncStyles);
 
     it('creates all styles', async () => {
       mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
@@ -570,7 +565,6 @@ describe('useToken test', () => {
     });
 
     it('respects decision to only create text styles', async () => {
-
       const mockStore = createMockStore({
         settings: {
           stylesColor: false,
@@ -600,7 +594,7 @@ describe('useToken test', () => {
           value: '#ffffff',
           type: 'color',
           internal__Parent: 'global',
-          rawValue: '#ffffff'
+          rawValue: '#ffffff',
         },
         {
           name: 'headline',
@@ -608,7 +602,7 @@ describe('useToken test', () => {
           type: 'typography',
           internal__Parent: 'global',
           resolvedValueWithReferences: { fontFamily: 'Inter', fontWeight: 'Bold' },
-          rawValue: { fontFamily: 'Inter', fontWeight: 'Bold' }
+          rawValue: { fontFamily: 'Inter', fontWeight: 'Bold' },
         },
         {
           name: 'shadow',
@@ -616,21 +610,21 @@ describe('useToken test', () => {
           type: 'boxShadow',
           internal__Parent: 'global',
           rawValue: '{shadows.default}',
-          failedToResolve: true
+          failedToResolve: true,
         },
         {
           name: 'bg.default',
           value: '#ffffff',
           type: 'color',
           internal__Parent: 'light',
-          rawValue: '#ffffff'
-        }
+          rawValue: '#ffffff',
+        },
       ];
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
-        settings: store.getState().settings
+        settings: store.getState().settings,
       });
     });
 
@@ -760,7 +754,7 @@ describe('useToken test', () => {
       result = renderHook(() => useTokens(), {
         wrapper: ({ children }: { children?: React.ReactNode }) => (
           <Provider store={tokenMockStore}>
-            <TokensContext.Provider value={customTokens}>{children}</TokensContext.Provider>,
+            <TokensContext.Provider value={customTokens}>{children}</TokensContext.Provider>
           </Provider>
         ),
       }).result;

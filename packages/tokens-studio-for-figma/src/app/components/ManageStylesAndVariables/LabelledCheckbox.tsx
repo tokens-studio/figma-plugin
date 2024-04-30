@@ -9,7 +9,7 @@ export const LabelledCheckbox = ({
     {/* @ts-ignore next-line */}
     <Stack direction="row" gap={2} css={{ alignItems: 'center' }}>
       <Checkbox name={name} id={id} checked={checked} onCheckedChange={onChange} />
-      <Label css={{ fontWeight: '$sansRegular' }} htmlFor={id}>{label}</Label>
+      <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor={id}>{label}</Label>
     </Stack>
   </>
 
