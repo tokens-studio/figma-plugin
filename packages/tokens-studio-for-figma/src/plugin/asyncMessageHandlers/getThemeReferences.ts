@@ -6,7 +6,6 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
-  const localVariables = await figma.variables.getLocalVariablesAsync();
   const figmaStyleMaps = getAllFigmaStyleMaps();
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -45,6 +44,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   // We'll also add local variables to the references in case of where we work with local sets
+  const localVariables = await figma.variables.getLocalVariablesAsync();
+
   localVariables.forEach((variable) => {
     if (!figmaVariableReferences.has(variable.name)) {
       figmaVariableReferences.set(variable.name, variable.key);
