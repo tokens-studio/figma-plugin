@@ -10,7 +10,6 @@ import {
 } from '@/selectors';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
-import { ExportThemeRow } from './ExportThemeRow';
 import { docsLinks } from './docsLinks';
 import { LabelledCheckbox } from './LabelledCheckbox';
 
@@ -52,7 +51,8 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
 
   function createThemeRow(theme: ThemeObject) {
     return (
-      <ExportThemeRow
+      <Stack
+        gap={3}
         key={theme.id}
       >
         {/* eslint-disable-next-line react/jsx-no-bind */}
@@ -60,7 +60,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
         {/* TODO: Add theme details */}
         {/* <ThemeDetails /> */}
         {/* <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} /> */}
-      </ExportThemeRow>
+      </Stack>
     );
   }
 

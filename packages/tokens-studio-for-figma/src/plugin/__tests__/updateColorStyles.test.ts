@@ -112,4 +112,34 @@ describe('updateColorStyles', () => {
       },
     ]);
   });
+
+  it('renames if option is true and style is found', async () => {
+    const existingStyles = [
+      {
+        type: 'PAINT',
+        id: '1234',
+        name: 'colors/red',
+        paints: [{
+          type: 'SOLID',
+          color: { r: 1, g: 0.1, b: 0.1 },
+          opacity: 1,
+        }],
+      },
+    ];
+    mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
+
+    await updateColorStyles(
+      [{
+        name: 'colors.red',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        path: 'colors/redRENAMED',
+        styleId: '1234',
+      }],
+      true,
+      true,
+    );
+
+    expect(existingStyles[0].name).toEqual('colors/redRENAMED');
+  });
 });

@@ -56,8 +56,8 @@ export type UiSettingsFromPluginMessage = {
     ignoreFirstPartForStyles: boolean;
     createStylesWithVariableReferences: boolean;
     prefixStylesWithThemeName: boolean;
-    overwriteExistingStylesAndVariables: boolean;
-    scopeVariablesByTokenType: boolean;
+    renameExistingStylesAndVariables: boolean;
+    removeStylesAndVariablesWithoutConnection: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
     baseFontSize: string;
