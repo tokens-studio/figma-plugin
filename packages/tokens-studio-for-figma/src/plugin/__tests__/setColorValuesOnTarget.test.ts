@@ -147,4 +147,25 @@ describe('setColorValuesOnTarget', () => {
       color: { r: 1, g: 0, b: 0 },
     }]);
   });
+
+  test('setColorValuesOnTarget uses givenValue when provided', async () => {
+    const mockStyle = {
+      paints: [],
+      consumers: [],
+    } as unknown as PaintStyle;
+    const token = 'mock-token';
+    const key = 'paints';
+    const givenValue = '#00ff00'; // Mock a givenValue
+
+    await setColorValuesOnTarget({
+      target: mockStyle, token, key, givenValue,
+    });
+
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalledWith();
+    expect(mockStyle.paints).toEqual([{
+      type: 'SOLID',
+      opacity: 1,
+      color: { r: 0, g: 1, b: 0 },
+    }]);
+  });
 });
