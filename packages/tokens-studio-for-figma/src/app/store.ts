@@ -1,6 +1,7 @@
 import { init, RematchDispatch } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
 import { models } from './store/models';
+import { middlewares } from './store/middlewares';
 
 import type { UIState } from './store/models/uiState';
 import type { SettingsState } from './store/models/settings';
@@ -18,6 +19,7 @@ export const store = init({
     rootReducers: {
       RESET_APP: () => undefined,
     },
+    middlewares,
   },
 });
 

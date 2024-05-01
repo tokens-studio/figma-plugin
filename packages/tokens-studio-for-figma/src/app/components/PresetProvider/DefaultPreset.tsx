@@ -1,9 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Stack, Text } from '@tokens-studio/ui';
 import { Dispatch } from '@/app/store';
-import Stack from '../Stack';
-import Text from '../Text';
 import { track } from '@/utils/analytics';
 
 type Props = {
@@ -26,7 +24,7 @@ export default function DefaultPreset({ onCancel }: Props) {
         </Heading>
         <Text>The preset contains a wide variety of tokens and some token sets to give you an idea of what you can do. Warning: This will override your tokens!</Text>
       </Stack>
-      <Stack direction="row" gap={2} justify="end">
+      <Stack direction="row" gap={3} justify="end">
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

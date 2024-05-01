@@ -3,29 +3,20 @@ import { useSelector } from 'react-redux';
 import {
   Button, Heading, Tabs, Link, Box, Stack, Checkbox, Label,
 } from '@tokens-studio/ui';
-import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
 import { StyledCard } from './StyledCard';
 import {
   themesListSelector,
 } from '@/selectors';
-import { StyledProBadge } from '../ProBadge';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
-import { ExportThemeRow } from './ExportThemeRow';
 import { docsLinks } from './docsLinks';
 import { LabelledCheckbox } from './LabelledCheckbox';
 
-const ProButton = styled(Button, {
-  ':first-child': {
-    flexDirection: 'row-reverse',
-  },
-});
-
-export default function useExportThemesTab() {
+export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
-  const isPro = useIsProUser();
+  const isProUser = useIsProUser();
 
   const ThemeGroups = React.useMemo(() => {
     const uniqueGroups: string[] = themes.reduce((unique: string[], theme) => {
@@ -41,7 +32,6 @@ export default function useExportThemesTab() {
 
   // TODO: Remeber selected themes in document storage
   // Reloading the plugin shouldn't forget the selected themes
-  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
 
   const handleSelectTheme = React.useCallback((themeId: string) => {
     if (selectedThemes.includes(themeId)) {
@@ -49,7 +39,7 @@ export default function useExportThemesTab() {
     } else {
       setSelectedThemes([...selectedThemes, themeId]);
     }
-  }, [selectedThemes]);
+  }, [selectedThemes, setSelectedThemes]);
 
   const handleSelectAllThemes = React.useCallback(() => {
     if (selectedThemes.length === themes.length) {
@@ -57,20 +47,12 @@ export default function useExportThemesTab() {
     } else {
       setSelectedThemes(themes.map((theme) => theme.id));
     }
-  }, [themes, selectedThemes]);
-
-  const handleManageThemes = React.useCallback(() => {
-    /* TODO: Open the manage themes modal */
-    alert('MANAGE THEMES');
-  }, []);
-
-  const handleGetPro = React.useCallback(() => {
-    window.open('https://tokens.studio/#pricing-1', '_blank');
-  }, []);
+  }, [themes, selectedThemes, setSelectedThemes]);
 
   function createThemeRow(theme: ThemeObject) {
     return (
-      <ExportThemeRow
+      <Stack
+        gap={3}
         key={theme.id}
       >
         {/* eslint-disable-next-line react/jsx-no-bind */}
@@ -78,16 +60,16 @@ export default function useExportThemesTab() {
         {/* TODO: Add theme details */}
         {/* <ThemeDetails /> */}
         {/* <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} /> */}
-      </ExportThemeRow>
+      </Stack>
     );
   }
 
-  const ExportThemesTab = () => (
+  return (
     <Tabs.Content value="useThemes">
       {themes.length === 0 ? (
         <StyledCard>
           <Stack direction="column" align="start" gap={4}>
-            {isPro ? (
+            {isProUser ? (
               <>
                 <Heading size="medium">{t('exportThemesTab.headingPro')}</Heading>
                 <p>{t('exportThemesTab.introPro')}</p>
@@ -123,24 +105,6 @@ export default function useExportThemesTab() {
           <Stack direction="column" align="start" gap={4}>
             <Heading>{t('exportThemesTab.confirmThemes')}</Heading>
             <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
-            <Box css={{
-              alignSelf: 'flex-start',
-            }}
-            >
-              <ProButton
-                as="a"
-                icon={<StyledProBadge>{isPro ? 'PRO' : 'GET PRO'}</StyledProBadge>}
-                variant="secondary"
-                size="small"
-                css={{
-                  alignContent: 'center',
-                  gap: '$2',
-                }}
-                onClick={isPro ? handleManageThemes : handleGetPro}
-              >
-                {t('actions.manageThemes')}
-              </ProButton>
-            </Box>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
                 <Checkbox id="check-all-themes" checked={selectedThemes.length === themes.length} onCheckedChange={handleSelectAllThemes} />
@@ -165,8 +129,4 @@ export default function useExportThemesTab() {
       )}
     </Tabs.Content>
   );
-  return {
-    ExportThemesTab,
-    selectedThemes,
-  };
 }

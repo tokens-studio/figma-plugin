@@ -1,19 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton, Label } from '@tokens-studio/ui';
-import { SelectPoint3d as VariableIcon, SunLight } from 'iconoir-react';
-import { FileDirectoryIcon } from '@primer/octicons-react';
+import {
+  IconButton, Label, Stack, Switch, Box,
+} from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
-import Box from '../Box';
 import { ThemeObject } from '@/types';
-import Stack from '../Stack';
 import IconDiveInto from '@/icons/dive-into.svg';
-import { StyledThemeMetaLabel } from './StyledThemeMetaLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { Switch, SwitchThumb } from '../Switch';
 import { Dispatch } from '@/app/store';
 import { activeThemeSelector } from '@/selectors';
-import StyleIcon from '@/icons/style.svg';
 
 type Props = {
   theme: ThemeObject
@@ -26,11 +21,22 @@ const StyledCountLabel = styled('span', {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  minWidth: 'calc(4ch + $space$2 + $sizes$4)',
   gap: '$2',
   fontSize: '$xsmall',
-  fontVariantNumeric: 'tabular-nums',
   color: '$fgMuted',
+  '&:not(:last-of-type)::after': {
+    content: "'·'",
+    paddingRight: '$1',
+    marginRight: '$1',
+    color: '$fgSubtle',
+  },
+  variants: {
+    variant: {
+      danger: {
+        color: '$dangerFg',
+      },
+    },
+  },
 });
 
 export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
@@ -80,41 +86,35 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
       }}
     >
 
-      <Switch checked={isActive} onCheckedChange={handleToggle}>
-        <SwitchThumb />
-      </Switch>
+      <Switch checked={isActive} onCheckedChange={handleToggle} />
       <Label>
         {' '}
         {theme.name}
       </Label>
 
-      <StyledCountLabel>
-        {tokenSetCount > 0 && (
-        <>
-          {tokenSetCount}
-          {' '}
-          sets
-        </>
-        )}
-      </StyledCountLabel>
-      <StyledCountLabel>
+      <Stack>
+        {tokenSetCount > 0 ? (
+          <StyledCountLabel>
+            {tokenSetCount}
+            {' '}
+            {tokenSetCount === 1 ? 'set' : 'sets'}
+          </StyledCountLabel>
+        ) : <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>}
         {stylesCount > 0 && (
-        <>
-          {tokenSetCount}
+        <StyledCountLabel>
+          {stylesCount}
           {' '}
           {stylesCount === 1 ? 'style' : 'styles'}
-        </>
+        </StyledCountLabel>
         )}
-      </StyledCountLabel>
-      <StyledCountLabel>
         {variablesCount > 0 && (
-        <>
-          {tokenSetCount}
+        <StyledCountLabel>
+          {variablesCount}
           {' '}
-          variables
-        </>
+          {variablesCount === 1 ? 'variable' : 'variables'}
+        </StyledCountLabel>
         )}
-      </StyledCountLabel>
+      </Stack>
 
       <IconButton
         data-testid={`singlethemeentry-${theme.id}`}

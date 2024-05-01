@@ -20,13 +20,13 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
-import { useFlags } from './LaunchDarkly';
 import ProBadge from './ProBadge';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
 import { useChangedState } from '@/hooks/useChangedState';
+import { useIsProUser } from '../hooks/useIsProUser';
 
 const BranchSwitchMenuItemElement: React.FC<
 React.PropsWithChildren<
@@ -54,7 +54,7 @@ export default function BranchSelector() {
   const { confirm } = useConfirm();
   const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
-  const { gitBranchSelector } = useFlags();
+  const isProUser = useIsProUser();
   const { setStorageType } = useStorage();
 
   const branchState = useSelector(branchSelector);
@@ -171,11 +171,11 @@ export default function BranchSelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top" sideOffset={0}>
+          <DropdownMenu.Content side="top" sideOffset={0} className="content scroll-container" css={{ maxWidth: '70vw' }}>
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger
                 data-testid="branch-selector-create-new-branch-trigger"
-                disabled={!gitBranchSelector}
+                disabled={!isProUser}
               >
                 {t('createNewBranch')}
                 <DropdownMenu.TrailingVisual>
@@ -202,7 +202,7 @@ export default function BranchSelector() {
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
             <DropdownMenu.Separator />
-            {!gitBranchSelector && (
+            {!isProUser && (
               <>
                 <DropdownMenu.Item css={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>{t('upgradeToPro', { ns: 'licence' })}</span>
@@ -215,7 +215,7 @@ export default function BranchSelector() {
               {branchState.branches.length > 0
                 && branchState.branches.map((branch, index) => (
                   <BranchSwitchMenuRadioElement
-                    disabled={!gitBranchSelector}
+                    disabled={!isProUser}
                     key={`radio_${seed(index)}`}
                     branch={branch}
                     branchSelected={onBranchSelected}

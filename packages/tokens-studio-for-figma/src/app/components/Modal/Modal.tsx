@@ -27,7 +27,6 @@ export type ModalProps = {
 const StyledBody = styled('div', {
   position: 'relative',
   padding: '$4',
-  overflow: 'auto',
   variants: {
     full: {
       true: {
@@ -43,6 +42,9 @@ const StyledBody = styled('div', {
 });
 
 const StyledDialogContent = styled(Dialog.Content, {
+  '&:focus-visible': {
+    outline: 'none',
+  },
   variants: {
     size: {
       large: {
@@ -169,8 +171,9 @@ export function Modal({
               data-testid={id}
               css={{
                 scrollPaddingBlockEnd: footer ? '$4' : 0,
-                marginBottom: footer ? 'calc(var(--sizes-controlMedium) + var(--space-5))' : 0, // Size of the fixed footer incl default sized buttons
+                marginBottom: footer && size === 'fullscreen' ? 'calc(var(--sizes-controlMedium) + var(--space-6))' : 0, // Size of the fixed footer incl default sized buttons
               }}
+              className="content scroll-container"
             >
               {children}
             </StyledBody>

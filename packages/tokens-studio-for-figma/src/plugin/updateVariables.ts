@@ -5,8 +5,6 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
-import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
-import { ExportNumberVariablesTokenTypes, TokenTypes } from '@/constants/TokenTypes';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -19,26 +17,34 @@ export type CreateVariableTypes = {
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
-export default async function updateVariables({
+export default function updateVariables({
   collection, mode, theme, tokens, settings, filterByTokenSet,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable, filterByTokenSet);
+  const tokensToCreate = generateTokensToCreate(theme, tokens, filterByTokenSet);
+  const variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
-    if (checkIfTokenCanCreateVariable(token)) {
-      if (
-        (token.type === TokenTypes.COLOR && settings.variablesColor)
-        || (ExportNumberVariablesTokenTypes.includes(token.type) && settings.variablesNumber)
-        || (token.type === TokenTypes.TEXT && settings.variablesString)
-        || (token.type === TokenTypes.BOOLEAN && settings.variablesBoolean)
-      ) {
-        variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
-      }
+    if (checkIfTokenCanCreateVariable(token, settings)) {
+      variablesToCreate.push(mapTokensToVariableInfo(token, theme, settings));
     }
   });
-  const variableObj = await setValuesOnVariable(figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id), variablesToCreate, collection, mode);
+
+  const variableObj = setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.renameExistingStylesAndVariables);
+  const removedVariables: string[] = [];
+
+  // Remove variables not handled in the current theme
+  if (settings.removeStylesAndVariablesWithoutConnection) {
+    variablesInCollection
+      .filter((variable) => !Object.values(variableObj.variableKeyMap).includes(variable.key))
+      .forEach((variable) => {
+        removedVariables.push(variable.key);
+        variable.remove();
+      });
+  }
+
   return {
     variableIds: variableObj.variableKeyMap,
     referenceVariableCandidate: variableObj.referenceVariableCandidates,
+    removedVariables,
   };
 }

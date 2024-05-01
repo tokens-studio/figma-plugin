@@ -25,6 +25,7 @@ export const backgroundJobTitles = {
   [BackgroundJobs.UI_UNDOING]: 'Undoing action...',
   [BackgroundJobs.UI_ATTACHING_LOCAL_STYLES]: 'Attaching local styles to theme...',
   [BackgroundJobs.UI_CREATEVARIABLES]: 'Creating variables...',
+  [BackgroundJobs.UI_CREATE_STYLES]: 'Creating styles...',
 };
 
 export default function LoadingBar() {

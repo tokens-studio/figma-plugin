@@ -43,7 +43,6 @@ import { RenameTokensAcrossSetsPayload } from '@/types/payloads/RenameTokensAcro
 import { wrapTransaction } from '@/profiling/transaction';
 import addIdPropertyToTokens from '@/utils/addIdPropertyToTokens';
 import { TokenFormat, TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
-import { ColorModifier } from '@/types/Modifier';
 import { pushToTokensStudio } from '../providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
 import {
@@ -53,6 +52,7 @@ import {
   updateTokenSetInTokensStudio,
 } from '@/storage/tokensStudio';
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
+import { updateAliasesInState } from '../utils/updateAliasesInState';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -499,97 +499,7 @@ export const tokenState = createModel<RootModel>()({
       };
     },
     updateAliases: (state, data: TokenToRename) => {
-      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
-        (acc, [key, values]) => {
-          const newValues = values.map<SingleToken>((token) => {
-            if (Array.isArray(token.value)) {
-              return {
-                ...token,
-                value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                  return a;
-                }, {})),
-              } as SingleToken;
-            }
-            if (typeof token.value === 'object') {
-              return {
-                ...token,
-                value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
-                  a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                  return a;
-                }, {}),
-              } as SingleToken;
-            }
-
-            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens']?.modify && token.$extensions?.['studio.tokens'].modify.value) {
-              const updatedModify = Object.entries(token.$extensions?.['studio.tokens'].modify).reduce<ColorModifier>((modify, [key, value]: string[]) => {
-                modify = {
-                  ...modify,
-                  [key]: value.replace(data.oldName, data.newName),
-                };
-                return modify;
-              }, {} as ColorModifier);
-
-              return {
-                ...token,
-                $extensions: {
-                  ...token.$extensions,
-                  'studio.tokens': {
-                    ...token.$extensions['studio.tokens'],
-                    modify: {
-                      ...updatedModify,
-                    },
-                  },
-                },
-              } as SingleToken;
-            }
-
-            return {
-              ...token,
-              value: replaceReferences(token.value.toString(), data.oldName, data.newName),
-            } as SingleToken;
-          });
-
-          acc[key] = newValues;
-          return acc;
-        },
-        {},
-      );
-
-      return {
-        ...state,
-        tokens: newTokens,
-      };
-    },
-    updateOtherAliases: (state, data: string[]) => {
-      const [oldName, newName] = data;
-      const newTokens = Object.entries(state.tokens).reduce<TokenState['tokens']>(
-        (acc, [key, values]) => {
-          const newValues = values.map<SingleToken>((token) => {
-            if (token.$extensions?.['studio.tokens'] && token.$extensions?.['studio.tokens'].modify && token.$extensions?.['studio.tokens'].modify.value.includes(oldName)) {
-              return {
-                ...token,
-                $extensions: {
-                  ...token.$extensions,
-                  'studio.tokens': {
-                    ...token.$extensions['studio.tokens'],
-                    modify: {
-                      ...token.$extensions['studio.tokens'].modify,
-                      value: token.$extensions['studio.tokens'].modify.value.replace(oldName, newName),
-                    },
-                  },
-                },
-              } as SingleToken;
-            }
-
-            return token;
-          });
-
-          acc[key] = newValues;
-          return acc;
-        },
-        {},
-      );
+      const newTokens = updateAliasesInState(state.tokens, data);
 
       return {
         ...state,
@@ -858,6 +768,6 @@ export const tokenState = createModel<RootModel>()({
       (Object.entries(tokenStateEffects).map(([key, factory]) => (
         [key, factory(dispatch)]
       ))),
-),
+    ),
   }),
 });

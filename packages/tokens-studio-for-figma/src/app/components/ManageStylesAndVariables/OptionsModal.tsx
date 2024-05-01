@@ -1,23 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack, Label, Box, Heading, Link, Button, Switch, Text,
+  Stack, Label, Box, Link, Button, Switch, Text,
 } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import {
-  ChevronLeftIcon, SlidersIcon,
+  ChevronLeftIcon,
 } from '@primer/octicons-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { styled } from '@stitches/react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
 import {
   ignoreFirstPartForStylesSelector,
-  overwriteExistingStylesAndVariablesSelector,
-  scopeVariablesByTokenTypeSelector,
   prefixStylesWithThemeNameSelector,
   createStylesWithVariableReferencesSelector,
+  removeStylesAndVariablesWithoutConnectionSelector,
+  renameExistingStylesAndVariablesSelector,
   variablesColorSelector,
   variablesNumberSelector,
   variablesBooleanSelector,
@@ -34,48 +34,21 @@ const StyledCheckboxGrid = styled(Box, {
   display: 'grid', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center',
 });
 
-type ExportOptions = {
-  variablesColor: boolean,
-  variablesString: boolean,
-  variablesNumber: boolean,
-  variablesBoolean: boolean,
-  stylesColor: boolean,
-  stylesTypography: boolean,
-  stylesEffect: boolean,
-  rulesOverwriteExistingStylesAndVariables: boolean | undefined,
-  rulesScopeVariablesByTokenType: boolean | undefined,
-  rulesIgnoreFirstPartForStyles: boolean | undefined,
-  rulesPrefixStylesWithThemeName: boolean | undefined,
-};
-
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
-  const rulesOverwriteExistingStylesAndVariables = useSelector(overwriteExistingStylesAndVariablesSelector);
-  const rulesScopeVariablesByTokenType = useSelector(scopeVariablesByTokenTypeSelector);
+  const rulesRemoveStylesAndVariablesWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
+  const rulesRenameExisting = useSelector(renameExistingStylesAndVariablesSelector);
+
   const rulesIgnoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
   const rulesPrefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const rulesCreateStylesWithVariableReferences = useSelector(createStylesWithVariableReferencesSelector);
 
-  const [variablesColor, setVariablesColor] = React.useState<boolean>(useSelector(variablesColorSelector));
-  const [variablesNumber, setvariablesNumber] = React.useState<boolean>(useSelector(variablesNumberSelector));
-  const [variablesString, setvariablesString] = React.useState<boolean>(useSelector(variablesStringSelector));
-  const [variablesBoolean, setvariablesBoolean] = React.useState<boolean>(useSelector(variablesBooleanSelector));
-  const [stylesEffect, setstylesEffect] = React.useState<boolean>(useSelector(stylesEffectSelector));
-  const [stylesTypography, setstylesTypography] = React.useState<boolean>(useSelector(stylesTypographySelector));
-  const [stylesColor, setstylesColor] = React.useState<boolean>(useSelector(stylesColorSelector));
-
-  const exportOptions: ExportOptions = {
-    variablesColor,
-    variablesString,
-    variablesNumber,
-    variablesBoolean,
-    stylesColor,
-    stylesTypography,
-    stylesEffect,
-    rulesOverwriteExistingStylesAndVariables,
-    rulesScopeVariablesByTokenType,
-    rulesIgnoreFirstPartForStyles,
-    rulesPrefixStylesWithThemeName,
-  };
+  const variablesColor = useSelector(variablesColorSelector);
+  const variablesNumber = useSelector(variablesNumberSelector);
+  const variablesBoolean = useSelector(variablesBooleanSelector);
+  const variablesString = useSelector(variablesStringSelector);
+  const stylesColor = useSelector(stylesColorSelector);
+  const stylesTypography = useSelector(stylesTypographySelector);
+  const stylesEffect = useSelector(stylesEffectSelector);
 
   const dispatch = useDispatch<Dispatch>();
 
@@ -100,74 +73,71 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
     [dispatch.settings],
   );
 
-  const handleScopeChange = React.useCallback(
+  const handleRenameExistingChange = React.useCallback(
     (state: CheckedState) => {
-      dispatch.settings.setScopeVariablesByTokenType(!!state);
+      dispatch.settings.setRenameExistingStylesAndVariables(!!state);
     },
     [dispatch.settings],
   );
 
-  const handleOverwriteChange = React.useCallback(
+  const handleRemoveStylesAndVariablesWithoutConnectionChange = React.useCallback(
     (state: CheckedState) => {
-      dispatch.settings.setOverwriteExistingStylesAndVariables(!!state);
+      dispatch.settings.setRemoveStylesAndVariablesWithoutConnection(!!state);
     },
     [dispatch.settings],
   );
 
   const handleExportVariablesColor = React.useCallback(
     (state: CheckedState) => {
-      setVariablesColor(!!state);
+      dispatch.settings.setVariablesColor(!!state);
+      // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
+      if (state) dispatch.settings.setStylesColor(!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
-      setvariablesNumber(!!state);
+      dispatch.settings.setVariablesNumber(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesBoolean = React.useCallback(
     (state: CheckedState) => {
-      setvariablesBoolean(!!state);
+      dispatch.settings.setVariablesBoolean(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
-      setvariablesString(!!state);
+      dispatch.settings.setVariablesString(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
-      setstylesColor(!!state);
+      dispatch.settings.setStylesColor(!!state);
+      // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
+      if (state) dispatch.settings.setVariablesColor(!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesTypography = React.useCallback(
     (state: CheckedState) => {
-      setstylesTypography(!!state);
+      dispatch.settings.setStylesTypography(!!state);
     },
-    [],
+    [dispatch.settings],
   );
   const handleExportStylesEffect = React.useCallback(
     (state: CheckedState) => {
-      setstylesEffect(!!state);
+      dispatch.settings.setStylesEffect(!!state);
     },
-    [],
+    [dispatch.settings],
   );
 
   const handleSaveOptions = React.useCallback(() => {
-    dispatch.settings.setVariablesColor(variablesColor);
-    dispatch.settings.setVariablesNumber(variablesNumber);
-    dispatch.settings.setVariablesString(variablesString);
-    dispatch.settings.setVariablesBoolean(variablesBoolean);
-    dispatch.settings.setStylesEffect(stylesEffect);
-    dispatch.settings.setStylesTypography(stylesTypography);
-    dispatch.settings.setStylesColor(stylesColor);
     closeAction();
-  }, [closeAction, dispatch.settings, variablesColor, variablesNumber, variablesString, variablesBoolean, stylesEffect, stylesTypography, stylesColor]);
+  }, [closeAction]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();
@@ -185,7 +155,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       /* eslint-disable-next-line react/jsx-no-bind */
       onInteractOutside={(event) => onInteractOutside(event)}
       footer={(
-        <Stack direction="row" justify="between">
+        <Stack direction="row" justify="between" gap={4}>
           <Button variant="invisible" id="manageStyles-button-close" onClick={closeAction} icon={<ChevronLeftIcon />}>
             {t('actions.cancel')}
           </Button>
@@ -198,71 +168,37 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
 )}
       stickyFooter
     >
-      <Stack direction="column" align="start" gap={6} css={{ overflowY: 'scroll' }}>
-        <Stack direction="column" align="start" gap={4}>
-          <Stack direction="row" align="center" gap={2}>
-            <SlidersIcon />
-            <Heading size="medium">{t('options.title')}</Heading>
-          </Stack>
+      <Stack direction="column" align="start" gap={4}>
+        <Stack direction="column" align="start" gap={3}>
+          <Text>{t('options.intro')}</Text>
           <Link target="_blank" href="https://docs.tokens.studio/">{`${t('generic.learnMore')} – ${t('docs.exportToFigmaOptions')}`}</Link>
         </Stack>
         <form>
-          <Stack direction="column" justify="between" gap={5} align="start" css={{ width: '100%' }}>
+          <Stack direction="column" gap={6}>
+            <Box>
+              <Text bold css={{ fontSize: '$medium', marginBottom: '$2' }}>{t('options.createAndUpdate')}</Text>
+              <Box css={{
+                width: '100%', display: 'grid', gridTemplateColumns: '1fr 1px 1fr', columnGap: '$5',
+              }}
+              >
+                <Stack direction="column" gap={3}>
+                  <Text css={{ fontWeight: '$sansMedium' }}>{t('generic.variables')}</Text>
+                  <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={!!variablesColor} label={t('variables.color')} />
+                  <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={!!variablesString} label={t('variables.string')} />
+                  <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={!!variablesNumber} label={t('variables.number')} />
+                  <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={!!variablesBoolean} label={t('variables.boolean')} />
+                </Stack>
+                <Box css={{ alignSelf: 'stretch', width: '1px', border: '1px solid $colors$borderSubtle' }} />
+                <Stack direction="column" gap={3}>
+                  <Text css={{ fontWeight: '$sansMedium' }}>{t('generic.styles')}</Text>
+                  <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={!!stylesColor} label={t('styles.color')} />
+                  <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={!!stylesTypography} label={t('styles.typography')} />
+                  <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={!!stylesEffect} label={t('styles.effects')} />
+                </Stack>
+              </Box>
+            </Box>
             <StyledCheckboxGrid>
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichVariablesShouldBeCreatedAndUpdated')}</Text>
-              <LabelledCheckbox id="variablesColor" onChange={handleExportVariablesColor} checked={exportOptions.variablesColor} label={t('variables.color')} />
-              <LabelledCheckbox id="variablesString" onChange={handleExportVariablesString} checked={exportOptions.variablesString} label={t('variables.string')} />
-              <LabelledCheckbox id="variablesNumber" onChange={handleExportVariablesNumber} checked={exportOptions.variablesNumber} label={t('variables.number')} />
-              <LabelledCheckbox id="variablesBoolean" onChange={handleExportVariablesBoolean} checked={exportOptions.variablesBoolean} label={t('variables.boolean')} />
-            </StyledCheckboxGrid>
-            <StyledCheckboxGrid>
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 3 }}>{t('options.whichStylesShouldBeCreatedAndUpdated')}</Text>
-              <LabelledCheckbox id="styleColor" onChange={handleExportStylesColor} checked={exportOptions.stylesColor} label={t('styles.color')} />
-              <LabelledCheckbox id="stylesTypography" onChange={handleExportStylesTypography} checked={exportOptions.stylesTypography} label={t('styles.typography')} />
-              <LabelledCheckbox id="stylesEffect" onChange={handleExportStylesEffect} checked={exportOptions.stylesEffect} label={t('styles.effects')} />
-            </StyledCheckboxGrid>
-            <Box css={{
-              display: 'grid',
-              alignItems: 'center',
-              gridAutoRows: 'auto',
-              gridTemplateColumns: 'min-content max-content min-content',
-              width: '100%',
-              gridColumnGap: '$4',
-              gridRowGap: '$5',
-            }}
-            >
-              <Text css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
-
-              <Switch
-                data-testid="overwriteExistingStylesAndVariables"
-                id="overwriteExistingStylesAndVariables"
-                checked={!!rulesOverwriteExistingStylesAndVariables}
-                defaultChecked={rulesOverwriteExistingStylesAndVariables}
-                onCheckedChange={handleOverwriteChange}
-              />
-              <Label htmlFor="overwriteExistingStylesAndVariables">{t('options.overwriteExistingStylesAndVariables')}</Label>
-              <ExplainerModal title={t('options.overwriteExistingStylesAndVariables')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.overwriteExistingStylesAndVariablesExplanation')}
-                </Box>
-              </ExplainerModal>
-
-              <Switch
-                data-testid="scopeVariablesByTokenType"
-                id="scopeVariablesByTokenType"
-                checked={!!rulesScopeVariablesByTokenType}
-                defaultChecked={rulesScopeVariablesByTokenType}
-                onCheckedChange={handleScopeChange}
-              />
-              <Label htmlFor="scopeVariablesByTokenType">{t('options.scopeVariablesByTokenType')}</Label>
-              <ExplainerModal title={t('options.scopeVariablesByTokenType')}>
-                <Box as="img" src="" css={{ borderRadius: '$small' }} />
-                <Box>
-                  {t('options.scopeVariablesByTokenTypeExplanation')}
-                </Box>
-              </ExplainerModal>
-
+              <Text bold css={{ fontSize: '$medium', gridColumnStart: 1, gridColumnEnd: 4 }}>{t('options.tokensExportedToFigmaShould')}</Text>
               <Switch
                 data-testid="ignoreFirstPartForStyles"
                 id="ignoreFirstPartForStyles"
@@ -270,7 +206,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 defaultChecked={rulesIgnoreFirstPartForStyles}
                 onCheckedChange={handleIgnoreChange}
               />
-              <Label htmlFor="ignoreFirstPartForStyles">{t('options.ignorePrefix')}</Label>
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="ignoreFirstPartForStyles">{t('options.ignorePrefix')}</Label>
               <ExplainerModal title={t('options.ignorePrefix')}>
                 <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
                 <Box>{t('options.ignorePrefixExplanation')}</Box>
@@ -283,7 +219,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 defaultChecked={rulesPrefixStylesWithThemeName}
                 onCheckedChange={handlePrefixWithThemeNameChange}
               />
-              <Label htmlFor="prefixStylesWithThemeName">{t('options.prefixStyles')}</Label>
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="prefixStylesWithThemeName">{t('options.prefixStyles')}</Label>
               <ExplainerModal title={t('options.prefixStyles')}>
                 <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
                 <Box>{t('options.prefixStylesExplanation')}</Box>
@@ -296,11 +232,33 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
                 defaultChecked={rulesCreateStylesWithVariableReferences}
                 onCheckedChange={handleCreateStylesWithVariableReferencesChange}
               />
-              <Label htmlFor="createStylesWithVariableReferences">{t('options.createStylesWithVariableReferences')}</Label>
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="createStylesWithVariableReferences">{t('options.createStylesWithVariableReferences')}</Label>
               <ExplainerModal title={t('options.createStylesWithVariableReferences')}>
                 <Box>{t('options.createStylesWithVariableReferencesExplanation')}</Box>
               </ExplainerModal>
-            </Box>
+              <Switch
+                data-testid="renameExisting"
+                id="renameExisting"
+                checked={!!rulesRenameExisting}
+                defaultChecked={rulesRenameExisting}
+                onCheckedChange={handleRenameExistingChange}
+              />
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="renameExisting">{t('options.renameExisting')}</Label>
+              <ExplainerModal title={t('options.renameExisting')}>
+                <Box>{t('options.renameExistingExplanation')}</Box>
+              </ExplainerModal>
+              <Switch
+                data-testid="removeWithoutConnection"
+                id="removeWithoutConnection"
+                checked={!!rulesRemoveStylesAndVariablesWithoutConnection}
+                defaultChecked={rulesRemoveStylesAndVariablesWithoutConnection}
+                onCheckedChange={handleRemoveStylesAndVariablesWithoutConnectionChange}
+              />
+              <Label css={{ fontWeight: '$sansRegular', fontSize: '$xsmall' }} htmlFor="removeWithoutConnection">{t('options.removeWithoutConnection')}</Label>
+              <ExplainerModal title={t('options.removeWithoutConnection')}>
+                <Box>{t('options.removeWithoutConnectionExplanation')}</Box>
+              </ExplainerModal>
+            </StyledCheckboxGrid>
           </Stack>
         </form>
       </Stack>

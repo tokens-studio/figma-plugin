@@ -2,6 +2,7 @@ import {
   StorageProviderType
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
+import MockEnv from '../support/mockEnv';
 
 
 describe('Inspector tokens', () => {
@@ -14,7 +15,7 @@ describe('Inspector tokens', () => {
       syncProviders: true,
     },
     localApiProviders: [],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -52,6 +53,7 @@ describe('Inspector tokens', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('successfully shows tokens applied on the node', () => {

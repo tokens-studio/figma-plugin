@@ -15,7 +15,7 @@ import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
 import type { ThemeObject } from './ThemeObject';
 import { DeleteTokenPayload } from './payloads';
-import { SyncOption, SyncVariableOption, TokensToRenamePayload } from '@/app/store/useTokens';
+import { TokensToRenamePayload } from '@/app/store/useTokens';
 import { AuthData } from './Auth';
 import { LocalVariableInfo } from '@/plugin/createLocalVariablesInPlugin';
 import { ResolvedVariableInfo } from '@/plugin/asyncMessageHandlers';
@@ -29,10 +29,10 @@ export enum AsyncMessageTypes {
   CREATE_STYLES = 'async/create-styles',
   RENAME_STYLES = 'async/rename-styles',
   REMOVE_STYLES = 'async/remove-styles',
-  SYNC_STYLES = 'async/sync-styles',
   CREDENTIALS = 'async/credentials',
   CHANGED_TABS = 'async/changed-tabs',
   SET_ONBOARDINGEXPLAINERSETS = 'async/set-onboardingExplainerSets',
+  SET_ONBOARDINGEXPLAINEREXPORTSETS = 'async/set-onboardingExplainerExportSets',
   SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
   SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
@@ -68,7 +68,6 @@ export enum AsyncMessageTypes {
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
-  SYNC_VARIABLES = 'async/sync-variables',
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
 }
@@ -85,6 +84,9 @@ export type ChangedTabsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHANG
 
 export type SetOnboardingExplainerSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS, { onboardingExplainerSets: boolean; }>;
 export type SetOnboardingExplainerSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS>;
+
+export type SetOnboardingExplainerExportSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS, { onboardingExplainerExportSets: boolean; }>;
+export type SetOnboardingExplainerExportSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS>;
 
 export type SetOnboardingExplainerSyncProvidersAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS, { onboardingExplainerSyncProviders: boolean; }>;
 export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS>;
@@ -197,15 +199,6 @@ export type RemoveStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMO
   styleIds: string[];
 }>;
 
-export type SyncStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
-  tokens: Record<string, AnyTokenList>;
-  options: Record<SyncOption, boolean>;
-  settings: SettingsState;
-}>;
-export type SyncStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_STYLES, {
-  styleIdsToRemove: string[];
-}>;
-
 export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
   tokens: AnyTokenList | null;
@@ -220,7 +213,6 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenFormat: TokenFormatOptions;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
-  styleIds: Record<string, string>;
   nodes: number
 }>;
 
@@ -329,13 +321,6 @@ export type UpdateVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_
 }>;
 export type UpdateVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_VARIABLES>;
 
-export type SyncVariableAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES, {
-  tokens: Record<string, AnyTokenList>;
-  options: Record<SyncVariableOption, boolean>;
-  settings: SettingsState;
-}>;
-export type SyncVariableAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_VARIABLES>;
-
 export type RemoveRelaunchDataMessage = AsyncMessage<
 AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 {
@@ -354,12 +339,12 @@ export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
   | RemoveStylesAsyncMessage
-  | SyncStylesAsyncMessage
   | CredentialsAsyncMessage
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
   | SetOnboardingExplainerSetsAsyncMessage
+  | SetOnboardingExplainerExportSetsAsyncMessage
   | SetOnboardingExplainerInspectAsyncMessage
   | SetOnboardingExplainerSyncProvidersAsyncMessage
   | SetNodeDataAsyncMessage
@@ -392,7 +377,6 @@ export type AsyncMessages =
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
-  | SyncVariableAsyncMessage
   | UpdateVariablesAsyncMessage
   | RemoveRelaunchDataMessage;
 
@@ -400,12 +384,12 @@ export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | RenameStylesAsyncMessageResult
   | RemoveStylesAsyncMessageResult
-  | SyncStylesAsyncMessageResult
   | CredentialsAsyncMessageResult
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
   | SetOnboardingExplainerSetsAsyncMessageResult
+  | SetOnboardingExplainerExportSetsAsyncMessageResult
   | SetOnboardingExplainerSyncProvidersAsyncMessageResult
   | SetOnboardingExplainerInspectAsyncMessageResult
   | SetNodeDataAsyncMessageResult
@@ -438,7 +422,6 @@ export type AsyncMessageResults =
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
-  | SyncVariableAsyncMessageResult
   | UpdateVariablesAsyncMessageResult
   | RemoveRelaunchDataMessageResult;
 

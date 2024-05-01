@@ -25,7 +25,6 @@ export interface SettingsState {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
-  updateStyles?: boolean;
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -49,8 +48,8 @@ export interface SettingsState {
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   createStylesWithVariableReferences?: boolean;
-  scopeVariablesByTokenType?: boolean;
-  overwriteExistingStylesAndVariables?: boolean;
+  renameExistingStylesAndVariables?: boolean;
+  removeStylesAndVariablesWithoutConnection?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -72,10 +71,11 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
-    updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
+    renameExistingStylesAndVariables: false,
+    removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
     inspectDeep: false,
     shouldSwapStyles: false,
@@ -184,12 +184,6 @@ export const settings = createModel<RootModel>()({
         updateOnChange: payload,
       };
     },
-    setUpdateStyles(state, payload: boolean) {
-      return {
-        ...state,
-        updateStyles: payload,
-      };
-    },
     setShouldSwapStyles(state, payload: boolean) {
       return {
         ...state,
@@ -202,76 +196,10 @@ export const settings = createModel<RootModel>()({
         tokenType: payload,
       };
     },
-    setIgnoreFirstPartForStyles(state, payload: boolean) {
-      return {
-        ...state,
-        ignoreFirstPartForStyles: payload,
-      };
-    },
-    setOverwriteExistingStylesAndVariables(state, payload: boolean) {
-      return {
-        ...state,
-        overwriteExistingStylesAndVariables: payload,
-      };
-    },
-    setScopeVariablesByTokenType(state, payload: boolean) {
-      return {
-        ...state,
-        scopeVariablesByTokenType: payload,
-      };
-    },
-    setCreateStylesWithVariableReferences(state, payload: boolean) {
-      return {
-        ...state,
-        createStylesWithVariableReferences: payload,
-      };
-    },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
       return {
         ...state,
         storeTokenIdInJsonEditor: payload,
-      };
-    },
-    setVariablesColor(state, payload: boolean) {
-      return {
-        ...state,
-        variablesColor: payload,
-      };
-    },
-    setVariablesString(state, payload: boolean) {
-      return {
-        ...state,
-        variablesString: payload,
-      };
-    },
-    setVariablesNumber(state, payload: boolean) {
-      return {
-        ...state,
-        variablesNumber: payload,
-      };
-    },
-    setVariablesBoolean(state, payload: boolean) {
-      return {
-        ...state,
-        variablesBoolean: payload,
-      };
-    },
-    setStylesColor(state, payload: boolean) {
-      return {
-        ...state,
-        stylesColor: payload,
-      };
-    },
-    setStylesTypography(state, payload: boolean) {
-      return {
-        ...state,
-        stylesTypography: payload,
-      };
-    },
-    setStylesEffect(state, payload: boolean) {
-      return {
-        ...state,
-        stylesEffect: payload,
       };
     },
   },
@@ -294,9 +222,6 @@ export const settings = createModel<RootModel>()({
         height: payload.isMinimized ? 50 : payload.height,
       });
     },
-    setUpdateStyles: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
     setShouldSwapStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
@@ -307,9 +232,6 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUpdateOnChange: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
-    setIgnoreFirstPartForStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setInspectDeep: (payload, rootState) => {
@@ -326,9 +248,6 @@ export const settings = createModel<RootModel>()({
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
-    setCreateStylesWithVariableReferences: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {

@@ -15,11 +15,11 @@ export default function SettingsDropdown() {
   const { t } = useTranslation(['tokens']);
 
   const {
-    updateRemote, updateOnChange, updateStyles, shouldSwapStyles,
+    updateRemote, updateOnChange, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setUpdateStyles, setShouldSwapStyles,
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -29,10 +29,6 @@ export default function SettingsDropdown() {
   const handleUpdateRemote = React.useCallback(() => {
     setUpdateRemote(!updateRemote);
   }, [updateRemote, setUpdateRemote]);
-
-  const handleUpdateStyles = React.useCallback(() => {
-    setUpdateStyles(!updateStyles);
-  }, [updateStyles, setUpdateStyles]);
 
   const handleShouldSwapStyles = React.useCallback(() => {
     setShouldSwapStyles(!shouldSwapStyles);
@@ -44,62 +40,51 @@ export default function SettingsDropdown() {
         <IconButton variant="invisible" size="small" icon={<GearIcon />} />
       </DropdownMenu.Trigger>
 
-      <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>
-        <DropdownMenu.CheckboxItem
-          data-testid="update-on-change"
-          checked={updateOnChange}
-          onCheckedChange={handleUpdateOnChange}
-        >
-          <DropdownMenu.ItemIndicator>
-            <CheckIcon />
-          </DropdownMenu.ItemIndicator>
-          {t('update.onChange.title')}
-          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-            {t('update.onChange.description')}
-          </Box>
-        </DropdownMenu.CheckboxItem>
-        {localApiState?.provider === StorageProviderType.JSONBIN ? (
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>
           <DropdownMenu.CheckboxItem
-            data-testid="update-remote"
-            checked={updateRemote}
-            onCheckedChange={handleUpdateRemote}
+            data-testid="update-on-change"
+            checked={updateOnChange}
+            onCheckedChange={handleUpdateOnChange}
           >
             <DropdownMenu.ItemIndicator>
               <CheckIcon />
             </DropdownMenu.ItemIndicator>
-            {t('update.remoteJSONBin.title')}
+            {t('update.onChange.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.remoteJSONBin.description')}
+              {t('update.onChange.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
-        ) : null}
-        <DropdownMenu.CheckboxItem
-          data-testid="update-styles"
-          checked={updateStyles}
-          onCheckedChange={handleUpdateStyles}
-        >
-          <DropdownMenu.ItemIndicator>
-            <CheckIcon />
-          </DropdownMenu.ItemIndicator>
-          {t('update.styles.title')}
-          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-            {t('update.styles.description')}
-          </Box>
-        </DropdownMenu.CheckboxItem>
-        <DropdownMenu.CheckboxItem
-          data-testid="swap-styles"
-          checked={shouldSwapStyles}
-          onCheckedChange={handleShouldSwapStyles}
-        >
-          <DropdownMenu.ItemIndicator>
-            <CheckIcon />
-          </DropdownMenu.ItemIndicator>
-          {t('update.swapStyles.title')}
-          <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-            {t('update.swapStyles.description')}
-          </Box>
-        </DropdownMenu.CheckboxItem>
-      </DropdownMenu.Content>
+          {localApiState?.provider === StorageProviderType.JSONBIN ? (
+            <DropdownMenu.CheckboxItem
+              data-testid="update-remote"
+              checked={updateRemote}
+              onCheckedChange={handleUpdateRemote}
+            >
+              <DropdownMenu.ItemIndicator>
+                <CheckIcon />
+              </DropdownMenu.ItemIndicator>
+              {t('update.remoteJSONBin.title')}
+              <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+                {t('update.remoteJSONBin.description')}
+              </Box>
+            </DropdownMenu.CheckboxItem>
+          ) : null}
+          <DropdownMenu.CheckboxItem
+            data-testid="swap-styles"
+            checked={shouldSwapStyles}
+            onCheckedChange={handleShouldSwapStyles}
+          >
+            <DropdownMenu.ItemIndicator>
+              <CheckIcon />
+            </DropdownMenu.ItemIndicator>
+            {t('update.swapStyles.title')}
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.swapStyles.description')}
+            </Box>
+          </DropdownMenu.CheckboxItem>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
     </DropdownMenu>
   );
 }

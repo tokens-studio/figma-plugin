@@ -4,9 +4,6 @@ import {
   CreateTokenMutation,
   UpdateTokenMutation,
   DeleteTokenMutation,
-  RawToken,
-  Raw_Token_border,
-  Raw_Token_boxShadow,
   CreateTokenSetMutation,
   UpdateTokenSetMutation,
   DeleteTokenSetMutation,
@@ -14,10 +11,13 @@ import {
   UpdateTokenSetOrderMutation,
   ThemeGroup,
   TokenSet,
+  UpdateThemeGroupMutation,
+  CreateThemeGroupMutation,
+  DeleteThemeGroupMutation,
+  TokenInput,
 } from '@tokens-studio/sdk';
-import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   RemoteTokenStorage,
@@ -37,62 +37,18 @@ import {
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_ORDER_MUTATION,
+  UPDATE_THEME_GROUP_MUTATION,
+  CREATE_THEME_GROUP_MUTATION,
+  DELETE_THEME_GROUP_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { tokensStudioToToken } from './tokensStudio/utils';
+import { fetchDynamicTokenSetData } from './tokensStudio/dynamicSets';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
-};
-
-interface Token {
-  description?: string | null | undefined;
-  type: string | null | undefined;
-  value: any;
-  $extensions?: SingleToken['$extensions'];
-}
-
-const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([key, v]) => v !== null));
-
-// We need to convert the raw token data from the GraphQL API into a format that the plugin will understand,
-// as there's some differences between the two. Ideally, we could just pass in a "request format"
-// into the query, but that's not possible so far.
-const tsToToken = (raw: RawToken) => {
-  const combined: Token = {
-    type: raw.type,
-    value: null,
-    $extensions: {
-      'studio.tokens': {
-        urn: raw.urn!,
-      },
-    },
-  };
-
-  if (raw.description) {
-    combined.description = raw.description;
-  }
-
-  if (raw.extensions) {
-    combined.$extensions = deepmerge(JSON.parse(raw.extensions), combined.$extensions);
-  }
-
-  // @ts-ignore
-  if (raw.value.typography) {
-    // @ts-ignore typography exists for typography tokens
-    combined.value = removeNulls((raw as RawToken).value!.typography!);
-    // @ts-ignore
-  } else if (raw.value.border) {
-    // @ts-ignore border exists for border tokens
-    combined.value = removeNulls((raw as unknown as Raw_Token_border).value!.border!);
-    // @ts-ignore
-  } else if (raw.value.boxShadow) {
-    // @ts-ignore
-    combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
-  } else {
-    combined.value = raw.value!.value;
-  }
-
-  return combined;
 };
 
 type ProjectData = {
@@ -117,14 +73,39 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
       return null;
     }
 
-    const tokenSets = data.data.project.sets as TokenSet[];
+    let tokenSets = data.data.project.sets as TokenSet[];
+
+    const dynamicTokenSets = tokenSets.filter((tokenSet) => tokenSet.type === 'DYNAMIC');
+    const dynamicTokenSetData = await Promise.all(
+      dynamicTokenSets.map(async (tokenSet) => {
+        if (!tokenSet.generatorUrn) {
+          return null;
+        }
+        const tokens = await fetchDynamicTokenSetData(tokenSet.generatorUrn);
+        return { ...tokenSet, tokens };
+      }),
+    );
+
+    if (dynamicTokenSetData.length) {
+      tokenSets = tokenSets.map((tokenSet) => {
+        if (tokenSet.type !== 'DYNAMIC') {
+          return tokenSet;
+        }
+
+        const dynamicSetData = dynamicTokenSetData.find((dynamicSet) => dynamicSet?.urn === tokenSet.urn);
+        if (dynamicSetData?.tokens) {
+          return { ...tokenSet, tokens: dynamicSetData.tokens };
+        }
+        return tokenSet;
+      });
+    }
 
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
         acc.tokens[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
           // We know that name exists (required field)
-          tokenSetAcc[token.name!] = tsToToken(token);
+          tokenSetAcc[token.name!] = tokensStudioToToken(token);
           return tokenSetAcc;
         }, {});
 
@@ -146,7 +127,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
     const themeGroups = data.data.project.themeGroups as ThemeGroup[];
 
     if (themeGroups) {
-      themeGroups.forEach(({ name: group, options }) => {
+      themeGroups.forEach(({ name: group, urn: groupUrn, options }) => {
         if (!options) {
           return;
         }
@@ -160,6 +141,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
               id: theme?.urn as string,
               name: theme?.name as string,
               group,
+              groupId: groupUrn,
               selectedTokenSets,
               $figmaStyleReferences: JSON.parse(JSON.parse(theme?.figmaStyleReferences || '{}')),
               $figmaVariableReferences: JSON.parse(JSON.parse(theme?.figmaVariableReferences || '{}')),
@@ -277,16 +259,29 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             throw new Error('Invalid data');
           }
 
+          const input: TokenInput = {
+            name: data.name,
+            type: data.type,
+            description: data.description,
+            extensions: JSON.stringify(data.$extensions),
+          };
+
+          if (data.type === TokenTypes.BOX_SHADOW) {
+            input.boxShadow = data.value;
+          } else if (data.type === TokenTypes.BORDER) {
+            input.border = data.value;
+          } else if (data.type === TokenTypes.TYPOGRAPHY) {
+            input.typography = data.value;
+          } else if (data.type === TokenTypes.COMPOSITION) {
+            input.value = JSON.stringify(data.value);
+          } else {
+            input.value = data.value;
+          }
+
           const responseData = await Graphql.exec<CreateTokenMutation>(
             Graphql.op(CREATE_TOKEN_MUTATION, {
               set: setId,
-              input: {
-                name: data.name,
-                type: data.type,
-                description: data.description,
-                value: data.value,
-                extensions: JSON.stringify(data.$extensions),
-              },
+              input,
             }),
           );
 
@@ -471,6 +466,78 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         } catch (e) {
           Sentry.captureException(e);
           console.error('Error updating token set order in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'CREATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<CreateThemeGroupMutation>(
+            Graphql.op(CREATE_THEME_GROUP_MUTATION, {
+              project: this.id,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create theme group in Tokens Studio');
+          notifyToUI('Theme group created in Tokens Studio', { error: false });
+
+          return responseData.data.createThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<UpdateThemeGroupMutation>(
+            Graphql.op(UPDATE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update theme group in Tokens Studio');
+          notifyToUI('Theme group updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<DeleteThemeGroupMutation>(
+            Graphql.op(DELETE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete theme group in Tokens Studio');
+          return responseData.data.deleteThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error deleting theme group in Tokens Studio', e);
           return null;
         }
       }

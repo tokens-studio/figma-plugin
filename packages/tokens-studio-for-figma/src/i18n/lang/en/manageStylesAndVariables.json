@@ -1,6 +1,7 @@
 {
-"modalTitle": "Manage Styles and Variables",
+"modalTitle": "Export to Figma",
 "buttonLabel": "Styles and Variables",
+"optionsModalTitle": "Export to Figma: Options",
 "actions": {
   "export": "Export to Figma",
   "import": "Import from Figma",
@@ -13,7 +14,7 @@
   "changeSets": "Change Sets"
 },
 "docs": {
-  "exportToFigmaOptions": "Export to Figma Options",
+  "exportToFigmaOptions": "Export to Figma: Options",
   "stylesAndVariables": "Styles and Variables",
   "referenceOnlyMode": "Enabled versus Reference Only Mode"
 },
@@ -21,7 +22,9 @@
   "learnMore": "Learn more",
   "themes": "Themes", 
   "noGroup": "No Group",
-  "selectAll": "Select All"
+  "selectAll": "Select All",
+  "variables": "Variables",
+  "styles": "Styles"
 },
 "tabs": {
   "exportThemes": "Themes",
@@ -29,19 +32,21 @@
 },
 "options": {
   "title": "Options",
-  "whichVariablesShouldBeCreatedAndUpdated": "Which variables should be created and updated?",
-  "whichStylesShouldBeCreatedAndUpdated": "Which styles should be created and updated?",
+  "intro": "Create styles or variables based on your themes or token sets. First, choose what types of tokens should be created as either styles or variables.",
+  "createAndUpdate": "Create and update",
   "tokensExportedToFigmaShould": "Tokens exported to Figma should:",
   "ignorePrefix": "Ignore first part of token name for styles",
   "ignorePrefixExplanation": "Useful if you want to ignore 'colors' in a token called 'colors.blue.500' for your styles",
   "prefixStyles": "Prefix styles with active theme name",
   "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
-  "overwriteExistingStylesAndVariables": "Overwrite existing styles and variables",
-  "overwriteExistingStylesAndVariablesExplanation": "Existing styles and variables with the same name will be overwritten",
+  "renameExisting": "Update existing style and variable names",
+  "renameExistingExplanation": "Existing styles and variables will be renamed to match the token name",
   "scopeVariablesByTokenType": "Scope Variables by token type",
   "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage",
   "createStylesWithVariableReferences": "Create styles with variable references",
-  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables"
+  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables",
+  "removeWithoutConnection": "Remove styles and variables without connection to a token",
+  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed"
 },
 "variables": {
   "color": "Color",
@@ -55,17 +60,19 @@
   "effects": "Effects"
 },
 "exportThemesTab": {
-  "headingPro": "Create Themes to get Started",
-  "headingBasic": "Creating Themes is a pro Feature",
-  "introPro": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
-  "introBasic": "Combinations of token sets create themes. Use Themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
-  "confirmThemes": "Confirm Themes",
-  "combinationsOfSetsMakeThemes": "Combinations of token sets create themes"
+  "headingPro": "Create themes to get started",
+  "headingBasic": "Creating themes is a pro Feature",
+  "introPro": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms. Or switch to Sets to export without using Themes",
+  "introBasic": "Combinations of token sets create themes. Use themes to create multiple collections of variables or styles for easy switching between design concepts like light or dark color modes, multiple brands, products or platforms.",
+  "confirmThemes": "Create styles or variables based on themes",
+  "combinationsOfSetsMakeThemes": "Choose which themes should be created or updated."
+
 },
 "exportSetsTab": {
   "changeSetsHeading": "Enabled sets will export to Figma",
-  "confirmSets": "Confirm Sets",
-  "intro": "You can use token sets to manage your styles, and variables. Use Themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts."
+  "confirmSets": "Create styles or variables based on token sets",
+  "intro": "You can use token sets to manage your styles, and variables. Use themes (Pro) to create multiple collections of variables or styles for easy switching between design concepts.",
+  "setsSelectedForExport": "Sets selected for export"
 }
 }
 

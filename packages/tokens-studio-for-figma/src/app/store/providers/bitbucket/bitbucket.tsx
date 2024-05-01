@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import { useFlags } from 'launchdarkly-react-client-sdk';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -18,8 +17,8 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
-import { useChangedState } from '@/hooks/useChangedState';
 import { PushOverrides } from '../../remoteTokens';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -32,7 +31,7 @@ export function useBitbucket() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
-  const { multiFileSync } = useFlags();
+  const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closePushDialog } = usePushDialog();
@@ -45,13 +44,14 @@ export function useBitbucket() {
         owner ?? splitContextId[0],
         repo ?? splitContextId[1],
         context.baseUrl ?? '',
+        context.username,
       );
       if (context.filePath) storageClient.changePath(context.filePath);
       if (context.branch) storageClient.selectBranch(context.branch);
-      if (multiFileSync) storageClient.enableMultiFile();
+      if (isProUser) storageClient.enableMultiFile();
       return storageClient;
     },
-    [multiFileSync],
+    [isProUser],
   );
 
   const askUserIfPull = useCallback(async () => {

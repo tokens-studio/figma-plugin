@@ -226,7 +226,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                 <Popover.Content side="bottom" align="end" sideOffset={4} style={{ pointerEvents: 'all', width: 'var(--radix-popover-trigger-width)' }}>
                   <Box
                     css={{
-                      backgroundColor: '$bgDefault',
+                      backgroundColor: '$bgCanvas',
                       border: '1px solid',
                       borderColor: '$borderSubtle',
                       borderRadius: '$medium',
@@ -299,7 +299,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                                   isFocused={highlightedIndex === index}
                                   style={style}
                                   // eslint-disable-next-line react/jsx-no-bind
-                                  onMouseDown={() => handleSelect(value)}
+                                  onMouseDown={() => handleSelect(filteredValue)}
                                 >
                                   <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
                                 </StyledItem>

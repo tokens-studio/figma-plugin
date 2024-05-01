@@ -27,15 +27,15 @@ type CreatedOrUpdatedFileType = {
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
 
-  constructor(secret: string, owner: string, repository: string, baseUrl?: string) {
-    super(secret, owner, repository, baseUrl);
+  constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string) {
+    super(secret, owner, repository, baseUrl, username);
     this.flags = {
       multiFileEnabled: false,
     };
 
     this.bitbucketClient = new Bitbucket({
       auth: {
-        username: this.owner,
+        username: this.username || this.owner, // technically username is required, but we'll use owner as a fallback
         password: this.secret,
       },
       baseUrl: this.baseUrl || undefined,
@@ -140,7 +140,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       const response = await fetch(url, {
         headers: {
-          Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
+          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
         },
       });
 
@@ -158,7 +158,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           const jsonFileContents = await Promise.all(
             jsonFiles.map((file: any) => fetch(file.links.self.href, {
               headers: {
-                Authorization: `Basic ${btoa(`${this.owner}:${this.secret}`)}`,
+                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
               },
             }).then((response) => response.text())),
           );

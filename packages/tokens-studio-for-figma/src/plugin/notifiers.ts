@@ -71,6 +71,8 @@ export type SavedSettings = {
   ignoreFirstPartForStyles: boolean;
   createStylesWithVariableReferences: boolean;
   prefixStylesWithThemeName: boolean;
+  renameExistingStylesAndVariables: boolean;
+  removeStylesAndVariablesWithoutConnection: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
@@ -106,6 +108,8 @@ export function notifyUISettings(
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
     tokenFormat,
+    renameExistingStylesAndVariables,
+    removeStylesAndVariablesWithoutConnection,
   }: SavedSettings,
 ) {
   postToUI({
@@ -138,6 +142,8 @@ export function notifyUISettings(
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
       tokenFormat,
+      renameExistingStylesAndVariables,
+      removeStylesAndVariablesWithoutConnection,
     },
   });
   postToUI({

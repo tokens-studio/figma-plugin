@@ -1,10 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@tokens-studio/ui';
+import { Button, TextInput, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import Stack from '../Stack';
-import Input from '../Input';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
@@ -58,16 +56,16 @@ export default function DuplicateTokenGroupModal({
         </form>
     )}
     >
-      <Stack direction="column" gap={4} css={{ justifyContent: 'center' }}>
-        <Input
+      <Stack direction="column" justify="center" align="start" gap={4}>
+        <TextInput
           form="duplicateTokenGroup"
-          full
           onChange={handleNewTokenGroupNameChange}
           type="text"
           name="tokengroupname"
           value={newName}
-          autofocus
+          autoFocus
           required
+          css={{ width: '100%' }}
         />
         <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
       </Stack>

@@ -875,6 +875,11 @@
   resolved "https://registry.npmjs.org/@babel/helper-plugin-utils/-/helper-plugin-utils-7.22.5.tgz"
   integrity sha512-uLls06UVKgFG9QD4OeFYLEGteMIAa5kpTPcFL28yuCIIzsf6ZyKZMllKVOCZFhiZ5ptnwX4mtKdWCBE/uT4amg==
 
+"@babel/helper-plugin-utils@^7.24.0":
+  version "7.24.0"
+  resolved "https://registry.yarnpkg.com/@babel/helper-plugin-utils/-/helper-plugin-utils-7.24.0.tgz#945681931a52f15ce879fd5b86ce2dae6d3d7f2a"
+  integrity sha512-9cUznXMG0+FxRuJfvL82QlTqIzhVW9sL0KjMPHhAOOvpQGL8QtdxnBKILjBqxlHyliz0yCa1G903ZXI/FuHy2w==
+
 "@babel/helper-remap-async-to-generator@^7.22.20", "@babel/helper-remap-async-to-generator@^7.22.5":
   version "7.22.20"
   resolved "https://registry.npmjs.org/@babel/helper-remap-async-to-generator/-/helper-remap-async-to-generator-7.22.20.tgz"
@@ -1581,6 +1586,14 @@
   integrity sha512-GzuSBcKkx62dGzZI1WVgTWvkkz84FZO5TC5T8dl/Tht/rAla6Dg/Mz9Yhypg+ezVACf/rgDuQt3kbWEv7LdUDQ==
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
+    "@babel/plugin-syntax-export-namespace-from" "^7.8.3"
+
+"@babel/plugin-transform-export-namespace-from@^7.24.1":
+  version "7.24.1"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-export-namespace-from/-/plugin-transform-export-namespace-from-7.24.1.tgz#f033541fc036e3efb2dcb58eedafd4f6b8078acd"
+  integrity sha512-Ft38m/KFOyzKw2UaJFkWG9QnHPG/Q/2SkOrRk4pNBPg5IPZ+dOxcmkK5IyuBcxiNPyyYowPGUReyBvrvZs7IlQ==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.24.0"
     "@babel/plugin-syntax-export-namespace-from" "^7.8.3"
 
 "@babel/plugin-transform-flow-strip-types@^7.22.5":
@@ -3025,10 +3038,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.90.0":
-  version "1.90.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.90.0.tgz#b69d9cf6605ab3050d4076ea0e28671be0531889"
-  integrity sha512-RvZrSkuV0SABRaYuRFO/S30u9+RGKJm6+CPjSG7MaMo60p8S1sX5YOWT+zDWZC6mqNEaxLkrbXdiyqWXsfdHQg==
+"@figma/plugin-typings@^1.91.0":
+  version "1.91.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.91.0.tgz#8a88ce43bc72500de2c1f4d8cb20558f05a7de23"
+  integrity sha512-Q1CUtWQyY16eSH4pEY18CLgfGqKNotp2Yg4pCjY9hz6+Fe/Obqz5wSAyUAYDDEq4SYU0UEZJ/t/3K+6KA3j35w==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"
@@ -5966,10 +5979,10 @@
   resolved "https://registry.npmjs.org/@testing-library/user-event/-/user-event-14.5.1.tgz"
   integrity sha512-UCcUKrUYGj7ClomOo2SpNVvx4/fkd/2BbIHDCle8A0ax+P3bU7yJwDBDrS6ZwdTMARWTGODX1hEsCcO+7beJjg==
 
-"@tokens-studio/sdk@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.3.tgz#acdc3ed52308f692b320005aadb73378f73637c1"
-  integrity sha512-t8bTglnzQJjYo6rB8S9AK4MEJrETY6PWc7X2HZvJc+wjXcdusutuK9Y4EpOq9pEna9rNJU4DyJIsg4k0gZjx5w==
+"@tokens-studio/sdk@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.4.tgz#bdcb27a1f48dc41bebccc68301bfd3af41f3d72a"
+  integrity sha512-BdTjMteeWOmVZ6El0ZuQFdYlWk+4nSsVJHvpsmmwVosxs8DI9V4381fZr94Y+zTedO4dR9lZncI5YEZZhr5unw==
   dependencies:
     "@aws-amplify/api" "^5.0.19"
     "@aws-amplify/auth" "^5.1.13"
@@ -5990,10 +6003,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
   integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
-"@tokens-studio/ui@0.5.4":
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.4.tgz#ee971e4ec74d35545d63962121a796d912523815"
-  integrity sha512-q7Mln4I50AWZCoJiDlqPTn17Rx/XRfSJDKV/Y910rS5YFFytmYd31XUnZgXk28vnOP1J9P8B/RaPCSyKg2XW3w==
+"@tokens-studio/ui@0.5.5":
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.5.5.tgz#7b6d9640ee0c293d866b1d919a296d135f38c1e4"
+  integrity sha512-bfVF6dBlOUWFw90Nva6kf9szCLgjoGiQRqb9eoZ58Cdy38iKCpGgyaaObz/IRd+62JTchi9vPi9I4YXkpAhSAA==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -14881,9 +14894,9 @@ latest-version@^3.0.0:
   dependencies:
     package-json "^4.0.0"
 
-launchdarkly-js-client-sdk@2.24.2, launchdarkly-js-client-sdk@^2.22.1:
+launchdarkly-js-client-sdk@2.24.2, launchdarkly-js-client-sdk@^2.28.0:
   version "2.24.2"
-  resolved "https://registry.npmjs.org/launchdarkly-js-client-sdk/-/launchdarkly-js-client-sdk-2.24.2.tgz"
+  resolved "https://registry.yarnpkg.com/launchdarkly-js-client-sdk/-/launchdarkly-js-client-sdk-2.24.2.tgz#8a8a206d8ea22f1bfbc2906e0615115c6e075798"
   integrity sha512-8jrLOia0vfZ4stqQRv9TjAYfRGK2JyWpLIL6PbTl99LqTtJMuYtryFUQp0b8WH1153YN+gVdoqPVI7uwbbzLLQ==
   dependencies:
     escape-string-regexp "^4.0.0"
@@ -14891,16 +14904,16 @@ launchdarkly-js-client-sdk@2.24.2, launchdarkly-js-client-sdk@^2.22.1:
 
 launchdarkly-js-sdk-common@3.8.2:
   version "3.8.2"
-  resolved "https://registry.npmjs.org/launchdarkly-js-sdk-common/-/launchdarkly-js-sdk-common-3.8.2.tgz"
+  resolved "https://registry.yarnpkg.com/launchdarkly-js-sdk-common/-/launchdarkly-js-sdk-common-3.8.2.tgz#38838f1c4e30cb07b4827de6f2928ab3530ea7c6"
   integrity sha512-pEqZ3FTKtYrTaPdbPntFJs87svzcezrkoRWY2GEFmyPC33txOqU788x0yby2+haC/saFPNfXpH6bbiJE/GjMSA==
   dependencies:
     base64-js "^1.3.0"
     fast-deep-equal "^2.0.1"
     uuid "^3.3.2"
 
-launchdarkly-react-client-sdk@^2.26.0:
+launchdarkly-react-client-sdk@^2.28.0:
   version "2.29.4"
-  resolved "https://registry.npmjs.org/launchdarkly-react-client-sdk/-/launchdarkly-react-client-sdk-2.29.4.tgz"
+  resolved "https://registry.yarnpkg.com/launchdarkly-react-client-sdk/-/launchdarkly-react-client-sdk-2.29.4.tgz#7c1bb9c3db5d1df55688d801eed2e7c56f173526"
   integrity sha512-f0vcrn/PtZl6DC0r2qQwwXg0JY/bkrFahijOfeB9RJY/gEgSAmO/eNmTGEyjKEGdc9SwzVmRzwS6i8OXs8np/w==
   dependencies:
     hoist-non-react-statics "^3.3.2"
@@ -17661,6 +17674,11 @@ rc@^1.0.1, rc@^1.1.6:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+re-resizable@6.9.11:
+  version "6.9.11"
+  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-6.9.11.tgz#f356e27877f12d926d076ab9ad9ff0b95912b475"
+  integrity sha512-a3hiLWck/NkmyLvGWUuvkAmN1VhwAz4yOhS6FdMTaxCUVN9joIWkT11wsO68coG/iEYuwn+p/7qAmfQzRhiPLQ==
 
 react-colorful@^5.5.1:
   version "5.6.1"

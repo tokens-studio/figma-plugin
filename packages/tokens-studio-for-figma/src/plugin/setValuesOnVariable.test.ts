@@ -51,4 +51,21 @@ describe('SetValuesOnVariable', () => {
     setValuesOnVariable(variablesInFigma, tokens, collection, mode);
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
+
+  it('renames variable if name and path differ and shouldRename is given', () => {
+    const tokens = [
+      {
+        name: 'button.primary.height',
+        path: 'button/primary/height',
+        rawValue: 16,
+        value: '16',
+        type: TokenTypes.NUMBER,
+        variableId: '123',
+      },
+    ] as SingleToken<true, { path: string, variableId: string }>[];
+    const result = setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
+    expect(result.renamedVariableKeys).toEqual(['123']);
+    expect(variablesInFigma[0].name).toEqual('button/primary/height');
+    expect(mockCreateVariable).not.toBeCalled();
+  });
 });

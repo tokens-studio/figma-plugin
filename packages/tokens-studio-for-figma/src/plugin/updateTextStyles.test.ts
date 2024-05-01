@@ -1,10 +1,12 @@
-import * as setTextValuesOnTarget from './setTextValuesOnTarget';
+import { mockGetLocalTextStyles } from '../../tests/__mocks__/figmaMock';
+import * as setTextValuesOnTargetModule from './setTextValuesOnTarget';
 import updateTextStyles from './updateTextStyles';
 import type { SingleTypographyToken } from '@/types/tokens';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 type ExtendedSingleToken = SingleTypographyToken<true, { path: string, styleId: string }>;
 
-const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTarget, 'default');
+const setTextValuesOnTargetSpy = jest.spyOn(setTextValuesOnTargetModule, 'setTextValuesOnTarget');
 
 const typographyTokens = [
   {
@@ -59,7 +61,7 @@ describe('updateTextStyles', () => {
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledTimes(2);
     expect(setTextValuesOnTargetSpy).toHaveBeenLastCalledWith(
       { ...newStyle, name: 'H1/withValueDescription' },
-      typographyTokens.find((t) => t.name === 'H1.withValueDescription'),
+      'H1.withValueDescription',
       baseFontSize,
     );
   });
@@ -70,8 +72,37 @@ describe('updateTextStyles', () => {
     updateTextStyles(typographyTokens, baseFontSize);
     expect(setTextValuesOnTargetSpy).toHaveBeenCalledWith(
       matchingFigmaStyle,
-      typographyTokens.find((t) => t.name === 'H1.withValue'),
+      'H1.withValue',
       baseFontSize,
     );
+  });
+
+  it('renames if option is true and style is found', async () => {
+    const existingStyles = [
+      {
+        id: '1234',
+        name: 'type/h1',
+        fontName: {
+          family: 'Inter',
+          style: 'Bold',
+        },
+      },
+    ];
+    mockGetLocalTextStyles.mockImplementation(() => existingStyles);
+
+    await updateTextStyles(
+      [{
+        name: 'type.h1',
+        value: typographyTokens[0].value,
+        type: TokenTypes.TYPOGRAPHY,
+        path: 'type/h1-RENAMED',
+        styleId: '1234',
+      }],
+      '16',
+      true,
+      true,
+    );
+
+    expect(existingStyles[0].name).toEqual('type/h1-RENAMED');
   });
 });

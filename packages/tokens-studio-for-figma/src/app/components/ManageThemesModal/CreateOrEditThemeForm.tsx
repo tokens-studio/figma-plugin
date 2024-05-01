@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
-import { Button, IconButton, Stack } from '@tokens-studio/ui';
+import { Box, Button, IconButton, Stack } from '@tokens-studio/ui';
+import { NavArrowLeft } from 'iconoir-react';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
@@ -11,9 +12,8 @@ import { useIsGitMultiFileEnabled } from '@/app/hooks/useIsGitMultiFileEnabled';
 import { TokenSetThemeItem } from './TokenSetThemeItem';
 import { StyledForm } from './StyledForm';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import Box from '../Box';
 import { RootState } from '@/app/store';
-import { IconBack, IconPlus } from '@/icons';
+import { IconPlus } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
@@ -92,7 +92,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           <IconButton
             tooltip="Return to overview"
             data-testid="button-return-to-overview"
-            icon={<IconBack />}
+            icon={<NavArrowLeft />}
             size="small"
             variant="invisible"
             onClick={onCancel}
@@ -149,7 +149,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {activeTab === ThemeFormTabs.SETS && (
-        <Stack direction="column" css={{ padding: '$4 $3', paddingTop: '$4' }}>
+        <Stack direction="column" gap={1} css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
