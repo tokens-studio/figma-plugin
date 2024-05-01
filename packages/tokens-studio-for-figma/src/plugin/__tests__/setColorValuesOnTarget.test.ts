@@ -37,7 +37,7 @@ describe('setColorValuesOnTarget', () => {
       description: '',
     } as unknown as PaintStyle;
 
-    await setColorValuesOnTarget(mockStyle, 'red', 'paints');
+    await setColorValuesOnTarget({ target: mockStyle, token: 'red', key: 'paints' });
 
     expect(mockStyle.description).toEqual('Red');
 
@@ -54,7 +54,7 @@ describe('setColorValuesOnTarget', () => {
       fills: [],
     } as unknown as RectangleNode;
 
-    await setColorValuesOnTarget(mockNode, 'red', 'fills');
+    await setColorValuesOnTarget({ target: mockNode, token: 'red', key: 'fills' });
 
     expect(mockNode.fills).toEqual([{
       type: 'SOLID',
@@ -69,7 +69,7 @@ describe('setColorValuesOnTarget', () => {
       strokes: [],
     } as unknown as RectangleNode;
 
-    await setColorValuesOnTarget(mockNode, 'red', 'strokes');
+    await setColorValuesOnTarget({ target: mockNode, token: 'red', key: 'strokes' });
 
     expect(mockNode.strokes).toEqual([{
       type: 'SOLID',
@@ -84,7 +84,7 @@ describe('setColorValuesOnTarget', () => {
       fills: [],
     } as unknown as RectangleNode;
 
-    await setColorValuesOnTarget(mockNode, 'gradient', 'fills');
+    await setColorValuesOnTarget({ target: mockNode, token: 'gradient', key: 'fills' });
 
     expect(mockNode.fills).toMatchSnapshot();
   });
@@ -96,7 +96,7 @@ describe('setColorValuesOnTarget', () => {
       fills: [],
     } as unknown as RectangleNode;
 
-    await setColorValuesOnTarget(mockNode, 'non-existent-token', 'fills');
+    await setColorValuesOnTarget({ target: mockNode, token: 'non-existent-token', key: 'fills' });
 
     // Assert that fills have not been changed
     expect(mockNode.fills).toEqual([]);
@@ -115,7 +115,7 @@ describe('setColorValuesOnTarget', () => {
       name: 'fg/subtle',
     }));
 
-    await setColorValuesOnTarget(mockStyle, 'ref-red', 'paints');
+    await setColorValuesOnTarget({ target: mockStyle, token: 'ref-red', key: 'paints' });
 
     // Assert that fills have been updated to the referenced token's color
     expect(mockSetBoundVariableForPaint).toHaveBeenCalledWith({
@@ -130,11 +130,14 @@ describe('setColorValuesOnTarget', () => {
   it('should handle missing token references by applying the hex value', async () => {
     const mockStyle = {
       paints: [],
+      consumers: [],
     } as unknown as PaintStyle;
 
     mockImportVariableByKeyAsync.mockImplementationOnce(() => null);
 
-    await setColorValuesOnTarget(mockStyle, 'ref-red', 'paints');
+    await setColorValuesOnTarget({
+      target: mockStyle, token: 'ref-red', key: 'paints', givenValue: '#ff0000',
+    });
 
     // Assert that fills have been updated to the hex value of the token
     expect(mockSetBoundVariableForPaint).not.toHaveBeenCalledWith();
@@ -142,6 +145,27 @@ describe('setColorValuesOnTarget', () => {
       type: 'SOLID',
       opacity: 1,
       color: { r: 1, g: 0, b: 0 },
+    }]);
+  });
+
+  test('setColorValuesOnTarget uses givenValue when provided', async () => {
+    const mockStyle = {
+      paints: [],
+      consumers: [],
+    } as unknown as PaintStyle;
+    const token = 'mock-token';
+    const key = 'paints';
+    const givenValue = '#00ff00'; // Mock a givenValue
+
+    await setColorValuesOnTarget({
+      target: mockStyle, token, key, givenValue,
+    });
+
+    expect(mockSetBoundVariableForPaint).not.toHaveBeenCalledWith();
+    expect(mockStyle.paints).toEqual([{
+      type: 'SOLID',
+      opacity: 1,
+      color: { r: 0, g: 1, b: 0 },
     }]);
   });
 });

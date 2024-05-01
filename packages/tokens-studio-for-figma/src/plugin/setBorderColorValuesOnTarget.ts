@@ -17,10 +17,8 @@ export async function setBorderColorValuesOnTarget({
   if ('strokes' in node) {
     if (!(await tryApplyColorVariableId(node, data, ColorPaintType.STROKES))) {
       const resolvedToken = defaultTokenValueRetriever.get(data);
-      if (!resolvedToken) return;
       let matchingStyleId = resolvedToken?.styleId;
-
-      if (!matchingStyleId) {
+      if (resolvedToken && !matchingStyleId) {
         // Local style not found - look for matching non-local style:
         const styleIdBackupKey = 'strokeStyleId_original';
         const nonLocalStyle = getNonLocalStyle(node, styleIdBackupKey, 'strokes');
@@ -40,7 +38,9 @@ export async function setBorderColorValuesOnTarget({
       }
 
       if (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'stroke', matchingStyleId)))) {
-        setColorValuesOnTarget(node, data, 'strokes');
+        setColorValuesOnTarget({
+          target: node, token: data, key: 'strokes', givenValue: value,
+        });
       }
     }
   }
