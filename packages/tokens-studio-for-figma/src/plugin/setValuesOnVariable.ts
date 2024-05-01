@@ -25,17 +25,17 @@ export default async function setValuesOnVariable(
   const renamedVariableKeys: string[] = [];
   try {
     await Promise.all(tokens.map(async (token) => {
-      const variableType = convertTokenTypeToVariableType(token.type, t.value);
+      const variableType = convertTokenTypeToVariableType(token.type, token.value);
       // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
       // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
       // In that case, we should delete the variable and re-create it.
-      const variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path) || figma.variables.createVariable(t.path, collection.id, variableType);
+      const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) || figma.variables.createVariable(token.path, collection.id, variableType);
 
       if (variable) {
         // First, rename all variables that should be renamed (if the user choose to do so)
-        if (variable.name !== t.path && shouldRename) {
+        if (variable.name !== token.path && shouldRename) {
           renamedVariableKeys.push(variable.key);
-          variable.name = t.path;
+          variable.name = token.path;
         }
         if (variableType !== variable?.resolvedType) {
           // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
@@ -44,7 +44,7 @@ export default async function setValuesOnVariable(
           // variable.remove();
           // variable = figma.variables.createVariable(t.path, collection.id, variableType);
         }
-        variable.description = t.description ?? '';
+        variable.description = token.description ?? '';
 
         switch (variableType) {
           case 'BOOLEAN':

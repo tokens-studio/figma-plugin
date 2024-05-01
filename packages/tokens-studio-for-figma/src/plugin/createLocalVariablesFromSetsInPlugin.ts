@@ -30,6 +30,9 @@ export default async function createLocalVariablesFromSetsInPlugin(tokens: Recor
     }, {} as ThemeObject);
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
+        const setTokens: Record<string, AnyTokenList> = {
+          [set.set]: tokens[set.set],
+        };
         const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
         let collection = allCollections.find((vr) => vr.name === set.set);
         let modeId;
@@ -43,7 +46,7 @@ export default async function createLocalVariablesFromSetsInPlugin(tokens: Recor
         }
 
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme: themeContainer, tokens, settings, filterByTokenSet: set.set,
+          collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
         });
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
