@@ -14,45 +14,6 @@ describe('tryApplyTypographyCompositeVariable', () => {
     value = {};
     resolvedValue = {};
     baseFontSize = '16px';
-    // const tokens = [
-    //   {
-    //     internal__Parent: 'core',
-    //     name: 'fontFamily.default',
-    //     rawValue: 'Roboto',
-    //     type: 'fontFamilies',
-    //     value: 'Roboto',
-    //   },
-    //   {
-    //     internal__Parent: 'core',
-    //     name: 'fontWeight.default',
-    //     rawValue: 'Bold',
-    //     type: 'fontWeights',
-    //     value: 'Bold',
-    //   },
-    //   {
-    //     internal__Parent: 'global',
-    //     name: 'headline',
-    //     rawValue: {
-    //       fontFamily: '{fontFamily.default}',
-    //       fontWeight: 'Bold',
-    //     },
-    //     resolvedValueWithReferences: {
-    //       fontFamily: 'Inter',
-    //       fontWeight: 'Bold',
-    //     },
-    //     type: 'typography',
-    //     value: {
-    //       fontFamily: 'Inter',
-    //       fontWeight: 'Bold',
-    //     },
-    //   },
-    // ];
-
-    // defaultTokenValueRetriever.initiate({
-    //   tokens,
-    //   variableReferences: new Map([['fontFamily.default', '123'], ['fontWeight.default', '124']]),
-    //   createStylesWithVariableReferences: true,
-    // });
   });
 
   it('should set font family and weight without variables', async () => {
