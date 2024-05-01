@@ -745,7 +745,7 @@ describe('Can set values on node', () => {
     expect(textNodeMock.characters).toEqual('0');
   });
 
-  it('should change characters when the value is undefined', async () => {
+  it('should not change characters when the value is undefined', async () => {
     await setValuesOnNode(
       {
         node: textNodeMock,
@@ -756,7 +756,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(figma.loadFontAsync).toHaveBeenCalled();
+    expect(figma.loadFontAsync).not.toHaveBeenCalled();
     expect(textNodeMock.characters).toEqual('foobar');
   });
 

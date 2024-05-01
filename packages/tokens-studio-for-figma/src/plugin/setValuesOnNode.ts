@@ -19,7 +19,6 @@ import { applySpacingValuesOnNode } from './applySpacingValuesOnNode';
 import { applyTextCharacterValuesOnNode } from './applyTextCharacterValuesOnNode';
 import { applyTypographyTokenOnNode } from './applyTypographyTokenOnNode';
 import { applyShadowValuesOnNode } from './applyShadowValuesOnNode';
-import { applyLineHeightValuesOnNode } from './applyLineHeightValuesOnNode';
 import removeValuesFromNode from './removeValuesFromNode';
 
 // Various logic to apply token values to nodes
@@ -64,7 +63,6 @@ export default async function setValuesOnNode({
       await applyNumberTokenValuesOnNode(node, data, values, baseFontSize);
       await applyBooleanTokenValuesOnNode(node, data, values);
       await applyTextCharacterValuesOnNode(node, data, values);
-      await applyLineHeightValuesOnNode(node, data, values, baseFontSize);
     }
   } catch (e) {
     console.log('Error setting data on node', e);
