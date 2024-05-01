@@ -1,10 +1,6 @@
-import { isPrimitiveValue, isSingleTypographyValue } from '@/utils/is';
-import { defaultTokenValueRetriever } from './TokenValueRetriever';
-import { clearStyleIdBackup, getNonLocalStyle, setStyleIdBackup } from './figmaUtils/styleUtils';
-import { textStyleMatchesTypographyToken } from './figmaUtils/styleMatchers';
-import { setTextValuesOnTarget } from './setTextValuesOnTarget';
-import { trySetStyleId } from '@/utils/trySetStyleId';
+import { isPrimitiveValue } from '@/utils/is';
 import { transformValue } from './helpers';
+import setLineHeightValuesOnTarget from './setLineHeightValuesOnTarget';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
 
@@ -14,9 +10,11 @@ export async function applyLineHeightValuesOnNode(
   values: MapValuesToTokensResult,
   baseFontSize: string,
 ) {
-  console.log('data in applyLineHeight: ', data);
-  console.log('values in applyLineHeight: ', values);
-  if (typeof values.lineHeight !== 'undefined') {
-    const transformedValue = transformValue(String(values.lineHeight), 'lineHeight', baseFontSize);
+  if ('characters' in node && node.fontName !== figma.mixed) {
+    await figma.loadFontAsync(node.fontName);
+  }
+  if (typeof values.lineHeights !== 'undefined' && isPrimitiveValue(values.lineHeights) && node.type === 'TEXT') {
+    const transformedValue = transformValue(String(values.lineHeights), 'lineHeights', baseFontSize) as LineHeight;
+    await setLineHeightValuesOnTarget(node, transformedValue);
   }
 }

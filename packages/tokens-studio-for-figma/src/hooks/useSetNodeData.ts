@@ -12,7 +12,6 @@ export default function useSetNodeData() {
 
   const setNodeData = useCallback(async (data: SelectionValue, resolvedTokens: AnyTokenList) => {
     const settings = settingsStateSelector(store.getState());
-    console.log('resolvedTokens: ', resolvedTokens);
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.SET_NODE_DATA,
       values: data,

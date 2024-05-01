@@ -36,10 +36,7 @@ export async function updatePluginDataAndNodes({
     promises.add(defaultWorker.schedule(async () => {
       try {
         await Promise.all(Object.entries(tokenValues).map(async ([key, value]) => {
-          console.log('key in updatePluginDataAndNodes: ', key);
-          console.log('value in updatePluginDataAndNodes: ', value);
           const jsonValue = JSON.stringify(value);
-          console.log('jsonValue in updatePluginDataAndNodes: ', jsonValue);
           switch (value) {
             case 'delete':
               await removePluginData({ nodes: [node], key: key as Properties, shouldRemoveValues: true });
@@ -54,9 +51,6 @@ export async function updatePluginDataAndNodes({
         }));
         const rawTokenMap = destructureTokenForAlias(tokensMap, tokenValues);
         const mappedValues = mapValuesToTokens(tokensMap, tokenValues);
-
-        console.log('rawTokenMap in updatePluginAndNodes: ', rawTokenMap);
-        console.log('mappedValues in updatePluginDataAndNodes: ', mappedValues);
 
         setValuesOnNode(
           {
