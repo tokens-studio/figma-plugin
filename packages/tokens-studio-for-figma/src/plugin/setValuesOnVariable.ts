@@ -18,9 +18,11 @@ export default function setValuesOnVariable(
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
   mode: string,
+  shouldRename = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
   const referenceVariableCandidates: ReferenceVariableType[] = [];
+  const renamedVariableKeys: string[] = [];
   try {
     tokens.forEach((t) => {
       const variableType = convertTokenTypeToVariableType(t.type, t.value);
@@ -30,8 +32,15 @@ export default function setValuesOnVariable(
       const variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path) || figma.variables.createVariable(t.path, collection.id, variableType);
 
       if (variable) {
+        // First, rename all variables that should be renamed (if the user choose to do so)
+        if (variable.name !== t.path && shouldRename) {
+          renamedVariableKeys.push(variable.key);
+          variable.name = t.path;
+        }
         if (variableType !== variable?.resolvedType) {
-          // TODO: DISCUSS IF THIS BEHAVIOR IS WANTED. It leads to many broken variables applied.. we cant change the type of a variable we have to re-create it
+          // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
+          // if they later change it to a string, we cannot update the variable type. Theoretically we should remove and recreate, but that would lead to broken variables?
+          // If we decide to remove, the following would work.
           // variable.remove();
           // variable = figma.variables.createVariable(t.path, collection.id, variableType);
         }
@@ -84,6 +93,7 @@ export default function setValuesOnVariable(
   }
 
   return {
+    renamedVariableKeys,
     variableKeyMap,
     referenceVariableCandidates,
   };

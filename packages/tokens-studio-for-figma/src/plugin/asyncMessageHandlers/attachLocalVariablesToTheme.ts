@@ -1,7 +1,6 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { generateTokensToCreate } from '../generateTokensToCreate';
-import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 
 export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME] = async (msg) => {
   const { tokens, theme } = msg;
@@ -16,7 +15,7 @@ export const attachLocalVariablesToTheme: AsyncMessageChannelHandlers[AsyncMessa
   );
   if (collection && mode) {
     const collectionVariableIds: Record<string, string> = {};
-    const tokensToCreateVariablesFor = generateTokensToCreate(theme, tokens, tokenTypesToCreateVariable);
+    const tokensToCreateVariablesFor = generateTokensToCreate(theme, tokens);
     tokensToCreateVariablesFor.forEach((token) => {
       const variable = figmaVariableMaps.get(token.name.split('.').join('/'));
       if (variable) {

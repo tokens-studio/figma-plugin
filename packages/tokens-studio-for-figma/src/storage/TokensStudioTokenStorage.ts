@@ -4,9 +4,6 @@ import {
   CreateTokenMutation,
   UpdateTokenMutation,
   DeleteTokenMutation,
-  RawToken,
-  Raw_Token_border,
-  Raw_Token_boxShadow,
   CreateTokenSetMutation,
   UpdateTokenSetMutation,
   DeleteTokenSetMutation,
@@ -17,12 +14,10 @@ import {
   UpdateThemeGroupMutation,
   CreateThemeGroupMutation,
   DeleteThemeGroupMutation,
-  TokenType,
   TokenInput,
 } from '@tokens-studio/sdk';
-import { deepmerge } from 'deepmerge-ts';
 import * as Sentry from '@sentry/react';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
   RemoteTokenStorage,
@@ -49,61 +44,11 @@ import {
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { tokensStudioToToken } from './tokensStudio/utils';
+import { fetchDynamicTokenSetData } from './tokensStudio/dynamicSets';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
-};
-
-interface Token {
-  description?: string | null | undefined;
-  type: string | null | undefined;
-  value: any;
-  $extensions?: SingleToken['$extensions'];
-}
-
-const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([key, v]) => v !== null));
-
-// We need to convert the raw token data from the GraphQL API into a format that the plugin will understand,
-// as there's some differences between the two. Ideally, we could just pass in a "request format"
-// into the query, but that's not possible so far.
-const tsToToken = (raw: RawToken) => {
-  const combined: Token = {
-    type: raw.type,
-    value: null,
-    $extensions: {
-      'studio.tokens': {
-        urn: raw.urn!,
-      },
-    },
-  };
-
-  if (raw.description) {
-    combined.description = raw.description;
-  }
-
-  if (raw.extensions) {
-    combined.$extensions = deepmerge(JSON.parse(raw.extensions), combined.$extensions);
-  }
-
-  // @ts-ignore
-  if (raw.value.typography) {
-    // @ts-ignore typography exists for typography tokens
-    combined.value = removeNulls((raw as RawToken).value!.typography!);
-    // @ts-ignore
-  } else if (raw.value.border) {
-    // @ts-ignore border exists for border tokens
-    combined.value = removeNulls((raw as unknown as Raw_Token_border).value!.border!);
-    // @ts-ignore
-  } else if (raw.value.boxShadow) {
-    // @ts-ignore
-    combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
-  } else if (raw.type === TokenType.composition) {
-    combined.value = raw.value?.value && JSON.parse(raw.value.value);
-  } else {
-    combined.value = raw.value!.value;
-  }
-
-  return combined;
 };
 
 type ProjectData = {
@@ -128,14 +73,39 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
       return null;
     }
 
-    const tokenSets = data.data.project.sets as TokenSet[];
+    let tokenSets = data.data.project.sets as TokenSet[];
+
+    const dynamicTokenSets = tokenSets.filter((tokenSet) => tokenSet.type === 'DYNAMIC');
+    const dynamicTokenSetData = await Promise.all(
+      dynamicTokenSets.map(async (tokenSet) => {
+        if (!tokenSet.generatorUrn) {
+          return null;
+        }
+        const tokens = await fetchDynamicTokenSetData(tokenSet.generatorUrn);
+        return { ...tokenSet, tokens };
+      }),
+    );
+
+    if (dynamicTokenSetData.length) {
+      tokenSets = tokenSets.map((tokenSet) => {
+        if (tokenSet.type !== 'DYNAMIC') {
+          return tokenSet;
+        }
+
+        const dynamicSetData = dynamicTokenSetData.find((dynamicSet) => dynamicSet?.urn === tokenSet.urn);
+        if (dynamicSetData?.tokens) {
+          return { ...tokenSet, tokens: dynamicSetData.tokens };
+        }
+        return tokenSet;
+      });
+    }
 
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
         acc.tokens[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
           // We know that name exists (required field)
-          tokenSetAcc[token.name!] = tsToToken(token);
+          tokenSetAcc[token.name!] = tokensStudioToToken(token);
           return tokenSetAcc;
         }, {});
 

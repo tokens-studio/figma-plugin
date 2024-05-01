@@ -21,8 +21,8 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
-      overwriteExistingStylesAndVariables: uiSettings.overwriteExistingStylesAndVariables ?? data?.overwriteExistingStylesAndVariables,
-      scopeVariablesByTokenType: uiSettings.scopeVariablesByTokenType ?? data?.scopeVariablesByTokenType,
+      renameExistingStylesAndVariables: uiSettings.renameExistingStylesAndVariables ?? data?.renameExistingStylesAndVariables,
+      removeStylesAndVariablesWithoutConnection: uiSettings.removeStylesAndVariablesWithoutConnection ?? data?.removeStylesAndVariablesWithoutConnection,
       variablesBoolean: uiSettings.variablesBoolean ?? data?.variablesBoolean,
       variablesColor: uiSettings.variablesColor ?? data?.variablesColor,
       variablesNumber: uiSettings.variablesNumber ?? data?.variablesNumber,
@@ -64,8 +64,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let ignoreFirstPartForStyles: boolean;
     let createStylesWithVariableReferences: boolean;
     let prefixStylesWithThemeName: boolean;
-    let overwriteExistingStylesAndVariables: boolean;
-    let scopeVariablesByTokenType: boolean;
+    let renameExistingStylesAndVariables: boolean;
+    let removeStylesAndVariablesWithoutConnection: boolean;
     let inspectDeep: boolean;
     let shouldSwapStyles: boolean;
     let baseFontSize: string;
@@ -94,8 +94,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
       createStylesWithVariableReferences = typeof data.createStylesWithVariableReferences === 'undefined' ? true : data.createStylesWithVariableReferences;
       prefixStylesWithThemeName = typeof data.prefixStylesWithThemeName === 'undefined' ? false : data.prefixStylesWithThemeName;
-      overwriteExistingStylesAndVariables = typeof data.overwriteExistingStylesAndVariables === 'undefined' ? false : data.overwriteExistingStylesAndVariables;
-      scopeVariablesByTokenType = typeof data.scopeVariablesByTokenType === 'undefined' ? false : data.scopeVariablesByTokenType;
+      renameExistingStylesAndVariables = typeof data.renameExistingStylesAndVariables === 'undefined' ? false : data.renameExistingStylesAndVariables;
+      removeStylesAndVariablesWithoutConnection = typeof data.removeStylesAndVariablesWithoutConnection === 'undefined' ? false : data.removeStylesAndVariablesWithoutConnection;
       baseFontSize = typeof data.baseFontSize === 'undefined' ? defaultBaseFontSize : data.baseFontSize;
       aliasBaseFontSize = typeof data.aliasBaseFontSize === 'undefined' ? defaultBaseFontSize : data.aliasBaseFontSize;
       inspectDeep = typeof data.inspectDeep === 'undefined' ? false : data.inspectDeep;
@@ -123,8 +123,8 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         ignoreFirstPartForStyles,
         createStylesWithVariableReferences,
         prefixStylesWithThemeName,
-        overwriteExistingStylesAndVariables,
-        scopeVariablesByTokenType,
+        renameExistingStylesAndVariables,
+        removeStylesAndVariablesWithoutConnection,
         inspectDeep,
         shouldSwapStyles,
         baseFontSize,

@@ -48,8 +48,8 @@ export interface SettingsState {
   ignoreFirstPartForStyles?: boolean;
   prefixStylesWithThemeName?: boolean;
   createStylesWithVariableReferences?: boolean;
-  scopeVariablesByTokenType?: boolean;
-  overwriteExistingStylesAndVariables?: boolean;
+  renameExistingStylesAndVariables?: boolean;
+  removeStylesAndVariablesWithoutConnection?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -74,6 +74,8 @@ export const settings = createModel<RootModel>()({
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
+    renameExistingStylesAndVariables: false,
+    removeStylesAndVariablesWithoutConnection: false,
     createStylesWithVariableReferences: false,
     inspectDeep: false,
     shouldSwapStyles: false,

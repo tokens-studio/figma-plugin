@@ -22,7 +22,9 @@
   "learnMore": "Learn more",
   "themes": "Themes", 
   "noGroup": "No Group",
-  "selectAll": "Select All"
+  "selectAll": "Select All",
+  "variables": "Variables",
+  "styles": "Styles"
 },
 "tabs": {
   "exportThemes": "Themes",
@@ -31,19 +33,20 @@
 "options": {
   "title": "Options",
   "intro": "Create styles or variables based on your themes or token sets. First, choose what types of tokens should be created as either styles or variables.",
-  "whichVariablesShouldBeCreatedAndUpdated": "Create or update variables",
-  "whichStylesShouldBeCreatedAndUpdated": "Create or update styles",
+  "createAndUpdate": "Create and update",
   "tokensExportedToFigmaShould": "Tokens exported to Figma should:",
   "ignorePrefix": "Ignore first part of token name for styles",
   "ignorePrefixExplanation": "Useful if you want to ignore 'colors' in a token called 'colors.blue.500' for your styles",
   "prefixStyles": "Prefix styles with active theme name",
   "prefixStylesExplanation": "Adds the active theme name to any styles created. Note: Using this with multi-dimensional themes will lead to unexpected results.",
-  "overwriteExistingStylesAndVariables": "Overwrite existing styles and variables",
-  "overwriteExistingStylesAndVariablesExplanation": "Existing styles and variables with the same name will be overwritten",
+  "renameExisting": "Update existing style and variable names",
+  "renameExistingExplanation": "Existing styles and variables will be renamed to match the token name",
   "scopeVariablesByTokenType": "Scope Variables by token type",
   "scopeVariablesByTokenTypeExplanation": "Variable scopes will be inferred from the token type and intended usage",
   "createStylesWithVariableReferences": "Create styles with variable references",
-  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables"
+  "createStylesWithVariableReferencesExplanation": "Styles will be created containing references to variables",
+  "removeWithoutConnection": "Remove styles and variables without connection to a token",
+  "removeWithoutConnectionExplanation": "Styles and variables that are not connected to a token will be removed"
 },
 "variables": {
   "color": "Color",
