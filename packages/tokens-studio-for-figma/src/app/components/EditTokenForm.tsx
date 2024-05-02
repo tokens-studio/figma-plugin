@@ -470,16 +470,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
-  const handleNameKeyChange = React.useCallback<React.KeyboardEventHandler<HTMLInputElement>>(
-    (e) => {
-      if (e.key === 'Enter') {
-        checkAndSubmitTokenValue()
-      }
-    }, [internalEditToken]
-  );
-
   const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
-    if (e.metaKey || e.ctrlKey) {
+    if (e.metaKey || e.ctrlKey || e.key === 'Enter') {
       checkAndSubmitTokenValue();
     }
   }, [checkAndSubmitTokenValue]);
@@ -610,7 +602,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
         label={t('name')}
         value={internalEditToken?.name}
         onChange={handleNameChange}
-        onKeyDown={handleNameKeyChange}
         type="text"
         autofocus
         name="name"
