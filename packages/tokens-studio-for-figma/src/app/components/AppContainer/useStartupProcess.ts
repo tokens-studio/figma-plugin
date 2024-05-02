@@ -10,12 +10,13 @@ import { useProcess } from '@/hooks';
 import { ApplicationInitSteps } from './ApplicationInitSteps';
 import { Dispatch, RootState } from '@/app/store';
 import {
-  addLicenseFactory, savePluginDataFactory, getLdFlagsFactory, saveStorageInformationFactory, pullTokensFactory,
+  savePluginDataFactory, getLdFlags, saveStorageInformationFactory, pullTokensFactory,
 } from './startupProcessSteps';
 import useStorage from '@/app/store/useStorage';
 import { useFlags } from '../LaunchDarkly';
 import useConfirm from '@/app/hooks/useConfirm';
 import useRemoteTokens from '@/app/store/remoteTokens';
+import { useLicenseKey } from './startupProcessSteps/useLicenseKey';
 
 let ldClientPromiseResolver: (client: LDClient) => void;
 const ldClientPromise = new Promise<LDClient>((resolve) => {
@@ -30,6 +31,8 @@ export function useStartupProcess(params: StartupMessage) {
   const useConfirmResult = useConfirm();
   const useRemoteTokensResult = useRemoteTokens();
   const flags = useFlags();
+  console.log('Flags', flags);
+  const { initiateLicenseKey } = useLicenseKey();
 
   const startupProcess = useProcess<ApplicationInitSteps>(useMemo(() => ([
     {
@@ -38,11 +41,11 @@ export function useStartupProcess(params: StartupMessage) {
     },
     {
       key: ApplicationInitSteps.ADD_LICENSE,
-      fn: addLicenseFactory(dispatch, params),
+      fn: async () => await initiateLicenseKey(params),
     },
     {
       key: ApplicationInitSteps.GET_LD_FLAGS,
-      fn: getLdFlagsFactory(store, ldClientPromise, params),
+      fn: async () => await getLdFlags(store, ldClientPromise, params),
     },
     {
       key: ApplicationInitSteps.SAVE_STORAGE_INFORMATION,

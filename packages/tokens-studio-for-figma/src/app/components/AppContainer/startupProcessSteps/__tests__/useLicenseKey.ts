@@ -1,25 +1,30 @@
-import { createMockStore } from '../../../../../../tests/config/setupTest';
+import { act } from '@testing-library/react-hooks';
+import { AllTheProviders, createMockStore, renderHook } from '../../../../../../tests/config/setupTest';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { addLicenseFactory } from '../addLicenseFactory';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import * as getLicenseKeyModule from '@/utils/getLicenseKey';
 import { LicenseStatus } from '@/constants/LicenseStatus';
+import { useLicenseKey } from '../useLicenseKey';
 
-describe('addLicenseFactory', () => {
+describe('useLicenseKey', () => {
   const getLicenseKeySpy = jest.spyOn(getLicenseKeyModule, 'default');
 
   it('should set the local license key if available', async () => {
+    const { result } = renderHook(() => useLicenseKey(), {
+      wrapper: AllTheProviders,
+    });
+
     const mockStore = createMockStore({});
     const mockParams = {
       user: { figmaId: 'figma:1234' },
       licenseKey: 'FIGMA-TOKENS',
     } as unknown as StartupMessage;
 
-    const addLicenseKeySpy = jest.spyOn(mockStore.dispatch.userState, 'addLicenseKey');
-    addLicenseKeySpy.mockResolvedValueOnce();
+    await act(async () => result.current.initiateLicenseKey(mockParams));
 
-    const fn = addLicenseFactory(mockStore.dispatch, mockParams);
-    await fn();
+    const addLicenseKeySpy = jest.spyOn(validateLicenseKey, 'addLicenseKey');
+    addLicenseKeySpy.mockResolvedValueOnce();
 
     expect(addLicenseKeySpy).toBeCalledTimes(1);
     expect(addLicenseKeySpy).toBeCalledWith({
@@ -40,8 +45,7 @@ describe('addLicenseFactory', () => {
       error: 'No license found',
     });
 
-    const fn = addLicenseFactory(mockStore.dispatch, mockParams);
-    await fn();
+    await initializeLicenseKey(mockParams);
 
     expect(addLicenseKeySpy).not.toBeCalled();
     expect(mockStore.getState().userState.licenseStatus).toEqual(LicenseStatus.NO_LICENSE);

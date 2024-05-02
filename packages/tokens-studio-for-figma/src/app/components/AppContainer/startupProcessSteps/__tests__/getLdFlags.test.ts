@@ -1,10 +1,10 @@
 import type { LDClient } from 'launchdarkly-js-client-sdk';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 import type { StartupMessage } from '@/types/AsyncMessages';
-import { getLdFlagsFactory } from '../getLdFlagsFactory';
+import { getLdFlags } from '../getLdFlags';
 import * as analytics from '@/utils/analytics';
 
-describe('getLdFlagsFactory', () => {
+describe('getLdFlags', () => {
   const setUserDataSpy = jest.spyOn(analytics, 'setUserData');
 
   it('should work', async () => {
@@ -27,7 +27,7 @@ describe('getLdFlagsFactory', () => {
       identify: jest.fn(),
     } as unknown as LDClient;
 
-    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
+    const fn = getLdFlags(mockStore, Promise.resolve(mockLdClient), mockParams);
     await fn();
 
     expect(setUserDataSpy).toBeCalledTimes(1);
@@ -60,8 +60,7 @@ describe('getLdFlagsFactory', () => {
       identify: jest.fn(),
     } as unknown as LDClient;
 
-    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
-    await fn();
+    await getLdFlags(mockStore, Promise.resolve(mockLdClient), mockParams);
 
     expect(setUserDataSpy).toBeCalledTimes(1);
     expect(setUserDataSpy).toBeCalledWith({
@@ -81,8 +80,7 @@ describe('getLdFlagsFactory', () => {
       identify: jest.fn(),
     } as unknown as LDClient;
 
-    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
-    await fn();
+    await getLdFlags(mockStore, Promise.resolve(mockLdClient), mockParams);
 
     expect(setUserDataSpy).toBeCalledTimes(1);
     expect(setUserDataSpy).toBeCalledWith({
@@ -113,8 +111,7 @@ describe('getLdFlagsFactory', () => {
     } as unknown as LDClient;
 
     mockIdentify.mockRejectedValueOnce(new Error('error'));
-    const fn = getLdFlagsFactory(mockStore, Promise.resolve(mockLdClient), mockParams);
-    await fn();
+    await getLdFlags(mockStore, Promise.resolve(mockLdClient), mockParams);
 
     expect(setUserDataSpy).toBeCalledTimes(2);
     expect(setUserDataSpy).toBeCalledWith({

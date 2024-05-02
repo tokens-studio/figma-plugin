@@ -7,7 +7,7 @@ import {
 import { AppContainer } from '../AppContainer';
 import * as savePluginDataFactoryModule from '../startupProcessSteps/savePluginDataFactory';
 import * as addLicenseFactoryModule from '../startupProcessSteps/addLicenseFactory';
-import * as getLdFlagsFactorySpyModule from '../startupProcessSteps/getLdFlagsFactory';
+import * as getLdFlagsFactorySpyModule from '../startupProcessSteps/getLdFlags';
 import * as saveStorageInformationFactoryModule from '../startupProcessSteps/saveStorageInformationFactory';
 import * as pullTokensFactoryModule from '../startupProcessSteps/pullTokensFactory';
 
