@@ -96,44 +96,6 @@ export const userState = createModel<RootModel>()({
     ...userStateReducers,
   },
   effects: (dispatch) => ({
-    addLicenseKey: async (payload: { key: string; source: AddLicenseSource }, rootState) => {
-      dispatch.userState.setLicenseStatus(LicenseStatus.VERIFYING);
-
-      const { userId, userName } = rootState.userState;
-      const { key, source } = payload;
-
-      const {
-        error, plan, email: clientEmail, entitlements,
-      } = await validateLicense(key, userId, userName);
-
-      if (error) {
-        dispatch.userState.setLicenseStatus(LicenseStatus.ERROR);
-        dispatch.userState.setLicenseError(error);
-        if (source === AddLicenseSource.INITAL_LOAD) {
-          notifyToUI('License key invalid, please check your Settings', { error: true });
-        }
-      } else {
-        // clear errors when license validation is succesfull
-        dispatch.userState.setLicenseError(undefined);
-        dispatch.userState.setLicenseDetails({
-          plan,
-          clientEmail,
-          entitlements: [...new Set(entitlements)],
-        });
-        dispatch.userState.setLicenseStatus(LicenseStatus.VERIFIED);
-
-        if (source === AddLicenseSource.UI) {
-          notifyToUI('License added succesfully!');
-          dispatch.userState.setLicenseKey(key);
-        }
-
-        AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.SET_LICENSE_KEY,
-          licenseKey: key,
-        });
-      }
-      dispatch.userState.setLicenseKey(key);
-    },
     removeLicenseKey: async (payload, rootState) => {
       const { licenseKey, userId, licenseError } = rootState.userState;
 
