@@ -1,12 +1,11 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button, EmptyState } from '@tokens-studio/ui';
+import {
+  Box, Checkbox, Label, Stack, Button, EmptyState,
+} from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import useTokens from '../store/useTokens';
-import Box from './Box';
-import Checkbox from './Checkbox';
-import Label from './Label';
 import InspectorTokenGroup from './InspectorTokenGroup';
 import { SingleToken } from '@/types/tokens';
 import { inspectStateSelector, uiStateSelector } from '@/selectors';
@@ -17,7 +16,6 @@ import { SelectionGroup } from '@/types';
 import { NodeInfo } from '@/types/NodeInfo';
 import { StyleIdBackupKeys } from '@/constants/StyleIdBackupKeys';
 import OnboardingExplainer from './OnboardingExplainer';
-import Stack from './Stack';
 import BulkRemapModal from './modals/BulkRemapModal';
 
 export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { resolvedTokens: SingleToken[], tokenToSearch: string }) {
@@ -111,11 +109,11 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
     <>
       {uiState.selectionValues.length > 0 && (
         <Box css={{
-          display: 'flex', alignItems: 'center', gap: '$3', justifyContent: 'space-between', paddingInline: '$4',
+          display: 'inline-flex', paddingInline: '$4', rowGap: '$3', justifyContent: 'space-between',
         }}
         >
           <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small',
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small', flexBasis: '80px',
           }}
           >
             <Checkbox
@@ -123,12 +121,12 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
               id="selectAll"
               onCheckedChange={handleSelectAll}
             />
-            <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
+            <Label htmlFor="selectAll" css={{ fontSize: '$small', fontWeight: '$sansBold', whiteSpace: 'nowrap' }}>
               {t('selectAll')}
             </Label>
           </Box>
           <Box css={{
-            display: 'flex', flexDirection: 'row', gap: '$1', paddingTop: '$2',
+            display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '$3',
           }}
           >
             <Button size="small" onClick={handleShowBulkRemap} variant="secondary">
@@ -137,7 +135,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
             <Button size="small" onClick={setNoneValues} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
               {t('setToNone')}
             </Button>
-            <Button size="small" onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="secondary">
+            <Button size="small" onClick={removeTokens} disabled={inspectState.selectedTokens.length === 0} variant="danger">
               {t('removeSelected')}
             </Button>
           </Box>
@@ -156,6 +154,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
         ) : (
           <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
             <EmptyState title={uiState.selectedLayers > 0 ? t('noTokensFound') : t('noLayersSelected')} description={uiState.selectedLayers > 0 ? t('noLayersWithTokens') : t('selectLayer')} />
+            {/* FIXME: Use selectors - this rerenders */}
             {uiState.onboardingExplainerInspect && (
               <OnboardingExplainer data={onboardingData} closeOnboarding={closeOnboarding} />
             )}

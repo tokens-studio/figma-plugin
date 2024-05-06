@@ -6,7 +6,8 @@ import parseTokenValues from '@/utils/parseTokenValues';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 
 export type RemoteTokenStorageMetadata = {
-  tokenSetOrder?: string[]
+  tokenSetOrder?: string[];
+  tokenSetsData?: Record<string, { id: string, isDynamic?: boolean }>;
 };
 
 export type RemoteTokenStorageData<Metadata> = {

@@ -37,6 +37,7 @@ export default function ApplySelector() {
       <Button
         data-testid="update-button"
         variant="primary"
+        size="small"
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
@@ -55,7 +56,7 @@ export default function ApplySelector() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '$controlMedium',
+            width: '$controlSmall',
             borderLeft: '1px solid $borderSubtle',
             boxShadow: '$buttonPrimaryShadow',
             color: '$buttonPrimaryFg',
@@ -66,45 +67,47 @@ export default function ApplySelector() {
           <IconChevronDown />
         </DropdownMenu.Trigger>
 
-        <DropdownMenu.Content side="top">
-          <DropdownMenu.RadioGroup value={updateMode}>
-            <DropdownMenu.RadioItem
-              data-testid="apply-to-selection"
-              value={UpdateMode.SELECTION}
-              onSelect={handleApplySelection}
-            >
-              <DropdownMenu.ItemIndicator>
-                <DotFilledIcon />
-              </DropdownMenu.ItemIndicator>
-              {t('applyTo.selection.title')}
-              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                {t('applyTo.selection.description')}
-              </Box>
-            </DropdownMenu.RadioItem>
-            <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
-              <DropdownMenu.ItemIndicator>
-                <DotFilledIcon />
-              </DropdownMenu.ItemIndicator>
-              {t('applyTo.page.title')}
-              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                {t('applyTo.page.description')}
-              </Box>
-            </DropdownMenu.RadioItem>
-            <DropdownMenu.RadioItem
-              data-testid="apply-to-document"
-              value={UpdateMode.DOCUMENT}
-              onSelect={handleApplyDocument}
-            >
-              <DropdownMenu.ItemIndicator>
-                <DotFilledIcon />
-              </DropdownMenu.ItemIndicator>
-              {t('applyTo.doc.title')}
-              <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                {t('applyTo.doc.description')}
-              </Box>
-            </DropdownMenu.RadioItem>
-          </DropdownMenu.RadioGroup>
-        </DropdownMenu.Content>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content side="top">
+            <DropdownMenu.RadioGroup value={updateMode}>
+              <DropdownMenu.RadioItem
+                data-testid="apply-to-selection"
+                value={UpdateMode.SELECTION}
+                onSelect={handleApplySelection}
+              >
+                <DropdownMenu.ItemIndicator>
+                  <DotFilledIcon />
+                </DropdownMenu.ItemIndicator>
+                {t('applyTo.selection.title')}
+                <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.selection.description')}
+                </Box>
+              </DropdownMenu.RadioItem>
+              <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
+                <DropdownMenu.ItemIndicator>
+                  <DotFilledIcon />
+                </DropdownMenu.ItemIndicator>
+                {t('applyTo.page.title')}
+                <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.page.description')}
+                </Box>
+              </DropdownMenu.RadioItem>
+              <DropdownMenu.RadioItem
+                data-testid="apply-to-document"
+                value={UpdateMode.DOCUMENT}
+                onSelect={handleApplyDocument}
+              >
+                <DropdownMenu.ItemIndicator>
+                  <DotFilledIcon />
+                </DropdownMenu.ItemIndicator>
+                {t('applyTo.doc.title')}
+                <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.doc.description')}
+                </Box>
+              </DropdownMenu.RadioItem>
+            </DropdownMenu.RadioGroup>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
       </DropdownMenu>
     </Stack>
   );

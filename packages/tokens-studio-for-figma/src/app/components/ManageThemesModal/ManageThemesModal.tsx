@@ -4,6 +4,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import { Button, EmptyState } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -25,6 +26,17 @@ import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
 
 type Props = unknown;
+
+const StyledReorderGroup = styled(ReorderGroup, {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gridAutoFlow: 'row',
+  '> li > button': {
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr min-content',
+    gridAutoFlow: 'column',
+  },
+});
 
 export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = () => {
   const dispatch = useDispatch<Dispatch>();
@@ -68,7 +80,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
-      const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?' });
+      const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?', confirmAction: 'Delete', variant: 'danger' });
       if (confirmDelete) {
         track('Delete theme', { id: themeEditorOpen });
         dispatch.tokenState.deleteTheme(themeEditorOpen);
@@ -148,7 +160,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     <Modal
       isOpen
       full
-      large
       title="Themes"
       stickyFooter
       showClose
@@ -178,21 +189,23 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                 </Button>
                 )}
               </Box>
-              <Button
-                data-testid="button-manage-themes-modal-cancel"
-                variant="secondary"
-                onClick={handleToggleOpenThemeEditor}
-              >
-                Cancel
-              </Button>
-              <Button
-                data-testid="button-manage-themes-modal-save-theme"
-                variant="primary"
-                type="submit"
-                form="form-create-or-edit-theme"
-              >
-                Save theme
-              </Button>
+              <Stack direction="row" gap={4}>
+                <Button
+                  data-testid="button-manage-themes-modal-cancel"
+                  variant="secondary"
+                  onClick={handleToggleOpenThemeEditor}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  data-testid="button-manage-themes-modal-save-theme"
+                  variant="primary"
+                  type="submit"
+                  form="form-create-or-edit-theme"
+                >
+                  Save theme
+                </Button>
+              </Stack>
             </>
           )}
         </Stack>
@@ -208,11 +221,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       )}
       {!!themes.length && !themeEditorOpen && (
         <Box css={{ padding: '$3 $2 $3 0' }}>
-          <ReorderGroup
+          <StyledReorderGroup
             layoutScroll
             values={treeItems}
             onReorder={handleReorder}
-            checkReorder={handleCheckReorder}
+            checkReorder={handleCheckReorder as (order: ItemData<unknown>[], value: unknown, offset: number, velocity: number) => ItemData<unknown>[]}
           >
             {
             treeItems.map((item) => (
@@ -231,7 +244,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               </DragItem>
             ))
           }
-          </ReorderGroup>
+          </StyledReorderGroup>
         </Box>
       )}
       {themeEditorOpen && (

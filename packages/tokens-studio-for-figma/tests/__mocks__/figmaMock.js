@@ -73,6 +73,7 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
+module.exports.mockGetLocalVariablesAsync = jest.fn(() => ([]));
 module.exports.mockCreateVariable = jest.fn();
 module.exports.mockGetLocalVariableCollections = jest.fn();
 module.exports.mockCreateVariableCollection = jest.fn();
@@ -111,6 +112,7 @@ module.exports.figma = {
   },
   variables: {
     getLocalVariables: module.exports.mockGetLocalVariables,
+    getLocalVariablesAsync: module.exports.mockGetLocalVariablesAsync,
     createVariable: module.exports.mockCreateVariable,
     getLocalVariableCollections: module.exports.mockGetLocalVariableCollections,
     createVariableCollection: module.exports.mockCreateVariableCollection,
@@ -120,8 +122,11 @@ module.exports.figma = {
     setBoundVariableForPaint: module.exports.mockSetBoundVariableForPaint
   },
   getLocalPaintStyles: module.exports.mockGetLocalPaintStyles,
+  getLocalPaintStylesAsync: module.exports.mockGetLocalPaintStyles,
   getLocalTextStyles: module.exports.mockGetLocalTextStyles,
+  getLocalTextStylesAsync: module.exports.mockGetLocalTextStyles,
   getLocalEffectStyles: module.exports.mockGetLocalEffectStyles,
+  getLocalEffectStylesAsync: module.exports.mockGetLocalEffectStyles,
   loadFontAsync: module.exports.mockLoadFontAsync,
   getStyleById: module.exports.mockGetStyleById,
   createTextStyle: module.exports.mockCreateTextStyle,

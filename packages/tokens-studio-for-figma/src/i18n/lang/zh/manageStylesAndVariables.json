@@ -1,0 +1,70 @@
+{
+  "modalTitle": "管理样式和变量",
+  "buttonLabel": "样式和变量",
+  "actions": {
+    "export": "导出到 Figma",
+    "import": "从 Figma 导入",
+    "options": "选项",
+    "cancel": "取消",
+    "confirm": "确认",
+    "createThemes": "创建主题",
+    "getPRO": "获取 PRO",
+    "manageThemes": "管理主题",
+    "changeSets": "更改集合"
+  },
+  "docs": {
+    "exportToFigmaOptions": "导出到 Figma 选项",
+    "stylesAndVariables": "样式和变量",
+    "referenceOnlyMode": "启用与仅引用模式"
+  },
+  "generic": {
+    "learnMore": "了解更多",
+    "themes": "主题",
+    "noGroup": "无分组",
+    "selectAll": "全选"
+  },
+  "tabs": {
+    "exportThemes": "主题",
+    "exportSets": "令牌集合"
+  },
+  "options": {
+    "title": "选项",
+    "whichVariablesShouldBeCreatedAndUpdated": "应创建和更新哪些变量？",
+    "whichStylesShouldBeCreatedAndUpdated": "应创建和更新哪些样式？",
+    "tokensExportedToFigmaShould": "导出到 Figma 的令牌应该：",
+    "ignorePrefix": "忽略样式的令牌名称的第一部分",
+    "ignorePrefixExplanation": "如果您想忽略样式中的“颜色”，对于名为“colors.blue.500”的令牌，这将非常有用",
+    "prefixStyles": "使用活动主题名称作为样式前缀",
+    "prefixStylesExplanation": "将活动主题名称添加到创建的任何样式中。注意：在使用多维主题时使用此选项会导致意外结果。",
+    "renameExistingStylesAndVariables": "覆盖现有的样式和变量",
+    "renameExistingStylesAndVariablesExplanation": "将覆盖具有相同名称的现有样式和变量",
+    "scopeVariablesByTokenType": "按令牌类型限定变量范围",
+    "scopeVariablesByTokenTypeExplanation": "变量范围将根据令牌类型和预期用途推断",
+    "createStylesWithVariableReferences": "创建包含变量引用的样式",
+    "createStylesWithVariableReferencesExplanation": "将创建包含对变量的引用的样式"
+  },
+  "variables": {
+    "color": "颜色",
+    "number": "数字",
+    "boolean": "布尔值",
+    "string": "字符串"
+  },
+  "styles": {
+    "color": "颜色",
+    "typography": "排版",
+    "effects": "效果"
+  },
+  "exportThemesTab": {
+    "headingPro": "创建主题以开始使用",
+    "headingBasic": "创建主题是高级功能",
+    "introPro": "令牌集合的组合创建主题。使用主题创建多个变量或样式的集合，以便在设计概念之间轻松切换，如浅色或深色模式、多个品牌、产品或平台。或者切换到集合以在不使用主题的情况下导出",
+    "introBasic": "令牌集合的组合创建主题。使用主题创建多个变量或样式的集合，以便在设计概念之间轻松切换，如浅色或深色模式、多个品牌、产品或平台。",
+    "confirmThemes": "确认主题",
+    "combinationsOfSetsMakeThemes": "令牌集合的组合创建主题"
+  },
+  "exportSetsTab": {
+    "changeSetsHeading": "启用的集合将导出到 Figma",
+    "confirmSets": "确认集合",
+    "intro": "您可以使用令牌集合来管理样式和变量。使用主题（Pro）创建多个变量或样式的集合，以便在设计概念之间轻松切换。"
+  }
+}

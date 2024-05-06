@@ -6,7 +6,6 @@ import URLForm from './StorageItemForm/URLForm';
 import GenericVersionedForm from './StorageItemForm/GenericVersioned';
 import BitbucketForm from './StorageItemForm/BitbucketForm';
 
-import { useFlags } from './LaunchDarkly';
 import { ChangeEventHandler } from './StorageItemForm/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -27,8 +26,6 @@ type Props = {
 export default function StorageItemForm({
   isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
-  const { bitBucketSync } = useFlags();
-
   switch (values.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB: {
@@ -44,7 +41,7 @@ export default function StorageItemForm({
       );
     }
     case StorageProviderType.BITBUCKET: {
-      return bitBucketSync ? (
+      return (
         <BitbucketForm
           onChange={onChange}
           onSubmit={onSubmit}
@@ -53,7 +50,7 @@ export default function StorageItemForm({
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />
-      ) : null;
+      );
     }
     case StorageProviderType.ADO: {
       return (

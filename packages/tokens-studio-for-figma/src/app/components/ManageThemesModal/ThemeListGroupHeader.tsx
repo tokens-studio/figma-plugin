@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton } from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -56,17 +57,22 @@ export function ThemeListGroupHeader({
   return (
     <StyledDragButton
       type="button"
-      style={{ cursor: 'inherit' }}
-      css={{ '&:not(:first-of-type)': { marginTop: '$4' } }}
+      css={{
+        backgroundColor: '$bgDefault',
+        display: 'grid',
+        cursor: 'inherit',
+        '&:not(:first-of-type)': { marginTop: '$4' },
+      }}
     >
-      <DragGrabber<string>
+      <DragGrabber
         item={groupName}
         canReorder={!editProhibited}
         onDragStart={handleDragStart}
       />
       <Box css={{
-        display: 'flex',
+        display: 'inherit',
         alignItems: 'center',
+        gridTemplateColumns: 'max-content min-content',
         '& > div > button ': {
           display: 'none',
         },

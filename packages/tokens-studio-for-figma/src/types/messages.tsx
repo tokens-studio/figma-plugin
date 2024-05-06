@@ -5,6 +5,7 @@ import type { TokenStore } from './tokens';
 import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageTypeCredentials } from './StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from './payloads';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -45,13 +46,24 @@ export type UiSettingsFromPluginMessage = {
     updateRemote: boolean;
     updateOnChange: boolean;
     updateStyles: boolean;
+    variablesColor: boolean;
+    variablesString: boolean;
+    variablesNumber: boolean;
+    variablesBoolean: boolean;
+    stylesColor: boolean;
+    stylesTypography: boolean;
+    stylesEffect: boolean;
     ignoreFirstPartForStyles: boolean;
+    createStylesWithVariableReferences: boolean;
     prefixStylesWithThemeName: boolean;
+    renameExistingStylesAndVariables: boolean;
+    removeStylesAndVariablesWithoutConnection: boolean;
     inspectDeep: boolean;
     shouldSwapStyles: boolean;
     baseFontSize: string;
     aliasBaseFontSize: string;
     storeTokenIdInJsonEditor: boolean;
+    tokenFormat: TokenFormatOptions;
   };
 };
 

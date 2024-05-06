@@ -1,154 +1,163 @@
 import {
   Graphql,
   Configuration,
-  TokenSetsQuery,
-  RawToken,
-  Raw_Token_border,
-  Raw_Token_boxShadow,
+  CreateTokenMutation,
+  UpdateTokenMutation,
+  DeleteTokenMutation,
+  CreateTokenSetMutation,
+  UpdateTokenSetMutation,
+  DeleteTokenSetMutation,
+  ProjectQuery,
+  UpdateTokenSetOrderMutation,
+  ThemeGroup,
+  TokenSet,
+  UpdateThemeGroupMutation,
+  CreateThemeGroupMutation,
+  DeleteThemeGroupMutation,
+  TokenInput,
 } from '@tokens-studio/sdk';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile } from './RemoteTokenStorage';
+import * as Sentry from '@sentry/react';
+import { AnyTokenSet } from '@/types/tokens';
+import { notifyToUI } from '@/plugin/notifiers';
+import {
+  RemoteTokenStorage,
+  RemoteTokenstorageErrorMessage,
+  RemoteTokenStorageFile,
+  RemoteTokenStorageMetadata,
+} from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
+import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+import {
+  GET_PROJECT_DATA_QUERY,
+  CREATE_TOKEN_MUTATION,
+  UPDATE_TOKEN_MUTATION,
+  DELETE_TOKEN_MUTATION,
+  CREATE_TOKEN_SET_MUTATION,
+  UPDATE_TOKEN_SET_MUTATION,
+  DELETE_TOKEN_SET_MUTATION,
+  UPDATE_TOKEN_SET_ORDER_MUTATION,
+  UPDATE_THEME_GROUP_MUTATION,
+  CREATE_THEME_GROUP_MUTATION,
+  DELETE_THEME_GROUP_MUTATION,
+} from './tokensStudio/graphql';
+import { track } from '@/utils/analytics';
+import { ThemeObjectsList } from '@/types';
+import { TokenTypes } from '@/constants/TokenTypes';
+import { tokensStudioToToken } from './tokensStudio/utils';
+import { fetchDynamicTokenSetData } from './tokensStudio/dynamicSets';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
 };
 
-interface Token {
-  description?: string | null | undefined;
-  type: string | null | undefined;
-  value: any;
-}
-
-const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([key, v]) => v !== null));
-
-// We need to convert the raw token data from the GraphQL API into a format that the plugin will understand,
-// as there's some differences between the two. Ideally, we could just pass in a "request format"
-// into the query, but that's not possible so far.
-const tsToToken = (raw: RawToken) => {
-  const combined: Token = {
-    type: raw.type,
-    value: null,
+type ProjectData = {
+  tokens: AnyTokenSet | null | undefined;
+  themes: ThemeObjectsList;
+  tokenSets: {
+    [tokenSetName: string]: { id: string };
   };
-
-  if (raw.description) {
-    combined.description = raw.description;
-  }
-
-  if (raw.extensions) {
-    // @ts-ignore
-    combined.$extensions = JSON.parse(raw.extensions);
-  }
-
-  // @ts-ignore
-  if (raw.value.typography) {
-    // @ts-ignore typography exists for typography tokens
-    combined.value = removeNulls((raw as RawToken).value!.typography!);
-    // @ts-ignore
-  } else if (raw.value.border) {
-    // @ts-ignore border exists for border tokens
-    combined.value = removeNulls((raw as unknown as Raw_Token_border).value!.border!);
-    // @ts-ignore
-  } else if (raw.value.boxShadow) {
-    // @ts-ignore
-    combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
-  } else {
-    combined.value = raw.value!.value;
-  }
-
-  return combined;
+  tokenSetOrder: string[];
 };
 
-async function getTokens(urn: string): Promise<AnyTokenSet | null> {
-  const data = await Graphql.exec<TokenSetsQuery>(
-    Graphql.op(
-      `query TokenSets(
-    $filter: TokenSetsFilterInput
-    $limit: Int
-    $offset: Int
-    $project: String!
-) {
-    tokenSets(
-    filter: $filter
-    limit: $limit
-    offset: $offset
-    project: $project
-    ) {
-    urn
-    name
-    projectUrn
-    tokens(limit: 400) {
-      description
-      name
-      urn
-      extensions
-      setUrn
-      metadata {
-          createdAt
-      }
-      type
-      value {
-        ... on Raw_Token_scalar {
-            value
-        }
-        ... on Raw_Token_typography {
-          value
-          typography {
-            textDecoration
-            textCase
-            lineHeight
-            letterSpacing
-            fontSize
-            fontFamily
-            fontWeight
-            paragraphIndent
-            paragraphSpacing
-          }
-        }
-        ... on Raw_Token_border {
-            border {
-              width
-              style
-              color
-            }
-        }
-        ... on Raw_Token_boxShadow {
-            boxShadow {
-              x
-              y
-              blur
-              spread
-              color
-              type
-            }
-        }
-      }
-    }
-  }
-}`,
-      {
+async function getProjectData(urn: string): Promise<ProjectData | null> {
+  try {
+    const data = await Graphql.exec<ProjectQuery>(
+      Graphql.op(GET_PROJECT_DATA_QUERY, {
         limit: 500,
-        project: urn,
-      },
-    ),
-  );
+        urn,
+      }),
+    );
 
-  if (!data.data) {
+    if (!data.data?.project) {
+      return null;
+    }
+
+    let tokenSets = data.data.project.sets as TokenSet[];
+
+    const dynamicTokenSets = tokenSets.filter((tokenSet) => tokenSet.type === 'DYNAMIC');
+    const dynamicTokenSetData = await Promise.all(
+      dynamicTokenSets.map(async (tokenSet) => {
+        if (!tokenSet.generatorUrn) {
+          return null;
+        }
+        const tokens = await fetchDynamicTokenSetData(tokenSet.generatorUrn);
+        return { ...tokenSet, tokens };
+      }),
+    );
+
+    if (dynamicTokenSetData.length) {
+      tokenSets = tokenSets.map((tokenSet) => {
+        if (tokenSet.type !== 'DYNAMIC') {
+          return tokenSet;
+        }
+
+        const dynamicSetData = dynamicTokenSetData.find((dynamicSet) => dynamicSet?.urn === tokenSet.urn);
+        if (dynamicSetData?.tokens) {
+          return { ...tokenSet, tokens: dynamicSetData.tokens };
+        }
+        return tokenSet;
+      });
+    }
+
+    const returnData = tokenSets.reduce(
+      (acc, tokenSet) => {
+        if (!tokenSet.name) return acc;
+        acc.tokens[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
+          // We know that name exists (required field)
+          tokenSetAcc[token.name!] = tokensStudioToToken(token);
+          return tokenSetAcc;
+        }, {});
+
+        acc.tokenSets[tokenSet.name] = { id: tokenSet.urn, isDynamic: tokenSet.type === 'DYNAMIC' };
+
+        return acc;
+      },
+      { tokens: {}, tokenSets: {} },
+    );
+
+    const tokenSetOrder = tokenSets
+      .sort((a, b) => (+(a.orderIndex || 0) > +(b.orderIndex || 0) ? 1 : -1))
+      .reduce((acc: string[], tokenSet) => {
+        if (!tokenSet.name) return acc;
+        return [...acc, tokenSet.name];
+      }, []);
+
+    let themes = [] as ThemeObjectsList;
+    const themeGroups = data.data.project.themeGroups as ThemeGroup[];
+
+    if (themeGroups) {
+      themeGroups.forEach(({ name: group, urn: groupUrn, options }) => {
+        if (!options) {
+          return;
+        }
+
+        const figmaThemes: ThemeObjectsList = options
+          ?.filter((theme) => !!theme)
+          .map((theme) => {
+            const selectedTokenSets = JSON.parse(JSON.parse(theme?.selectedTokenSets || '')) || [];
+
+            return {
+              id: theme?.urn as string,
+              name: theme?.name as string,
+              group,
+              groupId: groupUrn,
+              selectedTokenSets,
+              $figmaStyleReferences: JSON.parse(JSON.parse(theme?.figmaStyleReferences || '{}')),
+              $figmaVariableReferences: JSON.parse(JSON.parse(theme?.figmaVariableReferences || '{}')),
+            };
+          });
+
+        themes = [...themes, ...figmaThemes];
+      });
+    }
+
+    return { ...returnData, tokenSetOrder, themes };
+  } catch (e) {
+    Sentry.captureException(e);
+    console.error('Error fetching tokens', e);
     return null;
   }
-
-  const returnData: Record<string, SingleToken<true>> = data.data.tokenSets.reduce((acc, tokenSet) => {
-    if (!tokenSet.name) return acc;
-    acc[tokenSet.name] = tokenSet.tokens.reduce((tokenSetAcc, token) => {
-      // We know that name exists (required field)
-      tokenSetAcc[token.name!] = tsToToken(token);
-      return tokenSetAcc;
-    }, {});
-    return acc;
-  }, {});
-
-  return returnData;
 }
 
 export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSaveOptions, SaveOption> {
@@ -165,25 +174,55 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    let payload: AnyTokenSet | null = {};
+    let tokens: AnyTokenSet | null | undefined = {};
+    let themes: ThemeObjectsList = [];
+    const metadata: RemoteTokenStorageMetadata = {};
 
     try {
-      payload = await getTokens(this.id);
+      const projectData = await getProjectData(this.id);
+
+      tokens = projectData?.tokens;
+      themes = projectData?.themes || [];
+
+      if (projectData?.tokenSets) {
+        metadata.tokenSetsData = projectData.tokenSets;
+      }
+
+      if (projectData?.tokenSetOrder) {
+        metadata.tokenSetOrder = projectData.tokenSetOrder;
+      }
     } catch (error) {
       // We get errors in a slightly changed format from the backend
-      if (payload?.errors) console.log('Error is', payload.errors[0].message);
+      if (tokens?.errors) console.log('Error is', tokens.errors[0].message);
       return {
-        errorMessage: payload?.errors ? payload.errors[0].message : ErrorMessages.TOKENSSTUDIO_CREDENTIAL_ERROR,
+        errorMessage: tokens?.errors ? tokens.errors[0].message : ErrorMessages.TOKENSSTUDIO_CREDENTIAL_ERROR,
       };
     }
-    if (payload) {
+    if (tokens) {
       // @ts-ignore typescript is giving me a great friday morning
-      const returnPayload: RemoteTokenStorageFile[] = Object.entries(payload).map(([filename, data]) => ({
+      const returnPayload: RemoteTokenStorageFile[] = Object.entries(tokens).map(([filename, data]) => ({
         name: filename,
         type: 'tokenSet',
         path: filename,
         data,
       }));
+
+      if (themes) {
+        returnPayload.push({
+          type: 'themes',
+          path: 'themes',
+          data: themes,
+        });
+      }
+
+      if (metadata) {
+        returnPayload.push({
+          type: 'metadata',
+          path: 'metadata',
+          data: metadata,
+        });
+      }
+
       return returnPayload;
     }
     return {
@@ -192,13 +231,318 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
   }
 
   public async write(
-    // TODO: Add wrtie support
+    // TODO: Add write support
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     files: RemoteTokenStorageFile<TokensStudioSaveOptions>[],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     saveOptions?: SaveOption | undefined,
   ): Promise<boolean> {
-    console.log('WRITE NOT IMPLEMENTED');
+    console.log('WRITE NOT IMPLEMENTED', files, saveOptions);
     return undefined as any;
+  }
+
+  public async push({
+    action,
+    data,
+    metadata,
+  }: {
+    action: TokensStudioAction;
+    data: any;
+    metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+  }) {
+    switch (action) {
+      case 'CREATE_TOKEN': {
+        try {
+          const setId = metadata?.[data.parent]?.id;
+
+          if (!setId) {
+            throw new Error('Invalid data');
+          }
+
+          const input: TokenInput = {
+            name: data.name,
+            type: data.type,
+            description: data.description,
+            extensions: JSON.stringify(data.$extensions),
+          };
+
+          if (data.type === TokenTypes.BOX_SHADOW) {
+            input.boxShadow = data.value;
+          } else if (data.type === TokenTypes.BORDER) {
+            input.border = data.value;
+          } else if (data.type === TokenTypes.TYPOGRAPHY) {
+            input.typography = data.value;
+          } else if (data.type === TokenTypes.COMPOSITION) {
+            input.value = JSON.stringify(data.value);
+          } else {
+            input.value = data.value;
+          }
+
+          const responseData = await Graphql.exec<CreateTokenMutation>(
+            Graphql.op(CREATE_TOKEN_MUTATION, {
+              set: setId,
+              input,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create token in Tokens Studio');
+          notifyToUI('Token pushed to Tokens Studio', { error: false });
+
+          return responseData.data.createToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating token in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'EDIT_TOKEN': {
+        const tokenId = data.$extensions?.['studio.tokens']?.urn;
+
+        if (!tokenId) {
+          throw new Error('Invalid data');
+        }
+
+        try {
+          const responseData = await Graphql.exec<UpdateTokenMutation>(
+            Graphql.op(UPDATE_TOKEN_MUTATION, {
+              urn: tokenId,
+              input: {
+                name: data.name,
+                description: data.description,
+                value: data.value,
+                extensions: JSON.stringify(data.$extensions),
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Edit token in Tokens Studio');
+          notifyToUI('Token updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_TOKEN': {
+        if (!data.sourceId) {
+          throw new Error('Invalid data');
+        }
+
+        try {
+          const responseData = await Graphql.exec<DeleteTokenMutation>(
+            Graphql.op(DELETE_TOKEN_MUTATION, {
+              urn: data.sourceId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete token from Tokens Studio');
+          notifyToUI('Token removed from Tokens Studio', { error: false });
+
+          return responseData.data.deleteToken;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error removing token from Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'CREATE_TOKEN_SET': {
+        try {
+          if (!data.name) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<CreateTokenSetMutation>(
+            Graphql.op(CREATE_TOKEN_SET_MUTATION, {
+              project: this.id,
+              input: {
+                name: data.name,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create token set in Tokens Studio');
+          notifyToUI('Token set added in Tokens Studio', { error: false });
+
+          return responseData.data.createTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating token set in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_TOKEN_SET': {
+        try {
+          const setId = metadata?.[data.oldName]?.id;
+
+          if (!setId || !data.newName) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<UpdateTokenSetMutation>(
+            Graphql.op(UPDATE_TOKEN_SET_MUTATION, {
+              urn: setId,
+              input: {
+                name: data.newName,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update token set in Tokens Studio');
+          notifyToUI('Token set updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token set in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_TOKEN_SET': {
+        try {
+          const setId = metadata?.[data.name]?.id;
+
+          if (!setId) {
+            throw new Error('Invalid data');
+          }
+
+          const responseData = await Graphql.exec<DeleteTokenSetMutation>(
+            Graphql.op(DELETE_TOKEN_SET_MUTATION, {
+              urn: setId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete token set in Tokens Studio');
+          notifyToUI('Token set deleted from Tokens Studio', { error: false });
+
+          return responseData.data.deleteTokenSet;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error deleting token set in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_TOKEN_SET_ORDER': {
+        try {
+          const responseData = await Graphql.exec<UpdateTokenSetOrderMutation>(
+            Graphql.op(UPDATE_TOKEN_SET_ORDER_MUTATION, {
+              input: data,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update token set order in Tokens Studio');
+          notifyToUI('Token set order updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateTokenSetOrder;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token set order in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'CREATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<CreateThemeGroupMutation>(
+            Graphql.op(CREATE_THEME_GROUP_MUTATION, {
+              project: this.id,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Create theme group in Tokens Studio');
+          notifyToUI('Theme group created in Tokens Studio', { error: false });
+
+          return responseData.data.createThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'UPDATE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<UpdateThemeGroupMutation>(
+            Graphql.op(UPDATE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Update theme group in Tokens Studio');
+          notifyToUI('Theme group updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      case 'DELETE_THEME_GROUP': {
+        try {
+          const responseData = await Graphql.exec<DeleteThemeGroupMutation>(
+            Graphql.op(DELETE_THEME_GROUP_MUTATION, {
+              urn: data.groupId,
+            }),
+          );
+
+          if (!responseData.data) {
+            return null;
+          }
+
+          track('Delete theme group in Tokens Studio');
+          return responseData.data.deleteThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error deleting theme group in Tokens Studio', e);
+          return null;
+        }
+      }
+      default:
+        throw new Error(`Unimplemented storage provider for ${action}`);
+    }
   }
 }

@@ -10,6 +10,7 @@ import { AsyncMessageTypes, NotifyAsyncMessage } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from '@/types/payloads';
+import { TokenFormatOptions } from './TokenFormatStoreClass';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -60,13 +61,24 @@ export type SavedSettings = {
   updateRemote: boolean;
   updateOnChange: boolean;
   updateStyles: boolean;
+  variablesColor: boolean;
+  variablesNumber: boolean;
+  variablesString: boolean;
+  variablesBoolean: boolean;
+  stylesColor: boolean;
+  stylesTypography: boolean;
+  stylesEffect: boolean;
   ignoreFirstPartForStyles: boolean;
+  createStylesWithVariableReferences: boolean;
   prefixStylesWithThemeName: boolean;
+  renameExistingStylesAndVariables: boolean;
+  removeStylesAndVariablesWithoutConnection: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   storeTokenIdInJsonEditor: boolean;
+  tokenFormat: TokenFormatOptions;
 };
 
 export function notifyUISettings(
@@ -79,7 +91,15 @@ export function notifyUISettings(
     updateOnChange,
     updateStyles,
     showEmptyGroups,
+    variablesColor,
+    variablesNumber,
+    variablesString,
+    variablesBoolean,
+    stylesColor,
+    stylesTypography,
+    stylesEffect,
     ignoreFirstPartForStyles,
+    createStylesWithVariableReferences,
     prefixStylesWithThemeName,
     updateRemote = true,
     inspectDeep,
@@ -87,6 +107,9 @@ export function notifyUISettings(
     baseFontSize,
     aliasBaseFontSize,
     storeTokenIdInJsonEditor,
+    tokenFormat,
+    renameExistingStylesAndVariables,
+    removeStylesAndVariablesWithoutConnection,
   }: SavedSettings,
 ) {
   postToUI({
@@ -103,13 +126,24 @@ export function notifyUISettings(
       updateRemote,
       updateOnChange,
       updateStyles,
+      variablesColor,
+      variablesBoolean,
+      variablesNumber,
+      variablesString,
+      stylesColor,
+      stylesEffect,
+      stylesTypography,
       ignoreFirstPartForStyles,
+      createStylesWithVariableReferences,
       prefixStylesWithThemeName,
       inspectDeep,
       shouldSwapStyles,
       baseFontSize,
       aliasBaseFontSize,
       storeTokenIdInJsonEditor,
+      tokenFormat,
+      renameExistingStylesAndVariables,
+      removeStylesAndVariablesWithoutConnection,
     },
   });
   postToUI({

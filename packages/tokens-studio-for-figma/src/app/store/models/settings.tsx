@@ -25,19 +25,31 @@ export interface SettingsState {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
-  updateStyles?: boolean;
   tokenType?: TokenModeType;
-  ignoreFirstPartForStyles?: boolean;
-  prefixStylesWithThemeName?: boolean;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   /**
    * Whether the user has opted in for session recording in Sentry
-   */
+  */
   sessionRecording: boolean;
   storeTokenIdInJsonEditor: boolean;
+  /*
+   * Export styles and variables options
+  */
+  variablesColor: boolean;
+  variablesString: boolean;
+  variablesNumber: boolean;
+  variablesBoolean: boolean;
+  stylesColor: boolean;
+  stylesTypography: boolean;
+  stylesEffect: boolean;
+  ignoreFirstPartForStyles?: boolean;
+  prefixStylesWithThemeName?: boolean;
+  createStylesWithVariableReferences?: boolean;
+  renameExistingStylesAndVariables?: boolean;
+  removeStylesAndVariablesWithoutConnection?: boolean;
 }
 
 const setUI = (state: SettingsState) => {
@@ -59,15 +71,24 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
-    updateStyles: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
+    renameExistingStylesAndVariables: false,
+    removeStylesAndVariablesWithoutConnection: false,
+    createStylesWithVariableReferences: false,
     inspectDeep: false,
     shouldSwapStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
     storeTokenIdInJsonEditor: false,
+    variablesColor: true,
+    variablesString: true,
+    variablesNumber: true,
+    variablesBoolean: true,
+    stylesColor: true,
+    stylesTypography: true,
+    stylesEffect: true,
   } as SettingsState,
   reducers: {
     ...settingsStateReducers,
@@ -163,12 +184,6 @@ export const settings = createModel<RootModel>()({
         updateOnChange: payload,
       };
     },
-    setUpdateStyles(state, payload: boolean) {
-      return {
-        ...state,
-        updateStyles: payload,
-      };
-    },
     setShouldSwapStyles(state, payload: boolean) {
       return {
         ...state,
@@ -179,12 +194,6 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         tokenType: payload,
-      };
-    },
-    setIgnoreFirstPartForStyles(state, payload: boolean) {
-      return {
-        ...state,
-        ignoreFirstPartForStyles: payload,
       };
     },
     setStoreTokenIdInJsonEditorSelector(state, payload: boolean) {
@@ -213,9 +222,6 @@ export const settings = createModel<RootModel>()({
         height: payload.isMinimized ? 50 : payload.height,
       });
     },
-    setUpdateStyles: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
     setShouldSwapStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
@@ -226,9 +232,6 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUpdateOnChange: (payload, rootState) => {
-      setUI(rootState.settings);
-    },
-    setIgnoreFirstPartForStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setInspectDeep: (payload, rootState) => {

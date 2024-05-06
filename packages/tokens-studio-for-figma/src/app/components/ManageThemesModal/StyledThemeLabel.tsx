@@ -1,18 +1,19 @@
+import { Box } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
-import Box from '../Box';
 
 export const StyledThemeLabel = styled(Box, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   userSelect: 'none',
   cursor: 'pointer',
-  display: 'flex',
+  whiteSpace: 'nowrap',
+  display: 'block',
   alignItems: 'center',
   gap: '$2',
   variants: {
     ignored: {
       true: {
-        color: '$fgDisabled',
+        color: '$fgSubtle',
       },
     },
     variant: {

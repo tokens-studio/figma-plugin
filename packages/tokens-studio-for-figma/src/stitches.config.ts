@@ -1,6 +1,6 @@
 // stitches.config.ts
 import { createStitches } from '@stitches/react';
-import { lightTheme, darkTheme, core } from '@tokens-studio/tokens';
+import { lightTheme, darkFigmaTheme as darkTheme, core } from '@tokens-studio/tokens';
 
 export const stitchesInstance = createStitches({
   theme: {
@@ -24,6 +24,7 @@ export const stitchesInstance = createStitches({
       xxsmall: '11px !important',
       xsmall: '12px !important',
       small: '13px !important',
+      base: '14px !important',
       medium: '14px !important',
       large: '16px !important',
     },

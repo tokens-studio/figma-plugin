@@ -174,6 +174,7 @@ describe('editToken', () => {
           settings: {
             updateRemote: true,
             updateOnChange: true,
+            storeTokenIdInJsonEditor: false,
           },
         },
       },
@@ -674,7 +675,9 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
       },
     ];
@@ -810,8 +813,8 @@ describe('editToken', () => {
         type: TokenTypes.COLOR,
         value: '#000000',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -860,7 +863,9 @@ describe('editToken', () => {
     expect(tokens.global).toEqual([
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         name: '1',
         type: 'sizing',
@@ -868,7 +873,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         name: 'header',
         type: 'borderRadius',
@@ -876,18 +883,22 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
-        inheritTypeLevel: 2,
+        inheritTypeLevel: 1,
         name: 'black.100',
         type: 'color',
         value: '#0b0101',
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
-        inheritTypeLevel: 2,
+        inheritTypeLevel: 1,
         name: 'black.500',
         type: 'color',
         value: '#130c0c',
@@ -925,8 +936,8 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1038,8 +1049,8 @@ describe('editToken', () => {
         value: '1',
         type: 'sizing',
         $extensions: {
-          id: 'mock-uuid',
           'studio.tokens': {
+            id: 'mock-uuid',
             modify: {
               type: 'lighten',
               value: '0.5',
@@ -1080,12 +1091,14 @@ describe('editToken', () => {
         value: '1',
       },
       {
-        $extensions: {
-          id: 'mock-uuid',
-        },
         name: 'primary-copy',
         value: '1',
         type: 'sizing',
+        $extensions: {
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
+        },
       },
       {
         name: 'alias',
@@ -1672,7 +1685,9 @@ describe('editToken', () => {
     const expectedTokens = [
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.COLOR,
         value: '#ff0000',
@@ -1680,7 +1695,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.COLOR,
         value: '#000000',
@@ -1688,7 +1705,9 @@ describe('editToken', () => {
       },
       {
         $extensions: {
-          id: 'mock-uuid',
+          'studio.tokens': {
+            id: 'mock-uuid',
+          },
         },
         type: TokenTypes.BORDER_RADIUS,
         value: '12px',
@@ -1958,110 +1977,5 @@ describe('editToken', () => {
       metadata: null,
 
     });
-  });
-
-  it('should be able to update tokens when change other token', () => {
-    store.dispatch.tokenState.updateOtherAliases(['colors.modifier-ramp.', 'colors.lightness.']);
-    const expectedTokens = [
-      {
-        name: 'primary',
-        value: '1',
-      },
-      {
-        name: 'alias',
-        value: '$primary',
-      },
-      {
-        name: 'primary50',
-        value: '0.50',
-      },
-      {
-        name: 'alias50',
-        value: '$primary50',
-      },
-      {
-        name: 'header 1',
-        type: 'typography',
-        value: {
-          fontWeight: '400',
-          fontSize: '16',
-        },
-      },
-      {
-        name: 'header 1',
-        type: 'typography',
-        value: {
-          fontWeight: '400',
-          fontSize: '16',
-        },
-      },
-      {
-        name: 'shadow.mixed',
-        type: 'boxShadow',
-        description: 'the one with mixed shadows',
-        value: shadowArray,
-      },
-      {
-        name: 'font.big',
-        type: 'sizing',
-        value: '24px',
-      },
-      {
-        name: 'font.small',
-        type: 'sizing',
-        value: '12px',
-      },
-      {
-        name: 'font.medium',
-        type: 'fontSizes',
-        value: '18px',
-      },
-      {
-        name: 'font.alias',
-        type: 'sizing',
-        value: '$font.small',
-      },
-      {
-        name: 'colors.blue.50',
-        type: 'color',
-        value: '#FCFDFF',
-        $extensions: {
-          'studio.tokens': {
-            modify: {
-              space: 'hsl',
-              type: 'darken',
-              value: '{colors.lightness.10}',
-            },
-          },
-        },
-      },
-      {
-        name: 'colors.blue.100',
-        type: 'color',
-        value: '#EAF4FA',
-        $extensions: {
-          'studio.tokens': {
-            modify: {
-              space: 'hsl',
-              type: 'darken',
-              value: '{colors.lightness.20}',
-            },
-          },
-        },
-      },
-      {
-        name: 'colors.modifier-ramp.10',
-        type: 'other',
-        value: '0.1',
-      },
-      {
-        name: 'colors.modifier-ramp.20',
-        type: 'other',
-        value: '0.2',
-      },
-    ];
-
-    const { tokens } = store.getState().tokenState;
-    expect(tokens.global).toEqual(expectedTokens);
   });
 });

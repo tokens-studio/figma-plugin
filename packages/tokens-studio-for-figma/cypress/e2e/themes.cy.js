@@ -2,6 +2,7 @@ import {
   StorageProviderType
 } from '@/constants/StorageProviderType';
 import { UpdateMode } from '@/constants/UpdateMode';
+import MockEnv from '../support/mockEnv';
 
 describe('Themes', () => {
   const mockStartupParams = {
@@ -13,7 +14,7 @@ describe('Themes', () => {
       syncProviders: true,
     },
     localApiProviders: [],
-    licenseKey: null,
+    licenseKey: 'valid-license-key',
     settings: {
       width: 800,
       height: 500,
@@ -61,6 +62,7 @@ describe('Themes', () => {
       },
     });
     cy.waitForReact(1000);
+    MockEnv();
   });
 
   it('Can create a new theme', () => {
@@ -71,8 +73,7 @@ describe('Themes', () => {
     cy.get('[data-testid="button-manage-themes-modal-new-group"]').click();
     cy.get('[data-testid="create-or-edit-theme-form--group--name"]').type('GroupA');
     cy.get('[data-testid="create-or-edit-theme-form--input--name"]').type('My first theme');
-    cy.get('[data-testid="tokensettheme-item--select-trigger--global-set"]').click();
-    cy.get('[data-testid="tokensettheme-item--select-content--source"]').click();
+    cy.get('[data-testid="tokensettheme-item--ToggleGroup-content--global--source"]').click();
     cy.get('[data-testid="button-manage-themes-modal-save-theme"]').click();
     cy.get('[data-testid="singlethemeentry"]').should('have.length', 1)
   });

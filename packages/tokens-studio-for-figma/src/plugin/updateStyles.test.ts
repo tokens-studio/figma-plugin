@@ -12,9 +12,10 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type ExtendedSingleToken = SingleToken<true, { path: string, styleId: string }>;
+const mockRemove = jest.fn();
 
 describe('updateStyles', () => {
-  const colorSpy = jest.spyOn(updateColorStyles, 'default');
+  const colorSpy = jest.spyOn(updateColorStyles, 'default').mockReturnValue({ 'primary.500': '1234' });
   const textSpy = jest.spyOn(updateTextStyles, 'default');
   const effectSpy = jest.spyOn(updateEffectStyles, 'default');
 
@@ -34,6 +35,20 @@ describe('updateStyles', () => {
       disconnectPluginInstance();
       disconnectReactInstance();
     };
+    figma.getLocalPaintStylesAsync = jest.fn(() => Promise.resolve([{
+      name: 'other',
+      key: 'removekey',
+      id: 'removeid',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    },
+    {
+      name: 'primary/500',
+      key: '1234',
+      id: '1234',
+      paints: [{ type: 'SOLID', color: { r: 1, g: 0, b: 0 } }],
+      remove: mockRemove,
+    }]));
   });
 
   afterAll(() => {
@@ -49,6 +64,48 @@ describe('updateStyles', () => {
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
+  });
+
+  it('calls update functions with correct tokens and theme prefix', async () => {
+    const colorTokens = [
+      {
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: 'color',
+        styleId: '1234',
+        internal__Parent: 'global',
+      },
+    ] as ExtendedSingleToken[];
+
+    mockGetThemeInfo.mockImplementationOnce(() => (
+      Promise.resolve({
+        type: AsyncMessageTypes.GET_THEME_INFO,
+        activeTheme: {
+          [INTERNAL_THEMES_NO_GROUP]: 'light',
+        },
+        themes: [{
+          id: 'light',
+          name: 'light',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+          },
+          $figmaStyleReferences: {
+            'primary.500': '1234',
+          },
+        }],
+      })
+    ));
+
+    await updateStyles([...colorTokens], {
+      prefixStylesWithThemeName: true,
+      stylesColor: true,
+    } as SettingsState, false);
+    expect(colorSpy).toHaveBeenCalledWith(
+      colorTokens,
+      false,
+      undefined,
+    );
   });
 
   it('calls update functions with correct tokens when all tokens are given', async () => {
@@ -94,6 +151,9 @@ describe('updateStyles', () => {
     await updateStyles([...typographyTokens, ...colorTokens, ...effectTokens], {
       prefixStylesWithThemeName: true,
       ignoreFirstPartForStyles: true,
+      stylesColor: true,
+      stylesEffect: true,
+      stylesTypography: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       [{
@@ -104,6 +164,7 @@ describe('updateStyles', () => {
         styleId: '',
       }],
       false,
+      undefined,
     );
     expect(textSpy).toHaveBeenCalledWith(
       [{
@@ -119,25 +180,27 @@ describe('updateStyles', () => {
       }],
       undefined,
       false,
+      undefined,
     );
     expect(effectSpy).toHaveBeenCalledWith(
-      [{
-        name: 'shadow.large',
-        path: 'large',
-        type: 'boxShadow',
-        description: 'the one with one shadow',
-        value: {
-          type: 'dropShadow',
-          color: '#00000080',
-          x: 0,
-          y: 0,
-          blur: 10,
-          spread: 0,
-        },
-        styleId: '',
-      }],
-      undefined,
-      false,
+      {
+        effectTokens: [{
+          name: 'shadow.large',
+          path: 'large',
+          type: 'boxShadow',
+          description: 'the one with one shadow',
+          value: {
+            type: 'dropShadow',
+            color: '#00000080',
+            x: 0,
+            y: 0,
+            blur: 10,
+            spread: 0,
+          },
+          styleId: '',
+        }],
+        shouldCreate: false,
+      },
     );
   });
 
@@ -154,10 +217,12 @@ describe('updateStyles', () => {
 
     await updateStyles(colorTokens, {
       prefixStylesWithThemeName: true,
+      stylesColor: true,
     } as SettingsState);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
+      undefined,
     );
     expect(textSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
@@ -180,11 +245,13 @@ describe('updateStyles', () => {
 
     await updateStyles(typographyTokens, {
       prefixStylesWithThemeName: true,
+      stylesTypography: true,
     } as SettingsState);
     expect(textSpy).toHaveBeenCalledWith(
       typographyTokens,
       undefined,
       false,
+      undefined,
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(effectSpy).not.toHaveBeenCalled();
@@ -211,18 +278,22 @@ describe('updateStyles', () => {
 
     await updateStyles(effectTokens, {
       prefixStylesWithThemeName: true,
+      stylesColor: false,
+      stylesEffect: true,
+      stylesTypography: false,
     } as SettingsState);
     expect(effectSpy).toHaveBeenCalledWith(
-      effectTokens,
-      undefined,
-      false,
+      {
+        effectTokens,
+        shouldCreate: false,
+      },
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
   });
 
-  it('calls update functions with correct tokens and theme prefix', async () => {
-    const colorTokens = [
+  it('removes styles that arent connected if setting is on', async () => {
+    const tokens = [
       {
         name: 'primary.500',
         path: 'light/primary/500',
@@ -252,12 +323,10 @@ describe('updateStyles', () => {
       })
     ));
 
-    await updateStyles([...colorTokens], {
-      prefixStylesWithThemeName: true,
+    await updateStyles(tokens, {
+      removeStylesAndVariablesWithoutConnection: true,
+      stylesColor: true,
     } as SettingsState, false);
-    expect(colorSpy).toHaveBeenCalledWith(
-      colorTokens,
-      false,
-    );
+    expect(mockRemove).toHaveBeenCalledTimes(1);
   });
 });

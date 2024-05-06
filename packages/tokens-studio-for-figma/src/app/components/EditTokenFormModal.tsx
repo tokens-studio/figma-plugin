@@ -33,7 +33,7 @@ const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildr
   return (
     <Modal
       compact
-      large
+      size="large"
       isOpen
       modal={false}
       close={handleReset}

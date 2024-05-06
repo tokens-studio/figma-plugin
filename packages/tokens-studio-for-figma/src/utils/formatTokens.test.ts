@@ -1,24 +1,29 @@
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
 import formatTokens from './formatTokens';
+import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
 
 describe('formatTokens', () => {
+  beforeEach(() => {
+    setFormat(TokenFormatOptions.DTCG);
+  });
+
   const resolvedTokens = [
     {
       name: 'typography.heading.alias',
+      type: TokenTypes.TYPOGRAPHY,
       value: {
         fontFamily: 'Inter',
         fontWeight: 'Bold',
         fontSize: 36,
       },
       description: 'Use for headings',
-      type: TokenTypes.TYPOGRAPHY,
     },
     {
       name: 'typography.heading.non_resolved',
       value: '{typography.heading.new}',
-      description: 'Use for headings',
       type: TokenTypes.TYPOGRAPHY,
+      description: 'Use for headings',
     },
     {
       type: TokenTypes.BOX_SHADOW,
@@ -68,13 +73,13 @@ describe('formatTokens', () => {
       {
         name: 'typography.heading.non_resolved',
         value: '{typography.heading.new}',
-        description: 'Use for headings',
         type: TokenTypes.TYPOGRAPHY,
+        description: 'Use for headings',
       },
       {
         name: 'typography.heading.no_matching',
-        value: '{typography.heading.no_matching}',
         type: TokenTypes.TYPOGRAPHY,
+        value: '{typography.heading.no_matching}',
       },
       {
         type: TokenTypes.BOX_SHADOW,
@@ -99,77 +104,82 @@ describe('formatTokens', () => {
   } as unknown as Record<string, AnyTokenList>;
 
   it('converts given tokens to an array', () => {
-    expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: true, expandShadow: false,
-    })).toEqual(
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+        expandTypography: true,
+        expandShadow: false,
+      }),
+    ).toEqual(
       JSON.stringify(
         {
           global: {
             withValue: {
-              value: 'bar',
+              $value: 'bar',
             },
             basic: {
-              value: '#ff0000',
+              $value: '#ff0000',
             },
             typography: {
               heading: {
                 h1: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
+                    $value: 'Bold',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
+                    $value: 36,
+                    $type: 'fontSizes',
                   },
                 },
                 h2: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Regular',
-                    type: 'fontWeights',
+                    $value: 'Regular',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 24,
-                    type: 'fontSizes',
+                    $value: 24,
+                    $type: 'fontSizes',
                   },
                 },
                 alias: {
                   fontFamily: {
-                    value: 'Inter',
-                    type: 'fontFamilies',
+                    $value: 'Inter',
+                    $type: 'fontFamilies',
                   },
                   fontWeight: {
-                    value: 'Bold',
-                    type: 'fontWeights',
+                    $value: 'Bold',
+                    $type: 'fontWeights',
                   },
                   fontSize: {
-                    value: 36,
-                    type: 'fontSizes',
+                    $value: 36,
+                    $type: 'fontSizes',
                   },
                 },
                 non_resolved: {
-                  value: '{typography.heading.new}',
-                  description: 'Use for headings',
-                  type: TokenTypes.TYPOGRAPHY,
+                  $value: '{typography.heading.new}',
+                  $type: TokenTypes.TYPOGRAPHY,
+                  $description: 'Use for headings',
                 },
                 no_matching: {
-                  value: '{typography.heading.no_matching}',
-                  type: TokenTypes.TYPOGRAPHY,
+                  $value: '{typography.heading.no_matching}',
+                  $type: TokenTypes.TYPOGRAPHY,
                 },
               },
             },
             shadows: {
               md: {
-                type: TokenTypes.BOX_SHADOW,
-                value: [
+                $value: [
                   {
                     type: 'dropShadow',
                     color: 'rgba({colors.red.500}, 0.5)',
@@ -179,10 +189,11 @@ describe('formatTokens', () => {
                     spread: 4,
                   },
                 ],
+                $type: TokenTypes.BOX_SHADOW,
               },
               alias: {
-                type: TokenTypes.BOX_SHADOW,
-                value: '{shadows.md}',
+                $value: '{shadows.md}',
+                $type: TokenTypes.BOX_SHADOW,
               },
             },
           },
@@ -194,9 +205,135 @@ describe('formatTokens', () => {
   });
 
   it('converts given tokens to an array without expanding', () => {
-    expect(formatTokens({
-      tokens: typographyTokens, tokenSets: ['global'], resolvedTokens: resolvedTokens as AnyTokenList, expandTypography: false, expandShadow: true,
-    })).toEqual(
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+        expandTypography: false,
+        expandShadow: true,
+      }),
+    ).toEqual(
+      JSON.stringify(
+        {
+          global: {
+            withValue: {
+              $value: 'bar',
+            },
+            basic: {
+              $value: '#ff0000',
+            },
+            typography: {
+              heading: {
+                h1: {
+                  $value: {
+                    fontFamily: 'Inter',
+                    fontWeight: 'Bold',
+                    fontSize: 36,
+                  },
+                  $type: 'typography',
+                  $description: 'Use for bold headings',
+                },
+                h2: {
+                  $value: {
+                    fontFamily: 'Inter',
+                    fontWeight: 'Regular',
+                    fontSize: 24,
+                  },
+                  $type: 'typography',
+                  $description: 'Use for headings',
+                },
+                alias: {
+                  $value: '{typography.heading.h1}',
+                  $type: 'typography',
+                  $description: 'Use for headings',
+                },
+                non_resolved: {
+                  $value: '{typography.heading.new}',
+                  $type: TokenTypes.TYPOGRAPHY,
+                  $description: 'Use for headings',
+                },
+                no_matching: {
+                  $value: '{typography.heading.no_matching}',
+                  $type: TokenTypes.TYPOGRAPHY,
+                },
+              },
+            },
+            shadows: {
+              md: {
+                0: {
+                  type: {
+                    $value: 'dropShadow',
+                    $type: 'type',
+                  },
+                  color: {
+                    $value: 'rgba({colors.red.500}, 0.5)',
+                    $type: 'color',
+                  },
+                  x: {
+                    $value: 0,
+                    $type: 'x',
+                  },
+                  y: {
+                    $value: 0,
+                    $type: 'y',
+                  },
+                  blur: {
+                    $value: 2,
+                    $type: 'blur',
+                  },
+                  spread: {
+                    $value: 4,
+                    $type: 'spread',
+                  },
+                },
+              },
+              alias: {
+                0: {
+                  type: {
+                    $value: 'dropShadow',
+                    $type: 'type',
+                  },
+                  color: {
+                    $value: 'rgba({colors.red.500}, 0.5)',
+                    $type: 'color',
+                  },
+                  x: {
+                    $value: 0,
+                    $type: 'x',
+                  },
+                  y: {
+                    $value: 0,
+                    $type: 'y',
+                  },
+                  blur: {
+                    $value: 2,
+                    $type: 'blur',
+                  },
+                  spread: {
+                    $value: 4,
+                    $type: 'spread',
+                  },
+                },
+              },
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
+  });
+
+  it('respects the global token format setting', () => {
+    setFormat(TokenFormatOptions.Legacy);
+    expect(
+      formatTokens({
+        tokens: typographyTokens,
+        tokenSets: ['global'],
+        resolvedTokens: resolvedTokens as AnyTokenList,
+      }),
+    ).toEqual(
       JSON.stringify(
         {
           global: {
@@ -214,8 +351,8 @@ describe('formatTokens', () => {
                     fontWeight: 'Bold',
                     fontSize: 36,
                   },
-                  description: 'Use for bold headings',
                   type: 'typography',
+                  description: 'Use for bold headings',
                 },
                 h2: {
                   value: {
@@ -223,18 +360,18 @@ describe('formatTokens', () => {
                     fontWeight: 'Regular',
                     fontSize: 24,
                   },
-                  description: 'Use for headings',
                   type: 'typography',
+                  description: 'Use for headings',
                 },
                 alias: {
                   value: '{typography.heading.h1}',
-                  description: 'Use for headings',
                   type: 'typography',
+                  description: 'Use for headings',
                 },
                 non_resolved: {
                   value: '{typography.heading.new}',
-                  description: 'Use for headings',
                   type: TokenTypes.TYPOGRAPHY,
+                  description: 'Use for headings',
                 },
                 no_matching: {
                   value: '{typography.heading.no_matching}',
@@ -244,60 +381,21 @@ describe('formatTokens', () => {
             },
             shadows: {
               md: {
-                0: {
-                  type: {
-                    value: 'dropShadow',
-                    type: 'type',
+                value: [
+                  {
+                    type: 'dropShadow',
+                    color: 'rgba({colors.red.500}, 0.5)',
+                    x: 0,
+                    y: 0,
+                    blur: 2,
+                    spread: 4,
                   },
-                  color: {
-                    value: 'rgba({colors.red.500}, 0.5)',
-                    type: 'color',
-                  },
-                  x: {
-                    value: 0,
-                    type: 'x',
-                  },
-                  y: {
-                    value: 0,
-                    type: 'y',
-                  },
-                  blur: {
-                    value: 2,
-                    type: 'blur',
-                  },
-                  spread: {
-                    value: 4,
-                    type: 'spread',
-                  },
-                },
+                ],
+                type: TokenTypes.BOX_SHADOW,
               },
               alias: {
-                0: {
-                  type: {
-                    value: 'dropShadow',
-                    type: 'type',
-                  },
-                  color: {
-                    value: 'rgba({colors.red.500}, 0.5)',
-                    type: 'color',
-                  },
-                  x: {
-                    value: 0,
-                    type: 'x',
-                  },
-                  y: {
-                    value: 0,
-                    type: 'y',
-                  },
-                  blur: {
-                    value: 2,
-                    type: 'blur',
-                  },
-                  spread: {
-                    value: 4,
-                    type: 'spread',
-                  },
-                },
+                value: '{shadows.md}',
+                type: TokenTypes.BOX_SHADOW,
               },
             },
           },

@@ -32,7 +32,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
 
   return (
     <Box css={{
-      width: '100%', backgroundColor: '$bgDefault', borderBottom: '1px solid', borderColor: '$borderMuted',
+      width: '100%', backgroundColor: '$bgDefault',
     }}
     >
       {hasUnsavedChanges ? (
@@ -64,7 +64,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
               padding: '$3',
             }}
           >
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap={1} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
               <ToolsDropdown />
               <StylesDropdown />
             </Stack>

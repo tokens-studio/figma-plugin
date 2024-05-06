@@ -7,7 +7,7 @@ import {
 } from '@tokens-studio/ui';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
-import { editProhibitedSelector } from '@/selectors';
+import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
 import { IconCollapseArrow, IconExpandArrow, IconAdd } from '@/icons';
 import { StyledTokenGroupHeading, StyledTokenGroupAddIcon, StyledTokenGroupHeadingCollapsable } from './StyledTokenGroupHeading';
 import { Dispatch } from '../../store';
@@ -16,6 +16,7 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export type Props = {
   id: string
@@ -30,13 +31,18 @@ export function TokenGroupHeading({
 }: Props) {
   const { t } = useTranslation(['tokens']);
   const editProhibited = useSelector(editProhibitedSelector);
+  const activeTokenSetReadOnly = useSelector(activeTokenSetReadOnlySelector);
+  const activeApiProvider = useSelector(activeApiProviderSelector);
   const [newTokenGroupName, setNewTokenGroupName] = React.useState<string>(path);
   const [showRenameTokenGroupModal, setShowRenameTokenGroupModal] = React.useState<boolean>(false);
   const [showDuplicateTokenGroupModal, setShowDuplicateTokenGroupModal] = React.useState<boolean>(false);
   const { deleteGroup, renameGroup } = useManageTokens();
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
-  const { remapTokensInGroup, remapTokensWithOtherReference } = useTokens();
+  const { remapTokensInGroup } = useTokens();
+  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
+
+  const canEdit = !editProhibited && !activeTokenSetReadOnly && !isTokensStudioProvider;
 
   const handleDelete = React.useCallback(() => {
     deleteGroup(path, type);
@@ -53,7 +59,6 @@ export function TokenGroupHeading({
     await remapTokensInGroup({
       oldGroupName: `${path}.`, newGroupName: `${newTokenGroupName}.`, type, tokensToRename,
     });
-    await remapTokensWithOtherReference({ oldName: `${path}.`, newName: `${newTokenGroupName}.` });
     setShowRenameTokenGroupModal(false);
   }, [newTokenGroupName, path, renameGroup, type, remapTokensInGroup]);
 
@@ -96,13 +101,13 @@ export function TokenGroupHeading({
           </ContextMenu.Trigger>
           <ContextMenu.Portal>
             <ContextMenu.Content>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleRename}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleRename}>
                 {t('rename')}
               </ContextMenu.Item>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleDuplicate}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleDuplicate}>
                 {t('duplicate')}
               </ContextMenu.Item>
-              <ContextMenu.Item disabled={editProhibited} onSelect={handleDelete}>
+              <ContextMenu.Item disabled={!canEdit} onSelect={handleDelete}>
                 {t('delete')}
               </ContextMenu.Item>
             </ContextMenu.Content>
@@ -133,7 +138,7 @@ export function TokenGroupHeading({
         tooltip={t('addNew', { ns: 'tokens' })}
         tooltipSide="left"
         onClick={handleShowNewForm}
-        disabled={editProhibited}
+        disabled={!canEdit}
         data-testid="button-add-new-token-in-group"
         size="small"
         variant="invisible"

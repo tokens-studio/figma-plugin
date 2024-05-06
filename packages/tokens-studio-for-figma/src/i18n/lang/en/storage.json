@@ -57,6 +57,7 @@
       "projectName": "Project Name (optional)"
     },
     "bitbucket": {
+      "username": "Bitbucket username",
       "appPassword": "App Password",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"
@@ -69,5 +70,17 @@
   "active": "Active",
   "edit": "Edit",
   "delete": "Delete",
-  "save": "Save"
+  "save": "Save",
+  "format": "Format",
+  "w3cformat": "W3C DTCG format",
+  "legacyformat": "Legacy format",
+  "legacyformattooltip": "Legacy format, click to open W3C DTCG conversion",
+  "w3cconverttitle": "Convert to W3C DTCG format",
+  "w3cformatmodaltitle": "Using the W3C DTCG Format",
+  "w3cformatmodaldescription": "Your tokens are stored in the W3C Design Tokens Community Group format. If you need to convert them back again, you can do so here. If you need to adjust your development pipeline, read all about it below.",
+  "legacyformatmodaldescription": " Your tokens are currently stored in the legacy format. If you want to use the new W3C DTCG format, you can convert them here. Read all about changing the format below, including helpful advice on how to migrate your development pipeline.",
+  "converttow3c": "Convert to W3C DTCG format",
+  "converttolegacy": "Convert to legacy format",
+  "pushfirsterror": "Push your unsaved changes before converting",
+  "readmoreformat": "Read more"
 }

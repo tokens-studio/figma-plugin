@@ -25,3 +25,18 @@ export enum TokenTypes {
   BOOLEAN = 'boolean',
   NUMBER = 'number',
 }
+
+export const ExportNumberVariablesTokenTypes = [
+  TokenTypes.BORDER_RADIUS,
+  TokenTypes.SIZING,
+  TokenTypes.SPACING,
+  TokenTypes.BORDER_WIDTH,
+  TokenTypes.DIMENSION,
+  TokenTypes.NUMBER,
+  TokenTypes.FONT_SIZES,
+  TokenTypes.LETTER_SPACING,
+  TokenTypes.LINE_HEIGHTS,
+  TokenTypes.PARAGRAPH_INDENT,
+  TokenTypes.PARAGRAPH_SPACING,
+  TokenTypes.OPACITY,
+];

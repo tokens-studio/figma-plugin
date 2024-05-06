@@ -21,6 +21,11 @@ AsyncMessageChannel.PluginInstance.handle(
   asyncHandlers.setOnboardingExplainerSets,
 );
 AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
+  asyncHandlers.setOnboardingExplainerExportSets,
+);
+
+AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSYNCPROVIDERS,
   asyncHandlers.setOnboardingExplainerSyncProviders,
 );
@@ -36,7 +41,6 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GOTO_NODE, asyncHand
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SELECT_NODES, asyncHandlers.selectNodes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_STYLES, asyncHandlers.pullStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PULL_VARIABLES, asyncHandlers.pullVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_STYLES, asyncHandlers.syncStyles);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.NOTIFY, asyncHandlers.notify);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESIZE_WINDOW, asyncHandlers.resizeWindow);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CANCEL_OPERATION, asyncHandlers.cancelOperation);
@@ -58,13 +62,13 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_N
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, asyncHandlers.createLocalVariablesWithoutModes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
   asyncHandlers.attachLocalVariablesToTheme,
 );
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_VARIABLES, asyncHandlers.syncVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 

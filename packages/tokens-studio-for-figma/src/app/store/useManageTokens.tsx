@@ -26,6 +26,7 @@ type EditSingleTokenData = {
     [key: string]: any;
     'studio.tokens'?: {
       [key: string]: any;
+      id?: string;
       modify?: ColorModifier
     }
   }
@@ -41,6 +42,7 @@ type CreateSingleTokenData = {
   $extensions?: {
     [key: string]: any;
     'studio.tokens'?: {
+      id?: string;
       modify?: ColorModifier
     }
   }
@@ -138,6 +140,8 @@ export default function useManageTokens() {
       text: 'Delete token?',
       description: 'Are you sure you want to delete this token?',
       choices,
+      confirmAction: 'Delete',
+      variant: 'danger',
     });
     if (userConfirmation) {
       dispatch.uiState.startJob({
@@ -158,6 +162,8 @@ export default function useManageTokens() {
     const userConfirmation = await confirm({
       text: 'Delete group?',
       description: 'Are you sure you want to delete this group?',
+      variant: 'danger',
+      confirmAction: 'Delete',
     });
     if (userConfirmation) {
       const activeTokenSet = activeTokenSetSelector(store.getState());
@@ -173,7 +179,6 @@ export default function useManageTokens() {
   const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<TokenToRename[]> => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     const tokens = tokensSelector(store.getState());
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAMETOKENGROUP, isInfinite: true });
     await renameTokenGroup({
       parent: activeTokenSet, oldName, newName, type,
     });
@@ -186,9 +191,8 @@ export default function useManageTokens() {
       }));
     dispatch.tokenState.renameStyleNamesToCurrentTheme(tokensToRename);
     dispatch.tokenState.renameVariableNamesToThemes(tokensToRename);
-    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAMETOKENGROUP);
     return tokensToRename;
-  }, [store, renameTokenGroup, dispatch.uiState, dispatch.tokenState]);
+  }, [store, renameTokenGroup, dispatch.tokenState]);
 
   const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());

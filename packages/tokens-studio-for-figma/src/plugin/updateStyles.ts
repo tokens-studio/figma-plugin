@@ -50,13 +50,31 @@ export default async function updateStyles(
 
   if (!colorTokens && !textTokens && !effectTokens) return {};
 
-  const allStyleIds = {
-    ...(colorTokens.length > 0 ? updateColorStyles(colorTokens, shouldCreate) : {}),
-    ...(textTokens.length > 0 ? updateTextStyles(textTokens, settings.baseFontSize, shouldCreate) : {}),
-    ...(effectTokens.length > 0 ? updateEffectStyles(effectTokens, settings.baseFontSize, shouldCreate) : {}),
-  };
+  const allStyleIds = await Promise.all([
+    ...(colorTokens.length > 0 ? [updateColorStyles(colorTokens, shouldCreate, settings.renameExistingStylesAndVariables)] : []),
+    ...(textTokens.length > 0 ? [updateTextStyles(textTokens, settings.baseFontSize, shouldCreate, settings.renameExistingStylesAndVariables)] : []),
+    ...(effectTokens.length > 0 ? [updateEffectStyles({
+      effectTokens, baseFontSize: settings.baseFontSize, shouldCreate, shouldRename: settings.renameExistingStylesAndVariables,
+    })] : []),
+  ]).then((results) => Object.assign({}, ...results));
   if (styleTokens.length < tokens.length && shouldCreate) {
     notifyUI('Some styles were not created due to your settings. Make sure Ignore first part of token name doesn\'t conflict', { error: true });
+  }
+
+  // Remove styles that aren't in the theme or in the exposed token object
+  if (settings.removeStylesAndVariablesWithoutConnection) {
+    const [allLocalPaintStyles, allLocalTextStyles, allLocalEffectStyles] = await Promise.all([
+      figma.getLocalPaintStylesAsync(),
+      figma.getLocalTextStylesAsync(),
+      figma.getLocalEffectStylesAsync(),
+    ]);
+    const allLocalStyles = [...allLocalPaintStyles, ...allLocalTextStyles, ...allLocalEffectStyles];
+
+    allLocalStyles
+      .filter((style) => !Object.values(allStyleIds).includes(style.id))
+      .forEach((style) => {
+        style.remove();
+      });
   }
 
   return allStyleIds;

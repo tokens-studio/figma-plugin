@@ -231,14 +231,6 @@ describe('Generic Versioned Storage', () => {
       }, {
         storeTokenIdInJsonEditor: false,
       });
-
-      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
-        tokens,
-        themes,
-        {
-          tokenSetOrder: ['global'],
-        },
-      ]);
     });
 
     it('requires ID to be set', async () => {
@@ -295,14 +287,6 @@ describe('Generic Versioned Storage', () => {
       }, {
         storeTokenIdInJsonEditor: false,
       });
-
-      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
-        tokens,
-        themes,
-        {
-          tokenSetOrder: ['global'],
-        },
-      ]);
     });
   });
 
@@ -342,14 +326,6 @@ describe('Generic Versioned Storage', () => {
       }, {
         storeTokenIdInJsonEditor: false,
       });
-
-      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
-        tokens,
-        themes,
-        {
-          tokenSetOrder: ['global'],
-        },
-      ]);
     });
 
     it('updates remote even if retrieve returns null', async () => {
@@ -379,14 +355,6 @@ describe('Generic Versioned Storage', () => {
       }, {
         storeTokenIdInJsonEditor: false,
       });
-
-      expect(JSON.parse(mockStore.getState().tokenState.lastSyncedState)).toEqual([
-        tokens,
-        themes,
-        {
-          tokenSetOrder: ['global'],
-        },
-      ]);
     });
 
     it('notify updating error when remote data is newer', async () => {

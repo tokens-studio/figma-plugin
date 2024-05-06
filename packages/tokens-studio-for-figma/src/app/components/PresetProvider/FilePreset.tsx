@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Stack, Text } from '@tokens-studio/ui';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import {
@@ -8,8 +8,6 @@ import {
   activeThemeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../../store/remoteTokens';
-import Stack from '../Stack';
-import Text from '../Text';
 import { track } from '@/utils/analytics';
 
 declare module 'react' {
@@ -64,7 +62,7 @@ export default function FilePreset({ onCancel }: Props) {
           If you&lsquo;re using a single file, the first-level keys should be the token set names. If you&lsquo;re using multiple files, the file name / path are the set names.
         </Text>
       </Stack>
-      <Stack direction="row" gap={2} justify="end">
+      <Stack direction="row" gap={3} justify="end">
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

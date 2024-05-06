@@ -38,6 +38,7 @@ export default function BitbucketForm({
       const zodSchema = zod.object({
         provider: zod.string(),
         name: zod.string(),
+        username: zod.string(),
         id: zod.string(),
         branch: zod.string(),
         filePath: zod.string(),
@@ -63,6 +64,12 @@ export default function BitbucketForm({
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
+        </FormField>
+        <FormField>
+          <Label htmlFor="name">
+            {t('providers.bitbucket.username')}
+          </Label>
+          <TextInput value={values.username || ''} onChange={onChange} type="text" name="username" id="username" required />
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>
@@ -114,23 +121,11 @@ export default function BitbucketForm({
           />
           <Text muted size="xsmall">{t('filePathCaption')}</Text>
         </FormField>
-        <FormField>
-          <Label htmlFor="name">{t('providers.bitbucket.projectName')}</Label>
-          <TextInput
-            value={values.baseUrl || ''}
-            placeholder="https://api.bitbucket.com/v2"
-            onChange={onChange}
-            type="text"
-            name="baseUrl"
-            id="baseUrl"
-          />
-        </FormField>
 
         <Stack direction="row" justify="end" gap={4}>
-          <Button variant="secondary" size="large" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-
           <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
             {t('save')}
           </Button>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
-  Box, Button, Heading, Spinner, Stack, Text, ToggleGroup,
+  Button, Heading, Spinner, Stack, Text, ToggleGroup,
 } from '@tokens-studio/ui';
 import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
@@ -15,11 +15,11 @@ import { isGitProvider } from '@/utils/is';
 import { useShortcut } from '@/hooks/useShortcut';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
-import { TabButton } from './TabButton';
 import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Modal from './Modal';
+import { FormatSelector } from './FormatSelector';
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -84,9 +84,9 @@ function PushDialog() {
   );
 
   React.useEffect(() => {
-    if (showPushDialog === 'initial' && isGitProvider(localApiState)) {
-      setCommitMessage('');
-      setBranch(localApiState.branch ?? '');
+    if (showPushDialog?.state === 'initial' && isGitProvider(localApiState)) {
+      setCommitMessage(showPushDialog?.overrides?.commitMessage ?? '');
+      setBranch(showPushDialog?.overrides?.branch ?? localApiState.branch ?? '');
     }
   }, [showPushDialog, localApiState]);
 
@@ -98,7 +98,7 @@ function PushDialog() {
 
   const handleSaveShortcut = React.useCallback(
     (event: KeyboardEvent) => {
-      if (showPushDialog === 'initial' && (event.metaKey || event.ctrlKey)) {
+      if (showPushDialog?.state === 'initial' && (event.metaKey || event.ctrlKey)) {
         handlePushChanges();
       }
     },
@@ -107,18 +107,15 @@ function PushDialog() {
 
   useShortcut(['Enter'], handleSaveShortcut);
 
-  const handleSwitch = React.useCallback((tab: string) => {
-    setActiveTab(tab);
-  }, []);
-
-  switch (showPushDialog) {
+  switch (showPushDialog?.state) {
+    case 'dtcgconversion':
     case 'initial': {
       return (
         <Modal
           full
           title={t('pushTo', { provider: transformProviderName(storageType.provider) })}
           showClose
-          large
+          size="large"
           isOpen
           close={onCancel}
           stickyFooter
@@ -139,19 +136,17 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <Box css={{ padding: '$4', paddingBottom: 0 }}>
-              <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab}>
-                <ToggleGroup.Item iconOnly={false} value="commit">
-                  {t('commit')}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item iconOnly={false} value="diff">
-                  {t('diff')}
-                </ToggleGroup.Item>
-                <ToggleGroup.Item iconOnly={false} value="json">
-                  JSON
-                </ToggleGroup.Item>
-              </ToggleGroup>
-            </Box>
+            <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab} css={{ marginLeft: '$3', marginTop: '$3' }}>
+              <ToggleGroup.Item iconOnly={false} value="commit">
+                {t('commit')}
+              </ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value="diff">
+                {t('diff')}
+              </ToggleGroup.Item>
+              <ToggleGroup.Item iconOnly={false} value="json">
+                JSON
+              </ToggleGroup.Item>
+            </ToggleGroup>
             {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
               <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
                 {t('thisWillPushYourLocalChangesToTheBranch')}
@@ -185,7 +180,7 @@ function PushDialog() {
     }
     case 'loading': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal size="large" isOpen close={onCancel}>
           <Stack direction="column" gap={4} justify="center" align="center">
             <Spinner />
             <Heading size="medium">
@@ -202,7 +197,7 @@ function PushDialog() {
     }
     case 'success': {
       return (
-        <Modal large isOpen close={onCancel}>
+        <Modal size="large" isOpen close={onCancel}>
           <Stack direction="column" align="center" gap={6} css={{ textAlign: 'center' }}>
             <Stack direction="column" gap={4}>
               <Heading data-testid="push-dialog-success-heading" size="medium">
@@ -217,7 +212,8 @@ function PushDialog() {
                 {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
               </Text>
             </Stack>
-            <Button variant="primary" href={redirectHref}>
+            {/* @ts-ignore Exception for Button to accept target */}
+            <Button as="a" target="_blank" variant="primary" href={redirectHref}>
               {localApiState.provider === StorageProviderType.SUPERNOVA ? (
                 <>{t('openSupernovaWorkspace')}</>
               ) : (

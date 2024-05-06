@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
+import { NavArrowRight } from 'iconoir-react';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
-
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
 import ProBadge from '../ProBadge';
-import { useFlags } from '../LaunchDarkly';
 import { track } from '@/utils/analytics';
 import { INTERNAL_THEMES_NO_GROUP, INTERNAL_THEMES_NO_GROUP_LABEL } from '@/constants/InternalTokenGroup';
 import Box from '../Box';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type AvailableTheme = {
   value: string
@@ -20,7 +20,7 @@ type AvailableTheme = {
 };
 
 export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>> = () => {
-  const { tokenThemes } = useFlags();
+  const isProUser = useIsProUser();
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['tokens']);
   const activeTheme = useSelector(activeThemeSelector);
@@ -105,10 +105,11 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild data-testid="themeselector-dropdown">
-        <Button size="small" variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
+        <Button variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
           <Box css={{
             marginRight: '$2',
             color: '$fgSubtle',
+            fontWeight: '$sansRegular',
           }}
           >
             {t('theme')}
@@ -121,26 +122,30 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         <DropdownMenu.Content
           data-testid="themeselector-dropdown-content"
           side="bottom"
-          css={{ minWidth: '180px' }}
+          css={{ minWidth: '180px', maxWidth: '70vw' }}
+          align="end"
+          className="content scroll-container"
         >
+          <DropdownMenu.Item
+            data-testid="themeselector-managethemes"
+            css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            disabled={!isProUser}
+            onSelect={handleManageThemes}
+          >
+            <span>{t('manageThemes')}</span>
+            {!isProUser && <ProBadge compact />}
+            <DropdownMenu.TrailingVisual>
+              <NavArrowRight />
+            </DropdownMenu.TrailingVisual>
+          </DropdownMenu.Item>
+          <DropdownMenu.Separator />
           {availableThemes.length === 0 && (
           <DropdownMenu.RadioItem css={{ paddingLeft: '$6' }} value="" disabled={!activeTheme} onSelect={handleClearTheme}>
             <Text css={{ color: '$contextMenuFgMuted', fontSize: '$xsmall' }}>{t('noThemes')}</Text>
           </DropdownMenu.RadioItem>
           )}
           {availableThemeOptions}
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item
-            data-testid="themeselector-managethemes"
-            css={{
-              paddingLeft: '$7', display: 'flex', justifyContent: 'space-between',
-            }}
-            disabled={!tokenThemes}
-            onSelect={handleManageThemes}
-          >
-            <span>{t('manageThemes')}</span>
-            {!tokenThemes && <ProBadge compact />}
-          </DropdownMenu.Item>
+
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu>

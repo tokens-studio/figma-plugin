@@ -17,6 +17,7 @@ const StyledLink = styled('a', {
 
 const StyledImage = styled('img', {
   borderRadius: '$medium',
+  marginBottom: '$3',
 });
 
 function fetchOnboardingImage(idx: number) {

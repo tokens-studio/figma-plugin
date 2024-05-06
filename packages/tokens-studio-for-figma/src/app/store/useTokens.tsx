@@ -1,10 +1,6 @@
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo, useContext } from 'react';
-import {
-  AnyTokenList,
-  SingleToken,
-  TokenToRename,
-} from '@/types/tokens';
+import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
@@ -21,6 +17,7 @@ import {
   uiStateSelector,
   updateModeSelector,
   usedTokenSetSelector,
+  themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -37,10 +34,12 @@ import { UpdateTokenVariablePayload } from '@/types/payloads/UpdateTokenVariable
 import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
+import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { theme } from '@/stitches.config';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
+import { ThemeObject } from '@/types';
 
-type ConfirmResult =
-  ('textStyles' | 'colorStyles' | 'effectStyles' | string)[]
-  | string;
+type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
 type GetFormattedTokensOptions = {
   includeAllTokens: boolean;
@@ -55,12 +54,9 @@ type RemoveTokensByValueData = { property: Properties; nodes: NodeInfo[] }[];
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 
-export type SyncOption = 'removeStyle' | 'renameStyle';
-export type SyncVariableOption = 'removeVariable' | 'renameVariable';
-
 export type TokensToRenamePayload = {
-  oldName: string,
-  newName: string
+  oldName: string;
+  newName: string;
 };
 
 export default function useTokens() {
@@ -69,6 +65,7 @@ export default function useTokens() {
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
+  const themes = useSelector(themesListSelector);
   const settings = useSelector(settingsStateSelector, isEqual);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { confirm } = useConfirm<ConfirmResult>();
@@ -76,6 +73,7 @@ export default function useTokens() {
   const tokensContext = useContext(TokensContext);
   const shouldConfirm = useMemo(() => updateMode === UpdateMode.DOCUMENT, [updateMode]);
   const VALID_TOKEN_TYPES = [TokenTypes.DIMENSION, TokenTypes.BORDER_RADIUS, TokenTypes.BORDER, TokenTypes.BORDER_WIDTH, TokenTypes.SPACING];
+  const tokenFormat = getFormat();
 
   // Gets value of token
   const getTokenValue = useCallback((name: string, resolved: AnyTokenList) => (
@@ -88,20 +86,37 @@ export default function useTokens() {
   ), []);
 
   // Returns formatted tokens for style dictionary
-  const getFormattedTokens = useCallback((opts: GetFormattedTokensOptions) => {
-    const {
-      includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
-    } = opts;
-    const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
-    return formatTokens({
-      tokens, tokenSets, resolvedTokens: tokensContext.resolvedTokens, includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder, storeTokenIdInJsonEditor,
-    });
-  }, [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens]);
+  const getFormattedTokens = useCallback(
+    (opts: GetFormattedTokensOptions) => {
+      const {
+        includeAllTokens = false, includeParent = true, expandTypography = false, expandShadow = false, expandComposition = false, expandBorder = false,
+      } = opts;
+      const tokenSets = includeAllTokens ? Object.keys(tokens) : [activeTokenSet];
+      return formatTokens({
+        tokens,
+        tokenSets,
+        resolvedTokens: tokensContext.resolvedTokens,
+        includeAllTokens,
+        includeParent,
+        expandTypography,
+        expandShadow,
+        expandComposition,
+        expandBorder,
+        storeTokenIdInJsonEditor,
+      });
+    },
+    // Adding tokenFormat as a dependency to cause a change when format changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokensContext.resolvedTokens, tokenFormat],
+  );
 
   // Returns stringified tokens for the JSON editor
-  const getStringTokens = useCallback(() => (
-    stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor)
-  ), [tokens, activeTokenSet, storeTokenIdInJsonEditor]);
+  const getStringTokens = useCallback(
+    () => stringifyTokens(tokens, activeTokenSet, storeTokenIdInJsonEditor),
+    // Adding tokenFormat as a dependency to cause a change when format changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tokens, activeTokenSet, storeTokenIdInJsonEditor, tokenFormat],
+  );
 
   // handles updating JSON
   const handleJSONUpdate = useCallback((newTokens: string) => {
@@ -165,8 +180,8 @@ export default function useTokens() {
       text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
-        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: true },
-        { key: 'useRem', label: 'Use rem for dimension values', enabled: true },
+        { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
+        { key: 'useRem', label: 'Use rem for dimension values', enabled: false },
       ],
       confirmAction: 'Import',
     });
@@ -232,6 +247,7 @@ export default function useTokens() {
   const remapTokensInGroup = useCallback(async ({
     oldGroupName, newGroupName, type, tokensToRename,
   }: { oldGroupName: string, newGroupName: string, type: string, tokensToRename: TokenToRename[] }) => {
+    // TODO: Move all of this logic to individual files, this hook is already way too overloaded
     const confirmData = await confirm({
       text: `Remap all tokens that use tokens in ${oldGroupName} group?`,
       description: 'This will change all layers that used the old token name. This could take a while.',
@@ -300,91 +316,126 @@ export default function useTokens() {
     }
   }, [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]);
 
-  const remapTokensWithOtherReference = useCallback(async ({
-    oldName, newName,
-  }: { oldName: string, newName:string }) => {
-    dispatch.tokenState.updateOtherAliases([oldName, newName]);
-  }, [dispatch.tokenState]);
-
   // Asks user which styles to create, then calls Figma with all tokens to create styles
-  const createStylesFromTokens = useCallback(async () => {
-    const userDecision = await confirm({
-      text: 'Create styles',
-      description: 'What styles should be created?',
-      confirmAction: 'Create',
-      choices: [
-        { key: 'colorStyles', label: 'Color', enabled: true },
-        { key: 'textStyles', label: 'Text', enabled: true },
-        { key: 'effectStyles', label: 'Shadows', enabled: true },
-      ],
+  const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
+    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
+    if (!shouldCreateStyles) return;
+
+    track('createStyles', {
+      type: 'sets',
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
     });
 
-    if (userDecision && Array.isArray(userDecision.data) && userDecision.data.length) {
-      track('createStyles', {
-        textStyles: userDecision.data.includes('textStyles'),
-        colorStyles: userDecision.data.includes('colorStyles'),
-        effectStyles: userDecision.data.includes('effectStyles'),
-      });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
+    });
 
-      const enabledTokenSets = Object.entries(usedTokenSet)
-        .filter(([, status]) => status === TokenSetStatus.ENABLED)
-        .map(([tokenSet]) => tokenSet);
-      if (enabledTokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure token sets are active.', { error: true });
-        return;
+    const enabledTokenSets = selectedSets
+      .filter((set) => set.status === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet.set);
+
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure token sets are active.', { error: true });
+      return;
+    }
+
+    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
+
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
+
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const shouldCreate = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (shouldCreate) {
+        acc.push(curr);
       }
-      const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
-        ...usedTokenSet,
-        [activeTokenSet]: TokenSetStatus.ENABLED,
-      }));
-      const withoutSourceTokens = resolved.filter((token) => (
-        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-      ));
+      return acc;
+    }, []);
 
-      const tokensToCreate = withoutSourceTokens.filter((token) => (
-        [
-          userDecision.data.includes('textStyles') && token.type === TokenTypes.TYPOGRAPHY,
-          userDecision.data.includes('colorStyles') && token.type === TokenTypes.COLOR,
-          userDecision.data.includes('effectStyles') && token.type === TokenTypes.BOX_SHADOW,
-        ].some((isEnabled) => isEnabled)
-      ));
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
 
-      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        settings,
-      }));
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+  }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
 
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
+    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0);
+    if (!shouldCreateStyles) return;
+
+    track('createStyles', {
+      type: 'themes',
+      textStyles: settings.stylesTypography,
+      colorStyles: settings.stylesColor,
+      effectStyles: settings.stylesEffect,
+    });
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
+    });
+
+    const selectedSets = themes.reduce((acc, curr) => {
+      if (selectedThemes.includes(curr.id)) {
+        acc = {
+          ...acc,
+          ...curr.selectedTokenSets,
+        };
+      }
+      return acc;
+    }, {});
+
+    const enabledTokenSets = Object.keys(selectedSets)
+      .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+      .map((tokenSet) => tokenSet);
+
+    if (enabledTokenSets.length === 0) {
+      notifyToUI('No styles created. Make sure themes are active.', { error: true });
+      return;
     }
-  }, [confirm, usedTokenSet, tokens, settings, dispatch.tokenState, activeTokenSet]);
 
-  const syncStyles = useCallback(async () => {
-    const userConfirmation = await confirm({
-      text: 'Sync styles',
-      description: 'This will try to rename any styles that were connected via Themes and try to remove any styles that are not connected to any theme.',
-      choices: [
-        { key: 'removeStyles', label: 'Remove styles without connection' },
-        { key: 'renameStyles', label: 'Rename styles' },
-      ],
-    }) as ResolveCallbackPayload<any>;
+    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
 
-    if (userConfirmation && Array.isArray(userConfirmation.data) && userConfirmation.data.length) {
-      track('syncStyles', userConfirmation.data);
+    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+    const withoutSourceTokens = resolved.filter((token) => (
+      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+    ));
 
-      const syncStyleResult = await wrapTransaction({ name: 'syncStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SYNC_STYLES,
-        tokens,
-        options: {
-          renameStyle: userConfirmation.data.includes('renameStyles'),
-          removeStyle: userConfirmation.data.includes('removeStyles'),
-        },
-        settings,
-      }));
+    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const shouldCreate = [
+        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+        settings.stylesColor && curr.type === TokenTypes.COLOR,
+        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+      ].some((isEnabled) => isEnabled);
+      if (shouldCreate) {
+        if (!acc.find((token) => curr.name === token.name)) {
+          acc.push(curr);
+        }
+      }
+      return acc;
+    }, []);
 
-      dispatch.tokenState.removeStyleIdsFromThemes(syncStyleResult.styleIdsToRemove);
-    }
-  }, [confirm, tokens, dispatch.tokenState, settings]);
+    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: tokensToCreate,
+      settings,
+    }));
+
+    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+  }, [dispatch.tokenState, tokens, settings, themes, dispatch.uiState]);
 
   const renameStylesFromTokens = useCallback(async (tokensToRename: TokensToRenamePayload[], parent: string) => {
     track('renameStyles', { tokensToRename, parent });
@@ -437,7 +488,6 @@ export default function useTokens() {
         if ((tokenItem.$extensions || {})['studio.tokens'] && typeof resolvedValue === 'string') {
           // We don't want to change the actual value as this could cause unintended side effects
           tokenItem = { ...tokenItem };
-          // @ts-ignore
           tokenItem.value = resolvedValue;
         }
         if (typeof tokenItem.value === 'string' && VALID_TOKEN_TYPES.includes(tokenItem.type)) {
@@ -456,7 +506,6 @@ export default function useTokens() {
   }, [tokens]);
 
   const createVariables = useCallback(async () => {
-    track('createVariables');
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATEVARIABLES,
       isInfinite: true,
@@ -479,6 +528,66 @@ export default function useTokens() {
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
   }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
 
+  const createVariablesFromSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
+    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedSets.length > 0));
+    if (!shouldCreateVariables) return;
+
+    track('createVariables', {
+      type: 'sets',
+    });
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+      tokens,
+      settings,
+      selectedSets,
+    }));
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+    Promise.resolve();
+  }, [dispatch.uiState, tokens, settings]);
+
+  const createVariablesFromThemes = useCallback(async (selectedThemes: string[]) => {
+    const shouldCreateVariables = ((settings.variablesBoolean || settings.variablesColor || settings.variablesNumber || settings.variablesString) && (selectedThemes.length > 0));
+    if (!shouldCreateVariables) return;
+
+    track('createVariables', {
+      type: 'themes',
+    });
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATEVARIABLES,
+      isInfinite: true,
+    });
+    const createVariableResult = await wrapTransaction({
+      name: 'createVariables',
+      statExtractor: async (result, transaction) => {
+        const data = await result;
+        if (data) {
+          transaction.setMeasurement('variables', data.totalVariables, '');
+        }
+      },
+    }, async () => await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES,
+      tokens,
+      settings,
+      selectedThemes,
+    }));
+    dispatch.tokenState.assignVariableIdsToTheme(createVariableResult.variableIds);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATEVARIABLES);
+    Promise.resolve();
+  }, [dispatch.tokenState, dispatch.uiState, tokens, settings]);
+
   const renameVariablesFromToken = useCallback(async ({ oldName, newName }: TokenToRename) => {
     track('renameVariables', { oldName, newName });
 
@@ -492,31 +601,6 @@ export default function useTokens() {
 
     dispatch.tokenState.renameVariableIdsToTheme(result.renameVariableToken);
   }, [dispatch.tokenState]);
-
-  const syncVariables = useCallback(async () => {
-    const userConfirmation = await confirm({
-      text: 'Sync variables',
-      description: 'This will try to rename any variables that were connected via Tokens and try to remove any variables that are not connected to any token.',
-      choices: [
-        { key: 'removeVariables', label: 'Remove variables without connection' },
-        { key: 'renameVariables', label: 'Rename variables' },
-      ],
-    }) as ResolveCallbackPayload<any>;
-
-    if (userConfirmation) {
-      track('syncVariables', userConfirmation.data);
-
-      await wrapTransaction({ name: 'syncVariables' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SYNC_VARIABLES,
-        tokens,
-        options: {
-          renameVariable: userConfirmation.data.includes('renameVariables'),
-          removeVariable: userConfirmation.data.includes('removeVariables'),
-        },
-        settings,
-      }));
-    }
-  }, [confirm, tokens, settings]);
 
   const updateVariablesFromToken = useCallback(async (payload: UpdateTokenVariablePayload) => {
     track('updateVariables', payload);
@@ -532,24 +616,24 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,
     remapTokensInGroup,
-    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
-    syncStyles,
     setNoneValuesOnNode,
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromSets,
     renameVariablesFromToken,
-    syncVariables,
+    createVariablesFromThemes,
     updateVariablesFromToken,
     filterMultiValueTokens,
   }), [
@@ -557,24 +641,24 @@ export default function useTokens() {
     getTokenValue,
     getFormattedTokens,
     getStringTokens,
-    createStylesFromTokens,
+    createStylesFromSelectedTokenSets,
+    createStylesFromSelectedThemes,
     pullStyles,
     pullVariables,
     remapToken,
     remapTokensInGroup,
-    remapTokensWithOtherReference,
     removeTokensByValue,
     handleRemap,
     renameStylesFromTokens,
     handleBulkRemap,
     removeStylesFromTokens,
-    syncStyles,
     setNoneValuesOnNode,
     handleUpdate,
     handleJSONUpdate,
     createVariables,
+    createVariablesFromSets,
+    createVariablesFromThemes,
     renameVariablesFromToken,
-    syncVariables,
     updateVariablesFromToken,
     filterMultiValueTokens,
   ]);

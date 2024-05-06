@@ -9,10 +9,11 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
+import { TokenFormatOptions } from './TokenFormatStoreClass';
 
 // @TODO fix typings
 
@@ -72,7 +73,12 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       } else if (returnValueToLookFor(key) === 'description') {
         // Not all tokens have a description, so we need to treat it special
         acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
-      } else if (borderPropertyMap.get(key as Properties) && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
+      } else if (
+        borderPropertyMap.get(key as Properties)
+        && resolvedToken.type === TokenTypes.BORDER
+        && typeof resolvedToken.value === 'object'
+        && 'color' in resolvedToken.value && resolvedToken.value.color
+        && !('borderColor' in acc)) {
         // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
         acc.borderColor = resolvedToken.value.color;
         // We return the value because the token holds its values in the 'value' prop
@@ -98,6 +104,7 @@ export async function getTokenData(): Promise<{
   version: string;
   checkForChanges: boolean | null
   collapsedTokenSets: string[] | null
+  tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
     const values = await ValuesProperty.read(figma.root) ?? {};
@@ -107,6 +114,7 @@ export async function getTokenData(): Promise<{
     const updatedAt = await UpdatedAtProperty.read(figma.root);
     const checkForChanges = await CheckForChangesProperty.read(figma.root);
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
+    const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
         acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
@@ -120,6 +128,7 @@ export async function getTokenData(): Promise<{
         version: version || '',
         checkForChanges,
         collapsedTokenSets,
+        tokenFormat: tokenFormat as TokenFormatOptions,
       };
     }
   } catch (e) {
@@ -135,6 +144,10 @@ export async function saveStorageType(context: StorageType) {
 
 export async function saveOnboardingExplainerSets(onboardingExplainerSets: boolean) {
   await OnboardingExplainerSetsProperty.write(onboardingExplainerSets);
+}
+
+export async function saveOnboardingExplainerExportSets(onboardingExplainerExportSets: boolean) {
+  await OnboardingExplainerExportSetsProperty.write(onboardingExplainerExportSets);
 }
 
 export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSyncProviders: boolean) {
@@ -191,8 +204,8 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  if (values && values.border) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
+  if (values && values.border && !values.borderColor) {
+    // if we have a border token we must convert the color variable out of it given how our resolution logic works
     const resolvedToken = tokens.get(values.border as string);
     if (resolvedToken && resolvedToken.resolvedValueWithReferences) {
       if (typeof resolvedToken.resolvedValueWithReferences === 'object' && 'color' in resolvedToken.resolvedValueWithReferences) {
@@ -200,6 +213,7 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
         values.borderColor = borderColorTokenName;
       }
     }
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
   if (values && values.borderTop) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };

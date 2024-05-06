@@ -16,12 +16,45 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokensStudioTokenStorage } from '../../../../storage/TokensStudioTokenStorage'; // todo
 import usePushDialog from '../../../hooks/usePushDialog';
-import { saveLastSyncedState } from '../../../../utils/saveLastSyncedState';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
+import { PushOverrides } from '../../remoteTokens';
+import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
+import { applyTokenSetOrder } from '@/utils/tokenset';
 
 type TokensStudioCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type TokensStudioFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
+
+export type TokensStudioAction =
+  | 'CREATE_TOKEN'
+  | 'EDIT_TOKEN'
+  | 'DELETE_TOKEN'
+  | 'CREATE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET'
+  | 'DELETE_TOKEN_SET'
+  | 'UPDATE_TOKEN_SET_ORDER'
+  | 'CREATE_THEME_GROUP'
+  | 'UPDATE_THEME_GROUP'
+  | 'DELETE_THEME_GROUP';
+
+interface PushToTokensStudio {
+  context: TokensStudioCredentials;
+  action: TokensStudioAction;
+  data: any;
+  metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+}
+
+export const pushToTokensStudio = async ({
+  context, action, data, metadata,
+}: PushToTokensStudio) => {
+  const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
+
+  return storageClient.push({
+    action,
+    data,
+    metadata,
+  });
+};
 
 export function useTokensStudio() {
   const tokens = useSelector(tokensSelector);
@@ -39,19 +72,11 @@ export function useTokensStudio() {
   }, []);
 
   const pushTokensToTokensStudio = useCallback(
-    async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
+    async (context: TokensStudioCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
       const storage = await storageClientFactory(context);
 
-      const content = await storage.retrieve();
-      if (content?.status === 'failure') {
-        return {
-          status: 'failure',
-          errorMessage: content?.errorMessage,
-        };
-      }
-
       dispatch.uiState.setLocalApiState({ ...context });
-      const pushSettings = await pushDialog();
+      const pushSettings = await pushDialog({ state: 'initial', overrides });
       if (pushSettings) {
         try {
           const metadata = {
@@ -67,7 +92,6 @@ export function useTokensStudio() {
               storeTokenIdInJsonEditor,
             },
           );
-          saveLastSyncedState(dispatch, tokens, themes, metadata);
           dispatch.uiState.setLocalApiState({ ...localApiState } as TokensStudioCredentials);
           dispatch.uiState.setApiData({ ...context });
           dispatch.tokenState.setTokenData({
@@ -75,9 +99,10 @@ export function useTokensStudio() {
             themes,
             usedTokenSet,
             activeTheme,
+            hasChangedRemote: true,
           });
 
-          pushDialog('success');
+          pushDialog({ state: 'success' });
           return {
             status: 'success',
             tokens,
@@ -127,10 +152,11 @@ export function useTokensStudio() {
           };
         }
         if (content) {
-          // We're doing read-only for now, so no editing.
-          dispatch.tokenState.setEditProhibited(true);
-
-          return content;
+          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+          return {
+            ...content,
+            tokens: sortedTokens,
+          };
         }
       } catch (e) {
         return {
@@ -140,7 +166,7 @@ export function useTokensStudio() {
       }
       return null;
     },
-    [storageClientFactory, dispatch.tokenState],
+    [storageClientFactory],
   );
 
   const syncTokensWithTokensStudio = useCallback(
@@ -161,10 +187,8 @@ export function useTokensStudio() {
         return {
           status: 'success',
           tokens: data.tokens,
-          // TODO: Add support for resolvers which are our theme configs
-          themes: [],
-          // TODO: We dont have metadata yet, but we'll likely need it in the form of token set ordering
-          metadata: {},
+          themes: data.themes,
+          metadata: data.metadata ?? {},
         };
       } catch (e) {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });

@@ -7,15 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { Button, DropdownMenu } from '@tokens-studio/ui';
 import {
   branchSelector,
-  lastSyncedStateSelector,
-  tokensSelector,
   localApiStateBranchSelector,
   apiSelector,
   usedTokenSetSelector,
   localApiStateSelector,
-  themesListSelector,
   activeThemeSelector,
-  storageTypeSelector,
 } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import useConfirm from '@/app/hooks/useConfirm';
@@ -24,13 +20,13 @@ import CreateBranchModal from './modals/CreateBranchModal';
 import { Dispatch } from '../store';
 import { BranchSwitchMenuRadioElement } from './BranchSwitchMenuRadioElement';
 import { isGitProvider } from '@/utils/is';
-import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
-import { useFlags } from './LaunchDarkly';
 import ProBadge from './ProBadge';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { track } from '@/utils/analytics';
+import { useChangedState } from '@/hooks/useChangedState';
+import { useIsProUser } from '../hooks/useIsProUser';
 
 const BranchSwitchMenuItemElement: React.FC<
 React.PropsWithChildren<
@@ -58,15 +54,10 @@ export default function BranchSelector() {
   const { confirm } = useConfirm();
   const { pullTokens, pushTokens } = useRemoteTokens();
   const dispatch = useDispatch<Dispatch>();
-  const { gitBranchSelector } = useFlags();
+  const isProUser = useIsProUser();
   const { setStorageType } = useStorage();
 
   const branchState = useSelector(branchSelector);
-  const lastSyncedState = useSelector(lastSyncedStateSelector);
-  const tokens = useSelector(tokensSelector);
-  const themes = useSelector(themesListSelector);
-
-  const storageType = useSelector(storageTypeSelector);
   const localApiState = useSelector(localApiStateSelector);
   const localApiStateBranch = useSelector(localApiStateBranchSelector);
   const apiData = useSelector(apiSelector);
@@ -77,23 +68,11 @@ export default function BranchSelector() {
   const [startBranch, setStartBranch] = useState<string | null>(null);
   const [createBranchModalVisible, setCreateBranchModalVisible] = useState(false);
   const [isCurrentChanges, setIsCurrentChanges] = useState(false);
+  const { hasChanges } = useChangedState();
 
   useEffect(() => {
     setCurrentBranch(localApiStateBranch);
   }, [localApiStateBranch, setCurrentBranch]);
-
-  const checkForChanges = React.useCallback(() => {
-    const tokenSetOrder = Object.keys(tokens);
-    const defaultMetadata = isGitProvider(storageType) ? { tokenSetOrder } : {};
-    const hasChanged = !compareLastSyncedState(tokens, themes, defaultMetadata, lastSyncedState, [
-      {},
-      [],
-      defaultMetadata,
-    ]);
-    return hasChanged;
-  }, [lastSyncedState, tokens, themes, storageType]);
-
-  const hasChanges = React.useMemo(() => checkForChanges(), [checkForChanges]);
 
   const askUserIfPushChanges = React.useCallback(async () => {
     const confirmResult = await confirm({
@@ -192,11 +171,11 @@ export default function BranchSelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top" sideOffset={0}>
+          <DropdownMenu.Content side="top" sideOffset={0} className="content scroll-container" css={{ maxWidth: '70vw' }}>
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger
                 data-testid="branch-selector-create-new-branch-trigger"
-                disabled={!gitBranchSelector}
+                disabled={!isProUser}
               >
                 {t('createNewBranch')}
                 <DropdownMenu.TrailingVisual>
@@ -223,7 +202,7 @@ export default function BranchSelector() {
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
             <DropdownMenu.Separator />
-            {!gitBranchSelector && (
+            {!isProUser && (
               <>
                 <DropdownMenu.Item css={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>{t('upgradeToPro', { ns: 'licence' })}</span>
@@ -236,7 +215,7 @@ export default function BranchSelector() {
               {branchState.branches.length > 0
                 && branchState.branches.map((branch, index) => (
                   <BranchSwitchMenuRadioElement
-                    disabled={!gitBranchSelector}
+                    disabled={!isProUser}
                     key={`radio_${seed(index)}`}
                     branch={branch}
                     branchSelected={onBranchSelected}

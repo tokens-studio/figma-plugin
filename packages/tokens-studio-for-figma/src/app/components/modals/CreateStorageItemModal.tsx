@@ -46,7 +46,7 @@ export default function CreateStorageItemModal({
   }, [handleCreateNewClick]);
 
   return (
-    <Modal title={t('addNewSyncProvider')} large isOpen={isOpen} close={onClose}>
+    <Modal title={t('addNewSyncProvider')} size="large" isOpen={isOpen} close={onClose}>
       <StorageItemForm
         isNew
         onChange={handleChange}

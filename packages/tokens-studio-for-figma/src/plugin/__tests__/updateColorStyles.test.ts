@@ -1,17 +1,29 @@
 import updateColorStyles from '../updateColorStyles';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mockCreatePaintStyle, mockGetLocalPaintStyles } from '../../../tests/__mocks__/figmaMock';
+import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 describe('updateColorStyles', () => {
-  it('Can create styles', () => {
-    const createdEffect = {
+  beforeEach(() => {
+    defaultTokenValueRetriever.initiate({
+      tokens: [{
+        name: 'colors.red',
+        value: '#ff0000',
+        rawValue: '#ff0000',
+        type: TokenTypes.COLOR,
+      },
+      ],
+    });
+  });
+  it('Can create styles', async () => {
+    const createdStyle = {
       id: '1234',
       name: 'colors/red',
       paints: [],
     };
-    mockCreatePaintStyle.mockImplementationOnce(() => createdEffect);
+    mockCreatePaintStyle.mockImplementationOnce(() => createdStyle);
 
-    updateColorStyles(
+    await updateColorStyles(
       [{
         name: 'colors.red',
         value: '#ff0000',
@@ -22,7 +34,7 @@ describe('updateColorStyles', () => {
       true,
     );
 
-    expect(createdEffect.paints).toEqual([
+    expect(createdStyle.paints).toEqual([
       {
         type: 'SOLID',
         color: { r: 1, g: 0, b: 0 },
@@ -31,7 +43,7 @@ describe('updateColorStyles', () => {
     ]);
   });
 
-  it('Can find style by styleId and update an existing style', () => {
+  it('Can find style by styleId and update an existing style', async () => {
     const existingStyles = [
       {
         type: 'PAINT',
@@ -46,7 +58,7 @@ describe('updateColorStyles', () => {
     ];
     mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
 
-    updateColorStyles(
+    await updateColorStyles(
       [{
         name: 'colors.red',
         value: '#ff0000',
@@ -66,7 +78,7 @@ describe('updateColorStyles', () => {
     ]);
   });
 
-  it('Can find style by styleId and update an existing style', () => {
+  it('Can find style by styleId and update an existing style', async () => {
     const existingStyles = [
       {
         type: 'PAINT',
@@ -81,7 +93,7 @@ describe('updateColorStyles', () => {
     ];
     mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
 
-    updateColorStyles(
+    await updateColorStyles(
       [{
         name: 'colors.red',
         value: '#ff0000',
@@ -99,5 +111,35 @@ describe('updateColorStyles', () => {
         opacity: 1,
       },
     ]);
+  });
+
+  it('renames if option is true and style is found', async () => {
+    const existingStyles = [
+      {
+        type: 'PAINT',
+        id: '1234',
+        name: 'colors/red',
+        paints: [{
+          type: 'SOLID',
+          color: { r: 1, g: 0.1, b: 0.1 },
+          opacity: 1,
+        }],
+      },
+    ];
+    mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
+
+    await updateColorStyles(
+      [{
+        name: 'colors.red',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        path: 'colors/redRENAMED',
+        styleId: '1234',
+      }],
+      true,
+      true,
+    );
+
+    expect(existingStyles[0].name).toEqual('colors/redRENAMED');
   });
 });

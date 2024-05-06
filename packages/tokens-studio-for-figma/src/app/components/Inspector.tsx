@@ -1,14 +1,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, Tooltip, IconButton } from '@tokens-studio/ui';
+import {
+  Checkbox, TextInput, ToggleGroup, Tooltip,
+} from '@tokens-studio/ui';
+import { Search } from 'iconoir-react';
 import Box from './Box';
 import InspectorDebugView from './InspectorDebugView';
 import InspectorMultiView from './InspectorMultiView';
 import IconDebug from '@/icons/debug.svg';
 import IconInspect from '@/icons/multiinspect.svg';
 import { Dispatch } from '../store';
-import Checkbox from './Checkbox';
 import Label from './Label';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { track } from '@/utils/analytics';
@@ -36,8 +38,10 @@ function Inspector() {
   ), [tokens, usedTokenSet]);
 
   const handleSetInspectView = React.useCallback((view: 'multi' | 'debug') => {
-    track('setInspectView', { view });
-    setInspectView(view);
+    if (view) {
+      track('setInspectView', { view });
+      setInspectView(view);
+    }
   }, []);
 
   function renderInspectView() {
@@ -60,7 +64,7 @@ function Inspector() {
     }}
     >
       <Box css={{
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$4', borderBottom: '1px solid $borderMuted',
+        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$3', borderBottom: '1px solid $borderMuted',
       }}
       >
         <Box
@@ -71,13 +75,12 @@ function Inspector() {
             gap: '$3',
           }}
         >
-          <Input
-            full
+          <TextInput
             value={searchInputValue}
             onChange={handleSearchInputChange}
             type="text"
-            autofocus
-            placeholder={`${t('search')}...`}
+            placeholder={`${t('search')}…`}
+            leadingVisual={<Search />}
           />
         </Box>
         <Stack direction="row" align="center" gap={2}>
@@ -98,7 +101,11 @@ function Inspector() {
               </Label>
             </Tooltip>
           </Stack>
-          <ToggleGroup type="single" value={inspectView} onValueChange={handleSetInspectView}>
+          <ToggleGroup
+            type="single"
+            value={inspectView}
+            onValueChange={handleSetInspectView}
+          >
             {/* Disabling tooltip for now due to https://github.com/radix-ui/primitives/issues/602
             <ToggleGroup.Item value="multi" tooltip={t('inspectLayers') as string} tooltipSide="bottom"> */}
             <ToggleGroup.Item value="multi">

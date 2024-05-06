@@ -6,16 +6,12 @@ import { useTranslation } from 'react-i18next';
 import {
   Box, Link, Text, Button, Heading, Label, Stack, Switch,
 } from '@tokens-studio/ui';
-import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
-import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { track } from '@/utils/analytics';
 import SyncSettings from '../SyncSettings';
 import { LanguageSelector } from '../LanguageSelector';
 import { Dispatch } from '../../store';
 import {
-  ignoreFirstPartForStylesSelector,
   storeTokenIdInJsonEditorSelector,
-  prefixStylesWithThemeNameSelector,
   uiStateSelector,
 } from '@/selectors';
 import AddLicenseKey from '../AddLicenseKey/AddLicenseKey';
@@ -36,8 +32,6 @@ function Settings() {
     url: 'https://docs.tokens.studio/sync/sync?ref=onboarding_explainer_syncproviders',
   };
 
-  const ignoreFirstPartForStyles = useSelector(ignoreFirstPartForStylesSelector);
-  const prefixStylesWithThemeName = useSelector(prefixStylesWithThemeNameSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const uiState = useSelector(uiStateSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -81,27 +75,10 @@ function Settings() {
     }
     getSessionId();
   });
-  const handleIgnoreChange = React.useCallback(
-    (state: CheckedState) => {
-      track('setIgnoreFirstPartForStyles', { value: state });
-      dispatch.settings.setIgnoreFirstPartForStyles(!!state);
-    },
-    [dispatch.settings],
-  );
-
-  const handlePrefixWithThemeNameChange = React.useCallback(
-    (state: CheckedState) => {
-      track('setPrefixStylesWithThemeName', { value: state });
-
-      dispatch.settings.setPrefixStylesWithThemeName(!!state);
-    },
-    [dispatch.settings],
-  );
 
   const handleStoreTokenIdInJsonEditorChange = React.useCallback(
     (state: CheckedState) => {
       track('setStoreTokenIdInJsonEditorSelector', { value: state });
-
       dispatch.settings.setStoreTokenIdInJsonEditorSelector(!!state);
     },
     [dispatch.settings],
@@ -113,6 +90,7 @@ function Settings() {
 
   const handleResetButton = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerSets(true);
+    dispatch.uiState.setOnboardingExplainerExportSets(true);
     dispatch.uiState.setOnboardingExplainerInspect(true);
     dispatch.uiState.setOnboardingExplainerSyncProviders(true);
     dispatch.uiState.setLastOpened(0);
@@ -153,42 +131,7 @@ function Settings() {
               width: '100%',
             }}
           >
-            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
-              <Stack direction="column">
-                <Stack direction="row" gap={1} align="center">
-                  <Label htmlFor="ignoreFirstPartForStyles">{t('ignorePrefix')}</Label>
-                  <ExplainerModal title={t('ignorePrefix')}>
-                    <Box as="img" src={ignoreFirstPartImage} css={{ borderRadius: '$small' }} />
-                    <Box>{t('usefulIgnore')}</Box>
-                  </ExplainerModal>
-                </Stack>
-              </Stack>
-              <Switch
-                data-testid="ignoreFirstPartForStyles"
-                id="ignoreFirstPartForStyles"
-                checked={!!ignoreFirstPartForStyles}
-                defaultChecked={ignoreFirstPartForStyles}
-                onCheckedChange={handleIgnoreChange}
-              />
-            </Stack>
-            <Stack direction="row" gap={3} align="start" justify="between" css={{ width: '100%' }}>
-              <Stack direction="column">
-                <Stack direction="row" gap={1} align="center">
-                  <Label htmlFor="prefixStylesWithThemeName">{t('prefixStyles')}</Label>
-                  <ExplainerModal title={t('prefixStyles')}>
-                    <Box as="img" src={prefixStylesImage} css={{ borderRadius: '$small' }} />
-                    <Box>{t('prefixStylesExplanation')}</Box>
-                  </ExplainerModal>
-                </Stack>
-              </Stack>
-              <Switch
-                data-testid="prefixStylesWithThemeName"
-                id="prefixStylesWithThemeName"
-                checked={!!prefixStylesWithThemeName}
-                defaultChecked={prefixStylesWithThemeName}
-                onCheckedChange={handlePrefixWithThemeNameChange}
-              />
-            </Stack>
+
             {idStorage && (
               <Stack direction="row" gap={3} align="center" css={{ width: '100%' }}>
                 <Label htmlFor="storeTokenIdInJsonEditor">{t('storeTokenId')}</Label>
@@ -228,7 +171,7 @@ function Settings() {
                       {' '}
                       {t('forMoreInformationPleaseSeeOur')}
                       {' '}
-                      <Link href="https://tokens.studio/privacy">{t('privacyPolicy')}</Link>
+                      <Link href="https://tokens.studio/privacy" target="_blank">{t('privacyPolicy')}</Link>
                     </Box>
                   </ExplainerModal>
                   <Box

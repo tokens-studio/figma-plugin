@@ -16,8 +16,9 @@ import { styled } from '@/stitches.config';
 
 const StyledCode = styled('code', {
   display: 'flex',
+  alignItems: 'center',
   flexWrap: 'wrap',
-  gap: '$2',
+  gap: '$3',
 });
 
 export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens: SingleToken[] }) {
@@ -56,25 +57,28 @@ export default function InspectorDebugView({ resolvedTokens }: { resolvedTokens:
 
         {uiState.selectedLayers === 1 && Object.entries(uiState.mainNodeSelectionValues).length > 0
           ? (
-            <Stack direction="column" gap={1}>
+            <Stack direction="column" gap={5}>
               {Object.entries(uiState.mainNodeSelectionValues)
                 .filter(([key, value]) => !StyleIdBackupKeys.includes(key) && value !== 'delete')
                 .map(([property, value]) => (
-                  <Stack key={property} direction="row" align="start" justify="between">
-                    <StyledCode>
-                      <Text bold>{property}</Text>
-                      :
-                      {' '}
-                      <StyledInspectBadge>
-                        {typeof value === 'string' && value.split('.').join('-')}
-                      </StyledInspectBadge>
-                      <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${getResolvedValue(property, value)} */`}</Text>
-                    </StyledCode>
-                  </Stack>
+                  <StyledCode key={property}>
+                    <Text bold>
+                      {property}
+                      {': '}
+                    </Text>
+                    <StyledInspectBadge>
+                      {typeof value === 'string' && value.split('.').join('-')}
+                    </StyledInspectBadge>
+                    <Text size="xsmall" muted css={{ wordBreak: 'break-all' }}>{`/* ${getResolvedValue(property, value)} */`}</Text>
+                  </StyledCode>
                 ))}
             </Stack>
           )
-          : renderBlankslate()}
+          : (
+            <Stack direction="column" gap={4} css={{ padding: '$5', margin: 'auto' }}>
+              {renderBlankslate()}
+            </Stack>
+          )}
       </Stack>
     </Box>
   );

@@ -3,6 +3,7 @@ import {
   Stack, Dialog, IconButton, Box, Heading,
 } from '@tokens-studio/ui';
 import { XIcon } from '@primer/octicons-react';
+import { ArrowLeft } from 'iconoir-react';
 import { ModalFooter } from './ModalFooter';
 import { styled } from '@/stitches.config';
 
@@ -10,21 +11,22 @@ export type ModalProps = {
   id?: string;
   title?: string;
   full?: boolean;
-  large?: boolean;
+  size?: 'large' | 'fullscreen';
   compact?: boolean;
-  isOpen: boolean;
+  isOpen?: boolean;
   children: React.ReactNode;
   footer?: React.ReactNode;
   stickyFooter?: boolean;
   showClose?: boolean;
+  backArrow?: boolean
   close: () => void;
   modal?: boolean;
+  onInteractOutside?: (event: Event) => void;
 };
 
 const StyledBody = styled('div', {
   position: 'relative',
   padding: '$4',
-  overflow: 'auto',
   variants: {
     full: {
       true: {
@@ -39,11 +41,44 @@ const StyledBody = styled('div', {
   },
 });
 
+const StyledDialogContent = styled(Dialog.Content, {
+  '&:focus-visible': {
+    outline: 'none',
+  },
+  variants: {
+    size: {
+      large: {
+        width: 'calc(100vw - $7)',
+        maxWidth: 'calc(100vw -$7)',
+        padding: 0,
+        boxShadow: '$contextMenu',
+        borderColor: '$borderSubtle',
+      },
+      fullscreen: {
+        width: '100vw',
+        maxWidth: '100vw',
+        padding: 0,
+        height: '100vh',
+        maxHeight: '100vh',
+        borderRadius: 0,
+        border: 'none',
+        boxShadow: 'none',
+      },
+      regular: {
+        padding: '0',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'regular',
+  },
+});
+
 export function Modal({
   id,
   title,
   full,
-  large,
+  size,
   isOpen,
   close,
   children,
@@ -52,6 +87,8 @@ export function Modal({
   showClose = false,
   compact = false,
   modal = true,
+  backArrow = false,
+  onInteractOutside,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -77,29 +114,17 @@ export function Modal({
             backgroundColor: '$modalBackdrop',
           }}
         />
-        <Dialog.Content
-          css={
-            large
-              ? {
-                width: 'calc(100vw - $7)',
-                maxWidth: 'calc(100vw - $7)',
-                padding: 0,
-                boxShadow: '$contextMenu',
-                borderColor: '$borderSubtle',
-              }
-              : { padding: 0 }
-          }
-        >
+        <StyledDialogContent size={size} onInteractOutside={onInteractOutside}>
           <Box css={{
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
           }}
           >
-            {(showClose || title) && (
+            {(showClose || title || backArrow) && (
             <Stack
               direction="row"
-              justify="between"
+              justify={backArrow ? 'start' : 'between'}
               align="center"
               css={{
                 borderBottomColor: '$borderSubtle',
@@ -111,28 +136,50 @@ export function Modal({
                 backgroundColor: '$bgDefault',
                 top: 0,
                 zIndex: 10,
+                gap: '$3',
               }}
             >
+              {backArrow && (
+                <IconButton
+                  onClick={handleClose}
+                  data-testid="back-arrow"
+                  icon={<ArrowLeft />}
+                  size="small"
+                  variant="invisible"
+                />
+              )}
               {title && (
-              <Dialog.Title>
-                <Heading size="small">{title}</Heading>
+              <Dialog.Title asChild>
+                <Heading as="h6" size="small">{title}</Heading>
               </Dialog.Title>
               )}
+              {showClose && (
               <IconButton
-                onClick={handleClose}
+                onClick={handleClose || null}
                 data-testid="close-button"
                 icon={<XIcon />}
                 size="small"
                 variant="invisible"
               />
+
+              )}
             </Stack>
             )}
-            <StyledBody compact={compact} full={full} data-testid={id}>
+            <StyledBody
+              compact={compact}
+              full={full}
+              data-testid={id}
+              css={{
+                scrollPaddingBlockEnd: footer ? '$4' : 0,
+                marginBottom: footer && size === 'fullscreen' ? 'calc(var(--sizes-controlMedium) + var(--space-6))' : 0, // Size of the fixed footer incl default sized buttons
+              }}
+              className="content scroll-container"
+            >
               {children}
             </StyledBody>
-            {!!footer && <ModalFooter stickyFooter={stickyFooter}>{footer}</ModalFooter>}
+            {!!footer && <ModalFooter stickyFooter={stickyFooter} fullscreen={size === 'fullscreen'}>{footer}</ModalFooter>}
           </Box>
-        </Dialog.Content>
+        </StyledDialogContent>
       </Dialog.Portal>
     </Dialog>
   );

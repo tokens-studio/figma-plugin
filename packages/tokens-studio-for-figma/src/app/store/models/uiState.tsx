@@ -13,6 +13,8 @@ import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/ty
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { PushOverrides } from '../remoteTokens';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -25,6 +27,7 @@ export type ConfirmProps = {
   choices?: { key: string; label: string; enabled?: boolean, unique?: boolean }[];
   confirmAction?: string;
   cancelAction?: string;
+  variant?: 'danger';
   input?: {
     type: 'text';
     placeholder: string;
@@ -67,13 +70,14 @@ export interface UIState {
   changelog: StoryblokStory['content'][];
   lastOpened: number | null;
   onboardingExplainerSets: boolean;
+  onboardingExplainerExportSets: boolean;
   onboardingExplainerSyncProviders: boolean;
   onboardingExplainerInspect: boolean;
   editToken: EditTokenObject;
   showEditForm: boolean;
   tokenFilter: string;
   confirmState: ConfirmProps;
-  showPushDialog: string | false;
+  showPushDialog: { state: string | false, overrides?: PushOverrides };
   showPullDialog: string | false;
   showEmptyGroups: boolean;
   collapsed: boolean;
@@ -83,6 +87,8 @@ export interface UIState {
   figmaFonts: Font[]
   secondScreenEnabled: boolean;
   showAutoSuggest: boolean;
+  showConvertTokenFormatModal: boolean;
+  sidebarWidth: number;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -113,11 +119,13 @@ export const uiState = createModel<RootModel>()({
     localApiState: {
       provider: StorageProviderType.LOCAL,
       new: false,
+      format: TokenFormatOptions.Legacy,
     },
     lastUpdatedAt: null,
     changelog: [],
     lastOpened: '',
     onboardingExplainerSets: null,
+    onboardingExplainerExportSets: null,
     onboardingExplainerSyncProviders: null,
     onboardingExplainerInspect: null,
     editToken: {
@@ -128,7 +136,7 @@ export const uiState = createModel<RootModel>()({
     tokenFilter: '',
     tokenFilterVisible: false,
     confirmState: defaultConfirmState,
-    showPushDialog: false,
+    showPushDialog: { state: false },
     showPullDialog: false,
     showEmptyGroups: true,
     collapsed: false,
@@ -138,9 +146,15 @@ export const uiState = createModel<RootModel>()({
     figmaFonts: [],
     secondScreenEnabled: false,
     showAutoSuggest: false,
+    showConvertTokenFormatModal: false,
+    sidebarWidth: 150,
   } as unknown as UIState,
   reducers: {
-    setShowPushDialog: (state, data: string | false) => ({
+    setShowConvertTokenFormatModal: (state, data: boolean) => ({
+      ...state,
+      showConvertTokenFormatModal: data,
+    }),
+    setShowPushDialog: (state, data: { state: string | false, overrides?: PushOverrides }) => ({
       ...state,
       showPushDialog: data,
     }),
@@ -156,6 +170,7 @@ export const uiState = createModel<RootModel>()({
         choices: { key: string; label: string; enabled?: boolean; unique?: boolean }[];
         confirmAction?: string;
         cancelAction?: string;
+        variant?: 'danger';
         input?: {
           type: 'text';
           placeholder: string;
@@ -171,6 +186,7 @@ export const uiState = createModel<RootModel>()({
         confirmAction: data.confirmAction || defaultConfirmState.confirmAction,
         cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
         input: data.input,
+        variant: data.variant,
       },
     }),
     setSelectedLayers: (state, data: number) => ({
@@ -293,6 +309,12 @@ export const uiState = createModel<RootModel>()({
         onboardingExplainerSets: payload,
       };
     },
+    setOnboardingExplainerExportSets(state, payload: boolean) {
+      return {
+        ...state,
+        onboardingExplainerExportSets: payload,
+      };
+    },
     setOnboardingExplainerSyncProviders(state, payload: boolean) {
       return {
         ...state,
@@ -386,6 +408,10 @@ export const uiState = createModel<RootModel>()({
       ...state,
       showAutoSuggest: data,
     }),
+    setSidebarWidth: (state, data: number) => ({
+      ...state,
+      sidebarWidth: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {
@@ -397,6 +423,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
         onboardingExplainerSets: payload,
+      });
+    },
+    setOnboardingExplainerExportSets: (payload) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_ONBOARDINGEXPLAINEREXPORTSETS,
+        onboardingExplainerExportSets: payload,
       });
     },
     setOnboardingExplainerSyncProviders: (payload) => {

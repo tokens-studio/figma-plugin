@@ -4,9 +4,10 @@ import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
   CheckForChangesProperty,
-  ThemesProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -16,6 +17,7 @@ type Payload = {
   updatedAt: string
   checkForChanges: boolean
   collapsedTokenSets: string[]
+  tokenFormat: TokenFormatOptions
 };
 
 export async function updateLocalTokensData(payload: Payload) {
@@ -27,4 +29,5 @@ export async function updateLocalTokensData(payload: Payload) {
   await ActiveThemeProperty.write(payload.activeTheme);
   await CheckForChangesProperty.write(payload.checkForChanges);
   await CollapsedTokenSetsProperty.write(payload.collapsedTokenSets);
+  await TokenFormatProperty.write(payload.tokenFormat);
 }

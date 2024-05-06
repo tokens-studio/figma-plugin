@@ -90,7 +90,6 @@ describe('ImportedTokensDialog', () => {
     );
 
     waitFor(async () => {
-      expect(result.queryByText('import')).toBeInTheDocument();
       expect(result.queryByText('newTokens')).toBeInTheDocument();
       expect(result.queryByText('createAll')).toBeInTheDocument();
       expect(result.queryByText('existingTokens')).toBeInTheDocument();
@@ -140,7 +139,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'small',
             type: 'sizing',
@@ -181,27 +182,18 @@ describe('ImportedTokensDialog', () => {
             value: '50%',
           },
           {
-            $extensions: {
-              id: 'mock-uuid',
-            },
             name: 'small',
             type: 'sizing',
             value: '12',
             description: 'regular sizing token',
           },
           {
-            $extensions: {
-              id: 'mock-uuid',
-            },
             name: 'black',
             type: 'color',
             value: '#ffffff',
             description: 'regular color token',
           },
           {
-            $extensions: {
-              id: 'mock-uuid',
-            },
             name: 'headline',
             type: 'boxShadow',
             value: {
@@ -253,7 +245,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'black',
             type: 'color',
@@ -262,7 +256,9 @@ describe('ImportedTokensDialog', () => {
           },
           {
             $extensions: {
-              id: 'mock-uuid',
+              'studio.tokens': {
+                id: 'mock-uuid',
+              },
             },
             name: 'headline',
             type: 'boxShadow',
@@ -463,6 +459,6 @@ describe('ImportedTokensDialog', () => {
     });
     expect(mockStore.getState().tokenState.importedTokens.newTokens).toEqual([]);
     expect(mockStore.getState().tokenState.importedTokens.updatedTokens).toEqual([]);
-    expect(result.queryByText('import')).not.toBeInTheDocument();
+    expect(result.queryByText('imported')).not.toBeInTheDocument();
   });
 });

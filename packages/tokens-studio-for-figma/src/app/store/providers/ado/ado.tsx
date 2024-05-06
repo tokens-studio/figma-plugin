@@ -14,11 +14,11 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
-import { useFlags } from '@/app/components/LaunchDarkly';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
-import { saveLastSyncedState } from '@/utils/saveLastSyncedState';
+import { PushOverrides } from '../../remoteTokens';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -31,7 +31,7 @@ export const useADO = () => {
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const dispatch = useDispatch<Dispatch>();
-  const { multiFileSync } = useFlags();
+  const isProUser = useIsProUser();
   const { confirm } = useConfirm();
   const { pushDialog, closePushDialog } = usePushDialog();
 
@@ -39,9 +39,9 @@ export const useADO = () => {
     const storageClient = new ADOTokenStorage(context);
     if (context.filePath) storageClient.changePath(context.filePath);
     if (context.branch) storageClient.selectBranch(context.branch);
-    if (multiFileSync) storageClient.enableMultiFile();
+    if (isProUser) storageClient.enableMultiFile();
     return storageClient;
-  }, [multiFileSync]);
+  }, [isProUser]);
 
   const askUserIfPull = React.useCallback(async () => {
     const confirmResult = await confirm({
@@ -51,40 +51,12 @@ export const useADO = () => {
     return confirmResult;
   }, [confirm]);
 
-  const pushTokensToADO = React.useCallback(async (context: AdoCredentials): Promise<RemoteResponseData> => {
+  const pushTokensToADO = React.useCallback(async (context: AdoCredentials, overrides?: PushOverrides): Promise<RemoteResponseData> => {
     const storage = storageClientFactory(context);
-    if (context.branch) {
-      storage.setSource(context.branch);
-    }
-    const content = await storage.retrieve();
-    if (content?.status === 'failure') {
-      return {
-        status: 'failure',
-        errorMessage: content?.errorMessage,
-      };
-    }
-    if (
-      content
-      && isEqual(content.tokens, tokens)
-      && isEqual(content.themes, themes)
-      && isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
-    ) {
-      notifyToUI('Nothing to commit');
-      return {
-        status: 'success',
-        tokens,
-        themes,
-      };
-    }
 
     dispatch.uiState.setLocalApiState({ ...context });
-    dispatch.tokenState.setRemoteData({
-      tokens: content?.tokens ?? {},
-      themes: content?.themes ?? [],
-      metadata: { tokenSetOrder: content?.metadata?.tokenSetOrder ?? [] },
-    });
 
-    const pushSettings = await pushDialog();
+    const pushSettings = await pushDialog({ state: 'initial', overrides });
     if (pushSettings) {
       const { commitMessage, customBranch } = pushSettings;
       try {
@@ -101,7 +73,6 @@ export const useADO = () => {
           storeTokenIdInJsonEditor,
         });
 
-        saveLastSyncedState(dispatch, tokens, themes, metadata);
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as AdoCredentials);
         dispatch.uiState.setApiData({ ...context, branch: customBranch });
         dispatch.tokenState.setTokenData({
@@ -109,9 +80,10 @@ export const useADO = () => {
           themes,
           usedTokenSet,
           activeTheme,
+          hasChangedRemote: true,
         });
 
-        pushDialog('success');
+        pushDialog({ state: 'success' });
 
         return {
           status: 'success',
@@ -224,12 +196,12 @@ export const useADO = () => {
           const userDecision = await askUserIfPull();
           if (userDecision) {
             const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
-            saveLastSyncedState(dispatch, sortedValues, content.themes, content.metadata);
             dispatch.tokenState.setTokenData({
               values: sortedValues,
               themes: content.themes,
               usedTokenSet,
               activeTheme,
+              hasChangedRemote: true,
             });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');

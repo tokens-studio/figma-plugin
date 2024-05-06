@@ -11,13 +11,10 @@ export function updateTokenPayloadToSingleToken(
     type: payload.type,
     $extensions: {
       ...payload.$extensions,
-      ...(id ? { id } : {}),
-      ...(payload.$extensions?.['studio.tokens'] ? {
-        'studio.tokens': {
-          ...payload.$extensions['studio.tokens'],
-          modify: payload.$extensions['studio.tokens']?.modify,
-        },
-      } : {}),
+      'studio.tokens': {
+        ...(id ? { id } : {}),
+        ...payload?.$extensions?.['studio.tokens'],
+      },
     },
     ...(payload.description ? {
       description: payload.description,

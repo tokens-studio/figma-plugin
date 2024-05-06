@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IconButton } from '@tokens-studio/ui';
-import Box from '../Box';
+import {
+  IconButton, Label, Stack, Switch, Box,
+} from '@tokens-studio/ui';
+import { styled } from '@stitches/react';
 import { ThemeObject } from '@/types';
-import Stack from '../Stack';
 import IconDiveInto from '@/icons/dive-into.svg';
-import { StyledThemeMetaLabel } from './StyledThemeMetaLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { Switch, SwitchThumb } from '../Switch';
 import { Dispatch } from '@/app/store';
 import { activeThemeSelector } from '@/selectors';
 
@@ -17,6 +16,28 @@ type Props = {
   groupName: string
   onOpen: (theme: ThemeObject) => void
 };
+
+const StyledCountLabel = styled('span', {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: '$2',
+  fontSize: '$xsmall',
+  color: '$fgMuted',
+  '&:not(:last-of-type)::after': {
+    content: "'·'",
+    paddingRight: '$1',
+    marginRight: '$1',
+    color: '$fgSubtle',
+  },
+  variants: {
+    variant: {
+      danger: {
+        color: '$dangerFg',
+      },
+    },
+  },
+});
 
 export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   theme, isActive, groupName, onOpen,
@@ -53,27 +74,56 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
   }, [dispatch, theme.id, isActive, activeTheme, groupName]);
 
   return (
-    <Box key={theme.id} data-testid="singlethemeentry" css={{ width: '100%', overflow: 'hidden' }}>
-      <Stack direction="row" align="center" justify="between">
-        <Stack gap={4} direction="row" align="center">
-          <Switch checked={isActive} onCheckedChange={handleToggle}>
-            <SwitchThumb />
-          </Switch>
-          <span>{theme.name}</span>
-        </Stack>
-        <Stack gap={4} direction="row" align="center" css={{ overflow: 'hidden' }}>
-          <StyledThemeMetaLabel>
-            {`${tokenSetCount} sets, ${stylesCount} styles, ${variablesCount} variables`}
-          </StyledThemeMetaLabel>
-          <IconButton
-            data-testid={`singlethemeentry-${theme.id}`}
-            icon={<IconDiveInto />}
-            onClick={handleOpenClick}
-            size="small"
-            variant="invisible"
-          />
-        </Stack>
+    <Box
+      key={theme.id}
+      data-testid="singlethemeentry"
+      css={{
+        display: 'grid',
+        gridAutoFlow: 'column',
+        gridTemplateColumns: 'min-content auto repeat(3, max-content) min-content',
+        alignItems: 'center',
+        gridGap: '$2',
+      }}
+    >
+
+      <Switch checked={isActive} onCheckedChange={handleToggle} />
+      <Label>
+        {' '}
+        {theme.name}
+      </Label>
+
+      <Stack>
+        {tokenSetCount > 0 ? (
+          <StyledCountLabel>
+            {tokenSetCount}
+            {' '}
+            {tokenSetCount === 1 ? 'set' : 'sets'}
+          </StyledCountLabel>
+        ) : <StyledCountLabel variant="danger">No sets defined</StyledCountLabel>}
+        {stylesCount > 0 && (
+        <StyledCountLabel>
+          {stylesCount}
+          {' '}
+          {stylesCount === 1 ? 'style' : 'styles'}
+        </StyledCountLabel>
+        )}
+        {variablesCount > 0 && (
+        <StyledCountLabel>
+          {variablesCount}
+          {' '}
+          {variablesCount === 1 ? 'variable' : 'variables'}
+        </StyledCountLabel>
+        )}
       </Stack>
+
+      <IconButton
+        data-testid={`singlethemeentry-${theme.id}`}
+        icon={<IconDiveInto />}
+        onClick={handleOpenClick}
+        size="small"
+        variant="invisible"
+      />
+
     </Box>
   );
 };
