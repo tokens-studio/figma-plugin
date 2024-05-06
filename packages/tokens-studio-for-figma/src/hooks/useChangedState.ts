@@ -32,6 +32,11 @@ export function useChangedState() {
 
   const hasChanges = useMemo(() => {
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);
+    console.log('tokens in useChangedState: ', tokens);
+    console.log('themes in useChangedState: ', themes);
+    console.log('lastSyncedState in useChangedState: ', lastSyncedState);
+    console.log('tokenFormat in useChangedState: ', tokenFormat);
+    console.log('hasChanged in useChangedState: ', hasChanged);
     dispatch.tokenState.updateCheckForChanges(hasChanged);
     return hasChanged;
   }, [tokens, themes, lastSyncedState, tokenFormat, dispatch.tokenState]);

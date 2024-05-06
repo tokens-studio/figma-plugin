@@ -20,6 +20,7 @@ function usePullDialog(): UseDialogResult {
 
   const showPullDialog: UseDialogResult['showPullDialog'] = useCallback((givenState) => {
     if (givenState) {
+      console.log('givenState: ', givenState);
       dispatch.uiState.setShowPullDialog(givenState);
     } else {
       dispatch.uiState.setShowPullDialog('initial');

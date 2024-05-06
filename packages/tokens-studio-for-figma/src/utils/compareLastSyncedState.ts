@@ -20,6 +20,12 @@ export function compareLastSyncedState(
   if (!parsedState) {
     return false;
   }
+  console.log('lastSyncedState in compare: ', lastSyncedState);
+  console.log('json in compare: ', JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2));
+  console.log('isEqual in compare: ', isEqual(
+    lastSyncedState,
+    JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2),
+  ));
   return isEqual(
     lastSyncedState,
     JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2),

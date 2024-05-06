@@ -8,6 +8,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 
 function ChangedStateList() {
   const { changedState } = useChangedState();
+  console.log('changedState: ', changedState);
   const [collapsed, setCollapsed] = React.useState(false);
   const { t } = useTranslation(['tokens']);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
