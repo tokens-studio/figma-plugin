@@ -20,14 +20,6 @@ Looking to contribute a translation for your language? See instructions [here](.
 
 There's a Slack channel where the community can exchange ideas, best practices or simply ask a question. Join us [here](https://tokens.studio/slack)!
 
-## Sponsors
-
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;"><img src="sponsors/zed_logo.png" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Zed Logo"/></a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank"><img src="sponsors/mirahi_logo_dark.svg" style="display: block; width: 75px; height: auto; margin-bottom: 4px" alt="Mirahi Logo"/></a> |
-| --- | --- |
-| <a href="https://zed.dev/" target="_blank" style="display: block; text-align: center;">zed.dev</a> | <a href="https://mirahi.io/?ref=six7-sponsorship" target="_blank" style="display: block; text-align: center;">Mirahi</a> |                                                                                                             |
-
-Is your company using Tokens Studio for Figma? Consider subscribing to Pro to benefit from advanced features and support the project! More info on [our website.](https://tokens.studio)
-
 ## How should I use this plugin?
 
 There's 2 ways how you could use the plugin:
