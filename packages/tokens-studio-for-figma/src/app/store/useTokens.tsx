@@ -548,7 +548,7 @@ export default function useTokens() {
         }
       },
     }, async () => await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS,
+      type: AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
       tokens,
       settings,
       selectedSets,

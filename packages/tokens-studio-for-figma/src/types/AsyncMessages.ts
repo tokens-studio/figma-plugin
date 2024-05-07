@@ -64,7 +64,7 @@ export enum AsyncMessageTypes {
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
-  CREATE_LOCAL_VARIABLES_FROM_SETS = 'async/create-local-variables-from-sets',
+  CREATE_LOCAL_VARIABLES_WITHOUT_MODES = 'async/create-local-variables-without-modes',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
   ATTACH_LOCAL_VARIABLES_TO_THEME = 'async/attach-local-variables-to-theme',
   RENAME_VARIABLES = 'async/rename-variables',
@@ -281,12 +281,12 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
   totalVariables: number
 }>;
 
-export type CreateLocalVariablesFromSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS, {
+export type CreateLocalVariablesFromSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedSets: ExportTokenSet[]
 }>;
-export type CreateLocalVariablesFromSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_FROM_SETS, {
+export type CreateLocalVariablesFromSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   variableIds: Record<string, LocalVariableInfo>
   totalVariables: number
 }>;

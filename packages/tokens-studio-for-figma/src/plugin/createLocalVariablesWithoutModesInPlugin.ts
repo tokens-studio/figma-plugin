@@ -12,7 +12,7 @@ import { mergeVariableReferences } from './mergeVariableReferences';
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 
 // This function is used to create variables based on token sets, without the use of themes
-export default async function createLocalVariablesFromSetsInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
+export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
