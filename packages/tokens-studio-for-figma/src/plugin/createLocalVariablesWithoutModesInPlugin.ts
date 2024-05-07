@@ -28,12 +28,13 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       };
       return acc;
     }, {} as ThemeObject);
+    const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
           [set.set]: tokens[set.set],
         };
-        const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
         let collection = allCollections.find((vr) => vr.name === set.set);
         let modeId;
         if (collection) {

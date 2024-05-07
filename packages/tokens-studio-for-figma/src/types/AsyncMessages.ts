@@ -281,12 +281,12 @@ export type CreateLocalVariablesAsyncMessageResult = AsyncMessage<AsyncMessageTy
   totalVariables: number
 }>;
 
-export type CreateLocalVariablesFromSetsAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+export type CreateLocalVariablesWithoutModesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState,
   selectedSets: ExportTokenSet[]
 }>;
-export type CreateLocalVariablesFromSetsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
+export type CreateLocalVariablesWithoutModesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, {
   variableIds: Record<string, LocalVariableInfo>
   totalVariables: number
 }>;
@@ -373,7 +373,7 @@ export type AsyncMessages =
   | SetAuthDataMessage
   | SetUsedEmailMessage
   | CreateLocalVariablesAsyncMessage
-  | CreateLocalVariablesFromSetsAsyncMessage
+  | CreateLocalVariablesWithoutModesAsyncMessage
   | ResolveVariableInfo
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
@@ -418,7 +418,7 @@ export type AsyncMessageResults =
   | SetAuthDataMessageResult
   | SetUsedEmailMessageResult
   | CreateLocalVariablesAsyncMessageResult
-  | CreateLocalVariablesFromSetsAsyncMessageResult
+  | CreateLocalVariablesWithoutModesAsyncMessageResult
   | ResolveVariableInfoResult
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
