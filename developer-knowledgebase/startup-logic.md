@@ -1,6 +1,7 @@
 ## Current situation
 
-It is important to understand the startup process of the plugin. At the time of writing this logic is a little scattered and can/should be optimized. (which is the situation we would want to be in)
+It is important to understand the startup process of the plugin. At the time of writing this logic is a little scattered and should be optimized. See the [section below](./startup-logic.md#desired-situation).
+
 
 However, for everyone's understanding the current logic is as follows:
 
@@ -44,7 +45,7 @@ However, for everyone's understanding the current logic is as follows:
 
 As you may notice this logic is quite scattered and should/can be optimized as proposed below.
 
-## [TODO] Desired situation
+## Desired situation
 We should simply split up the logic in 2 parts - the plugin side and the client side.
 1. First we need to get all the locally stored data as well as the user information and send it to the client. This is the base starting point for our UI.
 2. We can use this information to determine the license validity, get the feature flags and fetch the remote data all in one go.
