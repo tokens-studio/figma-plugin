@@ -3,10 +3,17 @@ const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
+// const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 const dotenv = require('dotenv');
 
+const modeArg = process.argv.filter(str => str.startsWith('--mode')).shift();
+const mode = modeArg !== undefined ? modeArg.split('=')[1].trim() : 'development';
+const devMode = mode !== 'production';
 
 
 const { version } = require('./package.json');
@@ -29,28 +36,55 @@ module.exports = (env, argv) => {
       code: './src/plugin/controller.ts', // The entry point for your plugin code
     },
 
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      compress: true,
+      open: false,
+      // openPage: '/ui.html',
+      hot: true,
+      inline: true,
+      historyApiFallback: true,
+      port: 9000,
+    },
+
     module: {
       rules: [
         // Converts TypeScript code to JavaScript
         {
-          test: /\.tsx?$/,
-          use: [
-            {
-              loader: 'swc-loader',
-            },
-          ],
+          test: /\.[jt]sx?$/,
           exclude: /node_modules/,
-        },
-        {
-          test: /\.c?js$/,
-          // We don't add an exclude for node_modules as we need to aggressively optimize code deps
-          exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
           use: [
             {
-              loader: 'swc-loader',
+              loader: require.resolve('babel-loader'),
+              options: {
+                plugins: [argv.PREVIEW_ENV === 'browser' && require.resolve('react-refresh/babel')].filter(Boolean),
+              },
             },
           ],
         },
+
+        // {
+        //   test: /\.tsx?$/,
+        //   use: [
+        //     {
+        //       loader: 'swc-loader',
+        //       options: {
+        //         jsc: { transform: { react: { refresh: devMode }}}
+        //       }
+        //     },
+        //   ],
+        //   exclude: /(node_modules|.*\.test\.(js|ts))/
+        // },
+        // {
+        //   test: /\.c?js$/,
+        //   // We don't add an exclude for node_modules as we need to aggressively optimize code deps
+        //   exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
+        //   use: [
+        //     {
+        //       loader: 'swc-loader',
+        //     },
+        //   ],
+        // },
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
         { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
         // Imports webfonts
@@ -106,6 +140,8 @@ module.exports = (env, argv) => {
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
+      argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin(),
+      // argv.PREVIEW_ENV === 'browser' && new ForkTsCheckerWebpackPlugin(),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
@@ -145,11 +181,15 @@ module.exports = (env, argv) => {
         chunks: ['ui'],
         cache: argv.mode === 'production',
       }),
-      new HtmlInlineScriptPlugin({
+      argv.PREVIEW_ENV !== 'browser' && new HtmlInlineScriptPlugin({
         assetPreservePattern: [/\.js$/],
       }),
+      // argv.PREVIEW_ENV !== 'browser' && new HtmlWebpackInlineSourcePlugin(),
       new webpack.DefinePlugin({
-        'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
+        'process.env':  {
+          PREVIEW_ENV: JSON.stringify(argv.PREVIEW_ENV),
+          LAUNCHDARKLY_FLAGS: JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
+        },
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',
@@ -160,7 +200,7 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       }),
-
+      // new BundleAnalyzerPlugin()
     ].filter(Boolean),
   }
 };
