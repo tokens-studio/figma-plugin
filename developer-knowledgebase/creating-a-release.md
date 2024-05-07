@@ -27,7 +27,7 @@ SENTRY_AUTH_TOKEN=INSERT_SENTRY_TOKEN
 ## Bundling the files
 
 Make sure that `package.json` contains the correct version number in the field `version` (for example `1.12.23`).
-Then, to create the necessary bundle, run `yan build` followed by `yarn bundle` to automatically create the release bundle in `./dist/bundle.zip`.
+Then, to create the necessary bundle, run `yarn build` followed by `yarn bundle` to automatically create the release bundle in `./dist/bundle.zip`.
 
 ## Launching in Figma
 
