@@ -166,15 +166,15 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
                 </ContextMenu.SubContent>
               </ContextMenu.Portal>
             </ContextMenu.Sub>
-            ) : (
-              <MoreButtonProperty
-                key={property.name}
-                value={token.name}
-                property={property}
-                onClick={handleClick}
-                disabled={property.disabled}
-              />
-            )))}
+          ) : (
+            <MoreButtonProperty
+              key={property.name}
+              value={token.name}
+              property={property}
+              onClick={handleClick}
+              disabled={property.disabled}
+            />
+          )))}
           <ContextMenu.Sub>
             <ContextMenu.SubTrigger>
               Documentation Tokens
