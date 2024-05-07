@@ -20,6 +20,7 @@ import { userIdSelector } from '@/selectors/userIdSelector';
 import { licenseDetailsSelector } from '@/selectors';
 import { ldUserFactory } from '@/utils/ldUserFactory';
 import { ErrorMessage } from '../ErrorMessage';
+import { addLicenseKey } from '@/utils/addLicenseKey';
 
 export default function AddLicenseKey() {
   const inputEl = useRef<HTMLInputElement | null>(null);
@@ -40,9 +41,11 @@ export default function AddLicenseKey() {
 
   const addKey = useCallback(async () => {
     if (newKey) {
-      await dispatch.userState.addLicenseKey({ key: newKey, source: AddLicenseSource.UI });
+      await addLicenseKey(dispatch, { key: newKey, source: AddLicenseSource.UI }, {
+        userId,
+      });
     }
-  }, [newKey, dispatch]);
+  }, [newKey, dispatch, userId]);
 
   const removeAccessToFeatures = useCallback(() => {
     if (userId) {

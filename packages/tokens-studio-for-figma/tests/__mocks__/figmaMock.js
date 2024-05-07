@@ -73,6 +73,7 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
+module.exports.mockGetLocalVariablesAsync = jest.fn(() => ([]));
 module.exports.mockCreateVariable = jest.fn();
 module.exports.mockGetLocalVariableCollections = jest.fn();
 module.exports.mockCreateVariableCollection = jest.fn();
@@ -111,6 +112,7 @@ module.exports.figma = {
   },
   variables: {
     getLocalVariables: module.exports.mockGetLocalVariables,
+    getLocalVariablesAsync: module.exports.mockGetLocalVariablesAsync,
     createVariable: module.exports.mockCreateVariable,
     getLocalVariableCollections: module.exports.mockGetLocalVariableCollections,
     createVariableCollection: module.exports.mockCreateVariableCollection,

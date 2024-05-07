@@ -73,7 +73,12 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       } else if (returnValueToLookFor(key) === 'description') {
         // Not all tokens have a description, so we need to treat it special
         acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
-      } else if (borderPropertyMap.get(key as Properties) && resolvedToken.type === TokenTypes.BORDER && typeof resolvedToken.value === 'object' && 'color' in resolvedToken.value && resolvedToken.value.color) {
+      } else if (
+        borderPropertyMap.get(key as Properties)
+        && resolvedToken.type === TokenTypes.BORDER
+        && typeof resolvedToken.value === 'object'
+        && 'color' in resolvedToken.value && resolvedToken.value.color
+        && !('borderColor' in acc)) {
         // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
         acc.borderColor = resolvedToken.value.color;
         // We return the value because the token holds its values in the 'value' prop
@@ -199,8 +204,8 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  if (values && values.border) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
+  if (values && values.border && !values.borderColor) {
+    // if we have a border token we must convert the color variable out of it given how our resolution logic works
     const resolvedToken = tokens.get(values.border as string);
     if (resolvedToken && resolvedToken.resolvedValueWithReferences) {
       if (typeof resolvedToken.resolvedValueWithReferences === 'object' && 'color' in resolvedToken.resolvedValueWithReferences) {
@@ -208,6 +213,7 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
         values.borderColor = borderColorTokenName;
       }
     }
+    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
   }
   if (values && values.borderTop) {
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };

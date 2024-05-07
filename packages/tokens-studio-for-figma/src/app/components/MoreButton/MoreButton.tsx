@@ -6,9 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import copy from 'copy-to-clipboard';
 
-import {
-  ContextMenu,
-} from '@tokens-studio/ui';
+import { ContextMenu } from '@tokens-studio/ui';
 import { styled } from '@/stitches.config';
 import { activeTokenSetReadOnlySelector, activeTokenSetSelector, editProhibitedSelector } from '@/selectors';
 import { PropertyObject } from '@/types/properties';
@@ -142,14 +140,13 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
 
   return (
     <ContextMenu>
-
       <ContextMenu.Trigger id={`${token.name}-button}`}>
         <TokenButtonContent type={type} active={active} onClick={handleTokenClick} token={token} />
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content alignOffset={5} collisionPadding={30}>
           {visibleProperties.map((property) => (property.childProperties ? (
-            <ContextMenu.Sub>
+            <ContextMenu.Sub key={property.label}>
               <ContextMenu.SubTrigger>
                 {property.label}
                 <RightSlot>
@@ -187,7 +184,14 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
             </ContextMenu.SubTrigger>
             <ContextMenu.Portal>
               <ContextMenu.SubContent alignOffset={-5} collisionPadding={30}>
-                {DocumentationProperties.map((property) => <MoreButtonProperty key={property.name} value={token.name} property={property} onClick={handleClick} />)}
+                {DocumentationProperties.map((property) => (
+                  <MoreButtonProperty
+                    key={property.name}
+                    value={token.name}
+                    property={property}
+                    onClick={handleClick}
+                  />
+                ))}
               </ContextMenu.SubContent>
             </ContextMenu.Portal>
           </ContextMenu.Sub>

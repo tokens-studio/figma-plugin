@@ -1,25 +1,25 @@
 type StyleType = 'fill' | 'text' | 'stroke' | 'effect';
 
 export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: string) {
-  let actualStyleId = styleId;
-
-  // @README we need to try and import the style just in case it's a library provided one
-  const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
-  if (styleKeyMatch) {
-    actualStyleId = await new Promise<string>((resolve) => {
-      const localStyle = figma.getStyleById(styleId);
-      if (localStyle) {
-        resolve(localStyle.id);
-      } else {
-        figma.importStyleByKeyAsync(styleKeyMatch[1])
-          .then((remoteStyle) => resolve(remoteStyle.id))
-          .catch(() => {
-            resolve(styleId);
-          });
-      }
-    });
-  }
   try {
+    let actualStyleId = styleId;
+
+    // @README we need to try and import the style just in case it's a library provided one
+    const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
+    if (styleKeyMatch) {
+      actualStyleId = await new Promise<string>((resolve) => {
+        const localStyle = figma.getStyleById(styleId);
+        if (localStyle) {
+          resolve(localStyle.id);
+        } else {
+          figma.importStyleByKeyAsync(styleKeyMatch[1])
+            .then((remoteStyle) => resolve(remoteStyle.id))
+            .catch(() => {
+              resolve(styleId);
+            });
+        }
+      });
+    }
     if (type === 'fill' && 'fillStyleId' in node) {
       node.fillStyleId = actualStyleId;
       return (
