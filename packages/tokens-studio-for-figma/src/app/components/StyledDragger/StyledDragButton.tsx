@@ -11,9 +11,6 @@ export const StyledDragButton = styled('button', {
     [`+ ${StyledCheckbox}`]: {
       opacity: 1,
     },
-    [`${StyledGrabber}`]: {
-      opacity: 1,
-    },
   },
   variants: {
     isActive: {
