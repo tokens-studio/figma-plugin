@@ -8,6 +8,8 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
   const {
     figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
   } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
+  console.log('figmaVariableReferences: ', figmaVariableReferences);
+  console.log('figmaStyleReferences: ', figmaStyleReferences);
   defaultTokenValueRetriever.initiate({
     tokens: msg.tokens,
     variableReferences: figmaVariableReferences,

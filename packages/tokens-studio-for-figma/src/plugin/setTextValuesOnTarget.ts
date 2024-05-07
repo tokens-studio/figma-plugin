@@ -8,7 +8,11 @@ export async function setTextValuesOnTarget(
   baseFontSize: string = '16',
 ) {
   try {
+    console.log('token in setTextValuesOnTarget: ', token);
+    console.log('variableReferences in setTextValuesOnTarget', defaultTokenValueRetriever.variableReferences);
+    console.log('tokens in setTextValuesOnTarget: ', defaultTokenValueRetriever.tokens);
     const resolvedToken = defaultTokenValueRetriever.get(token);
+    console.log('resolvedToken in setTextValuesOnTarget: ', resolvedToken);
     if (typeof resolvedToken === 'undefined') return;
     const { value, description } = resolvedToken;
     const resolvedValue: ResolvedTypographyObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;

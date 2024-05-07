@@ -68,6 +68,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     });
   }
   const figmaVariables = figma.variables.getLocalVariables();
+  console.log('figmaVariables in createLocalVariablesWithoutModesInPlugin: ', figmaVariables);
+  console.log('referenceVariableCandidate in createLocalVariablesWithoutModesInPlugin: ', referenceVariableCandidates);
   updateVariablesToReference(figmaVariables, referenceVariableCandidates);
   if (figmaVariables.length === 0) {
     notifyUI('No variables were created');

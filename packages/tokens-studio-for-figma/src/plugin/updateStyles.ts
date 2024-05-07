@@ -27,6 +27,7 @@ export default async function updateStyles(
     const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
     const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);
+    console.log('path in updateStyles: ', path);
     return {
       ...token,
       path,
@@ -34,19 +35,23 @@ export default async function updateStyles(
       styleId: activeTheme?.$figmaStyleReferences ? activeTheme?.$figmaStyleReferences[token.name] : '',
     } as SingleToken<true, { path: string, styleId: string }>;
   }).filter((token) => token.path);
+  console.log('styleTokens in updateStyles: ', styleTokens);
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.COLOR }
   >[];
+  console.log('colorTokens in updateStyles: ', colorTokens);
   const textTokens = styleTokens.filter((n) => [TokenTypes.TYPOGRAPHY].includes(n.type)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.TYPOGRAPHY }
   >[];
+  console.log('textTokens in updateStyles: ', textTokens);
   const effectTokens = styleTokens.filter((n) => [TokenTypes.BOX_SHADOW].includes(n.type)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.BOX_SHADOW }
   >[];
+  console.log('effectTokens in updateStyles: ', effectTokens);
 
   if (!colorTokens && !textTokens && !effectTokens) return {};
 
