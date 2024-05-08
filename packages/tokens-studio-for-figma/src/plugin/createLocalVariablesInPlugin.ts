@@ -6,7 +6,7 @@ import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
 import { notifyUI } from './notifiers';
-import { mergeVariableReferences } from './mergeVariableReferences';
+import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
 
 export type LocalVariableInfo = {
@@ -47,8 +47,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
         updatedVariableCollections.push(collection);
       }
     }));
-    const figmaVariables = await figma.variables.getLocalVariablesAsync();
-    const existingVariables = await mergeVariableReferences({ themes: themeInfo.themes, localVariables: figmaVariables });
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(themeInfo.themes);
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
   if (updatedVariables.length === 0) {

@@ -7,7 +7,7 @@ import { notifyUI } from './notifiers';
 import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { mergeVariableReferences } from './mergeVariableReferences';
+import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
 
@@ -50,8 +50,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         }
       }
     }));
-    const figmaVariables = await figma.variables.getLocalVariablesAsync();
-    const existingVariables = await mergeVariableReferences({ localVariables: figmaVariables });
+    const existingVariables = await mergeVariableReferencesWithLocalVariables();
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
   if (updatedVariables.length === 0) {

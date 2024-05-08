@@ -1,6 +1,8 @@
 import { ThemeObject } from '@/types';
 
-export function mergeVariableReferences({themes = [], localVariables}: {themes?: ThemeObject[], localVariables: Variable[]}): Map<string, string> {
+export async function mergeVariableReferencesWithLocalVariables(themes: ThemeObject[] = []): Promise<Map<string, string>> {
+  const localVariables = await figma.variables.getLocalVariablesAsync();
+
   const variables = new Map();
   themes.forEach((theme) => {
     if (!theme.$figmaVariableReferences) return;
