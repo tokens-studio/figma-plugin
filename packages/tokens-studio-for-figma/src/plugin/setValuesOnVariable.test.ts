@@ -38,7 +38,7 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
   });
 
-  it('when there is no variable which is connected to the token, we create new variable', () => {
+  it('when there is no variable which is connected to the token, we create a new variable', () => {
     const tokens = [
       {
         name: 'button.primary.width',
@@ -49,10 +49,10 @@ describe('SetValuesOnVariable', () => {
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode);
-    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
+    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection.id, 'FLOAT');
   });
 
-  it('renames variable if name and path differ and shouldRename is given', () => {
+  it('renames variable if name and path differ and shouldRename is given', async () => {
     const tokens = [
       {
         name: 'button.primary.height',
@@ -62,8 +62,8 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.NUMBER,
         variableId: '123',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
-    const result = setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
+    ];
+    const result = await setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
     expect(result.renamedVariableKeys).toEqual(['123']);
     expect(variablesInFigma[0].name).toEqual('button/primary/height');
     expect(mockCreateVariable).not.toBeCalled();

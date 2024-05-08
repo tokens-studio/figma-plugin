@@ -106,7 +106,7 @@ describe('updateVariables', () => {
       {
         variable: newVariable,
         modeId: 'light',
-        referenceVariable: 'primary/500',
+        referenceVariable: 'primary.500',
       },
     ]);
   });
