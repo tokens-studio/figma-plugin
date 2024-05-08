@@ -9,22 +9,19 @@ export type Props<T> = {
   onDragStart?: (event: React.PointerEvent<HTMLDivElement>, item: T) => void;
 };
 
-export function DragGrabber<T>({
-  item,
-  canReorder = false,
-  onDragStart,
-}: Props<T>) {
-  const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>((event) => {
-    if (onDragStart) onDragStart(event, item);
-  }, [item, onDragStart]);
+export function DragGrabber<T>({ item, canReorder = false, onDragStart }: Props<T>) {
+  const handleGrabberPointerDown = useCallback<React.PointerEventHandler<HTMLDivElement>>(
+    (event) => {
+      if (onDragStart) onDragStart(event, item);
+    },
+    [item, onDragStart],
+  );
 
   return (
     <StyledBeforeFlex>
-      {canReorder ? (
-        <StyledGrabber onPointerDown={handleGrabberPointerDown}>
-          <IconGrabber />
-        </StyledGrabber>
-      ) : null}
+      <StyledGrabber onPointerDown={handleGrabberPointerDown} canReorder={canReorder}>
+        <IconGrabber />
+      </StyledGrabber>
     </StyledBeforeFlex>
   );
 }
