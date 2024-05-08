@@ -80,11 +80,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const onInteractOutside = React.useCallback((event: Event) => {
     event.preventDefault();
   }, []);
-
-  React.useEffect(() => {
-    setActiveTab(isProUser ? 'useThemes' : 'useSets');
-  }, [isProUser]);
-
+  
   return (
     <>
       <Modal
