@@ -108,7 +108,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
         stickyFooter
       >
         <Tabs defaultValue={isProUser ? 'useThemes' : 'useSets'}>
-          <Tabs.List>
+          <Tabs.List defaultValue={activeTab}>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isProUser ? 'PRO' : 'Get PRO'}</StyledProBadge>
