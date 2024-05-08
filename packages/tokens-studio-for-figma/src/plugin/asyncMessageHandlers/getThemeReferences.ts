@@ -47,9 +47,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const localVariables = await figma.variables.getLocalVariablesAsync();
 
   localVariables.forEach((variable) => {
-    if (!figmaVariableReferences.has(variable.name)) {
-      figmaVariableReferences.set(variable.name, variable.key);
-    }
+    figmaVariableReferences.set(variable.name, variable.key);
   });
 
   return {
