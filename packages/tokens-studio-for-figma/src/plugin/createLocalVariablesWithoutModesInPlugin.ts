@@ -3,13 +3,13 @@ import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
-import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
 import { ThemeObject } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { mergeVariableReferences } from './mergeVariableReferences';
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
+import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
 
 // This function is used to create variables based on token sets, without the use of themes
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
@@ -35,16 +35,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         const setTokens: Record<string, AnyTokenList> = {
           [set.set]: tokens[set.set],
         };
-        let collection = allCollections.find((vr) => vr.name === set.set);
-        let modeId;
-        if (collection) {
-          const mode = collection.modes.find((m) => m.name === set.set);
-          modeId = mode?.modeId ?? createVariableMode(collection, set.set);
-        } else {
-          collection = figma.variables.createVariableCollection(set.set);
-          collection.renameMode(collection.modes[0].modeId, set.set);
-          modeId = collection.modes[0].modeId;
-        }
+        const { collection, modeId } = getOrCreateVariableCollection(set.set, set.set, allCollections);
 
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,

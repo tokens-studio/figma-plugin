@@ -5,9 +5,9 @@ import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
-import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
 import { mergeVariableReferences } from './mergeVariableReferences';
+import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -27,18 +27,11 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
+    const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+
     await Promise.all(themeInfo.themes.map(async (theme) => {
       if (selectedThemes?.includes(theme.id)) {
-        let collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
-        let modeId;
-        if (collection) {
-          const mode = collection.modes.find((m) => m.name === theme.name);
-          modeId = mode?.modeId ?? createVariableMode(collection, theme.name);
-        } else {
-          collection = figma.variables.createVariableCollection(theme.group ?? theme.name);
-          collection.renameMode(collection.modes[0].modeId, theme.name);
-          modeId = collection.modes[0].modeId;
-        }
+        const { collection, modeId } = getOrCreateVariableCollection(theme.group ?? theme.name, theme.name, allCollections);
 
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme, tokens, settings,
