@@ -81,6 +81,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     event.preventDefault();
   }, []);
 
+  React.useEffect(() => {
+    setActiveTab(isProUser ? 'useThemes' : 'useSets');
+  }, [isProUser]);
+
   return (
     <>
       <Modal
@@ -107,8 +111,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   )}
         stickyFooter
       >
-        <Tabs>
-          <Tabs.List defaultValue={activeTab}>
+        <Tabs defaultValue={activeTab}>
+          <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
               <StyledProBadge css={{ marginInlineStart: '$2' }}>{isProUser ? 'PRO' : 'Get PRO'}</StyledProBadge>
