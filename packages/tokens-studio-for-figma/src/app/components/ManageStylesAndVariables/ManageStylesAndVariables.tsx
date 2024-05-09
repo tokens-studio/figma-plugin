@@ -80,7 +80,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const onInteractOutside = React.useCallback((event: Event) => {
     event.preventDefault();
   }, []);
-
+  
   return (
     <>
       <Modal
@@ -107,7 +107,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   )}
         stickyFooter
       >
-        <Tabs defaultValue={isProUser ? 'useThemes' : 'useSets'}>
+        <Tabs defaultValue={activeTab}>
           <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
