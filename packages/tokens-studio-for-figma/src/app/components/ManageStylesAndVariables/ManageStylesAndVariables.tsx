@@ -57,10 +57,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowModal(false);
     if (activeTab === 'useSets') {
       await createVariablesFromSets(selectedSets);
-      createStylesFromSelectedTokenSets(selectedSets);
+      await createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
       await createVariablesFromThemes(selectedThemes);
-      createStylesFromSelectedThemes(selectedThemes);
+      await createStylesFromSelectedThemes(selectedThemes);
     }
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;

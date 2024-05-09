@@ -48,7 +48,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
 
   localVariables.forEach((variable) => {
     if (!figmaVariableReferences.has(variable.name)) {
-      figmaVariableReferences.set(variable.name, variable.key);
+      const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
+      figmaVariableReferences.set(normalizedVariableName, variable.key);
     }
   });
 
