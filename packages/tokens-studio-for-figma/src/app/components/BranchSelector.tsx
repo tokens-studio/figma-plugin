@@ -161,6 +161,8 @@ export default function BranchSelector() {
     setCreateBranchModalVisible(false);
   }, []);
 
+    console.log(':):):) BranchSelector', { hasChanges });
+
   return currentBranch ? (
     <>
       <DropdownMenu>

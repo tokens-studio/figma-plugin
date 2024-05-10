@@ -60,6 +60,8 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
+  console.log(':):):) Footer', { hasChanges });
+
   return (
     <Box
       css={{
