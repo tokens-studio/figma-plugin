@@ -21,6 +21,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
+  console.log('============================================= in createLocalVariables');
   console.log('figma collections in createLocalVariables: ', figma.variables.getLocalVariableCollections());
   if (!checkSetting) {
     themeInfo.themes.forEach((theme) => {
