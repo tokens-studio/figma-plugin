@@ -42,9 +42,6 @@ export default function Footer() {
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges } = useChangedState();
 
-  console.log('hasChanges in Footer: ', hasChanges);
-  console.log('editProhibited: ', editProhibited);
-
   React.useEffect(() => {
     const interval = setInterval(() => {
       checkRemoteChange().then((response: boolean) => {
@@ -59,8 +56,6 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
-
-  console.log(':):):) Footer', { hasChanges });
 
   return (
     <Box

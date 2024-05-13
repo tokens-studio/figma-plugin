@@ -44,7 +44,6 @@ export function isEqual(value1: any, value2: any): boolean {
     return compareObjects(value1, value2);
   }
 
-  console.log('??? isEqual ???', {subTypeVals: compareNativeSubtypes(value1, value2) })
   return compareNativeSubtypes(value1, value2);
 }
 
