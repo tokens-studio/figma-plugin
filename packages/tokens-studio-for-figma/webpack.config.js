@@ -45,12 +45,14 @@ module.exports = (env, argv) => {
       inline: true,
       historyApiFallback: true,
       port: 9000,
+      overlay: false,
     },
 
     module: {
       rules: [
         // Converts TypeScript code to JavaScript
-        {
+        // Development fast reload
+        argv.PREVIEW_ENV === 'browser' ? {
           test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           use: [
@@ -61,30 +63,28 @@ module.exports = (env, argv) => {
               },
             },
           ],
+        } : {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'swc-loader',
+              // options: {
+              //   jsc: { transform: { react: { refresh: devMode }}}
+              // }
+            },
+          ],
+          exclude: /(node_modules|.*\.test\.(js|ts))/
         },
-
-        // {
-        //   test: /\.tsx?$/,
-        //   use: [
-        //     {
-        //       loader: 'swc-loader',
-        //       options: {
-        //         jsc: { transform: { react: { refresh: devMode }}}
-        //       }
-        //     },
-        //   ],
-        //   exclude: /(node_modules|.*\.test\.(js|ts))/
-        // },
-        // {
-        //   test: /\.c?js$/,
-        //   // We don't add an exclude for node_modules as we need to aggressively optimize code deps
-        //   exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
-        //   use: [
-        //     {
-        //       loader: 'swc-loader',
-        //     },
-        //   ],
-        // },
+        {
+          test: /\.c?js$/,
+          // We don't add an exclude for node_modules as we need to aggressively optimize code deps
+          exclude: argv.mode === 'production' ? undefined : /node_modules\/(?!(colorjs.io)\/)/,
+          use: [
+            {
+              loader: 'swc-loader',
+            },
+          ],
+        },
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
         { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
         // Imports webfonts
@@ -186,10 +186,11 @@ module.exports = (env, argv) => {
       }),
       // argv.PREVIEW_ENV !== 'browser' && new HtmlWebpackInlineSourcePlugin(),
       new webpack.DefinePlugin({
-        'process.env':  {
-          PREVIEW_ENV: JSON.stringify(argv.PREVIEW_ENV),
-          LAUNCHDARKLY_FLAGS: JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
-        },
+        // 'process.env':  {
+        //   PREVIEW_ENV: JSON.stringify(argv.PREVIEW_ENV),
+        // },
+        'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
+        'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
       }),
       new ForkTsCheckerWebpackPlugin({
         async: argv.mode === 'development',
