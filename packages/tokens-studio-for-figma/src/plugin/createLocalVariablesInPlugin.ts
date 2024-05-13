@@ -24,9 +24,19 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   if (!checkSetting) {
     themeInfo.themes.forEach((theme) => {
       if (!selectedThemes || (selectedThemes && selectedThemes.includes(theme.id))) {
-        const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
+        let collection = figma.variables.getLocalVariableCollections().find((vr) => vr.id === theme.$figmaCollectionId);
         if (collection) {
-          const mode = collection.modes.find((m) => m.name === theme.name);
+          collection.name = theme.group ?? theme.name;
+        } else {
+          collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
+        }
+        if (collection) {
+          let mode = collection.modes.find((m) => m.modeId === theme.$figmaModeId);
+          if (mode) {
+            collection.renameMode(mode.modeId, theme.name);
+          } else {
+            mode = collection.modes.find((m) => m.name === theme.name);
+          }
           const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
           if (modeId) {
             const allVariableObj = updateVariables({
