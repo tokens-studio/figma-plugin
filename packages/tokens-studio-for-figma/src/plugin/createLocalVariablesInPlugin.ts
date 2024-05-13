@@ -21,18 +21,24 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
-  console.log('============================================= in createLocalVariables');
-  console.log('figma collections in createLocalVariables: ', figma.variables.getLocalVariableCollections());
   if (!checkSetting) {
     themeInfo.themes.forEach((theme) => {
       if (!selectedThemes || (selectedThemes && selectedThemes.includes(theme.id))) {
-        console.log('themeId in createLocalVariables: ', theme.id);
-        console.log('theme in createlocalVariables: ', theme);
-        const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
-        console.log('collection modes in createLocalVariables: ', collection?.modes);
-        console.log('collection in createLocalVariables: ', collection);
+        let collection;
+        if (figma.variables.getLocalVariableCollections().find((vr) => vr.id === theme.$figmaCollectionId)) {
+          collection = figma.variables.getLocalVariableCollections().find((vr) => vr.id === theme.$figmaCollectionId);
+          collection.name = theme.group ?? theme.name;
+        } else {
+          collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
+        }
         if (collection) {
-          const mode = collection.modes.find((m) => m.name === theme.name);
+          let mode;
+          if (collection.modes.find((m) => m.modeId === theme.$figmaModeId)) {
+            mode = collection.modes.find((m) => m.modeId === theme.$figmaModeId);
+            collection.renameMode(mode?.modeId, theme.name);
+          } else {
+            mode = collection.modes.find((m) => m.name === theme.name);
+          }
           const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
           if (modeId) {
             const allVariableObj = updateVariables({
