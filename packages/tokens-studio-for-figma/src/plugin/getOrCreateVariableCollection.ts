@@ -6,7 +6,10 @@ export function getOrCreateVariableCollection(collectionName: string, modeName: 
   let collection;
   let modeId: string;
 
+  console.log('Existing collection', allCollections,  existingCollection);
+
   if (existingCollection) {
+    collection = existingCollection;
     const mode = existingCollection.modes.find((m) => m.name === modeName);
     modeId = mode?.modeId ?? createVariableMode(existingCollection, modeName);
   } else {

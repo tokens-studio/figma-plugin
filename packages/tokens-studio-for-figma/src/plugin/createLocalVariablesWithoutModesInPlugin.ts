@@ -11,6 +11,18 @@ import { mergeVariableReferencesWithLocalVariables } from './mergeVariableRefere
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
 
+async function createNecessaryVariableCollectionsFromSets(selectedSets: ExportTokenSet[]) {
+  const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+
+  // TODO: Modes dont work yet. maybe best to merge this with the other function in the other and rely on collections and modes being created before here
+
+  return selectedSets.map((set) => {
+    const nameOfCollection = set.set; // Weird name, but set.set is the setname (let's change this!)
+    const existingCollection = allCollections.find((vr) => vr.name === nameOfCollection);
+    return existingCollection ?? figma.variables.createVariableCollection(nameOfCollection);
+  });
+}
+
 // This function is used to create variables based on token sets, without the use of themes
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
@@ -28,14 +40,15 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       };
       return acc;
     }, {} as ThemeObject);
-    const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+
+    const collections = await createNecessaryVariableCollectionsFromSets(selectedSets);
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
           [set.set]: tokens[set.set],
         };
-        const { collection, modeId } = getOrCreateVariableCollection(set.set, set.set, allCollections);
+        const { collection, modeId } = getOrCreateVariableCollection(set.set, set.set, collections);
 
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
