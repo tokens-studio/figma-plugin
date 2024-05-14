@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Mentions from 'rc-mentions';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
@@ -8,7 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 import './mentions.css';
 import {
-  StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
+  StyledItem, StyledItemColor, StyledItemName, StyledItemValue, StyledPart, StyledItemInfo, StyledItemInfoLabel,
 } from './StyledDownshiftInput';
 import getResolvedTextValue from '@/utils/getResolvedTextValue';
 
@@ -49,6 +50,7 @@ export default function MentionsInput({
   hasPrefix = false,
 }: Props) {
   const referenceTokenTypes = useReferenceTokenType(type as TokenTypes);
+  const { t } = useTranslation(['tokens']);
 
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
     if (isDocumentationType(type as Properties)) {
@@ -107,17 +109,27 @@ export default function MentionsInput({
         className="mentions-item"
       >
         <StyledItem
+          css={{ display: 'block' }}
           className="dropdown-item"
         >
-          {type === 'color' && (
-          <StyledItemColorDiv>
-            <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
-          </StyledItemColorDiv>
-          )}
-          <StyledItemName css={{ flexGrow: '1' }}>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
+          <StyledItemInfo>
+            <StyledItemInfoLabel>{`${t('name')}: `}</StyledItemInfoLabel>
+            <StyledItemName>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
+          </StyledItemInfo>
           {
-            resolvedToken && <StyledItemValue>{getResolvedTextValue(resolvedToken)}</StyledItemValue>
-          }
+            resolvedToken && (
+            <StyledItemInfo>
+              <StyledItemInfoLabel>{`${t('value')}: `}</StyledItemInfoLabel>
+              <StyledItemValue>{getResolvedTextValue(resolvedToken)}</StyledItemValue>
+            </StyledItemInfo>
+            )
+}
+          {type === 'color' && (
+            <StyledItemInfo>
+              <StyledItemInfoLabel>{`${t('types.Color')}: `}</StyledItemInfoLabel>
+              <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
+            </StyledItemInfo>
+          )}
         </StyledItem>
       </Option>
     );
