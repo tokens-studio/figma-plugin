@@ -264,23 +264,41 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                         {({ index, style }) => {
                           const token = filteredTokenItems[index];
                           return (
-                            <StyledItem
-                              data-testid="downshift-input-item"
-                              className="dropdown-item"
-                              {...getItemProps({ key: token.name, index, item: token.name })}
-                              isFocused={highlightedIndex === index}
-                              style={style}
-                              // eslint-disable-next-line react/jsx-no-bind
-                              onMouseDown={() => handleSelect(token.name)}
-                            >
-                              {type === 'color' && (
-                              <StyledItemColorDiv>
-                                <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
-                              </StyledItemColorDiv>
+                            <Tooltip
+                              side="bottom"
+                              label={(
+                                <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+                                  <StyledItemName css={{ color: '$tooltipFg' }}>
+                                    {getHighlightedText(token.name, searchInput || '')}
+                                  </StyledItemName>
+                                  <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
+                                    <span>{getResolvedText(token)}</span>
+                                  </StyledItemValue>
+                                </Stack>
                               )}
-                              <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                              <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
-                            </StyledItem>
+                            >
+                              <StyledItem
+                                data-testid="downshift-input-item"
+                                className="dropdown-item"
+                                {...getItemProps({ key: token.name, index, item: token.name })}
+                                isFocused={highlightedIndex === index}
+                                style={style}
+                              // eslint-disable-next-line react/jsx-no-bind
+                                onMouseDown={() => handleSelect(token.name)}
+                              >
+                                {type === 'color' && (
+                                <StyledItemColorDiv>
+                                  <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                                </StyledItemColorDiv>
+                                )}
+                                <StyledItemName truncate>
+                                  {getHighlightedText(token.name, searchInput || '')}
+                                </StyledItemName>
+                                <StyledItemValue truncate>
+                                  <span>{getResolvedText(token)}</span>
+                                </StyledItemValue>
+                              </StyledItem>
+                            </Tooltip>
                           );
                         }}
                       </StyledList>
@@ -292,17 +310,30 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                             {({ index, style }) => {
                               const filteredValue = filteredValues[index];
                               return (
-                                <StyledItem
-                                  data-testid="downshift-input-item"
-                                  className="dropdown-item"
-                                  {...getItemProps({ key: value, index, item: value })}
-                                  isFocused={highlightedIndex === index}
-                                  style={style}
-                                  // eslint-disable-next-line react/jsx-no-bind
-                                  onMouseDown={() => handleSelect(filteredValue)}
+                                <Tooltip
+                                  side="bottom"
+                                  label={(
+                                    <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+                                      <StyledItemValue css={{ color: '$tooltipFg' }}>
+                                        {getHighlightedText(filteredValue, searchInput || '')}
+                                      </StyledItemValue>
+                                    </Stack>
+                              )}
                                 >
-                                  <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
-                                </StyledItem>
+                                  <StyledItem
+                                    data-testid="downshift-input-item"
+                                    className="dropdown-item"
+                                    {...getItemProps({ key: value, index, item: value })}
+                                    isFocused={highlightedIndex === index}
+                                    style={style}
+                                  // eslint-disable-next-line react/jsx-no-bind
+                                    onMouseDown={() => handleSelect(filteredValue)}
+                                  >
+                                    <StyledItemName truncate>
+                                      {getHighlightedText(filteredValue, searchInput || '')}
+                                    </StyledItemName>
+                                  </StyledItem>
+                                </Tooltip>
                               );
                             }}
                         </StyledList>
