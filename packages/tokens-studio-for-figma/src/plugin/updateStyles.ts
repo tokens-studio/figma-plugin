@@ -35,6 +35,8 @@ export default async function updateStyles(
     } as SingleToken<true, { path: string, styleId: string }>;
   }).filter((token) => token.path);
 
+  console.log('styleTokens in createStyles: ', styleTokens);
+
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
     typeof styleTokens[number],
   { type: TokenTypes.COLOR }
@@ -60,6 +62,8 @@ export default async function updateStyles(
   if (styleTokens.length < tokens.length && shouldCreate) {
     notifyUI('Some styles were not created due to your settings. Make sure Ignore first part of token name doesn\'t conflict', { error: true });
   }
+
+  console.log('allStyleIds in createStyles: ', allStyleIds);
 
   // Remove styles that aren't in the theme or in the exposed token object
   if (settings.removeStylesAndVariablesWithoutConnection) {
