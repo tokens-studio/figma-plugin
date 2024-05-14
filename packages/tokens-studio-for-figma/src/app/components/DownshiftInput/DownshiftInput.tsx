@@ -278,8 +278,16 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                                 <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
                               </StyledItemColorDiv>
                               )}
-                              <StyledItemName>{getHighlightedText(token.name, searchInput || '')}</StyledItemName>
-                              <StyledItemValue>{getResolvedText(token)}</StyledItemValue>
+                              <StyledItemName truncate>
+                                <Tooltip label={getHighlightedText(token.name, searchInput) || ''} side="bottom">
+                                  {getHighlightedText(token.name, searchInput || '')}
+                                </Tooltip>
+                              </StyledItemName>
+                              <StyledItemValue truncate>
+                                <Tooltip label={getResolvedText(token)} side="bottom">
+                                  <span>{getResolvedText(token)}</span>
+                                </Tooltip>
+                              </StyledItemValue>
                             </StyledItem>
                           );
                         }}
@@ -301,7 +309,11 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                                   // eslint-disable-next-line react/jsx-no-bind
                                   onMouseDown={() => handleSelect(filteredValue)}
                                 >
-                                  <StyledItemName>{getHighlightedText(filteredValue, searchInput || '')}</StyledItemName>
+                                  <StyledItemName truncate>
+                                    <Tooltip label={getHighlightedText(filteredValue, searchInput)} side="bottom">
+                                      {getHighlightedText(filteredValue, searchInput || '')}
+                                    </Tooltip>
+                                  </StyledItemName>
                                 </StyledItem>
                               );
                             }}

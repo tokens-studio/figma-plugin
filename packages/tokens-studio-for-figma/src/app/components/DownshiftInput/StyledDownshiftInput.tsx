@@ -42,22 +42,30 @@ export const StyledList = styled(List as ComponentType<any>, {
 export const StyledItemValue = styled('div', {
   color: '$fgMuted',
   fontWeight: '$sansBold',
-  textAlign: 'right',
-  maxWidth: '300px',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  variants: {
+    truncate: {
+      true: {
+        maxWidth: '50%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        textWrap: 'nowrap',
+      },
+    },
+  },
 });
 
 export const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  gap: '$2',
+  justifyContent: 'space-between',
+  gap: '$1',
   padding: '$2 $3',
-  borderRadius: '$small',
   fontSize: '$xxsmall',
+  borderBottom: '1px solid $bgSubtle',
   variants: {
     isFocused: {
       true: {
+        borderRadius: '0 !important',
         backgroundColor: '$bgSubtle',
       },
     },
@@ -77,9 +85,26 @@ export const StyledItemColor = styled('div', {
 });
 
 export const StyledItemName = styled('div', {
-  flexGrow: 1,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  fontWeight: '$sansBold',
+  variants: {
+    truncate: {
+      true: {
+        maxWidth: '50%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        textWrap: 'nowrap',
+      },
+    },
+  },
+});
+
+export const StyledItemInfo = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+});
+
+export const StyledItemInfoLabel = styled('span', {
+  marginRight: '$2',
 });
 
 export const StyledPart = styled('span', {
