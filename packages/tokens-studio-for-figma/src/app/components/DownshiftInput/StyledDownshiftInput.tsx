@@ -28,6 +28,7 @@ export const StyledDropdown = styled('div', {
   backgroundColor: '$bgDefault',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
+  padding: '$3',
 });
 
 export const StyledList = styled(List as ComponentType<any>, {
@@ -40,8 +41,9 @@ export const StyledList = styled(List as ComponentType<any>, {
 });
 
 export const StyledItemValue = styled('div', {
-  color: '$fgMuted',
-  fontWeight: '$sansBold',
+  fontSize: '$medium',
+  color: '$fgDefault',
+  fontWeight: '$normal',
   variants: {
     truncate: {
       true: {
@@ -58,8 +60,7 @@ export const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '$1',
-  padding: '$2 $3',
+  padding: '$3',
   fontSize: '$xxsmall',
   borderBottom: '1px solid $bgSubtle',
   variants: {
@@ -85,7 +86,10 @@ export const StyledItemColor = styled('div', {
 });
 
 export const StyledItemName = styled('div', {
-  fontWeight: '$sansBold',
+  fontSize: '$medium',
+  color: '$fgDefault',
+  fontWeight: '$normal',
+  lineHeight: '1.4',
   variants: {
     truncate: {
       true: {
@@ -101,10 +105,15 @@ export const StyledItemName = styled('div', {
 export const StyledItemInfo = styled('div', {
   display: 'flex',
   alignItems: 'center',
+  marginBottom: '$3',
 });
 
 export const StyledItemInfoLabel = styled('span', {
-  marginRight: '$2',
+  marginRight: '$3',
+  fontSize: '$medium',
+  color: '$fgDefault',
+  fontWeight: '$sansSemibold',
+  lineHeight: '1.4',
 });
 
 export const StyledPart = styled('span', {

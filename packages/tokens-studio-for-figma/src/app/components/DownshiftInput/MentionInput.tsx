@@ -113,20 +113,20 @@ export default function MentionsInput({
           className="dropdown-item"
         >
           <StyledItemInfo>
-            <StyledItemInfoLabel>{`${t('name')}: `}</StyledItemInfoLabel>
+            <StyledItemInfoLabel>{`${t('name')} `}</StyledItemInfoLabel>
             <StyledItemName>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
           </StyledItemInfo>
           {
             resolvedToken && (
             <StyledItemInfo>
-              <StyledItemInfoLabel>{`${t('value')}: `}</StyledItemInfoLabel>
+              <StyledItemInfoLabel>{`${t('value')} `}</StyledItemInfoLabel>
               <StyledItemValue>{getResolvedTextValue(resolvedToken)}</StyledItemValue>
             </StyledItemInfo>
             )
 }
           {type === 'color' && (
             <StyledItemInfo>
-              <StyledItemInfoLabel>{`${t('types.Color')}: `}</StyledItemInfoLabel>
+              <StyledItemInfoLabel>{`${t('types.Color')} `}</StyledItemInfoLabel>
               <StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} />
             </StyledItemInfo>
           )}
