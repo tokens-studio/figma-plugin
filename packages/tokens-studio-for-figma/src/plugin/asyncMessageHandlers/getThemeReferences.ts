@@ -7,6 +7,7 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
   const figmaStyleMaps = getAllFigmaStyleMaps();
+  console.log('figmaStyleMaps in getThemeReferences: ', figmaStyleMaps);
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,

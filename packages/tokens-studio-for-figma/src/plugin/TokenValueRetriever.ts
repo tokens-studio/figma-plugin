@@ -25,6 +25,13 @@ export class TokenValueRetriever {
   public initiate({
     tokens, variableReferences, styleReferences, stylePathPrefix, ignoreFirstPartForStyles = false, createStylesWithVariableReferences = false,
   }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; createStylesWithVariableReferences?: boolean }) {
+    console.log('============ TokenValueRetriever ============')
+    console.log('tokens in TokenValueRetriever: ', tokens);
+    console.log('variableReferences in TokenValueRetriever: ', variableReferences);
+    if (styleReferences) {
+      console.log('styleReferences in TokenValueRetriever: ', [...styleReferences]);
+    }
+    console.log('stylePathPrefix in TokenValueRetriever: ', stylePathPrefix);
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
     this.createStylesWithVariableReferences = createStylesWithVariableReferences;
