@@ -3,4 +3,5 @@ import { Flex } from '../Flex';
 
 export const StyledCreateOrEditThemeFormTabsFlex = styled(Flex, {
   marginLeft: 'auto',
+  paddingBlock: '$3',
 });

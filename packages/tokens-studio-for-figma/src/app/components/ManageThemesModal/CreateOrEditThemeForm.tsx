@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useSelector, useStore } from 'react-redux';
-import { Box, Button, IconButton, Stack } from '@tokens-studio/ui';
+import {
+  Box, Button, IconButton, Stack,
+} from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
 import Input from '../Input';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
@@ -19,6 +21,7 @@ import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
+
 
 export type FormValues = {
   name: string
@@ -97,7 +100,9 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             variant="invisible"
             onClick={onCancel}
           />
-          {
+          <Stack direction="column" gap={1} css={{ alignItems: 'start' }}>
+            <Stack direction="row" gap={1} css={{ alignItems: 'center' }}>
+              {
             showGroupInput ? (
               <Input
                 autofocus
@@ -137,17 +142,22 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
               </Box>
             )
           }
-          <Box>/</Box>
-          <Input
-            data-testid="create-or-edit-theme-form--input--name"
-            {...register('name', { required: true })}
-          />
+              <Box>/</Box>
+            </Stack>
+            <Input
+              data-testid="create-or-edit-theme-form--input--name"
+              {...register('name', { required: true })}
+            />
+          </Stack>
+          {id && (
           <StyledCreateOrEditThemeFormTabsFlex>
             <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
             <TabButton name={ThemeFormTabs.STYLES_VARIABLES} disabled={!id} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} />
           </StyledCreateOrEditThemeFormTabsFlex>
+          )}
+
         </StyledCreateOrEditThemeFormHeaderFlex>
-      </StyledNameInputBox>
+      </StyledNameInputBox> 
       {activeTab === ThemeFormTabs.SETS && (
         <Stack direction="column" gap={1} css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
