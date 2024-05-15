@@ -22,7 +22,6 @@ import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
 
-
 export type FormValues = {
   name: string
   group?: string
@@ -90,7 +89,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
-      <StyledNameInputBox>
+      <StyledNameInputBox css={{ width: '100%' }}>
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
             tooltip="Return to overview"
@@ -100,17 +99,28 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             variant="invisible"
             onClick={onCancel}
           />
-          <Stack direction="column" gap={1} css={{ alignItems: 'start' }}>
+          <Stack
+            direction="column"
+            gap={1}
+            css={{
+              alignItems: 'start',
+              width: '100%',
+              paddingBlock: '$2',
+              minHeight: '72px',
+              justifyContent: 'space-evenly',
+            }}
+          >
             <Stack direction="row" gap={1} css={{ alignItems: 'center' }}>
               {
             showGroupInput ? (
               <Input
+                full
                 autofocus
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
               />
             ) : (
-              <Box>
+              <Box css={{ width: '100%' }}>
                 {
                   groupNames.length > 0 ? (
                     <Controller
@@ -145,19 +155,21 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
               <Box>/</Box>
             </Stack>
             <Input
+              full
               data-testid="create-or-edit-theme-form--input--name"
               {...register('name', { required: true })}
             />
           </Stack>
-          {id && (
-          <StyledCreateOrEditThemeFormTabsFlex>
-            <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
-            <TabButton name={ThemeFormTabs.STYLES_VARIABLES} disabled={!id} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} />
-          </StyledCreateOrEditThemeFormTabsFlex>
-          )}
 
         </StyledCreateOrEditThemeFormHeaderFlex>
-      </StyledNameInputBox> 
+      </StyledNameInputBox>
+      {id && (
+      <StyledCreateOrEditThemeFormTabsFlex>
+        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
+        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} />
+      </StyledCreateOrEditThemeFormTabsFlex>
+      )}
+
       {activeTab === ThemeFormTabs.SETS && (
         <Stack direction="column" gap={1} css={{ padding: '$4 $3', paddingTop: '$4' }}>
           <TokenSetTreeContent
