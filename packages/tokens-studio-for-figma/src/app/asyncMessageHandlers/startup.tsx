@@ -13,7 +13,7 @@ import { AppContainer } from '../components/AppContainer';
 import PreviewApp from './preview';
 
 // eslint-disable-next-line
-const PREVIEW_ENV = process.env.PREVIEW_ENV
+const PREVIEW_ENV = process.env.PREVIEW_ENV;
 
 const StartupApp = () => {
   const [params, setParams] = useState<StartupMessage | null>(null);

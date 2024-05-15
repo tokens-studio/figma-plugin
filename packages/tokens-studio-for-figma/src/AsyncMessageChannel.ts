@@ -26,6 +26,8 @@ export type AsyncMessageChannelHandlers = {
   >
 };
 
+const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
+
 const sendWsMessage = <Message>(ws, msg: Message) => {
   const message = JSON.stringify(msg);
   if (ws && ws.readyState === 1) {
@@ -44,6 +46,10 @@ const sendMessageToController = (pluginMessage) => {
   );
 };
 
+const sendMessageToUi = (pluginMessage) => {
+  figma.ui.postMessage(pluginMessage);
+};
+
 const parseWsEvent = (event) => {
   try {
     const msg = JSON.parse(event.data);
@@ -52,7 +58,7 @@ const parseWsEvent = (event) => {
       return temp;
     }
   } catch (err) {
-    console.error('not a valid message', err);
+    console.warn('not a valid message', err);
     return null;
   }
   return null;
@@ -75,6 +81,8 @@ export class AsyncMessageChannel {
 
   protected environment: Environment | null = null;
 
+  protected isPreview: boolean = false;
+
   protected ws: WebSocket | null = null;
 
   public isWsConnected: boolean = false;
@@ -87,6 +95,10 @@ export class AsyncMessageChannel {
       this.environment = Environment.BROWSER;
     } else {
       this.environment = Environment.UI;
+    }
+
+    if (process.env.PREVIEW_ENV) {
+      this.isPreview = true;
     }
   }
 
@@ -102,49 +114,43 @@ export class AsyncMessageChannel {
     return this.ws;
   }
 
-  private addWsEventListener(callback) {
-    const listener = async (event) => {
-      const msg = parseWsEvent(event);
-      const possiblePromise = callback(msg);
+  private listenerFactory<Message>(callback, removeEventListener, parseEvent = (event) => event) {
+    const listener = async (msg: Message) => {
+      const possiblePromise = callback(parseEvent(msg));
       if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
-        this.ws?.removeEventListener('message', listener);
+        removeEventListener('message', listener);
       }
     };
-    this.ws?.addEventListener('message', listener);
+
     return listener;
   }
 
   public attachMessageListener<Message>(callback: (msg: Message) => void | false | Promise<void | false>) {
     switch (this.environment) {
       case Environment.PLUGIN: {
-        const listener = async (msg: Message) => {
-          const possiblePromise = callback(msg);
-          if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
-            figma.ui.off('message', listener);
-          }
-        };
+        const listener = this.listenerFactory(callback, figma.ui.off);
         figma.ui.on('message', listener);
         return () => figma.ui.off('message', listener);
       }
       case Environment.BROWSER: {
-        const listener = this.addWsEventListener(callback);
+        const listener = this.listenerFactory(callback, this.ws?.removeEventListener, parseWsEvent);
+        this.ws?.addEventListener('message', listener);
         return () => this.ws?.removeEventListener('message', listener);
       }
       case Environment.UI: {
-        let wsListener;
-        if (process.env.PREVIEW_ENV === 'figma') {
-          wsListener = this.addWsEventListener(callback);
-        }
-        const listener = async (event: { data: { pluginMessage: Message } }) => {
-          const possiblePromise = callback(event.data.pluginMessage);
-          if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
-            window.removeEventListener('message', listener);
-          }
-        };
+        const wsListener = this.isPreview
+          ? this.listenerFactory(callback, this.ws?.removeEventListener, parseWsEvent)
+          : null;
+        const listener = this.listenerFactory(callback, window.removeEventListener, (event: { data: { pluginMessage: Message } }) => event.data.pluginMessage);
         window.addEventListener('message', listener);
+        if (wsListener) {
+          this.ws?.addEventListener('message', wsListener);
+        }
         return () => {
           window.removeEventListener('message', listener);
-          this.ws?.removeEventListener('message', wsListener);
+          if (wsListener) {
+            this.ws?.removeEventListener('message', wsListener);
+          }
         };
       }
       default: {
@@ -153,40 +159,21 @@ export class AsyncMessageChannel {
     }
   }
 
-  public attachWsEventListener<Message>(callback: (msg: Message) => void | false | Promise<void | false>) {
-    if (!this.ws) {
-      return () => {};
+  private startWebSocketConnection() {
+    if (this.ws === null) {
+      this.ws = new WebSocket(WEBSOCKET_SERVER_URL);
+      const self = this;
+      this.ws.addEventListener('open', () => {
+        self.isWsConnected = true;
+      });
+      this.ws.addEventListener('close', () => {
+        self.isWsConnected = false;
+        setTimeout(() => {
+          self.ws = null;
+          this.startWebSocketConnection();
+        }, 5000);
+      });
     }
-    const listener = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.src === 'server') {
-          const temp = JSON.parse(msg.message);
-          callback(temp);
-        }
-      } catch (err) {
-        console.error('not a valid message', err);
-      }
-    };
-
-    this.ws.addEventListener('message', listener);
-
-    return () => { if (this.ws) { this.ws.removeEventListener('message', listener); } };
-  }
-
-  private startWebSocket() {
-    this.ws = new WebSocket('ws://localhost:9001/ws');
-    const self = this;
-    this.ws.addEventListener('open', () => {
-      self.isWsConnected = true;
-    });
-    this.ws.addEventListener('close', () => {
-      self.isWsConnected = false;
-      setTimeout(() => {
-        this.ws = null;
-        this.startWebSocket();
-      }, 5000);
-    });
 
     return () => {
       if (this.ws) {
@@ -204,22 +191,18 @@ export class AsyncMessageChannel {
         if (msg.src !== 'browser') {
           this.sendMessageToBrowser({ ...msg, src: 'ui' });
         } else {
-          parent.postMessage({
-            pluginMessage: msg,
-          }, '*');
+          sendMessageToController(msg);
         }
         return;
       }
       return;
     }
     const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
-    if (this.environment === Environment.UI) {
+    if (this.environment === Environment.UI && this.isPreview) {
       if (msg.src !== 'browser') {
         this.sendMessageToBrowser({ ...msg, src: 'ui' });
       } else {
-        parent.postMessage({
-          pluginMessage: msg,
-        }, '*');
+        sendMessageToController(msg);
       }
       return;
     }
@@ -233,7 +216,7 @@ export class AsyncMessageChannel {
           : { type: msg.message.type };
 
         if (this.isInFigmaSandbox) {
-          figma.ui.postMessage({
+          sendMessageToUi({
             id: msg.id,
             message: payload,
           });
@@ -241,34 +224,27 @@ export class AsyncMessageChannel {
           if (this.environment === Environment.BROWSER) {
             this.sendMessageFromBrowser({ ...msg, src: 'browser' });
           } else {
-            parent.postMessage({
-              pluginMessage: { id: msg.id, message: payload },
-            }, '*');
+            sendMessageToController({ id: msg.id, message: payload });
           }
         }
       } catch (err) {
         console.error(err);
         if (this.isInFigmaSandbox) {
-          figma.ui.postMessage({
+          sendMessageToUi({
             id: msg.id,
             error: err,
           });
         } else {
-          parent.postMessage({
-            pluginMessage: { id: msg.id, error: err },
-          }, '*');
+          sendMessageToController({ id: msg.id, error: err });
         }
       }
     }
   };
 
   public connect() {
-    if (this.environment !== Environment.PLUGIN && process.env.PREVIEW_ENV) {
-      this.startWebSocket();
+    if (this.environment !== Environment.PLUGIN && this.isPreview) {
+      this.startWebSocketConnection();
     }
-    // if (process.env.PREVIEW_ENV === 'browser') {
-    //   return null;
-    // }
 
     return this.attachMessageListener(this.onMessageEvent);
   }
@@ -300,11 +276,11 @@ export class AsyncMessageChannel {
     });
     switch (this.environment) {
       case Environment.PLUGIN: {
-        figma.ui.postMessage({ id: messageId, message, src: 'figma' });
+        sendMessageToUi({ id: messageId, message, src: 'figma' });
         break;
       }
       case Environment.UI: {
-        if (process.env.PREVIEW_ENV === 'figma') {
+        if (this.isPreview) {
           this.sendMessageToBrowser({ id: messageId, message });
         } else {
           sendMessageToController({ id: messageId, message });
