@@ -12,14 +12,15 @@ const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 const dotenv = require('dotenv');
 
 
-const smp = new SpeedMeasurePlugin();
 
 const { version } = require('./package.json');
 
 const wrapper = (callback) => {
-  if (true) { // Set to false to enable SpeedMeasurePlugin (breaks Figma UI build)
-    return callback;
+  const measureSpeed = false;
+  if (!measureSpeed) { // Set to true to enable SpeedMeasurePlugin (breaks Figma UI build)
+      return callback;
   }
+  const smp = new SpeedMeasurePlugin();
 
   return smp.wrap(callback);
 };
@@ -151,7 +152,6 @@ module.exports = wrapper((env, argv) => {
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
       argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
-      // argv.PREVIEW_ENV === 'browser' && new ForkTsCheckerWebpackPlugin(),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
