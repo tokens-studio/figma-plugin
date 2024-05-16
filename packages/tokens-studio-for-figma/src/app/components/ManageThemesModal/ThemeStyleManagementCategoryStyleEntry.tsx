@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { Box, IconButton } from '@tokens-studio/ui';
+import { Box, IconButton, Tooltip } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
@@ -60,27 +60,44 @@ export const ThemeStyleManagementCategoryStyleEntry: React.FC<React.PropsWithChi
           justifyContent: 'flex-start',
           alignItems: 'center',
           width: '100%',
+          minWidth: 0,
         }}
       >
-        <Box css={{
-          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
-        }}
-        >
-          <Text size="small">{token}</Text>
-          <ArrowRightIcon />
-          {(!styleInfo.name && !styleInfo.failedToResolve) && (
-            <ResolvingLoader />
+        <Tooltip
+          side="bottom"
+          label={(
+            <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+              <Text css={{ color: '$tooltipFg' }}>
+                {token}
+              </Text>
+              <Text css={{ color: '$tooltipFgMuted' }}>
+                {styleInfo.name}
+              </Text>
+            </Stack>
           )}
-          {(!styleInfo.name && styleInfo.failedToResolve) && (
+        >
+          <Box css={{
+            flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
+          }}
+          >
+            <Text css={{ overflow: 'hidden', textOverflow: 'ellipsis' }} size="small">{token}</Text>
+            <Box css={{ flexShrink: 0 }}>
+              <ArrowRightIcon />
+            </Box>
+            {(!styleInfo.name && !styleInfo.failedToResolve) && (
+            <ResolvingLoader />
+            )}
+            {(!styleInfo.name && styleInfo.failedToResolve) && (
             <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
               <LinkBreak1Icon />
               Reference not found
             </Stack>
-          )}
-          {styleInfo.name && (
+            )}
+            {styleInfo.name && (
             <Text bold size="small" title={styleInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{styleInfo.name}</Text>
-          )}
-        </Box>
+            )}
+          </Box>
+        </Tooltip>
         <IconButton size="small" variant="invisible" tooltip="Detach style" icon={<LinkBreak2Icon />} data-testid="themestylemanagementcategorystyleentry-unlink" onClick={handleDisconnectStyle} />
       </Flex>
     </Flex>
