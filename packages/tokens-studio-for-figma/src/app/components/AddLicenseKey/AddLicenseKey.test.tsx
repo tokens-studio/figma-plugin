@@ -15,6 +15,7 @@ import {
 import { AddLicenseSource } from '@/app/store/models/userState';
 import ConfirmDialog from '../ConfirmDialog';
 import * as notifiers from '@/plugin/notifiers';
+import { addLicenseKey } from '@/utils/addLicenseKey';
 
 // Hide log calls unless they are expected. This is mainly related to react-modal
 jest.spyOn(console, 'error').mockImplementation(() => { });
@@ -159,9 +160,11 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await mockStore.dispatch.userState.addLicenseKey({
+    await addLicenseKey(mockStore.dispatch, {
       key: LICENSE_FOR_VALID_RESPONSE,
       source: AddLicenseSource.UI,
+    }, {
+      userId: '123',
     });
 
     const removeKeyButton = await result.findByRole('button', {
@@ -185,9 +188,11 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await mockStore.dispatch.userState.addLicenseKey({
+    await addLicenseKey(mockStore.dispatch, {
       key: LICENSE_FOR_VALID_RESPONSE,
       source: AddLicenseSource.UI,
+    }, {
+      userId: '123',
     });
 
     const removeKeyButton = await result.findByRole('button', {
@@ -220,9 +225,11 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await mockStore.dispatch.userState.addLicenseKey({
+    await addLicenseKey(mockStore.dispatch, {
       key: LICENSE_FOR_DETACH_ERROR_RESPONSE,
       source: AddLicenseSource.UI,
+    }, {
+      userId: '123',
     });
 
     const removeKeyButton = await result.getByRole('button', {
@@ -252,9 +259,11 @@ describe('Add license key', () => {
       </Provider>,
     );
 
-    await mockStore.dispatch.userState.addLicenseKey({
+    await addLicenseKey(mockStore.dispatch, {
       key: LICENSE_FOR_ERROR_RESPONSE,
       source: AddLicenseSource.UI,
+    }, {
+      userId: '123',
     });
 
     await act(async () => {

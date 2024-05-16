@@ -205,6 +205,12 @@ export default function useRemoteTokens() {
                 }, {} as Record<string, string>)
               : {};
 
+            dispatch.tokenState.setRemoteData({
+              tokens: remoteData.tokens,
+              themes: remoteData.themes,
+              metadata: remoteData.metadata
+            });
+
             dispatch.tokenState.setTokenData({
               values: remoteData.tokens,
               themes: remoteData.themes,

@@ -2,6 +2,7 @@ import type { Dispatch } from '@/app/store';
 import { AddLicenseSource } from '@/app/store/models/userState';
 import { LicenseStatus } from '@/constants/LicenseStatus';
 import type { StartupMessage } from '@/types/AsyncMessages';
+import { addLicenseKey } from '@/utils/addLicenseKey';
 import getLicenseKey from '@/utils/getLicenseKey';
 
 export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
@@ -18,9 +19,12 @@ export function addLicenseFactory(dispatch: Dispatch, params: StartupMessage) {
     }
 
     if (licenseKey) {
-      await dispatch.userState.addLicenseKey({
+      await addLicenseKey(dispatch, {
         key: licenseKey,
         source: AddLicenseSource.INITAL_LOAD,
+      }, {
+        userId: user!.figmaId,
+        userName: user!.name,
       });
     } else {
       dispatch.userState.setLicenseStatus(LicenseStatus.NO_LICENSE);

@@ -57,10 +57,10 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
     setShowModal(false);
     if (activeTab === 'useSets') {
       await createVariablesFromSets(selectedSets);
-      createStylesFromSelectedTokenSets(selectedSets);
+      await createStylesFromSelectedTokenSets(selectedSets);
     } else if (activeTab === 'useThemes') {
       await createVariablesFromThemes(selectedThemes);
-      createStylesFromSelectedThemes(selectedThemes);
+      await createStylesFromSelectedThemes(selectedThemes);
     }
   }, [setShowModal, activeTab, selectedThemes, selectedSets, createVariablesFromSets, createStylesFromSelectedTokenSets, createVariablesFromThemes, createStylesFromSelectedThemes]);
   const canExportToFigma = activeTab === 'useSets' ? selectedSets.length > 0 : selectedThemes.length > 0;
@@ -80,7 +80,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const onInteractOutside = React.useCallback((event: Event) => {
     event.preventDefault();
   }, []);
-
+  
   return (
     <>
       <Modal
@@ -107,7 +107,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   )}
         stickyFooter
       >
-        <Tabs defaultValue={isProUser ? 'useThemes' : 'useSets'}>
+        <Tabs defaultValue={activeTab}>
           <Tabs.List>
             <Tabs.Trigger value="useThemes" onClick={() => handleTabChange('useThemes')}>
               {t('tabs.exportThemes')}
