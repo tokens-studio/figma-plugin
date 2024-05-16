@@ -25,12 +25,6 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
     }
   });
 
-  figmaStyleMaps.paintStyles.forEach((style) => {
-    if (!figmaStyleReferences.has(style.name)) {
-      figmaStyleReferences.set(style.name, style.id);
-    }
-  });
-
   activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
       if (!figmaVariableReferences.has(token)) {
