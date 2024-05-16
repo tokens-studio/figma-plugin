@@ -11,6 +11,7 @@ import { ErrorFallback } from '../components/ErrorFallback';
 import { RootState, store } from '../store';
 import { AppContainer } from '../components/AppContainer';
 import PreviewApp from './preview';
+import FigmaLoading from '../components/FigmaLoading';
 
 // eslint-disable-next-line
 const PREVIEW_ENV = process.env.PREVIEW_ENV;
@@ -35,7 +36,13 @@ const StartupApp = () => {
   }, []);
 
   const appContainer = (
-    params ? <AppContainer {...params} /> : null
+    params ? <AppContainer {...params} /> : (
+      <FigmaLoading
+        isLoading
+      >
+        <span />
+      </FigmaLoading>
+    )
   );
 
   return PREVIEW_ENV ? (
