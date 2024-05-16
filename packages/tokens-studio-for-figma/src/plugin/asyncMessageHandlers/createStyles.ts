@@ -6,7 +6,6 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_STYLES] = async (msg) => {
   try {
-    const styleIds = await updateStyles(msg.tokens, msg.settings, true);
     const {
       figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
@@ -18,8 +17,10 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
     });
+    const styleIds = await updateStyles(msg.tokens, msg.settings, true);
+
     return {
-      styleIds
+      styleIds,
     };
   } catch (e) {
     console.error(e);
