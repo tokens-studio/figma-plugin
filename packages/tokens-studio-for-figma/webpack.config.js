@@ -5,20 +5,26 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-// const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 const dotenv = require('dotenv');
 
-const modeArg = process.argv.filter(str => str.startsWith('--mode')).shift();
-const mode = modeArg !== undefined ? modeArg.split('=')[1].trim() : 'development';
-const devMode = mode !== 'production';
 
+const smp = new SpeedMeasurePlugin();
 
 const { version } = require('./package.json');
 
-module.exports = (env, argv) => {
+const wrapper = (callback) => {
+  if (true) { // Set to false to enable SpeedMeasurePlugin (breaks Figma UI build)
+    return callback;
+  }
+
+  return smp.wrap(callback);
+};
+
+module.exports = wrapper((env, argv) => {
 
   //Needed to load the process.env variables for sentry
   dotenv.config({
@@ -52,25 +58,29 @@ module.exports = (env, argv) => {
       rules: [
         // Converts TypeScript code to JavaScript
         // Development fast reload
-        argv.PREVIEW_ENV === 'browser' ? {
+        ...(argv.PREVIEW_ENV === 'browser' ? [{
           test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           use: [
             {
-              loader: require.resolve('babel-loader'),
+              loader: 'swc-loader',
               options: {
-                plugins: [argv.PREVIEW_ENV === 'browser' && require.resolve('react-refresh/babel')].filter(Boolean),
-              },
+                jsc: {
+                  transform: {
+                    react: {
+                      development: argv.mode === 'development',
+                      refresh: argv.mode === 'development'
+                    }
+                  }
+                }
+              }
             },
           ],
-        } : {
+        }] : [{
           test: /\.tsx?$/,
           use: [
             {
               loader: 'swc-loader',
-              // options: {
-              //   jsc: { transform: { react: { refresh: devMode }}}
-              // }
             },
           ],
           exclude: /(node_modules|.*\.test\.(js|ts))/
@@ -84,7 +94,7 @@ module.exports = (env, argv) => {
               loader: 'swc-loader',
             },
           ],
-        },
+        }]),
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
         { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
         // Imports webfonts
@@ -140,7 +150,7 @@ module.exports = (env, argv) => {
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
-      argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin(),
+      argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
       // argv.PREVIEW_ENV === 'browser' && new ForkTsCheckerWebpackPlugin(),
       new webpack.ProvidePlugin({
         process: 'process/browser',
@@ -184,11 +194,7 @@ module.exports = (env, argv) => {
       argv.PREVIEW_ENV !== 'browser' && new HtmlInlineScriptPlugin({
         assetPreservePattern: [/\.js$/],
       }),
-      // argv.PREVIEW_ENV !== 'browser' && new HtmlWebpackInlineSourcePlugin(),
       new webpack.DefinePlugin({
-        // 'process.env':  {
-        //   PREVIEW_ENV: JSON.stringify(argv.PREVIEW_ENV),
-        // },
         'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
         'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
       }),
@@ -201,7 +207,8 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       }),
-      // new BundleAnalyzerPlugin()
+      argv.ANALYZE_BUNDLE && new BundleAnalyzerPlugin({ openAnalyzer: false }),
     ].filter(Boolean),
   }
-};
+});
+// });
