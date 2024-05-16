@@ -192,8 +192,10 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
             {error ? <ErrorValidation>{error}</ErrorValidation> : null}
           </Stack>
           <Box css={{ display: 'flex', position: 'relative', width: '100%' }} className="input">
-            {!!inlineLabel && !prefix && <Tooltip label={name}><StyledPrefix isText>{label}</StyledPrefix></Tooltip>}
-            {!!prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+            {!!inlineLabel && !prefix && (
+              <Tooltip label={name}><StyledPrefix isText css={{ height: 'auto' }}>{label}</StyledPrefix></Tooltip>
+            )}
+            {!!prefix && <StyledPrefix css={{ height: 'auto' }}>{prefix}</StyledPrefix>}
             <MentionsInput
               name={name}
               type={type}
@@ -214,7 +216,9 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                   data-testid="downshift-input-suffix-button"
                   icon={<StyledIconDisclosure />}
                   size="small"
-                  css={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0, boxShadow: 'none' }}
+                  css={{
+                    borderTopLeftRadius: 0, borderBottomLeftRadius: 0, boxShadow: 'none', height: 'auto',
+                  }}
                 />
               </Popover.Trigger>
               {/* Using Anchor to control the width of the popover to match the parent input */}

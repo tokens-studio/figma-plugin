@@ -9,7 +9,7 @@
 .rc-mentions > textarea,
 .rc-mentions-measure {
   width: 100%;
-  height: var(--sizes-controlSmall) !important;
+  min-height: var(--sizes-controlSmall) !important;
   font-style: inherit;
   font-variant: inherit;
   font-stretch: inherit;
