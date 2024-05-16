@@ -7,7 +7,6 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
   const figmaStyleMaps = getAllFigmaStyleMaps();
-  console.log('figmaStyleMaps in getThemeReferences: ', figmaStyleMaps);
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -45,6 +44,18 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
     if (!figmaVariableReferences.has(variable.name)) {
       const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
       figmaVariableReferences.set(normalizedVariableName, variable.key);
+    }
+  });
+
+  const effectStyles = figma.getLocalEffectStyles();
+  const paintStyles = figma.getLocalPaintStyles();
+  const textStyles = figma.getLocalTextStyles();
+  const localStyles = [...effectStyles, ...paintStyles, ...textStyles];
+
+  // We'll also add local styles to the references in case of where we work with local sets
+  localStyles.forEach((style) => {
+    if (!figmaStyleReferences.has(style.name)) {
+      figmaStyleReferences.set(style.name, style.id);
     }
   });
 

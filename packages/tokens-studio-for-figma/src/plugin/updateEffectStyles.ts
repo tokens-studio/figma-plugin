@@ -20,10 +20,6 @@ export default async function updateEffectStyles({
   const effectStylesToKeyMap = getEffectStylesKeyMap();
   const tokenToStyleMap: Record<string, string> = {};
 
-  console.log('effectTokens in updateEffectStyles: ', effectTokens);
-  console.log('effectStylesToIdMap in updateEffectStyles: ', effectStylesToIdMap);
-  console.log('effectStylesToKeyMap in updateEffectStyles: ', effectStylesToKeyMap);
-
   await Promise.all(effectTokens.map(async (token) => {
     if (effectStylesToIdMap.has(token.styleId)) {
       const effectStyle = effectStylesToIdMap.get(token.styleId)!;
@@ -38,17 +34,13 @@ export default async function updateEffectStyles({
 
       await setEffectValuesOnTarget(effectStyle, token.name, baseFontSize);
     } else if (shouldCreate) {
-      console.log('1111111 in updateEffectStyles');
       const style = figma.createEffectStyle();
-      console.log('token.path in updateEffectStyles: ', token.path);
       style.name = token.path;
       tokenToStyleMap[token.name] = style.id;
 
       await setEffectValuesOnTarget(style, token.name, baseFontSize);
     }
   }));
-
-  console.log('tokenToStyleMap in updateEffectStyles: ', tokenToStyleMap);
 
   return tokenToStyleMap;
 }
