@@ -30,10 +30,9 @@ describe('updatePluginDataAndNodes', () => {
     const tokensMap = new Map([
       ['red', { value: '#ff0000', type: TokenTypes.COLOR } as SingleToken],
     ]);
-    const figmaStyleMaps = { paintStyles: new Map(), effectStyles: new Map(), textStyles: new Map() };
 
     await updatePluginDataAndNodes({
-      entries, values, tokensMap, figmaStyleMaps, figmaVariableReferences: new Map(), figmaStyleReferences: {},
+      entries, values, tokensMap,
     });
 
     expect(mockSetSharedPluginData).toBeCalledWith('tokens', 'borderRadius', 'none');
