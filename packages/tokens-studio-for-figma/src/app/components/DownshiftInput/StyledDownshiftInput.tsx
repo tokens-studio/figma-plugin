@@ -41,7 +41,7 @@ export const StyledList = styled(List as ComponentType<any>, {
 });
 
 export const StyledItemValue = styled('div', {
-  fontSize: '$xsmall',
+  fontSize: '$xxsmall',
   color: '$fgDefault',
   fontWeight: '$normal',
   variants: {
@@ -60,9 +60,8 @@ export const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '$3',
+  padding: '$2',
   fontSize: '$xxsmall',
-  borderBottom: '1px solid $bgSubtle',
   variants: {
     isFocused: {
       true: {
@@ -89,13 +88,13 @@ export const StyledItemName = styled('div', {
   fontSize: '$xsmall',
   color: '$fgDefault',
   fontWeight: '$sansBold',
+  flexGrow: 1,
   lineHeight: '1.4',
   wordBreak: 'break-word',
   marginRight: '$2',
   variants: {
     truncate: {
       true: {
-        maxWidth: '50%',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         textWrap: 'nowrap',
@@ -107,7 +106,6 @@ export const StyledItemName = styled('div', {
 export const StyledItemInfo = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  marginBottom: '$2',
 });
 
 export const StyledPart = styled('span', {

@@ -49,8 +49,9 @@ export default async function setColorValuesOnTarget({
       let successfullyAppliedVariable = false;
 
       const containsReferenceVariable = resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}');
+      const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(resolvedValue.slice(1, -1));
 
-      if (containsReferenceVariable && shouldCreateStylesWithVariables) {
+      if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables) {
         try {
           successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
         } catch (e) {
@@ -58,9 +59,11 @@ export default async function setColorValuesOnTarget({
         }
       }
 
-      // If value contains references but we werent able to apply, likely that reference doesnt exist.
-      // So we should apply the raw hex value instead
-      const valueToApply = containsReferenceVariable ? givenValue : resolvedValue;
+      // If value contains references but we werent able to apply, likely that reference doesnt exist. It could be that this is a composite token like border
+      // Where we pass in the color value from a composite but technically that token doesnt exist in the current set of tokens (but a reference to a variable exists!)
+      // So we should see if there is a token that exists for the value we're trying to apply, if not, use the givenValue that we pass on in that case
+      const fallbackValue = defaultTokenValueRetriever.get(token)?.value; // Value on a token if we're given a token
+      const valueToApply = fallbackValue ?? givenValue;
 
       if (!successfullyAppliedVariable) {
         const { color, opacity } = convertToFigmaColor(valueToApply);

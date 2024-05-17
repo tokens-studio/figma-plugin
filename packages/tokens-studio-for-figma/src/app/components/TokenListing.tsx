@@ -95,6 +95,7 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
             css={{
               padding: '$4',
               display: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'none' : 'block',
+              paddingTop: '$1',
             }}
           >
             <TokenGroup

@@ -45,7 +45,6 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { tokensStudioToToken } from './tokensStudio/utils';
-import { fetchDynamicTokenSetData } from './tokensStudio/dynamicSets';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -73,32 +72,7 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
       return null;
     }
 
-    let tokenSets = data.data.project.sets as TokenSet[];
-
-    const dynamicTokenSets = tokenSets.filter((tokenSet) => tokenSet.type === 'DYNAMIC');
-    const dynamicTokenSetData = await Promise.all(
-      dynamicTokenSets.map(async (tokenSet) => {
-        if (!tokenSet.generatorUrn) {
-          return null;
-        }
-        const tokens = await fetchDynamicTokenSetData(tokenSet.generatorUrn);
-        return { ...tokenSet, tokens };
-      }),
-    );
-
-    if (dynamicTokenSetData.length) {
-      tokenSets = tokenSets.map((tokenSet) => {
-        if (tokenSet.type !== 'DYNAMIC') {
-          return tokenSet;
-        }
-
-        const dynamicSetData = dynamicTokenSetData.find((dynamicSet) => dynamicSet?.urn === tokenSet.urn);
-        if (dynamicSetData?.tokens) {
-          return { ...tokenSet, tokens: dynamicSetData.tokens };
-        }
-        return tokenSet;
-      });
-    }
+    const tokenSets = data.data.project.sets as TokenSet[];
 
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
@@ -534,6 +508,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           }
 
           track('Delete theme group in Tokens Studio');
+          notifyToUI('Theme group deleted from Tokens Studio', { error: false });
           return responseData.data.deleteThemeGroup;
         } catch (e) {
           Sentry.captureException(e);
