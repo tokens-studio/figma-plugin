@@ -80,7 +80,7 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const onInteractOutside = React.useCallback((event: Event) => {
     event.preventDefault();
   }, []);
-
+  
   return (
     <>
       <Modal

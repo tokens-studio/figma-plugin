@@ -23,6 +23,10 @@ import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
 
+const StyledTabButton = styled(TabButton, {
+  padding: '$3',
+});
+
 export type FormValues = {
   name: string
   group?: string

@@ -1,8 +1,6 @@
 import { GeneratorQuery, Graphql, RawToken } from '@tokens-studio/sdk';
-import {
-  FlowGraph, execute, minimizeFlowGraph, nodes,
-} from '@tokens-studio/graph-engine';
 import { GET_GENERATOR_QUERY } from '../graphql';
+import { FlowGraph, execute, minimizeFlowGraph, nodes } from '@tokens-studio/graph-engine';
 import { externalLoader } from './externalLoader';
 
 export const fetchDynamicTokenSetData = async (generatorUrn: string) => {

@@ -25,14 +25,14 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const theme = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
-        [curr.set]: curr.status,
-      };
+        [curr.set]: curr.status
+      }
       return acc;
     }, {} as ThemeObject);
     selectedSets.forEach((set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
-          [set.set]: tokens[set.set],
+          [set.set]: tokens[set.set]
         };
         const collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === set.set);
         if (collection) {
@@ -40,7 +40,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
           const modeId: string = mode?.modeId ?? createVariableMode(collection, set.set);
           if (modeId) {
             const allVariableObj = updateVariables({
-              collection, mode: modeId, theme, tokens: setTokens, settings,
+              collection, mode: modeId, theme, tokens: setTokens, settings
             });
             if (Object.keys(allVariableObj.variableIds).length > 0) {
               allVariableCollectionIds[index] = {
@@ -55,7 +55,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
           const newCollection = figma.variables.createVariableCollection(set.set);
           newCollection.renameMode(newCollection.modes[0].modeId, set.set);
           const allVariableObj = updateVariables({
-            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens: setTokens, settings,
+            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens: setTokens, settings
           });
           allVariableCollectionIds[index] = {
             collectionId: newCollection.id,
