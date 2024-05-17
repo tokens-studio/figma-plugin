@@ -198,17 +198,17 @@ export default function useRemoteTokens() {
             // remove those active thems that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                    acc[key] = activeTheme[key];
-                  }
-                  return acc;
-                }, {} as Record<string, string>)
+                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                  acc[key] = activeTheme[key];
+                }
+                return acc;
+              }, {} as Record<string, string>)
               : {};
 
             dispatch.tokenState.setRemoteData({
               tokens: remoteData.tokens,
               themes: remoteData.themes,
-              metadata: remoteData.metadata
+              metadata: remoteData.metadata,
             });
 
             dispatch.tokenState.setTokenData({
