@@ -5,7 +5,7 @@ import {
   Box, Button, IconButton, Stack,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
-import Input from '../Input';
+import { styled } from '@stitches/react';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { StyledCreateOrEditThemeFormHeaderFlex } from './StyledCreateOrEditThemeFormHeaderFlex';
@@ -17,10 +17,15 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { RootState } from '@/app/store';
 import { IconPlus } from '@/icons';
 import { StyledCreateOrEditThemeFormTabsFlex } from './StyledCreateOrEditThemeFormTabsFlex';
+import Input from '../Input';
 import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
+
+const StyledTabButton = styled(TabButton, {
+  padding: '$3',
+});
 
 export type FormValues = {
   name: string
@@ -164,27 +169,29 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </StyledCreateOrEditThemeFormHeaderFlex>
       </StyledNameInputBox>
       {id && (
+
       <StyledCreateOrEditThemeFormTabsFlex>
-        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} />
-        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} />
+        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} small />
+        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} small />
       </StyledCreateOrEditThemeFormTabsFlex>
       )}
-
-      {activeTab === ThemeFormTabs.SETS && (
-        <Stack direction="column" gap={1} css={{ padding: '$4 $3', paddingTop: '$4' }}>
+      <Stack direction="column" gap={1}>
+        {activeTab === ThemeFormTabs.SETS && (
+        <Stack direction="column" gap={1} css={{ padding: '0 $4 $3' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
             keyPosition="end"
           />
         </Stack>
-      )}
-      {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
-        <Box css={{ padding: '$4 $3', paddingTop: '$4' }}>
+        )}
+        {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
+        <Box css={{ padding: '0 $3 $4' }}>
           <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
           <ThemeStyleManagementForm id={id} />
         </Box>
-      )}
+        )}
+      </Stack>
     </StyledForm>
   );
 };
