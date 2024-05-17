@@ -9,11 +9,13 @@ type Props = {
 };
 
 export const saveTheme = ({
-  action, themes, prevThemes, groupIdsMap,
+  action, themes: newThemes, prevThemes, groupIdsMap,
 }: Props) => {
   const {
     payload: { id, name, group },
   } = action;
+
+  const themes = newThemes.map((theme) => (!id && theme.name === name ? { ...theme, id: '' } : theme));
 
   let themeToCreate: ThemeObject | null = null;
   let themeGroupsToUpdate: Record<string, ThemeObjectsList> = {};
@@ -29,13 +31,17 @@ export const saveTheme = ({
       // Create new group with the moved theme
       const movedTheme = themes.find((theme) => theme.id === id);
       if (movedTheme) {
-        themeToCreate = movedTheme;
+        themeToCreate = {
+          ...movedTheme,
+          groupId: undefined,
+        };
       }
 
       // remove the theme from the old group or remove the group if there are no themes left
       const movedThemePrevGroupId = prevThemes.find((theme) => theme.id === id)?.groupId;
+
       if (movedThemePrevGroupId) {
-        const themesToUpdate = themes.filter(({ groupId }) => groupId === movedThemePrevGroupId);
+        const themesToUpdate = themes.filter(({ groupId, name: themeName }) => groupId === movedThemePrevGroupId && themeName !== name);
 
         if (themesToUpdate.length) {
           themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate, groupIdsMap);

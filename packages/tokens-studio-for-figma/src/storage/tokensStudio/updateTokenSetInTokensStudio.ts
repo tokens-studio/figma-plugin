@@ -27,7 +27,7 @@ export async function updateTokenSetInTokensStudio({
     delete tokenSetMetadata[data.oldName];
 
     onTokenSetUpdated({
-      ...rootState.tokenState.tokenSetMetadata,
+      ...tokenSetMetadata,
       [data.newName]: {
         id: tokenSet.urn,
       },
