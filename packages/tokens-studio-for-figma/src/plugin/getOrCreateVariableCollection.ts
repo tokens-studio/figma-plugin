@@ -1,12 +1,9 @@
 import createVariableMode from './createVariableMode';
 
-
 export function getOrCreateVariableCollection(collectionName: string, modeName: string, allCollections: VariableCollection[]): { collection: VariableCollection; modeId: string; } {
   const existingCollection = allCollections.find((vr) => vr.name === collectionName);
   let collection;
   let modeId: string;
-
-  console.log('Existing collection', allCollections,  existingCollection);
 
   if (existingCollection) {
     collection = existingCollection;
