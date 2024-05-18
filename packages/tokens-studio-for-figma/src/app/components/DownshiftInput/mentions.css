@@ -9,7 +9,7 @@
 .rc-mentions > textarea,
 .rc-mentions-measure {
   width: 100%;
-  height: var(--sizes-controlSmall) !important;
+  min-height: var(--sizes-controlSmall) !important;
   font-style: inherit;
   font-variant: inherit;
   font-stretch: inherit;
@@ -57,8 +57,8 @@
 }
 
 .rc-mentions-dropdown-menu {
-  width: 70vw;
-  max-width: 450px;
+  min-width: 200px;
+  max-width: 60vw;
   margin: 0;
   padding: 0;
   max-height: 250px;
@@ -78,7 +78,6 @@
 
 .rc-mentions-dropdown-menu-item {
   width: 100%;
-  min-width: 150px;
   position: relative;
   border-radius: var(--radii-small);
   color: var(--colors-fgDefault);

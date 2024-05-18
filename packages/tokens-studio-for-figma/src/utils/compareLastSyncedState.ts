@@ -17,11 +17,15 @@ export function compareLastSyncedState(
   format: TokenFormatOptions,
 ) {
   const parsedState = tryParseJson<LastSyncedState>(lastSyncedState);
+
   if (!parsedState) {
     return false;
   }
+
+  const formattedCurrentState = JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2);
+
   return isEqual(
     lastSyncedState,
-    JSON.stringify(compact([removeIdPropertyFromTokens(tokens), themes, format]), null, 2),
+    formattedCurrentState,
   );
 }

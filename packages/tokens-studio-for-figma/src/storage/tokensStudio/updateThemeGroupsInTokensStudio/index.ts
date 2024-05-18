@@ -136,7 +136,6 @@ export async function updateThemeGroupsInTokensStudio({
         name: themeToCreate.group,
         options: {
           name: themeToCreate.name,
-          urn: themeToCreate.id,
           selectedTokenSets: JSON.stringify(themeToCreate.selectedTokenSets),
           figmaStyleReferences: JSON.stringify(themeToCreate.$figmaStyleReferences),
           figmaVariableReferences: JSON.stringify(themeToCreate.$figmaVariableReferences),

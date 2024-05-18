@@ -5,20 +5,22 @@ import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_STYLES] = async (msg) => {
-  const {
-    figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
-  } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
-  defaultTokenValueRetriever.initiate({
-    tokens: msg.tokens,
-    variableReferences: figmaVariableReferences,
-    styleReferences: figmaStyleReferences,
-    stylePathPrefix,
-    ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
-    createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
-  });
   try {
+    const {
+      figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
+    } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
+    defaultTokenValueRetriever.initiate({
+      tokens: msg.tokens,
+      variableReferences: figmaVariableReferences,
+      styleReferences: figmaStyleReferences,
+      stylePathPrefix,
+      ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
+      createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
+    });
+    const styleIds = await updateStyles(msg.tokens, msg.settings, true);
+
     return {
-      styleIds: await updateStyles(msg.tokens, msg.settings, true),
+      styleIds,
     };
   } catch (e) {
     console.error(e);

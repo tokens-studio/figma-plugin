@@ -1,12 +1,10 @@
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
-import { getAllFigmaStyleMaps } from '@/utils/getAllFigmaStyleMaps';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
-  const figmaStyleMaps = getAllFigmaStyleMaps();
 
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
@@ -17,18 +15,6 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
 
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
   const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
-
-  figmaStyleMaps.paintStyles.forEach((style) => {
-    if (!figmaStyleReferences.has(style.name)) {
-      figmaStyleReferences.set(style.name, style.id);
-    }
-  });
-
-  figmaStyleMaps.paintStyles.forEach((style) => {
-    if (!figmaStyleReferences.has(style.name)) {
-      figmaStyleReferences.set(style.name, style.id);
-    }
-  });
 
   activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
@@ -48,11 +34,25 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
 
   localVariables.forEach((variable) => {
     if (!figmaVariableReferences.has(variable.name)) {
-      figmaVariableReferences.set(variable.name, variable.key);
+      const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
+      figmaVariableReferences.set(normalizedVariableName, variable.key);
+    }
+  });
+
+  const effectStyles = figma.getLocalEffectStyles();
+  const paintStyles = figma.getLocalPaintStyles();
+  const textStyles = figma.getLocalTextStyles();
+  const localStyles = [...effectStyles, ...paintStyles, ...textStyles];
+
+  // We'll also add local styles to the references in case of where we work with local sets
+  localStyles.forEach((style) => {
+    if (!figmaStyleReferences.has(style.name)) {
+      const normalizedStyleName = style.name.split('/').join('.'); // adjusting variable name to match the token name
+      figmaStyleReferences.set(normalizedStyleName, style.id);
     }
   });
 
   return {
-    figmaStyleMaps, figmaStyleReferences, figmaVariableReferences, stylePathPrefix,
+    figmaStyleReferences, figmaVariableReferences, stylePathPrefix,
   };
 }

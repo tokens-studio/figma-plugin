@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { Box, IconButton } from '@tokens-studio/ui';
+import { Box, IconButton, Tooltip } from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
@@ -57,27 +57,44 @@ export const ThemeVariableManagementEntry: React.FC<React.PropsWithChildren<Reac
           justifyContent: 'flex-start',
           alignItems: 'center',
           width: '100%',
+          minWidth: 0,
         }}
       >
-        <Box css={{
-          flexGrow: 1, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
-        }}
-        >
-          <Text size="small">{token}</Text>
-          <ArrowRightIcon />
-          {(!variableInfo.name && !variableInfo.isResolved) && (
-            <ResolvingLoader />
+        <Tooltip
+          side="bottom"
+          label={(
+            <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+              <Text css={{ color: '$tooltipFg' }}>
+                {token}
+              </Text>
+              <Text css={{ color: '$tooltipFgMuted' }}>
+                {variableInfo.name}
+              </Text>
+            </Stack>
           )}
-          {(!variableInfo.name && variableInfo.isResolved) && (
+        >
+          <Box css={{
+            flexGrow: 0, display: 'flex', alignItems: 'center', gap: '$3', overflow: 'hidden',
+          }}
+          >
+            <Text css={{ overflow: 'hidden', textOverflow: 'ellipsis' }} size="small">{token}</Text>
+            <Box css={{ flexShrink: 0 }}>
+              <ArrowRightIcon />
+            </Box>
+            {(!variableInfo.name && !variableInfo.isResolved) && (
+            <ResolvingLoader />
+            )}
+            {(!variableInfo.name && variableInfo.isResolved) && (
             <Stack direction="row" gap={1} css={{ color: '$dangerFg' }}>
               <LinkBreak1Icon />
               Reference not found
             </Stack>
-          )}
-          {variableInfo.name && (
+            )}
+            {variableInfo.name && (
             <Text bold size="small" title={variableInfo.name} css={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{variableInfo.name}</Text>
-          )}
-        </Box>
+            )}
+          </Box>
+        </Tooltip>
         <IconButton tooltip="Detach variable" icon={<LinkBreak2Icon />} variant="invisible" data-testid="ThemeVariableManagementEntry-unlink" onClick={handleDisconnectVariable} />
       </Flex>
     </Flex>
