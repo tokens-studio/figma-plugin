@@ -63,7 +63,6 @@ export class NodeManager {
     } else {
       relevantNodes = findAll([figma.root], false, opts.nodesWithoutPluginData);
     }
-
     postToUI({
       type: MessageFromPluginTypes.START_JOB,
       job: {
@@ -91,7 +90,6 @@ export class NodeManager {
       await Promise.all(promises);
     })();
     await this.waitForUpdating();
-
     postToUI({
       type: MessageFromPluginTypes.COMPLETE_JOB,
       name: BackgroundJobs.NODEMANAGER_FINDNODESWITHDATA,

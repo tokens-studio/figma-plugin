@@ -397,6 +397,7 @@ describe('useToken test', () => {
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old.padding-start',
       newName: 'new.padding-start',
+      resolvedTokens: undefined,
       updateMode: UpdateMode.SELECTION,
     });
   });
@@ -546,6 +547,7 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.BULK_REMAP_TOKENS,
         oldName: 'oldName',
         newName: 'newName',
+        resolvedTokens: undefined,
         updateMode: UpdateMode.SELECTION,
       });
     });

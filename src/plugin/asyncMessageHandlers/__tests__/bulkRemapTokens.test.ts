@@ -44,6 +44,7 @@ describe('bulkRemapTokens', () => {
         },
       },
     ]));
+
     await bulkRemapTokens({
       type: AsyncMessageTypes.BULK_REMAP_TOKENS,
       oldName: 'old',
