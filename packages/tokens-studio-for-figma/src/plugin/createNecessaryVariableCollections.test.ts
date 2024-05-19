@@ -43,12 +43,16 @@ describe('createNecessaryVariableCollections', () => {
         id: 'C:124',
         name: 'Light',
         group: 'Mode',
+        $figmaCollectionId: 'Coll:124',
+        $figmaModeId: 'M:124',
         selectedTokenSets: {},
       },
       {
         id: 'C:125',
         name: 'Dark',
         group: 'Mode',
+        $figmaCollectionId: 'Coll:125',
+        $figmaModeId: 'M:125',
         selectedTokenSets: {},
       },
     ];
@@ -92,5 +96,47 @@ describe('createNecessaryVariableCollections', () => {
     const selectedThemes = ['C:124'];
     await createNecessaryVariableCollections(themes, selectedThemes);
     expect(mockAddMode).not.toHaveBeenCalled();
+  });
+
+  it('renames existing collection if id is a match but name is not', async () => {
+    mockGetLocalVariableCollectionsAsync.mockResolvedValue([
+      {
+        name: 'OldCollectionName', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'Light' }], addMode: mockAddMode,
+      },
+    ]);
+
+    const themes: ThemeObjectsList = [
+      {
+        id: 'C:124',
+        name: 'Light',
+        group: 'NewCollectionName',
+        $figmaCollectionId: 'Coll:124',
+        selectedTokenSets: {},
+      },
+    ];
+    const selectedThemes = ['C:124'];
+    const updatedCollections = await createNecessaryVariableCollections(themes, selectedThemes);
+    expect(updatedCollections[0].name).toBe('NewCollectionName');
+  });
+
+  it('renames existing mode if id is a match but name isnt', async () => {
+    mockGetLocalVariableCollectionsAsync.mockResolvedValue([
+      {
+        name: 'Collection', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'OldModeName' }], addMode: mockAddMode,
+      },
+    ]);
+
+    const themes: ThemeObjectsList = [
+      {
+        id: 'C:124',
+        name: 'NewModeName',
+        group: 'Collection',
+        $figmaModeId: 'M:123',
+        selectedTokenSets: {},
+      },
+    ];
+    const selectedThemes = ['C:124'];
+    await createNecessaryVariableCollections(themes, selectedThemes);
+    expect(mockRenameMode).toHaveBeenCalledWith('M:123', 'NewModeName');
   });
 });
