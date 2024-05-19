@@ -9,21 +9,11 @@ import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
-import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
-
-async function createNecessaryVariableCollectionsFromSets(selectedSets: ExportTokenSet[]) {
-  const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
-
-  // TODO: Modes dont work yet. maybe best to merge this with the other function in the other and rely on collections and modes being created before here
-
-  return selectedSets.map((set) => {
-    const nameOfCollection = set.set; // Weird name, but set.set is the setname (let's change this!)
-    const existingCollection = allCollections.find((vr) => vr.name === nameOfCollection);
-    return existingCollection ?? figma.variables.createVariableCollection(nameOfCollection);
-  });
-}
+import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
+import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 
 // This function is used to create variables based on token sets, without the use of themes
+// TODO: We can likely merge this with createLocalVariablesInPlugin to reduce duplication
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
@@ -40,15 +30,16 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       };
       return acc;
     }, {} as ThemeObject);
+    const selectedSetIds = selectedSets.map((set) => set.set);
 
-    const collections = await createNecessaryVariableCollectionsFromSets(selectedSets);
+    const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
           [set.set]: tokens[set.set],
         };
-        const { collection, modeId } = getOrCreateVariableCollection(set.set, set.set, collections);
+        const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
@@ -61,6 +52,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
           };
           referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
         }
+        updatedVariableCollections.push(collection);
       }
     }));
     const existingVariables = await mergeVariableReferencesWithLocalVariables();

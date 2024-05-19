@@ -7,7 +7,7 @@ import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
 import { notifyUI } from './notifiers';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
-import { getOrCreateVariableCollection } from './getOrCreateVariableCollection';
+import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 
 export type LocalVariableInfo = {
@@ -33,7 +33,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     await Promise.all(selectedThemes.map(async (themeId) => {
       const theme = themeInfo.themes.find((t) => t.id === themeId);
       if (!theme) return;
-      const { collection, modeId } = getOrCreateVariableCollection(theme.group ?? theme.name, theme.name, collections);
+      const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       const allVariableObj = await updateVariables({
         collection, mode: modeId, theme, tokens, settings,
