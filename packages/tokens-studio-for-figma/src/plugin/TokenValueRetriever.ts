@@ -14,6 +14,10 @@ export class TokenValueRetriever {
 
   private ignoreFirstPartForStyles;
 
+  public shouldApplyVariables;
+
+  public shouldApplyStyles;
+
   public createStylesWithVariableReferences;
 
   private getAdjustedTokenName(tokenName: string): string {
@@ -23,14 +27,32 @@ export class TokenValueRetriever {
   }
 
   public initiate({
-    tokens, variableReferences, styleReferences, stylePathPrefix, ignoreFirstPartForStyles = false, createStylesWithVariableReferences = false,
-  }: { tokens: AnyTokenList, variableReferences?: RawVariableReferenceMap, styleReferences?: Map<string, string>, stylePathPrefix?: string, ignoreFirstPartForStyles?: boolean; createStylesWithVariableReferences?: boolean }) {
+    tokens,
+    variableReferences,
+    styleReferences,
+    stylePathPrefix,
+    ignoreFirstPartForStyles = false,
+    createStylesWithVariableReferences = false,
+    shouldApplyVariables = true,
+    shouldApplyStyles = true,
+  }: { tokens: AnyTokenList,
+    variableReferences?: RawVariableReferenceMap,
+    styleReferences?: Map<string,
+    string>,
+    stylePathPrefix?: string,
+    ignoreFirstPartForStyles?: boolean,
+    createStylesWithVariableReferences?: boolean,
+    shouldApplyVariables?: boolean,
+    shouldApplyStyles?: boolean
+  }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
     this.createStylesWithVariableReferences = createStylesWithVariableReferences;
     this.styleReferences = styleReferences || new Map();
     this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
+    this.shouldApplyVariables = shouldApplyVariables;
+    this.shouldApplyStyles = shouldApplyStyles;
 
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);

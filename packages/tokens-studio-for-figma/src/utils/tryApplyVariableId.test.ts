@@ -21,6 +21,14 @@ describe('tryApplyVariableId', () => {
     defaultTokenValueRetriever.clearCache();
   });
 
+  it('exits early if variable application is turned off', async () => {
+    const variableReferences = new Map();
+    defaultTokenValueRetriever.initiate({
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences, shouldApplyVariables: false,
+    });
+    expect(await tryApplyVariableId(node, 'width', 'token')).toBe(false);
+  });
+
   it('when there is no matching variable, should not apply variable and return false', async () => {
     const variableReferences = new Map();
     defaultTokenValueRetriever.initiate({

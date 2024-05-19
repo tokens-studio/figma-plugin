@@ -8,6 +8,9 @@ export enum ColorPaintType {
 }
 
 export async function tryApplyColorVariableId(target: BaseNode | PaintStyle, token: string, type: ColorPaintType) {
+  const { shouldApplyVariables } = defaultTokenValueRetriever;
+  if (!shouldApplyVariables) return false;
+
   const variable = await defaultTokenValueRetriever.getVariableReference(token);
   if (!variable) return false;
 
