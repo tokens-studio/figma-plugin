@@ -33,6 +33,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       stylePathPrefix,
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
+      shouldApplyStylesAndVariables: msg.settings.applyStylesAndVariables,
     });
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,

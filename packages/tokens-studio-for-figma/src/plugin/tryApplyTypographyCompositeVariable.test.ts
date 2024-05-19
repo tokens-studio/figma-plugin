@@ -111,7 +111,7 @@ describe('tryApplyTypographyCompositeVariable', () => {
       fontFamily: 'Roboto-raw',
       fontWeight: 'Bold-raw',
     };
-    defaultTokenValueRetriever.shouldApplyVariables = false;
+    defaultTokenValueRetriever.shouldApplyStylesAndVariables = false;
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue('Roboto');
     defaultTokenValueRetriever.getVariableReference = jest.fn()
       .mockResolvedValueOnce('Roboto')

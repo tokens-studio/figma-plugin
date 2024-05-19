@@ -15,8 +15,10 @@ export async function tryApplyTypographyCompositeVariable({
 }) {
   // If we're creating styles we need to check the user's setting. If we're applying on a layer, always try to apply variables.
   // 'consumers' only exists in styles, so we can use that to determine if we're creating a style or applying to a layer
-  const { shouldApplyVariables } = defaultTokenValueRetriever;
-  const shouldCreateStylesWithVariables = defaultTokenValueRetriever.createStylesWithVariableReferences || !('consumers' in target && shouldApplyVariables);
+  const { shouldApplyStylesAndVariables } = defaultTokenValueRetriever;
+  const isStyle = 'consumers' in target;
+  const shouldCreateStylesWithVariables = (isStyle && defaultTokenValueRetriever.createStylesWithVariableReferences) || (!isStyle && shouldApplyStylesAndVariables);
+
   if (typeof value === 'string') return;
 
   try {

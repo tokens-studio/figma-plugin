@@ -23,7 +23,7 @@ describe('tryApplyColorVariableId', () => {
     const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
     const figmaVariableReferences: RawVariableReferenceMap = new Map([]);
     await defaultTokenValueRetriever.initiate({
-      tokens, variableReferences: figmaVariableReferences, shouldApplyVariables: false,
+      tokens, variableReferences: figmaVariableReferences, shouldApplyStylesAndVariables: false,
     });
     expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(false);
   });

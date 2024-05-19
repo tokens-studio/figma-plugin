@@ -25,6 +25,7 @@ export interface SettingsState {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
+  applyStylesAndVariables?: boolean;
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -71,6 +72,7 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
+    applyStylesAndVariables: true,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
@@ -182,6 +184,12 @@ export const settings = createModel<RootModel>()({
       return {
         ...state,
         updateOnChange: payload,
+      };
+    },
+    setApplyStylesAndVariables(state, payload: boolean) {
+      return {
+        ...state,
+        applyStylesAndVariables: payload,
       };
     },
     setShouldSwapStyles(state, payload: boolean) {

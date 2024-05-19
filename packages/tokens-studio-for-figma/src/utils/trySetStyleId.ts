@@ -3,8 +3,8 @@ import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 type StyleType = 'fill' | 'text' | 'stroke' | 'effect';
 
 export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: string) {
-  const { shouldApplyStyles } = defaultTokenValueRetriever;
-  if (!shouldApplyStyles) return false;
+  const { shouldApplyStylesAndVariables } = defaultTokenValueRetriever;
+  if (!shouldApplyStylesAndVariables) return false;
   try {
     let actualStyleId = styleId;
 

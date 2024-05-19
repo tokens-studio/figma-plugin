@@ -14,9 +14,7 @@ export class TokenValueRetriever {
 
   private ignoreFirstPartForStyles;
 
-  public shouldApplyVariables;
-
-  public shouldApplyStyles;
+  public shouldApplyStylesAndVariables;
 
   public createStylesWithVariableReferences;
 
@@ -33,8 +31,7 @@ export class TokenValueRetriever {
     stylePathPrefix,
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
-    shouldApplyVariables = true,
-    shouldApplyStyles = true,
+    shouldApplyStylesAndVariables = true,
   }: { tokens: AnyTokenList,
     variableReferences?: RawVariableReferenceMap,
     styleReferences?: Map<string,
@@ -42,8 +39,7 @@ export class TokenValueRetriever {
     stylePathPrefix?: string,
     ignoreFirstPartForStyles?: boolean,
     createStylesWithVariableReferences?: boolean,
-    shouldApplyVariables?: boolean,
-    shouldApplyStyles?: boolean
+    shouldApplyStylesAndVariables?: boolean,
   }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
@@ -51,8 +47,7 @@ export class TokenValueRetriever {
     this.styleReferences = styleReferences || new Map();
     this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
-    this.shouldApplyVariables = shouldApplyVariables;
-    this.shouldApplyStyles = shouldApplyStyles;
+    this.shouldApplyStylesAndVariables = shouldApplyStylesAndVariables;
 
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);

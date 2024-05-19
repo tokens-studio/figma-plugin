@@ -1,8 +1,8 @@
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 export async function tryApplyEffectVariableId(effect: Effect, token: string) {
-  const { shouldApplyVariables } = defaultTokenValueRetriever;
-  if (!shouldApplyVariables) return false;
+  const { shouldApplyStylesAndVariables } = defaultTokenValueRetriever;
+  if (!shouldApplyStylesAndVariables) return false;
 
   const variable = defaultTokenValueRetriever.get(token)?.variableId;
 
