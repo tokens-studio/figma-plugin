@@ -1,7 +1,7 @@
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
-import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials

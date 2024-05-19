@@ -242,6 +242,9 @@ export const settings = createModel<RootModel>()({
     setUpdateOnChange: (payload, rootState) => {
       setUI(rootState.settings);
     },
+    setApplyStylesAndVariables: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
     setInspectDeep: (payload, rootState) => {
       setUI(rootState.settings);
     },
