@@ -35,6 +35,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       if (!theme) return;
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
+      // If we dont have a collection or modeId, we skip this theme
+      // This could be because the user is in a free Figma plan and we werent able to create more than 1 mode
+      if (!collection || !modeId) return;
+
       const allVariableObj = await updateVariables({
         collection, mode: modeId, theme, tokens, settings,
       });
@@ -51,6 +55,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     const existingVariables = await mergeVariableReferencesWithLocalVariables(themeInfo.themes);
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
+
   if (updatedVariables.length === 0) {
     notifyUI('No variables were created');
   } else {
