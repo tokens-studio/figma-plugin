@@ -194,11 +194,11 @@ export default function useManageTokens() {
     return tokensToRename;
   }, [store, renameTokenGroup, dispatch.tokenState]);
 
-  const duplicateGroup = useCallback(async (data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
+  const duplicateGroup = useCallback((data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
 
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
-    await duplicateTokenGroup({
+    duplicateTokenGroup({
       parent: activeTokenSet, oldName: data.oldName, newName: data.newName, tokenSets: data.tokenSets, type: data.type,
     });
     dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);

@@ -94,8 +94,8 @@ const TokenListing: React.FC<React.PropsWithChildren<React.PropsWithChildren<Pro
             data-testid={`tokenlisting-${tokenKey}-content`}
             css={{
               padding: '$4',
-              paddingTop: 0,
               display: collapsedTokenTypeObj[tokenKey as TokenTypes] ? 'none' : 'block',
+              paddingTop: '$1',
             }}
           >
             <TokenGroup

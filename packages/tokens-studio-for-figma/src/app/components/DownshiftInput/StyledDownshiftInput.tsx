@@ -28,6 +28,7 @@ export const StyledDropdown = styled('div', {
   backgroundColor: '$bgDefault',
   cursor: 'pointer',
   boxShadow: '$contextMenu',
+  padding: '$3',
 });
 
 export const StyledList = styled(List as ComponentType<any>, {
@@ -40,24 +41,31 @@ export const StyledList = styled(List as ComponentType<any>, {
 });
 
 export const StyledItemValue = styled('div', {
-  color: '$fgMuted',
-  fontWeight: '$sansBold',
-  textAlign: 'right',
-  maxWidth: '300px',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  fontSize: '$xxsmall',
+  color: '$fgDefault',
+  fontWeight: '$normal',
+  variants: {
+    truncate: {
+      true: {
+        maxWidth: '50%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        textWrap: 'nowrap',
+      },
+    },
+  },
 });
 
 export const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  gap: '$2',
-  padding: '$2 $3',
-  borderRadius: '$small',
+  justifyContent: 'space-between',
+  padding: '$2',
   fontSize: '$xxsmall',
   variants: {
     isFocused: {
       true: {
+        borderRadius: '0 !important',
         backgroundColor: '$bgSubtle',
       },
     },
@@ -66,20 +74,38 @@ export const StyledItem = styled('div', {
 
 export const StyledItemColorDiv = styled('div', {
   flexShrink: 0,
+  marginRight: '$2',
 });
 
 export const StyledItemColor = styled('div', {
-  width: '16px',
-  height: '16px',
-  borderRadius: '$small',
-  border: '1px solid',
-  borderColor: '$borderSubtle',
+  width: '20px',
+  height: '20px',
+  borderRadius: '$medium',
+  border: '1px solid $borderMuted',
 });
 
 export const StyledItemName = styled('div', {
+  fontSize: '$xsmall',
+  color: '$fgDefault',
+  fontWeight: '$sansBold',
   flexGrow: 1,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  lineHeight: '1.4',
+  wordBreak: 'break-word',
+  marginRight: '$2',
+  variants: {
+    truncate: {
+      true: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        textWrap: 'nowrap',
+      },
+    },
+  },
+});
+
+export const StyledItemInfo = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
 });
 
 export const StyledPart = styled('span', {
