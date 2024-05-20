@@ -2,70 +2,25 @@
 
 ## `AsyncMessageChannel` Data Flow
 
-```
-              +------------------------------------+
-              |      Figma Plugin Controller       |
-              |          (Sandbox Env)             |
-              |          controller.ts             |
-              +------------------------------------+
-                          |            ^
-                          |            |
-                          |            |
-                          v            |
-              +------------------------------+
-              |   AsyncMessageChannel        |
-              |  +------------------------+  |
-              |  | PluginInstance         |  |
-              |  | Environment.CONTROLLER |  |
-              |  +------------------------+  |
-              +-----------------------------+
-                          |            ^
-                          |            |
-sendMessageToUi --------  |            |
-(figma.ui.postMessage(...))            |
-                          |            |
-                          |            |-- sendMessageToController
-                          |            |    (parent.postMessage({ pluginMessage: {...} }))
-                          v            |
-              +------------------------------------+
-              |          Figma Plugin UI           |
-              |          UI entrypoint             |
-              |          app/index.tsx             |
-              +------------------------------------+
-                          |            ^
-                          |            |
-                          |            |
-                          |            |
-                          v            |
-              +-----------------------------+
-              |   AsyncMessageChannel       |
-              |  +-----------------------+  |
-              |  |   ReactInstance       |  |
-              |  |   Environment.UI      |  |
-              |  +-----------------------+  |
-              +-----------------------------+
-                          |            ^
-                          |            |
-  sendMessageToBrowser ---|            |
-    (ws.send(...))        |            |
-                          |            |
-                          v            |
-              +------------------------------------+
-              |        Web Browser Preview         |
-              |        http://localhost:9000       |
-              +------------------------------------+
-                          |            ^
-                          |            |-- sendMessageFromBrowser
-                          |            |    (ws.send(...))
-                          |            |
-                          v            |
-              +-----------------------------+
-              |   AsyncMessageChannel       |
-              |  +-----------------------+  |
-              |  |   ReactInstance       |  |
-              |  |   Environment.BROWSER |  |
-              |  +-----------------------+  |
-              +-----------------------------+
+```mermaid
+graph TD
+    A["Figma Plugin Controller\n(Sandbox Env)\ncontroller.ts"]
+    B[AsyncMessageChannel\nPluginInstance\nEnvironment.CONTROLLER]
+    C[Figma Plugin UI\nUI entrypoint\napp/index.tsx]
+    D[AsyncMessageChannel\nReactInstance\nEnvironment.UI]
+    E[Web Browser Preview\nhttp://localhost:9000]
+    F[AsyncMessageChannel\nReactInstance\nEnvironment.BROWSER]
+
+    A -->|"PluginInstance.connect()"| B
+    B -->|"PluginInstance.handle(...)"| A
+    B -->|"ReactInstance.connect()"| C
+    C -->|"ReactInstance.handle(...)"| B
+    C -->|"sendMessageToUi\n(figma.ui.postMessage(...))"| D
+    D -->|"sendMessageToController\n(parent.postMessage({ pluginMessage: {...} }))"| C
+    D -->|"ReactInstance.connect()"| E
+    E -->|"ReactInstance.handle(...)"| D
+    E -->|"sendMessageToBrowser\n(ws.send(...))"| F
+    F -->|"sendMessageFromBrowser\n(ws.send(...))"| E
 ```
 
 ## Instances
@@ -143,11 +98,6 @@ Next, if the environment is `UI` and `PREVIEW_MODE` is truthy, the message is fo
 Then the handler is called; the function is retrieved from `$handlers[msg.message.type]`.
 
 The result of the handler function is `await`ed and a message is sent back to the source with the same message type, and the payload from the handler function result.
-
-
-
-
-
 
 ## Message Handling
 
