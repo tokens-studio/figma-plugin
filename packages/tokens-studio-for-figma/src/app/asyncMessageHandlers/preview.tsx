@@ -28,22 +28,22 @@ function PreviewApp({ children }: { children: ReactNode }) {
         alignItems: 'center',
       }}
     >
-      <Text css={{ fontSize: '20px' }}>Web Preview</Text>
+      <Text css={{ fontSize: '$large' }}>Web Preview</Text>
       <Stack css={{ flex: 1 }}><span /></Stack>
       <Stack
         direction="row"
         css={{
-          paddingTop: 4,
-          paddingBottom: 4,
-          paddingLeft: 8,
-          paddingRight: 8,
+          paddingTop: '$2',
+          paddingBottom:  '$2',
+          paddingLeft:  '$3',
+          paddingRight:  '$3',
           alignItems: 'center',
           border: `1px solid ${isConnected ? '$successFg' : '$dangerFg'}`,
           backgroundColor: isConnected ? '$successBg' : '$dangerBg',
-          borderRadius: '4px',
+          borderRadius: '$small',
         }}
       >
-        <Text css={{ fontSize: '16px', color: isConnected ? '$successFg' : '$dangerFg' }}>
+        <Text css={{ fontSize: '$base', color: isConnected ? '$successFg' : '$dangerFg' }}>
           {isConnected ? 'Connected' : 'Disconnected'}
         </Text>
       </Stack>
@@ -52,7 +52,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
 
   return (
     <Box css={{
-      justifyContent: 'center', alignItems: 'center', padding: '40px', backgroundColor: '$bgSubtle', height: '100vh',
+      justifyContent: 'center', alignItems: 'center', padding: '$7', backgroundColor: '$bgSubtle', height: '100vh',
     }}
     >
       {PREVIEW_ENV === 'browser' ? (
