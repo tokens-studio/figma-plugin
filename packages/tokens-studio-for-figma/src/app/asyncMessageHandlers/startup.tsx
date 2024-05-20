@@ -62,7 +62,6 @@ export default async () => {
     <Sentry.ErrorBoundary fallback={ErrorFallback}>
       <Provider store={store}>
         <Tooltip.Provider>
-          {/* {params ? <AppContainer {...params} /> : null} */}
           <StartupApp />
         </Tooltip.Provider>
       </Provider>
