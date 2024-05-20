@@ -22,8 +22,8 @@ function PreviewApp({ children }: { children: ReactNode }) {
         color: '$fgMuted',
         backgroundColor: '$bgSurface',
         padding: '$4',
-        borderRadius: '12px',
-        marginBottom: '40px',
+        borderRadius: '$medium',
+        marginBottom: '$7',
         justifyContent: 'space-between',
         alignItems: 'center',
       }}
