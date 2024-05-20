@@ -49,7 +49,7 @@ describe('SetValuesOnVariable', () => {
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode);
-    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection.id, 'FLOAT');
+    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 
   it('renames variable if name and path differ and shouldRename is given', async () => {
