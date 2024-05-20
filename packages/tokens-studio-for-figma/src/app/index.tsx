@@ -14,6 +14,5 @@ initializeSentry();
 
 AsyncMessageChannel.ReactInstance.connect();
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
-// AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, asyncHandlers.startup);
 
 startup();
