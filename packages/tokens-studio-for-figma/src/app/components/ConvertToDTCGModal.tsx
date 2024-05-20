@@ -13,7 +13,8 @@ import { ErrorMessage } from './ErrorMessage';
 import { showConvertTokenFormatModalSelector } from '@/selectors/showConvertTokenFormatModalSelector';
 import useRemoteTokens from '../store/remoteTokens';
 import w3cConvertImage from '@/app/assets/hints/w3cformat.png';
-import { localApiStateSelector, storageTypeSelector } from '@/selectors';
+import legacyConvertImage from '@/app/assets/hints/legacyformat.png';
+import { storageTypeSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function ConvertToDTCGModal() {
@@ -51,7 +52,7 @@ export function ConvertToDTCGModal() {
   return (
     <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>
       <Stack direction="column" align="start" gap={4} css={{ color: '$fgMuted', fontSize: '$xsmall' }}>
-        <Box as="img" src={w3cConvertImage} css={{ borderRadius: '$small' }} />
+        <Box as="img" src={isDTCG ? legacyConvertImage : w3cConvertImage} css={{ borderRadius: '$small' }} />
         <Box>
           {isDTCG ? t('w3cformatmodaldescription') : t('legacyformatmodaldescription')}
         </Box>
