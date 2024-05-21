@@ -117,7 +117,6 @@ class TokenResolver {
     if (memoKey && this.memo.has(memoKey)) {
       const cacheResult = this.memo.get(memoKey);
       if (cacheResult) {
-        console.log("@@@@reaturn1 in TokenResolver: ", cacheResult);
         return cacheResult;
       }
     }
