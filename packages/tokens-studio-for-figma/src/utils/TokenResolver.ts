@@ -46,9 +46,6 @@ class TokenResolver {
   public resolveTokenValues(): ResolveTokenValuesResult[] {
     const resolvedTokens: ResolveTokenValuesResult[] = [];
 
-    console.log('resolveTokenValue function call in TokenResolver: ');
-    console.log('tokens in TokenResolver: ', this.tokens);
-
     for (const token of this.tokens) {
       const resolvedValue = this.resolveReferences(token);
       if (typeof resolvedValue.value === 'string' && AliasRegex.test(resolvedValue.value)) {
@@ -116,13 +113,11 @@ class TokenResolver {
     // We use the name as the memo key, if it exists
     const memoKey = token.name || undefined;
 
-    console.log('======== TokenResolver ========');
-    console.log('token in TokenResolver: ', token);
-
     // If we have a cache hit, we can return it
     if (memoKey && this.memo.has(memoKey)) {
       const cacheResult = this.memo.get(memoKey);
       if (cacheResult) {
+        console.log("@@@@reaturn1 in TokenResolver: ", cacheResult);
         return cacheResult;
       }
     }
@@ -133,20 +128,15 @@ class TokenResolver {
     if (typeof token.value === 'string') {
       const references = token.value.toString().match(AliasRegex) || [];
 
-      console.log('references in TokenResolver: ', references);
-
       let finalValue: SingleToken['value'] = token.value;
       let resolvedValueWithReferences: SingleToken['value'] | undefined;
 
       // Resolve every reference, there could be more than 1, as in "{color.primary} {color.secondary}"
       for (const reference of references) {
         const path = getPathName(reference);
-        console.log('path in TokenResolver: ', path);
 
         // We need to avoid circular references, so we check if we already resolved this reference
         if (resolvedReferences.has(path)) {
-          console.log('11111111111 in TokenResolver');
-          console.log('Circular reference detected:', path);
           return {
             ...token,
             rawValue: token.value,
@@ -161,7 +151,6 @@ class TokenResolver {
         // As long as we have matches, we need to resolve them. This is needed for multiple levels of nesting. Performance will suffer, but that's the user's choice.
         while (matches !== false) {
           const match = resolvedPath.match(AliasRegex);
-          console.log('match in TokenResolver: ', match);
           matches = Boolean(match?.length);
           if (!match?.length) break;
 
@@ -187,22 +176,20 @@ class TokenResolver {
         const propertyName = propertyPath.pop() as string;
         const tokenNameWithoutLastPart = propertyPath.join('.');
         foundToken = this.tokenMap.get(resolvedPath);
-        console.log('foundToken in TokenResolver: ', foundToken);
 
         if (foundToken) {
           // For composite tokens that are being referenced, we need to store the value of the found token so that we have something between raw value of a string and the final resolved token
           if (typeof token.value === 'string' && (typeof foundToken.value === 'object' || Array.isArray(foundToken.value))) {
-            console.log('222222222222222222 in TokenResolver: ');
             resolvedValueWithReferences = foundToken.value;
           }
           // We add the already resolved references to the new set, so we can check for circular references
-          console.log('resolvedReferences in TokenResolver: ', resolvedReferences);
           const newResolvedReferences = new Set(resolvedReferences);
           newResolvedReferences.add(resolvedPath);
-          console.log('newResolvedReferences in TokenResolver: ', newResolvedReferences);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
           const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
-          console.log('!!!resolvedTokenValue!!! in TokenResolver: ', resolvedTokenValue);
+          if (resolvedTokenValue.resolvedValueWithReferences) {
+            resolvedValueWithReferences = resolvedTokenValue.resolvedValueWithReferences;
+          }
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {
@@ -216,7 +203,6 @@ class TokenResolver {
             finalValue = finalValue.replace(reference, resolvedTokenValue.value);
           } else if (resolvedTokenValue.value !== undefined) {
             finalValue = resolvedTokenValue.value;
-            console.log('3333333333 in TokenResolver: ', finalValue);
           }
         } else {
           // If we didn't find a value, we need to check if we have a composite token
@@ -252,7 +238,6 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-
         const yamlString = dump(finalValue);
 
         const hasFailingReferences = AliasRegex.test(yamlString);

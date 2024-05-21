@@ -93,8 +93,6 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
   const setPluginValue = React.useCallback(
     async (value: SelectionValue) => {
       dispatch.uiState.startJob({ name: BackgroundJobs.UI_APPLYNODEVALUE });
-      console.log('value in MoreButton: ', value);
-      console.log('tokensContext.resolvedTokens in MoreButton: ', tokensContext.resolvedTokens);
       await setNodeData(value, tokensContext.resolvedTokens);
       dispatch.uiState.completeJob(BackgroundJobs.UI_APPLYNODEVALUE);
     },
@@ -123,7 +121,6 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
         givenProperties.clear.map((item) => Object.assign(newProps, { [item]: 'delete' }));
       }
 
-      console.log('newProps in MoreButton: ', newProps);
       setPluginValue(newProps);
     },
     [active, token.name, setPluginValue],
@@ -135,7 +132,6 @@ export const MoreButton: React.FC<React.PropsWithChildren<React.PropsWithChildre
       if (canEdit && ((isMacBrowser && event.metaKey) || (!isMacBrowser && event.ctrlKey))) {
         handleEditClick();
       } else {
-        console.log('properties in MoreButton: ', properties);
         handleClick(properties[0]);
       }
     },
