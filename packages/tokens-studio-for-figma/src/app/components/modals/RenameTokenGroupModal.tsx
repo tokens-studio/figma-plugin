@@ -1,5 +1,7 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Button } from '@tokens-studio/ui';
+import { tokensSelector, activeTokenSetSelector } from '@/selectors';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import Input from '../Input';
@@ -17,6 +19,14 @@ type Props = {
 export default function RenameTokenGroupModal({
   isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange,
 }: Props) {
+  const tokens = useSelector(tokensSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+
+  const canRename = React.useMemo(() => {
+    const isDuplicated = tokens[activeTokenSet].some((token) => token.name.split('.').includes(newName));
+    return !isDuplicated;
+  }, [tokens, newName, activeTokenSet]);
+
   return (
     <Modal
       title={`Rename ${oldName}`}
@@ -28,7 +38,7 @@ export default function RenameTokenGroupModal({
             <Button variant="secondary" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={newName === oldName}>
+            <Button type="submit" variant="primary" disabled={(newName === oldName) || !canRename}>
               Change
             </Button>
           </Stack>
