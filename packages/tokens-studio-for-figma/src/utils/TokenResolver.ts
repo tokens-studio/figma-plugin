@@ -136,7 +136,6 @@ class TokenResolver {
 
         // We need to avoid circular references, so we check if we already resolved this reference
         if (resolvedReferences.has(path)) {
-          console.log('Circular reference detected:', path);
           return {
             ...token,
             rawValue: token.value,
@@ -187,6 +186,9 @@ class TokenResolver {
           newResolvedReferences.add(resolvedPath);
           // We initiate a new resolveReferences call, as we need to resolve the references of the reference
           const resolvedTokenValue = this.resolveReferences({ ...foundToken, name: resolvedPath } as SingleToken, newResolvedReferences);
+          if (resolvedTokenValue.resolvedValueWithReferences) {
+            resolvedValueWithReferences = resolvedTokenValue.resolvedValueWithReferences;
+          }
 
           // We weren't able to resolve the reference, so we return the token as is, but mark it as failed to resolve
           if (resolvedTokenValue.value === undefined) {
@@ -235,7 +237,6 @@ class TokenResolver {
         }
       } else {
         // If it's not, we mark it as failed to resolve
-
         const yamlString = dump(finalValue);
 
         const hasFailingReferences = AliasRegex.test(yamlString);
