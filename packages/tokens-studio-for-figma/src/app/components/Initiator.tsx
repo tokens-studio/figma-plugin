@@ -12,6 +12,7 @@ import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -169,9 +170,9 @@ export function Initiator() {
         const event = parseWsEvent(e);
         onMessageEvent({ data: { pluginMessage: event } });
       };
-      AsyncMessageChannel.ReactInstance.getWs()?.addEventListener('message', listener);
+      (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.addEventListener('message', listener);
       return () => {
-        AsyncMessageChannel.ReactInstance.getWs()?.removeEventListener('message', listener);
+        (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.removeEventListener('message', listener);
       };
     }
     window.onmessage = onMessageEvent;
