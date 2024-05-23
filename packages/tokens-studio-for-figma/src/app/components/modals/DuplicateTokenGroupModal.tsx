@@ -41,7 +41,7 @@ export default function DuplicateTokenGroupModal({
   const canDuplicate = React.useMemo(() => {
     const isDuplicated = Object.entries(tokens).some(([tokenSetKey, tokenList]) => {
       if (selectedTokenSets.includes(tokenSetKey)) {
-        return tokenList.some((token) => token.name.startsWith(`${newName}.`));
+        return tokenList.some((token) => token.name.startsWith(`${newName}.`) || token.name === newName);
       }
       return false;
     });

@@ -26,7 +26,7 @@ export default function RenameTokenGroupModal({
   const { t } = useTranslation(['tokens']);
 
   const canRename = React.useMemo(() => {
-    const isDuplicated = tokens[activeTokenSet].some((token) => token.name.startsWith(`${newName}.`));
+    const isDuplicated = tokens[activeTokenSet].some((token) => token.name.startsWith(`${newName}.`) || token.name === newName );
     return !isDuplicated;
   }, [tokens, newName, activeTokenSet]);
 
