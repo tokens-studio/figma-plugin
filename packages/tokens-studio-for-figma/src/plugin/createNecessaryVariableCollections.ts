@@ -9,7 +9,7 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
 
   const updatedCollections = collectionsToCreateOrUpdate.reduce((acc, currentTheme) => {
     const nameOfCollection = currentTheme.group ?? currentTheme.name; // If there is a group, use that as the collection name, otherwise use the theme name (e.g. for when creating with sets we use the theme name)
-    const existingCollection = acc[nameOfCollection] || allCollections.find((vr) => vr.id === currentTheme.$figmaCollectionId || vr.name === currentTheme.name); // Check if we already have a collection with the same name, if not find one by the id of $themes or as a fallback by name
+    const existingCollection = acc[nameOfCollection] || allCollections.find((vr) => vr.id === currentTheme.$figmaCollectionId || vr.name === nameOfCollection); // Check if we already have a collection with the same name, if not find one by the id of $themes or as a fallback by name
 
     // If we found an existing collection, check if the mode exists, if not create it
     if (existingCollection) {
