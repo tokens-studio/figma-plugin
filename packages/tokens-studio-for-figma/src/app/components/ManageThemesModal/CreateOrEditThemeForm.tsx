@@ -5,7 +5,6 @@ import {
   Box, Button, IconButton, Stack,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
-import { styled } from '@stitches/react';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { StyledCreateOrEditThemeFormHeaderFlex } from './StyledCreateOrEditThemeFormHeaderFlex';
@@ -22,7 +21,6 @@ import { TabButton } from '../TabButton';
 import { ThemeStyleManagementForm } from './ThemeStyleManagementForm';
 import { TokenSetTreeContent } from '../TokenSetTree/TokenSetTreeContent';
 import { ThemeGroupDropDownMenu } from './ThemeGroupDropDownMenu';
-
 
 export type FormValues = {
   name: string
@@ -103,16 +101,16 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
           />
           <Stack
             direction="column"
+            align="start"
             gap={1}
             css={{
-              alignItems: 'start',
               width: '100%',
               paddingBlock: '$2',
               minHeight: '72px',
               justifyContent: 'space-evenly',
             }}
           >
-            <Stack direction="row" gap={1} css={{ alignItems: 'center' }}>
+            <Stack direction="row" gap={1} align="center">
               {
             showGroupInput ? (
               <Input
@@ -183,7 +181,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         </Stack>
         )}
         {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
-        <Box css={{ padding: '0 $3 $4' }}>
+        <Box css={{ padding: '$3' }}>
           <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
           <ThemeStyleManagementForm id={id} />
         </Box>

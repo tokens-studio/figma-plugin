@@ -41,7 +41,7 @@ const StyledButton = styled('button', {
   },
   '&:disabled': {
     pointerEvents: 'none',
-    color: '$fgSubtle',
+    color: '$fgDisabled',
   },
   variants: {
     isActive: {
