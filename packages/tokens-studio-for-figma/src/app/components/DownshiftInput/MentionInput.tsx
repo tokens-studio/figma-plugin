@@ -138,6 +138,7 @@ export default function MentionsInput({
       value={value}
       placeholder={placeholder}
       prefix={['{']}
+      split=""
       placement="bottom"
       autoFocus={autoFocus}
       onChange={handleMentionInputChange}
