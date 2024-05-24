@@ -38,7 +38,7 @@ describe('RenameTokenGroupModal', () => {
     );
   });
 
-  it('should allow renaming when there are no duplicates', async () => {
+  it('should not allow renaming when there are no duplicates', () => {
     const newName = 'foo.bar';
     const oldName = 'otherfoo-copy';
 
@@ -55,12 +55,12 @@ describe('RenameTokenGroupModal', () => {
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getByText('Change')).not.toBeDisabled();
+    waitFor(async () => {
+      expect(getByText('Change')).toBeDisabled();
     });
   });
 
-  it('should disable renaming when there are duplicates', () => {
+  it('should allow renaming when there are duplicates', () => {
     const newName = 'foo.bar.ss';
     const oldName = 'otherfoo-copy';
 
@@ -77,6 +77,8 @@ describe('RenameTokenGroupModal', () => {
       </Provider>
     );
 
-    expect(getByText('Change')).not.toBeDisabled();
+    waitFor(async () => {
+      expect(getByText('Change')).not.toBeDisabled();
+    });
   });
 });

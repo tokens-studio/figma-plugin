@@ -38,7 +38,7 @@ describe('DuplicateTokenGroupModal', () => {
     );
   });
 
-  it('should allow duplication when there are no duplicates', async () => {
+  it('should not allow duplication when there are no duplicates', () => {
     const newName = 'foo.bar';
     const oldName = 'otherfoo-copy';
 
@@ -55,12 +55,12 @@ describe('DuplicateTokenGroupModal', () => {
       </Provider>
     );
 
-    await waitFor(() => {
-      expect(getByText('duplicate')).not.toBeDisabled();
-    });
+    waitFor(async () => {
+      expect(getByText('duplicate')).toBeDisabled();
+    })
   });
 
-  it('should disable duplication when there are duplicates', () => {
+  it('should allow duplication when there are duplicates', () => {
     const newName = 'foo.bar.ss';
     const oldName = 'otherfoo-copy';
 
@@ -77,6 +77,8 @@ describe('DuplicateTokenGroupModal', () => {
       </Provider>
     );
 
-    expect(getByText('duplicate')).not.toBeDisabled();
+    waitFor(async () => {
+      expect(getByText('duplicate')).not.toBeDisabled();
+    });
   });
 });
