@@ -5,7 +5,7 @@ import { IconButton } from '@tokens-studio/ui';
 import { uiStateSelector } from '@/selectors';
 import createAnnotation from './createAnnotation';
 import Stack from './Stack';
-import Text from './Text';x
+import Text from './Text';
 import Box from './Box';
 import { isEqual } from '@/utils/isEqual';
 import { Direction } from '@/constants/Direction';
