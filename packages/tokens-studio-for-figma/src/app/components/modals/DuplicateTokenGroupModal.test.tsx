@@ -38,7 +38,7 @@ describe('DuplicateTokenGroupModal', () => {
     );
   });
 
-  it('should not allow duplication when there are no duplicates', () => {
+  it('should disable duplication when there are duplicates', () => {
     const newName = 'foo.bar';
     const oldName = 'otherfoo-copy';
 
