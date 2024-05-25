@@ -57,7 +57,7 @@ export default function RenameTokenGroupModal({
           autofocus
           required
         />
-        {!canRename && <ErrorMessage css={{ width: '100%' }}> {t('renameGroupError')} </ErrorMessage>}
+        {!canRename && <ErrorMessage css={{ width: '100%' }}>{t('renameGroupError')}</ErrorMessage>}
         <Text muted>Renaming only affects tokens of the same type</Text>
       </Stack>
     </Modal>
