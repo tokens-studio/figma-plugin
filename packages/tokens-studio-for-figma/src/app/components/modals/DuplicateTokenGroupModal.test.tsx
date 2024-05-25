@@ -60,7 +60,7 @@ describe('DuplicateTokenGroupModal', () => {
     })
   });
 
-  it('should allow duplication when there are duplicates', () => {
+  it('should not disable duplication when there are no duplicates', () => {
     const newName = 'foo.bar.ss';
     const oldName = 'otherfoo-copy';
 
