@@ -38,7 +38,7 @@ describe('RenameTokenGroupModal', () => {
     );
   });
 
-  it('should not allow renaming when there are no duplicates', () => {
+  it('should disable renaming when there are duplicates', () => {
     const newName = 'foo.bar';
     const oldName = 'otherfoo-copy';
 
