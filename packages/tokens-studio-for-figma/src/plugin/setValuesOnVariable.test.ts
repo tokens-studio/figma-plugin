@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import setValuesOnVariable from './setValuesOnVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 
+// TODO: A lot of these tests could be rearranged and grouped follow the order of logic of each file, to see better what happy / sad paths are being covered.
+
 describe('SetValuesOnVariable', () => {
   const mockSetValueForMode = jest.fn();
   const variablesInFigma = [
