@@ -1,8 +1,9 @@
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 export async function tryApplyVariableId(node: SceneNode, type: VariableBindableNodeField, token: string) {
-  const { shouldApplyStylesAndVariables } = defaultTokenValueRetriever;
-  if (!shouldApplyStylesAndVariables) return false;
+  const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
+  if (applyVariablesStylesOrRawValue !== ApplyVariablesStylesOrRawValues.VARIABLES_STYLES) return false;
 
   const variable = await defaultTokenValueRetriever.getVariableReference(token);
 

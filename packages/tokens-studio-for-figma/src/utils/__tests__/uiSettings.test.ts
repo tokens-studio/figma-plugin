@@ -3,7 +3,7 @@ import { mockSetAsync, mockGetAsync, mockNotify } from '../../../tests/__mocks__
 import { getUISettings, updateUISettings } from '../uiSettings';
 import { UiSettingsProperty } from '@/figmaStorage';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
-import { renameExistingStylesAndVariablesSelector, scopeVariablesByTokenTypeSelector } from '@/selectors';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('uiSettings', () => {
   const uiSettingsReadSpy = jest.spyOn(UiSettingsProperty, 'read');
@@ -17,7 +17,7 @@ describe('uiSettings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      applyStylesAndVariables: true,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues,
       updateStyles: true,
       ignoreFirstPartForStyles: false,
       createStylesWithVariableReferences: true,
@@ -43,7 +43,7 @@ describe('uiSettings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      applyStylesAndVariables: true,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues,
       updateStyles: true,
       ignoreFirstPartForStyles: false,
       createStylesWithVariableReferences: true,
@@ -77,7 +77,7 @@ describe('uiSettings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      applyStylesAndVariables: true,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues,
       updateStyles: true,
       variablesColor: true,
       variablesNumber: true,
@@ -109,7 +109,7 @@ describe('uiSettings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      applyStylesAndVariables: true,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues,
       updateStyles: true,
       variablesColor: true,
       variablesNumber: true,
@@ -138,7 +138,7 @@ describe('uiSettings', () => {
       updateMode: UpdateMode.PAGE,
       updateRemote: true,
       updateOnChange: true,
-      applyStylesAndVariables: true,
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues,
       updateStyles: true,
       variablesColor: true,
       variablesNumber: true,

@@ -2,11 +2,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu, IconButton } from '@tokens-studio/ui';
+import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-import Box from './Box';
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
 
@@ -15,11 +14,11 @@ export default function SettingsDropdown() {
   const { t } = useTranslation(['tokens']);
 
   const {
-    updateRemote, updateOnChange, shouldSwapStyles, applyStylesAndVariables,
+    updateRemote, updateOnChange, shouldSwapStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setApplyStylesAndVariables,
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -33,10 +32,6 @@ export default function SettingsDropdown() {
   const handleShouldSwapStyles = React.useCallback(() => {
     setShouldSwapStyles(!shouldSwapStyles);
   }, [shouldSwapStyles, setShouldSwapStyles]);
-
-  const handleApplyStylesAndVariables = React.useCallback(() => {
-    setApplyStylesAndVariables(!applyStylesAndVariables);
-  }, [applyStylesAndVariables, setApplyStylesAndVariables]);
 
   return (
     <DropdownMenu>
@@ -74,19 +69,6 @@ export default function SettingsDropdown() {
               </Box>
             </DropdownMenu.CheckboxItem>
           ) : null}
-          <DropdownMenu.CheckboxItem
-            data-testid="apply-styles-variables"
-            checked={applyStylesAndVariables}
-            onCheckedChange={handleApplyStylesAndVariables}
-          >
-            <DropdownMenu.ItemIndicator>
-              <CheckIcon />
-            </DropdownMenu.ItemIndicator>
-            {t('update.applyStylesVariables.title')}
-            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
-              {t('update.applyStylesVariables.description')}
-            </Box>
-          </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             data-testid="swap-styles"
             checked={shouldSwapStyles}

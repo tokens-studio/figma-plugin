@@ -1,10 +1,11 @@
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 
 type StyleType = 'fill' | 'text' | 'stroke' | 'effect';
 
 export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: string) {
-  const { shouldApplyStylesAndVariables } = defaultTokenValueRetriever;
-  if (!shouldApplyStylesAndVariables) return false;
+  const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
+  if (applyVariablesStylesOrRawValue !== ApplyVariablesStylesOrRawValues.VARIABLES_STYLES) return false;
   try {
     let actualStyleId = styleId;
 

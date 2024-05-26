@@ -11,6 +11,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from '@/types/payloads';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -60,7 +61,7 @@ export type SavedSettings = {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange: boolean;
-  applyStylesAndVariables: boolean;
+  applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues;
   updateStyles: boolean;
   variablesColor: boolean;
   variablesNumber: boolean;
@@ -90,7 +91,7 @@ export function notifyUISettings(
     height,
     updateMode,
     updateOnChange,
-    applyStylesAndVariables,
+    applyVariablesStylesOrRawValue,
     updateStyles,
     showEmptyGroups,
     variablesColor,
@@ -127,7 +128,7 @@ export function notifyUISettings(
       updateMode,
       updateRemote,
       updateOnChange,
-      applyStylesAndVariables,
+      applyVariablesStylesOrRawValue,
       updateStyles,
       variablesColor,
       variablesBoolean,

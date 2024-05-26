@@ -6,6 +6,7 @@ import type { UpdateMode } from '@/constants/UpdateMode';
 import type { StorageTypeCredentials } from './StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from './payloads';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -45,7 +46,7 @@ export type UiSettingsFromPluginMessage = {
     updateMode: UpdateMode;
     updateRemote: boolean;
     updateOnChange: boolean;
-    applyStylesAndVariables: boolean;
+    applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues;
     updateStyles: boolean;
     variablesColor: boolean;
     variablesString: boolean;

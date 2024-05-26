@@ -1,3 +1,4 @@
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { AnyTokenList } from '@/types/tokens';
 
@@ -14,7 +15,7 @@ export class TokenValueRetriever {
 
   private ignoreFirstPartForStyles;
 
-  public shouldApplyStylesAndVariables;
+  public applyVariablesStylesOrRawValue;
 
   public createStylesWithVariableReferences;
 
@@ -31,7 +32,7 @@ export class TokenValueRetriever {
     stylePathPrefix,
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
-    shouldApplyStylesAndVariables = true,
+    applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
   }: { tokens: AnyTokenList,
     variableReferences?: RawVariableReferenceMap,
     styleReferences?: Map<string,
@@ -39,7 +40,7 @@ export class TokenValueRetriever {
     stylePathPrefix?: string,
     ignoreFirstPartForStyles?: boolean,
     createStylesWithVariableReferences?: boolean,
-    shouldApplyStylesAndVariables?: boolean,
+    applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues,
   }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
@@ -47,7 +48,7 @@ export class TokenValueRetriever {
     this.styleReferences = styleReferences || new Map();
     this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
-    this.shouldApplyStylesAndVariables = shouldApplyStylesAndVariables;
+    this.applyVariablesStylesOrRawValue = applyVariablesStylesOrRawValue;
 
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);

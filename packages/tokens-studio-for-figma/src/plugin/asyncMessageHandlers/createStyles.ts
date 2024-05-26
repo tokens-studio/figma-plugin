@@ -16,7 +16,7 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
       stylePathPrefix,
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
-      shouldApplyStylesAndVariables: msg.settings.applyStylesAndVariables,
+      applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
     });
     const styleIds = await updateStyles(msg.tokens, msg.settings, true);
 
