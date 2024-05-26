@@ -80,7 +80,7 @@ describe('updateVariables', () => {
     expect(result.variableIds).toEqual({ 'primary.500': 'VariableID:1:0' });
   });
 
-  it('handles tokens that reference another token', async () => {
+  it('should handle tokens that reference another token', async () => {
     const tokensWithReference = {
       core: [
         {
@@ -111,7 +111,7 @@ describe('updateVariables', () => {
     ]);
   });
 
-  it('removes existing variables that were not handled', async () => {
+  it('should remove existing variables that were not handled', async () => {
     const result = await updateVariables({
       collection,
       mode: 'light',

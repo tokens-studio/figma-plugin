@@ -52,7 +52,7 @@ describe('mergeVariableReferencesWithLocalVariables', () => {
     expect(variables.get('fg.muted')).toBe('V:999');
   });
 
-  it('does not overwrite variable reference if exists already', async () => {
+  it('should not overwrite a variable reference if it exists already', async () => {
     const themes = [
       {
         $figmaVariableReferences: {
@@ -72,7 +72,7 @@ describe('mergeVariableReferencesWithLocalVariables', () => {
     expect(variables.get('fg.default')).toBe('V:012');
   });
 
-  it('prefers variable reference over local one', async () => {
+  it('should give preference to a variable reference over local one', async () => {
     const themes = [
       {
         $figmaVariableReferences: {
