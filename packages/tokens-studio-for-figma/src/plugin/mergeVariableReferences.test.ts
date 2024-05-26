@@ -35,7 +35,7 @@ describe('mergeVariableReferencesWithLocalVariables', () => {
     expect(variables.get('fg.local')).toBe('V:123');
   });
 
-  it('should handle themes without variable references', async () => {
+  it('should handle themes without variable references and merges them with local variable ids', async () => {
     const themes = [
       {
         name: 'Theme 1',
