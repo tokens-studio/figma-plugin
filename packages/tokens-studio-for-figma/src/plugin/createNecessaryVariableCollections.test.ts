@@ -22,14 +22,14 @@ describe('createNecessaryVariableCollections', () => {
       },
     ];
     const selectedThemes = ['C:123'];
-    const createdCollections = await createNecessaryVariableCollections(themes, selectedThemes);
-    expect(createdCollections).toHaveLength(1);
+    const updatedCollections = await createNecessaryVariableCollections(themes, selectedThemes);
+    expect(updatedCollections).toHaveLength(1);
     expect(mockRenameMode).toHaveBeenCalledWith('M:123', 'Core');
   });
 
   it('updates existing collection if theme group is passed and that is a match', async () => {
     mockGetLocalVariableCollectionsAsync.mockResolvedValue([
-      { name: 'Core', modes: [{ modeId: 'M:123', name: 'Default' }] },
+      { name: 'Core', modes: [{ modeId: 'M:123', name: 'Default' }], renameMode: mockRenameMode },
     ]);
 
     mockCreateVariableCollection.mockReturnValue({
@@ -57,14 +57,16 @@ describe('createNecessaryVariableCollections', () => {
       },
     ];
     const selectedThemes = ['C:124', 'C:125'];
-    const createdCollections = await createNecessaryVariableCollections(themes, selectedThemes);
-    expect(createdCollections).toHaveLength(1);
+    const updatedCollections = await createNecessaryVariableCollections(themes, selectedThemes);
+    expect(updatedCollections).toHaveLength(2);
     expect(mockAddMode).toHaveBeenCalledWith('Dark');
   });
 
   it('creates new mode if found collection, but mode didnt exist', async () => {
     mockGetLocalVariableCollectionsAsync.mockResolvedValue([
-      { name: 'Mode', modes: [{ modeId: 'M:123', name: 'Default' }], addMode: mockAddMode },
+      {
+        name: 'Mode', modes: [{ modeId: 'M:123', name: 'Default' }], addMode: mockAddMode, renameMode: mockRenameMode,
+      },
     ]);
 
     const themes: ThemeObjectsList = [
@@ -82,7 +84,9 @@ describe('createNecessaryVariableCollections', () => {
 
   it('does not call addMode if a mode matches name of theme', async () => {
     mockGetLocalVariableCollectionsAsync.mockResolvedValue([
-      { name: 'Mode', modes: [{ modeId: 'M:123', name: 'Light' }], addMode: mockAddMode },
+      {
+        name: 'Mode', modes: [{ modeId: 'M:123', name: 'Light' }], addMode: mockAddMode, renameMode: mockRenameMode,
+      },
     ]);
 
     const themes: ThemeObjectsList = [
@@ -101,7 +105,7 @@ describe('createNecessaryVariableCollections', () => {
   it('renames existing collection if id is a match but name is not', async () => {
     mockGetLocalVariableCollectionsAsync.mockResolvedValue([
       {
-        name: 'OldCollectionName', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'Light' }], addMode: mockAddMode,
+        name: 'OldCollectionName', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'Light' }], addMode: mockAddMode, renameMode: mockRenameMode,
       },
     ]);
 
@@ -122,7 +126,7 @@ describe('createNecessaryVariableCollections', () => {
   it('renames existing mode if id is a match but name isnt', async () => {
     mockGetLocalVariableCollectionsAsync.mockResolvedValue([
       {
-        name: 'Collection', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'OldModeName' }], addMode: mockAddMode,
+        name: 'Collection', id: 'Coll:124', modes: [{ modeId: 'M:123', name: 'OldModeName' }], addMode: mockAddMode, renameMode: mockRenameMode,
       },
     ]);
 

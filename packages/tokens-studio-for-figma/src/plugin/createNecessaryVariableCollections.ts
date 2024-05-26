@@ -7,13 +7,15 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
 
   const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
 
-  const updatedCollections = collectionsToCreateOrUpdate.reduce<VariableCollection[]>((acc, currentTheme) => {
+  return collectionsToCreateOrUpdate.reduce<VariableCollection[]>((acc, currentTheme) => {
     const nameOfCollection = currentTheme.group ?? currentTheme.name; // If there is a group, use that as the collection name, otherwise use the theme name (e.g. for when creating with sets we use the theme name)
     const existingCollection = acc.find((collection) => collection.name === nameOfCollection)
     || allCollections.find((vr) => vr.id === currentTheme.$figmaCollectionId
     || vr.name === nameOfCollection);
 
     if (existingCollection) {
+      console.log('found', existingCollection);
+
       // Check if we already have a collection with the same name, if not find one by the id of $themes or as a fallback by name
       // We do this because we might've found the collection by id, but the name might've changed
       if (existingCollection.name !== nameOfCollection) {
@@ -39,5 +41,4 @@ export async function createNecessaryVariableCollections(themes: ThemeObjectsLis
     acc.push(newCollection);
     return acc;
   }, []);
-  return updatedCollections;
 }
