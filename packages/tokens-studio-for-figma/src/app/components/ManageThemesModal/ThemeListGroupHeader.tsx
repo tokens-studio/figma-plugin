@@ -57,6 +57,7 @@ export function ThemeListGroupHeader({
   return (
     <StyledDragButton
       type="button"
+      canReorder={!editProhibited}
       css={{
         backgroundColor: '$bgDefault',
         display: 'grid',

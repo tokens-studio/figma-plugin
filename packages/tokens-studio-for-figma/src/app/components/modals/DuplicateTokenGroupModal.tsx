@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, TextInput, Stack } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';
+import { ErrorMessage } from '../ErrorMessage';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
 
@@ -37,6 +38,16 @@ export default function DuplicateTokenGroupModal({
     onClose();
   }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
 
+  const canDuplicate = React.useMemo(() => {
+    const isDuplicated = Object.entries(tokens).some(([tokenSetKey, tokenList]) => {
+      if (selectedTokenSets.includes(tokenSetKey)) {
+        return tokenList.some((token) => token.name.startsWith(`${newName}.`) || token.name === newName);
+      }
+      return false;
+    });
+    return !isDuplicated;
+  }, [tokens, newName, selectedTokenSets]);
+
   return (
     <Modal
       title={t('duplicateGroup') as string}
@@ -49,7 +60,7 @@ export default function DuplicateTokenGroupModal({
             <Button variant="secondary" onClick={onClose}>
               {t('cancel')}
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" disabled={!canDuplicate}>
               {t('duplicate')}
             </Button>
           </Stack>
@@ -67,6 +78,7 @@ export default function DuplicateTokenGroupModal({
           required
           css={{ width: '100%' }}
         />
+        {!canDuplicate && <ErrorMessage css={{ width: '100%' }}> {t('duplicateGroupError')} </ErrorMessage>}
         <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
       </Stack>
     </Modal>
