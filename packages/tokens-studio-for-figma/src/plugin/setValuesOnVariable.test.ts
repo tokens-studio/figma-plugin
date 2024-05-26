@@ -38,7 +38,7 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
   });
 
-  it('when there is no variable which is connected to the token, we create a new variable', () => {
+  it('should create a new variable when there is no variable which is connected to the token', () => {
     const tokens = [
       {
         name: 'button.primary.width',
@@ -52,7 +52,7 @@ describe('SetValuesOnVariable', () => {
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 
-  it('renames variable if name and path differ and shouldRename is given', async () => {
+  it('should rename variable if name and path differ and shouldRename is given', async () => {
     const tokens = [
       {
         name: 'button.primary.height',
