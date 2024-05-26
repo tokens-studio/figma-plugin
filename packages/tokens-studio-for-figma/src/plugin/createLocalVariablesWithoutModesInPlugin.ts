@@ -41,6 +41,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
+        if (!collection || !modeId) return;
+
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
         });
