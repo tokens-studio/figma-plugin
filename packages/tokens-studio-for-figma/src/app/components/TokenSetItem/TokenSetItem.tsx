@@ -121,6 +121,7 @@ export function TokenSetItem({
                 paddingLeft: `${5 * item.level}px`,
               }}
               isActive={isActive}
+              canReorder={canReorder}
               onClick={handleClick}
             >
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
@@ -137,6 +138,7 @@ export function TokenSetItem({
               }}
               data-testid={`tokensetitem-${item.path}`}
               isActive={isActive}
+              canReorder={canReorder}
               onClick={handleClick}
             >
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />

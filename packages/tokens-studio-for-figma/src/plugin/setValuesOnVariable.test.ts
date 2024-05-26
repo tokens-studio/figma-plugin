@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import setValuesOnVariable from './setValuesOnVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 
+// TODO: A lot of these tests could be rearranged and grouped follow the order of logic of each file, to see better what happy / sad paths are being covered.
+
 describe('SetValuesOnVariable', () => {
   const mockSetValueForMode = jest.fn();
   const variablesInFigma = [
@@ -38,7 +40,7 @@ describe('SetValuesOnVariable', () => {
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
   });
 
-  it('when there is no variable which is connected to the token, we create new variable', () => {
+  it('should create a new variable when there is no variable which is connected to the token', () => {
     const tokens = [
       {
         name: 'button.primary.width',
@@ -49,10 +51,10 @@ describe('SetValuesOnVariable', () => {
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode);
-    expect(mockCreateVariable).toBeCalledWith('button/primary/width', 'VariableCollectionId:309:16430', 'FLOAT');
+    expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 
-  it('renames variable if name and path differ and shouldRename is given', () => {
+  it('should rename variable if name and path differ and shouldRename is given', async () => {
     const tokens = [
       {
         name: 'button.primary.height',
@@ -62,8 +64,8 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.NUMBER,
         variableId: '123',
       },
-    ] as SingleToken<true, { path: string, variableId: string }>[];
-    const result = setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
+    ];
+    const result = await setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
     expect(result.renamedVariableKeys).toEqual(['123']);
     expect(variablesInFigma[0].name).toEqual('button/primary/height');
     expect(mockCreateVariable).not.toBeCalled();

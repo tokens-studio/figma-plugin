@@ -12,14 +12,15 @@ export type CreateVariableTypes = {
   theme: ThemeObject;
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
+  filterByTokenSet?: string;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
-export default function updateVariables({
-  collection, mode, theme, tokens, settings,
+export default async function updateVariables({
+  collection, mode, theme, tokens, settings, filterByTokenSet,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens);
+  const tokensToCreate = generateTokensToCreate(theme, tokens, filterByTokenSet);
   const variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
@@ -28,7 +29,7 @@ export default function updateVariables({
     }
   });
 
-  const variableObj = setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.renameExistingStylesAndVariables);
+  const variableObj = await setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.renameExistingStylesAndVariables);
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme

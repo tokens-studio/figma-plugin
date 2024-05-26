@@ -8,7 +8,7 @@ import createLocalVariablesInPlugin from './createLocalVariablesInPlugin';
 import { SingleToken } from '@/types/tokens';
 import { SettingsState } from '@/app/store/models/settings';
 
-describe('SetValuesOnVariable', () => {
+describe('createLocalVariablesInPlugin', () => {
   const mockRenameMode = jest.fn();
   const mockAddMode = jest.fn();
   const runAfter: (() => void)[] = [];
