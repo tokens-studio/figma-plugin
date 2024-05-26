@@ -1,11 +1,12 @@
 import { trySetStyleId } from '../trySetStyleId';
 import { mockGetStyleById, mockImportStyleByKeyAsync } from '../../../tests/__mocks__/figmaMock';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('trySetStyleId', () => {
   beforeEach(() => {
     mockImportStyleByKeyAsync.mockImplementation(() => Promise.reject());
-    defaultTokenValueRetriever.shouldApplyStyles = true;
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
   });
 
   it('should try to set a local fill style', async () => {

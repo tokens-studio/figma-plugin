@@ -73,7 +73,7 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
-    applyStylesAndVariables: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
+    applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,

@@ -2,6 +2,7 @@ import { tryApplyTypographyCompositeVariable } from './tryApplyTypographyComposi
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('tryApplyTypographyCompositeVariable', () => {
   let target: TextNode | TextStyle;
@@ -111,7 +112,7 @@ describe('tryApplyTypographyCompositeVariable', () => {
       fontFamily: 'Roboto-raw',
       fontWeight: 'Bold-raw',
     };
-    defaultTokenValueRetriever.shouldApplyStylesAndVariables = false;
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.RAW_VALUES;
     defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue('Roboto');
     defaultTokenValueRetriever.getVariableReference = jest.fn()
       .mockResolvedValueOnce('Roboto')
