@@ -12,8 +12,15 @@ import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 
-// This function is used to create variables based on token sets, without the use of themes
-// TODO: We can likely merge this with createLocalVariablesInPlugin to reduce duplication
+/**
+* This function is used to create variables based on token sets, without the use of themes
+* - We first create a "theme container" storing the selected token sets to get closer to theme logic
+* - It then creates the necessary variable collections and modes or returns existing ones
+* - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
+* - Then goes on to update variables for each theme
+* - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
+* - TODO: Likely a good idea to merge this with createLocalVariablesInPlugin to reduce duplication
+* */
 export default async function createLocalVariablesWithoutModesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedSets: ExportTokenSet[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};

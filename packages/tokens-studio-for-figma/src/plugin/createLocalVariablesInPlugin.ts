@@ -15,7 +15,14 @@ export type LocalVariableInfo = {
   modeId: string;
   variableIds: Record<string, string>
 };
-// This function is used to create variables based on themes
+
+/**
+* This function is used to create and update variables based on themes
+* - It first creates the necessary variable collections and modes or returns existing ones
+* - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
+* - Then goes on to update variables for each theme
+* - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
+* */
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -35,8 +42,6 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       if (!theme) return;
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
-      // If we dont have a collection or modeId, we skip this theme
-      // This could be because the user is in a free Figma plan and we werent able to create more than 1 mode
       if (!collection || !modeId) return;
 
       const allVariableObj = await updateVariables({
