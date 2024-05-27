@@ -35,6 +35,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
+    const selectedThemeInfos = themeInfo.themes.filter((theme) => selectedThemes.includes(theme.id));
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
     await Promise.all(selectedThemes.map(async (themeId) => {
@@ -53,11 +54,14 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           modeId,
           variableIds: allVariableObj.variableIds,
         };
+        console.log('allVariableObj', allVariableObj, selectedThemes);
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
       updatedVariableCollections.push(collection);
     }));
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(themeInfo.themes);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeInfos);
+    console.log('Existing variables', Array.from(existingVariables.entries()));
+
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
