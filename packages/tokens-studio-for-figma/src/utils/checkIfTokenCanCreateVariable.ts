@@ -25,7 +25,7 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
       return false;
     }
     // Ignore percentage values, except on text type tokens
-    if (token.type !== TokenTypes.TEXT && typeof token.value === 'string' && numberMatchesPercentage(token.value)) {
+    if (token.type !== TokenTypes.TEXT && token.type !== TokenTypes.OPACITY && typeof token.value === 'string' && numberMatchesPercentage(token.value)) {
       return false;
     }
     return true;
