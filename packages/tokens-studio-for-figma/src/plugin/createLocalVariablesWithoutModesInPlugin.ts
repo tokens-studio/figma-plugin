@@ -39,16 +39,26 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     }, {} as ThemeObject);
     const selectedSetIds = selectedSets.map((set) => set.set);
 
+    console.log('[themeContainer] in createWithoutModes: ', [themeContainer]);
+    console.log('selectedSetIds in createWithoutModes: ', selectedSetIds);
     const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
+    console.log('collection in createWithoutModes: ', collections);
+
+    console.log('selectedSets in createWithoutModes: ', selectedSets);
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
+      console.log('set in createWithoutModes: ', set)
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
           [set.set]: tokens[set.set],
         };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
+        console.log('collection in createWithoutModes: ', collection);
+        console.log('modeId in createWithoutModes: ', modeId);
 
         if (!collection || !modeId) return;
+
+        console.log('setTokens in createWithoutModes: ', setTokens);
 
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,

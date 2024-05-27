@@ -3,7 +3,10 @@ import createVariableMode from './createVariableMode';
 
 // Takes a given theme input and creates required variable collections with modes, or updates existing ones and renames / adds modes
 export async function createNecessaryVariableCollections(themes: ThemeObjectsList, selectedThemes: string[]): Promise<VariableCollection[]> {
+  console.log('themes in createNecessary: ', themes);
+  console.log('selectedThemes in createNecessary: ', selectedThemes);
   const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
+  console.log('allCollections in createNecessary: ', allCollections);
 
   const collectionsToCreateOrUpdate = themes.filter((theme) => selectedThemes.includes(theme.id));
 
