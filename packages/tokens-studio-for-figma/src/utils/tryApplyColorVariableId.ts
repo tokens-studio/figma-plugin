@@ -1,5 +1,6 @@
 import { clone } from '@figma-plugin/helpers';
 import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 export enum ColorPaintType {
   FILLS = 'fills',
@@ -8,6 +9,12 @@ export enum ColorPaintType {
 }
 
 export async function tryApplyColorVariableId(target: BaseNode | PaintStyle, token: string, type: ColorPaintType) {
+  const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
+  const shouldApplyVariable = applyVariablesStylesOrRawValue === ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
+  const isNode = !('consumers' in target);
+  // First check if this is about a node or a style. If it is a node we'd need to check if we should apply variables
+  if (isNode && !shouldApplyVariable) return false;
+
   const variable = await defaultTokenValueRetriever.getVariableReference(token);
   if (!variable) return false;
 

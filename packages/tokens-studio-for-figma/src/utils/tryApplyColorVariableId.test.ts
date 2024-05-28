@@ -4,6 +4,7 @@ import { ColorPaintType, tryApplyColorVariableId } from './tryApplyColorVariable
 import { SingleToken } from '@/types/tokens';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('tryApplyColorVariableId', () => {
   const mockSetBoundVariable = jest.fn();
@@ -18,6 +19,15 @@ describe('tryApplyColorVariableId', () => {
       ],
     },
   } as unknown as SceneNode;
+
+  it('exits early if variable application is turned off', async () => {
+    const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
+    const figmaVariableReferences: RawVariableReferenceMap = new Map([]);
+    await defaultTokenValueRetriever.initiate({
+      tokens, variableReferences: figmaVariableReferences, applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
+    });
+    expect(await tryApplyColorVariableId(node, 'token', ColorPaintType.FILLS)).toBe(false);
+  });
 
   it('when there is no matching variable, should not apply variable and return false', async () => {
     const tokens: SingleToken[] = [{ name: 'token', value: '8', type: TokenTypes.COLOR }];
