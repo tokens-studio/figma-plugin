@@ -18,6 +18,7 @@ export async function applyOpacityValuesOnNode(
     && isPrimitiveValue(values.opacity)
     && !(await tryApplyVariableId(node, 'opacity', data.opacity))
   ) {
+    console.log('data on applyOpacity: ', data);
     node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
   }
 }
