@@ -3,6 +3,7 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { isPrimitiveValue } from '@/utils/is';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { transformValue } from './helpers';
+import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
 export async function applyOpacityValuesOnNode(
   node: BaseNode,
@@ -18,7 +19,9 @@ export async function applyOpacityValuesOnNode(
     && isPrimitiveValue(values.opacity)
     && !(await tryApplyVariableId(node, 'opacity', data.opacity))
   ) {
-    console.log('data on applyOpacity: ', data);
+    const resolvedToken = defaultTokenValueRetriever.get(data.opacity);
+    const variableId = resolvedToken?.variableId;
     node.opacity = transformValue(String(values.opacity), 'opacity', baseFontSize);
+    node.setBoundVariable('opacity', variableId);
   }
 }
