@@ -3,7 +3,7 @@ const http = require("http");
 const WebSocket = require("ws");
 const path = require("path");
 
-const PORT = 9001;
+const PORT = process.env.WEBSOCKETS_PORT || 9001;
 
 const app = express();
 
