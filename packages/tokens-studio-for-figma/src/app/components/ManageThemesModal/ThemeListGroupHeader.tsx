@@ -104,6 +104,7 @@ export function ThemeListGroupHeader({
             onChange={handleGroupNameChange}
             onKeyDown={handleKeyDown}
             autofocus
+            full
           />
         )}
       </Box>
