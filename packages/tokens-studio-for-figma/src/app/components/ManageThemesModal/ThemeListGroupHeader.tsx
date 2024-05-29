@@ -59,7 +59,7 @@ export function ThemeListGroupHeader({
       type="button"
       css={{
         backgroundColor: '$bgDefault',
-        display: 'grid',
+        display: 'flex',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
       }}
@@ -70,9 +70,8 @@ export function ThemeListGroupHeader({
         onDragStart={handleDragStart}
       />
       <Box css={{
-        display: 'inherit',
+        display: 'flex',
         alignItems: 'center',
-        gridTemplateColumns: 'max-content min-content',
         '& > div > button ': {
           display: 'none',
         },

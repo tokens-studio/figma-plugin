@@ -54,7 +54,12 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
         }
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content side="bottom">
+        <DropdownMenu.Content
+          side="bottom"
+          css={{
+            maxWidth: '70vw',
+          }}
+        >
           <DropdownMenu.RadioGroup value={selectedGroup ?? ''}>
             {themeGroupList}
           </DropdownMenu.RadioGroup>

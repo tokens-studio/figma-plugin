@@ -106,7 +106,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             css={{
               width: '100%',
               paddingBlock: '$2',
-              minHeight: '72px',
+              minHeight: 'calc( (2 * $controlMedium) + $2 )',
               justifyContent: 'space-evenly',
             }}
           >
@@ -118,6 +118,9 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 autofocus
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
+                css={{
+                  display: 'flex',
+                }}
               />
             ) : (
               <Box css={{ width: '100%' }}>
