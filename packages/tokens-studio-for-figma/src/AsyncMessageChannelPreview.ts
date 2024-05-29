@@ -26,7 +26,7 @@ export type AsyncMessageChannelHandlers = {
   >
 };
 
-const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
+export const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
 
 const sendWsMessage = <Message>(ws, msg: Message) => {
   const message = JSON.stringify(msg);
@@ -259,7 +259,7 @@ export class AsyncMessageChannelPreview {
     });
     const promise = new Promise<AsyncMessageResults & { type: Message['type'] }>((resolve, reject) => {
       this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
-        if (msg.id === messageId) {
+        if (msg?.id === messageId) {
           if ('message' in msg) {
             resolve(msg.message);
           } else {
