@@ -28,18 +28,17 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+  const selectedThemeObjects = themeInfo.themes.filter((theme) => selectedThemes?.includes(theme.id));
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
-  const updatedVariables: Variable[] = [];
+  let updatedVariables: Variable[] = [];
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
-    await Promise.all(selectedThemes.map(async (themeId) => {
-      const theme = themeInfo.themes.find((t) => t.id === themeId);
-      if (!theme) return;
+    await Promise.all(selectedThemeObjects.map(async (theme) => {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       if (!collection || !modeId) return;
@@ -58,13 +57,9 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
       updatedVariableCollections.push(collection);
     }));
-    selectedThemes.forEach((themeId) => {
-      const existingVariables = await mergeVariableReferencesWithLocalVariables();
-      console.log('Existing variables', Array.from(existingVariables.entries()));
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects);
 
-      const updatedThemeVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
-      updatedVariables.concat(updatedThemeVariables);
-    });
+    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
   if (updatedVariables.length === 0) {
