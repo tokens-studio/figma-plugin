@@ -31,11 +31,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
-  let updatedVariables: Variable[] = [];
+  const updatedVariables: Variable[] = [];
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
-    const selectedThemeInfos = themeInfo.themes.filter((theme) => selectedThemes.includes(theme.id));
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
     await Promise.all(selectedThemes.map(async (themeId) => {
@@ -59,10 +58,13 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
       updatedVariableCollections.push(collection);
     }));
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeInfos);
-    console.log('Existing variables', Array.from(existingVariables.entries()));
+    selectedThemes.forEach((themeId) => {
+      const existingVariables = await mergeVariableReferencesWithLocalVariables();
+      console.log('Existing variables', Array.from(existingVariables.entries()));
 
-    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
+      const updatedThemeVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
+      updatedVariables.concat(updatedThemeVariables);
+    });
   }
 
   if (updatedVariables.length === 0) {
