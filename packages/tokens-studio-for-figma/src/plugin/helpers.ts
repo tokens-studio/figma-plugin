@@ -35,6 +35,7 @@ export function transformValue(value: string, type: 'lineHeights', baseFontSize:
 export function transformValue(value: string, type: 'boxShadowType', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertBoxShadowTypeToFigma>;
 export function transformValue(value: string, type: 'textCase', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertTextCaseToFigma>;
 export function transformValue(value: string, type: 'textDecoration', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertTextDecorationToFigma>;
+export function transformValue(value: string, type: 'opacity', baseFontSize: string, shouldOutputForVariables?: boolean): number;
 export function transformValue(value: string, type: string, baseFontSize: string, shouldOutputForVariables?: boolean): number;
 export function transformValue(value: string, type: string, baseFontSize: string, shouldOutputForVariables = false) {
   switch (type) {
@@ -77,7 +78,7 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case 'lineHeight':
       return convertLineHeightToFigma(value, baseFontSize, shouldOutputForVariables);
     case 'opacity':
-      return convertOpacityToFigma(value.toString());
+      return convertOpacityToFigma(value.toString(), shouldOutputForVariables);
     case 'boxShadowType':
       return convertBoxShadowTypeToFigma(value);
     case 'textCase':
