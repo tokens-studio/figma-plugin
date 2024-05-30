@@ -24,7 +24,7 @@ export default function checkIfTokenCanCreateVariable(token: ResolveTokenValuesR
     if (token.type === TokenTypes.LINE_HEIGHTS && typeof token.value === 'string' && token.value === 'AUTO') {
       return false;
     }
-    // Ignore percentage values, except on text type tokens
+    // Ignore percentage values, except on text type tokens and opacity tokens
     if (token.type !== TokenTypes.TEXT && token.type !== TokenTypes.OPACITY && typeof token.value === 'string' && numberMatchesPercentage(token.value)) {
       return false;
     }

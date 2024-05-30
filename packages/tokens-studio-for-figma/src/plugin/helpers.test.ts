@@ -60,7 +60,7 @@ describe('transformValue', () => {
     {
       input: '50%',
       type: 'opacity',
-      output: 50,
+      output: 0.5,
     },
     {
       input: '0.6',
