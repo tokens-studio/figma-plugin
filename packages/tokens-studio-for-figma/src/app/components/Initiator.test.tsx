@@ -10,6 +10,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import { UpdateMode } from '@/constants/UpdateMode';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'mock-uuid'),
@@ -660,6 +661,7 @@ describe('Initiator', () => {
       inspectDeep: false,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
     });
   });
 });

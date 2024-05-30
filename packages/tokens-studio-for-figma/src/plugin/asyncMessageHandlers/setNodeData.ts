@@ -21,6 +21,7 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
         styleReferences: figmaStyleReferences,
         stylePathPrefix,
         ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+        applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
       });
 
       await updatePluginDataAndNodes({

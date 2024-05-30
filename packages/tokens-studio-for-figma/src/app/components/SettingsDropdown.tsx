@@ -2,11 +2,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { DropdownMenu, IconButton } from '@tokens-studio/ui';
+import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-import Box from './Box';
 
 import { StorageProviderType } from '@/constants/StorageProviderType';
 

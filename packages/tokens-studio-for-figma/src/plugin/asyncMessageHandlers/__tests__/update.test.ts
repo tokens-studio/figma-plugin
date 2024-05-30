@@ -10,6 +10,7 @@ import {
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('update', () => {
   const findNodesSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findBaseNodesWithData');
@@ -59,6 +60,7 @@ describe('update', () => {
       shouldSwapStyles: true,
       baseFontSize: '16',
       aliasBaseFontSize: '16',
+      applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
     },
     usedTokenSet: {
       global: TokenSetStatus.ENABLED,
