@@ -205,12 +205,10 @@ export default function useManageTokens() {
   }, [store, duplicateTokenGroup, dispatch.uiState]);
 
   const renameTokensAcrossSets = useCallback(async (oldName: string, newName: string, type: string, tokenSets: string[]) => {
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
     await renameTokenAcrossSets({
       oldName, newName, type, tokenSets,
     });
-    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
-  }, [renameTokenAcrossSets, dispatch.uiState]);
+  }, [renameTokenAcrossSets]);
 
   const importMultipleTokens = useCallback(async (data: UpdateTokenPayload[]) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
