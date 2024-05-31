@@ -5,4 +5,5 @@ export const StyledCreateOrEditThemeFormHeaderFlex = styled(Flex, {
   gap: '$3',
   alignItems: 'center',
   justifyContent: 'flex-start',
+  width: '100%',
 });
