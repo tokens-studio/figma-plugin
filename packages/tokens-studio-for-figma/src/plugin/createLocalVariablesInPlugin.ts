@@ -52,7 +52,6 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
           modeId,
           variableIds: allVariableObj.variableIds,
         };
-        console.log('allVariableObj', allVariableObj, selectedThemes);
         referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
       updatedVariableCollections.push(collection);
