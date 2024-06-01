@@ -2,10 +2,8 @@ import { ReferenceVariableType } from './setValuesOnVariable';
 
 export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
   const updatedVariables: Variable[] = [];
-
   await Promise.all(referenceVariableCandidates.map(async (aliasVariable) => {
     const referenceVariable = figmaVariables.get(aliasVariable.referenceVariable);
-
     if (!referenceVariable) return;
     let variable;
     try {
