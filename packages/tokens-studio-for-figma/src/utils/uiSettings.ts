@@ -1,7 +1,8 @@
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { defaultBaseFontSize } from '../constants/defaultBaseFontSize';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { UiSettingsProperty } from '@/figmaStorage';
-import { TokenFormatOptions, setFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { notifyUISettings, notifyUI, SavedSettings } from '@/plugin/notifiers';
 
 // update credentials
@@ -17,6 +18,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       updateMode: uiSettings.updateMode ?? data?.updateMode,
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
+      applyVariablesStylesOrRawValue: uiSettings.applyVariablesStylesOrRawValue ?? data?.applyVariablesStylesOrRawValue,
       updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
@@ -53,6 +55,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let updateMode: UpdateMode;
     let updateRemote: boolean;
     let updateOnChange: boolean;
+    let applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues;
     let updateStyles: boolean;
     let variablesColor: boolean;
     let variablesBoolean: boolean;
@@ -83,6 +86,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateMode = data.updateMode || UpdateMode.PAGE;
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
+      applyVariablesStylesOrRawValue = typeof data.applyVariablesStylesOrRawValue === 'undefined' ? ApplyVariablesStylesOrRawValues.VARIABLES_STYLES : data.applyVariablesStylesOrRawValue;
       updateStyles = typeof data.updateStyles === 'undefined' ? true : data.updateStyles;
       variablesColor = typeof data.variablesColor === 'undefined' ? true : data.variablesColor;
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
@@ -111,6 +115,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         showEmptyGroups,
         updateMode,
         updateOnChange,
+        applyVariablesStylesOrRawValue,
         updateRemote,
         updateStyles,
         variablesBoolean,
