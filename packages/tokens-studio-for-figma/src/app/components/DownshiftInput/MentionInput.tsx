@@ -146,7 +146,7 @@ export default function MentionsInput({
       onFocus={handleOnFocus}
       onPressEnter={handleEnterKeyDown}
       data-testid={`mention-input-${name}`}
-      style={hasPrefix ? {} : { borderTopLeftRadius: 'var(--borderRadius-small)', borderBottomLeftRadius: 'var(--borderRadius-small)' }}
+      className={hasPrefix ? '' : 'mentions-no-prefix'}
     >
       {mentionData.map((item) => (
         renderMentionListItem(item)
