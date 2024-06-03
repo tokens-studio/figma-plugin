@@ -28,6 +28,7 @@
   border-right: 0;
   border-radius: 0;
   background: transparent;
+  font-size: var(--fontSizes-small);
 }
 
 .mentions-no-prefix > textarea {
