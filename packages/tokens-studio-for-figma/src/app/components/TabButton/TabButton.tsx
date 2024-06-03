@@ -15,6 +15,7 @@ type Props<T extends string> = {
   endEnhancer?: React.ReactNode,
   tooltip?: string;
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
+  small?: boolean;
 };
 
 const StyledButton = styled('button', {
@@ -46,11 +47,16 @@ const StyledButton = styled('button', {
     isActive: {
       true: { color: '$fgDefault' },
     },
+    small: {
+      true: {
+        padding: '0',
+      },
+    },
   },
 });
 
 export function TabButton<T extends string = Tabs>({
-  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer, tooltip, tooltipSide,
+  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer, tooltip, tooltipSide, small,
 }: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
@@ -66,6 +72,7 @@ export function TabButton<T extends string = Tabs>({
       name={name}
       disabled={disabled}
       onClick={onClick}
+      small={small}
     >
       <Tooltip side={tooltipSide} label={tooltip ?? ''}>
         <>
