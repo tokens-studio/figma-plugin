@@ -77,7 +77,7 @@ export default function AuthModal() {
           <>
             <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
               <Text>Do not have an account ?</Text>
-              <Button size="small" variant="invisible" onClick={onCtaClick}>
+              <Button size="small" onClick={onCtaClick}>
                 Sign up here
               </Button>
 
