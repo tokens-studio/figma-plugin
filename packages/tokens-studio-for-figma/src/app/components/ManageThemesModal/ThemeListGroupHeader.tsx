@@ -57,9 +57,10 @@ export function ThemeListGroupHeader({
   return (
     <StyledDragButton
       type="button"
+      canReorder={!editProhibited}
       css={{
         backgroundColor: '$bgDefault',
-        display: 'grid',
+        display: 'flex',
         cursor: 'inherit',
         '&:not(:first-of-type)': { marginTop: '$4' },
       }}
@@ -70,9 +71,8 @@ export function ThemeListGroupHeader({
         onDragStart={handleDragStart}
       />
       <Box css={{
-        display: 'inherit',
+        display: 'flex',
         alignItems: 'center',
-        gridTemplateColumns: 'max-content min-content',
         '& > div > button ': {
           display: 'none',
         },
@@ -105,6 +105,7 @@ export function ThemeListGroupHeader({
             onChange={handleGroupNameChange}
             onKeyDown={handleKeyDown}
             autofocus
+            full
           />
         )}
       </Box>

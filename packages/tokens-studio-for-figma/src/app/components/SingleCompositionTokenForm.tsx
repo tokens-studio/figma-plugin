@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
-import { Select, Box, IconButton } from '@tokens-studio/ui';
+import {
+  Select, Box, IconButton, Stack,
+} from '@tokens-studio/ui';
 import IconMinus from '@/icons/minus.svg';
 import { Properties } from '@/constants/Properties';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
@@ -85,31 +87,45 @@ export default function SingleCompositionTokenForm({
       },
     }}
     >
-      <Select value={property || t('chooseAProperty')} onValueChange={onPropertySelected}>
-        <Select.Trigger
-          value={property || t('chooseAProperty')}
-          data-testid="composition-token-dropdown"
-        />
-        <Select.Content>
-          {properties.length > 0
-                && properties.map((prop, idx) => <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
-        </Select.Content>
-      </Select>
-      <Box css={{ flexGrow: 1 }}>
-        <DownshiftInput
-          value={propertyValue}
-          type={propertyType}
-          resolvedTokens={resolvedTokens}
-          handleChange={onPropertyValueChanged}
-          setInputValue={handleDownShiftInputChange}
-          placeholder={
-            propertyType === 'color' ? t('colorOrAlias') : t('valueOrAlias')
-          }
-          suffix
-          onSubmit={onSubmit}
-        />
-      </Box>
-      <Box css={{ width: '$5', marginRight: '$3' }}>
+      <Stack direction="row" css={{ flex: 1, alignItems: 'center' }}>
+        <Select value={property || t('chooseAProperty')} onValueChange={onPropertySelected}>
+          <Select.Trigger
+            value={property || t('chooseAProperty')}
+            size="small"
+            css={{
+              borderTopRightRadius: '$0',
+              borderBottomRightRadius: '$0',
+              height: 'auto',
+              alignSelf: 'stretch',
+              marginTop: '3px', // Hack to compensate for textarea autosize height
+              marginBottom: '1px', // Hack to compensate for textarea autosize height
+              width: '150px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+            data-testid="composition-token-dropdown"
+          />
+          <Select.Content>
+            {properties.length > 0
+                  && properties.map((prop, idx) => <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
+          </Select.Content>
+        </Select>
+        <Box css={{ flexGrow: 1 }}>
+          <DownshiftInput
+            value={propertyValue}
+            type={propertyType}
+            resolvedTokens={resolvedTokens}
+            handleChange={onPropertyValueChanged}
+            setInputValue={handleDownShiftInputChange}
+            placeholder={
+              propertyType === 'color' ? t('colorOrAlias') : t('valueOrAlias')
+            }
+            suffix
+            onSubmit={onSubmit}
+          />
+        </Box>
+      </Stack>
+      <Box css={{ width: '$5', marginRight: '$4' }}>
         <IconButton
           tooltip={t('removeThisStyle')}
           data-testid="button-style-remove-multiple"

@@ -78,14 +78,13 @@ export default function SecondScreen() {
           </Heading>
           <StyledP>
             {t('secondScreenExplainer')}
+            <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
           </StyledP>
-          <StyledReadMoreLink href="https://docs.tokens.studio/sync/second-screen" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</StyledReadMoreLink>
         </Stack>
         {
           user ? (
             <>
               <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
-
                 <Stack
                   gap={4}
                   direction="row"
@@ -122,21 +121,22 @@ export default function SecondScreen() {
                     <SwitchThumb />
                   </Switch>
                 </Stack>
-
-                <Button disabled={user == null} variant="secondary" size="small" icon={<ExternalLinkIcon />} onClick={handleOpenSecondScreen}>
-                  {t('openSecondScreen')}
-                </Button>
+                <Box>
+                  <Button disabled={user == null} variant="secondary" size="small" icon={<ExternalLinkIcon />} onClick={handleOpenSecondScreen}>
+                    {t('openSecondScreen')}
+                  </Button>
+                </Box>
               </Stack>
 
               <Divider />
 
-              <Stack direction="column" gap={2} css={{ padding: '0 $4', alignItems: 'stretch' }}>
+              <Stack direction="column" align="start" gap={3} css={{ padding: '0 $4' }}>
 
                 <Button variant="secondary" size="small" icon={<ExitIcon />} onClick={handleLogout}>
                   {t('signOut')}
                 </Button>
                 <Box css={{
-                  fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', alignSelf: 'center', textOverflow: 'ellipsis',
+                  fontWeight: '$sansRegular', fontSize: '$xsmall', overflow: 'hidden', textOverflow: 'ellipsis',
                 }}
                 >
                   {t('signedInAs')}
@@ -147,7 +147,7 @@ export default function SecondScreen() {
             </>
 
           ) : (
-            <Stack direction="column" gap={2} css={{ padding: '0 $4' }}>
+            <Stack direction="column" align="start" gap={2} css={{ padding: '0 $4' }}>
               <Button variant="primary" icon={<EnterIcon />} onClick={onSyncClick}>
                 {t('signInToContinue')}
               </Button>

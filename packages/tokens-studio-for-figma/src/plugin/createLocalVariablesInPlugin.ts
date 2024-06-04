@@ -5,14 +5,24 @@ import { SettingsState } from '@/app/store/models/settings';
 import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
-import createVariableMode from './createVariableMode';
 import { notifyUI } from './notifiers';
+import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
+import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
+import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 
 export type LocalVariableInfo = {
   collectionId: string;
   modeId: string;
   variableIds: Record<string, string>
 };
+
+/**
+* This function is used to create and update variables based on themes
+* - It first creates the necessary variable collections and modes or returns existing ones
+* - It then checks if the selected themes generated any collections. It could be a user is in a Free plan and we were unable to create more than 1 mode. If mode wasnt created, we skip the theme.
+* - Then goes on to update variables for each theme
+* - There's another step that we perform where we check if any variables need to be using references to other variables. This is a second step, as we need to have all variables created first before we can reference them.
+* */
 export default async function createLocalVariablesInPlugin(tokens: Record<string, AnyTokenList>, settings: SettingsState, selectedThemes?: string[]) {
   // Big O (n * m * x): (n: amount of themes, m: amount of variableCollections, x: amount of modes)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -20,64 +30,44 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   });
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
+  const updatedVariableCollections: VariableCollection[] = [];
+  let updatedVariables: Variable[] = [];
+
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
-  if (!checkSetting) {
-    themeInfo.themes.forEach((theme) => {
-      if (!selectedThemes || (selectedThemes && selectedThemes.includes(theme.id))) {
-        let collection = figma.variables.getLocalVariableCollections().find((vr) => vr.id === theme.$figmaCollectionId);
-        if (collection) {
-          collection.name = theme.group ?? theme.name;
-        } else {
-          collection = figma.variables.getLocalVariableCollections().find((vr) => vr.name === (theme.group ?? theme.name));
-        }
-        if (collection) {
-          let mode = collection.modes.find((m) => m.modeId === theme.$figmaModeId);
-          if (mode) {
-            collection.renameMode(mode.modeId, theme.name);
-          } else {
-            mode = collection.modes.find((m) => m.name === theme.name);
-          }
-          const modeId: string = mode?.modeId ?? createVariableMode(collection, theme.name);
-          if (modeId) {
-            const allVariableObj = updateVariables({
-              collection, mode: modeId, theme, tokens, settings,
-            });
-            if (Object.keys(allVariableObj.variableIds).length > 0) {
-              allVariableCollectionIds[theme.id] = {
-                collectionId: collection.id,
-                modeId,
-                variableIds: allVariableObj.variableIds,
-              };
-              referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
-            }
-          }
-        } else {
-          const newCollection = figma.variables.createVariableCollection(theme.group ?? theme.name);
-          newCollection.renameMode(newCollection.modes[0].modeId, theme.name);
-          const allVariableObj = updateVariables({
-            collection: newCollection, mode: newCollection.modes[0].modeId, theme, tokens, settings,
-          });
-          if (Object.keys(allVariableObj.variableIds).length > 0) {
-            allVariableCollectionIds[theme.id] = {
-              collectionId: newCollection.id,
-              modeId: newCollection.modes[0].modeId,
-              variableIds: allVariableObj.variableIds,
-            };
-            referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
-          }
-        }
+  if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
+    const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
+
+    await Promise.all(selectedThemes.map(async (themeId) => {
+      const theme = themeInfo.themes.find((t) => t.id === themeId);
+      if (!theme) return;
+      const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
+
+      if (!collection || !modeId) return;
+
+      const allVariableObj = await updateVariables({
+        collection, mode: modeId, theme, tokens, settings,
+      });
+      if (Object.keys(allVariableObj.variableIds).length > 0) {
+        allVariableCollectionIds[theme.id] = {
+          collectionId: collection.id,
+          modeId,
+          variableIds: allVariableObj.variableIds,
+        };
+        referenceVariableCandidates = referenceVariableCandidates.concat(allVariableObj.referenceVariableCandidate);
       }
-    });
+      updatedVariableCollections.push(collection);
+    }));
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(themeInfo.themes);
+    updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
-  const figmaVariables = figma.variables.getLocalVariables();
-  updateVariablesToReference(figmaVariables, referenceVariableCandidates);
-  if (figmaVariables.length === 0) {
+
+  if (updatedVariables.length === 0) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${figma.variables.getLocalVariableCollections().length} collections and ${figmaVariables.length} variables created`);
+    notifyUI(`${updatedVariableCollections.length} collections and ${updatedVariables.length} variables created`);
   }
   return {
     allVariableCollectionIds,
-    totalVariables: figmaVariables.length,
+    totalVariables: updatedVariables.length,
   };
 }

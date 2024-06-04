@@ -10,6 +10,7 @@ import * as settingsStateReducers from './reducers/settingsState';
 import * as settingsStateEffects from './effects/settingsState';
 import { defaultBaseFontSize } from '@/constants/defaultBaseFontSize';
 import { setupReplay } from '@/app/sentry';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 type WindowSettingsType = {
   width: number;
@@ -25,6 +26,7 @@ export interface SettingsState {
   updateMode: UpdateMode;
   updateRemote: boolean;
   updateOnChange?: boolean;
+  applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues;
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
@@ -71,6 +73,7 @@ export const settings = createModel<RootModel>()({
     updateMode: UpdateMode.SELECTION,
     updateRemote: true,
     updateOnChange: false,
+    applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
     tokenType: 'object',
     ignoreFirstPartForStyles: false,
     prefixStylesWithThemeName: false,
@@ -184,6 +187,12 @@ export const settings = createModel<RootModel>()({
         updateOnChange: payload,
       };
     },
+    setApplyVariablesStyleOrRawValue(state, payload: ApplyVariablesStylesOrRawValues) {
+      return {
+        ...state,
+        applyVariablesStylesOrRawValue: payload,
+      };
+    },
     setShouldSwapStyles(state, payload: boolean) {
       return {
         ...state,
@@ -232,6 +241,9 @@ export const settings = createModel<RootModel>()({
       setUI(rootState.settings);
     },
     setUpdateOnChange: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setApplyVariablesStyleOrRawValue: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setInspectDeep: (payload, rootState) => {

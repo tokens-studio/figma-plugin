@@ -13,7 +13,7 @@ export type ReferenceVariableType = {
   referenceVariable: string;
 };
 
-export default function setValuesOnVariable(
+export default async function setValuesOnVariable(
   variablesInFigma: Variable[],
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
@@ -24,18 +24,18 @@ export default function setValuesOnVariable(
   const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
   try {
-    tokens.forEach((t) => {
-      const variableType = convertTokenTypeToVariableType(t.type, t.value);
+    await Promise.all(tokens.map(async (token) => {
+      const variableType = convertTokenTypeToVariableType(token.type, token.value);
       // If id matches the variableId, or name patches the token path, we can use it to update the variable instead of re-creating.
       // This has the nasty side-effect that if font weight changes from string to number, it will not update the variable given we cannot change type.
       // In that case, we should delete the variable and re-create it.
-      const variable = variablesInFigma.find((v) => (v.key === t.variableId && !v.remote) || v.name === t.path) || figma.variables.createVariable(t.path, collection.id, variableType);
+      const variable = variablesInFigma.find((v) => (v.key === token.variableId && !v.remote) || v.name === token.path) || figma.variables.createVariable(token.path, collection, variableType);
 
       if (variable) {
         // First, rename all variables that should be renamed (if the user choose to do so)
-        if (variable.name !== t.path && shouldRename) {
+        if (variable.name !== token.path && shouldRename) {
           renamedVariableKeys.push(variable.key);
-          variable.name = t.path;
+          variable.name = token.path;
         }
         if (variableType !== variable?.resolvedType) {
           // TODO: There's an edge case where the user had created a variable based on a numerical weight leading to a float variable,
@@ -44,52 +44,52 @@ export default function setValuesOnVariable(
           // variable.remove();
           // variable = figma.variables.createVariable(t.path, collection.id, variableType);
         }
-        variable.description = t.description ?? '';
+        variable.description = token.description ?? '';
 
         switch (variableType) {
           case 'BOOLEAN':
-            if (typeof t.value === 'string') {
-              setBooleanValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'COLOR':
-            if (typeof t.value === 'string') {
-              setColorValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setColorValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'FLOAT':
-            setNumberValuesOnVariable(variable, mode, Number(t.value));
+            setNumberValuesOnVariable(variable, mode, Number(token.value));
             break;
           case 'STRING':
-            if (typeof t.value === 'string') {
-              setStringValuesOnVariable(variable, mode, t.value);
+            if (typeof token.value === 'string') {
+              setStringValuesOnVariable(variable, mode, token.value);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
-            } else if (t.type === TokenTypes.FONT_WEIGHTS && Array.isArray(t.value)) {
-              setStringValuesOnVariable(variable, mode, t.value[0]);
+            } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
+              setStringValuesOnVariable(variable, mode, token.value[0]);
             }
             break;
           default:
             break;
         }
         let referenceTokenName: string = '';
-        if (t.rawValue && t.rawValue?.toString().startsWith('{')) {
-          referenceTokenName = t.rawValue?.toString().slice(1, t.rawValue.toString().length - 1);
+        if (token.rawValue && token.rawValue?.toString().startsWith('{')) {
+          referenceTokenName = token.rawValue?.toString().slice(1, token.rawValue.toString().length - 1);
         } else {
-          referenceTokenName = t.rawValue!.toString().substring(1);
+          referenceTokenName = token.rawValue!.toString().substring(1);
         }
-        variableKeyMap[t.name] = variable.key;
-        if (checkCanReferenceVariable(t)) {
+        variableKeyMap[token.name] = variable.key;
+        if (token && checkCanReferenceVariable(token)) {
           referenceVariableCandidates.push({
             variable,
             modeId: mode,
-            referenceVariable: referenceTokenName.split('.').join('/'),
+            referenceVariable: referenceTokenName,
           });
         }
       }
-    });
+    }));
   } catch (e) {
-    console.error('Setting values on variable is failed', e);
+    console.error('Setting values on variable failed', e);
   }
 
   return {

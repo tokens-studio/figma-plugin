@@ -1,17 +1,22 @@
 import { ReferenceVariableType } from './setValuesOnVariable';
 
-export default async function updateVariablesToReference(figmaVariables: Variable[], referenceVariableCandidates: ReferenceVariableType[]) {
-  const nameToVariableMap = figmaVariables.reduce<Record<string, Variable>>((acc, curr) => {
-    acc[curr.name] = curr;
-    return acc;
-  }, {});
-  referenceVariableCandidates.forEach((aliasVariable) => {
-    const referenceVariable = nameToVariableMap[aliasVariable.referenceVariable];
-    if (referenceVariable) {
-      aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
-        type: 'VARIABLE_ALIAS',
-        id: referenceVariable.id,
-      });
+export default async function updateVariablesToReference(figmaVariables: Map<string, string>, referenceVariableCandidates: ReferenceVariableType[]): Promise<Variable[]> {
+  const updatedVariables: Variable[] = [];
+  await Promise.all(referenceVariableCandidates.map(async (aliasVariable) => {
+    const referenceVariable = figmaVariables.get(aliasVariable.referenceVariable);
+    if (!referenceVariable) return;
+    let variable;
+    try {
+      variable = await figma.variables.importVariableByKeyAsync(referenceVariable);
+    } catch (e) {
+      console.log('error importing variable', e);
     }
-  });
+    if (!variable) return;
+    await aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
+      type: 'VARIABLE_ALIAS',
+      id: variable.id,
+    });
+    updatedVariables.push(aliasVariable.variable);
+  }));
+  return updatedVariables;
 }

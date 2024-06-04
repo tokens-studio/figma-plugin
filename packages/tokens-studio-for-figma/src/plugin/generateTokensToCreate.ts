@@ -5,10 +5,10 @@ import { AnyTokenList } from '@/types/tokens';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 
-export function generateTokensToCreate(theme: ThemeObject, tokens: Record<string, AnyTokenList>) {
+export function generateTokensToCreate(theme: ThemeObject, tokens: Record<string, AnyTokenList>, filterByTokenSet?: string) {
   // Big O(resolveTokenValues * mergeTokenGroups)
   const enabledTokenSets = Object.entries(theme.selectedTokenSets)
-    .filter(([, status]) => status === TokenSetStatus.ENABLED)
+    .filter(([name, status]) => status === TokenSetStatus.ENABLED && (!filterByTokenSet || name === filterByTokenSet))
     .map(([tokenSet]) => tokenSet);
   const resolved = defaultTokenResolver.setTokens(mergeTokenGroups(tokens, theme.selectedTokenSets));
   return resolved.filter(

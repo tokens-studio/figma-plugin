@@ -31,6 +31,15 @@ export const StyledDragButton = styled('button', {
         },
       },
     },
+    canReorder: {
+      true: {
+        '&:hover, &:focus': {
+          [`${StyledGrabber}`]: {
+            opacity: 1,
+          },
+        },
+      },
+    },
     itemType: {
       folder: {
         cursor: 'default',

@@ -1,9 +1,12 @@
 import { trySetStyleId } from '../trySetStyleId';
 import { mockGetStyleById, mockImportStyleByKeyAsync } from '../../../tests/__mocks__/figmaMock';
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('trySetStyleId', () => {
   beforeEach(() => {
     mockImportStyleByKeyAsync.mockImplementation(() => Promise.reject());
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
   });
 
   it('should try to set a local fill style', async () => {
@@ -95,7 +98,7 @@ describe('trySetStyleId', () => {
     const node = { effectStyleId: '' } as unknown as RectangleNode;
     expect(await trySetStyleId(node, 'effect', 'S:1234')).toBe(true);
     expect(mockImportStyleByKeyAsync).toBeCalledTimes(0);
-    expect(node.effectStyleId).toEqual('S:1234');
+    expect(node.effectStyleId).toEqual('S:1234,');
   });
 
   it('should not do anything for invalid parameters', async () => {
