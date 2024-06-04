@@ -16,7 +16,6 @@ import { TokenBoxshadowValue } from '@/types/values';
 import ColorPicker from './ColorPicker';
 import SingleBoxShadowDownShiftInput from './SingleBoxShadowDownShiftInput';
 import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
-import { collapsedTokenTypeObjSelector } from '@/selectors';
 
 interface DragItem {
   index: number;
