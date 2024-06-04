@@ -7,6 +7,7 @@ import { swapStyles } from './swapStyles';
 import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenFormatOptions } from '../TokenFormatStoreClass';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let allWithData: NodeManagerNode[] = [];
@@ -33,13 +34,15 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       stylePathPrefix,
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
+      applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
     });
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
 
     await updateNodes(allWithData, msg.settings);
-    if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles) {
+    const shouldApplyStyles = msg.settings.applyVariablesStylesOrRawValue === ApplyVariablesStylesOrRawValues.VARIABLES_STYLES;
+    if (msg.activeTheme && msg.themes && msg.settings.shouldSwapStyles && shouldApplyStyles) {
       await swapStyles(msg.activeTheme, msg.themes, msg.settings.updateMode);
     }
   }

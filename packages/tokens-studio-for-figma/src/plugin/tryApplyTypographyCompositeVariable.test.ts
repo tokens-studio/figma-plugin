@@ -2,6 +2,7 @@ import { tryApplyTypographyCompositeVariable } from './tryApplyTypographyComposi
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { SingleTypographyToken } from '@/types/tokens';
 import { ResolvedTypographyObject } from './ResolvedTypographyObject';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('tryApplyTypographyCompositeVariable', () => {
   let target: TextNode | TextStyle;
@@ -67,6 +68,64 @@ describe('tryApplyTypographyCompositeVariable', () => {
   });
 
   it('should apply values directly if no variables are available', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+    } as TextNode | TextStyle;
+    value = {
+      fontFamily: 'Inter',
+      fontWeight: 'Ultrabold',
+      fontSize: '24px',
+      lineHeight: '1.5',
+    };
+    resolvedValue = {
+      fontFamily: '{fontFamilyVariable}',
+      fontWeight: '{fontWeightVariable}',
+      fontSize: '{fontSizeVariable}',
+      lineHeight: '1.5',
+    };
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.fontName).toEqual({ family: 'Inter', style: 'Ultrabold' });
+    expect(target.fontSize).toEqual(24);
+    expect(target.lineHeight).toEqual({ unit: 'PIXELS', value: 1.5 });
+  });
+
+  it('should apply variables if available', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+      setBoundVariable: jest.fn(),
+    } as TextNode | TextStyle;
+    resolvedValue = {
+      fontFamily: '{fontFamily.default}',
+      fontWeight: '{fontWeight.default}',
+    };
+    value = {
+      fontFamily: 'Roboto-raw',
+      fontWeight: 'Bold-raw',
+    };
+    defaultTokenValueRetriever.applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.RAW_VALUES;
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue('Roboto');
+    defaultTokenValueRetriever.getVariableReference = jest.fn()
+      .mockResolvedValueOnce('Roboto')
+      .mockResolvedValueOnce('Bold');
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.fontName).toEqual({ family: 'Roboto-raw', style: 'Bold-raw' });
+  });
+
+  it('should apply values directly if no variable application is turned off', async () => {
     target = {
       fontName: {
         family: 'Arial',

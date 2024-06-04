@@ -18,3 +18,4 @@ benchmark/flamegraphs
 **.0x
 techdocs/
 .turbo
+cypress/downloads

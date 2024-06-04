@@ -1,6 +1,5 @@
 import { mockSetValueForMode } from '../../tests/__mocks__/figmaMock';
 import updateVariables from './updateVariables';
-import { CreateVariableTypes } from '@/types/variables';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { ThemeObject } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -69,8 +68,8 @@ describe('updateVariables', () => {
     removeStylesAndVariablesWithoutConnection: true,
   };
 
-  it('creates variables for eligible token and ignores invalid token types', () => {
-    const result = updateVariables({
+  it('creates variables for eligible token and ignores invalid token types', async () => {
+    const result = await updateVariables({
       collection,
       mode: 'light',
       theme,
@@ -81,7 +80,7 @@ describe('updateVariables', () => {
     expect(result.variableIds).toEqual({ 'primary.500': 'VariableID:1:0' });
   });
 
-  it('handles tokens that reference another token', () => {
+  it('should handle tokens that reference another token', async () => {
     const tokensWithReference = {
       core: [
         {
@@ -96,7 +95,7 @@ describe('updateVariables', () => {
         },
       ],
     };
-    const result = updateVariables({
+    const result = await updateVariables({
       collection,
       mode: 'light',
       theme,
@@ -107,13 +106,13 @@ describe('updateVariables', () => {
       {
         variable: newVariable,
         modeId: 'light',
-        referenceVariable: 'primary/500',
+        referenceVariable: 'primary.500',
       },
     ]);
   });
 
-  it('removes existing variables that were not handled', () => {
-    const result = updateVariables({
+  it('should remove existing variables that were not handled', async () => {
+    const result = await updateVariables({
       collection,
       mode: 'light',
       theme,

@@ -1,5 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@tokens-studio/ui';
+import { tokensSelector, activeTokenSetSelector } from '@/selectors';
+import { ErrorMessage } from '../ErrorMessage';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import Input from '../Input';
@@ -17,6 +21,15 @@ type Props = {
 export default function RenameTokenGroupModal({
   isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange,
 }: Props) {
+  const tokens = useSelector(tokensSelector);
+  const activeTokenSet = useSelector(activeTokenSetSelector);
+  const { t } = useTranslation(['tokens']);
+
+  const canRename = React.useMemo(() => {
+    const isDuplicated = tokens[activeTokenSet].some((token) => token.name.startsWith(`${newName}.`) || token.name === newName );
+    return !isDuplicated;
+  }, [tokens, newName, activeTokenSet]);
+
   return (
     <Modal
       title={`Rename ${oldName}`}
@@ -28,7 +41,7 @@ export default function RenameTokenGroupModal({
             <Button variant="secondary" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={newName === oldName}>
+            <Button type="submit" variant="primary" disabled={(newName === oldName) || !canRename}>
               Change
             </Button>
           </Stack>
@@ -44,6 +57,7 @@ export default function RenameTokenGroupModal({
           autofocus
           required
         />
+        {!canRename && <ErrorMessage css={{ width: '100%' }}>{t('renameGroupError')}</ErrorMessage>}
         <Text muted>Renaming only affects tokens of the same type</Text>
       </Stack>
     </Modal>

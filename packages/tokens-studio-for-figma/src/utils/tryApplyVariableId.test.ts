@@ -2,6 +2,7 @@ import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
 import { mockImportVariableByKeyAsync } from '../../tests/__mocks__/figmaMock';
 import { tryApplyVariableId } from './tryApplyVariableId';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 
 describe('tryApplyVariableId', () => {
   const mockSetBoundVariable = jest.fn();
@@ -19,6 +20,14 @@ describe('tryApplyVariableId', () => {
 
   afterEach(() => {
     defaultTokenValueRetriever.clearCache();
+  });
+
+  it('exits early if variable application is turned off', async () => {
+    const variableReferences = new Map();
+    defaultTokenValueRetriever.initiate({
+      tokens: [{ name: 'token', value: '8', type: TokenTypes.NUMBER }], variableReferences, applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.RAW_VALUES,
+    });
+    expect(await tryApplyVariableId(node, 'width', 'token')).toBe(false);
   });
 
   it('when there is no matching variable, should not apply variable and return false', async () => {

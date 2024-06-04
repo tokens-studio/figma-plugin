@@ -332,6 +332,30 @@ const tokens = [
   },
 ];
 
+const nestedTokens = [
+  {
+    internal_Parent: 'b',
+    name: 'tertiary',
+    type: 'typography',
+    value: '{secondary}'
+  },
+  {
+    internal_Parent: 'a',
+    name: 'original',
+    type: 'typography',
+    value: {
+      fontFamily: 'ABeeZee',
+      fontSize: '50'
+    }
+  },
+  {
+    internal_Parent: 'a',
+    name: 'secondary',
+    type: 'typography',
+    value: '{original}'
+  }
+];
+
 const output = [
   {
     name: 'foo',
@@ -794,5 +818,60 @@ describe('resolveTokenValues deep nested', () => {
         type: TokenTypes.DIMENSION,
       },
     ]);
+  });
+});
+
+describe('resolve tokens with multiple nested references', () => {
+  it('resolves all multi nested values it can resolve', () => {
+    const resolvedTokensOutput = [
+      {
+        internal_Parent: 'b',
+        name: 'tertiary',
+        rawValue: '{secondary}',
+        resolvedValueWithReferences: {
+          fontFamily: 'ABeeZee',
+          fontSize: '50'
+        },
+        type: 'typography',
+        value: {
+          fontFamily: 'ABeeZee',
+          fontSize: 50
+        }
+      },
+      {
+        internal_Parent: 'a',
+        name: 'original',
+        rawValue: {
+          fontFamily: 'ABeeZee',
+          fontSize: '50'
+        },
+        resolvedValueWithReferences: {
+          fontFamily: 'ABeeZee',
+          fontSize: '50'
+        },
+        type: 'typography',
+        value: {
+          fontFamily: 'ABeeZee',
+          fontSize: 50
+        }
+      },
+      {
+        internal_Parent: 'a',
+        name: 'secondary',
+        rawValue: '{original}',
+        resolvedValueWithReferences: {
+          fontFamily: 'ABeeZee',
+          fontSize: '50'
+        },
+        type: 'typography',
+        value: {
+          fontFamily: 'ABeeZee',
+          fontSize: 50
+        }
+      }
+    ];
+
+    const resolvedTokens = defaultTokenResolver.setTokens(nestedTokens);
+    expect(resolvedTokens).toEqual(resolvedTokensOutput); 
   });
 });

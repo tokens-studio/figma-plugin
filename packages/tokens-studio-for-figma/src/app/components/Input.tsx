@@ -190,7 +190,7 @@ const Input = React.forwardRef<HTMLInputElement, Props>(({
   }, [autofocus, htmlInputRef]);
 
   return (
-    <StyledLabel htmlFor={name}>
+    <StyledLabel htmlFor={name} css={{ width: full ? '100%' : '' }}>
       {(!!label || !!error) && (
         <Stack direction="row" justify="between" align="center" css={{ marginBottom: '$1' }}>
           {label || null}

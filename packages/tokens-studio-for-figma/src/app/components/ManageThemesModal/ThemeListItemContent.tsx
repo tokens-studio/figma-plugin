@@ -37,6 +37,7 @@ export function ThemeListItemContent({
   return (
     <StyledDragButton
       type="button"
+      canReorder={!editProhibited}
       css={{
         padding: 0, width: '100%', display: 'inherit', cursor: 'inherit',
       }}

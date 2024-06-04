@@ -64,7 +64,7 @@ function Inspector() {
     }}
     >
       <Box css={{
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$3', borderBottom: '1px solid $borderMuted',
+        display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '$2', padding: '$2', borderBottom: '1px solid $borderMuted',
       }}
       >
         <Box
@@ -101,6 +101,7 @@ function Inspector() {
               </Label>
             </Tooltip>
           </Stack>
+          <InspectSearchOptionDropdown />
           <ToggleGroup
             type="single"
             value={inspectView}
@@ -117,7 +118,6 @@ function Inspector() {
               <IconDebug />
             </ToggleGroup.Item>
           </ToggleGroup>
-          <InspectSearchOptionDropdown />
         </Stack>
       </Box>
       {renderInspectView()}

@@ -1,25 +1,27 @@
+import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { defaultTokenValueRetriever } from '@/plugin/TokenValueRetriever';
+
 type StyleType = 'fill' | 'text' | 'stroke' | 'effect';
 
 export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: string) {
+  const { applyVariablesStylesOrRawValue } = defaultTokenValueRetriever;
+  if (applyVariablesStylesOrRawValue !== ApplyVariablesStylesOrRawValues.VARIABLES_STYLES) return false;
   try {
-    let actualStyleId = styleId;
-
     // @README we need to try and import the style just in case it's a library provided one
     const styleKeyMatch = styleId.match(/^S:([a-zA-Z0-9_-]+),/);
-    if (styleKeyMatch) {
-      actualStyleId = await new Promise<string>((resolve) => {
-        const localStyle = figma.getStyleById(styleId);
-        if (localStyle) {
-          resolve(localStyle.id);
-        } else {
-          figma.importStyleByKeyAsync(styleKeyMatch[1])
-            .then((remoteStyle) => resolve(remoteStyle.id))
-            .catch(() => {
-              resolve(styleId);
-            });
-        }
-      });
-    }
+    const actualStyleId = await new Promise<string>((resolve, reject) => {
+      const localStyle = figma.getStyleById(styleId);
+      if (localStyle) {
+        resolve(localStyle.id);
+      } else if (styleKeyMatch) {
+        figma.importStyleByKeyAsync(styleKeyMatch[1])
+          .then((remoteStyle) => resolve(remoteStyle.id))
+          .catch(() => {
+            reject(styleId);
+          });
+      }
+    });
+    if (!actualStyleId) return false;
     if (type === 'fill' && 'fillStyleId' in node) {
       node.fillStyleId = actualStyleId;
       return (
@@ -46,7 +48,7 @@ export async function trySetStyleId(node: BaseNode, type: StyleType, styleId: st
       return node.effectStyleId === actualStyleId || (styleKeyMatch && styleKeyMatch[0] === node.effectStyleId);
     }
   } catch (e) {
-    console.log('error', e);
+    console.log('Unable to apply style for id', e);
   }
   return false;
 }

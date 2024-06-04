@@ -31,6 +31,11 @@
   font-size: var(--fontSizes-small);
 }
 
+.mentions-no-prefix > textarea {
+  border-top-left-radius: var(--radii-small);
+  border-bottom-left-radius: var(--radii-small);
+}
+
 .rc-mentions > textarea::placeholder {
   color: var(--colors-fgSubtle);
 }
