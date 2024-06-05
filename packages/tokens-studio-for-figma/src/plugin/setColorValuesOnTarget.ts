@@ -31,7 +31,7 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (String(resolvedValue).startsWith('linear-gradient')) {
+    if (resolvedValue.startsWith('linear-gradient')) {
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(resolvedValue);
       const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
