@@ -3,7 +3,7 @@ import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, DropdownMenu, Stack,
+  Button, DropdownMenu, Stack, Box
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
@@ -91,12 +91,18 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.selection.title')}
+                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.selection.description')}
+                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.page.title')}
+                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.page.description')}
+                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-document"
@@ -107,6 +113,9 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.doc.title')}
+                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.doc.description')}
+                </Box>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
             <DropdownMenu.Separator />
@@ -122,6 +131,9 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
+                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.variablesStyles.description')}
+                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-raw-values"
@@ -132,6 +144,9 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
+                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
+                  {t('applyTo.rawValues.description')}
+                </Box>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
           </DropdownMenu.Content>
