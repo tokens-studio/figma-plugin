@@ -78,7 +78,7 @@ export default function ApplySelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top">
+          <DropdownMenu.Content side="top" css={{ maxWidth: '350px' }}>
             {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
             <DropdownMenu.Item disabled>{t('applyTo.applyTo')}</DropdownMenu.Item>
             <DropdownMenu.RadioGroup value={updateMode}>
