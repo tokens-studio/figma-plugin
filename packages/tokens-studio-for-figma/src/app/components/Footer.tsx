@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
+import { WarningTriangleSolid } from 'iconoir-react';
 import { IconButton } from '@tokens-studio/ui';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -29,6 +30,7 @@ import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import ResolveDuplicateTokensModal from './modals/ResolveDuplicateTokensModal';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -41,6 +43,7 @@ export default function Footer() {
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges } = useChangedState();
+  const [showResolveDuplicateTokensModal, setShowResolveDuplicateTokensModal] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -56,6 +59,14 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
+
+  const handleResolveDuplicateTokensModalClose = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(false);
+  }, []);
+
+  const handleResolveDuplicateOpen = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(true);
+  }, []);
 
   return (
     <Box
@@ -140,6 +151,14 @@ export default function Footer() {
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
+          <IconButton
+            onClick={handleResolveDuplicateOpen}
+            icon={<WarningTriangleSolid />}
+            variant="invisible"
+            size="small"
+            tooltip="Duplicate Warning"
+            target="_blank"
+          />
           <ProBadge />
           <IconButton
             as="a"
@@ -161,7 +180,14 @@ export default function Footer() {
           />
         </Stack>
       </Stack>
-
+      <ResolveDuplicateTokensModal
+        isOpen={showResolveDuplicateTokensModal}
+        // type={type}
+        // newName={newTokenGroupName}
+        // oldName={path}
+        onClose={handleResolveDuplicateTokensModalClose}
+        // handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+      />
     </Box>
   );
 }
