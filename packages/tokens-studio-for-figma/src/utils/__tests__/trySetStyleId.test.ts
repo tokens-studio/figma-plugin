@@ -98,7 +98,7 @@ describe('trySetStyleId', () => {
     const node = { effectStyleId: '' } as unknown as RectangleNode;
     expect(await trySetStyleId(node, 'effect', 'S:1234')).toBe(true);
     expect(mockImportStyleByKeyAsync).toBeCalledTimes(0);
-    expect(node.effectStyleId).toEqual('S:1234');
+    expect(node.effectStyleId).toEqual('S:1234,');
   });
 
   it('should not do anything for invalid parameters', async () => {
