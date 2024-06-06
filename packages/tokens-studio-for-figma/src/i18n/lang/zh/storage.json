@@ -1,73 +1,86 @@
 {
-  "setToDocumentStorage": "设置为文档存储？",
-  "youCanAlwaysGoBack": "您可以随时返回远程存储。",
-  "addNewSyncProvider": "添加新的同步提供商",
-  "editCredentials": "编辑同步提供商凭据",
-  "name": "姓名",
-  "pat": "个人访问令牌",
-  "gitExplained": "读取存储在存储库中靠近代码的令牌。",
-  "readMore": "阅读更多",
-  "cancel": "取消",
-  "repo": "存储库（所有者/存储库）",
-  "branch": "分支",
-  "baseUrl": "基本 URL（可选）",
-  "secret": "秘密",
-  "filePath": "文件路径",
-  "filePathCaption": "src/tokens 用于同步到文件夹，在末尾添加 .json 以同步到单个文件",
-  "syncProviders": "同步提供商",
-  "providers": {
-    "generic": {
-      "title": "通用版本",
-      "url": "网址",
-      "description": "访问存储在您自己的存储提供商上的令牌，允许双向同步、创建和只读操作。",
-      "flowType": "流量型",
-      "readOnly": "只读",
-      "readWrite": "读/写",
-      "readWriteCreate": "读/写/创建",
-      "additionalHeaders": "附加标头",
-      "name": "姓名",
-      "value": "价值"
+    "setToDocumentStorage": "设置为文档存储？",
+    "youCanAlwaysGoBack": "您可以随时返回远程存储。",
+    "addNewSyncProvider": "添加新的同步提供商",
+    "editCredentials": "编辑同步提供商凭据",
+    "name": "姓名",
+    "pat": "个人访问令牌",
+    "gitExplained": "读取存储在存储库中靠近代码的令牌。",
+    "readMore": "阅读更多",
+    "cancel": "取消",
+    "repo": "存储库（所有者/存储库）",
+    "branch": "分支",
+    "baseUrl": "基本 URL（可选）",
+    "secret": "秘密",
+    "filePath": "文件路径",
+    "filePathCaption": "src/tokens 用于同步到文件夹，在末尾添加 .json 以同步到单个文件",
+    "syncProviders": "同步提供商",
+    "providers": {
+        "generic": {
+            "title": "通用版本",
+            "url": "网址",
+            "description": "访问存储在您自己的存储提供商上的令牌，允许双向同步、创建和只读操作。",
+            "flowType": "流量型",
+            "readOnly": "只读",
+            "readWrite": "读/写",
+            "readWriteCreate": "读/写/创建",
+            "additionalHeaders": "附加标头",
+            "name": "姓名",
+            "value": "价值"
+        },
+        "url": {
+            "title": "网址",
+            "description": "存储在服务器上的令牌允许您将它们添加为只读提供程序。",
+            "url": "网址",
+            "headers": "标头"
+        },
+        "jsonbin": {
+            "title": "JSONBIN",
+            "description": "访问存储在 JSONBin.io 上的令牌，这是一种用于双向同步的免费 JSON 存储服务。"
+        },
+        "github": {
+            "title": "GitHub"
+        },
+        "gitlab": {
+            "title": "GitLab"
+        },
+        "supernova": {
+            "accessToken": "超新星访问令牌",
+            "dsUrl": "设计系统网址",
+            "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。"
+        },
+        "ado": {
+            "description": "访问存储在存储库中的令牌，以双向同步方式推送和拉取令牌。",
+            "pat": "个人访问令牌",
+            "orgUrl": "组织网址",
+            "repositoryName": "存储库名称",
+            "projectName": "项目名称（可选）"
+        },
+        "bitbucket": {
+            "appPassword": "应用程序密码",
+            "projectName": "项目名称（可选）",
+            "repository": "存储库（工作区/存储库）",
+            "username": "比特桶用户名"
+        }
     },
-    "url": {
-      "title": "网址",
-      "description": "存储在服务器上的令牌允许您将它们添加为只读提供程序。",
-      "url": "网址",
-      "headers": "标头"
-    },
-    "jsonbin": {
-      "title": "JSONBIN",
-      "description": "访问存储在 JSONBin.io 上的令牌，这是一种用于双向同步的免费 JSON 存储服务。"
-    },
-    "github": {
-      "title": "GitHub"
-    },
-    "gitlab": {
-      "title": "GitLab"
-    },
-    "supernova": {
-      "accessToken": "超新星访问令牌",
-      "dsUrl": "设计系统网址",
-      "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。"
-    },
-    "ado": {
-      "description": "访问存储在存储库中的令牌，以双向同步方式推送和拉取令牌。",
-      "pat": "个人访问令牌",
-      "orgUrl": "组织网址",
-      "repositoryName": "存储库名称",
-      "projectName": "项目名称（可选）"
-    },
-    "bitbucket": {
-      "appPassword": "应用程序密码",
-      "projectName": "项目名称（可选）",
-      "repository": "存储库（工作区/存储库）"
-    }
-  },
-  "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
-  "localDocument": "本地文件",
-  "apply": "申请",
-  "confirmDelete": "您真的要删除这个吗？",
-  "active": "积极的",
-  "edit": "编辑",
-  "delete": "删除",
-  "save": "节省"
+    "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
+    "localDocument": "本地文件",
+    "apply": "申请",
+    "confirmDelete": "您真的要删除这个吗？",
+    "active": "积极的",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "节省",
+    "format": "格式",
+    "w3cformat": "W3C DTCG 格式",
+    "legacyformat": "旧格式",
+    "legacyformattooltip": "旧格式，点击打开W3C DTCG转换",
+    "w3cconverttitle": "转换为 W3C DTCG 格式",
+    "w3cformatmodaltitle": "使用 W3C DTCG 格式",
+    "w3cformatmodaldescription": "您的令牌以 W3C 设计令牌社区组格式存储。如果您需要再次将它们转换回来，可以在此处进行。如果您需要调整您的开发流程，请阅读下面的所有内容。",
+    "legacyformatmodaldescription": "您的令牌当前以旧格式存储。如果您想使用新的 W3C DTCG 格式，可以在此处进行转换。阅读下面有关更改格式的所有内容，包括有关如何迁移开发管道的有用建议。",
+    "converttow3c": "转换为 W3C DTCG 格式",
+    "converttolegacy": "转换为旧格式",
+    "pushfirsterror": "转换前推送未保存的更改",
+    "readmoreformat": "阅读更多"
 }

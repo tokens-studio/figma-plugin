@@ -1,73 +1,86 @@
 {
-  "setToDocumentStorage": "¿Configurado para almacenamiento de documentos?",
-  "youCanAlwaysGoBack": "Siempre puedes volver al almacenamiento remoto.",
-  "addNewSyncProvider": "Agregar nuevo proveedor de sincronización",
-  "editCredentials": "Editar credenciales del proveedor de sincronización",
-  "name": "Nombre",
-  "pat": "Token de acceso personal",
-  "gitExplained": "Lea sus tokens que están almacenados en su repositorio, cerca de su código.",
-  "readMore": "Leer más",
-  "cancel": "Cancelar",
-  "repo": "Repositorio (propietario/repositorio)",
-  "branch": "Rama",
-  "baseUrl": "URL base (opcional)",
-  "secret": "Secreto",
-  "filePath": "Ruta de archivo",
-  "filePathCaption": "src/tokens para sincronizar con una carpeta, agregue .json al final para sincronizar con un solo archivo",
-  "syncProviders": "Proveedores de sincronización",
-  "providers": {
-    "generic": {
-      "title": "Versión genérica",
-      "url": "URL",
-      "description": "Acceda a tokens almacenados en su propio proveedor de almacenamiento, lo que permite operaciones de sincronización bidireccional, creación y de solo lectura.",
-      "flowType": "Tipo de flujo",
-      "readOnly": "Solo lectura",
-      "readWrite": "Leer escribir",
-      "readWriteCreate": "Leer / Escribir / Crear",
-      "additionalHeaders": "Encabezados adicionales",
-      "name": "Nombre",
-      "value": "Valor"
+    "setToDocumentStorage": "¿Configurado para almacenamiento de documentos?",
+    "youCanAlwaysGoBack": "Siempre puedes volver al almacenamiento remoto.",
+    "addNewSyncProvider": "Agregar nuevo proveedor de sincronización",
+    "editCredentials": "Editar credenciales del proveedor de sincronización",
+    "name": "Nombre",
+    "pat": "Token de acceso personal",
+    "gitExplained": "Lea sus tokens que están almacenados en su repositorio, cerca de su código.",
+    "readMore": "Leer más",
+    "cancel": "Cancelar",
+    "repo": "Repositorio (propietario/repositorio)",
+    "branch": "Rama",
+    "baseUrl": "URL base (opcional)",
+    "secret": "Secreto",
+    "filePath": "Ruta de archivo",
+    "filePathCaption": "src/tokens para sincronizar con una carpeta, agregue .json al final para sincronizar con un solo archivo",
+    "syncProviders": "Proveedores de sincronización",
+    "providers": {
+        "generic": {
+            "title": "Versión genérica",
+            "url": "URL",
+            "description": "Acceda a tokens almacenados en su propio proveedor de almacenamiento, lo que permite operaciones de sincronización bidireccional, creación y de solo lectura.",
+            "flowType": "Tipo de flujo",
+            "readOnly": "Solo lectura",
+            "readWrite": "Leer escribir",
+            "readWriteCreate": "Leer / Escribir / Crear",
+            "additionalHeaders": "Encabezados adicionales",
+            "name": "Nombre",
+            "value": "Valor"
+        },
+        "url": {
+            "title": "URL",
+            "description": "Los tokens almacenados en un servidor le permiten agregarlos como proveedor de solo lectura.",
+            "url": "URL",
+            "headers": "Encabezados"
+        },
+        "jsonbin": {
+            "title": "JSONBIN",
+            "description": "Acceda a tokens almacenados en JSONBin.io, un servicio de almacenamiento JSON gratuito para sincronización bidireccional."
+        },
+        "github": {
+            "title": "GitHub"
+        },
+        "gitlab": {
+            "title": "GitLab"
+        },
+        "supernova": {
+            "accessToken": "Token de acceso a supernova",
+            "dsUrl": "URL del sistema de diseño",
+            "description": "Le permite insertar tokens en una marca y un tema específicos en un sistema de diseño seleccionado."
+        },
+        "ado": {
+            "description": "Acceda a los tokens almacenados en su repositorio, envíe y extraiga tokens en una sincronización bidireccional.",
+            "pat": "Token de acceso personal",
+            "orgUrl": "URL de la organización",
+            "repositoryName": "Nombre del repositorio",
+            "projectName": "Nombre del proyecto (opcional)"
+        },
+        "bitbucket": {
+            "appPassword": "Contraseña de la aplicación",
+            "projectName": "Nombre del proyecto (opcional)",
+            "repository": "Repositorio (espacio de trabajo/repositorio)",
+            "username": "nombre de usuario de Bitbucket"
+        }
     },
-    "url": {
-      "title": "URL",
-      "description": "Los tokens almacenados en un servidor le permiten agregarlos como proveedor de solo lectura.",
-      "url": "URL",
-      "headers": "Encabezados"
-    },
-    "jsonbin": {
-      "title": "JSONBIN",
-      "description": "Acceda a tokens almacenados en JSONBin.io, un servicio de almacenamiento JSON gratuito para sincronización bidireccional."
-    },
-    "github": {
-      "title": "GitHub"
-    },
-    "gitlab": {
-      "title": "GitLab"
-    },
-    "supernova": {
-      "accessToken": "Token de acceso a supernova",
-      "dsUrl": "URL del sistema de diseño",
-      "description": "Le permite insertar tokens en una marca y un tema específicos en un sistema de diseño seleccionado."
-    },
-    "ado": {
-      "description": "Acceda a los tokens almacenados en su repositorio, envíe y extraiga tokens en una sincronización bidireccional.",
-      "pat": "Token de acceso personal",
-      "orgUrl": "URL de la organización",
-      "repositoryName": "Nombre del repositorio",
-      "projectName": "Nombre del proyecto (opcional)"
-    },
-    "bitbucket": {
-      "appPassword": "Contraseña de la aplicación",
-      "projectName": "Nombre del proyecto (opcional)",
-      "repository": "Repositorio (espacio de trabajo/repositorio)"
-    }
-  },
-  "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
-  "localDocument": "documento local",
-  "apply": "Aplicar",
-  "confirmDelete": "¿Realmente quieres eliminar esto?",
-  "active": "Activo",
-  "edit": "Editar",
-  "delete": "Borrar",
-  "save": "Ahorrar"
+    "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
+    "localDocument": "documento local",
+    "apply": "Aplicar",
+    "confirmDelete": "¿Realmente quieres eliminar esto?",
+    "active": "Activo",
+    "edit": "Editar",
+    "delete": "Borrar",
+    "save": "Ahorrar",
+    "format": "Formato",
+    "w3cformat": "Formato W3C DTCG",
+    "legacyformat": "Formato heredado",
+    "legacyformattooltip": "Formato heredado, haga clic para abrir la conversión W3C DTCG",
+    "w3cconverttitle": "Convertir al formato W3C DTCG",
+    "w3cformatmodaltitle": "Usando el formato W3C DTCG",
+    "w3cformatmodaldescription": "Sus tokens se almacenan en el formato del Grupo Comunitario de Tokens de Diseño del W3C. Si necesita volver a convertirlos, puede hacerlo aquí. Si necesita ajustar su proceso de desarrollo, lea todo al respecto a continuación.",
+    "legacyformatmodaldescription": "Sus tokens están actualmente almacenados en el formato heredado. Si desea utilizar el nuevo formato W3C DTCG, puede convertirlos aquí. Lea todo sobre cómo cambiar el formato a continuación, incluidos consejos útiles sobre cómo migrar su canal de desarrollo.",
+    "converttow3c": "Convertir al formato W3C DTCG",
+    "converttolegacy": "Convertir a formato heredado",
+    "pushfirsterror": "Empuje sus cambios no guardados antes de realizar la conversión",
+    "readmoreformat": "Leer más"
 }
