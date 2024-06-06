@@ -58,7 +58,7 @@ export default async function updateStyles(
     })] : []),
   ]).then((results) => Object.assign({}, ...results));
   if (styleTokens.length < tokens.length && shouldCreate) {
-    notifyUI('Some styles were not created due to your settings. Make sure Ignore first part of token name doesn\'t conflict', { error: true });
+    notifyUI('Some styles were ignored due to Ignore first part of token name setting\'t conflict', { error: true });
   }
 
   // Remove styles that aren't in the theme or in the exposed token object
