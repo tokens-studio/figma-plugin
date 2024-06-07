@@ -147,6 +147,9 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
       if (remoteData?.status === 'success') {
+        if (activeTab !== Tabs.LOADING) {
+          dispatch.tokenState.setPulledTokenFormat();
+        }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
           if (activeTab !== Tabs.LOADING) {
