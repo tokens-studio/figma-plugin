@@ -52,7 +52,7 @@ export default function DuplicateTokenGroupModal({
   }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
 
   const error = useMemo(() => {
-    if (newName === oldName) {
+    if (newName === oldName && selectedTokenSets.includes(activeTokenSet)) {
       return {
         type: ErrorType.ExistingGroup,
       };
