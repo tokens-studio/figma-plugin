@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@tokens-studio/ui';
@@ -8,6 +8,7 @@ import Modal from '../Modal';
 import Stack from '../Stack';
 import Input from '../Input';
 import Text from '../Text';
+import { StyledTokenButton, StyledTokenButtonText } from '../TokenButton/StyledTokenButton';
 
 type Props = {
   isOpen: boolean
@@ -18,31 +19,68 @@ type Props = {
   handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 };
 
+enum ErrorType {
+  UniqueToken = 'uniqueToken',
+  ExistingGroup = 'existingGroup',
+  OverlappingToken = 'overlappingToken',
+  OverlappingGroup = 'overlappingGroup',
+}
+
 export default function RenameTokenGroupModal({
   isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange,
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
-  const { t } = useTranslation(['tokens']);
+  const { t } = useTranslation(['tokens', 'general']);
 
-  const canRename = React.useMemo(() => {
-    const isDuplicated = tokens[activeTokenSet].some((token) => token.name.startsWith(`${newName}.`) || token.name === newName );
-    return !isDuplicated;
-  }, [tokens, newName, activeTokenSet]);
+  const error = useMemo(() => {
+    if (newName === oldName) {
+      return null;
+    }
+
+    const newGroupTokens = tokens[activeTokenSet].filter((token) => token.name.startsWith(`${newName}.`));
+    const oldGroupTokens = tokens[activeTokenSet].filter((token) => token.name.startsWith(`${oldName}`)).map((token) => {
+      const [, ...name] = token.name.split('.');
+
+      return {
+        ...token,
+        name: `${newName}.${name.join('.')}`,
+      };
+    });
+
+    const possibleDuplicates = newGroupTokens.filter((a) => oldGroupTokens.filter((b) => a.name === b.name).length > 0);
+    const foundOverlappingToken = (newName !== oldName) && tokens[activeTokenSet].find((token) => token.name === newName);
+
+    if (Object.keys(possibleDuplicates).length > 0) {
+      return {
+        possibleDuplicates,
+        type: ErrorType.OverlappingGroup,
+      };
+    }
+    if (foundOverlappingToken) {
+      return {
+        type: ErrorType.OverlappingToken,
+        foundOverlappingToken,
+      };
+    }
+    return null;
+  }, [activeTokenSet, newName, oldName, tokens]);
+
+  const canRename = !(newName === oldName || error);
 
   return (
     <Modal
-      title={`Rename ${oldName}`}
+      title={`${t('rename')} ${oldName}`}
       isOpen={isOpen}
       close={onClose}
       footer={(
         <form id="renameTokenGroup" onSubmit={handleRenameTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
-            <Button type="submit" variant="primary" disabled={(newName === oldName) || !canRename}>
-              Change
+            <Button type="submit" variant="primary" disabled={!canRename}>
+              {t('change')}
             </Button>
           </Stack>
         </form>
@@ -57,8 +95,43 @@ export default function RenameTokenGroupModal({
           autofocus
           required
         />
-        {!canRename && <ErrorMessage css={{ width: '100%' }}>{t('renameGroupError')}</ErrorMessage>}
-        <Text muted>Renaming only affects tokens of the same type</Text>
+        {!canRename && error && (
+          <ErrorMessage css={{ width: '100%', maxHeight: 150, overflow: 'scroll' }}>
+            {{
+              [ErrorType.OverlappingToken]: (
+                <>
+                  {t('renameGroupModal.errors.overlappingToken', {
+                    tokenSet: activeTokenSet,
+                  })}
+                  <StyledTokenButton
+                    as="div"
+                    css={{
+                      display: 'inline-flex', borderRadius: '$small', margin: 0, marginLeft: '$2',
+                    }}
+                  >
+                    <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{error.foundOverlappingToken?.name}</span></StyledTokenButtonText>
+                  </StyledTokenButton>
+                </>
+              ),
+              [ErrorType.OverlappingGroup]: (
+                <>
+                  {t('renameGroupModal.errors.overlappingGroup', {
+                    groupName: newName,
+                    tokenSet: activeTokenSet,
+                  })}
+                  <Stack direction="row" wrap css={{ marginTop: '$2' }}>
+                    {error.possibleDuplicates?.map(({ name }) => (
+                      <StyledTokenButton as="div" css={{ borderRadius: '$small' }}>
+                        <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{name}</span></StyledTokenButtonText>
+                      </StyledTokenButton>
+                    ))}
+                  </Stack>
+                </>
+              ),
+            }[error.type]}
+          </ErrorMessage>
+        )}
+        <Text muted>{t('renameGroupModal.infoSameType')}</Text>
       </Stack>
     </Modal>
   );
