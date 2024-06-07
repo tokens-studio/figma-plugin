@@ -19,7 +19,7 @@ export default async function setColorValuesOnTarget({
     const resolvedToken = defaultTokenValueRetriever.get(token);
     if (typeof resolvedToken === 'undefined' && !givenValue) return;
     const { description } = resolvedToken || {};
-    const resolvedValue = givenValue || defaultTokenValueRetriever.get(token)?.rawValue;
+    const resolvedValue = givenValue || defaultTokenValueRetriever.get(token)?.value;
 
     if (typeof resolvedValue === 'undefined') return;
     let existingPaint: Paint | null = null;
