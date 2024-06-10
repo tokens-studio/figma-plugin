@@ -28,6 +28,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
+  const selectedThemeObjects = themeInfo.themes.filter((theme) => selectedThemes?.includes(theme.id));
   const allVariableCollectionIds: Record<string, LocalVariableInfo> = {};
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
@@ -37,9 +38,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
-    await Promise.all(selectedThemes.map(async (themeId) => {
-      const theme = themeInfo.themes.find((t) => t.id === themeId);
-      if (!theme) return;
+    await Promise.all(selectedThemeObjects.map(async (theme) => {
       const { collection, modeId } = findCollectionAndModeIdForTheme(theme.group ?? theme.name, theme.name, collections);
 
       if (!collection || !modeId) return;
@@ -57,7 +56,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
       updatedVariableCollections.push(collection);
     }));
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(themeInfo.themes);
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects);
+
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
