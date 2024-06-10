@@ -1,32 +1,46 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
+// Components
 import { Button } from '@tokens-studio/ui';
 import ApplySelector from './ApplySelector';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
-import { hasUnsavedChangesSelector } from '@/selectors';
 import Stack from './Stack';
 import SettingsDropdown from './SettingsDropdown';
-import useTokens from '../store/useTokens';
-import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import ToolsDropdown from './ToolsDropdown';
+
+// State
+import useTokens from '../store/useTokens';
+import { hasUnsavedChangesSelector } from '@/selectors';
+import { stringTokensSelector } from '@/selectors/stringTokensSelector';
+
+// Utils
 import { track } from '@/utils/analytics';
+import parseTokenValues from '@/utils/parseTokenValues';
+import parseJson from '@/utils/parseJson';
 
 type Props = {
-  hasJSONError: boolean;
+  handleError: (error: string) => void;
 };
 
-export default function TokensBottomBar({ hasJSONError }: Props) {
+export default function TokensBottomBar({ handleError }: Props) {
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const stringTokens = useSelector(stringTokensSelector);
 
   const { handleJSONUpdate } = useTokens();
 
   const handleSaveJSON = useCallback(() => {
-    track('Saved in JSON');
-    handleJSONUpdate(stringTokens);
-  }, [handleJSONUpdate, stringTokens]);
+    try {
+      const parsedTokens = parseJson(stringTokens);
+      parseTokenValues(parsedTokens);
+      track('Saved in JSON');
+      handleJSONUpdate(stringTokens);
+    } catch (e) {
+      handleError(`Unable to read JSON: ${JSON.stringify(e)}`);
+    }
+  }, [handleError, handleJSONUpdate, stringTokens]);
 
   const { t } = useTranslation(['general']);
 
@@ -47,7 +61,7 @@ export default function TokensBottomBar({ hasJSONError }: Props) {
           }}
         >
           <Box css={{ fontSize: '$xsmall' }}>{t('unsavedChanges')}</Box>
-          <Button variant="primary" disabled={hasJSONError} onClick={handleSaveJSON}>
+          <Button variant="primary" onClick={handleSaveJSON}>
             {t('save')}
             {' '}
             JSON
