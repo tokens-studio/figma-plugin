@@ -669,9 +669,6 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument();
       }
     },
-    setPulledTokenFormat() {
-      dispatch.tokenState.setTokenFormat(TokenFormat.format);
-    },
     toggleUsedTokenSet() {
       dispatch.tokenState.updateDocument({ updateRemote: false });
     },

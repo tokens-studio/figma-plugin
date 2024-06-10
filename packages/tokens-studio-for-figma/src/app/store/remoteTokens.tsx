@@ -23,6 +23,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
+import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -148,7 +149,8 @@ export default function useRemoteTokens() {
       }
       if (remoteData?.status === 'success') {
         if (activeTab !== Tabs.LOADING) {
-          dispatch.tokenState.setPulledTokenFormat();
+          const format = getFormat();
+          dispatch.tokenState.setTokenFormat(format);
         }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
