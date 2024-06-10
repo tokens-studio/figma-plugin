@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Heading, Button, Box, Stack, Text, Dialog,
+  DropdownMenu, Heading, Button, Box, Stack,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import StorageItem from './StorageItem';
@@ -16,7 +16,6 @@ import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
 import { getProviderIcon } from '@/utils/getProviderIcon';
-import { StyledBetaBadge } from './SecondScreen';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
@@ -45,9 +44,8 @@ const SyncSettings = () => {
       type: StorageProviderType.ADO,
     },
     {
-      text: 'BitBucket',
+      text: 'BitBucket (Beta)',
       type: StorageProviderType.BITBUCKET,
-      beta: true,
     },
     {
       text: 'Supernova',
@@ -56,19 +54,15 @@ const SyncSettings = () => {
     {
       text: t('providers.generic.title'),
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-      description: t('providers.generic.description'),
     },
     {
-      text: 'Tokens Studio',
+      text: 'Tokens Studio (Beta)',
       type: StorageProviderType.TOKENS_STUDIO,
-      beta: true,
     },
   ], [t]);
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
-
-  const [open, setOpen] = React.useState(false);
 
   const { fetchBranches } = useRemoteTokens();
 
@@ -103,7 +97,6 @@ const SyncSettings = () => {
 
   const handleProviderClick = React.useCallback(
     (provider: StorageProviderType) => () => {
-      setOpen(false);
       setStorageProvider(provider);
       handleShowAddCredentials(provider);
     },
@@ -138,51 +131,7 @@ const SyncSettings = () => {
       )}
       <Box css={{ padding: '0 $4' }}>
         <Stack gap={4} direction="column" align="start">
-          <Stack direction="row" justify="between" align="center" css={{ width: '100%' }}>
-            <Heading size="medium">{t('syncProviders')}</Heading>
-            <Dialog modal open={open} onOpenChange={setOpen}>
-              <Dialog.Trigger asChild>
-                <Button variant="secondary" size="small" data-testid="add-storage-item-button">
-                  {t('addNewSyncProvider')}
-                </Button>
-              </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content className="content scroll-container">
-                  <Heading>{t('addNewSyncProvider')}</Heading>
-
-                  <Stack direction="column" gap={4}>
-                    {
-                    providers.map((provider) => (
-                      <Stack direction="row" justify="between" align="center">
-                        <Stack direction="column">
-                          <Box css={{
-                            color: '$fgSubtle', display: 'inline-flex', gap: '$2', alignItems: 'center',
-                          }}
-                          >
-                            {getProviderIcon(provider.type)}
-                            {provider.text}
-                            {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
-                          </Box>
-                          {provider.description && <Text>{provider.description}</Text>}
-                        </Stack>
-                        <Button
-                          key={provider.type}
-                          onClick={handleProviderClick(provider.type)}
-                          variant="secondary"
-                          size="small"
-                          data-testid={`add-${provider.text}-credential`}
-                        >
-                          {t('choose')}
-                        </Button>
-                      </Stack>
-                    ))
-                  }
-                  </Stack>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog>
-          </Stack>
+          <Heading size="medium">{t('syncProviders')}</Heading>
           <Stack direction="column" gap={2} width="full" align="start">
             <LocalStorageItem />
             {apiProviders.length > 0 && apiProviders.map((item) => (
@@ -193,6 +142,28 @@ const SyncSettings = () => {
               />
             ))}
           </Stack>
+          <DropdownMenu>
+            <DropdownMenu.Trigger asChild data-testid="add-storage-item-dropdown">
+              <Button asDropdown>
+                {t('addNewSyncProvider')}
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                side="bottom"
+                className="content scroll-container"
+              >
+                {
+                providers.map((provider) => (
+                  <DropdownMenu.Item key={provider.type} onSelect={handleProviderClick(provider.type)} css={{ display: 'flex', gap: '$3' }} data-testid={`add-${provider.text}-credential`}>
+                    <Box css={{ color: '$fgSubtle' }}>{getProviderIcon(provider.type)}</Box>
+                    {provider.text}
+                  </DropdownMenu.Item>
+                ))
+              }
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu>
         </Stack>
       </Box>
     </Box>
