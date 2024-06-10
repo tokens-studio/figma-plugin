@@ -45,11 +45,11 @@ describe('tryApplyTypographyCompositeVariable', () => {
       },
       setBoundVariable: jest.fn(),
     } as TextNode | TextStyle;
-    resolvedValue = {
+    value = {
       fontFamily: '{fontFamily.default}',
       fontWeight: '{fontWeight.default}',
     };
-    value = {
+    resolvedValue = {
       fontFamily: 'Roboto-raw',
       fontWeight: 'Bold-raw',
     };

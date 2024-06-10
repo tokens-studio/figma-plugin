@@ -32,8 +32,8 @@ export async function tryApplyTypographyCompositeVariable({
     for (const [originalKey, val] of Object.entries(resolvedValue).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       if (typeof val === 'undefined') return;
       let successfullyAppliedVariable = false;
-      if (val.toString().startsWith('{') && val.toString().endsWith('}') && shouldCreateStylesWithVariables) {
-        const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.toString().slice(1, -1));
+      if (value[originalKey].toString().startsWith('{') && value[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
+        const variableToApply = await defaultTokenValueRetriever.getVariableReference(value[originalKey].toString().slice(1, -1));
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
         if (variableToApply) {
           if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);

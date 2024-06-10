@@ -69,10 +69,7 @@ export default function MentionsInput({
       }));
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
-  console.log('mentionData in MentionInput: ', mentionData);
-
   const handleMentionInputChange = React.useCallback((newValue: string) => {
-    console.log('newValue in MentionInput: ', newValue);
     handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}'));
   }, [handleChange, name]);
 
@@ -103,7 +100,6 @@ export default function MentionsInput({
     suggestion: SuggestionDataItem,
   ) => {
     const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.display);
-    console.log('resolvedToken in MentionInput: ', resolvedToken);
     return (
       <Option
         key={(suggestion.id as string) || 'not-found'}
