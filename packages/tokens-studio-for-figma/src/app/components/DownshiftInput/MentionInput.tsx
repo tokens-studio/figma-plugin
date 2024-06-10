@@ -107,7 +107,7 @@ export default function MentionsInput({
         className="mentions-item"
       >
         <StyledItem
-          css={{ display: 'block', isolation: 'isolate' }}
+          css={{ display: 'block' }}
           className="dropdown-item"
         >
           <StyledItemInfo>
