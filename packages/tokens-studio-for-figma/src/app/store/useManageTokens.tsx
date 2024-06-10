@@ -1,0 +1,222 @@
+import { useDispatch, useStore } from 'react-redux';
+import { useCallback, useMemo } from 'react';
+import { SingleToken, TokenToRename } from '@/types/tokens';
+import { Dispatch, RootState } from '../store';
+import useConfirm from '../hooks/useConfirm';
+import { BackgroundJobs } from '@/constants/BackgroundJobs';
+import { activeTokenSetSelector, tokensSelector } from '@/selectors';
+import { TokenTypes } from '@/constants/TokenTypes';
+import {
+  DeleteTokenPayload, DuplicateTokenGroupPayload, DuplicateTokenPayload, UpdateTokenPayload,
+} from '@/types/payloads';
+import useTokens from './useTokens';
+import { StyleOptions } from '@/constants/StyleOptions';
+import { ColorModifier } from '@/types/Modifier';
+// @TODO this typing could be more strict in the future
+
+type EditSingleTokenData = {
+  parent: string;
+  type: TokenTypes;
+  name: string;
+  value: SingleToken['value'];
+  description?: string;
+  oldName?: string;
+  shouldUpdateDocument?: boolean;
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      [key: string]: any;
+      id?: string;
+      modify?: ColorModifier
+    }
+  }
+};
+
+type CreateSingleTokenData = {
+  parent: string;
+  type: TokenTypes;
+  name: string;
+  value: SingleToken['value'];
+  description?: string;
+  shouldUpdateDocument?: boolean;
+  $extensions?: {
+    [key: string]: any;
+    'studio.tokens'?: {
+      id?: string;
+      modify?: ColorModifier
+    }
+  }
+};
+
+type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
+
+export default function useManageTokens() {
+  const store = useStore<RootState>();
+  const dispatch = useDispatch<Dispatch>();
+  const { confirm } = useConfirm();
+  const { removeStylesFromTokens } = useTokens();
+  const {
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, renameTokenAcrossSets,
+  } = dispatch.tokenState;
+
+  const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
+    const {
+      parent, type, name, value, description, oldName, shouldUpdateDocument = true, $extensions,
+    } = data;
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_EDITSINGLETOKEN,
+      isInfinite: true,
+    });
+
+    // should be a setting which users can toggle on / off to disable auto-sync after each token change
+    const shouldUpdate = true;
+    if (shouldUpdate) {
+      editToken({
+        parent,
+        name,
+        type,
+        value,
+        description,
+        oldName,
+        shouldUpdate: shouldUpdateDocument,
+        $extensions,
+      } as UpdateTokenPayload);
+      if (oldName) {
+        dispatch.tokenState.renameStyleNamesToCurrentTheme([{ oldName, newName: name }]);
+        dispatch.tokenState.renameVariableNamesToThemes([{ oldName, newName: name }]);
+      }
+    }
+    dispatch.uiState.completeJob(BackgroundJobs.UI_EDITSINGLETOKEN);
+  }, [editToken, dispatch.uiState, dispatch.tokenState]);
+
+  const createSingleToken = useCallback(async (data: CreateSingleTokenData) => {
+    const {
+      parent, type, name, value, description, shouldUpdateDocument = true, $extensions,
+    } = data;
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATESINGLETOKEN,
+      isInfinite: true,
+    });
+    // should be a setting which users can toggle on / off to disable auto-sync after each token change
+    const shouldUpdate = true;
+
+    // Importing a variable token can make a new set
+    if (!store.getState().tokenState.tokens[parent]) {
+      dispatch.tokenState.addTokenSet(parent);
+    }
+
+    if (shouldUpdate) {
+      createToken({
+        parent,
+        name,
+        type,
+        value,
+        description,
+        shouldUpdate: shouldUpdateDocument,
+        $extensions,
+      } as UpdateTokenPayload);
+    }
+    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATESINGLETOKEN);
+  }, [createToken, dispatch.uiState, dispatch.tokenState, store]);
+
+  const duplicateSingleToken = useCallback(async (data: DuplicateTokenPayload) => {
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_DUPLICATETOKEN,
+      isInfinite: true,
+    });
+    duplicateToken(data);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKEN);
+  }, [duplicateToken, dispatch.uiState]);
+
+  const deleteSingleToken = useCallback(async (data: DeleteTokenPayload) => {
+    const choices: Choice[] = [];
+    if (store.getState().tokenState.themes.length > 0 && data.type && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(data?.type)) {
+      choices.push({
+        key: StyleOptions.REMOVE, label: 'Delete associated style',
+      });
+    }
+
+    const userConfirmation = await confirm({
+      text: 'Delete token?',
+      description: 'Are you sure you want to delete this token?',
+      choices,
+      confirmAction: 'Delete',
+      variant: 'danger',
+    });
+    if (userConfirmation) {
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_DELETETOKEN,
+        isInfinite: true,
+      });
+      deleteToken(data);
+      if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
+        removeStylesFromTokens(data);
+      }
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
+      dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
+      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent);
+    }
+  }, [confirm, deleteToken, dispatch.uiState]);
+
+  const deleteGroup = useCallback(async (path: string, type: string) => {
+    const userConfirmation = await confirm({
+      text: 'Delete group?',
+      description: 'Are you sure you want to delete this group?',
+      variant: 'danger',
+      confirmAction: 'Delete',
+    });
+    if (userConfirmation) {
+      const activeTokenSet = activeTokenSetSelector(store.getState());
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_DELETETOKENGROUP,
+        isInfinite: true,
+      });
+      deleteTokenGroup({ parent: activeTokenSet, path, type });
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
+    }
+  }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
+
+  const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<TokenToRename[]> => {
+    const activeTokenSet = activeTokenSetSelector(store.getState());
+    const tokens = tokensSelector(store.getState());
+    await renameTokenGroup({
+      parent: activeTokenSet, oldName, newName, type,
+    });
+    const tokensInParent = tokens[activeTokenSet] ?? [];
+    const tokensToRename = tokensInParent
+      .filter((token) => token.name.startsWith(oldName) && token.type === type)
+      .map((filteredToken) => ({
+        oldName: filteredToken.name,
+        newName: filteredToken.name.replace(oldName, newName),
+      }));
+    dispatch.tokenState.renameStyleNamesToCurrentTheme(tokensToRename);
+    dispatch.tokenState.renameVariableNamesToThemes(tokensToRename);
+    return tokensToRename;
+  }, [store, renameTokenGroup, dispatch.tokenState]);
+
+  const duplicateGroup = useCallback((data: Omit<DuplicateTokenGroupPayload, 'parent'>) => {
+    const activeTokenSet = activeTokenSetSelector(store.getState());
+
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_DUPLICATETOKENGROUP, isInfinite: true });
+    duplicateTokenGroup({
+      parent: activeTokenSet, oldName: data.oldName, newName: data.newName, tokenSets: data.tokenSets, type: data.type,
+    });
+    dispatch.uiState.completeJob(BackgroundJobs.UI_DUPLICATETOKENGROUP);
+  }, [store, duplicateTokenGroup, dispatch.uiState]);
+
+  const renameTokensAcrossSets = useCallback(async (oldName: string, newName: string, type: string, tokenSets: string[]) => {
+    await renameTokenAcrossSets({
+      oldName, newName, type, tokenSets,
+    });
+  }, [renameTokenAcrossSets]);
+
+  const importMultipleTokens = useCallback(async (data: UpdateTokenPayload[]) => {
+    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
+    dispatch.tokenState.importMultipleTokens(data);
+    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
+  }, [dispatch.uiState, dispatch.tokenState]);
+
+  return useMemo(() => ({
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens,
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens]);
+}

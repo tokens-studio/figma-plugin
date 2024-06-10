@@ -1,0 +1,55 @@
+import React from 'react';
+import { Provider } from 'react-redux';
+import userEvent from '@testing-library/user-event';
+import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import TokensBottomBar from '../TokensBottomBar';
+
+describe('TokenBottomBar', () => {
+  it('should render', () => {
+    const mockStore = createMockStore({});
+
+    render(
+      <Provider store={mockStore}>
+        <TokensBottomBar hasJSONError={false} />
+      </Provider>,
+    );
+  });
+
+  it('should show the preset modal', async () => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <TokensBottomBar hasJSONError={false} />
+      </Provider>,
+    );
+
+    const toolsButton = await result.findByLabelText('tools');
+    await userEvent.click(toolsButton);
+    const loadButton = await result.findByText('loadFromFileOrPreset');
+    await userEvent.click(loadButton, { pointerEventsCheck: 0 });
+    expect(result.queryByText('Import')).toBeInTheDocument();
+
+    const closeButton = await result.findByTestId('close-button');
+    closeButton.click();
+    waitFor(() => {
+      expect(result.queryByText('Import')).toBeNull();
+    });
+  });
+
+  it('should show the export modal', async () => {
+    const mockStore = createMockStore({});
+
+    const result = render(
+      <Provider store={mockStore}>
+        <TokensBottomBar hasJSONError={false} />
+      </Provider>,
+    );
+
+    const toolsButton = await result.findByLabelText('tools');
+    await userEvent.click(toolsButton);
+    const exportButton = await result.findByText('exportToFile');
+    await userEvent.click(exportButton, { pointerEventsCheck: 0 });
+    expect(result.queryByText('Export tokens')).toBeInTheDocument();
+  });
+});

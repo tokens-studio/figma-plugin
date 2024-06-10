@@ -1,0 +1,86 @@
+{
+  "setToDocumentStorage": "Set to document storage?",
+  "youCanAlwaysGoBack": "You can always go back to remote storage.",
+  "addNewSyncProvider": "Add new sync provider",
+  "editCredentials": "Edit sync provider credentials",
+  "name": "Name",
+  "pat": "Personal Access Token",
+  "gitExplained": "Read your tokens that are stored on your repository, close to your code.",
+  "readMore": "Read more",
+  "cancel": "Cancel",
+  "repo": "Repository (owner/repo)",
+  "branch": "Branch",
+  "baseUrl": "Base URL (optional)",
+  "secret": "Secret",
+  "filePath": "File Path",
+  "filePathCaption": "To sync to a single file add .json at the end, for folder-sync (Pro) just specify the folder path.",
+  "syncProviders": "Sync providers",
+  "providers": {
+    "generic": {
+      "title": "Generic Versioned",
+      "url": "URL",
+      "description": "Access tokens stored on your own storage provider, allowing two-way sync, create and read-only operations.",
+      "flowType": "Flow type",
+      "readOnly": "Read Only",
+      "readWrite": "Read / Write",
+      "readWriteCreate": "Read / Write / Create",
+      "additionalHeaders": "Additional headers",
+      "name": "Name",
+      "value": "Value"
+    },
+    "url": {
+      "title": "URL",
+      "description": "Tokens stored on a server allow you to add them as a read-only provider.",
+      "url": "URL",
+      "headers": "Headers"
+    },
+    "jsonbin": {
+      "title": "JSONBIN",
+      "description": "Access tokens stored on JSONBin.io, a free JSON storage service for two-way sync."
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Supernova Access Token",
+      "dsUrl": "Design System URL",
+      "description": "Allows you to push tokens into specific brand and theme in a selected design system."
+    },
+    "ado": {
+      "description": "Access tokens stored on your repository, push and pull tokens in a two-way sync.",
+      "pat": "Personal Access Token",
+      "orgUrl": "Organization Url",
+      "repositoryName": "Repository Name",
+      "projectName": "Project Name (optional)"
+    },
+    "bitbucket": {
+      "username": "Bitbucket username",
+      "appPassword": "App Password",
+      "projectName": "Project Name (optional)",
+      "repository": "Repository (workspace/repo)"
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
+  "localDocument": "Local document",
+  "apply": "Apply",
+  "confirmDelete": "Do you really want to delete this?",
+  "active": "Active",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
+  "format": "Format",
+  "w3cformat": "W3C DTCG format",
+  "legacyformat": "Legacy format",
+  "legacyformattooltip": "Legacy format, click to open W3C DTCG conversion",
+  "w3cconverttitle": "Convert to W3C DTCG format",
+  "w3cformatmodaltitle": "Using the W3C DTCG Format",
+  "w3cformatmodaldescription": "Your tokens are stored in the W3C Design Tokens Community Group format. If you need to convert them back again, you can do so here. If you need to adjust your development pipeline, read all about it below.",
+  "legacyformatmodaldescription": " Your tokens are currently stored in the legacy format. If you want to use the new W3C DTCG format, you can convert them here. Read all about changing the format below, including helpful advice on how to migrate your development pipeline.",
+  "converttow3c": "Convert to W3C DTCG format",
+  "converttolegacy": "Convert to legacy format",
+  "pushfirsterror": "Push your unsaved changes before converting",
+  "readmoreformat": "Read more"
+}
