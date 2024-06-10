@@ -3,9 +3,10 @@ import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, DropdownMenu, Stack,
+  Button, DropdownMenu, Stack, Box
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
+import { styled } from '@/stitches.config';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
@@ -41,6 +42,11 @@ export default function ApplySelector() {
     setApplyVariablesStyleOrRawValue(ApplyVariablesStylesOrRawValues.RAW_VALUES);
   }, [setApplyVariablesStyleOrRawValue]);
 
+  const StyledDropdownOptionDescription = styled(Box, {
+    fontSize: '$xxsmall',
+    color: '$contextMenuFgMuted',
+  })
+
   return (
     <Stack direction="row">
       <Button
@@ -50,7 +56,7 @@ export default function ApplySelector() {
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
-        {t('applyTo.applyTo')}
+        {t('applyTo.button')}
         {' '}
         {updateMode}
       </Button>
@@ -80,7 +86,7 @@ export default function ApplySelector() {
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
             {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyTo')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Item>
             <DropdownMenu.RadioGroup value={updateMode}>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-selection"
@@ -91,12 +97,18 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.selection.title')}
+                <StyledDropdownOptionDescription>
+                {t('applyTo.selection.description')}
+              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.page.title')}
+                <StyledDropdownOptionDescription>
+                {t('applyTo.page.description')}
+              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-document"
@@ -106,12 +118,15 @@ export default function ApplySelector() {
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
-                {t('applyTo.doc.title')}
+                {t('applyTo.document.title')}
+                <StyledDropdownOptionDescription>
+                {t('applyTo.document.description')}
+              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
             <DropdownMenu.Separator />
             {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyAs')}</DropdownMenu.Item>
+            <DropdownMenu.Item disabled>{t('applyTo.applyCurrentTokensAs')}</DropdownMenu.Item>
             <DropdownMenu.RadioGroup value={applyVariablesStylesOrRawValue}>
               <DropdownMenu.RadioItem
                 data-testid="apply-variables-styles"
@@ -122,6 +137,9 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
+                <StyledDropdownOptionDescription>
+                {t('applyTo.variablesStyles.description')}
+                </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-raw-values"
@@ -132,6 +150,9 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
+                <StyledDropdownOptionDescription>
+                {t('applyTo.rawValues.description')}
+                </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
           </DropdownMenu.Content>
