@@ -65,6 +65,9 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
   handleBlur,
   onSubmit,
 }) => {
+  console.log('name in Downshift: ', name);
+  console.log('type in Downshift: ', type);
+  console.log('label in Downshift: ', label);
   const [showAutoSuggest, setShowAutoSuggest] = React.useState(false);
   const [searchInput, setSearchInput] = React.useState('');
   const [currentSearchField, setCurrentSearchField] = React.useState<SearchField>('Tokens');
