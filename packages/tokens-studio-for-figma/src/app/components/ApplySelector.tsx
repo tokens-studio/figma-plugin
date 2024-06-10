@@ -3,7 +3,7 @@ import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, DropdownMenu, Stack, Box
+  Button, DropdownMenu, Stack, Box,
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import { styled } from '@/stitches.config';
@@ -44,8 +44,8 @@ export default function ApplySelector() {
 
   const StyledDropdownOptionDescription = styled(Box, {
     fontSize: '$xxsmall',
-    color: '$contextMenuFgMuted',
-  })
+    color: '$fgMuted',
+  });
 
   return (
     <Stack direction="row">
@@ -85,8 +85,7 @@ export default function ApplySelector() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top">
-            {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Item>
+            <DropdownMenu.Label>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Label>
             <DropdownMenu.RadioGroup value={updateMode}>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-selection"
@@ -97,18 +96,12 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.selection.title')}
-                <StyledDropdownOptionDescription>
-                {t('applyTo.selection.description')}
-              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.page.title')}
-                <StyledDropdownOptionDescription>
-                {t('applyTo.page.description')}
-              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-document"
@@ -119,14 +112,10 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.document.title')}
-                <StyledDropdownOptionDescription>
-                {t('applyTo.document.description')}
-              </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
             <DropdownMenu.Separator />
-            {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyCurrentTokensAs')}</DropdownMenu.Item>
+            <DropdownMenu.Label>{t('applyTo.applyCurrentTokensAs')}</DropdownMenu.Label>
             <DropdownMenu.RadioGroup value={applyVariablesStylesOrRawValue}>
               <DropdownMenu.RadioItem
                 data-testid="apply-variables-styles"
@@ -138,7 +127,7 @@ export default function ApplySelector() {
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
                 <StyledDropdownOptionDescription>
-                {t('applyTo.variablesStyles.description')}
+                  {t('applyTo.variablesStyles.description')}
                 </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
@@ -151,7 +140,7 @@ export default function ApplySelector() {
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
                 <StyledDropdownOptionDescription>
-                {t('applyTo.rawValues.description')}
+                  {t('applyTo.rawValues.description')}
                 </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
