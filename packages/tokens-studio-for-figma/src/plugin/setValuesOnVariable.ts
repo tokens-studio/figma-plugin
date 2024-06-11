@@ -66,7 +66,7 @@ export default async function setValuesOnVariable(
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
             } else if (token.type === TokenTypes.FONT_WEIGHTS && Array.isArray(token.value)) {
-              setStringValuesOnVariable(variable, mode, String(token.value[0]));
+              setStringValuesOnVariable(variable, mode, Number(token.value[0]));
             }
             break;
           default:

@@ -3,7 +3,7 @@ import { SingleToken } from '@/types/tokens';
 
 export function convertTokenTypeToVariableType(type: TokenTypes, value: SingleToken['value']): VariableResolvedDataType {
   // For numerical font weights we want to create a float variable
-  if (type === TokenTypes.FONT_WEIGHTS && typeof value === 'number' && parseFloat(value)) {
+  if (type === TokenTypes.FONT_WEIGHTS && parseFloat(value)) {
     return 'FLOAT';
   }
 
