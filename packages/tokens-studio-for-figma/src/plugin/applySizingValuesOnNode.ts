@@ -3,7 +3,6 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { isPrimitiveValue } from '@/utils/is';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { transformValue } from './helpers';
-import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
 import { isAutoLayout } from '@/utils/isAutoLayout';
 
 export async function applySizingValuesOnNode(
