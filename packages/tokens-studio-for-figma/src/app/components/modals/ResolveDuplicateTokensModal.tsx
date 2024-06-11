@@ -1,14 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { Button, TextInput, Stack } from '@tokens-studio/ui';
+import {
+  Button, TextInput, Stack, Text,
+} from '@tokens-studio/ui';
 import Modal from '../Modal';
 import { MultiSelectDropdown } from '../MultiSelectDropdown';
 import { ErrorMessage } from '../ErrorMessage';
-import { activeTokenSetSelector, tokensSelector } from '@/selectors';
+import { activeTokenSetSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
 import ResolveDuplicateTokenGroup from '../DuplicateResolver/ResolveDuplicateTokenGroup';
 import { SingleToken } from '@/types/tokens';
+import { TokensContext } from '@/context';
+import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type Props = {
   isOpen: boolean;
@@ -25,24 +30,29 @@ export default function ResolveDuplicateTokensModal({
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  // const tokensContext = useContext(TokensContext);
+  const resolvedTokens = React.useMemo(() => (
+    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
+  ), [tokens, usedTokenSet]);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
   // const { duplicateGroup } = useManageTokens();
   const { t } = useTranslation(['tokens']);
-  const activeSetTokens = tokens[activeTokenSet];
 
-  const duplicateTokens: { [key: string]: SingleToken[] } = useMemo(() => {
-    const duplicatesByName = activeSetTokens.reduce((acc, token) => {
-      const allTokensWithName = activeSetTokens.filter((a) => a.name === token.name);
+  const duplicateTokens: { [key: string]: { [key: string]: SingleToken[] } } = useMemo(() => Object.keys(tokens).reduce((acc, setName) => {
+    const currentSetTokens = tokens[setName];
+    const duplicatesByName = currentSetTokens.reduce((acc2, token) => {
+      const allTokensWithName = currentSetTokens.filter((a) => a.name === token.name);
       if (allTokensWithName.length > 1) {
-        acc[token.name] = allTokensWithName;
+        acc2[token.name] = allTokensWithName;
       }
 
-      return acc;
+      return acc2;
     }, {});
-    // const duplicates = activeSetTokens.filter((a) => activeSetTokens.filter((b) => a.name === b.name).length > 0);
 
-    return duplicatesByName;
-  }, [activeSetTokens]);
+    acc[setName] = duplicatesByName;
+    return acc;
+  }, {}), [tokens]);
   console.log({ duplicateTokens });
 
   const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
@@ -88,12 +98,17 @@ export default function ResolveDuplicateTokensModal({
     )}
     >
       <Stack direction="column" justify="center" align="start" gap={4}>
-        {Object.entries(duplicateTokens).map(([tokenName, duplicates]) => (
-          <ResolveDuplicateTokenGroup
-            group={[tokenName, duplicates]}
-            resolvedTokens={[]}
-          />
-        ))}
+        {Object.entries(duplicateTokens).map(([setName, allTokens]) => ((Object.keys(allTokens).length > 0) ? (
+          <Stack direction="column" key={`duplicateTokens-${setName}`}>
+            <Text bold css={{ fontSize: '$large', marginBottom: '$2' }}>{setName}</Text>
+            {Object.entries(allTokens).map(([tokenName, duplicates]) => (
+              <ResolveDuplicateTokenGroup
+                group={[tokenName, duplicates]}
+                resolvedTokens={resolvedTokens}
+              />
+            ))}
+          </Stack>
+        ) : null))}
         {/* <TextInput
           form="duplicateTokenGroup"
           onChange={handleNewTokenGroupNameChange}
