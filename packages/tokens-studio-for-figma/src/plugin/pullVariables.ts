@@ -21,15 +21,23 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     });
   }
 
+  const isAlias = (value: VariableValue) => typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS';
+
+  const wrapAliasValueInBrackets = (value: VariableAlias) => {
+    const alias = figma.variables.getVariableById(value.id);
+    return `{${alias?.name.replace(/\//g, '.')}}`;
+  };
+
   figma.variables.getLocalVariables().forEach((variable) => {
+    console.log(variable);
     const variableName = variable.name.replace(/\//g, '.');
     const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
     switch (variable.resolvedType) {
       case 'COLOR':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
           let tokenValue;
-
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+          if (isAlias(value)) {
+            value = value as VariableAlias;
             const alias = figma.variables.getVariableById(value.id);
             tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
           } else {
@@ -52,7 +60,8 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
           let tokenValue;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+          if (isAlias(value)) {
+            value = value as VariableAlias;
             const alias = figma.variables.getVariableById(value.id);
             tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
           } else {
@@ -72,7 +81,8 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
           let tokenValue;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+          if (isAlias(value)) {
+            value = value as VariableAlias;
             const alias = figma.variables.getVariableById(value.id);
             tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
           } else {
@@ -90,30 +100,21 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
         break;
       case 'FLOAT':
         Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          let tokenValue: string | number = value as number;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-            const alias = figma.variables.getVariableById(value.id);
-            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else if (options.useDimensions && options.useRem) {
-            tokenValue = `${Number(tokenValue) / baseRem}rem`;
-          } else {
-            tokenValue = `${tokenValue}px`;
-          }
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-
-          if (options.useDimensions) {
-            dimensions.push({
+          if (!options.useDimensions) {
+            numbers.push({
               name: variableName,
-              value: tokenValue as string,
-              type: TokenTypes.DIMENSION,
+              value: isAlias(value) ? wrapAliasValueInBrackets(value as VariableAlias) : value.toString(),
+              type: TokenTypes.NUMBER,
               parent: `${collection?.name}/${modeName}`,
               description: variable.description,
             });
           } else {
-            numbers.push({
+            const convertUnit = (numberValue: number) => (options.useRem ? `${Number(numberValue) / baseRem}rem` : `${numberValue}px`);
+            dimensions.push({
               name: variableName,
-              value: value.toString(),
-              type: TokenTypes.NUMBER,
+              value: isAlias(value) ? wrapAliasValueInBrackets(value as VariableAlias) : convertUnit(value as number),
+              type: TokenTypes.DIMENSION,
               parent: `${collection?.name}/${modeName}`,
               description: variable.description,
             });
