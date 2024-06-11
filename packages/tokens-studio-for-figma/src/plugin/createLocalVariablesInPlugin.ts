@@ -33,6 +33,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
+  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables().length;
+  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections().length;
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
@@ -61,10 +63,13 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  if (updatedVariables.length === 0) {
+  const figmaVariablesAfterCreate = figma.variables.getLocalVariables().length;
+  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections().length;
+
+  if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${updatedVariableCollections.length} collections and ${updatedVariables.length} variables created`);
+    notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
   return {
     allVariableCollectionIds,
