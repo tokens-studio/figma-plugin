@@ -96,13 +96,6 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
-function findLastIndex(arr, callback, thisArg?) { // eslint-disable-next-line
-  for (let i = arr.length - 1; i >= 0; i--) {
-    if (callback.call(thisArg, arr[i], i, arr)) return i;
-  }
-  return -1;
-}
-
 export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
@@ -124,12 +117,7 @@ export async function getTokenData(): Promise<{
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
       const tokenObject = Object.entries(values).reduce<Record<string, AnyTokenList>>((acc, [key, groupValues]) => {
-        const parsedValues: AnyTokenList = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
-
-        // Deduplicate
-        acc[key] = parsedValues.filter(
-          (token1, i, arr) => findLastIndex(arr, (token2) => (token2.name === token1.name) || token2.name.startsWith(`${token1.name}`)) === i,
-        );
+        acc[key] = typeof groupValues === 'string' ? JSON.parse(groupValues) : groupValues;
         return acc;
       }, {});
       return {
