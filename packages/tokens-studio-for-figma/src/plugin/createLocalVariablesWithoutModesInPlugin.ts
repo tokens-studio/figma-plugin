@@ -27,8 +27,10 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
-  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables().length;
-  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections().length;
+  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
+
+  let figmaVariablesAfterCreate = 0;
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
@@ -55,6 +57,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
         });
+        figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
             collectionId: collection.id,
@@ -69,8 +72,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const existingVariables = await mergeVariableReferencesWithLocalVariables();
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
-  const figmaVariablesAfterCreate = figma.variables.getLocalVariables().length;
-  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections().length;
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');

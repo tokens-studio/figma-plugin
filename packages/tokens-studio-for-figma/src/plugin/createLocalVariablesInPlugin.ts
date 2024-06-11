@@ -33,8 +33,10 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
-  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables().length;
-  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections().length;
+  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
+
+  let figmaVariablesAfterCreate = 0;
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
@@ -48,6 +50,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       const allVariableObj = await updateVariables({
         collection, mode: modeId, theme, tokens, settings,
       });
+      figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
       if (Object.keys(allVariableObj.variableIds).length > 0) {
         allVariableCollectionIds[theme.id] = {
           collectionId: collection.id,
@@ -63,8 +66,8 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  const figmaVariablesAfterCreate = figma.variables.getLocalVariables().length;
-  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections().length;
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
