@@ -5,14 +5,7 @@ import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { styled } from '@/stitches.config';
 import { getAliasValue } from '@/utils/alias';
-
-const StyledButton = styled('button', {
-  display: 'block',
-  width: '1.5rem',
-  height: '1.5rem',
-  borderRadius: '$small',
-  cursor: 'pointer',
-});
+import { ColorPickerTrigger } from './ColorPickerTrigger';
 
 export default function BorderTokenDownShiftInput({
   name,
@@ -70,13 +63,7 @@ export default function BorderTokenDownShiftInput({
       placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder] as unknown as string}
       prefix={
         name === 'color' && (
-          <StyledButton
-            type="button"
-            style={{ background: resolvedColor ?? '#000000', fontSize: 0 }}
-            onClick={handleToggleInputHelper}
-          >
-            {value}
-          </StyledButton>
+          <ColorPickerTrigger onClick={handleToggleInputHelper} background={resolvedColor} />
         )
       }
       suffix
