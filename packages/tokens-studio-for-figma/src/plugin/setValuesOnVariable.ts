@@ -21,7 +21,7 @@ export default async function setValuesOnVariable(
   shouldRename = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
-  const referenceVariableCandidates: ReferenceVariableType[] = [];0
+  const referenceVariableCandidates: ReferenceVariableType[] = [];
   const renamedVariableKeys: string[] = [];
   try {
     await Promise.all(tokens.map(async (token) => {
