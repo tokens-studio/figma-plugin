@@ -12,6 +12,8 @@ export async function applySizingValuesOnNode(
   values: MapValuesToTokensResult,
   baseFontSize: string,
 ) {
+  console.log('applySizingValuesOnNode', node, data, values, baseFontSize);
+
   // SIZING: BOTH
   // When given just `size` we apply it to width and height
   if (
@@ -54,8 +56,6 @@ export async function applySizingValuesOnNode(
   if (
     node.type !== 'DOCUMENT'
     && node.type !== 'PAGE'
-    && node.type !== 'INSTANCE'
-    && !isPartOfInstance(node.id)
     && (isAutoLayout(node)
       || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))
   ) {
@@ -78,6 +78,7 @@ export async function applySizingValuesOnNode(
       && isPrimitiveValue(values.maxWidth)
       && !(await tryApplyVariableId(node, 'maxWidth', data.maxWidth))
     ) {
+      console.log()
       node.maxWidth = transformValue(String(values.maxWidth), 'sizing', baseFontSize);
     }
 
