@@ -12,8 +12,6 @@ export async function applySizingValuesOnNode(
   values: MapValuesToTokensResult,
   baseFontSize: string,
 ) {
-  console.log('applySizingValuesOnNode', node, data, values, baseFontSize);
-
   // SIZING: BOTH
   // When given just `size` we apply it to width and height
   if (
@@ -78,7 +76,6 @@ export async function applySizingValuesOnNode(
       && isPrimitiveValue(values.maxWidth)
       && !(await tryApplyVariableId(node, 'maxWidth', data.maxWidth))
     ) {
-      console.log()
       node.maxWidth = transformValue(String(values.maxWidth), 'sizing', baseFontSize);
     }
 
