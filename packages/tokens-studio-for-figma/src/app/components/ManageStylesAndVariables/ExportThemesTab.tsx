@@ -111,7 +111,7 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                 <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
               </Stack>
               {ThemeGroups.map((group) => (
-                <Stack direction="column" gap={2}>
+                <Stack direction="column" gap={2} key={group}>
                   <Heading size="small">{group}</Heading>
                   {themes.filter((theme) => theme.group === group).map((theme) => createThemeRow(theme))}
                 </Stack>
