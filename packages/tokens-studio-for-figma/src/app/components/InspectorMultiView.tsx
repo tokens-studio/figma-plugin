@@ -83,11 +83,11 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
 
   const handleSelectAll = React.useCallback(() => {
     dispatch.inspectState.setSelectedTokens(
-      inspectState.selectedTokens.length === uiState.selectionValues.length
+      inspectState.selectedTokens.length === filteredSelectionValues.length
         ? []
-        : uiState.selectionValues.map((v) => `${v.category}-${v.value}`),
+        : filteredSelectionValues.map((v) => `${v.category}-${v.value}`),
     );
-  }, [dispatch.inspectState, inspectState.selectedTokens.length, uiState.selectionValues]);
+  }, [dispatch.inspectState, inspectState.selectedTokens.length, filteredSelectionValues]);
 
   const closeOnboarding = React.useCallback(() => {
     dispatch.uiState.setOnboardingExplainerInspect(false);

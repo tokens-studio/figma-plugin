@@ -18,15 +18,52 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
 }
 
 export function convertStringToFigmaGradient(value: string) {
-  const [gradientDegrees, ...colorStops] = value
-    .substring(value.indexOf('(') + 1, value.lastIndexOf(')'))
-    .split(', ');
-    // subtract 90 and negate it -- figma's roation goes anti-clockwise and 0deg
-    // is left-right as opposed to bottom-top in css
-  const degreesAsNumber = convertDegreeToNumber(gradientDegrees);
-  const degrees = -(degreesAsNumber - 90);
+  const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
+
+  // Default angle is to top (180 degrees)
+  let angle = 180;
+  if (parts[0].includes('deg')) {
+    angle = parseFloat(parts[0].replace('deg', ''));
+    parts.shift();
+  } else if (parts[0].includes('turn')) {
+    angle = parseFloat(parts[0].replace('turn', '')) * 360;
+    parts.shift();
+  } else if (parts[0].startsWith('to ')) {
+    const direction = parts[0].replace('to ', '');
+    parts.shift();
+    switch (direction) {
+      case 'top':
+        angle = 180;
+        break;
+      case 'right':
+        angle = 270;
+        break;
+      case 'bottom':
+        angle = 0;
+        break;
+      case 'left':
+        angle = 90;
+        break;
+      case 'top right':
+        angle = 225;
+        break;
+      case 'top left':
+        angle = 135;
+        break;
+      case 'bottom right':
+        angle = 315;
+        break;
+      case 'bottom left':
+        angle = 45;
+        break;
+      default:
+        break;
+    }
+  }
+
+  const degrees = -(angle - 90);
   const rad = degrees * (Math.PI / 180);
-  const scale = degreesAsNumber % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(degreesAsNumber * (Math.PI / 180)) ** 2);
+  const scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
 
   // start by transforming to the gradient center
   // which for figma is .5 .5 as it is a relative transform
@@ -60,14 +97,14 @@ export function convertStringToFigmaGradient(value: string) {
 
   const gradientTransformMatrix = inverse(transformationMatrix).to2DArray();
 
-  const gradientStops = colorStops.map((stop) => {
+  const gradientStops = parts.map((stop, i, arr) => {
     const seperatedStop = stop.split(' ');
     const { color, opacity } = convertToFigmaColor(seperatedStop[0]);
     const gradientColor = color;
     gradientColor.a = opacity;
     return {
       color: gradientColor,
-      position: parseFloat(seperatedStop[1]) / 100,
+      position: seperatedStop[1] ? parseFloat(seperatedStop[1]) / 100 : i / (arr.length - 1),
     };
   }) as ColorStop[];
 
