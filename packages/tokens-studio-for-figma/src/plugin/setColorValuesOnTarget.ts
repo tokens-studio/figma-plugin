@@ -19,7 +19,7 @@ export default async function setColorValuesOnTarget({
     const resolvedToken = defaultTokenValueRetriever.get(token);
     if (typeof resolvedToken === 'undefined' && !givenValue) return;
     const { description } = resolvedToken || {};
-    const resolvedValue = defaultTokenValueRetriever.get(token)?.rawValue || givenValue;
+    const resolvedValue = givenValue || defaultTokenValueRetriever.get(token)?.rawValue;
 
     if (typeof resolvedValue === 'undefined') return;
     let existingPaint: Paint | null = null;
@@ -32,7 +32,8 @@ export default async function setColorValuesOnTarget({
     }
 
     if (resolvedValue.startsWith('linear-gradient')) {
-      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(resolvedValue);
+      const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
+      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
       const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
         gradientTransform,

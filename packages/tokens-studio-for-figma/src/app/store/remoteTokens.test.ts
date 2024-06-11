@@ -18,6 +18,7 @@ const mockSelectBrach = jest.fn();
 const mockEnableMultiFile = jest.fn();
 const mockSetLastSyncedState = jest.fn();
 const mockSetTokenData = jest.fn();
+const mockSetTokenFormat = jest.fn();
 const mockSetEditProhibited = jest.fn();
 const mockCompleteJob = jest.fn();
 const mockAssignProjectId = jest.fn();
@@ -91,6 +92,7 @@ jest.mock('react-redux', () => ({
       setChangedState: mocksetChangedState,
       resetChangedState: mockResetChangedState,
       setRemoteData: mockSetRemoteData,
+      setTokenFormat: mockSetTokenFormat
     },
     branchState: {
       setBranches: mockSetBranches,
