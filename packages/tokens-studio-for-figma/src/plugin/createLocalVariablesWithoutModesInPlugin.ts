@@ -38,8 +38,10 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       return acc;
     }, {} as ThemeObject);
     const selectedSetIds = selectedSets.map((set) => set.set);
+    console.log('selectedSetIds in createLocalWithOutModes: ', selectedSetIds);
 
     const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
+    console.log('collections in createLocalWithOutModes: ', collections);
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
