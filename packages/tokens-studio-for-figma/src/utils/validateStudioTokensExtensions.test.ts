@@ -64,7 +64,7 @@ const output = {
 describe('validateStudioTokensExtensions', () => {
   it('strips empty extension', () => {
     const validatedTokens = validateStudioTokensExtensions(tokens.blue as SingleToken);
-    expect(validatedTokens).toEqual({});
+    expect(validatedTokens).toEqual(undefined);
   });
   it('skips no extensions', () => {
     const validatedTokens = validateStudioTokensExtensions(tokens.green as SingleToken);
@@ -76,7 +76,7 @@ describe('validateStudioTokensExtensions', () => {
   });
   it('strips empty modify', () => {
     const validatedTokens = validateStudioTokensExtensions(tokens.red as SingleToken);
-    expect(validatedTokens).toEqual({});
+    expect(validatedTokens).toEqual(undefined);
   });
   it('keeps valid modify', () => {
     const validatedTokens = validateStudioTokensExtensions(tokens.valid as SingleToken);
