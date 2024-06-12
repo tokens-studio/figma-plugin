@@ -34,6 +34,18 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
+    const themesToCreateCollections = selectedSets.reduce((acc: ThemeObject[], curr: ExportTokenSet) => {
+      if (curr.status === TokenSetStatus.ENABLED) {
+        acc.push({
+          selectedTokenSets: {
+            [curr.set]: curr.status,
+          },
+          id: curr.set,
+          name: curr.set
+        })
+      }
+      return acc;
+    }, [] as ThemeObject[]);
     const themeContainer = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
@@ -43,12 +55,19 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     }, {} as ThemeObject);
     const selectedSetIds = selectedSets.map((set) => set.set);
 
-    const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
+    const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
+
+    const sourceSets = selectedSets.filter((t) => t.status === TokenSetStatus.SOURCE);
+    const sourceTokenSets = sourceSets.reduce((acc, curr) => {
+      acc[curr.set] = tokens[curr.set];
+      return acc;
+    }, {});
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
-          [set.set]: tokens[set.set],
+          ...sourceTokenSets,
+          [set.set]: tokens[set.set]
         };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
