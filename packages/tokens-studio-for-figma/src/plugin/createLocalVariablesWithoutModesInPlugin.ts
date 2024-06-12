@@ -53,14 +53,24 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
+    const sourceSets = selectedSets.filter((t) => t.status === TokenSetStatus.SOURCE);
+    const sourceTokenSets = sourceSets.reduce((acc, curr) => {
+      acc[curr.set] = tokens[curr.set];
+      return acc;
+    }, {});
+
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
+        const setTokens: Record<string, AnyTokenList> = {
+          ...sourceTokenSets,
+          [set.set]: tokens[set.set]
+        };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
         if (!collection || !modeId) return;
 
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme: themeContainer, tokens, settings, filterByTokenSet: set.set,
+          collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
         });
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
