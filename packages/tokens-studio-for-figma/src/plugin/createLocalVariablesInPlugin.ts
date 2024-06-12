@@ -66,7 +66,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length ?? 0;
   const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
