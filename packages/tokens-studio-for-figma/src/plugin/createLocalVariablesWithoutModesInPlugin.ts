@@ -30,6 +30,18 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
+    const themesToCreateCollections = selectedSets.reduce((acc: ThemeObject[], curr: ExportTokenSet) => {
+      if (curr.status === TokenSetStatus.ENABLED) {
+        acc.push({
+          selectedTokenSets: {
+            [curr.set]: curr.status,
+          },
+          id: curr.set,
+          name: curr.set
+        })
+      }
+      return acc;
+    }, [] as ThemeObject[]);
     const themeContainer = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
@@ -38,22 +50,17 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       return acc;
     }, {} as ThemeObject);
     const selectedSetIds = selectedSets.map((set) => set.set);
-    console.log('selectedSetIds in createLocalWithOutModes: ', selectedSetIds);
 
-    const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
-    console.log('collections in createLocalWithOutModes: ', collections);
+    const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
-        const setTokens: Record<string, AnyTokenList> = {
-          [set.set]: tokens[set.set],
-        };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
         if (!collection || !modeId) return;
 
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
+          collection, mode: modeId, theme: themeContainer, tokens, settings, filterByTokenSet: set.set,
         });
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
