@@ -9,6 +9,7 @@ import Stack from '../Stack';
 import Input from '../Input';
 import Text from '../Text';
 import { StyledTokenButton, StyledTokenButtonText } from '../TokenButton/StyledTokenButton';
+import { validateRenameGroupName } from '@/utils/validateGroupName';
 
 type Props = {
   isOpen: boolean
@@ -17,6 +18,7 @@ type Props = {
   onClose: () => void;
   handleRenameTokenGroupSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  type: string
 };
 
 enum ErrorType {
@@ -27,7 +29,7 @@ enum ErrorType {
 }
 
 export default function RenameTokenGroupModal({
-  isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange,
+  isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange, type,
 }: Props) {
   const tokens = useSelector(tokensSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
@@ -38,33 +40,8 @@ export default function RenameTokenGroupModal({
       return null;
     }
 
-    const newGroupTokens = tokens[activeTokenSet].filter((token) => token.name.startsWith(`${newName}.`));
-    const oldGroupTokens = tokens[activeTokenSet].filter((token) => token.name.startsWith(`${oldName}`)).map((token) => {
-      const [, ...name] = token.name.split('.');
-
-      return {
-        ...token,
-        name: `${newName}.${name.join('.')}`,
-      };
-    });
-
-    const possibleDuplicates = newGroupTokens.filter((a) => oldGroupTokens.filter((b) => a.name === b.name).length > 0);
-    const foundOverlappingToken = (newName !== oldName) && tokens[activeTokenSet].find((token) => token.name === newName);
-
-    if (Object.keys(possibleDuplicates).length > 0) {
-      return {
-        possibleDuplicates,
-        type: ErrorType.OverlappingGroup,
-      };
-    }
-    if (foundOverlappingToken) {
-      return {
-        type: ErrorType.OverlappingToken,
-        foundOverlappingToken,
-      };
-    }
-    return null;
-  }, [activeTokenSet, newName, oldName, tokens]);
+    return validateRenameGroupName(tokens[activeTokenSet], type, oldName, newName);
+  }, [activeTokenSet, newName, oldName, tokens, type]);
 
   const canRename = !(newName === oldName || error);
 

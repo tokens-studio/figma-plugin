@@ -11,7 +11,7 @@ import { ErrorMessage } from '../ErrorMessage';
 import { activeTokenSetSelector, tokensSelector } from '@/selectors';
 import useManageTokens from '@/app/store/useManageTokens';
 import { StyledTokenButton, StyledTokenButtonText } from '../TokenButton/StyledTokenButton';
-import { SingleToken } from '@/types/tokens';
+import { validateDuplicateGroupName, ErrorType } from '@/utils/validateGroupName';
 
 type Props = {
   isOpen: boolean;
@@ -21,14 +21,6 @@ type Props = {
   onClose: () => void;
   handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
-
-enum ErrorType {
-  UniqueToken = 'uniqueToken',
-  NoSetSelected = 'noSetSelected',
-  ExistingGroup = 'existingGroup',
-  OverlappingToken = 'overlappingToken',
-  OverlappingGroup = 'overlappingGroup',
-}
 
 export default function DuplicateTokenGroupModal({
   isOpen, type, newName, oldName, onClose, handleNewTokenGroupNameChange,
@@ -62,46 +54,8 @@ export default function DuplicateTokenGroupModal({
         type: ErrorType.NoSetSelected,
       };
     }
-
-    const possibleDuplicates: { [key: string]: SingleToken[] } = selectedTokenSets.reduce((acc, selectedTokenSet) => {
-      const newGroupTokens = tokens[selectedTokenSet].filter((token) => token.name.startsWith(`${newName}.`));
-      const oldGroupTokens = tokens[activeTokenSet].filter((token) => token.name.startsWith(`${oldName}`)).map((token) => {
-        const [, ...name] = token.name.split('.');
-
-        return {
-          ...token,
-          name: `${newName}.${name.join('.')}`,
-        };
-      });
-      const overlappingTokens = newGroupTokens.filter((a) => oldGroupTokens.filter((b) => a.name === b.name).length > 0);
-      if (overlappingTokens.length > 0) {
-        acc[selectedTokenSet] = overlappingTokens;
-      }
-      return acc;
-    }, {});
-    const foundOverlappingToken: { [key: string]: SingleToken } = selectedTokenSets.reduce((acc, selectedTokenSet) => {
-      const overlappingToken = tokens[selectedTokenSet].find((token) => token.name === newName);
-      if (overlappingToken) {
-        acc[selectedTokenSet] = overlappingToken;
-      }
-
-      return acc;
-    }, {});
-
-    if (Object.keys(possibleDuplicates).length > 0) {
-      return {
-        possibleDuplicates,
-        type: ErrorType.OverlappingGroup,
-      };
-    }
-    if (Object.keys(foundOverlappingToken).length > 0) {
-      return {
-        type: ErrorType.OverlappingToken,
-        foundOverlappingToken,
-      };
-    }
-    return null;
-  }, [activeTokenSet, newName, oldName, selectedTokenSets, tokens]);
+    return validateDuplicateGroupName(tokens, selectedTokenSets, activeTokenSet, type, oldName, newName);
+  }, [activeTokenSet, newName, oldName, selectedTokenSets, tokens, type]);
 
   const canDuplicate = !error;
 
