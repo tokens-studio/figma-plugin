@@ -60,7 +60,7 @@ export default function ADOForm({
         <Text muted>
           {t('providers.ado.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider">{t('readMore')}</Link>
+          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
         </Text>
         <FormField>
           <Label htmlFor="baseUrl">{t('providers.ado.orgUrl')}</Label>
