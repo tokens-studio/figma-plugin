@@ -355,8 +355,8 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
-      if (pushResult.status && String(pushResult.status).includes('failure')) {
-        notifyToUI(String(pushResult.errorMessage), { error: true });
+      if (pushResult.status && pushResult.status === 'failure') {
+        notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
     [
