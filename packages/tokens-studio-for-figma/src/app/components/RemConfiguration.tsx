@@ -2,17 +2,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Box, Button, Label, Stack, Text,
-} from '@tokens-studio/ui';
+import { Box, Button, Label, Stack, Text } from '@tokens-studio/ui';
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';
-import {
-  tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
-} from '@/selectors';
+import { tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector } from '@/selectors';
 import DownshiftInput from './DownshiftInput';
 import { getAliasValue } from '@/utils/alias';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
@@ -31,12 +27,13 @@ const RemConfiguration = () => {
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
   const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(
-      mergeTokenGroups(tokens, {
-        ...usedTokenSet,
-        [activeTokenSet]: TokenSetStatus.ENABLED,
-      }),
-    ),
+    () =>
+      defaultTokenResolver.setTokens(
+        mergeTokenGroups(tokens, {
+          ...usedTokenSet,
+          [activeTokenSet]: TokenSetStatus.ENABLED,
+        }),
+      ),
     [tokens, usedTokenSet, activeTokenSet],
   );
 
@@ -44,9 +41,10 @@ const RemConfiguration = () => {
     const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
 
     if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
-      const remValue = typeof resolvedAliasBaseFontSize === 'number'
-        ? resolvedAliasBaseFontSize / 16
-        : parseFloat(resolvedAliasBaseFontSize) / 16;
+      const remValue =
+        typeof resolvedAliasBaseFontSize === 'number'
+          ? resolvedAliasBaseFontSize / 16
+          : parseFloat(resolvedAliasBaseFontSize) / 16;
       const formattedRemValue = isNaN(remValue) ? 1 : Number(remValue.toFixed(2));
       return `${t('baseFont')} (${formattedRemValue} rem)`;
     }
@@ -95,13 +93,13 @@ const RemConfiguration = () => {
         title={displayBaseFontValue}
         showClose
         modal={false}
-        footer={(
+        footer={
           <Stack direction="row" justify="end">
             <Button onClick={toggleModalVisible} variant="primary">
               {t('confirm')}
             </Button>
           </Stack>
-        )}
+        }
       >
         <Stack direction="column" gap={3} css={{ padding: '$4' }}>
           <Text muted>{t('baseFontExplanation')}</Text>
@@ -117,7 +115,6 @@ const RemConfiguration = () => {
             />
           </Box>
         </Stack>
-
       </Modal>
     </Stack>
   );
