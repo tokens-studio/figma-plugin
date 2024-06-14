@@ -91,6 +91,7 @@ export default function SingleCompositionTokenForm({
         <Select value={property || t('chooseAProperty')} onValueChange={onPropertySelected}>
           <Select.Trigger
             value={property || t('chooseAProperty')}
+            size="small"
             css={{
               borderTopRightRadius: '$0',
               borderBottomRightRadius: '$0',
@@ -98,6 +99,9 @@ export default function SingleCompositionTokenForm({
               alignSelf: 'stretch',
               marginTop: '3px', // Hack to compensate for textarea autosize height
               marginBottom: '1px', // Hack to compensate for textarea autosize height
+              width: '150px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
             data-testid="composition-token-dropdown"
           />

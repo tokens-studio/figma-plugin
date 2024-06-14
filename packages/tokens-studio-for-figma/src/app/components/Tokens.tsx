@@ -17,8 +17,6 @@ import JSONEditor from './JSONEditor';
 import Box from './Box';
 import IconListing from '@/icons/listing.svg';
 import useTokens from '../store/useTokens';
-import parseTokenValues from '@/utils/parseTokenValues';
-import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
@@ -127,12 +125,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const handleChangeJSON = React.useCallback((val: string) => {
     setError(null);
-    try {
-      const parsedTokens = parseJson(val);
-      parseTokenValues(parsedTokens);
-    } catch (e) {
-      setError(`Unable to read JSON: ${JSON.stringify(e)}`);
-    }
     dispatch.tokenState.setStringTokens(val);
   }, [dispatch.tokenState]);
 
@@ -311,9 +303,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           </Box>
           {manageThemesModalOpen && <ManageThemesModal />}
         </Box>
-        <TokensBottomBar
-          hasJSONError={!!error}
-        />
+        <TokensBottomBar handleError={setError} />
       </Box>
     </TokensContext.Provider>
   );

@@ -80,6 +80,7 @@ export default function SingleBoxShadowInput({
   }, [index, value, handleBoxShadowValueChange]);
 
   const onTypeChange = React.useCallback((newValue: BoxShadowTypes) => {
+    if (newValue !== BoxShadowTypes.DROP_SHADOW && newValue !== BoxShadowTypes.INNER_SHADOW) return;
     if (Array.isArray(value)) {
       const values = [...value];
       values.splice(index, 1, { ...value[index], type: newValue });
