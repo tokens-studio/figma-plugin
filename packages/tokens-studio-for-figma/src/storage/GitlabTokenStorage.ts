@@ -240,7 +240,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         } : undefined,
       );
       return !!response;
-    } catch (e) {
+    } catch (e: any) {
       if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
         throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
       }
