@@ -70,4 +70,17 @@ describe('SetValuesOnVariable', () => {
     expect(variablesInFigma[0].name).toEqual('button/primary/height');
     expect(mockCreateVariable).not.toBeCalled();
   });
+
+  it('should apply fontWeight token with numeric value', async () => {
+    const tokens = [{
+      name: 'global.fontWeight',
+      path: 'global/fontWeight',
+      value: 300,
+      rawValue: 300,
+      type: TokenTypes.FONT_WEIGHTS,
+      variableId: '1234'
+    }];
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode);
+    expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
+  })
 });

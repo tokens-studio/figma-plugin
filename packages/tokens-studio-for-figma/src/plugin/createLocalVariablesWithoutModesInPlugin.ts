@@ -27,9 +27,25 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
+  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
+
+  let figmaVariablesAfterCreate = 0;
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting) {
+    const themesToCreateCollections = selectedSets.reduce((acc: ThemeObject[], curr: ExportTokenSet) => {
+      if (curr.status === TokenSetStatus.ENABLED) {
+        acc.push({
+          selectedTokenSets: {
+            [curr.set]: curr.status,
+          },
+          id: curr.set,
+          name: curr.set
+        })
+      }
+      return acc;
+    }, [] as ThemeObject[]);
     const themeContainer = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
       acc.selectedTokenSets = {
         ...acc.selectedTokenSets,
@@ -39,12 +55,19 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     }, {} as ThemeObject);
     const selectedSetIds = selectedSets.map((set) => set.set);
 
-    const collections = await createNecessaryVariableCollections([themeContainer], selectedSetIds);
+    const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
+
+    const sourceSets = selectedSets.filter((t) => t.status === TokenSetStatus.SOURCE);
+    const sourceTokenSets = sourceSets.reduce((acc, curr) => {
+      acc[curr.set] = tokens[curr.set];
+      return acc;
+    }, {});
 
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
-          [set.set]: tokens[set.set],
+          ...sourceTokenSets,
+          [set.set]: tokens[set.set]
         };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
@@ -53,6 +76,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
         const allVariableObj = await updateVariables({
           collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
         });
+        figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
         if (Object.keys(allVariableObj.variableIds).length > 0) {
           allVariableCollectionIds[index] = {
             collectionId: collection.id,
@@ -67,10 +91,14 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     const existingVariables = await mergeVariableReferencesWithLocalVariables();
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
-  if (updatedVariables.length === 0) {
+
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
+
+  if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
   } else {
-    notifyUI(`${updatedVariableCollections.length} collections and ${updatedVariables.length} variables created`);
+    notifyUI(`${figmaVariableCollectionsAfterCreate - figmaVariableCollectionsBeforeCreate} collections and ${figmaVariablesAfterCreate - figmaVariablesBeforeCreate} variables created`);
   }
   return {
     allVariableCollectionIds,
