@@ -93,24 +93,29 @@ export default function DuplicateTokenGroupModal({
           <ErrorMessage css={{ width: '100%', maxHeight: 150, overflow: 'scroll' }}>
             {{
               [ErrorType.NoSetSelected]: t('duplicateGroupModal.errors.noSetSelected'),
+              [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
               [ErrorType.ExistingGroup]: t('duplicateGroupModal.errors.existingGroup'),
-              [ErrorType.OverlappingToken]: error.foundOverlappingToken && (
+              [ErrorType.OverlappingToken]: error.foundOverlappingTokens && (
                 <>
                   {t('duplicateGroupModal.errors.overlappingToken', {
-                    tokenSets: Object.keys(error.foundOverlappingToken).map((n) => `“${n}”`).join(', '),
+                    tokenSets: Object.keys(error.foundOverlappingTokens).map((n) => `“${n}”`).join(', '),
                   })}
-                  {Object.entries(error.foundOverlappingToken).map(([selectedSet, overlappingToken]) => (
-                    <>
-                      <Tooltip label="Set" side="right">
-                        <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>
-                          {selectedSet}
-                        </Text>
-                      </Tooltip>
-                      <StyledTokenButton as="div" css={{ display: 'inline-flex', borderRadius: '$small', margin: 0 }}>
-                        <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{overlappingToken.name}</span></StyledTokenButtonText>
-                      </StyledTokenButton>
-                    </>
-                  ))}
+                    {Object.entries(error.foundOverlappingTokens).map(([selectedSet, overlappingTokens]) => (
+                      <>
+                        <Tooltip label="Set" side="right">
+                          <Text css={{ marginTop: '$2', marginBottom: '$2', fontWeight: '$bold' }}>
+                            {selectedSet}
+                          </Text>
+                        </Tooltip>
+                        <Stack direction="row" gap={2}>
+                          {overlappingTokens.map((t) => (
+                            <StyledTokenButton as="div" css={{ display: 'inline-flex', borderRadius: '$small', margin: 0 }}>
+                              <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{t.name}</span></StyledTokenButtonText>
+                            </StyledTokenButton>
+                          ))}
+                        </Stack>
+                      </>
+                    ))}
                 </>
               ),
               [ErrorType.OverlappingGroup]: (

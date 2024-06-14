@@ -9,7 +9,7 @@ import Stack from '../Stack';
 import Input from '../Input';
 import Text from '../Text';
 import { StyledTokenButton, StyledTokenButtonText } from '../TokenButton/StyledTokenButton';
-import { validateRenameGroupName } from '@/utils/validateGroupName';
+import { validateRenameGroupName, ErrorType } from '@/utils/validateGroupName';
 
 type Props = {
   isOpen: boolean
@@ -20,13 +20,6 @@ type Props = {
   handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   type: string
 };
-
-enum ErrorType {
-  UniqueToken = 'uniqueToken',
-  ExistingGroup = 'existingGroup',
-  OverlappingToken = 'overlappingToken',
-  OverlappingGroup = 'overlappingGroup',
-}
 
 export default function RenameTokenGroupModal({
   isOpen, newName, oldName, onClose, handleRenameTokenGroupSubmit, handleNewTokenGroupNameChange, type,
@@ -75,19 +68,22 @@ export default function RenameTokenGroupModal({
         {!canRename && error && (
           <ErrorMessage css={{ width: '100%', maxHeight: 150, overflow: 'scroll' }}>
             {{
-              [ErrorType.OverlappingToken]: (
+              [ErrorType.EmptyGroupName]: t('duplicateGroupModal.errors.emptyGroupName'),
+              [ErrorType.OverlappingToken]: error.foundOverlappingTokens?.length > 0 && (
                 <>
                   {t('renameGroupModal.errors.overlappingToken', {
                     tokenSet: activeTokenSet,
                   })}
-                  <StyledTokenButton
-                    as="div"
-                    css={{
-                      display: 'inline-flex', borderRadius: '$small', margin: 0, marginLeft: '$2',
-                    }}
-                  >
-                    <StyledTokenButtonText css={{ wordBreak: 'break-word' }}><span>{error.foundOverlappingToken?.name}</span></StyledTokenButtonText>
-                  </StyledTokenButton>
+                  {error.foundOverlappingTokens?.map((t) => (
+                    <StyledTokenButton
+                      as="div"
+                      css={{
+                        display: 'inline-flex', borderRadius: '$small', margin: 0, marginLeft: '$2',
+                      }}
+                    >
+                      <StyledTokenButtonText key={t.name} css={{ wordBreak: 'break-word' }}><span>{t.name}</span></StyledTokenButtonText>
+                    </StyledTokenButton>
+                  ))}
                 </>
               ),
               [ErrorType.OverlappingGroup]: (
