@@ -40,6 +40,19 @@ const RemConfiguration = () => {
     [tokens, usedTokenSet, activeTokenSet],
   );
 
+  const displayBaseFontValue = React.useMemo(() => {
+    const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+
+    if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
+      const remValue = typeof resolvedAliasBaseFontSize === 'number'
+        ? resolvedAliasBaseFontSize / 16
+        : parseFloat(resolvedAliasBaseFontSize) / 16;
+      const formattedRemValue = isNaN(remValue) ? 1 : Number(remValue.toFixed(2));
+      return `${t('baseFont')} (${formattedRemValue} rem)`;
+    }
+    return `${t('baseFont')} (1 rem)`;
+  }, [aliasBaseFontSize, resolvedTokens]);
+
   const handleBaseFontSizeChange = React.useCallback(
     (property: string, value: string) => {
       dispatch.settings.setAliasBaseFontSize(value);
@@ -65,8 +78,8 @@ const RemConfiguration = () => {
   return (
     <Stack direction="row" align="center" justify="between" css={{ width: '100%' }}>
       <Stack direction="row" align="center" gap={1}>
-        <Label>{t('baseFont')}</Label>
-        <ExplainerModal title={t('baseFont')}>
+        <Label>{displayBaseFontValue}</Label>
+        <ExplainerModal title={displayBaseFontValue}>
           <Box as="img" src={remConfigurationImage} css={{ borderRadius: '$small' }} />
           <Box>{t('baseFontExplanation')}</Box>
         </ExplainerModal>
@@ -79,7 +92,7 @@ const RemConfiguration = () => {
       <Modal
         isOpen={modalVisible}
         close={toggleModalVisible}
-        title={t('baseFont')}
+        title={displayBaseFontValue}
         showClose
         modal={false}
         footer={(
