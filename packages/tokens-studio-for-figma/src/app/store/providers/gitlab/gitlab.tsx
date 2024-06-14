@@ -110,6 +110,12 @@ export function useGitLab() {
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
           };
         }
+        if (e instanceof Error && e.message === ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR,
+          };
+        }
         return {
           status: 'failure',
           errorMessage: ErrorMessages.GITLAB_CREDENTIAL_ERROR,

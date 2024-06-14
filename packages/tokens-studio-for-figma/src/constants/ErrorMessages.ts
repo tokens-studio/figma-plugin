@@ -18,4 +18,5 @@ export enum ErrorMessages {
   ID_NON_EXIST_ERROR = 'ID or Secret should be exist',
   JSONBIN_CREATE_ERROR = 'Error creating JSONbin token storage',
   GIT_MULTIFILE_PERMISSION_ERROR = 'You try to save a multi-file project as a free user. Upgrade to Pro or add a json file at the end of the filepath (tokens.json)',
+  GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR = '403 Forbidden - You are not allowed to push into this branch',
 }
