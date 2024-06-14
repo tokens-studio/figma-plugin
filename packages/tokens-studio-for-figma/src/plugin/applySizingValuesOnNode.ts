@@ -4,6 +4,7 @@ import { isPrimitiveValue } from '@/utils/is';
 import { tryApplyVariableId } from '@/utils/tryApplyVariableId';
 import { transformValue } from './helpers';
 import { isAutoLayout } from '@/utils/isAutoLayout';
+import { isPartOfInstance } from '@/utils/is/isPartOfInstance';
 
 export async function applySizingValuesOnNode(
   node: BaseNode,
@@ -53,6 +54,7 @@ export async function applySizingValuesOnNode(
   if (
     node.type !== 'DOCUMENT'
     && node.type !== 'PAGE'
+    && !isPartOfInstance(node.id)
     && (isAutoLayout(node)
       || (node.parent && node.parent.type !== 'DOCUMENT' && node.parent.type !== 'PAGE' && isAutoLayout(node.parent)))
   ) {
