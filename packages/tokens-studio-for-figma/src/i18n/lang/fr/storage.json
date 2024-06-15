@@ -3,6 +3,7 @@
   "youCanAlwaysGoBack": "Vous pouvez toujours revenir au stockage distant.",
   "addNewSyncProvider": "Ajouter un nouveau fournisseur de synchronisation",
   "editCredentials": "Modifier les informations d'identification du fournisseur de synchronisation",
+  "choose": "Choisir",
   "name": "Nom",
   "pat": "Jeton d'accès personnel",
   "gitExplained": "Lisez vos jetons stockés sur votre référentiel, à proximité de votre code.",

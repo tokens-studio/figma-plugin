@@ -3,6 +3,7 @@
   "youCanAlwaysGoBack": "U kunt altijd teruggaan naar externe opslag.",
   "addNewSyncProvider": "Nieuwe synchronisatieprovider toevoegen",
   "editCredentials": "Bewerk de inloggegevens van de synchronisatieprovider",
+  "choose": "Kiezen",
   "name": "Naam",
   "pat": "Persoonlijk toegangstoken",
   "gitExplained": "Lees uw tokens die in uw repository zijn opgeslagen, dichtbij uw code.",
