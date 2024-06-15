@@ -59,7 +59,7 @@ export default function JSONBinForm({
         <Text muted>
           {t('providers.jsonbin.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider">{t('readMore')}</Link>
+          <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>

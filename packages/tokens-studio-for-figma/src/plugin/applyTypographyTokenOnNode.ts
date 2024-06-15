@@ -57,6 +57,16 @@ export async function applyTypographyTokenOnNode(
     || values.textCase
     || values.textDecoration
   ) {
+    const resolvedValueObject = {
+      fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
+      fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
+      lineHeight: isPrimitiveValue(data.lineHeights) ? String(data.lineHeights.startsWith('{') ? data.lineHeights : `{${data.lineHeights}}`) : undefined,
+      fontSize: isPrimitiveValue(data.fontSizes) ? String(data.fontSizes.startsWith('{') ? data.fontSizes : `{${data.fontSizes}}`) : undefined,
+      letterSpacing: isPrimitiveValue(data.letterSpacing) ? String(data.letterSpacing.startsWith('{') ? data.letterSpacing : `{${data.letterSpacing}}`) : undefined,
+      paragraphSpacing: isPrimitiveValue(data.paragraphSpacing) ? String(data.paragraphSpacing.startsWith('{') ? data.paragraphSpacing : `{${data.paragraphSpacing}}`) : undefined,
+      textCase: isPrimitiveValue(data.textCase) ? String(data.textCase.startsWith('{') ? data.textCase : `{${data.textCase}}`) : undefined,
+      textDecoration: isPrimitiveValue(data.textDecoration) ? String(data.textDecoration.startsWith('{') ? data.textDecoration : `{${data.textDecoration}}`) : undefined,
+    }
     const valueObject = {
       fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : undefined,
       fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : undefined,
@@ -70,7 +80,7 @@ export async function applyTypographyTokenOnNode(
     await tryApplyTypographyCompositeVariable({
       target: node,
       value: valueObject,
-      resolvedValue: valueObject,
+      resolvedValue: resolvedValueObject,
       baseFontSize,
     });
   }

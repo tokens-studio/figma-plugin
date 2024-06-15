@@ -3,10 +3,9 @@ import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, DropdownMenu, Stack, Box,
+  Button, DropdownMenu, Stack,
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
-import { styled } from '@/stitches.config';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
@@ -41,11 +40,6 @@ export default function ApplySelector() {
   const handlePreferRawValues = React.useCallback(() => {
     setApplyVariablesStyleOrRawValue(ApplyVariablesStylesOrRawValues.RAW_VALUES);
   }, [setApplyVariablesStyleOrRawValue]);
-
-  const StyledDropdownOptionDescription = styled(Box, {
-    fontSize: '$xxsmall',
-    color: '$fgMuted',
-  });
 
   return (
     <Stack direction="row">
@@ -84,7 +78,7 @@ export default function ApplySelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top">
+          <DropdownMenu.Content side="top" css={{ maxWidth: '350px' }}>
             <DropdownMenu.Label>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Label>
             <DropdownMenu.RadioGroup value={updateMode}>
               <DropdownMenu.RadioItem
@@ -126,9 +120,6 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
-                <StyledDropdownOptionDescription>
-                  {t('applyTo.variablesStyles.description')}
-                </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-raw-values"
@@ -139,9 +130,6 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
-                <StyledDropdownOptionDescription>
-                  {t('applyTo.rawValues.description')}
-                </StyledDropdownOptionDescription>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
           </DropdownMenu.Content>

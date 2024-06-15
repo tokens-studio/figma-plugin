@@ -101,13 +101,19 @@ export function useGitLab() {
           themes,
           metadata: {},
         };
-      } catch (e) {
+      } catch (e: any) {
         closePushDialog();
         console.log('Error pushing to GitLab', e);
         if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
           return {
             status: 'failure',
             errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+          };
+        }
+        if (e instanceof Error && e.message === ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR,
           };
         }
         return {

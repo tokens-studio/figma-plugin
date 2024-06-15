@@ -4,14 +4,8 @@ import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
 import { styled } from '@/stitches.config';
-
-const StyledButton = styled('button', {
-  display: 'block',
-  width: '1.5rem',
-  height: '1.5rem',
-  borderRadius: '$small',
-  cursor: 'pointer',
-});
+import { getAliasValue } from '@/utils/alias';
+import { ColorPickerTrigger } from './ColorPickerTrigger';
 
 export default function BorderTokenDownShiftInput({
   name,
@@ -23,16 +17,30 @@ export default function BorderTokenDownShiftInput({
   handleToggleInputHelper,
   onSubmit,
 }: {
-  name: string,
+  name: string;
   value: string;
   type: string;
   resolvedTokens: ResolveTokenValuesResult[];
   handleChange: (property: string, value: string) => void;
   setInputValue: (newInputValue: string, property: string) => void;
   handleToggleInputHelper?: () => void;
-  onSubmit: () => void
+  onSubmit: () => void;
 }) {
-  const handleBorderDownShiftInputChange = React.useCallback((newInputValue: string) => setInputValue(newInputValue, name), [name, setInputValue]);
+  const [resolvedColor, setResolvedColor] = React.useState<string>(value ? String(value) : '');
+
+  React.useEffect(() => {
+    if (name === 'color' && value && value.startsWith('{')) {
+      const aliasValue = getAliasValue(value, resolvedTokens);
+      setResolvedColor(aliasValue ? String(aliasValue) : '');
+    } else {
+      setResolvedColor(typeof value === 'string' ? value : '');
+    }
+  }, [value, resolvedTokens, name]);
+
+  const handleBorderDownShiftInputChange = React.useCallback(
+    (newInputValue: string) => setInputValue(newInputValue, name),
+    [name, setInputValue],
+  );
   const getIconComponent = React.useMemo(() => getLabelForProperty(name), [name]);
 
   const { t } = useTranslation(['tokens']);
@@ -55,13 +63,7 @@ export default function BorderTokenDownShiftInput({
       placeholder={mapTypeToPlaceHolder[name as keyof typeof mapTypeToPlaceHolder] as unknown as string}
       prefix={
         name === 'color' && (
-          <StyledButton
-            type="button"
-            style={{ background: value ?? '#000000', fontSize: 0 }}
-            onClick={handleToggleInputHelper}
-          >
-            {value}
-          </StyledButton>
+          <ColorPickerTrigger onClick={handleToggleInputHelper} background={resolvedColor} />
         )
       }
       suffix

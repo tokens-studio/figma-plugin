@@ -3,6 +3,7 @@
   "youCanAlwaysGoBack": "您可以随时返回远程存储。",
   "addNewSyncProvider": "添加新的同步提供商",
   "editCredentials": "编辑同步提供商凭据",
+  "choose": "选择",
   "name": "姓名",
   "pat": "个人访问令牌",
   "gitExplained": "读取存储在存储库中靠近代码的令牌。",

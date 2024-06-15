@@ -111,7 +111,7 @@ describe('ConfirmDialog', () => {
     );
 
     await act(async () => {
-      const trigger = await result.getByTestId('add-storage-item-dropdown');
+      const trigger = await result.getByTestId('add-storage-item-button');
       trigger?.focus();
       await userEvent.keyboard('[Enter]');
     });

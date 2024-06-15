@@ -67,7 +67,7 @@ export default function SupernovaForm({
         <Text muted>
           {t('providers.supernova.description')}
           {' '}
-          <Link href="https://learn.supernova.io/" target="_blank">{t('readMore', { ns: 'general' })}</Link>
+          <Link href="https://learn.supernova.io/" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>

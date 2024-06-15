@@ -125,7 +125,7 @@ export default function GenericVersionedForm({
         <Text muted>
           {t('providers.generic.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider" target="_blank">{t('readMore')}</Link>
+          <Link href="https://docs.tokens.studio/sync/generic-storage?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('providers.generic.name')}</Label>
