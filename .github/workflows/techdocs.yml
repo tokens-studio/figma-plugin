@@ -1,4 +1,4 @@
-name: Merge
+name: Techdocs
 
 on:
   push:
@@ -12,34 +12,6 @@ permissions:
   contents: write
 
 jobs:
-  analysis:
-    name: Analyze
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Import Secrets
-        id: secrets
-        uses: hashicorp/vault-action@v2
-        with:
-          url: ${{ vars.VAULT_URL }}
-          role: sonarqube
-          method: jwt
-          namespace: admin
-          secrets: |
-            secret/data/cicd/sonarqube/global  SONAR_TOKEN |SONAR_TOKEN ;
-            secret/data/cicd/sonarqube/global  SONAR_HOST_URL | SONAR_HOST_URL;
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN:  ${{ steps.secrets.outputs.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ steps.secrets.outputs.SONAR_HOST_URL }}
-
-
   techdocs: 
     name: Techdocs
     runs-on: ubuntu-latest
