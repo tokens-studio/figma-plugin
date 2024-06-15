@@ -56,7 +56,6 @@ const SyncSettings = () => {
     {
       text: t('providers.generic.title'),
       type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-      description: t('providers.generic.description'),
     },
     {
       text: 'Tokens Studio',
@@ -157,14 +156,13 @@ const SyncSettings = () => {
                       <Stack direction="row" justify="between" align="center">
                         <Stack direction="column">
                           <Box css={{
-                            color: '$fgSubtle', display: 'inline-flex', gap: '$2', alignItems: 'center',
+                            color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
                           }}
                           >
-                            {getProviderIcon(provider.type)}
+                            <Box css={{ color: '$fgSubtle' }}>{getProviderIcon(provider.type)}</Box>
                             {provider.text}
                             {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
                           </Box>
-                          {provider.description && <Text>{provider.description}</Text>}
                         </Stack>
                         <Button
                           key={provider.type}

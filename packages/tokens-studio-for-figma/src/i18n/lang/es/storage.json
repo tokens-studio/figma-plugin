@@ -3,6 +3,7 @@
   "youCanAlwaysGoBack": "Siempre puedes volver al almacenamiento remoto.",
   "addNewSyncProvider": "Agregar nuevo proveedor de sincronización",
   "editCredentials": "Editar credenciales del proveedor de sincronización",
+  "choose": "Elegir",
   "name": "Nombre",
   "pat": "Token de acceso personal",
   "gitExplained": "Lea sus tokens que están almacenados en su repositorio, cerca de su código.",
