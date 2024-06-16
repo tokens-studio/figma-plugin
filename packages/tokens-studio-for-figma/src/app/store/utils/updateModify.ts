@@ -21,9 +21,7 @@ export function updateModify(token: SingleToken, data: TokenToRename) {
       ...token.$extensions,
       'studio.tokens': {
         ...token.$extensions['studio.tokens'],
-        modify: {
-          ...updatedModify,
-        },
+        ...(updatedModify && { modify: { ...updatedModify } }),
       },
     },
   } as SingleToken;
