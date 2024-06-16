@@ -171,7 +171,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     // because of specific logic requirements
     setError(null);
     dispatch.tokenState.setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState, getStringTokens]);
+  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState]); // getStringTokens removed to fix bug around first paste/edit (useEffect was being triggered)
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
