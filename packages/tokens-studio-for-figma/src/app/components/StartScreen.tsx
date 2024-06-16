@@ -74,7 +74,6 @@ function StartScreen() {
   return (
     <Box
       css={{
-        backgroundColor: '$loadingScreenBg',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -88,7 +87,6 @@ function StartScreen() {
           align="start"
           css={{
             padding: '$7',
-            backgroundColor: '$loadingScreenBg',
             margin: 'auto',
             maxWidth: '400px',
             borderRadius: '$medium',
