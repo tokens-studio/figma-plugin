@@ -33,7 +33,7 @@ describe('TokenGroupHeading', () => {
     await fireEvent.contextMenu(getByText('color'));
     await fireEvent.click(getByText('rename'));
 
-    expect(getByText('Rename color.slate')).toBeInTheDocument();
+    expect(getByText('rename color.slate')).toBeInTheDocument();
   });
 
   it('should render duplicate token group modal', async () => {
