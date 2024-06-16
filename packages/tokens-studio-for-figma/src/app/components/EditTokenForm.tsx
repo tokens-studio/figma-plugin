@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Heading, Textarea, Label, Stack,
-} from '@tokens-studio/ui';
+import { Button, Heading, Textarea, Label, Stack } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
@@ -14,13 +12,16 @@ import Text from './Text';
 import useConfirm from '../hooks/useConfirm';
 import useTokens from '../store/useTokens';
 import {
-  EditTokenObject, SingleBoxShadowToken, SingleDimensionToken, SingleToken, SingleTypographyToken,
+  EditTokenObject,
+  SingleBorderToken,
+  SingleBoxShadowToken,
+  SingleDimensionToken,
+  SingleToken,
+  SingleTypographyToken,
 } from '@/types/tokens';
 import { checkIfAlias, checkIfContainsAlias, getAliasValue } from '@/utils/alias';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
-import {
-  activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector,
-} from '@/selectors';
+import { activeTokenSetSelector, editTokenSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { TokenTypes } from '@/constants/TokenTypes';
 import TypographyInput from './TypographyInput';
 import DownshiftInput from './DownshiftInput';
@@ -46,7 +47,7 @@ type Props = {
   resolvedTokens: ResolveTokenValuesResult[];
 };
 
-type Choice = { key: string; label: string; enabled?: boolean, unique?: boolean };
+type Choice = { key: string; label: string; enabled?: boolean; unique?: boolean };
 
 // @TODO this needs to be reviewed from a typings perspective + performance
 function EditTokenForm({ resolvedTokens }: Props) {
@@ -56,17 +57,20 @@ function EditTokenForm({ resolvedTokens }: Props) {
   const editToken = useSelector(editTokenSelector);
   const themes = useSelector(themesListSelector);
   const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
-  const {
-    editSingleToken, createSingleToken, duplicateSingleToken, renameTokensAcrossSets,
-  } = useManageTokens();
-  const {
-    remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken,
-  } = useTokens();
+  const { editSingleToken, createSingleToken, duplicateSingleToken, renameTokensAcrossSets } = useManageTokens();
+  const { remapToken, renameStylesFromTokens, renameVariablesFromToken, updateVariablesFromToken } = useTokens();
   const dispatch = useDispatch<Dispatch>();
   const [error, setError] = React.useState<string | null>(null);
   const [internalEditToken, setInternalEditToken] = React.useState<typeof editToken>(editToken);
   const { confirm } = useConfirm();
-  const isValidDimensionToken = React.useMemo(() => internalEditToken.type === TokenTypes.DIMENSION && (internalEditToken.value?.endsWith('px') || internalEditToken.value?.endsWith('rem') || checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)), [internalEditToken, resolvedTokens, checkIfAlias]);
+  const isValidDimensionToken = React.useMemo(
+    () =>
+      internalEditToken.type === TokenTypes.DIMENSION &&
+      (internalEditToken.value?.endsWith('px') ||
+        internalEditToken.value?.endsWith('rem') ||
+        checkIfAlias(internalEditToken as SingleDimensionToken, resolvedTokens)),
+    [internalEditToken, resolvedTokens, checkIfAlias],
+  );
   const isValidColorToken = React.useMemo(() => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify?.type === ColorModifierTypes.MIX) {
       return !!internalEditToken?.$extensions?.['studio.tokens']?.modify?.color;
@@ -75,8 +79,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken]);
 
   const isValid = React.useMemo(() => {
-    if (internalEditToken?.type === TokenTypes.COMPOSITION && internalEditToken.value
-      && (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)) {
+    if (
+      internalEditToken?.type === TokenTypes.COMPOSITION &&
+      internalEditToken.value &&
+      (internalEditToken.value.hasOwnProperty('') || Object.keys(internalEditToken.value).length === 0)
+    ) {
       return false;
     }
     if (internalEditToken.type === TokenTypes.DIMENSION) {
@@ -88,26 +95,24 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return internalEditToken?.value && internalEditToken.name && !error;
   }, [internalEditToken, error, isValidColorToken, isValidDimensionToken]);
 
-  const hasNameThatExistsAlready = React.useMemo(
-    () => {
-      const editToken = resolvedTokens
-        .filter((t) => selectedTokenSets.includes(t.internal__Parent ?? ''))
-        .find((t) => t.name === internalEditToken?.name);
+  const hasNameThatExistsAlready = React.useMemo(() => {
+    const editToken = resolvedTokens
+      .filter((t) => selectedTokenSets.includes(t.internal__Parent ?? ''))
+      .find((t) => t.name === internalEditToken?.name);
 
-      if (editToken) {
-        editToken.description = internalEditToken.description;
-      }
+    if (editToken) {
+      editToken.description = internalEditToken.description;
+    }
 
-      return editToken;
-    },
-    [internalEditToken, resolvedTokens, activeTokenSet, selectedTokenSets],
-  );
+    return editToken;
+  }, [internalEditToken, resolvedTokens, activeTokenSet, selectedTokenSets]);
 
   const hasAnotherTokenThatStartsWithName = React.useMemo(
-    () => resolvedTokens
-      .filter((t) => t.internal__Parent === activeTokenSet)
-      .filter((t) => t.name !== internalEditToken?.initialName)
-      .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
+    () =>
+      resolvedTokens
+        .filter((t) => t.internal__Parent === activeTokenSet)
+        .filter((t) => t.name !== internalEditToken?.initialName)
+        .find((t) => t.name.startsWith(`${internalEditToken?.name}.`)),
     [internalEditToken, resolvedTokens, activeTokenSet],
   );
 
@@ -125,30 +130,34 @@ function EditTokenForm({ resolvedTokens }: Props) {
     return false;
   }, [internalEditToken]);
 
-  const hasPriorTokenName = React.useMemo(
-    () => {
-      const tokensWithSameParent = resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet);
-      if (internalEditToken?.status === EditTokenFormStatus.CREATE) {
-        // If we are creating a new token, disallow naming it as a prefix of an existing token
-        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
-      } if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
-        // If we are editing a token, only disallow the name if it's prefix matches another token and it is not the token we are currently editing
-        return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`) && internalEditToken.initialName !== t.name);
-      }
-      return false;
-    },
-    [internalEditToken, resolvedTokens, activeTokenSet],
-  );
+  const hasPriorTokenName = React.useMemo(() => {
+    const tokensWithSameParent = resolvedTokens.filter((t) => t.internal__Parent === activeTokenSet);
+    if (internalEditToken?.status === EditTokenFormStatus.CREATE) {
+      // If we are creating a new token, disallow naming it as a prefix of an existing token
+      return tokensWithSameParent.find((t) => internalEditToken.name?.startsWith(`${t.name}.`));
+    }
+    if (internalEditToken?.status === EditTokenFormStatus.EDIT) {
+      // If we are editing a token, only disallow the name if it's prefix matches another token and it is not the token we are currently editing
+      return tokensWithSameParent.find(
+        (t) => internalEditToken.name?.startsWith(`${t.name}.`) && internalEditToken.initialName !== t.name,
+      );
+    }
+    return false;
+  }, [internalEditToken, resolvedTokens, activeTokenSet]);
 
-  const nameWasChanged = React.useMemo(() => internalEditToken?.initialName !== internalEditToken?.name, [
-    internalEditToken,
-  ]);
+  const nameWasChanged = React.useMemo(
+    () => internalEditToken?.initialName !== internalEditToken?.name,
+    [internalEditToken],
+  );
 
   React.useEffect(() => {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError(t('tokenNamesMustBeUnique', { ns: 'errors' }));
     }
-    if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasAnotherTokenThatStartsWithName) {
+    if (
+      (internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) &&
+      hasAnotherTokenThatStartsWithName
+    ) {
       setError(t('mustNotUseNameOfAnotherGroup', { ns: 'errors' }));
     }
     if ((internalEditToken?.status || nameWasChanged) && hasPriorTokenName) {
@@ -182,14 +191,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBlur = React.useCallback(
-    () => {
-      if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
-        setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
-      }
-    },
-    [internalEditToken, isValidDimensionToken],
-  );
+  const handleBlur = React.useCallback(() => {
+    if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
+      setError(t('valueMustIncludePxOrRem', { ns: 'errors' }));
+    }
+  }, [internalEditToken, isValidDimensionToken]);
 
   const handleBoxShadowValueChange = React.useCallback(
     (shadow: SingleBoxShadowToken['value']) => {
@@ -232,23 +238,29 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleTypographyValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
-      setInternalEditToken({
-        ...internalEditToken,
-        value: { ...internalEditToken.value, [property]: newInputValue },
-      });
-    }
-  }, [internalEditToken]);
+  const handleTypographyValueDownShiftInputChange = React.useCallback(
+    (newInputValue: string, property: string) => {
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof internalEditToken?.value !== 'string') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: { ...internalEditToken.value, [property]: newInputValue },
+        });
+      }
+    },
+    [internalEditToken],
+  );
 
-  const setTypographyValue = React.useCallback((newTypographyValue: SingleTypographyToken['value']) => {
-    if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof newTypographyValue === 'object') {
-      setInternalEditToken({
-        ...internalEditToken,
-        value: { ...newTypographyValue },
-      });
-    }
-  }, [internalEditToken]);
+  const setTypographyValue = React.useCallback(
+    (newTypographyValue: SingleTypographyToken['value']) => {
+      if (internalEditToken?.type === TokenTypes.TYPOGRAPHY && typeof newTypographyValue === 'object') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: { ...newTypographyValue },
+        });
+      }
+    },
+    [internalEditToken],
+  );
 
   const handleBorderValueChange = React.useCallback(
     (property: string, value: string) => {
@@ -265,14 +277,29 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
-  const handleBorderValueDownShiftInputChange = React.useCallback((newInputValue: string, property: string) => {
-    if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
-      setInternalEditToken({
-        ...internalEditToken,
-        value: { ...internalEditToken.value, [property]: newInputValue },
-      });
-    }
-  }, [internalEditToken]);
+  const handleBorderValueDownShiftInputChange = React.useCallback(
+    (newInputValue: string, property: string) => {
+      if (internalEditToken?.type === TokenTypes.BORDER && typeof internalEditToken?.value !== 'string') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: { ...internalEditToken.value, [property]: newInputValue },
+        });
+      }
+    },
+    [internalEditToken],
+  );
+
+  const setBorderValue = React.useCallback(
+    (newBorderValue: SingleBorderToken['value']) => {
+      if (internalEditToken?.type === TokenTypes.BORDER && typeof newBorderValue === 'object') {
+        setInternalEditToken({
+          ...internalEditToken,
+          value: { ...newBorderValue },
+        });
+      }
+    },
+    [internalEditToken],
+  );
 
   const removeColorModify = React.useCallback(() => {
     const newValue = { ...internalEditToken.$extensions?.['studio.tokens'] };
@@ -286,25 +313,31 @@ function EditTokenForm({ resolvedTokens }: Props) {
     });
   }, [internalEditToken]);
 
-  const handleColorModifyChange = React.useCallback((newModify: ColorModifier) => {
-    setInternalEditToken({
-      ...internalEditToken,
-      $extensions: {
-        ...internalEditToken.$extensions,
-        'studio.tokens': {
-          ...internalEditToken.$extensions?.['studio.tokens'],
-          modify: newModify,
-        },
-      } as SingleToken['$extensions'],
-    });
-  }, [internalEditToken]);
+  const handleColorModifyChange = React.useCallback(
+    (newModify: ColorModifier) => {
+      setInternalEditToken({
+        ...internalEditToken,
+        $extensions: {
+          ...internalEditToken.$extensions,
+          'studio.tokens': {
+            ...internalEditToken.$extensions?.['studio.tokens'],
+            modify: newModify,
+          },
+        } as SingleToken['$extensions'],
+      });
+    },
+    [internalEditToken],
+  );
 
-  const handleDownShiftInputChange = React.useCallback((newInputValue: string) => {
-    setInternalEditToken({
-      ...internalEditToken,
-      value: newInputValue,
-    } as typeof editToken);
-  }, [internalEditToken]);
+  const handleDownShiftInputChange = React.useCallback(
+    (newInputValue: string) => {
+      setInternalEditToken({
+        ...internalEditToken,
+        value: newInputValue,
+      } as typeof editToken);
+    },
+    [internalEditToken],
+  );
 
   const handleDescriptionChange = React.useCallback(
     (value: string) => {
@@ -328,9 +361,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [internalEditToken, resolvedTokens]);
 
   // @TODO update to useCallback
-  const submitTokenValue = async ({
-    type, value, name, $extensions,
-  }: EditTokenObject) => {
+  const submitTokenValue = async ({ type, value, name, $extensions }: EditTokenObject) => {
     if (internalEditToken && value && name) {
       let oldName: string | undefined;
       if (internalEditToken.initialName !== name && internalEditToken.initialName) {
@@ -344,10 +375,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       if (internalEditToken.status === EditTokenFormStatus.CREATE) {
         track('Create token', { type: internalEditToken.type, isModifier: !!$extensions?.['studio.tokens']?.modify });
         createSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           name: newName,
           type,
@@ -356,10 +384,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
         });
       } else if (internalEditToken.status === EditTokenFormStatus.EDIT) {
         editSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           name: newName,
           oldName,
@@ -382,23 +407,38 @@ function EditTokenForm({ resolvedTokens }: Props) {
           track('Edit token', { renamed: true, type: internalEditToken.type });
           const choices: Choice[] = [
             {
-              key: UpdateMode.SELECTION, label: 'Selection', unique: true, enabled: UpdateMode.SELECTION === lastUsedRenameOption,
+              key: UpdateMode.SELECTION,
+              label: 'Selection',
+              unique: true,
+              enabled: UpdateMode.SELECTION === lastUsedRenameOption,
             },
             {
-              key: UpdateMode.PAGE, label: 'Page', unique: true, enabled: UpdateMode.PAGE === lastUsedRenameOption,
+              key: UpdateMode.PAGE,
+              label: 'Page',
+              unique: true,
+              enabled: UpdateMode.PAGE === lastUsedRenameOption,
             },
             {
-              key: UpdateMode.DOCUMENT, label: 'Document', unique: true, enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
+              key: UpdateMode.DOCUMENT,
+              label: 'Document',
+              unique: true,
+              enabled: UpdateMode.DOCUMENT === lastUsedRenameOption,
             },
           ];
-          if (themes.length > 0 && [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)) {
+          if (
+            themes.length > 0 &&
+            [TokenTypes.COLOR, TokenTypes.TYPOGRAPHY, TokenTypes.BOX_SHADOW].includes(internalEditToken.type)
+          ) {
             choices.push({
-              key: StyleOptions.RENAME, label: 'Rename styles', enabled: lastUsedRenameStyles,
+              key: StyleOptions.RENAME,
+              label: 'Rename styles',
+              enabled: lastUsedRenameStyles,
             });
           }
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
             choices.push({
-              key: ModalOptions.RENAME_VARIABLE, label: 'Rename variable',
+              key: ModalOptions.RENAME_VARIABLE,
+              label: 'Rename variable',
             });
           }
           const tokenSetsContainsSameToken: string[] = [];
@@ -409,7 +449,8 @@ function EditTokenForm({ resolvedTokens }: Props) {
           });
           if (tokenSetsContainsSameToken.length > 1) {
             choices.push({
-              key: ModalOptions.RENAME_ACROSS_SETS, label: 'Rename in other sets',
+              key: ModalOptions.RENAME_ACROSS_SETS,
+              label: 'Rename in other sets',
             });
           }
           const confirmData = await confirm({
@@ -418,7 +459,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
             choices,
           });
           if (confirmData && confirmData.result) {
-            if (confirmData.data.some((data: string) => [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode))) {
+            if (
+              confirmData.data.some((data: string) =>
+                [UpdateMode.DOCUMENT, UpdateMode.PAGE, UpdateMode.SELECTION].includes(data as UpdateMode),
+              )
+            ) {
               remapToken(oldName, newName, confirmData.data[0]);
               lastUsedRenameOption = confirmData.data[0] as UpdateMode;
             }
@@ -439,10 +484,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
       } else if (internalEditToken.status === EditTokenFormStatus.DUPLICATE) {
         oldName = internalEditToken.initialName?.slice(0, internalEditToken.initialName?.lastIndexOf('-copy'));
         duplicateSingleToken({
-          description: (
-            internalEditToken.description
-            ?? internalEditToken.oldDescription
-          ),
+          description: internalEditToken.description ?? internalEditToken.oldDescription,
           parent: activeTokenSet,
           newName,
           oldName,
@@ -466,11 +508,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
-  const handleSaveShortcut = React.useCallback((e: KeyboardEvent) => {
-    if (e.metaKey || e.ctrlKey) {
-      checkAndSubmitTokenValue();
-    }
-  }, [checkAndSubmitTokenValue]);
+  const handleSaveShortcut = React.useCallback(
+    (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey) {
+        checkAndSubmitTokenValue();
+      }
+    },
+    [checkAndSubmitTokenValue],
+  );
 
   useShortcut(['Enter'], handleSaveShortcut);
 
@@ -532,6 +577,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             handleBorderValueDownShiftInputChange={handleBorderValueDownShiftInputChange}
             handleBorderAliasValueChange={handleChange}
             handleDownShiftInputChange={handleDownShiftInputChange}
+            setBorderValue={setBorderValue}
             onSubmit={checkAndSubmitTokenValue}
           />
         );
@@ -568,18 +614,19 @@ function EditTokenForm({ resolvedTokens }: Props) {
             />
 
             {checkIfContainsAlias(internalEditToken.value) && (
-              <Box css={{
-                display: 'flex',
-                padding: '$3',
-                marginTop: '$3',
-                fontFamily: '$mono',
-                color: '$fgMuted',
-                backgroundColor: '$bgSubtle',
-                borderColor: '$borderSubtle',
-                borderRadius: '$medium',
-                fontSize: '$xxs',
-                alignItems: 'center',
-              }}
+              <Box
+                css={{
+                  display: 'flex',
+                  padding: '$3',
+                  marginTop: '$3',
+                  fontFamily: '$mono',
+                  color: '$fgMuted',
+                  backgroundColor: '$bgSubtle',
+                  borderColor: '$borderSubtle',
+                  borderRadius: '$medium',
+                  fontSize: '$xxs',
+                  alignItems: 'center',
+                }}
               >
                 {resolvedValue?.toString()}
               </Box>
@@ -607,7 +654,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
         />
         {renderTokenForm()}
 
-        {internalEditToken?.schema?.explainer && <Text muted size="small">{internalEditToken.schema.explainer}</Text>}
+        {internalEditToken?.schema?.explainer && (
+          <Text muted size="small">
+            {internalEditToken.schema.explainer}
+          </Text>
+        )}
         <Box>
           <Heading size="small">{t('description')}</Heading>
           <Textarea
@@ -619,14 +670,16 @@ function EditTokenForm({ resolvedTokens }: Props) {
             css={{ fontSize: '$xsmall', padding: '$3' }}
           />
         </Box>
-        {
-          internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
-            <Box>
-              <Label>{t('set', { ns: 'general' })}</Label>
-              <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
-            </Box>
-          )
-        }
+        {internalEditToken.status === EditTokenFormStatus.DUPLICATE && (
+          <Box>
+            <Label>{t('set', { ns: 'general' })}</Label>
+            <MultiSelectDropdown
+              menuItems={Object.keys(tokens)}
+              selectedItems={selectedTokenSets}
+              handleSelectedItemChange={handleSelectedItemChange}
+            />
+          </Box>
+        )}
         <Stack direction="row" justify="end" gap={3}>
           <Button variant="secondary" type="button" onClick={handleReset}>
             {t('cancel')}
@@ -634,10 +687,9 @@ function EditTokenForm({ resolvedTokens }: Props) {
           <Button disabled={!isValid || !!error} variant="primary" type="submit">
             {internalEditToken?.status === EditTokenFormStatus.CREATE && t('create')}
             {internalEditToken?.status === EditTokenFormStatus.EDIT && t('save')}
-            {(
-              internalEditToken?.status !== EditTokenFormStatus.CREATE
-              && internalEditToken?.status !== EditTokenFormStatus.EDIT
-            ) && t('duplicate')}
+            {internalEditToken?.status !== EditTokenFormStatus.CREATE &&
+              internalEditToken?.status !== EditTokenFormStatus.EDIT &&
+              t('duplicate')}
           </Button>
         </Stack>
       </Stack>

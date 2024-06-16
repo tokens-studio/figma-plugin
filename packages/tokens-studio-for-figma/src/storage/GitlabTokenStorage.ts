@@ -229,16 +229,23 @@ export class GitlabTokenStorage extends GitTokenStorage {
       })));
     }
 
-    const response = await this.gitlabClient.Commits.create(
-      this.projectId,
-      branch,
-      message,
-      gitlabActions,
-      shouldCreateBranch ? {
-        startBranch: branches[0],
-      } : undefined,
-    );
-    return !!response;
+    try {
+      const response = await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        message,
+        gitlabActions,
+        shouldCreateBranch ? {
+          startBranch: branches[0],
+        } : undefined,
+      );
+      return !!response;
+    } catch (e: any) {
+      if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
+        throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
+      }
+      throw new Error(e);
+    }
   }
 
   public async getLatestCommitDate(): Promise<Date | null> {
