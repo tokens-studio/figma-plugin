@@ -20,23 +20,22 @@ export default function TokenNodes({ nodes }: { nodes: NodeInfo[] }) {
   }, [nodes]);
 
   const dropdownContent = (
-    <DropdownMenu.Content sideOffset={4}>
-      <DropdownMenu.Arrow offset={14} />
-      <Box
-        css={{
-          width: '164px',
-          background: '$contextMenuBg',
-          borderRadius: '$medium',
-          padding: '$2 0',
-          fontSize: '$small',
-          maxHeight: `${VISIBLE_VIEWPORT_NODES * NODE_HEIGHT + CONTAINER_PADDING}px`,
-        }}
-        className={`content content-dark ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
-      >
-        {nodes.map(({ id, name, type }) => (
-          <TokenNode key={id} id={id} name={name} type={type} />
-        ))}
-      </Box>
+    <DropdownMenu.Content
+      css={{
+        width: '164px',
+        background: '$contextMenuBg',
+        borderRadius: '$medium',
+        padding: '$2 0',
+        fontSize: '$small',
+        maxHeight: `${VISIBLE_VIEWPORT_NODES * NODE_HEIGHT + CONTAINER_PADDING}px`,
+      }}
+      sideOffset={4}
+      className={`content content-dark ${nodes.length > VISIBLE_VIEWPORT_NODES ? 'scroll-container' : null}`}
+    >
+
+      {nodes.map(({ id, name, type }) => (
+        <TokenNode key={id} id={id} name={name} type={type} />
+      ))}
     </DropdownMenu.Content>
   );
 
