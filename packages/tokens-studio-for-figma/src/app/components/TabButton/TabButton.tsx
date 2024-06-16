@@ -29,6 +29,7 @@ const StyledButton = styled('button', {
   gap: '$2',
   cursor: 'pointer',
   color: '$fgSubtle',
+  opacity: 0.7,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   '&:not(:disabled):focus, &:not(:disabled):hover': {
@@ -45,7 +46,7 @@ const StyledButton = styled('button', {
   },
   variants: {
     isActive: {
-      true: { color: '$fgDefault' },
+      true: { color: '$fgDefault', opacity: 1 },
     },
     small: {
       true: {

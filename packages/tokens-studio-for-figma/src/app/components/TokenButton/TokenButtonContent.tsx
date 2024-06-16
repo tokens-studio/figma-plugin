@@ -1,6 +1,5 @@
 import React, { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { lightOrDark } from '@/utils/color';
 import { TokensContext } from '@/context';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
@@ -56,7 +55,7 @@ export default function TokenButtonContent({
       case TokenTypes.COLOR: {
         return {
           '--backgroundColor': String(displayValue),
-          '--borderColor': lightOrDark(String(displayValue)) === 'light' ? '$colors$borderDefault' : '$colors$borderMuted',
+          '--borderColor': '$colors$borderMuted',
         };
       }
       case TokenTypes.BORDER_RADIUS: {
