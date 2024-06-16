@@ -3,7 +3,7 @@ import React from 'react';
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, DropdownMenu, Stack, Box
+  Button, DropdownMenu, Stack,
 } from '@tokens-studio/ui';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
@@ -50,7 +50,7 @@ export default function ApplySelector() {
         css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={handleUpdate}
       >
-        {t('applyTo.applyTo')}
+        {t('applyTo.button')}
         {' '}
         {updateMode}
       </Button>
@@ -79,8 +79,7 @@ export default function ApplySelector() {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top" css={{ maxWidth: '350px' }}>
-            {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyTo')}</DropdownMenu.Item>
+            <DropdownMenu.Label>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Label>
             <DropdownMenu.RadioGroup value={updateMode}>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-selection"
@@ -91,18 +90,12 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.selection.title')}
-                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                  {t('applyTo.selection.description')}
-                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.page.title')}
-                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                  {t('applyTo.page.description')}
-                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-to-document"
@@ -112,15 +105,11 @@ export default function ApplySelector() {
                 <DropdownMenu.ItemIndicator>
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
-                {t('applyTo.doc.title')}
-                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                  {t('applyTo.doc.description')}
-                </Box>
+                {t('applyTo.document.title')}
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
             <DropdownMenu.Separator />
-            {/* TODO: Use DropdownMenu.Label - first add that to `ds` */}
-            <DropdownMenu.Item disabled>{t('applyTo.applyAs')}</DropdownMenu.Item>
+            <DropdownMenu.Label>{t('applyTo.applyCurrentTokensAs')}</DropdownMenu.Label>
             <DropdownMenu.RadioGroup value={applyVariablesStylesOrRawValue}>
               <DropdownMenu.RadioItem
                 data-testid="apply-variables-styles"
@@ -131,9 +120,6 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
-                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                  {t('applyTo.variablesStyles.description')}
-                </Box>
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 data-testid="apply-raw-values"
@@ -144,9 +130,6 @@ export default function ApplySelector() {
                   <DotFilledIcon />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
-                <Box css={{ color: '$contextMenuFgMuted', fontSize: '$xxsmall' }}>
-                  {t('applyTo.rawValues.description')}
-                </Box>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
           </DropdownMenu.Content>
