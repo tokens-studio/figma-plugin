@@ -1,8 +1,8 @@
 import React, { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Spinner, Stack } from '@tokens-studio/ui';
-import FigmaMark from '@/icons/figma-mark.svg';
-import FigmaLetter from '@/icons/figma-letter.svg';
+import TokensStudioIcon from '@/icons/tokensstudio.svg';
+import TokensStudioWord from '@/icons/tokensstudio-word.svg';
 import * as pjs from '../../../package.json';
 import { styled } from '@/stitches.config';
 
@@ -10,6 +10,16 @@ const StyledLoadingScreen = styled(Stack, {
   background: '$loadingScreenBg',
   height: '100vh',
   color: '$loadingScreenFg',
+});
+
+const StyledTokensStudioIcon = styled(TokensStudioIcon, {
+  width: '150px',
+  height: '125px',
+});
+
+const StyledTokensStudioWord = styled(TokensStudioWord, {
+  width: '200px',
+  height: '25px',
 });
 
 const StyledLoadingButton = styled('button', {
@@ -43,8 +53,8 @@ export default function FigmaLoading({
     <StyledLoadingScreen data-testid="figmaloading" justify="center" direction="column" gap={4} className="content scroll-container">
       <Stack direction="column" gap={4} align="center">
         <Stack direction="column" gap={4} align="center">
-          <FigmaMark />
-          <FigmaLetter />
+          <StyledTokensStudioIcon />
+          <StyledTokensStudioWord />
         </Stack>
         <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScreenFgMuted' }}>
           {t('version')}

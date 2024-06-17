@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import { CheckIcon, GearIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
+import { Check, Settings } from 'iconoir-react';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
@@ -36,7 +36,7 @@ export default function SettingsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger asChild data-testid="bottom-bar-settings">
-        <IconButton variant="invisible" size="small" icon={<GearIcon />} />
+        <IconButton variant="invisible" size="small" icon={<Settings />} />
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
@@ -47,7 +47,7 @@ export default function SettingsDropdown() {
             onCheckedChange={handleUpdateOnChange}
           >
             <DropdownMenu.ItemIndicator>
-              <CheckIcon />
+              <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.onChange.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
@@ -61,7 +61,7 @@ export default function SettingsDropdown() {
               onCheckedChange={handleUpdateRemote}
             >
               <DropdownMenu.ItemIndicator>
-                <CheckIcon />
+                <Check />
               </DropdownMenu.ItemIndicator>
               {t('update.remoteJSONBin.title')}
               <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
@@ -75,7 +75,7 @@ export default function SettingsDropdown() {
             onCheckedChange={handleShouldSwapStyles}
           >
             <DropdownMenu.ItemIndicator>
-              <CheckIcon />
+              <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.swapStyles.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>

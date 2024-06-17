@@ -667,6 +667,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
             placeholder={t('optionalDescription')}
             onChange={handleDescriptionChange}
             rows={3}
+            css={{ fontSize: '$xsmall', padding: '$3' }}
           />
         </Box>
         {internalEditToken.status === EditTokenFormStatus.DUPLICATE && (

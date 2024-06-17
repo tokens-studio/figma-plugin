@@ -1,10 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
-import { DotFilledIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
   Button, DropdownMenu, Stack,
 } from '@tokens-studio/ui';
+import { Check } from 'iconoir-react';
 import { Dispatch } from '../store';
 import IconChevronDown from '@/icons/chevrondown.svg';
 import { settingsStateSelector } from '@/selectors';
@@ -87,13 +87,13 @@ export default function ApplySelector() {
                 onSelect={handleApplySelection}
               >
                 <DropdownMenu.ItemIndicator>
-                  <DotFilledIcon />
+                  <Check />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.selection.title')}
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem data-testid="apply-to-page" value={UpdateMode.PAGE} onSelect={handleApplyPage}>
                 <DropdownMenu.ItemIndicator>
-                  <DotFilledIcon />
+                  <Check />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.page.title')}
               </DropdownMenu.RadioItem>
@@ -103,7 +103,7 @@ export default function ApplySelector() {
                 onSelect={handleApplyDocument}
               >
                 <DropdownMenu.ItemIndicator>
-                  <DotFilledIcon />
+                  <Check />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.document.title')}
               </DropdownMenu.RadioItem>
@@ -117,7 +117,7 @@ export default function ApplySelector() {
                 onSelect={handlePreferVariablesStyles}
               >
                 <DropdownMenu.ItemIndicator>
-                  <DotFilledIcon />
+                  <Check />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.variablesStyles.title')}
               </DropdownMenu.RadioItem>
@@ -127,7 +127,7 @@ export default function ApplySelector() {
                 onSelect={handlePreferRawValues}
               >
                 <DropdownMenu.ItemIndicator>
-                  <DotFilledIcon />
+                  <Check />
                 </DropdownMenu.ItemIndicator>
                 {t('applyTo.rawValues.title')}
               </DropdownMenu.RadioItem>

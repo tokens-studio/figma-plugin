@@ -83,7 +83,7 @@ export default function AuthModal() {
 
             </Box>
             <Box css={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Link target="_blank" href={`https://google.com/${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">Forgot password ?</Link>
+              <Link target="_blank" href={`${process.env.SECOND_SCREEN_APP_URL}/password-recovery`} rel="noreferrer">Forgot password ?</Link>
             </Box>
           </>
         )}
