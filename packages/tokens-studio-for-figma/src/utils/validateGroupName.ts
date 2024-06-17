@@ -21,12 +21,14 @@ const getRenamedChildGroups = (newPrefix, oldPrefix, tokens) => {
   // Create a set to store unique child groups
   const childGroups = new Set();
 
-  tokens.forEach((token) => {
-    if (token.name.startsWith(oldPrefixWithDot)) {
-      const childGroup = getGroupName(token.name.replace(oldPrefixWithDot, newPrefixWithDot));
-      childGroups.add(childGroup);
-    }
-  });
+  if (tokens) {
+    tokens.forEach((token) => {
+      if (token.name.startsWith(oldPrefixWithDot)) {
+        const childGroup = getGroupName(token.name.replace(oldPrefixWithDot, newPrefixWithDot));
+        childGroups.add(childGroup);
+      }
+    });
+  }
 
   return Array.from(childGroups);
 };
@@ -84,6 +86,9 @@ export function validateDuplicateGroupName(tokens, selectedTokenSets, activeToke
   if (!newName) {
     return { type: ErrorType.EmptyGroupName };
   }
+  if (!tokens[activeTokenSet]) {
+    return null;
+  }
   const selectedTokenGroup = tokens[activeTokenSet].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
   const newTokenGroup = selectedTokenGroup.map((token) => {
     const { name, ...rest } = token;
@@ -120,7 +125,7 @@ export function validateDuplicateGroupName(tokens, selectedTokenSets, activeToke
 
   const foundOverlappingTokens: { [key: string]: SingleToken[] } = selectedTokenSets.reduce((acc, selectedTokenSet) => {
     const renamedChildGroupNames = getRenamedChildGroups(newName, oldName, tokens[selectedTokenSet]);
-    const overlappingTokens = tokens[selectedTokenSet].filter((token) => [newName, ...renamedChildGroupNames].includes(token.name));
+    const overlappingTokens = tokens[selectedTokenSet] ? tokens[selectedTokenSet].filter((token) => [newName, ...renamedChildGroupNames].includes(token.name)) : [];
     if (overlappingTokens?.length > 0) {
       acc[selectedTokenSet] = overlappingTokens;
     }
