@@ -41,14 +41,16 @@ const RemConfiguration = () => {
     const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
 
     if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
-      const remValue =
+      const resolvedAliasBaseFontSizeValue =
         typeof resolvedAliasBaseFontSize === 'number'
-          ? resolvedAliasBaseFontSize / 16
-          : parseFloat(resolvedAliasBaseFontSize) / 16;
-      const formattedRemValue = isNaN(remValue) ? 1 : Number(remValue.toFixed(2));
-      return `${t('baseFont')} (${formattedRemValue} rem)`;
+          ? resolvedAliasBaseFontSize
+          : parseFloat(resolvedAliasBaseFontSize);
+      const formattedpxValue = isNaN(resolvedAliasBaseFontSizeValue)
+        ? 16
+        : Number(resolvedAliasBaseFontSizeValue.toFixed(2));
+      return `${t('baseFont')} (1rem = ${formattedpxValue}px)`;
     }
-    return `${t('baseFont')} (1 rem)`;
+    return `${t('baseFont')} (1rem = 16px)`;
   }, [aliasBaseFontSize, resolvedTokens]);
 
   const handleBaseFontSizeChange = React.useCallback(
