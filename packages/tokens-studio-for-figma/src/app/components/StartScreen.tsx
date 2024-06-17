@@ -5,8 +5,7 @@ import {
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Heading } from '@tokens-studio/ui';
-import FigmaMark from '@/icons/figma-mark.svg';
-import FigmaLetter from '@/icons/figma-letter.svg';
+import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
 import { Dispatch } from '../store';
@@ -20,14 +19,9 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
 
-const StyledFigmaTokensLogo = styled(FigmaLetter, {
-  width: '130px',
-  height: '55px',
-});
-
-const StyledFigmaTokensLogoMark = styled(FigmaMark, {
-  width: '55px',
-  height: '55px',
+const StyledTokensStudioIcon = styled(TokensStudioLogo, {
+  width: '200px',
+  height: '23px',
 });
 
 const HelpfulLink = styled('a', {
@@ -93,15 +87,13 @@ function StartScreen() {
           align="start"
           css={{
             padding: '$7',
-            backgroundColor: '$bgSubtle',
             margin: 'auto',
             maxWidth: '400px',
             borderRadius: '$medium',
           }}
         >
           <Stack direction="row" gap={4}>
-            <StyledFigmaTokensLogoMark />
-            <StyledFigmaTokensLogo />
+            <StyledTokensStudioIcon />
           </Stack>
           <Text muted>{t('intro')}</Text>
           <Stack direction="column" gap={4}>

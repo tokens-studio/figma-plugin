@@ -103,6 +103,7 @@ function Inspector() {
           </Stack>
           <InspectSearchOptionDropdown />
           <ToggleGroup
+            size="small"
             type="single"
             value={inspectView}
             onValueChange={handleSetInspectView}
