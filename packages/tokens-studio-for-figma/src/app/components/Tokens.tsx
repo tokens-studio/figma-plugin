@@ -31,6 +31,7 @@ import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { IconJson } from '@/icons';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -237,6 +238,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             }}
           >
             <ToggleGroup
+              size="small"
               type="single"
               value={activeTokensTabToggleState}
               onValueChange={handleSetTokensTab}
@@ -244,8 +246,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               <ToggleGroup.Item value="list">
                 <IconListing />
               </ToggleGroup.Item>
-              <ToggleGroup.Item value="json" iconOnly={false}>
-                JSON
+              <ToggleGroup.Item value="json">
+                <IconJson />
               </ToggleGroup.Item>
             </ToggleGroup>
           </Box>

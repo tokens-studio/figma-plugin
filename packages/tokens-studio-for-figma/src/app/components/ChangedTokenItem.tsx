@@ -22,11 +22,11 @@ export default function ChangedTokenItem({
               <Text size="small">{t('value')}</Text>
               <Stack direction="row" align="center" gap={1}>
                 {token.oldValue ? (
-                  <StyledDiff size="small" type="danger">
+                  <StyledDiff type="danger">
                     {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
                   </StyledDiff>
                 ) : null}
-                <StyledDiff size="small" type="success">
+                <StyledDiff type="success">
                   {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
                 </StyledDiff>
               </Stack>
@@ -38,11 +38,11 @@ export default function ChangedTokenItem({
           <Text size="small">{t('description')}</Text>
           <Stack direction="column" align="end" gap={1}>
             {token.oldDescription ? (
-              <StyledDiff size="small" type="danger">
+              <StyledDiff type="danger">
                 {token.oldDescription}
               </StyledDiff>
             ) : null}
-            <StyledDiff size="small" type="success">
+            <StyledDiff type="success">
               {token.description}
             </StyledDiff>
           </Stack>
@@ -50,7 +50,7 @@ export default function ChangedTokenItem({
         )}
         {
           token.importType === 'REMOVE' && (
-            <StyledDiff size="small" type="danger">
+            <StyledDiff type="danger">
               {t('removed')}
             </StyledDiff>
           )

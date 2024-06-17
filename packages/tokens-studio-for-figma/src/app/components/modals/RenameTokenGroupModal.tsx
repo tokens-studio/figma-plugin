@@ -29,12 +29,16 @@ export default function RenameTokenGroupModal({
   const { t } = useTranslation(['tokens', 'general']);
 
   const error = useMemo(() => {
+    if (!isOpen) {
+      return null;
+    }
+
     if (newName === oldName) {
       return null;
     }
 
     return validateRenameGroupName(tokens[activeTokenSet], type, oldName, newName);
-  }, [activeTokenSet, newName, oldName, tokens, type]);
+  }, [isOpen, activeTokenSet, newName, oldName, tokens, type]);
 
   const canRename = !(newName === oldName || error);
 

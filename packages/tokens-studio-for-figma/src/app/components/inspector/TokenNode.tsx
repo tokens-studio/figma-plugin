@@ -11,30 +11,30 @@ export default function TokenNode({ id, name, type }: NodeInfo) {
   }, [id]);
 
   return (
-    <DropdownMenu.Item key={id} onSelect={onNodeSelect}>
+    <DropdownMenu.Item
+      key={id}
+      onSelect={onNodeSelect}
+      css={{
+        // Note: This is quite bad. We should not massacre a dropdown menu for it to be rendered as a context menu. let's think about introducing a dark version of our dropdown menu
+        display: 'flex',
+        color: '$contextMenuFg',
+        padding: '$1 $4',
+        '&:hover:not([data-disabled]), &:focus:not([data-disabled])': {
+          backgroundColor: '$contextMenuBgHover',
+        },
+      }}
+    >
+
+      <NodeIcon type={type} />
       <Box
         css={{
-          display: 'flex',
-          color: '$contextMenuFg',
-          cursor: 'pointer',
-          padding: '$1 $4',
-          '&:hover': {
-            backgroundColor: '$accentDefault',
-            color: '$fgOnEmphasis',
-          },
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
         }}
+        title={name}
       >
-        <NodeIcon type={type} />
-        <Box
-          css={{
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-          title={name}
-        >
-          {name}
-        </Box>
+        {name}
       </Box>
     </DropdownMenu.Item>
   );
