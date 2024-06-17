@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import { DropdownMenu } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import Box from '../Box';
@@ -30,7 +30,7 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
         onSelect={handleSelect}
       >
         <DropdownMenu.ItemIndicator>
-          <CheckIcon />
+          <Check />
         </DropdownMenu.ItemIndicator>
         <Box>
           {groupName}
