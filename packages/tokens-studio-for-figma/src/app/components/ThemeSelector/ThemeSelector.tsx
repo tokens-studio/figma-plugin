@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check, NavArrowRight } from 'iconoir-react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
-import { NavArrowRight } from 'iconoir-react';
 import { activeThemeSelector, themeOptionsSelector } from '@/selectors';
 import Text from '../Text';
 import { Dispatch } from '@/app/store';
@@ -75,7 +74,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         onSelect={handleSelect}
       >
         <DropdownMenu.ItemIndicator>
-          <CheckIcon />
+          <Check />
         </DropdownMenu.ItemIndicator>
         {label}
       </DropdownMenu.RadioItem>
