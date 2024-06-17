@@ -1,19 +1,13 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, TextInput, Stack, Text,
+  Button, Stack, Text,
 } from '@tokens-studio/ui';
 import Modal from '../Modal';
-import { MultiSelectDropdown } from '../MultiSelectDropdown';
-import { ErrorMessage } from '../ErrorMessage';
-import { activeTokenSetSelector, tokensSelector, usedTokenSetSelector } from '@/selectors';
-import useManageTokens from '@/app/store/useManageTokens';
+import { tokensSelector } from '@/selectors';
 import ResolveDuplicateTokenGroup from '../DuplicateResolver/ResolveDuplicateTokenGroup';
 import { SingleToken } from '@/types/tokens';
-import { TokensContext } from '@/context';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
-import { defaultTokenResolver } from '@/utils/TokenResolver';
 
 type Props = {
   isOpen: boolean;
@@ -29,22 +23,15 @@ export default function ResolveDuplicateTokensModal({
   // isOpen, type, newName, oldName, onClose, handleNewTokenGroupNameChange,
 }: Props) {
   const tokens = useSelector(tokensSelector);
-  const activeTokenSet = useSelector(activeTokenSetSelector);
-  const usedTokenSet = useSelector(usedTokenSetSelector);
-  // const tokensContext = useContext(TokensContext);
-  const resolvedTokens = React.useMemo(() => (
-    defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
-  ), [tokens, usedTokenSet]);
-  const [selectedTokenSets, setSelectedTokenSets] = React.useState<string[]>([activeTokenSet]);
-  // const { duplicateGroup } = useManageTokens();
   const { t } = useTranslation(['tokens']);
+  // const [selectedTokens, setSelectedTokens]
 
-  const duplicateTokens: { [key: string]: { [key: string]: SingleToken[] } } = useMemo(() => Object.keys(tokens).reduce((acc, setName) => {
+  const [duplicateTokens, setDuplicateTokens] = useState<{ [key: string]: { [key: string]: SingleToken[] } }>(Object.keys(tokens).reduce((acc, setName) => {
     const currentSetTokens = tokens[setName];
     const duplicatesByName = currentSetTokens.reduce((acc2, token) => {
       const allTokensWithName = currentSetTokens.filter((a) => a.name === token.name);
       if (allTokensWithName.length > 1) {
-        acc2[token.name] = allTokensWithName;
+        acc2[token.name] = allTokensWithName.map((t, i) => ({ ...t, selected: i === 0 }));
       }
 
       return acc2;
@@ -52,12 +39,25 @@ export default function ResolveDuplicateTokensModal({
 
     acc[setName] = duplicatesByName;
     return acc;
-  }, {}), [tokens]);
-  console.log({ duplicateTokens });
+  }, {}));
 
-  const handleSelectedItemChange = React.useCallback((selectedItems: string[]) => {
-    setSelectedTokenSets(selectedItems);
-  }, []);
+  // const onRadioClick = useCallback((setName, tokenName, index) => {
+  //   // const updatedTokens = typeof duplicateTokens?[setName]?[tokenName]?.selected !== 'undefined' ? duplicateTokens?[setName]?[tokenName]?.selected = !duplicateTokens?[setName]?[tokenName]?.selected : undefined;
+  //   // const patchedDuplicateTokens = Object.entries(duplicateTokens).reduce((acc, [setName, setTokens]) => {
+  //   //   if
+
+  //   //   return acc;
+  //   // }, {});
+  //   if (typeof duplicateTokens?[setName]?[tokenName]?.selected !== 'undefined') {
+  //     setDuplicateTokens({
+  //       ...duplicateTokens,
+  //       [setName]: {
+  //         ...duplicateTokens[setName],
+  //         [tokenName]
+  //       }
+  //     })
+  //   }
+  // }, []);
 
   const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,15 +68,7 @@ export default function ResolveDuplicateTokensModal({
   // }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
   }, []);
 
-  // const canDuplicate = React.useMemo(() => {
-  //   // const isDuplicated = Object.entries(tokens).some(([tokenSetKey, tokenList]) => {
-  //   //   if (selectedTokenSets.includes(tokenSetKey)) {
-  //   //     return tokenList.some((token) => token.name.startsWith(`${newName}.`) || token.name === newName);
-  //   //   }
-  //   //   return false;
-  //   // });
-  //   // return !isDuplicated;
-  // }, [tokens, newName, selectedTokenSets]);
+  const canResolve = false;
 
   return (
     <Modal
@@ -85,14 +77,15 @@ export default function ResolveDuplicateTokensModal({
       close={onClose}
       size="large"
       footer={(
-        <form id="duplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
+        <form id="resolveDuplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
           <Stack direction="row" justify="end" gap={4}>
             <Button variant="secondary" onClick={onClose}>
               {t('cancel')}
             </Button>
-            {/* <Button type="submit" variant="primary" disabled={!canDuplicate}>
+            <Button type="submit" variant="primary" disabled={!canResolve}>
               {t('duplicate')}
-            </Button> */}
+              Resolve Duplicates
+            </Button>
           </Stack>
         </form>
     )}
@@ -104,27 +97,13 @@ export default function ResolveDuplicateTokensModal({
             {Object.entries(allTokens).map(([tokenName, duplicates]) => (
               <ResolveDuplicateTokenGroup
                 group={[tokenName, duplicates]}
-                resolvedTokens={resolvedTokens}
+                set={setName}
+                tokens={tokens}
+                // resolvedTokens={resolvedTokens}
               />
             ))}
           </Stack>
         ) : null))}
-        {/* <TextInput
-          form="duplicateTokenGroup"
-          onChange={handleNewTokenGroupNameChange}
-          type="text"
-          name="tokengroupname"
-          value={newName}
-          autoFocus
-          required
-          css={{ width: '100%' }}
-        />
-        {!canDuplicate && (
-          <ErrorMessage css={{ width: '100%' }}>
-            {t('duplicateGroupError')}
-          </ErrorMessage>
-        )} */}
-        <MultiSelectDropdown menuItems={Object.keys(tokens)} selectedItems={selectedTokenSets} handleSelectedItemChange={handleSelectedItemChange} />
       </Stack>
     </Modal>
   );
