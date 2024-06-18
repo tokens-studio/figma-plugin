@@ -6,5 +6,7 @@
   "tokenNamesMustBeUnique": "Les noms de jeton doivent être uniques",
   "mustNotUseNameOfAnotherGroup": "Ne doit pas utiliser le nom d'un autre groupe",
   "tokensCantShareNameWithGroup": "Les jetons ne peuvent pas partager de nom avec un groupe",
-  "valueMustIncludePxOrRem": "La valeur doit inclure px ou rem"
+  "valueMustIncludePxOrRem": "La valeur doit inclure px ou rem",
+  "tokenNamesCantStartWithDollar": "Je ne peux pas commencer par un signe dollar ($)",
+  "tokenNamesCantContainCurlyBraces": "Ne peut pas contenir d'accolades '{}'"
 }

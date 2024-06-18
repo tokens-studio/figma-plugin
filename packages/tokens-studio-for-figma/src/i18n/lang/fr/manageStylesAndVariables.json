@@ -21,7 +21,9 @@
     "learnMore": "En savoir plus",
     "themes": "Thèmes",
     "noGroup": "Aucun groupe",
-    "selectAll": "Sélectionner tout"
+    "selectAll": "Sélectionner tout",
+    "variables": "Variables",
+    "styles": "modes"
   },
   "tabs": {
     "exportThemes": "Thèmes",
@@ -41,7 +43,13 @@
     "scopeVariablesByTokenType": "Définir la portée des variables en fonction du type de jeton",
     "scopeVariablesByTokenTypeExplanation": "Les portées des variables seront déduites du type de jeton et de l'utilisation prévue",
     "createStylesWithVariableReferences": "Créer des styles avec des références de variables",
-    "createStylesWithVariableReferencesExplanation": "Les styles seront créés contenant des références aux variables"
+    "createStylesWithVariableReferencesExplanation": "Les styles seront créés contenant des références aux variables",
+    "intro": "Créez des styles ou des variables en fonction de vos thèmes ou ensembles de jetons. Tout d’abord, choisissez quels types de jetons doivent être créés en tant que styles ou variables.",
+    "createAndUpdate": "Créer et mettre à jour",
+    "renameExisting": "Mettre à jour les styles et les noms de variables existants",
+    "renameExistingExplanation": "Les styles et variables existants seront renommés pour correspondre au nom du jeton",
+    "removeWithoutConnection": "Supprimer les styles et les variables sans connexion à un jeton",
+    "removeWithoutConnectionExplanation": "Les styles et variables qui ne sont pas connectés à un jeton seront supprimés"
   },
   "variables": {
     "color": "Couleur",
@@ -65,6 +73,8 @@
   "exportSetsTab": {
     "changeSetsHeading": "Les ensembles activés seront exportés vers Figma",
     "confirmSets": "Confirmer les ensembles",
-    "intro": "Vous pouvez utiliser des ensembles de jetons pour gérer vos styles et vos variables. Utilisez les thèmes (Pro) pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design."
-  }
+    "intro": "Vous pouvez utiliser des ensembles de jetons pour gérer vos styles et vos variables. Utilisez les thèmes (Pro) pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design.",
+    "setsSelectedForExport": "Ensembles sélectionnés pour l'exportation"
+  },
+  "optionsModalTitle": "Exporter vers Figma : Options"
 }

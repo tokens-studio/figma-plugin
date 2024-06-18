@@ -6,5 +6,7 @@
   "tokenNamesMustBeUnique": "Tokennamen moeten uniek zijn",
   "mustNotUseNameOfAnotherGroup": "Mag geen naam van een andere groep gebruiken",
   "tokensCantShareNameWithGroup": "Tokens kunnen geen naam delen met een groep",
-  "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten"
+  "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten",
+  "tokenNamesCantStartWithDollar": "Kan niet beginnen met een dollarteken ($).",
+  "tokenNamesCantContainCurlyBraces": "Mag geen accolades '{}' bevatten"
 }

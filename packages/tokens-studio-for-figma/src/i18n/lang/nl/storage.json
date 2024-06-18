@@ -60,7 +60,8 @@
     "bitbucket": {
       "appPassword": "App-wachtwoord",
       "projectName": "Projectnaam (optioneel)",
-      "repository": "Repository (werkruimte/repository)"
+      "repository": "Repository (werkruimte/repository)",
+      "username": "Bitbucket-gebruikersnaam"
     }
   },
   "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",
@@ -70,5 +71,17 @@
   "active": "Actief",
   "edit": "Bewerking",
   "delete": "Verwijderen",
-  "save": "Redden"
+  "save": "Redden",
+  "format": "Formaat",
+  "w3cformat": "W3C DTCG-formaat",
+  "legacyformat": "Legacy-formaat",
+  "legacyformattooltip": "Legacy-indeling, klik om de W3C DTCG-conversie te openen",
+  "w3cconverttitle": "Converteren naar W3C DTCG-formaat",
+  "w3cformatmodaltitle": "Het W3C DTCG-formaat gebruiken",
+  "w3cformatmodaldescription": "Uw tokens worden opgeslagen in het W3C Design Tokens Community Group-formaat. Als u ze opnieuw wilt converteren, kunt u dat hier doen. Als u uw ontwikkelingspijplijn moet aanpassen, lees er hieronder alles over.",
+  "legacyformatmodaldescription": "Je tokens worden momenteel opgeslagen in het oude formaat. Als u het nieuwe W3C DTCG-formaat wilt gebruiken, kunt u deze hier converteren. Lees hieronder alles over het wijzigen van het formaat, inclusief nuttig advies over hoe u uw ontwikkelingspijplijn kunt migreren.",
+  "converttow3c": "Converteren naar W3C DTCG-formaat",
+  "converttolegacy": "Converteren naar verouderd formaat",
+  "pushfirsterror": "Push uw niet-opgeslagen wijzigingen voordat u converteert",
+  "readmoreformat": "Lees verder"
 }
