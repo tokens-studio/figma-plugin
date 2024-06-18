@@ -111,8 +111,7 @@ export function Modal({
           css={{
             position: 'fixed',
             inset: 0,
-            // backgroundColor: '$modalBackdrop', TODO: reintroduce this once our colors are fixed
-            backgroundColor: 'rgba(120, 120, 120, 0.3)',
+            backgroundColor: '$modalBackdrop',
           }}
         />
         <StyledDialogContent size={size} onInteractOutside={onInteractOutside}>
