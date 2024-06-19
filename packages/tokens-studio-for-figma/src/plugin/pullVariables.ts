@@ -112,8 +112,6 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               description: variable.description,
             });
           } else {
-            console.log('value in pullVariables: ', value);
-            console.log('tokenValue in pullVariables: ', tokenValue);
             numbers.push({
               name: variableName,
               value: tokenValue as string,
