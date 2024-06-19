@@ -101,7 +101,7 @@ const RemConfiguration = () => {
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: isBrokenLink ? '$dangerBg' : '$accentBg',
-                padding: '4px',
+                padding: '2px',
               }}
             >
               <Label css={{ fontSize: '12px', color: isBrokenLink ? '$dangerFg' : '$accentDefault' }}>
