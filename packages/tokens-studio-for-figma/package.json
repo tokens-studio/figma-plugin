@@ -31,8 +31,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "dependencies": {
-    "0x": "^5.7.0",
+  "dependencies": {    
     "@figma-plugin/helpers": "^0.15.2",
     "@gitbeaker/rest": "^39.21.2",
     "@monaco-editor/react": "^4.5.1",
@@ -178,6 +177,7 @@
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
+    "0x": "^5.7.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "changeset": "^0.2.6",
