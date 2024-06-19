@@ -5,6 +5,16 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 
+const getReferenceTokensFromGradient = (rawValue: string): string[] => {
+  const rawValueDetails = rawValue.replace('linear-gradient(', '').replace(')', '').split(',');
+  const referenceTokens: string[] = rawValueDetails.map((val) => {
+    const matches = val.match(/{(.*?)}/g);
+    return matches ? matches[0].replace(/[\{\}]/g, '') : '';
+  });
+
+  return referenceTokens.length === 3 ? referenceTokens.slice(1) : referenceTokens;
+}
+
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,
 }: {
@@ -36,9 +46,7 @@ export default async function setColorValuesOnTarget({
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
 
       const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
-      const referenceTokens = rawValue.includes('{') ? rawValue.match(/{(.*?)}/g).map(function(val) {
-        return val.replace(/[\{\}]/g, '');
-      }) : [];
+      const referenceTokens = getReferenceTokensFromGradient(rawValue);
 
       let gradientStopsWithReferences = gradientStops;
       if (gradientStops && referenceTokens.length > 0) {
