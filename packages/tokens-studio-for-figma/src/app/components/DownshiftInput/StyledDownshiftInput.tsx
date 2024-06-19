@@ -44,6 +44,7 @@ export const StyledItemValue = styled('div', {
   fontSize: '$xxsmall',
   color: '$fgDefault',
   fontWeight: '$normal',
+  flex: '1 1 50%',
   variants: {
     truncate: {
       true: {
@@ -88,7 +89,7 @@ export const StyledItemName = styled('div', {
   fontSize: '$xsmall',
   color: '$fgDefault',
   fontWeight: '$sansBold',
-  flexGrow: 1,
+  flex: '1 1 50%',
   lineHeight: '1.4',
   wordBreak: 'break-word',
   marginRight: '$2',
@@ -101,11 +102,6 @@ export const StyledItemName = styled('div', {
       },
     },
   },
-});
-
-export const StyledItemInfo = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
 });
 
 export const StyledPart = styled('span', {
@@ -136,7 +132,6 @@ export const StyledDownshiftInput: React.FC<React.PropsWithChildren<React.PropsW
   name,
   value,
   placeholder,
-  suffix,
   inputRef,
   dataCy,
   onChange,
