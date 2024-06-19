@@ -6,5 +6,7 @@
   "tokenNamesMustBeUnique": "Token 名称必须是唯一的",
   "mustNotUseNameOfAnotherGroup": "不得使用其他组的名称",
   "tokensCantShareNameWithGroup": "Token 不能与组共享名称",
-  "valueMustIncludePxOrRem": "值必须包含 px 或 rem"
+  "valueMustIncludePxOrRem": "值必须包含 px 或 rem",
+  "tokenNamesCantStartWithDollar": "不能以美元 ($) 符号开头",
+  "tokenNamesCantContainCurlyBraces": "不能包含大括号“{}”"
 }

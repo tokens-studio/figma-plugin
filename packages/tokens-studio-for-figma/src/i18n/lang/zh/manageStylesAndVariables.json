@@ -21,7 +21,9 @@
     "learnMore": "了解更多",
     "themes": "主题",
     "noGroup": "无分组",
-    "selectAll": "全选"
+    "selectAll": "全选",
+    "variables": "变量",
+    "styles": "风格"
   },
   "tabs": {
     "exportThemes": "主题",
@@ -41,7 +43,13 @@
     "scopeVariablesByTokenType": "按令牌类型限定变量范围",
     "scopeVariablesByTokenTypeExplanation": "变量范围将根据令牌类型和预期用途推断",
     "createStylesWithVariableReferences": "创建包含变量引用的样式",
-    "createStylesWithVariableReferencesExplanation": "将创建包含对变量的引用的样式"
+    "createStylesWithVariableReferencesExplanation": "将创建包含对变量的引用的样式",
+    "intro": "根据您的主题或标记集创建样式或变量。首先，选择应将哪些类型的标记创建为样式或变量。",
+    "createAndUpdate": "创建和更新",
+    "renameExisting": "更新现有样式和变量名称",
+    "renameExistingExplanation": "现有样式和变量将被重命名以匹配令牌名称",
+    "removeWithoutConnection": "删除样式和变量而不连接到令牌",
+    "removeWithoutConnectionExplanation": "未连接到令牌的样式和变量将被删除"
   },
   "variables": {
     "color": "颜色",
@@ -65,6 +73,8 @@
   "exportSetsTab": {
     "changeSetsHeading": "启用的集合将导出到 Figma",
     "confirmSets": "确认集合",
-    "intro": "您可以使用令牌集合来管理样式和变量。使用主题（Pro）创建多个变量或样式的集合，以便在设计概念之间轻松切换。"
-  }
+    "intro": "您可以使用令牌集合来管理样式和变量。使用主题（Pro）创建多个变量或样式的集合，以便在设计概念之间轻松切换。",
+    "setsSelectedForExport": "选择导出的集"
+  },
+  "optionsModalTitle": "导出到 Figma：选项"
 }

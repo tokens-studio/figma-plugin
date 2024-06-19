@@ -35,5 +35,7 @@
   "language": "语言",
   "languageExplainer": "Tokens Studio 已经过 Mr. Biscuit 手动翻译，因此翻译较为准确。\n 没有看到您的语言？提交功能请求",
   "liveSyncActive": "实时同步激活",
-  "chooseANewToken": "输入新值或选择令牌"
+  "chooseANewToken": "输入新值或选择令牌",
+  "change": "改变",
+  "confirm": "确认"
 }

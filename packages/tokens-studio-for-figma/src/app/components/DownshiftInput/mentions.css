@@ -55,7 +55,6 @@
 .rc-mentions-dropdown {
   position: absolute;
   border-radius: var(--radii-medium);
-  z-index: 10;
 }
 
 .rc-mentions-dropdown-menu {
@@ -75,7 +74,6 @@
   box-shadow: var(--shadows-contextMenu);
   background: var(--colors-bgCanvas);
   cursor: pointer;
-  z-index: 10;
 }
 
 .rc-mentions-dropdown-menu-item {

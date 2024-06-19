@@ -60,7 +60,8 @@
     "bitbucket": {
       "appPassword": "Mot de passe de l'application",
       "projectName": "Nom du projet (facultatif)",
-      "repository": "Dépôt (espace de travail/dépôt)"
+      "repository": "Dépôt (espace de travail/dépôt)",
+      "username": "Nom d'utilisateur Bitbucket"
     }
   },
   "selectALayerToSeeAppliedTokens": "Sélectionnez un calque pour voir les jetons appliqués",
@@ -70,5 +71,17 @@
   "active": "Actif",
   "edit": "Modifier",
   "delete": "Supprimer",
-  "save": "Sauvegarder"
+  "save": "Sauvegarder",
+  "format": "Format",
+  "w3cformat": "Format W3C DTCG",
+  "legacyformat": "Format hérité",
+  "legacyformattooltip": "Format hérité, cliquez pour ouvrir la conversion W3C DTCG",
+  "w3cconverttitle": "Convertir au format W3C DTCG",
+  "w3cformatmodaltitle": "Utilisation du format DTCG du W3C",
+  "w3cformatmodaldescription": "Vos jetons sont stockés au format W3C Design Tokens Community Group. Si vous devez les reconvertir, vous pouvez le faire ici. Si vous devez ajuster votre pipeline de développement, lisez tout ci-dessous.",
+  "legacyformatmodaldescription": "Vos jetons sont actuellement stockés dans le format existant. Si vous souhaitez utiliser le nouveau format DTCG du W3C, vous pouvez les convertir ici. Découvrez ci-dessous tout ce qui concerne la modification du format, y compris des conseils utiles sur la façon de migrer votre pipeline de développement.",
+  "converttow3c": "Convertir au format W3C DTCG",
+  "converttolegacy": "Convertir au format existant",
+  "pushfirsterror": "Poussez vos modifications non enregistrées avant la conversion",
+  "readmoreformat": "En savoir plus"
 }

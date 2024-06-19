@@ -95,7 +95,7 @@ async function autoTranslate() {
       }, initial);
 
 
-      await fs.writeFile(path.join(langRoot, lang, file), JSON.stringify(completed, null, 4));
+      await fs.writeFile(path.join(langRoot, lang, file), `${JSON.stringify(completed, null, 2)}\n`);
     }));
   });
 
