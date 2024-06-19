@@ -34,13 +34,35 @@ export default async function setColorValuesOnTarget({
     if (resolvedValue.startsWith('linear-gradient')) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
+
+      const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+      const referenceTokens = rawValue.includes('{') ? rawValue.match(/{(.*?)}/g).map(function(val) {
+        return val.replace(/[\{\}]/g, '');
+      }) : [];
+
+      let gradientStopsWithReferences = gradientStops;
+      if (gradientStops && referenceTokens.length > 0) {
+        gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
+          const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
+          if (referenceVariableExists) {
+            return {
+              ...stop,
+              boundVariables: {
+                color: {
+                  type: 'VARIABLE_ALIAS',
+                  id: referenceVariableExists.id,
+                }
+              }
+            };
+          }
+          return stop;
+        }));
+      }
       const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
         gradientTransform,
-        gradientStops,
+        gradientStops: gradientStopsWithReferences,
       };
-
-      console.log('newPaint in setColorValues: ', newPaint);
 
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
         if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
