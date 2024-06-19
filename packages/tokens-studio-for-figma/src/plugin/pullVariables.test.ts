@@ -81,7 +81,6 @@ describe('pullStyles', () => {
   };
 
   it('pulls variables without no dimension options', async () => {
-    // @ts-ignore next-line
     await pullVariables({ useDimensions: false, useRem: false });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
