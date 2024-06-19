@@ -78,8 +78,8 @@ export const StyledItemColorDiv = styled('div', {
 });
 
 export const StyledItemColor = styled('div', {
-  width: '20px',
-  height: '20px',
+  width: '14px',
+  height: '14px',
   borderRadius: '$medium',
   border: '1px solid $borderMuted',
 });
@@ -106,6 +106,9 @@ export const StyledItemName = styled('div', {
 export const StyledItemInfo = styled('div', {
   display: 'flex',
   alignItems: 'center',
+  gap: '$1',
+  maxWidth: '50%',
+  overflow: 'hidden',
 });
 
 export const StyledPart = styled('span', {
