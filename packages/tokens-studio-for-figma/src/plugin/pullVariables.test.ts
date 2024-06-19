@@ -177,7 +177,6 @@ describe('pullStyles', () => {
   });
 
   it('pulls variables with Convert numbers to dimensions option', async () => {
-    // @ts-ignore next-line
     await pullVariables({ useDimensions: true, useRem: false });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
@@ -273,7 +272,6 @@ describe('pullStyles', () => {
   });
 
   it('pulls variables with Use rem for dimension values option', async () => {
-    // @ts-ignore next-line
     await pullVariables({ useDimensions: false, useRem: true });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
@@ -369,7 +367,6 @@ describe('pullStyles', () => {
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
-    // @ts-ignore next-line
     await pullVariables({ useDimensions: true, useRem: true });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
