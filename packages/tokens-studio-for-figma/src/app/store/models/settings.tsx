@@ -89,7 +89,7 @@ export const settings = createModel<RootModel>()({
     variablesString: true,
     variablesNumber: true,
     variablesBoolean: true,
-    stylesColor: true,
+    stylesColor: false,
     stylesTypography: true,
     stylesEffect: true,
   } as SettingsState,
