@@ -40,6 +40,10 @@ function Settings() {
   const { idStorage } = useFlags();
 
   const toggleDebugMode = React.useCallback(async (checked: CheckedState) => {
+    if (checked && process.env.ENVIRONMENT === 'development') {
+      console.warn('Session recording is disabled in development mode');
+    }
+
     dispatch.settings.setSessionRecording(!!checked);
     if (checked) {
       // Display the info to the user
@@ -155,9 +159,9 @@ function Settings() {
               width: '100%',
             }}
           >
-            <Stack direction="row" justify="between" gap={2} align="center" css={{ width: '100%' }}>
-              <Stack direction="column">
-                <Stack direction="row" align="center" gap={1}>
+            <Stack direction="column" gap={2} css={{ width: '100%' }}>
+              <Stack direction="row" align="center" justify="between" gap={1}>
+                <Stack direction="row" gap={2} align="center">
                   <Label htmlFor="enableDebugging">{t('enableSessionRecording')}</Label>
                   <ExplainerModal title={t('enableSessionRecording')}>
                     <Box css={{
@@ -171,32 +175,34 @@ function Settings() {
                       {' '}
                       {t('forMoreInformationPleaseSeeOur')}
                       {' '}
-                      <Link href="https://tokens.studio/privacy" target="_blank">{t('privacyPolicy')}</Link>
+                      <Link href="https://tokens.studio/privacy" target="_blank" rel="noreferrer">{t('privacyPolicy')}</Link>
                     </Box>
                   </ExplainerModal>
-                  <Box
-                    css={{
-                      color: '$fgMuted',
-                      fontSize: '$xsmall',
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {debugSession && (
-                    <Text>
-                      {t('yourCurrentSessionIdIs')}
-                      {' '}
-                      <b>{debugSession}</b>
-                    </Text>
-                    )}
-                  </Box>
                 </Stack>
+                <Box css={{ flexShrink: 0 }}>
+                  <Switch
+                    id="enableDebugging"
+                    checked={!!debugMode}
+                    defaultChecked={debugMode}
+                    onCheckedChange={toggleDebugMode}
+                  />
+                </Box>
               </Stack>
-              <Switch
-                id="enableDebugging"
-                checked={!!debugMode}
-                defaultChecked={debugMode}
-                onCheckedChange={toggleDebugMode}
-              />
+              <Box
+                css={{
+                  color: '$fgMuted',
+                  fontSize: '$xsmall',
+                  lineHeight: 1.5,
+                }}
+              >
+                {debugSession && (
+                <Text>
+                  {t('yourCurrentSessionIdIs')}
+                  {' '}
+                  <b>{debugSession}</b>
+                </Text>
+                )}
+              </Box>
             </Stack>
             <Stack direction="row" justify="between" gap={2} align="center" css={{ width: '100%' }}>
               <Label>{t('resetOnboarding')}</Label>

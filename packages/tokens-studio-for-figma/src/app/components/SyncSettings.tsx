@@ -153,7 +153,7 @@ const SyncSettings = () => {
                   <Stack direction="column" gap={4}>
                     {
                     providers.map((provider) => (
-                      <Stack direction="row" justify="between" align="center">
+                      <Stack direction="row" justify="between" align="center" key={provider.text}>
                         <Stack direction="column">
                           <Box css={{
                             color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
