@@ -40,6 +40,8 @@ export default async function setColorValuesOnTarget({
         gradientStops,
       };
 
+      console.log('newPaint in setColorValues: ', newPaint);
+
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
         if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
         if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
