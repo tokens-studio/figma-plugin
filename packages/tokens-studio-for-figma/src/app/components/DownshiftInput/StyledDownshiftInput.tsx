@@ -44,7 +44,8 @@ export const StyledItemValue = styled('div', {
   fontSize: '$xxsmall',
   color: '$fgDefault',
   fontWeight: '$normal',
-  flex: '1 1 50%',
+  textAlign: 'right',
+  flex: '1 0 auto',
   variants: {
     truncate: {
       true: {
@@ -61,7 +62,7 @@ export const StyledItem = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '$2',
+  padding: '$2 $3',
   fontSize: '$xxsmall',
   variants: {
     isFocused: {
@@ -89,7 +90,7 @@ export const StyledItemName = styled('div', {
   fontSize: '$xsmall',
   color: '$fgDefault',
   fontWeight: '$sansBold',
-  flex: '1 1 50%',
+  flex: '1 1 auto',
   lineHeight: '1.4',
   wordBreak: 'break-word',
   marginRight: '$2',

@@ -124,17 +124,16 @@ export default function MentionsInput({
                 {getHighlightedText(resolvedToken?.name ?? '', value || '')}
               </StyledItemName>
               {resolvedToken && (
-              <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
-                <span>{getResolvedTextValue(resolvedToken)}</span>
-              </StyledItemValue>
+                <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
+                  <span>
+                    {getResolvedTextValue(resolvedToken)}
+                  </span>
+                </StyledItemValue>
               )}
             </Stack>
-)}
+          )}
         >
-          <StyledItem
-            className="dropdown-item"
-          >
-
+          <StyledItem className="dropdown-item">
             {type === 'color' && <StyledItemColorDiv><StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} /></StyledItemColorDiv>}
             <StyledItemName truncate>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
             {resolvedToken && <StyledItemValue truncate>{getResolvedTextValue(resolvedToken)}</StyledItemValue>}
