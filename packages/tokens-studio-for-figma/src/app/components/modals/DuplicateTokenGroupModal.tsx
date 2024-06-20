@@ -47,7 +47,6 @@ export default function DuplicateTokenGroupModal({
     if (!isOpen) {
       return null;
     }
-    
     if (newName === oldName && selectedTokenSets.includes(activeTokenSet)) {
       return {
         type: ErrorType.ExistingGroup,

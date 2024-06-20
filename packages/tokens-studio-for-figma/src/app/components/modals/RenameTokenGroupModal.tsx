@@ -29,11 +29,7 @@ export default function RenameTokenGroupModal({
   const { t } = useTranslation(['tokens', 'general']);
 
   const error = useMemo(() => {
-    if (!isOpen) {
-      return null;
-    }
-
-    if (newName === oldName) {
+    if (newName === oldName || !isOpen) {
       return null;
     }
 

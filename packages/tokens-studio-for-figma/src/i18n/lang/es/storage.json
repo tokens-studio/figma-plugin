@@ -60,7 +60,8 @@
     "bitbucket": {
       "appPassword": "Contraseña de la aplicación",
       "projectName": "Nombre del proyecto (opcional)",
-      "repository": "Repositorio (espacio de trabajo/repositorio)"
+      "repository": "Repositorio (espacio de trabajo/repositorio)",
+      "username": "nombre de usuario de Bitbucket"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
@@ -70,5 +71,17 @@
   "active": "Activo",
   "edit": "Editar",
   "delete": "Borrar",
-  "save": "Ahorrar"
+  "save": "Ahorrar",
+  "format": "Formato",
+  "w3cformat": "Formato W3C DTCG",
+  "legacyformat": "Formato heredado",
+  "legacyformattooltip": "Formato heredado, haga clic para abrir la conversión W3C DTCG",
+  "w3cconverttitle": "Convertir al formato W3C DTCG",
+  "w3cformatmodaltitle": "Usando el formato W3C DTCG",
+  "w3cformatmodaldescription": "Sus tokens se almacenan en el formato del Grupo Comunitario de Tokens de Diseño del W3C. Si necesita volver a convertirlos, puede hacerlo aquí. Si necesita ajustar su proceso de desarrollo, lea todo al respecto a continuación.",
+  "legacyformatmodaldescription": "Sus tokens están actualmente almacenados en el formato heredado. Si desea utilizar el nuevo formato W3C DTCG, puede convertirlos aquí. Lea todo sobre cómo cambiar el formato a continuación, incluidos consejos útiles sobre cómo migrar su canal de desarrollo.",
+  "converttow3c": "Convertir al formato W3C DTCG",
+  "converttolegacy": "Convertir a formato heredado",
+  "pushfirsterror": "Empuje sus cambios no guardados antes de realizar la conversión",
+  "readmoreformat": "Leer más"
 }

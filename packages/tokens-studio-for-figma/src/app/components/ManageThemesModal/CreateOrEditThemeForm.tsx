@@ -100,13 +100,12 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
             onClick={onCancel}
           />
           <Stack
-            direction="column"
-            align="start"
+            direction="row"
+            align="center"
             gap={1}
             css={{
               width: '100%',
-              paddingBlock: '$2',
-              minHeight: 'calc( (2 * $controlMedium) + $2 )',
+              paddingBlock: '$4',
               justifyContent: 'space-evenly',
             }}
           >
@@ -118,6 +117,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 autofocus
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
+                placeholder="Add group"
                 css={{
                   display: 'flex',
                 }}
@@ -142,7 +142,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                   ) : (
                     <Button
                       data-testid="button-manage-themes-modal-new-group"
-                      variant="invisible"
+                      variant="secondary"
                       icon={<IconPlus />}
                       onClick={handleAddGroup}
                       size="small"
@@ -155,13 +155,16 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
               </Box>
             )
           }
-              <Box>/</Box>
+              <Box css={{ margin: '0 $3' }}>/</Box>
             </Stack>
-            <Input
-              full
-              data-testid="create-or-edit-theme-form--input--name"
-              {...register('name', { required: true })}
-            />
+            <Stack direction="row" gap={1} align="center" css={{ flexGrow: 1 }}>
+              <Input
+                full
+                data-testid="create-or-edit-theme-form--input--name"
+                {...register('name', { required: true })}
+                placeholder="Theme name"
+              />
+            </Stack>
           </Stack>
 
         </StyledCreateOrEditThemeFormHeaderFlex>
@@ -175,7 +178,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       )}
       <Stack direction="column" gap={1}>
         {activeTab === ThemeFormTabs.SETS && (
-        <Stack direction="column" gap={1} css={{ padding: '0 $4 $3' }}>
+        <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}

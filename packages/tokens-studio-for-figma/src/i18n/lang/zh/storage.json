@@ -60,7 +60,8 @@
     "bitbucket": {
       "appPassword": "应用程序密码",
       "projectName": "项目名称（可选）",
-      "repository": "存储库（工作区/存储库）"
+      "repository": "存储库（工作区/存储库）",
+      "username": "比特桶用户名"
     }
   },
   "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
@@ -70,5 +71,17 @@
   "active": "积极的",
   "edit": "编辑",
   "delete": "删除",
-  "save": "节省"
+  "save": "节省",
+  "format": "格式",
+  "w3cformat": "W3C DTCG 格式",
+  "legacyformat": "旧格式",
+  "legacyformattooltip": "旧格式，点击打开W3C DTCG转换",
+  "w3cconverttitle": "转换为 W3C DTCG 格式",
+  "w3cformatmodaltitle": "使用 W3C DTCG 格式",
+  "w3cformatmodaldescription": "您的令牌以 W3C 设计令牌社区组格式存储。如果您需要再次将它们转换回来，可以在此处进行。如果您需要调整您的开发流程，请阅读下面的所有内容。",
+  "legacyformatmodaldescription": "您的令牌当前以旧格式存储。如果您想使用新的 W3C DTCG 格式，可以在此处进行转换。阅读下面有关更改格式的所有内容，包括有关如何迁移开发管道的有用建议。",
+  "converttow3c": "转换为 W3C DTCG 格式",
+  "converttolegacy": "转换为旧格式",
+  "pushfirsterror": "转换前推送未保存的更改",
+  "readmoreformat": "阅读更多"
 }

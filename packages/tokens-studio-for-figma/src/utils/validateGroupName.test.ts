@@ -211,7 +211,7 @@ describe('validateRenameGroupName', () => {
       }],
     });
   });
-  it('prevent overlapping token name with group name', () => {
+  it('should prevent overlapping token name with group name', () => {
     setFormat(TokenFormatOptions.DTCG);
     const type = 'color';
     const oldName = 'buttons2';
@@ -225,7 +225,7 @@ describe('validateRenameGroupName', () => {
       }],
     });
   });
-  it('prevent overlapping tokens due to overlapping group name and token names', () => {
+  it('should prevent overlapping tokens due to overlapping group name and token names', () => {
     setFormat(TokenFormatOptions.DTCG);
     const type = 'color';
     const oldName = 'buttons123';
@@ -270,31 +270,6 @@ describe('validateRenameGroupName', () => {
     const newName = 'buttons3';
     expect(validateRenameGroupName(tokens2[activeTokenSet], type, oldName, newName)).toEqual(null);
   });
-  // FIXME: Test is disabled, as this should not be a blocking issue. If there is just one of each incorrect values, it is still giving the correct error/overlapping token
-
-  // it('should not allow renaming parent group that would result in token name overlap with group name and return multiple overlapping tokens', () => {
-  //   setFormat(TokenFormatOptions.DTCG);
-  //   const type = 'color';
-  //   const oldName = 'colors.foo';
-  //   const newName = 'colors.red';
-  //   const testTokens = [...tokens3[activeTokenSet], {
-  //     name: 'colors.foo.test',
-  //     type: 'color',
-  //     value: '#4a5568',
-  //   }];
-  //   expect(validateRenameGroupName(testTokens, type, oldName, newName)).toEqual({
-  //     type: ErrorType.OverlappingToken,
-  //     foundOverlappingTokens: [{
-  //       name: 'colors.red.bar',
-  //       type: 'color',
-  //       value: '#0fa',
-  //     }, {
-  //       name: 'colors.red.test',
-  //       type: 'color',
-  //       value: '#4a5568',
-  //     }],
-  //   });
-  // });
 });
 
 describe('validateDuplicateGroupName', () => {
@@ -345,7 +320,7 @@ describe('validateDuplicateGroupName', () => {
     const newName = 'buttons.foo';
     expect(validateDuplicateGroupName(tokens, selectedTokenSets, activeTokenSet, type, oldName, newName)).toEqual(null);
   });
-  it('prevent overlapping token name with group name', () => {
+  it('should prevent overlapping token name with group name', () => {
     setFormat(TokenFormatOptions.DTCG);
     const activeTokenSet = 'global';
     const type = 'color';
@@ -363,7 +338,7 @@ describe('validateDuplicateGroupName', () => {
       },
     });
   });
-  it('prevent overlapping tokens due to overlapping group name and token names', () => {
+  it('should prevent overlapping tokens due to overlapping group name and token names', () => {
     setFormat(TokenFormatOptions.DTCG);
     const activeTokenSet = 'global';
     const type = 'color';

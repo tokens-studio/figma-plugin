@@ -3,7 +3,6 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton } from '@tokens-studio/ui';
-import { styled } from '@stitches/react';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -13,6 +12,7 @@ import Box from '../Box';
 import Input from '../Input';
 import IconPencil from '@/icons/pencil.svg';
 import { Dispatch } from '@/app/store';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type Props = React.PropsWithChildren<{
   groupName: string
@@ -28,7 +28,7 @@ export function ThemeListGroupHeader({
   const dispatch = useDispatch<Dispatch>();
   const dragContext = useContext(DragControlsContext);
   const editProhibited = useSelector(editProhibitedSelector);
-  const [currentGroupName, setCurrentGroupName] = useState(label);
+  const [currentGroupName, setCurrentGroupName] = useState<string>(groupName === INTERNAL_THEMES_NO_GROUP ? '' : groupName);
   const [isEditing, setIsEditing] = useState(false);
   const handleDragStart = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragContext.controls?.start(event);
