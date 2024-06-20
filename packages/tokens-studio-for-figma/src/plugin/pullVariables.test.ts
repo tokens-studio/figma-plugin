@@ -120,56 +120,56 @@ describe('pullStyles', () => {
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'number',
-          value: '24'
+          value: 24
         },
         {
           description: '',
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'number',
-          value: '24'
+          value: 24
         },
         {
           description: '',
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'number',
-          value: '24'
+          value: 24
         },
         {
           description: '',
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'number',
-          value: '24'
+          value: 24
         },
         {
           description: '',
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'number',
-          value: '16'
+          value: 16
         },
         {
           description: '',
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'number',
-          value: '16'
+          value: 16
         },
         {
           description: '',
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'number',
-          value: '16'
+          value: 16
         },
         {
           description: '',
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'number',
-          value: '16'
+          value: 16
         }
       ]
     });
