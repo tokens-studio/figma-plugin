@@ -54,10 +54,9 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
                 variant="secondary"
                 icon={<IconPlus />}
                 size="small"
-                css={{ display: 'flex', alignItems: 'center', height: '28px' }}
                 asDropdown
               >
-                Add&nbsp;group
+                {t('addGroup')}
               </Button>
             </Box>
           )

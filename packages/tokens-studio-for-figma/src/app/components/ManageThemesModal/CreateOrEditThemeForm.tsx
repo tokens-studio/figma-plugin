@@ -5,6 +5,7 @@ import {
   Box, Button, IconButton, Stack,
 } from '@tokens-studio/ui';
 import { NavArrowLeft } from 'iconoir-react';
+import { useTranslation } from 'react-i18next';
 import { allTokenSetsSelector, themesListSelector, usedTokenSetSelector } from '@/selectors';
 import { StyledNameInputBox } from './StyledNameInputBox';
 import { StyledCreateOrEditThemeFormHeaderFlex } from './StyledCreateOrEditThemeFormHeaderFlex';
@@ -53,6 +54,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
   const availableTokenSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
   const groupNames = useMemo(() => ([...new Set(themes.filter((t) => t?.group).map((t) => t.group as string))]), [themes]);
+  const { t } = useTranslation(['tokens', 'errors']);
 
   const treeOrListItems = useMemo(() => (
     githubMfsEnabled
@@ -92,7 +94,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       <StyledNameInputBox css={{ width: '100%' }}>
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
-            tooltip="Return to overview"
+            tooltip={t('returnToOverview')}
             data-testid="button-return-to-overview"
             icon={<NavArrowLeft />}
             size="small"
@@ -117,7 +119,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 autofocus
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
-                placeholder="Add group"
+                placeholder={t('addGroup')}
                 css={{
                   display: 'flex',
                 }}
@@ -146,9 +148,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                       icon={<IconPlus />}
                       onClick={handleAddGroup}
                       size="small"
-                      css={{ display: 'flex', alignItems: 'center', height: '28px' }}
                     >
-                      Add&nbsp;group
+                      {t('addGroup')}
                     </Button>
                   )
                 }
@@ -162,7 +163,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 full
                 data-testid="create-or-edit-theme-form--input--name"
                 {...register('name', { required: true })}
-                placeholder="Theme name"
+                placeholder={t('themeName')}
               />
             </Stack>
           </Stack>
@@ -172,8 +173,8 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       {id && (
 
       <StyledCreateOrEditThemeFormTabsFlex>
-        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label="Sets" onSwitch={setActiveTab} small />
-        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label="Styles & Variables" onSwitch={setActiveTab} small />
+        <TabButton name={ThemeFormTabs.SETS} activeTab={activeTab} label={t('sets.title')} onSwitch={setActiveTab} small />
+        <TabButton name={ThemeFormTabs.STYLES_VARIABLES} activeTab={activeTab} label={t('stylesAndVariables')} onSwitch={setActiveTab} small />
       </StyledCreateOrEditThemeFormTabsFlex>
       )}
       <Stack direction="column" gap={1}>
@@ -188,7 +189,9 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
         )}
         {(activeTab === ThemeFormTabs.STYLES_VARIABLES && id) && (
         <Box css={{ padding: '$3' }}>
-          <Box css={{ padding: '$1', marginBottom: '$2' }}>Note: When using multi-dimensional themes where values depend on tokens of another theme, connecting styles might not work as expected.</Box>
+          <Box css={{ padding: '$1', marginBottom: '$2' }}>
+            {t('stylesVarMultiDimensionalThemesWarning')}
+          </Box>
           <ThemeStyleManagementForm id={id} />
         </Box>
         )}
