@@ -92,7 +92,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
       variablesString = typeof data.variablesString === 'undefined' ? true : data.variablesString;
-      stylesColor = typeof data.stylesColor === 'undefined' ? true : data.stylesColor;
+      stylesColor = typeof data.stylesColor === 'undefined' ? false : data.stylesColor;
       stylesTypography = typeof data.stylesTypography === 'undefined' ? true : data.stylesTypography;
       stylesEffect = typeof data.stylesEffect === 'undefined' ? true : data.stylesEffect;
       ignoreFirstPartForStyles = typeof data.ignoreFirstPartForStyles === 'undefined' ? false : data.ignoreFirstPartForStyles;
