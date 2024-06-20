@@ -101,24 +101,24 @@ const RemConfiguration = () => {
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: isBrokenLink ? '$dangerBg' : '$accentBg',
-                padding: '2px',
+                padding: '$2',
               }}
             >
-              <Label css={{ fontSize: '12px', color: isBrokenLink ? '$dangerFg' : '$accentDefault' }}>
+              <Label css={{ fontSize: '$small', color: isBrokenLink ? '$dangerFg' : '$accentDefault' }}>
                 {aliasBaseFontSize}
               </Label>
               {isBrokenLink && (
                 <IconBrokenLink
-                  style={{ color: '#e03e1a', width: '24px', height: '24px', marginLeft: '3px', fontWeight: 'bold' }}
+                  style={{ color: 'var(--colors-dangerFg)', width: 'var(--sizes-6)', height: 'var(--sizes-6)', marginLeft: '3px' }}
                 />
               )}
             </Box>
           )}
           <Label
             css={{
-              fontSize: '12px',
+              fontSize: '$small',
               color: '$fgSubtle',
-              marginLeft: aliasBaseFontSize.startsWith('{') ? '8px' : '0px',
+              marginLeft: aliasBaseFontSize.startsWith('{') ? '$3' : '',
             }}
           >
             {displayBaseFontValue}
