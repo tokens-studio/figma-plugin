@@ -4,16 +4,7 @@ import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
-
-const getReferenceTokensFromGradient = (rawValue: string): string[] => {
-  const rawValueDetails = rawValue.replace('linear-gradient(', '').replace(')', '').split(',');
-  const referenceTokens: string[] = rawValueDetails.map((val) => {
-    const matches = val.match(/{(.*?)}/g);
-    return matches ? matches[0].replace(/[\{\}]/g, '') : '';
-  });
-
-  return referenceTokens.length === 3 ? referenceTokens.slice(1) : referenceTokens;
-}
+import { getReferenceTokensFromGradient } from '@/utils/color';
 
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,

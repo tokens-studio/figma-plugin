@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"0x@^5.6.0":
+"0x@^5.7.0":
   version "5.7.0"
-  resolved "https://registry.npmjs.org/0x/-/0x-5.7.0.tgz"
+  resolved "https://registry.yarnpkg.com/0x/-/0x-5.7.0.tgz#c6a6b60ff7aca105bacc961064769abd90afbdcb"
   integrity sha512-oc5lqaJP7lu3C5zx+MRbsigfRlTTUg0LKjFDCr0NmR9g+nkZcR7yRU6jzMOiedSVKZ0p0b4y2TBQ+YYo6O3sZg==
   dependencies:
     ajv "^8.8.2"
@@ -3038,10 +3038,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.91.0":
-  version "1.91.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.91.0.tgz#8a88ce43bc72500de2c1f4d8cb20558f05a7de23"
-  integrity sha512-Q1CUtWQyY16eSH4pEY18CLgfGqKNotp2Yg4pCjY9hz6+Fe/Obqz5wSAyUAYDDEq4SYU0UEZJ/t/3K+6KA3j35w==
+"@figma/plugin-typings@^1.96.0":
+  version "1.96.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.96.0.tgz#c24398c6d6c1ef8adb7c411a8f7235deb78c1da2"
+  integrity sha512-fk/izqv13KHh8SKQF0d3475j7K9RaQ1EhPQT9E3iuRJnf492qYwj68hy1rO1CdZjm++l6Lk6ayhSowPLARq7Zw==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"
@@ -12321,10 +12321,10 @@ figma-api-stub@^0.0.56:
     nanoid "^3.1.20"
     rxjs "^6.5.3"
 
-figma-plugin-ds@^0.1.8:
-  version "0.1.9"
-  resolved "https://registry.npmjs.org/figma-plugin-ds/-/figma-plugin-ds-0.1.9.tgz"
-  integrity sha512-/nHfRltntOAU+2vEAyIZX7YEgU23iJZsuKzu4BJ/GJZs+zzEKIG7MfZCTKjtwr0tb7XPfJohQunYfGxfovsC+w==
+figma-plugin-ds@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/figma-plugin-ds/-/figma-plugin-ds-1.0.1.tgz#bcaf2f96c4533be80ef439232e1f7cd037cc3c80"
+  integrity sha512-j1/mcHeYx8IRzdLbNyqo9PQXqtI3ujN/RfjuXFS7OintJojuXG2GuaL8COzqAH66ZPXx4aFHMkqRjbBaudBCpA==
 
 figures@^1.7.0:
   version "1.7.0"
