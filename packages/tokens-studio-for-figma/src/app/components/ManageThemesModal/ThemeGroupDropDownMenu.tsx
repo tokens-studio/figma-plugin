@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Check } from 'iconoir-react';
-import { DropdownMenu } from '@tokens-studio/ui';
+import { Button, DropdownMenu } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import Box from '../Box';
 import { IconPlus } from '@/icons';
@@ -41,14 +41,24 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
 
   return (
     <DropdownMenu>
-      <DropdownMenu.Trigger>
+      <DropdownMenu.Trigger asChild>
         {
           selectedGroup ? (
-            <span>{selectedGroup}</span>
+            <Button variant="secondary" asDropdown>
+              <span>{selectedGroup}</span>
+            </Button>
           ) : (
             <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
-              <IconPlus />
-              Add&nbsp;group
+              <Button
+                data-testid="button-manage-themes-modal-group-dropdown"
+                variant="secondary"
+                icon={<IconPlus />}
+                size="small"
+                css={{ display: 'flex', alignItems: 'center', height: '28px' }}
+                asDropdown
+              >
+                Add&nbsp;group
+              </Button>
             </Box>
           )
         }

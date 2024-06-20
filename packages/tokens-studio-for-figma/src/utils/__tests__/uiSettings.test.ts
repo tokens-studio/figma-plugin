@@ -85,7 +85,7 @@ describe('uiSettings', () => {
       variablesBoolean: true,
       stylesEffect: true,
       stylesTypography: true,
-      stylesColor: true,
+      stylesColor: false,
       createStylesWithVariableReferences: true,
       ignoreFirstPartForStyles: false,
       prefixStylesWithThemeName: false,

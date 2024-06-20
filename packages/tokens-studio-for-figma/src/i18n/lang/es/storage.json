@@ -62,6 +62,11 @@
       "projectName": "Nombre del proyecto (opcional)",
       "repository": "Repositorio (espacio de trabajo/repositorio)",
       "username": "nombre de usuario de Bitbucket"
+    },
+    "tokensstudio": {
+      "name": "Name",
+      "apikey": "API key",
+      "urn": "Connection URN"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",

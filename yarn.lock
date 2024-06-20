@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"0x@^5.6.0":
+"0x@^5.7.0":
   version "5.7.0"
-  resolved "https://registry.npmjs.org/0x/-/0x-5.7.0.tgz"
+  resolved "https://registry.yarnpkg.com/0x/-/0x-5.7.0.tgz#c6a6b60ff7aca105bacc961064769abd90afbdcb"
   integrity sha512-oc5lqaJP7lu3C5zx+MRbsigfRlTTUg0LKjFDCr0NmR9g+nkZcR7yRU6jzMOiedSVKZ0p0b4y2TBQ+YYo6O3sZg==
   dependencies:
     ajv "^8.8.2"
@@ -3038,10 +3038,10 @@
     lodash "^4.17.15"
     matrix-inverse "^1.0.1"
 
-"@figma/plugin-typings@^1.91.0":
-  version "1.91.0"
-  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.91.0.tgz#8a88ce43bc72500de2c1f4d8cb20558f05a7de23"
-  integrity sha512-Q1CUtWQyY16eSH4pEY18CLgfGqKNotp2Yg4pCjY9hz6+Fe/Obqz5wSAyUAYDDEq4SYU0UEZJ/t/3K+6KA3j35w==
+"@figma/plugin-typings@^1.96.0":
+  version "1.96.0"
+  resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.96.0.tgz#c24398c6d6c1ef8adb7c411a8f7235deb78c1da2"
+  integrity sha512-fk/izqv13KHh8SKQF0d3475j7K9RaQ1EhPQT9E3iuRJnf492qYwj68hy1rO1CdZjm++l6Lk6ayhSowPLARq7Zw==
 
 "@floating-ui/core@^1.4.2":
   version "1.5.1"
@@ -6101,10 +6101,10 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.4.tgz#d0ad9ce72e6140219ddaf3e5f5f2c746254d2c3c"
-  integrity sha512-mE84BfkY/Zo8NPF3LMvzzrxEw1OTA2fOQw1r8GAyr68rUKa2LlL1ZbTS9G43+7ayppK2qEvpEG1anPC9WSRN5w==
+"@tokens-studio/tokens@0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.6.tgz#48d9839627befc5b057ee9111463cbcb6fb58f92"
+  integrity sha512-/U1R4bWi957SvrMb+vWRez4uPFbezhzfa34Xu1LIojZzwa+rLeG/PNrABvL6tzX0vhx2MN5lwn2vKJQLRLZUEw==
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
@@ -6116,10 +6116,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
   integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
-"@tokens-studio/ui@0.6.7":
-  version "0.6.7"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.6.7.tgz#26a8ecf20a9d54c4cdd7b9a39b22ea328f1b9309"
-  integrity sha512-h8W22uSuv2z3taN8lVnBRa15YW7/qsirePZhVIWQjyHNCBhchaHdPHrjA7q976ALCe7soD1b51VneSKlZwucvA==
+"@tokens-studio/ui@0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.6.8.tgz#dea217d4461ac73c3b8b6edadabfb36226ad9e0b"
+  integrity sha512-K3yaHEDH/rohALVnPJwrW8yCbXp7osK0uxWHxlXBv2hTMKmrn0YOVMQEdv9DJrp2LMi2otkubQlAzgUY6sX+Ww==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -12321,10 +12321,10 @@ figma-api-stub@^0.0.56:
     nanoid "^3.1.20"
     rxjs "^6.5.3"
 
-figma-plugin-ds@^0.1.8:
-  version "0.1.9"
-  resolved "https://registry.npmjs.org/figma-plugin-ds/-/figma-plugin-ds-0.1.9.tgz"
-  integrity sha512-/nHfRltntOAU+2vEAyIZX7YEgU23iJZsuKzu4BJ/GJZs+zzEKIG7MfZCTKjtwr0tb7XPfJohQunYfGxfovsC+w==
+figma-plugin-ds@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/figma-plugin-ds/-/figma-plugin-ds-1.0.1.tgz#bcaf2f96c4533be80ef439232e1f7cd037cc3c80"
+  integrity sha512-j1/mcHeYx8IRzdLbNyqo9PQXqtI3ujN/RfjuXFS7OintJojuXG2GuaL8COzqAH66ZPXx4aFHMkqRjbBaudBCpA==
 
 figures@^1.7.0:
   version "1.7.0"
