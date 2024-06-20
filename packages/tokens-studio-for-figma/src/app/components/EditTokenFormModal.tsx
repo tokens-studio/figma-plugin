@@ -26,6 +26,16 @@ const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildr
     }
   }, [dispatch, showAutoSuggest]);
 
+  const handleEditTokenModalClose = React.useCallback(() => {
+    /**
+     * Temporary fix - Radix UI leaves `pointer-events: none` on body when dialog is closed
+     * Future fix - upgrade the Dialog in our DS (https://github.com/tokens-studio/ds/issues/219)
+     * */
+    setTimeout(() => {
+      document.body.style.pointerEvents = 'auto';
+    }, 1000);
+  }, []);
+
   if (!editToken) {
     return null;
   }
@@ -35,8 +45,8 @@ const EditTokenFormModal: React.FC<React.PropsWithChildren<React.PropsWithChildr
       compact
       size="large"
       isOpen
-      modal={false}
       close={handleReset}
+      onCloseCallback={handleEditTokenModalClose}
       // eslint-disable-next-line no-nested-ternary
       title={editToken.status === EditTokenFormStatus.CREATE ? t('newToken')
         : editToken.status === EditTokenFormStatus.DUPLICATE ? t('duplicateToken') : editToken.initialName}
