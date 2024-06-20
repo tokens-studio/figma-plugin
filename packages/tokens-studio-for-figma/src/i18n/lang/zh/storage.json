@@ -62,6 +62,11 @@
       "projectName": "项目名称（可选）",
       "repository": "存储库（工作区/存储库）",
       "username": "比特桶用户名"
+    },
+    "tokensstudio": {
+      "name": "名称",
+      "apikey": "API 密钥",
+      "urn": "连接 URN"
     }
   },
   "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",

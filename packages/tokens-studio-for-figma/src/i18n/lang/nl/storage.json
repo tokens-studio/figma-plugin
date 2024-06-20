@@ -62,6 +62,11 @@
       "projectName": "Projectnaam (optioneel)",
       "repository": "Repository (werkruimte/repository)",
       "username": "Bitbucket-gebruikersnaam"
+    },
+    "tokensstudio": {
+      "name": "Name",
+      "apikey": "API key",
+      "urn": "Connection URN"
     }
   },
   "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",

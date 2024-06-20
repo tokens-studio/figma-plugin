@@ -2,14 +2,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Label, Stack, Text } from '@tokens-studio/ui';
+import {
+  Box, Button, Label, Stack, Text,
+} from '@tokens-studio/ui';
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
 import IconBrokenLink from '@/icons/brokenlink.svg';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';
-import { tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector } from '@/selectors';
+import {
+  tokensSelector, usedTokenSetSelector, activeTokenSetSelector, aliasBaseFontSizeSelector,
+} from '@/selectors';
 import DownshiftInput from './DownshiftInput';
 import { getAliasValue } from '@/utils/alias';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
@@ -29,27 +33,22 @@ const RemConfiguration = () => {
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
   const resolvedTokens = React.useMemo(
-    () =>
-      defaultTokenResolver.setTokens(
-        mergeTokenGroups(tokens, {
-          ...usedTokenSet,
-          [activeTokenSet]: TokenSetStatus.ENABLED,
-        }),
-      ),
+    () => defaultTokenResolver.setTokens(
+      mergeTokenGroups(tokens, {
+        ...usedTokenSet,
+        [activeTokenSet]: TokenSetStatus.ENABLED,
+      }),
+    ),
     [tokens, usedTokenSet, activeTokenSet],
   );
-
-  const resolvedAliasBaseFontSizes = getAliasValue(aliasBaseFontSize, resolvedTokens);
 
   const displayBaseFontValue = React.useMemo(() => {
     const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
     let formattedpxValue = 16;
-    console.log(resolvedAliasBaseFontSize);
     if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
-      const resolvedAliasBaseFontSizeValue =
-        typeof resolvedAliasBaseFontSize === 'number'
-          ? resolvedAliasBaseFontSize
-          : parseFloat(resolvedAliasBaseFontSize);
+      const resolvedAliasBaseFontSizeValue = typeof resolvedAliasBaseFontSize === 'number'
+        ? resolvedAliasBaseFontSize
+        : parseFloat(resolvedAliasBaseFontSize);
       if (isNaN(resolvedAliasBaseFontSizeValue)) {
         formattedpxValue = 16;
         setIsBrokenLink(true);
@@ -59,7 +58,7 @@ const RemConfiguration = () => {
       }
       return `1rem = ${formattedpxValue}px`;
     }
-    return `1rem = 16px`;
+    return '1rem = 16px';
   }, [aliasBaseFontSize, resolvedTokens]);
 
   const handleBaseFontSizeChange = React.useCallback(
@@ -98,6 +97,7 @@ const RemConfiguration = () => {
           {aliasBaseFontSize.startsWith('{') && (
             <Box
               css={{
+                borderRadius: '$small',
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: isBrokenLink ? '$dangerBg' : '$accentBg',
@@ -109,14 +109,16 @@ const RemConfiguration = () => {
               </Label>
               {isBrokenLink && (
                 <IconBrokenLink
-                  style={{ color: 'var(--colors-dangerFg)', width: 'var(--sizes-6)', height: 'var(--sizes-6)', marginLeft: '3px' }}
+                  style={{
+                    color: 'var(--colors-dangerFg)', width: 'var(--sizes-6)', height: 'var(--sizes-6)', marginLeft: '3px',
+                  }}
                 />
               )}
             </Box>
           )}
           <Label
             css={{
-              fontSize: '$small',
+              fontSize: '$xsmall',
               color: '$fgSubtle',
               marginLeft: aliasBaseFontSize.startsWith('{') ? '$3' : '',
             }}
@@ -136,13 +138,13 @@ const RemConfiguration = () => {
         title={displayBaseFontValue}
         showClose
         modal={false}
-        footer={
+        footer={(
           <Stack direction="row" justify="end">
             <Button onClick={toggleModalVisible} variant="primary">
               {t('confirm')}
             </Button>
           </Stack>
-        }
+        )}
       >
         <Stack direction="column" gap={3} css={{ padding: '$4' }}>
           <Text muted>{t('baseFontExplanation')}</Text>
