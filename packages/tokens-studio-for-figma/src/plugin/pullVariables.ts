@@ -96,7 +96,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
           } else if (typeof value === 'number') {
             if (options.useRem) {
-              tokenValue = `${Number(tokenValue) / baseRem}rem`;
+              tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
             } else if (options.useDimensions) {
               tokenValue = `${tokenValue}px`;
             }
