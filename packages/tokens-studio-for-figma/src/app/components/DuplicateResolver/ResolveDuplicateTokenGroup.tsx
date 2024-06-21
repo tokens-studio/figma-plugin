@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Heading, RadioGroup, RadioIndicator, RadioItem, RadioItemBefore,
   Stack,
   Text,
+  Tooltip,
 } from '@tokens-studio/ui';
-import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { SingleToken } from '@/types/tokens';
 import Box from '../Box';
 // import ResolveDuplicateTokenSingle from './ResolveDuplicateTokenSingle';
 
@@ -14,30 +15,36 @@ function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
   // const resolvedToken = duplicateResolvedTokens[index];
   return (
     <>
-      {/* <></> */}
       {/* <Stack css={{ width: '$8' }}>
         <InspectorResolvedToken token={resolvedToken as any} />
       </Stack> */}
-      <Box
-        css={{
-          background: '$bgSubtle',
-          fontSize: '$small',
-          padding: '$2 $3',
-          borderRadius: '$small',
-          // minWidth: '$9',
-        }}
-      >
-        <Text>
-          {token.value as string}
-        </Text>
-      </Box>
+      <Tooltip label={`Type: ${token.type}`}>
+        <Box
+          css={{
+            background: '$bgSubtle',
+            fontSize: '$small',
+            padding: '$2 $3',
+            borderRadius: '$small',
+            // minWidth: '$9',
+          }}
+        >
+          <Text>
+            {token.value as string}
+          </Text>
+        </Box>
+      </Tooltip>
     </>
   );
 }
 
-export default function ResolveDuplicateTokenGroup({ set, group, tokens }: { set: string, group: [string, SingleToken[]] }) {
+export default function ResolveDuplicateTokenGroup({
+  setName, group, onRadioClick, selectedTokens,
+}: {
+  setName: string, group: [string, SingleToken[]], onRadioClick: (value: string) => void, selectedTokens: { [key: string]: { [key: string]: number | string } }
+}) {
   const [groupKey, groupValue] = group;
-  const [checkedToken, setCheckedToken] = useState(`${groupKey}-0`);
+  const checkedToken = `${setName}:${groupKey}:${selectedTokens?.[setName]?.[groupKey] || 0}`;
+  // const [checkedToken, setCheckedToken] = useState(`${groupKey}-0`);
 
   return (
     <Box
@@ -56,14 +63,15 @@ export default function ResolveDuplicateTokenGroup({ set, group, tokens }: { set
       <Stack direction="row">
         <Heading size="small" css={{ minWidth: '$9' }}>Value: </Heading>
         <RadioGroup
-          onValueChange={(value) => setCheckedToken(value)}
+          // onValueChange={(value) => setCheckedToken(value)}
+          onValueChange={onRadioClick}
           value={checkedToken}
-          css={{ gap: 0 }}
+          css={{ gap: '$3' }}
         >
           {groupValue.map((uniqueToken, i) => (
             // eslint-disable-next-line react/no-array-index-key
-            <RadioItem key={`${uniqueToken.name}-${i}`} value={`${uniqueToken.name}-${i}`}>
-              <RadioItemBefore data-state={checkedToken === `${uniqueToken.name}-${i}` ? 'checked' : 'unchecked'}>
+            <RadioItem key={`${uniqueToken.name}-${i}`} value={`${setName}:${uniqueToken.name}:${i}`} css={{ padding: 0 }}>
+              <RadioItemBefore data-state={checkedToken === `${setName}:${uniqueToken.name}:${i}` ? 'checked' : 'unchecked'}>
                 <RadioIndicator />
               </RadioItemBefore>
               <ResolveDuplicateTokenSingle token={uniqueToken} />
