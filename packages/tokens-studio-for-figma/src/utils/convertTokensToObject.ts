@@ -10,24 +10,31 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
     const tokenGroupObj: AnyTokenSet<false> = {};
     val.forEach((token) => {
       const tokenWithType = appendTypeToToken(token);
-      const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
+      const tokenWithoutId = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
+
+      // Remove the name key to not include it in the output
+      const { name, ...tokenWithoutName } = tokenWithoutId;
+
+      // Directly work with tokenWithoutName to preserve order
       if (tokenWithoutName.inheritTypeLevel) {
-        const {
-          inheritTypeLevel, ...tokenWithoutTypeAndValue
-        } = tokenWithoutName;
-        // set type of group level
-        tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = tokenWithoutName.value;
-        tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
-        set(tokenGroupObj, getGroupTypeName(token.name, inheritTypeLevel), tokenWithoutName.type);
-        set(tokenGroupObj, token.name, tokenWithoutTypeAndValue, { merge: true });
+        // If inheritTypeLevel exists, handle it specifically
+        const { inheritTypeLevel } = tokenWithoutName;
+        delete tokenWithoutName.inheritTypeLevel; // Remove it to avoid altering the order
+
+        // Set type of group level without altering the order of tokenWithoutName
+        set(tokenGroupObj, getGroupTypeName(name, inheritTypeLevel), tokenWithoutName.type);
+
+        // Add value and description keys directly to preserve order
+        tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+        tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
+        set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       } else {
-        const {
-          type, value, description, ...tokenWithoutTypeAndValue
-        } = tokenWithoutName;
-        tokenWithoutTypeAndValue[TokenFormat.tokenTypeKey] = type;
-        tokenWithoutTypeAndValue[TokenFormat.tokenValueKey] = value;
-        tokenWithoutTypeAndValue[TokenFormat.tokenDescriptionKey] = description;
-        set(tokenGroupObj, token.name, tokenWithoutTypeAndValue, { merge: true });
+        // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
+        tokenWithoutName[TokenFormat.tokenTypeKey] = tokenWithoutName.type;
+        tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
+        tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
+
+        set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });
     acc[key] = tokenGroupObj;
