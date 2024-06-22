@@ -1,7 +1,7 @@
 /* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/indent */
 /* eslint "@typescript-eslint/no-unused-vars": off */
-import { Bitbucket } from 'bitbucket';
+import { Bitbucket, Schema } from 'bitbucket';
 import compact from 'just-compact';
 import {
   RemoteTokenStorageFile,
@@ -74,15 +74,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    */
   public async createBranch(branch: string, source?: string) {
     try {
-      const originRef = `refs/${source || this.branch}`;
-      const newRef = `refs/${branch}`;
-
       const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
       });
 
-      if (!originBranch.data.values || !originBranch.data.values[0] || !originBranch.data.values[0].target) {
+      const sourceBranchName = source || this.branch;
+      const sourceBranch = originBranch.data.values.find((branchValue: Schema.Branch) => branchValue.name === sourceBranchName);
+
+      if (!originBranch.data.values || !sourceBranch || !sourceBranch.target) {
         throw new Error('Could not retrieve origin branch');
       }
 
@@ -91,7 +91,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         _body: {
           name: branch, // branch name
           target: {
-            hash: originBranch.data.values[0].target.hash, // hash of the commit the new branch should point to
+            hash: sourceBranch.target.hash, // hash of the commit the new branch should point to
           },
         },
         repo_slug: this.repository,
@@ -161,7 +161,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             headers: {
               Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
             },
-          }).then((response) => response.text())),
+          }).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
@@ -212,7 +212,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               data: parsed.$metadata,
             },
           ] : []),
-          ...parsedData
+          ...parsedData,
         ];
       }
       return {
