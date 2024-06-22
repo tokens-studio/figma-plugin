@@ -49,7 +49,7 @@ const StyledDialogContent = styled(Dialog.Content, {
     size: {
       large: {
         width: 'calc(100vw - $7)',
-        maxWidth: 'calc(100vw -$7)',
+        maxWidth: '480px',
         padding: 0,
         boxShadow: '$contextMenu',
         borderColor: '$borderSubtle',

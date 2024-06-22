@@ -177,7 +177,7 @@ export default function useTokens() {
 
   const pullVariables = useCallback(async () => {
     const userDecision = await confirm({
-      text: 'Import variables',
+      text: 'Import Variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
         { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
