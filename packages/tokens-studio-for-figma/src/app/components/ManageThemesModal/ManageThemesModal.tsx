@@ -62,10 +62,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   }, [themes, themeEditorOpen]);
 
   const handleClose = useCallback(() => {
-    if (!IsThemeGroupNameEditing) {
-      dispatch.uiState.setManageThemesModalOpen(false);
-    }
-  }, [IsThemeGroupNameEditing, dispatch]);
+    dispatch.uiState.setManageThemesModalOpen(false);
+  }, [dispatch]);
 
   const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
     if (theme && typeof theme !== 'boolean') {
@@ -239,7 +237,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                     <ThemeListGroupHeader
                       label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                       groupName={item.value as string}
-                      setIsGroupEditing={handleUpdateIsEditing}
                     />
                   )
                 }
