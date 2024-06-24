@@ -106,7 +106,7 @@ export default function TokenSetTree({
       onDelete,
       onDuplicate,
       saveScrollPositionSet,
-      isActive: activeTokenSet === item.path,
+      isActive: activeTokenSet === item.key && item.isLeaf,
       canDelete: !editProhibited || Object.keys(tokenSets).length > 1,
       checkedState: determineCheckedState(item) as ReturnType<typeof determineCheckedState>,
     }))
@@ -123,6 +123,7 @@ export default function TokenSetTree({
   ]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
+    console.log('reorderedItems in TokenSetTree: ', reorderedItems);
     const nextItems = reorderedItems.reduce<typeof items>((acc, item) => {
       const found = items.find(({ key }) => item.key === key);
       if (found) {

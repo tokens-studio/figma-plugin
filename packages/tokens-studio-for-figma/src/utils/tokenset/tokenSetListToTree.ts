@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 export type TreeItem = {
   key: string;
   path: string;
@@ -5,6 +7,7 @@ export type TreeItem = {
   level: number;
   label: string;
   isLeaf: boolean;
+  id: string;
 };
 
 export function tokenSetListToTree(items: string[]) {
@@ -25,6 +28,7 @@ export function tokenSetListToTree(items: string[]) {
             parent: path.slice(0, index).join('/'),
             level: index,
             label,
+            id: uuidv4()
           });
         }
       });
@@ -39,6 +43,7 @@ export function tokenSetListToTree(items: string[]) {
         parent: parentName,
         level: path.length - 1,
         label: path[path.length - 1],
+        id: uuidv4()
       });
     } else {
       acc.push({
@@ -48,6 +53,7 @@ export function tokenSetListToTree(items: string[]) {
         parent: parentName,
         level: path.length - 1,
         label: path[path.length - 1],
+        id: uuidv4()
       });
     }
     return acc;
