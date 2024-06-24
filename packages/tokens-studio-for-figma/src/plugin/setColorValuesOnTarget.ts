@@ -37,25 +37,29 @@ export default async function setColorValuesOnTarget({
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
 
       const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
-      const referenceTokens = getReferenceTokensFromGradient(rawValue);
-
       let gradientStopsWithReferences = gradientStops;
-      if (gradientStops && referenceTokens.length > 0) {
-        gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
-          const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
-          if (referenceVariableExists) {
-            return {
-              ...stop,
-              boundVariables: {
-                color: {
-                  type: 'VARIABLE_ALIAS',
-                  id: referenceVariableExists.id,
+
+      const { createStylesWithVariableReferences } = defaultTokenValueRetriever;
+      if (createStylesWithVariableReferences) {
+        const referenceTokens = getReferenceTokensFromGradient(rawValue);
+
+        if (gradientStops && referenceTokens.length > 0) {
+          gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
+            const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
+            if (referenceVariableExists) {
+              return {
+                ...stop,
+                boundVariables: {
+                  color: {
+                    type: 'VARIABLE_ALIAS',
+                    id: referenceVariableExists.id,
+                  }
                 }
-              }
-            };
-          }
-          return stop;
-        }));
+              };
+            }
+            return stop;
+          }));
+        }
       }
       const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
