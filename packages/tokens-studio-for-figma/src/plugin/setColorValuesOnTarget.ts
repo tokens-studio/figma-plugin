@@ -4,6 +4,7 @@ import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
+import { getReferenceTokensFromGradient } from '@/utils/color';
 
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,
@@ -34,10 +35,32 @@ export default async function setColorValuesOnTarget({
     if (resolvedValue.startsWith('linear-gradient')) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
+
+      const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+      const referenceTokens = getReferenceTokensFromGradient(rawValue);
+
+      let gradientStopsWithReferences = gradientStops;
+      if (gradientStops && referenceTokens.length > 0) {
+        gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
+          const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
+          if (referenceVariableExists) {
+            return {
+              ...stop,
+              boundVariables: {
+                color: {
+                  type: 'VARIABLE_ALIAS',
+                  id: referenceVariableExists.id,
+                }
+              }
+            };
+          }
+          return stop;
+        }));
+      }
       const newPaint: GradientPaint = {
         type: 'GRADIENT_LINEAR',
         gradientTransform,
-        gradientStops,
+        gradientStops: gradientStopsWithReferences,
       };
 
       if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {

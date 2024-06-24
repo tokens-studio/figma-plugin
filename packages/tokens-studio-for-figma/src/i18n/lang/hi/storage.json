@@ -62,6 +62,11 @@
       "projectName": "प्रोजेक्ट का नाम (वैकल्पिक)",
       "repository": "रिपॉजिटरी (कार्यक्षेत्र/रेपो)",
       "username": "बिटबकेट उपयोगकर्ता नाम"
+    },
+    "tokensstudio": {
+      "name": "नाम",
+      "apikey": "API कुंजी",
+      "urn": "कनेक्शन URN"
     }
   },
   "selectALayerToSeeAppliedTokens": "लागू टोकन देखने के लिए एक परत का चयन करें",
