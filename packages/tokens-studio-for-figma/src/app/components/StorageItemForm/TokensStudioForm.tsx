@@ -1,7 +1,15 @@
 import React from 'react';
 import zod from 'zod';
 import {
-  Button, FormField, IconButton, Label, Stack, TextInput,
+  Box,
+  Button,
+  FormField,
+  Heading,
+  IconButton,
+  Label,
+  Link,
+  Stack,
+  TextInput,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +18,13 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
+import TokensStudioWord from '@/icons/tokensstudio-word.svg';
+import { styled } from '@/stitches.config';
+
+const StyledTokensStudioWord = styled(TokensStudioWord, {
+  width: '200px',
+  height: '25px',
+});
 
 type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.TOKENS_STUDIO }>;
 type Props = {
@@ -26,6 +41,7 @@ export default function TokensStudioForm({
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
+  const [showTeaser, setShowTeaser] = React.useState(true);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -54,15 +70,35 @@ export default function TokensStudioForm({
     [values, onSubmit],
   );
 
-  return (
+  React.useEffect(() => {
+    if (values.secret) {
+      setShowTeaser(false);
+    }
+  }, [values]);
+
+  const handleDismissTeaser = React.useCallback(() => {
+    setShowTeaser(false);
+  }, []);
+
+  return showTeaser ? (
+    <Stack direction="column" align="start" gap={5}>
+      <StyledTokensStudioWord />
+      <Stack direction="column" gap={3}>
+        <Heading size="large">A dedicated design tokens management platform</Heading>
+        <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
+        <Link href="https://tokens.studio/studio" target="_blank" rel="norefferer">Learn more</Link>
+      </Stack>
+      <Button onClick={handleDismissTeaser}>Already got access?</Button>
+    </Stack>
+  ) : (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
         <FormField>
-          <Label htmlFor="name">{t('name')}</Label>
+          <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
           <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
         </FormField>
         <FormField>
-          <Label htmlFor="secret">{t('secret')}</Label>
+          <Label htmlFor="secret">{t('providers.tokensstudio.apikey')}</Label>
           <TextInput
             value={values.secret || ''}
             onChange={onChange}
@@ -76,7 +112,7 @@ export default function TokensStudioForm({
           />
         </FormField>
         <FormField>
-          <Label htmlFor="id">{t('id')}</Label>
+          <Label htmlFor="id">{t('providers.tokensstudio.urn')}</Label>
           <TextInput
             value={values.id || ''}
             onChange={onChange}
@@ -95,9 +131,9 @@ export default function TokensStudioForm({
           </Button>
         </Stack>
         {hasErrored && (
-          <ErrorMessage data-testid="provider-modal-error">
-            {errorMessage}
-          </ErrorMessage>
+        <ErrorMessage data-testid="provider-modal-error">
+          {errorMessage}
+        </ErrorMessage>
         )}
       </Stack>
     </form>

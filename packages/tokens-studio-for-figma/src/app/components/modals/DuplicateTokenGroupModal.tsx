@@ -44,6 +44,9 @@ export default function DuplicateTokenGroupModal({
   }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
 
   const error = useMemo(() => {
+    if (!isOpen) {
+      return null;
+    }
     if (newName === oldName && selectedTokenSets.includes(activeTokenSet)) {
       return {
         type: ErrorType.ExistingGroup,
@@ -55,7 +58,7 @@ export default function DuplicateTokenGroupModal({
       };
     }
     return validateDuplicateGroupName(tokens, selectedTokenSets, activeTokenSet, type, oldName, newName);
-  }, [activeTokenSet, newName, oldName, selectedTokenSets, tokens, type]);
+  }, [isOpen, activeTokenSet, newName, oldName, selectedTokenSets, tokens, type]);
 
   const canDuplicate = !error;
 

@@ -21,7 +21,9 @@
     "learnMore": "Meer informatie",
     "themes": "Thema's",
     "noGroup": "Geen Groep",
-    "selectAll": "Alles selecteren"
+    "selectAll": "Alles selecteren",
+    "variables": "Variabelen",
+    "styles": "Stijlen"
   },
   "tabs": {
     "exportThemes": "Thema's",
@@ -41,7 +43,13 @@
     "scopeVariablesByTokenType": "Variabelen beperken op basis van tokentype",
     "scopeVariablesByTokenTypeExplanation": "Variabelen worden beperkt op basis van het tokentype en het beoogde gebruik",
     "createStylesWithVariableReferences": "Stijlen maken met variabelenreferenties",
-    "createStylesWithVariableReferencesExplanation": "Stijlen worden aangemaakt met verwijzingen naar variabelen"
+    "createStylesWithVariableReferencesExplanation": "Stijlen worden aangemaakt met verwijzingen naar variabelen",
+    "intro": "Creëer stijlen of variabelen op basis van uw thema's of tokensets. Kies eerst welke soorten tokens moeten worden gemaakt als stijlen of variabelen.",
+    "createAndUpdate": "Maken en bijwerken",
+    "renameExisting": "Update bestaande stijl- en variabelenamen",
+    "renameExistingExplanation": "Bestaande stijlen en variabelen worden hernoemd zodat ze overeenkomen met de tokennaam",
+    "removeWithoutConnection": "Verwijder stijlen en variabelen zonder verbinding met een token",
+    "removeWithoutConnectionExplanation": "Stijlen en variabelen die niet aan een token zijn gekoppeld, worden verwijderd"
   },
   "variables": {
     "color": "Kleur",
@@ -65,6 +73,8 @@
   "exportSetsTab": {
     "changeSetsHeading": "Ingeschakelde sets worden geëxporteerd naar Figma",
     "confirmSets": "Sets bevestigen",
-    "intro": "Je kunt token sets gebruiken om je stijlen en variabelen te beheren. Gebruik Thema's (Pro) om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten."
-  }
+    "intro": "Je kunt token sets gebruiken om je stijlen en variabelen te beheren. Gebruik Thema's (Pro) om meerdere verzamelingen van variabelen of stijlen te maken voor eenvoudig schakelen tussen ontwerpconcepten.",
+    "setsSelectedForExport": "Sets geselecteerd voor export"
+  },
+  "optionsModalTitle": "Exporteren naar Figma: Opties"
 }

@@ -56,7 +56,8 @@ export default function SingleFileExport({ onClose }: Props) {
     track('Export file', {
       includeParent, includeAllTokens, expandComposition, expandShadow, expandTypography, expandBorder,
     });
-  }, [expandComposition, expandShadow, expandTypography, expandBorder, includeAllTokens, includeParent]);
+    onClose();
+  }, [expandComposition, expandShadow, expandTypography, expandBorder, includeAllTokens, includeParent, onClose]);
 
   const formattedTokens = React.useMemo(() => getFormattedTokens({
     includeAllTokens, includeParent, expandTypography, expandShadow, expandComposition, expandBorder,

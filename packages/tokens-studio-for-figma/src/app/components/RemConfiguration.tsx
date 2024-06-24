@@ -6,6 +6,7 @@ import {
   Box, Button, Label, Stack, Text,
 } from '@tokens-studio/ui';
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
+import IconBrokenLink from '@/icons/brokenlink.svg';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
@@ -27,6 +28,7 @@ const RemConfiguration = () => {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['settings']);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [isBrokenLink, setIsBrokenLink] = React.useState<boolean>(false);
 
   const toggleModalVisible = React.useCallback(() => setModalVisible((prev) => !prev), []);
 
@@ -39,6 +41,25 @@ const RemConfiguration = () => {
     ),
     [tokens, usedTokenSet, activeTokenSet],
   );
+
+  const displayBaseFontValue = React.useMemo(() => {
+    const resolvedAliasBaseFontSize = getAliasValue(aliasBaseFontSize, resolvedTokens);
+    let formattedpxValue = 16;
+    if (typeof resolvedAliasBaseFontSize === 'string' || typeof resolvedAliasBaseFontSize === 'number') {
+      const resolvedAliasBaseFontSizeValue = typeof resolvedAliasBaseFontSize === 'number'
+        ? resolvedAliasBaseFontSize
+        : parseFloat(resolvedAliasBaseFontSize);
+      if (isNaN(resolvedAliasBaseFontSizeValue)) {
+        formattedpxValue = 16;
+        setIsBrokenLink(true);
+      } else {
+        formattedpxValue = Number(resolvedAliasBaseFontSizeValue.toFixed(2));
+        setIsBrokenLink(false);
+      }
+      return `1rem = ${formattedpxValue}px`;
+    }
+    return '1rem = 16px';
+  }, [aliasBaseFontSize, resolvedTokens]);
 
   const handleBaseFontSizeChange = React.useCallback(
     (property: string, value: string) => {
@@ -64,12 +85,47 @@ const RemConfiguration = () => {
 
   return (
     <Stack direction="row" align="center" justify="between" css={{ width: '100%' }}>
-      <Stack direction="row" align="center" gap={1}>
-        <Label>{t('baseFont')}</Label>
-        <ExplainerModal title={t('baseFont')}>
-          <Box as="img" src={remConfigurationImage} css={{ borderRadius: '$small' }} />
-          <Box>{t('baseFontExplanation')}</Box>
-        </ExplainerModal>
+      <Stack direction="column" align="start" gap={1}>
+        <Stack direction="row" align="center" gap={1}>
+          <Label>{t('baseFont')}</Label>
+          <ExplainerModal title={displayBaseFontValue}>
+            <Box as="img" src={remConfigurationImage} css={{ borderRadius: '$small' }} />
+            <Box>{t('baseFontExplanation')}</Box>
+          </ExplainerModal>
+        </Stack>
+        <Stack direction="row" align="center" gap={1}>
+          {aliasBaseFontSize.startsWith('{') && (
+            <Box
+              css={{
+                borderRadius: '$small',
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: isBrokenLink ? '$dangerBg' : '$accentBg',
+                padding: '$2',
+              }}
+            >
+              <Label css={{ fontSize: '$small', color: isBrokenLink ? '$dangerFg' : '$accentDefault' }}>
+                {aliasBaseFontSize}
+              </Label>
+              {isBrokenLink && (
+                <IconBrokenLink
+                  style={{
+                    color: 'var(--colors-dangerFg)', width: 'var(--sizes-6)', height: 'var(--sizes-6)', marginLeft: '3px',
+                  }}
+                />
+              )}
+            </Box>
+          )}
+          <Label
+            css={{
+              fontSize: '$xsmall',
+              color: '$fgSubtle',
+              marginLeft: aliasBaseFontSize.startsWith('{') ? '$3' : '',
+            }}
+          >
+            {displayBaseFontValue}
+          </Label>
+        </Stack>
       </Stack>
 
       <Button onClick={toggleModalVisible} variant="secondary">
@@ -79,7 +135,7 @@ const RemConfiguration = () => {
       <Modal
         isOpen={modalVisible}
         close={toggleModalVisible}
-        title={t('baseFont')}
+        title={displayBaseFontValue}
         showClose
         modal={false}
         footer={(
@@ -104,7 +160,6 @@ const RemConfiguration = () => {
             />
           </Box>
         </Stack>
-
       </Modal>
     </Stack>
   );

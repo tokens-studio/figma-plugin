@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import { DropdownMenu } from '@tokens-studio/ui';
 
 type Props = {
@@ -24,7 +24,7 @@ export const BranchSwitchMenuRadioElement: React.FC<React.PropsWithChildren<Reac
       css={{ position: 'relative' }}
     >
       <DropdownMenu.ItemIndicator>
-        <CheckIcon data-testid="branch-switch-menu-check-icon" />
+        <Check data-testid="branch-switch-menu-check-icon" />
       </DropdownMenu.ItemIndicator>
       {branch}
     </DropdownMenu.RadioItem>
