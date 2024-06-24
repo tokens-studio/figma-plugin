@@ -1,4 +1,3 @@
-import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
