@@ -20,6 +20,7 @@ export type ModalProps = {
   showClose?: boolean;
   backArrow?: boolean
   close: () => void;
+  onCloseCallback?: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
 };
@@ -89,6 +90,7 @@ export function Modal({
   modal = true,
   backArrow = false,
   onInteractOutside,
+  onCloseCallback,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -97,6 +99,9 @@ export function Modal({
   const handleOnOpenChange = React.useCallback(
     (open) => {
       if (!open) {
+        if (onCloseCallback) {
+          onCloseCallback();
+        }
         close();
       }
     },
