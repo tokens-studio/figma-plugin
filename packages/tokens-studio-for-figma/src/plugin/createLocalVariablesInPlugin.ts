@@ -61,12 +61,14 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       }
       updatedVariableCollections.push(collection);
     }));
-    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects);
+    // Gather references that we should use. Merge current theme references with the ones from all themes as well as local variables
+    const existingVariables = await mergeVariableReferencesWithLocalVariables(selectedThemeObjects, themeInfo.themes);
 
+    // Update variables to use references instead of raw values
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length ?? 0;
   const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
