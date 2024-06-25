@@ -123,14 +123,13 @@ export default function TokenSetTree({
   ]);
 
   const handleReorder = React.useCallback((reorderedItems: ExtendedTreeItem[]) => {
-    console.log('reorderedItems in TokenSetTree: ', reorderedItems);
     const nextItems = reorderedItems.reduce<typeof items>((acc, item) => {
-      const found = items.find(({ key }) => item.key === key);
+      const found = items.find(({ id }) => item.id === id);
       if (found) {
         // check if this group is collapsed
         acc.push(found);
         const itemIsCollapsed = collapsed.includes(item.key);
-        if (itemIsCollapsed) {
+        if (itemIsCollapsed && !item.isLeaf) {
           // also include all children
           return acc.concat(items.filter((possibleChild) => (
             possibleChild.parent && possibleChild.parent.startsWith(item.path)

@@ -20,7 +20,7 @@ export function tokenSetListToTree(items: string[]) {
       const parentNameSplit = parentName.split('/');
       parentNameSplit.forEach((directory, index) => {
         const label = directory;
-        if (!acc.find((item) => item.path === parentNameSplit.slice(0, index + 1).join('/'))) {
+        if (!acc.find((item) => item.path === parentNameSplit.slice(0, index + 1).join('/') && !item.isLeaf)) {
           acc.push({
             isLeaf: false,
             path: parentNameSplit.slice(0, index + 1).join('/'),
