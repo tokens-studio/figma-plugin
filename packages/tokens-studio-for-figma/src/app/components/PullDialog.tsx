@@ -58,8 +58,8 @@ function PullDialog() {
     }
     case 'loading': {
       return (
-        <Modal size="large" isOpen close={onCancel} title={`Pull from ${transformProviderName(storageType.provider)}`}>
-          <Stack direction="column" gap={4} justify="center" align="center">
+        <Modal isOpen close={onCancel}>
+          <Stack direction="column" gap={4} justify="center" align="center" css={{ padding: '$4 0' }}>
             <Spinner />
             <Heading size="medium">{t('pullFrom', { provider: transformProviderName(storageType.provider) })}</Heading>
           </Stack>
