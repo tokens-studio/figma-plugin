@@ -106,7 +106,7 @@ export default function TokenSetTree({
       onDelete,
       onDuplicate,
       saveScrollPositionSet,
-      isActive: activeTokenSet === item.key && item.isLeaf,
+      isActive: activeTokenSet === item.path && item.isLeaf,
       canDelete: !editProhibited || Object.keys(tokenSets).length > 1,
       checkedState: determineCheckedState(item) as ReturnType<typeof determineCheckedState>,
     }))
