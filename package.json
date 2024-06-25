@@ -36,9 +36,7 @@
   },
   "resolutions": {
     "react": "^18",
-    "@radix-ui/react-dismissable-layer": "1.0.5",
-    "@radix-ui/react-dialog": "1.0.5",
-    "@radix-ui/react-select": "1.2.1"
+    "@radix-ui/react-dismissable-layer": "1.0.5"
   },
   "dependencies": {
     "@changesets/cli": "^2.26.2",
