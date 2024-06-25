@@ -218,7 +218,7 @@ export class AsyncMessageChannelPreview {
           });
         } else { // eslint-disable-next-line
           if (this.environment === Environment.BROWSER) {
-            this.sendMessageFromBrowser({ ...msg, src: 'browser' });
+            this.sendMessageFromBrowser({ id: msg.id, message: payload, src: 'browser' });
           } else {
             sendMessageToController({ id: msg.id, message: payload });
           }

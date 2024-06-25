@@ -25,7 +25,8 @@ wss.on("connection", (ws) => {
   });
 
   // connection is up, let's add a simple simple event
-  ws.on("message", (message) => {
+  ws.on("message", (data, isBinary) => {
+    const message = isBinary ? data : data.toString();
     // send back the message to the other clients
     wss.clients.forEach((client) => {
       if (client != ws) {
