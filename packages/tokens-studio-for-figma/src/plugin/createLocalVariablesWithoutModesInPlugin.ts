@@ -41,8 +41,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
             [curr.set]: curr.status,
           },
           id: curr.set,
-          name: curr.set
-        })
+          name: curr.set,
+        });
       }
       return acc;
     }, [] as ThemeObject[]);
@@ -67,7 +67,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       if (set.status === TokenSetStatus.ENABLED) {
         const setTokens: Record<string, AnyTokenList> = {
           ...sourceTokenSets,
-          [set.set]: tokens[set.set]
+          [set.set]: tokens[set.set],
         };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
@@ -92,7 +92,7 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length;
+  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length ?? 0;
   const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
