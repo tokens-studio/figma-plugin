@@ -44,7 +44,7 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
       <DropdownMenu.Trigger asChild>
         {
           selectedGroup ? (
-            <Button variant="secondary" asDropdown>
+            <Button variant="secondary" asDropdown size="small">
               <span>{selectedGroup}</span>
             </Button>
           ) : (
