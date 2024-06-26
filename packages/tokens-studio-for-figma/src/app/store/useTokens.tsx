@@ -420,7 +420,7 @@ export default function useTokens() {
         settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
       ].some((isEnabled) => isEnabled);
       if (shouldCreate) {
-        if (!acc.find((token) => curr.name === token.name)) {
+        if (!acc.find((token) => curr.name === token.name && curr.internal__Parent === token.internal__Parent)) {
           acc.push(curr);
         }
       }

@@ -114,7 +114,7 @@ class TokenResolver {
     const memoKey = token.name || undefined;
 
     // If we have a cache hit, we can return it
-    if (memoKey && this.memo.has(memoKey)) {
+    if (memoKey && this.memo.has(memoKey) && token.internal__Parent === this.memo.get(memoKey)?.internal__Parent) {
       const cacheResult = this.memo.get(memoKey);
       if (cacheResult) {
         return cacheResult;
