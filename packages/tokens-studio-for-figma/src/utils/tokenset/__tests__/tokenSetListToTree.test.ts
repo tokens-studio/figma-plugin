@@ -1,10 +1,15 @@
 import { tokenSetListToTree } from '../tokenSetListToTree';
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'mock-uuid'),
+}));
+
 describe('tokenSetListToTree', () => {
   it('returns a tree', () => {
     const input = ['global', 'theme/type', 'theme/colors/blue', 'theme/colors/red'];
     const output = [
       {
+        id: 'mock-uuid',
         isLeaf: true,
         path: 'global',
         key: 'global',
@@ -13,6 +18,7 @@ describe('tokenSetListToTree', () => {
         label: 'global',
       },
       {
+        id: 'mock-uuid',
         isLeaf: false,
         path: 'theme',
         key: 'theme',
@@ -21,6 +27,7 @@ describe('tokenSetListToTree', () => {
         label: 'theme',
       },
       {
+        id: 'mock-uuid',
         isLeaf: true,
         path: 'theme/type',
         key: 'theme/type',
@@ -29,6 +36,7 @@ describe('tokenSetListToTree', () => {
         label: 'type',
       },
       {
+        id: 'mock-uuid',
         isLeaf: false,
         path: 'theme/colors',
         key: 'theme/colors',
@@ -37,6 +45,7 @@ describe('tokenSetListToTree', () => {
         label: 'colors',
       },
       {
+        id: 'mock-uuid',
         isLeaf: true,
         path: 'theme/colors/blue',
         key: 'theme/colors/blue',
@@ -45,6 +54,7 @@ describe('tokenSetListToTree', () => {
         label: 'blue',
       },
       {
+        id: 'mock-uuid',
         isLeaf: true,
         path: 'theme/colors/red',
         key: 'theme/colors/red',

@@ -105,7 +105,7 @@ describe('ThemeStyleManagementForm', () => {
       'typography.heading.h1': 'S:2345',
     });
 
-    const attachLocalStyles = (await result.findAllByText('Attach local styles'))[0];
+    const attachLocalStyles = (await result.findAllByText('attachLocalStyles'))[0];
     attachLocalStyles.click();
     expect(mockAttachLocalStylesToTheme).toBeCalledTimes(1);
 

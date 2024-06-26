@@ -48,7 +48,7 @@ describe('ThemeStyleManagementCategory', () => {
     expect(result.queryByText('typography/body/bold')).not.toBeUndefined();
     expect(result.queryByText('body/bold')).not.toBeUndefined();
 
-    const attachLocalStyles = await result.findByText('Attach local styles');
+    const attachLocalStyles = await result.findByText('attachLocalStyles');
     attachLocalStyles.click();
     expect(mockAttachLocalStyles).toBeCalledTimes(1);
 
