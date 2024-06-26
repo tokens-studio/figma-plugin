@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
+import { useTranslation } from 'react-i18next';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -24,7 +25,6 @@ import { TreeItem, themeListToTree } from '@/utils/themeListToTree';
 import { ItemData } from '@/context';
 import { checkReorder } from '@/utils/motion';
 import { ensureFolderIsTogether, findOrderableTargetIndexesInThemeList } from '@/utils/dragDropOrder';
-import { useTranslation } from 'react-i18next';
 
 type Props = unknown;
 
@@ -45,7 +45,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
 
@@ -150,10 +149,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       nextOrder = ensureFolderIsTogether<TreeItem>(value, order, nextOrder);
     }
     return nextOrder;
-  }, []);
-
-  const handleUpdateIsEditing = React.useCallback((editing: boolean) => {
-    setIsThemeGroupNameEditing(editing);
   }, []);
 
   return (
