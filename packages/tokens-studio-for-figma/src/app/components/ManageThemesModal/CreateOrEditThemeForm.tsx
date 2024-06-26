@@ -62,20 +62,23 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       : tokenSetListToList(availableTokenSets)
   ), [githubMfsEnabled, availableTokenSets]);
 
-  const { register, handleSubmit, control, resetField } = useForm<FormValues>({
+  const {
+    register, handleSubmit, control, resetField,
+
+  } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
       ...defaultValues,
     },
   });
 
-  const handleKeyDown = useCallback((fieldName: keyof FormValues) => (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleGroupKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       e.stopPropagation();
-      resetField(fieldName);
+      resetField('group');
       setShowGroupInput(false);
     }
-  }, [handleSubmit]);
+  }, [resetField]);
 
   const TokenSetThemeItemInput = useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
     <Controller
@@ -128,7 +131,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
                 data-testid="create-or-edit-theme-form--group--name"
                 {...register('group')}
                 placeholder={t('addGroup')}
-                onKeyDown={handleKeyDown('group')}
+                onKeyDown={handleGroupKeyDown}
                 css={{
                   display: 'flex',
                 }}
