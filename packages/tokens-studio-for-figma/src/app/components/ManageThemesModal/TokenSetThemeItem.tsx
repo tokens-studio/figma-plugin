@@ -6,6 +6,7 @@ import { Check, Xmark, CodeBrackets } from 'iconoir-react';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   item: TreeItem
@@ -15,9 +16,9 @@ type Props = {
 
 const tokenSetStatusValues = Object.values(TokenSetStatus);
 const tokenSetStatusLabels = {
-  [TokenSetStatus.DISABLED]: 'Disabled',
-  [TokenSetStatus.SOURCE]: 'Reference Only',
-  [TokenSetStatus.ENABLED]: 'Enabled',
+  [TokenSetStatus.DISABLED]: 'disabled',
+  [TokenSetStatus.SOURCE]: 'referenceOnly',
+  [TokenSetStatus.ENABLED]: 'enabled',
 };
 
 export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
@@ -26,6 +27,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
   const tokenSetStatus = useMemo(() => (
     value?.[item.path] ?? TokenSetStatus.DISABLED
   ), [item.path, value]);
+  const { t } = useTranslation(['tokens']);
 
   const handleValueChange = useCallback((status: string) => {
     if (status) {
@@ -85,7 +87,7 @@ export const TokenSetThemeItem: React.FC<React.PropsWithChildren<React.PropsWith
           >
             {tokenSetStatusValues.map((status) => (
 
-              <ToggleGroup.Item key={status} tooltip={tokenSetStatusLabels[status]} tooltipSide="top" value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${item.label}--${status}`}>
+              <ToggleGroup.Item key={status} tooltip={t(tokenSetStatusLabels[status])} tooltipSide="top" value={status} data-testid={`tokensettheme-item--ToggleGroup-content--${item.label}--${status}`}>
                 {statusIcon(status)}
               </ToggleGroup.Item>
 

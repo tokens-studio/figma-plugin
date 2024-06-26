@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
+import { useTranslation } from 'react-i18next';
 import { activeThemeSelector, themesListSelector } from '@/selectors';
 import Modal from '../Modal';
 import { Dispatch } from '@/app/store';
@@ -44,8 +45,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const [IsThemeGroupNameEditing, setIsThemeGroupNameEditing] = useState(false);
   const treeItems = themeListToTree(themes);
+  const { t } = useTranslation(['tokens']);
 
   const themeEditorDefaultValues = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
@@ -60,10 +61,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   }, [themes, themeEditorOpen]);
 
   const handleClose = useCallback(() => {
-    if (!IsThemeGroupNameEditing) {
-      dispatch.uiState.setManageThemesModalOpen(false);
-    }
-  }, [IsThemeGroupNameEditing, dispatch]);
+    dispatch.uiState.setManageThemesModalOpen(false);
+  }, [dispatch]);
 
   const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
     if (theme && typeof theme !== 'boolean') {
@@ -80,7 +79,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
 
   const handleDeleteTheme = useCallback(async () => {
     if (typeof themeEditorOpen === 'string') {
-      const confirmDelete = await confirm({ text: 'Are you sure you want to delete this theme?', confirmAction: 'Delete', variant: 'danger' });
+      const confirmDelete = await confirm({ text: t('confirmDeleteTheme'), confirmAction: t('delete'), variant: 'danger' });
       if (confirmDelete) {
         track('Delete theme', { id: themeEditorOpen });
         dispatch.tokenState.deleteTheme(themeEditorOpen);
@@ -152,15 +151,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     return nextOrder;
   }, []);
 
-  const handleUpdateIsEditing = React.useCallback((editing: boolean) => {
-    setIsThemeGroupNameEditing(editing);
-  }, []);
-
   return (
     <Modal
       isOpen
       full
-      title="Themes"
+      title={t('themes')}
       stickyFooter
       showClose
       footer={(
@@ -172,7 +167,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
               icon={<IconPlus />}
               onClick={handleToggleOpenThemeEditor}
             >
-              New theme
+              {t('newTheme')}
             </Button>
           )}
           {themeEditorOpen && (
@@ -185,7 +180,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                   type="submit"
                   onClick={handleDeleteTheme}
                 >
-                  Delete
+                  {t('delete')}
                 </Button>
                 )}
               </Box>
@@ -195,7 +190,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                   variant="secondary"
                   onClick={handleToggleOpenThemeEditor}
                 >
-                  Cancel
+                  {t('cancel')}
                 </Button>
                 <Button
                   data-testid="button-manage-themes-modal-save-theme"
@@ -203,7 +198,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                   type="submit"
                   form="form-create-or-edit-theme"
                 >
-                  Save theme
+                  {t('saveTheme')}
                 </Button>
               </Stack>
             </>
@@ -215,8 +210,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       {!themes.length && !themeEditorOpen && (
         <EmptyState
           css={{ padding: '$8 $4' }}
-          title="You don't have any themes yet"
-          description="Create your first theme now"
+          title={t('manageThemesModal.emptyTitle')}
+          description={t('manageThemesModal.emptyDescription')}
         />
       )}
       {!!themes.length && !themeEditorOpen && (
@@ -237,7 +232,6 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
                     <ThemeListGroupHeader
                       label={item.value === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : item.value as string}
                       groupName={item.value as string}
-                      setIsGroupEditing={handleUpdateIsEditing}
                     />
                   )
                 }

@@ -45,7 +45,7 @@ describe('ManageThemesModal', () => {
       </Provider>,
     );
 
-    expect(result.queryByText('You don\'t have any themes yet')).not.toBeNull();
+    expect(result.queryByText('manageThemesModal.emptyTitle')).not.toBeNull();
   });
 
   it('should render create new theme form', async () => {
@@ -57,8 +57,8 @@ describe('ManageThemesModal', () => {
       </Provider>,
     );
 
-    await result.getByText('New theme').click();
-    expect(result.getByText('Save theme')).toBeInTheDocument();
+    await result.getByText('newTheme').click();
+    expect(result.getByText('saveTheme')).toBeInTheDocument();
   });
 
   it('should render edit theme form', async () => {
@@ -85,8 +85,8 @@ describe('ManageThemesModal', () => {
     );
     waitFor(() => {
       result.getByTestId('singlethemeentry-light').click();
-      result.getByText('Delete').click();
-      expect(result.getByText('Delete')).toBeInTheDocument();
+      result.getByText('delete').click();
+      expect(result.getByText('delete')).toBeInTheDocument();
     });
   });
 });
