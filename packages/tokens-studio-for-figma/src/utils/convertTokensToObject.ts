@@ -18,8 +18,7 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
       // Directly work with tokenWithoutName to preserve order
       if (tokenWithoutName.inheritTypeLevel) {
         // If inheritTypeLevel exists, handle it specifically
-        const { inheritTypeLevel } = tokenWithoutName;
-        delete tokenWithoutName.inheritTypeLevel; // Remove it to avoid altering the order
+        const { inheritTypeLevel, ...tokenWithoutTypeLevel } = tokenWithoutName;
 
         // Set type of group level without altering the order of tokenWithoutName
         set(tokenGroupObj, getGroupTypeName(name, inheritTypeLevel), tokenWithoutName.type);
@@ -27,7 +26,7 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
         // Add value and description keys directly to preserve order
         tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
         tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
-        set(tokenGroupObj, name, tokenWithoutName, { merge: true });
+        set(tokenGroupObj, name, tokenWithoutTypeLevel, { merge: true });
       } else {
         // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
         tokenWithoutName[TokenFormat.tokenTypeKey] = tokenWithoutName.type;
