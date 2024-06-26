@@ -64,7 +64,6 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
   const {
     register, handleSubmit, control, resetField,
-
   } = useForm<FormValues>({
     defaultValues: {
       tokenSets: { ...selectedTokenSets },
