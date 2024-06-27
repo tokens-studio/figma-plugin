@@ -40,7 +40,7 @@ export default function SettingsDropdown() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content side="top" css={{ maxWidth: '300p' }}>
+        <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>
           <DropdownMenu.CheckboxItem
             data-testid="update-on-change"
             checked={updateOnChange}
