@@ -40,13 +40,13 @@ export default function SettingsDropdown() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content side="top" css={{ maxWidth: '300px' }}>
+        <DropdownMenu.Content side="top" css={{ maxWidth: '300p' }}>
           <DropdownMenu.CheckboxItem
             data-testid="update-on-change"
             checked={updateOnChange}
             onCheckedChange={handleUpdateOnChange}
           >
-            <DropdownMenu.ItemIndicator>
+            <DropdownMenu.ItemIndicator css={{ alignItems: 'flex-start', paddingTop: 'var(--space-3)' }}>
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.onChange.title')}
@@ -60,7 +60,7 @@ export default function SettingsDropdown() {
               checked={updateRemote}
               onCheckedChange={handleUpdateRemote}
             >
-              <DropdownMenu.ItemIndicator>
+              <DropdownMenu.ItemIndicator css={{ alignItems: 'flex-start', paddingTop: 'var(--space-3)' }}>
                 <Check />
               </DropdownMenu.ItemIndicator>
               {t('update.remoteJSONBin.title')}
@@ -74,7 +74,7 @@ export default function SettingsDropdown() {
             checked={shouldSwapStyles}
             onCheckedChange={handleShouldSwapStyles}
           >
-            <DropdownMenu.ItemIndicator>
+            <DropdownMenu.ItemIndicator css={{ alignItems: 'flex-start', paddingTop: 'var(--space-3)' }}>
               <Check />
             </DropdownMenu.ItemIndicator>
             {t('update.swapStyles.title')}
