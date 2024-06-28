@@ -176,7 +176,7 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
-  const deleteDuplicates = useCallback(async (set: string, path: string, index: number) => {
+  const deleteDuplicates = useCallback(async (duplicates: { set: string, path: string, index: number }[]) => {
     const userConfirmation = await confirm({
       text: 'Delete duplicate tokens?',
       description: 'Are you sure you want to delete duplicate tokens, keeping only the selected ones?',
@@ -184,12 +184,14 @@ export default function useManageTokens() {
       confirmAction: 'Delete',
     });
     if (userConfirmation) {
-      // const activeTokenSet = activeTokenSetSelector(store.getState());
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_DELETETOKENGROUP,
         isInfinite: true,
       });
-      deleteDuplicateTokens({ parent: set, path, index });
+      duplicates?.forEach((duplicate) => {
+        const { set, path, index } = duplicate;
+        deleteDuplicateTokens({ parent: set, path, index });
+      });
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
     }
   }, [confirm, deleteDuplicateTokens, dispatch.uiState]);

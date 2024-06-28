@@ -75,12 +75,14 @@ export default function ResolveDuplicateTokensModal({
 
   const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const listToDel: { set: string, path: string, index: number }[] = [];
     Object.entries(duplicateTokensToDelete).forEach(([set, duplicates]) => {
       Object.keys(duplicates)?.forEach((duplicateName) => {
         const index = duplicates[duplicateName];
-        deleteDuplicates(set, duplicateName, index);
+        listToDel.push({ set, path: duplicateName, index });
       });
     });
+    await deleteDuplicates(listToDel);
     onClose();
   }, [duplicateTokensToDelete, onClose, deleteDuplicates]);
 
