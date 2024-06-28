@@ -7,33 +7,23 @@ import {
 } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from '../Box';
-// import ResolveDuplicateTokenSingle from './ResolveDuplicateTokenSingle';
 
 function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
-  // const { getTokenValue } = useTokens();
-  // const duplicateResolvedTokens = resolvedTokens.filter((t) => t.name === token.name);
-  // const resolvedToken = duplicateResolvedTokens[index];
   return (
-    <>
-      {/* <Stack css={{ width: '$8' }}>
-        <InspectorResolvedToken token={resolvedToken as any} />
-      </Stack> */}
-      <Tooltip label={`Type: ${token.type}`}>
-        <Box
-          css={{
-            background: '$bgSubtle',
-            fontSize: '$small',
-            padding: '$2 $3',
-            borderRadius: '$small',
-            // minWidth: '$9',
-          }}
-        >
-          <Text>
-            {token.value as string}
-          </Text>
-        </Box>
-      </Tooltip>
-    </>
+    <Tooltip label={`Type: ${token.type}`}>
+      <Box
+        css={{
+          background: '$bgSubtle',
+          fontSize: '$small',
+          padding: '$2 $3',
+          borderRadius: '$small',
+        }}
+      >
+        <Text>
+          {token.value as string}
+        </Text>
+      </Box>
+    </Tooltip>
   );
 }
 
@@ -44,7 +34,6 @@ export default function ResolveDuplicateTokenGroup({
 }) {
   const [groupKey, groupValue] = group;
   const checkedToken = `${setName}:${groupKey}:${selectedTokens?.[setName]?.[groupKey] || 0}`;
-  // const [checkedToken, setCheckedToken] = useState(`${groupKey}-0`);
 
   return (
     <Box
@@ -63,7 +52,6 @@ export default function ResolveDuplicateTokenGroup({
       <Stack direction="row">
         <Heading size="small" css={{ minWidth: '$9' }}>Value: </Heading>
         <RadioGroup
-          // onValueChange={(value) => setCheckedToken(value)}
           onValueChange={onRadioClick}
           value={checkedToken}
           css={{ gap: '$3' }}
@@ -76,7 +64,6 @@ export default function ResolveDuplicateTokenGroup({
               </RadioItemBefore>
               <ResolveDuplicateTokenSingle token={uniqueToken} />
             </RadioItem>
-            // <ResolveDuplicateTokenSingle key={`${uniqueToken.name}-${uniqueToken.value}`} token={uniqueToken} resolvedTokens={resolvedTokens} />
           ))}
         </RadioGroup>
       </Stack>
