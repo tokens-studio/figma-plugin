@@ -8,26 +8,18 @@ import Modal from '../Modal';
 import { tokensSelector } from '@/selectors';
 import ResolveDuplicateTokenGroup from '../DuplicateResolver/ResolveDuplicateTokenGroup';
 import { SingleToken } from '@/types/tokens';
-
-function removeItem<T>(arr: Array<T>, value: T): Array<T> {
-  const index = arr.indexOf(value);
-  if (index > -1) {
-    arr.splice(index, 1);
-  }
-  return arr;
-}
+import useManageTokens from '@/app/store/useManageTokens';
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-type SingleTokenWithSelected = SingleToken & { selected?: boolean };
-
 export default function ResolveDuplicateTokensModal({
   isOpen, onClose,
 }: Props) {
   const tokens = useSelector(tokensSelector);
+  const { deleteDuplicates } = useManageTokens();
   const { t } = useTranslation(['tokens']);
   const [selectedTokens, setSelectedTokens] = useState<{ [setName: string]: { [tokenName: string]: number } }>(Object.keys(tokens).reduce((acc, setName) => {
     acc[setName] = {};
@@ -36,35 +28,39 @@ export default function ResolveDuplicateTokensModal({
 
   const { duplicateTokens, duplicateTokensToDelete } = useMemo<{
     duplicateTokens: { [key: string]: { [key: string]: SingleToken[] } },
-    duplicateTokensToDelete: { [key: string]: SingleToken[] }
+    duplicateTokensToDelete: { [key: string]: { [tokenName: string]: number } }
   }>(() => {
     const duplicateTokensObj = Object.keys(tokens).reduce((acc, setName) => {
       const currentSetTokens = tokens[setName];
       const duplicatesByName = currentSetTokens.reduce((acc2, token) => {
         const allTokensWithName = currentSetTokens.filter((a) => a.name === token.name);
         if (allTokensWithName.length > 1) {
-          acc2[token.name] = allTokensWithName.map((duplicateToken, i) => ({ ...duplicateToken, selected: i === 0 }));
+          acc2[token.name] = allTokensWithName.map((duplicateToken, i) => ({
+            ...duplicateToken,
+            selected: i === Number(selectedTokens?.[setName]?.[token.name] || 0),
+          }));
         }
-  
+
         return acc2;
       }, {});
-  
+
       acc[setName] = duplicatesByName;
       return acc;
     }, {});
 
-    const toDelete = Object.keys(duplicateTokensObj).reduce((acc, setName): { [key: string]: SingleTokenWithSelected[] } => {
+    const toDelete = Object.keys(duplicateTokensObj).reduce((acc, setName): { [key: string]: { [key: string]: number } } => {
       const tokensForSet = duplicateTokensObj[setName];
-      const mappedDuplicateTokens = Object.keys(tokensForSet).flatMap((tokenName) => tokensForSet[tokenName].filter((token: SingleTokenWithSelected, i) => {
-        return i !== selectedTokens?.[setName]?.[tokenName] && !token.selected;
-      }).map((token) => ({ ...token, name: tokenName, set: setName })));
-  
-      // acc.push(mappedDuplicateTokens);
+
+      const mappedDuplicateTokens = Object.keys(tokensForSet).reduce<{ [key: string]: number }>((acc2, tokenName) => {
+        acc2[tokenName] = tokensForSet[tokenName].findIndex((val) => val.selected) as number;
+        return acc2;
+      }, {});
+
       acc[setName] = mappedDuplicateTokens;
       return acc;
-    }, {} as { [key: string]: SingleTokenWithSelected[] });
-    return { duplicateTokensToDelete: toDelete, duplicateTokens: duplicateTokensObj }
-  }, [tokens]);
+    }, {} as { [key: string]: { [key: string]: number } });
+    return { duplicateTokensToDelete: toDelete, duplicateTokens: duplicateTokensObj };
+  }, [tokens, selectedTokens]);
 
   const onRadioClick = useCallback((value) => {
     const [setName, tokenName, index] = value.split(':');
@@ -75,21 +71,20 @@ export default function ResolveDuplicateTokensModal({
         [tokenName]: index,
       },
     });
-    //   return acc;
-    // }, {});
   }, [setSelectedTokens, selectedTokens]);
 
   const handleDuplicateTokenGroupSubmit = React.useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // duplicateGroup({
-    //   oldName, newName, tokenSets: selectedTokenSets, type,
-    // });
-    // console.log({ duplicateTokensToDelete });
+    Object.entries(duplicateTokensToDelete).forEach(([set, duplicates]) => {
+      Object.keys(duplicates)?.forEach((duplicateName) => {
+        const index = duplicates[duplicateName];
+        deleteDuplicates(set, duplicateName, index);
+      });
+    });
     onClose();
-  // }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
-  }, []);
+  }, [duplicateTokensToDelete, onClose, deleteDuplicates]);
 
-  const canResolve = true;
+  const canResolve = true; // Placeholder incase some error validation is needed
 
   return (
     <Modal
