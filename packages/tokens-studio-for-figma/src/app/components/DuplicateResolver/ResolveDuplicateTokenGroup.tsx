@@ -17,6 +17,7 @@ function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
           fontSize: '$small',
           padding: '$2 $3',
           borderRadius: '$small',
+          border: (typeof token.value === 'string' && (token.value as string).startsWith('#')) ? `1px solid ${token.value as string}` : undefined,
         }}
       >
         <Text>
