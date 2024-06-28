@@ -56,7 +56,7 @@ export default function useManageTokens() {
   const { confirm } = useConfirm();
   const { removeStylesFromTokens } = useTokens();
   const {
-    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, renameTokenAcrossSets,
+    editToken, createToken, deleteToken, duplicateToken, deleteTokenGroup, renameTokenGroup, duplicateTokenGroup, renameTokenAcrossSets, deleteDuplicateTokens,
   } = dispatch.tokenState;
 
   const editSingleToken = useCallback(async (data: EditSingleTokenData) => {
@@ -176,6 +176,24 @@ export default function useManageTokens() {
     }
   }, [store, confirm, deleteTokenGroup, dispatch.uiState]);
 
+  const deleteDuplicates = useCallback(async (set: string, path: string, index: number) => {
+    const userConfirmation = await confirm({
+      text: 'Delete duplicate tokens?',
+      description: 'Are you sure you want to delete duplicate tokens, keeping only the selected ones?',
+      variant: 'danger',
+      confirmAction: 'Delete',
+    });
+    if (userConfirmation) {
+      // const activeTokenSet = activeTokenSetSelector(store.getState());
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_DELETETOKENGROUP,
+        isInfinite: true,
+      });
+      deleteDuplicateTokens({ parent: set, path, index });
+      dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKENGROUP);
+    }
+  }, [confirm, deleteDuplicateTokens, dispatch.uiState]);
+
   const renameGroup = useCallback(async (oldName: string, newName: string, type: string): Promise<TokenToRename[]> => {
     const activeTokenSet = activeTokenSetSelector(store.getState());
     const tokens = tokensSelector(store.getState());
@@ -217,6 +235,6 @@ export default function useManageTokens() {
   }, [dispatch.uiState, dispatch.tokenState]);
 
   return useMemo(() => ({
-    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens,
-  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens]);
+    editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens, deleteDuplicates,
+  }), [editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens, deleteDuplicates]);
 }
