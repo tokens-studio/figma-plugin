@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ import {
   usedTokenSetSelector,
   projectURLSelector,
   activeThemeSelector,
+  tokensSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -43,7 +44,20 @@ export default function Footer() {
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges } = useChangedState();
+  const tokens = useSelector(tokensSelector);
   const [showResolveDuplicateTokensModal, setShowResolveDuplicateTokensModal] = React.useState<boolean>(false);
+
+  const hasDuplicates = useMemo(() => Object.keys(tokens).some((setName) => {
+    const currentSetTokens = tokens[setName];
+    return currentSetTokens.some((token) => {
+      const allTokensWithName = currentSetTokens.filter((a) => a.name === token.name);
+      if (allTokensWithName.length > 1) {
+        return true;
+      }
+
+      return false;
+    });
+  }), [tokens]);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -151,14 +165,16 @@ export default function Footer() {
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
-          <IconButton
-            onClick={handleResolveDuplicateOpen}
-            icon={<WarningTriangleSolid />}
-            variant="invisible"
-            size="small"
-            tooltip="Duplicate Warning"
-            target="_blank"
-          />
+          {hasDuplicates && (
+            <IconButton
+              onClick={handleResolveDuplicateOpen}
+              icon={<WarningTriangleSolid />}
+              variant="invisible"
+              size="small"
+              tooltip="Duplicate Warning"
+              target="_blank"
+            />
+          )}
           <ProBadge />
           <IconButton
             as="a"
@@ -180,14 +196,12 @@ export default function Footer() {
           />
         </Stack>
       </Stack>
-      <ResolveDuplicateTokensModal
-        isOpen={showResolveDuplicateTokensModal}
-        // type={type}
-        // newName={newTokenGroupName}
-        // oldName={path}
-        onClose={handleResolveDuplicateTokensModalClose}
-        // handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
-      />
+      {showResolveDuplicateTokensModal && (
+        <ResolveDuplicateTokensModal
+          isOpen={showResolveDuplicateTokensModal}
+          onClose={handleResolveDuplicateTokensModalClose}
+        />
+      )}
     </Box>
   );
 }
