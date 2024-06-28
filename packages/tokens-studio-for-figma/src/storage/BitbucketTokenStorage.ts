@@ -82,7 +82,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const sourceBranchName = source || this.branch;
       const sourceBranch = originBranch.data.values.find((branchValue: Schema.Branch) => branchValue.name === sourceBranchName);
 
-      if (!originBranch.data.values || !sourceBranch || !sourceBranch.target) {
+      if (!originBranch.data || !originBranch.data.values || !sourceBranch || !sourceBranch.target || !sourceBranch.target.hash) {
         throw new Error('Could not retrieve origin branch');
       }
 
