@@ -47,11 +47,10 @@ export default function ResolveDuplicateTokenGroup({
       key={`${groupKey}`}
     >
       <Stack direction="row" css={{ marginBottom: '$4' }}>
-        <Heading size="small" css={{ minWidth: '$9' }}>Token: </Heading>
-        <Heading size="small">{groupKey}</Heading>
+        <Heading size="small"><Box as="span" css={{ minWidth: '$9', display: 'inline-flex' }}>Token</Box>{groupKey}</Heading>
       </Stack>
       <Stack direction="row">
-        <Heading size="small" css={{ minWidth: '$9' }}>Value: </Heading>
+        <Heading size="small" css={{ minWidth: '$9' }}>Value</Heading>
         <RadioGroup
           onValueChange={onRadioClick}
           value={checkedToken}
@@ -59,7 +58,7 @@ export default function ResolveDuplicateTokenGroup({
         >
           {groupValue.map((uniqueToken, i) => (
             // eslint-disable-next-line react/no-array-index-key
-            <RadioItem key={`${uniqueToken.name}-${i}`} value={`${setName}:${uniqueToken.name}:${i}`} css={{ padding: 0 }}>
+            <RadioItem key={`${uniqueToken.name}-${i}`} value={`${setName}:${uniqueToken.name}:${i}`} css={{ alignItems: 'center' }}>
               <RadioItemBefore data-state={checkedToken === `${setName}:${uniqueToken.name}:${i}` ? 'checked' : 'unchecked'}>
                 <RadioIndicator />
               </RadioItemBefore>

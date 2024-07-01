@@ -47,17 +47,21 @@ export default function Footer() {
   const tokens = useSelector(tokensSelector);
   const [showResolveDuplicateTokensModal, setShowResolveDuplicateTokensModal] = React.useState<boolean>(false);
 
-  const hasDuplicates = useMemo(() => Object.keys(tokens).some((setName) => {
-    const currentSetTokens = tokens[setName];
-    return currentSetTokens.some((token) => {
-      const allTokensWithName = currentSetTokens.filter((a) => a.name === token.name);
-      if (allTokensWithName.length > 1) {
-        return true;
-      }
+  const hasDuplicates = useMemo(
+    () => Object.keys(tokens).some((setName) => {
+      const currentSetTokens = tokens[setName];
+      const seenNames = new Set();
 
-      return false;
-    });
-  }), [tokens]);
+      return currentSetTokens.some((token) => {
+        if (seenNames.has(token.name)) {
+          return true;
+        }
+        seenNames.add(token.name);
+        return false;
+      });
+    }),
+    [tokens],
+  );
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -172,7 +176,6 @@ export default function Footer() {
               variant="invisible"
               size="small"
               tooltip="Duplicate Warning"
-              target="_blank"
             />
           )}
           <ProBadge />
