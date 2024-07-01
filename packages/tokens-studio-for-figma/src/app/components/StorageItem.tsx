@@ -15,8 +15,6 @@ import useConfirm from '../hooks/useConfirm';
 import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
-import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
-import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenFormatBadge } from './TokenFormatBadge';
 
 type Props = {
@@ -34,12 +32,6 @@ const StorageItem = ({ item, onEdit }: Props) => {
   const { confirm } = useConfirm();
   const { setStorageType } = useStorage();
   const dispatch = useDispatch<Dispatch>();
-  const tokenFormat = useSelector(tokenFormatSelector);
-  const [isConvertModalOpen, setIsConvertModalOpen] = React.useState(false);
-
-  const openConvertModal = React.useCallback(() => {
-    setIsConvertModalOpen(true);
-  }, []);
 
   const { t } = useTranslation(['storage']);
 

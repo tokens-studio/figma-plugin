@@ -541,6 +541,7 @@ export default function useRemoteTokens() {
 
       if (files) {
         const remoteData = await readTokensFromFileOrDirectory(files);
+        console.log('remoteData in remoteTokens: ', remoteData);
         if (remoteData?.status === 'success') {
           const sortedTokens = applyTokenSetOrder(
             remoteData.tokens,

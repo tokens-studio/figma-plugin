@@ -18,6 +18,7 @@ export default function useFile() {
     const storage = storageClientFactory(files);
     try {
       const content = await storage.retrieve();
+      console.log('content in file: ', content);
       if (content) {
         return content;
       }
