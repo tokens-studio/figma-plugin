@@ -31,7 +31,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
-  "dependencies": {    
+  "dependencies": {
     "@figma-plugin/helpers": "^0.15.2",
     "@gitbeaker/rest": "^39.21.2",
     "@monaco-editor/react": "^4.5.1",
@@ -58,7 +58,7 @@
     "@tokens-studio/graph-engine": "^0.17.5",
     "@tokens-studio/sdk": "1.1.5",
     "@tokens-studio/tokens": "0.1.6",
-    "@tokens-studio/ui": "0.6.8",
+    "@tokens-studio/ui": "0.6.9",
     "@types/chroma-js": "^2.1.4",
     "@types/color": "^3.0.3",
     "@types/file-saver": "^2.0.5",
