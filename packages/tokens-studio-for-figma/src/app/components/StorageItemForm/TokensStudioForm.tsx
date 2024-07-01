@@ -1,16 +1,6 @@
 import React from 'react';
 import zod from 'zod';
-import {
-  Box,
-  Button,
-  FormField,
-  Heading,
-  IconButton,
-  Label,
-  Link,
-  Stack,
-  TextInput,
-} from '@tokens-studio/ui';
+import { Box, Button, FormField, Heading, IconButton, Label, Link, Stack, Text, TextInput } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -36,12 +26,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function TokensStudioForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
-}: Props) {
+export default function TokensStudioForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
-  const [showTeaser, setShowTeaser] = React.useState(true);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -70,35 +57,20 @@ export default function TokensStudioForm({
     [values, onSubmit],
   );
 
-  React.useEffect(() => {
-    if (values.secret) {
-      setShowTeaser(false);
-    }
-  }, [values]);
-
-  const handleDismissTeaser = React.useCallback(() => {
-    setShowTeaser(false);
-  }, []);
-
-  return showTeaser ? (
-    <Stack direction="column" align="start" gap={5}>
-      <StyledTokensStudioWord />
-      <Stack direction="column" gap={3}>
-        <Heading size="large">A dedicated design tokens management platform</Heading>
-        <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
-        <Link href="https://tokens.studio/studio" target="_blank" rel="norefferer">Learn more</Link>
-      </Stack>
-      <Button onClick={handleDismissTeaser}>Already got access?</Button>
-    </Stack>
-  ) : (
+  return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
+        <Text muted>{t('providers.tokensstudio.descriptionFirstPart')}</Text>
+        <Text muted css={{ marginTop: '$2' }}>
+          {t('providers.tokensstudio.descriptionSecondPart')}
+        </Text>
         <FormField>
           <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
           <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
-          <Label htmlFor="secret">{t('providers.tokensstudio.apikey')}</Label>
+          <Label htmlFor="secret">{t('providers.tokensstudio.pat')}</Label>
           <TextInput
             value={values.secret || ''}
             onChange={onChange}
@@ -107,20 +79,18 @@ export default function TokensStudioForm({
             required
             type={isMasked ? 'password' : 'text'}
             trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
             }
           />
         </FormField>
         <FormField>
-          <Label htmlFor="id">{t('providers.tokensstudio.urn')}</Label>
-          <TextInput
-            value={values.id || ''}
-            onChange={onChange}
-            type="text"
-            name="id"
-            id="id"
-            required
-          />
+          <Label htmlFor="id">{t('providers.tokensstudio.id')}</Label>
+          <TextInput value={values.id || ''} onChange={onChange} type="text" name="id" id="id" required />
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
@@ -130,11 +100,7 @@ export default function TokensStudioForm({
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-        <ErrorMessage data-testid="provider-modal-error">
-          {errorMessage}
-        </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );

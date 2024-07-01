@@ -1,9 +1,7 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Textarea, TextInput, Stack, Text, Link, Label, IconButton, FormField,
-} from '@tokens-studio/ui';
+import { Button, Textarea, TextInput, Stack, Text, Link, Label, IconButton, FormField } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
@@ -20,9 +18,7 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function SupernovaForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
-}: Props) {
+export default function SupernovaForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
   const inputEl = useRef<HTMLInputElement | null>(null);
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -30,28 +26,31 @@ export default function SupernovaForm({
     setIsMasked((prev) => !prev);
   }, []);
 
-  const { t } = useTranslation(['storage', 'general']);
+  const { t } = useTranslation(['storage']);
 
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const zodSchema = zod.object({
-      provider: zod.string(),
-      name: zod.string(),
-      designSystemUrl: zod.string(),
-      secret: zod.string(),
-      mapping: zod.string(),
-      internalId: zod.string().optional(),
-    });
-    const validationResult = zodSchema.safeParse(values);
-    if (validationResult.success) {
-      const formFields = {
-        ...validationResult.data,
-        internalId: validationResult.data.internalId || generateId(24),
-      } as ValidatedFormValues;
-      onSubmit(formFields);
-    }
-  }, [values, onSubmit]);
+      const zodSchema = zod.object({
+        provider: zod.string(),
+        name: zod.string(),
+        designSystemUrl: zod.string(),
+        secret: zod.string(),
+        mapping: zod.string(),
+        internalId: zod.string().optional(),
+      });
+      const validationResult = zodSchema.safeParse(values);
+      if (validationResult.success) {
+        const formFields = {
+          ...validationResult.data,
+          internalId: validationResult.data.internalId || generateId(24),
+        } as ValidatedFormValues;
+        onSubmit(formFields);
+      }
+    },
+    [values, onSubmit],
+  );
 
   const handleMappingChange = React.useCallback(
     (value: string, event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -64,14 +63,16 @@ export default function SupernovaForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>
-          {t('providers.supernova.description')}
-          {' '}
-          <Link href="https://learn.supernova.io/" target="_blank" rel="noreferrer">{t('readMore', { ns: 'general' })}</Link>
+        <Text muted>{t('providers.supernova.description')}</Text>
+        <Text muted css={{ marginTop: '$2' }}>
+          <Link href="https://learn.supernova.io/" target="_blank" rel="noreferrer">
+            {t('providers.supernova.readMore')}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.supernova.accessToken')}</Label>
@@ -84,7 +85,12 @@ export default function SupernovaForm({
             required
             type={isMasked ? 'password' : 'text'}
             trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
             }
           />
         </FormField>
@@ -100,30 +106,22 @@ export default function SupernovaForm({
           />
         </FormField>
         <FormField>
-          <Label htmlFor="mapping">
-            Supernova &lt;&gt; Tokens Studio mapping
-          </Label>
-          <Textarea
-            id="mapping"
-            rows={8}
-            value={values.mapping ?? ''}
-            onChange={handleMappingChange}
-            placeholder=""
-          />
+          <Label htmlFor="mapping">Supernova &lt;&gt; Tokens Studio mapping</Label>
+          <Textarea id="mapping" rows={8} value={values.mapping ?? ''} onChange={handleMappingChange} placeholder="" />
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={!values.secret && !values.name && !values.designSystemUrl && !values.mapping}
+          >
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-          <ErrorMessage data-testid="provider-modal-error">
-            {errorMessage}
-          </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );

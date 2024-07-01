@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Stack, Dialog, IconButton, Box, Heading,
-} from '@tokens-studio/ui';
+import { Stack, Dialog, IconButton, Box, Heading } from '@tokens-studio/ui';
 import { XIcon } from '@primer/octicons-react';
 import { ArrowLeft } from 'iconoir-react';
 import { ModalFooter } from './ModalFooter';
@@ -18,7 +16,8 @@ export type ModalProps = {
   footer?: React.ReactNode;
   stickyFooter?: boolean;
   showClose?: boolean;
-  backArrow?: boolean
+  backArrow?: boolean;
+  icon?: React.ReactNode;
   close: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
@@ -88,6 +87,7 @@ export function Modal({
   compact = false,
   modal = true,
   backArrow = false,
+  icon,
   onInteractOutside,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
@@ -115,55 +115,66 @@ export function Modal({
           }}
         />
         <StyledDialogContent size={size} onInteractOutside={onInteractOutside}>
-          <Box css={{
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
+          <Box
+            css={{
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
           >
-            {(showClose || title || backArrow) && (
-            <Stack
-              direction="row"
-              justify={backArrow ? 'start' : 'between'}
-              align="center"
-              css={{
-                borderBottomColor: '$borderSubtle',
-                borderBottomWidth: '1px',
-                borderTopLeftRadius: '$medium',
-                borderTopRightRadius: '$medium',
-                padding: '$4',
-                position: 'sticky',
-                backgroundColor: '$bgDefault',
-                top: 0,
-                zIndex: 10,
-                gap: '$3',
-              }}
-            >
-              {backArrow && (
-                <IconButton
-                  onClick={handleClose}
-                  data-testid="back-arrow"
-                  icon={<ArrowLeft />}
-                  size="small"
-                  variant="invisible"
-                />
-              )}
-              {title && (
-              <Dialog.Title asChild>
-                <Heading as="h6" size="small">{title}</Heading>
-              </Dialog.Title>
-              )}
-              {showClose && (
-              <IconButton
-                onClick={handleClose || null}
-                data-testid="close-button"
-                icon={<XIcon />}
-                size="small"
-                variant="invisible"
-              />
-
-              )}
-            </Stack>
+            {(showClose || title || backArrow || icon) && (
+              <Stack
+                direction="row"
+                justify={backArrow ? 'start' : 'between'}
+                align="center"
+                css={{
+                  borderBottomColor: '$borderSubtle',
+                  borderBottomWidth: '1px',
+                  borderTopLeftRadius: '$medium',
+                  borderTopRightRadius: '$medium',
+                  padding: '$4',
+                  position: 'sticky',
+                  backgroundColor: '$bgDefault',
+                  top: 0,
+                  zIndex: 10,
+                  gap: '$3',
+                }}
+              >
+                {backArrow && (
+                  <IconButton
+                    onClick={handleClose}
+                    data-testid="back-arrow"
+                    icon={<ArrowLeft />}
+                    size="small"
+                    variant="invisible"
+                  />
+                )}
+                <Box
+                  css={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '$3',
+                  }}
+                >
+                  {icon && <Box>{icon}</Box>}
+                  {title && (
+                    <Dialog.Title asChild>
+                      <Heading as="h6" size="small">
+                        {title}
+                      </Heading>
+                    </Dialog.Title>
+                  )}
+                </Box>
+                {showClose && (
+                  <IconButton
+                    onClick={handleClose || null}
+                    data-testid="close-button"
+                    icon={<XIcon />}
+                    size="small"
+                    variant="invisible"
+                  />
+                )}
+              </Stack>
             )}
             <StyledBody
               compact={compact}
@@ -177,7 +188,11 @@ export function Modal({
             >
               {children}
             </StyledBody>
-            {!!footer && <ModalFooter stickyFooter={stickyFooter} fullscreen={size === 'fullscreen'}>{footer}</ModalFooter>}
+            {!!footer && (
+              <ModalFooter stickyFooter={stickyFooter} fullscreen={size === 'fullscreen'}>
+                {footer}
+              </ModalFooter>
+            )}
           </Box>
         </StyledDialogContent>
       </Dialog.Portal>

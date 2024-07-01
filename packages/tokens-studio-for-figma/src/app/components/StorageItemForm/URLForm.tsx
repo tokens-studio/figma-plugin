@@ -1,9 +1,7 @@
 import React from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, TextInput, Stack, Text, Link, Label, IconButton, FormField,
-} from '@tokens-studio/ui';
+import { Button, TextInput, Stack, Text, Link, Label, IconButton, FormField } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeFormValues } from '@/types/StorageType';
@@ -11,9 +9,9 @@ import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
-type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL; }>;
+type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.URL }>;
 type Props = {
-  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.URL; }>;
+  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.URL }>;
   onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
@@ -21,9 +19,7 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function URLForm({
-  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
-}: Props) {
+export default function URLForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
   const { t } = useTranslation(['storage']);
 
   const [isMasked, setIsMasked] = React.useState(false);
@@ -32,38 +28,54 @@ export default function URLForm({
     setIsMasked((prev) => !prev);
   }, []);
 
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const zodSchema = zod.object({
-      provider: zod.string(),
-      name: zod.string().optional(),
-      id: zod.string(),
-      secret: zod.string().optional(),
-      internalId: zod.string().optional(),
-    });
-    const validationResult = zodSchema.safeParse(values);
-    if (validationResult.success) {
-      const formFields = {
-        ...validationResult.data,
-        provider: StorageProviderType.URL,
-        internalId: validationResult.data.internalId || generateId(24),
-      } as ValidatedFormValues;
-      onSubmit(formFields);
-    }
-  }, [values, onSubmit]);
+      const zodSchema = zod.object({
+        provider: zod.string(),
+        name: zod.string().optional(),
+        id: zod.string(),
+        secret: zod.string().optional(),
+        internalId: zod.string().optional(),
+      });
+      const validationResult = zodSchema.safeParse(values);
+      if (validationResult.success) {
+        const formFields = {
+          ...validationResult.data,
+          provider: StorageProviderType.URL,
+          internalId: validationResult.data.internalId || generateId(24),
+        } as ValidatedFormValues;
+        onSubmit(formFields);
+      }
+    },
+    [values, onSubmit],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>
-          {t('providers.url.description')}
-          {' '}
-          <Link href="https://docs.tokens.studio/sync/url?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
+        <Text muted>{t('providers.url.description')}</Text>
+        <Text muted css={{ marginTop: '$2' }}>
+          <Link href="https://docs.tokens.studio/sync/url?ref=addprovider" target="_blank" rel="noreferrer">
+            {t('providers.url.readMore')}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
-          <TextInput autoFocus name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+          <TextInput
+            autoFocus
+            name="name"
+            id="name"
+            value={values.name || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label htmlFor="id">{t('providers.url.url')}</Label>
+          <TextInput name="id" id="id" value={values.id || ''} onChange={onChange} type="text" required />
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.url.headers')}</Label>
@@ -74,13 +86,14 @@ export default function URLForm({
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
             trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
             }
           />
-        </FormField>
-        <FormField>
-          <Label htmlFor="id">{t('providers.url.url')}</Label>
-          <TextInput name="id" id="id" value={values.id || ''} onChange={onChange} type="text" required />
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
@@ -91,11 +104,7 @@ export default function URLForm({
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-          <ErrorMessage data-testid="provider-modal-error">
-            {errorMessage}
-          </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );
