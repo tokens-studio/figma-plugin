@@ -1,7 +1,9 @@
 import React from 'react';
 import zod from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Button, FormField, IconButton, Label, Link, Stack, Text, TextInput } from '@tokens-studio/ui';
+import {
+  Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -89,14 +91,14 @@ export default function JSONBinForm({
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
             required
           />
         </FormField>

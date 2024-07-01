@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
-import { Button, FormField, Stack, Text, Link, IconButton, Label, TextInput } from '@tokens-studio/ui';
+import {
+  Button, FormField, Stack, Text, Link, IconButton, Label, TextInput,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -19,7 +21,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function ADOForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
+export default function ADOForm({
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+}: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -57,7 +61,8 @@ export default function ADOForm({ onChange, onSubmit, onCancel, values, hasError
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
         <Text muted>
-          {t('providers.ado.description')}{' '}
+          {t('providers.ado.description')}
+          {' '}
           <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider" target="_blank" rel="noreferrer">
             {t('providers.ado.readMore')}
           </Link>
@@ -85,14 +90,14 @@ export default function ADOForm({ onChange, onSubmit, onCancel, values, hasError
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
             name="secret"
             id="secret"
             required

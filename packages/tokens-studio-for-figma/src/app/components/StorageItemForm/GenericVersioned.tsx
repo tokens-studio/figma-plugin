@@ -23,8 +23,8 @@ import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
 type ValidatedFormValues = Extract<
-  StorageTypeFormValues<false>,
-  { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }
+StorageTypeFormValues<false>,
+{ provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }
 >;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>;
@@ -84,13 +84,12 @@ export default function GenericVersionedForm({
   );
 
   const handleValueChange = useCallback(
-    (flow: string) =>
-      onChange({
-        target: {
-          name: 'flow',
-          value: flow as GenericVersionedStorageFlow,
-        },
-      }),
+    (flow: string) => onChange({
+      target: {
+        name: 'flow',
+        value: flow as GenericVersionedStorageFlow,
+      },
+    }),
     [onChange],
   );
 
@@ -205,14 +204,14 @@ export default function GenericVersionedForm({
                   disabled={!x.name}
                   onChange={onHeaderChange}
                   type={isMasked ? 'password' : 'text'}
-                  trailingAction={
+                  trailingAction={(
                     <IconButton
                       variant="invisible"
                       size="small"
                       onClick={toggleMask}
                       icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
                     />
-                  }
+                  )}
                   name="value"
                   id="value"
                   data-index={i}

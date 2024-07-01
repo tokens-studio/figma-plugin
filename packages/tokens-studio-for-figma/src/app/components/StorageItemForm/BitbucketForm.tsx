@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import zod from 'zod';
-import { Button, Box, TextInput, Stack, FormField, Label, Link, IconButton, Text } from '@tokens-studio/ui';
+import {
+  Button, Box, TextInput, Stack, FormField, Label, Link, IconButton, Text,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -19,7 +21,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function BitbucketForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
+export default function BitbucketForm({
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+}: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -92,14 +96,14 @@ export default function BitbucketForm({ onChange, onSubmit, onCancel, values, ha
             id="secret"
             required
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
           />
         </FormField>
         <FormField>

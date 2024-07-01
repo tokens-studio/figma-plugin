@@ -1,6 +1,8 @@
 import React from 'react';
 import zod from 'zod';
-import { Box, Button, FormField, Heading, IconButton, Label, Link, Stack, Text, TextInput } from '@tokens-studio/ui';
+import {
+  Box, Button, FormField, Heading, IconButton, Label, Link, Stack, Text, TextInput,
+} from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -26,7 +28,9 @@ type Props = {
   errorMessage?: string;
 };
 
-export default function TokensStudioForm({ onChange, onSubmit, onCancel, values, hasErrored, errorMessage }: Props) {
+export default function TokensStudioForm({
+  onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+}: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
 
@@ -78,14 +82,14 @@ export default function TokensStudioForm({ onChange, onSubmit, onCancel, values,
             id="secret"
             required
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
+            trailingAction={(
               <IconButton
                 variant="invisible"
                 size="small"
                 onClick={toggleMask}
                 icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
               />
-            }
+            )}
           />
         </FormField>
         <FormField>
