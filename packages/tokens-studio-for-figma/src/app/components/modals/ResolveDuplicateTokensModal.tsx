@@ -120,8 +120,6 @@ export default function ResolveDuplicateTokensModal({
                 setName={setName}
                 onRadioClick={onRadioClick}
                 selectedTokens={selectedTokens}
-                // tokens={tokens}
-                // resolvedTokens={resolvedTokens}
               />
             ))}
           </Stack>
