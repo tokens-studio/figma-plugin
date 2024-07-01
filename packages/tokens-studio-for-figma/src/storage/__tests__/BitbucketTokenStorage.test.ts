@@ -15,8 +15,15 @@ import {
   mockListBranches,
   mockCreateOrUpdateFiles,
   mockCreateBranch,
-  mockListRefs,
 } from '../../../tests/__mocks__/bitbucketMock';
+
+const mockListRefs = jest.fn(() => {
+  return Promise.resolve({
+    data: {
+      values: [{ name: 'main', target: { hash: 'simpleHash' } }],
+    },
+  });
+});
 
 // Mock FormData
 // createOrUpdateFiles function uses a FormData object to send the data to the createSrcFileCommit method

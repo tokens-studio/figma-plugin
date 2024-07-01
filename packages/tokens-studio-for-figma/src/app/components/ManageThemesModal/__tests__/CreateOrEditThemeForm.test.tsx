@@ -34,9 +34,9 @@ describe('CreateOrEditThemeForm', () => {
 
     expect((await result.findByTestId('create-or-edit-theme-form--input--name') as HTMLInputElement).value).toEqual('Light');
 
-    const stylesTabButton = await result.findByText('Styles & Variables');
+    const stylesTabButton = await result.findByText('stylesAndVariables');
     act(() => stylesTabButton.click());
 
-    expect(result.queryAllByText('Attach local styles')).toHaveLength(3);
+    expect(result.queryAllByText('attachLocalStyles')).toHaveLength(3);
   });
 });
