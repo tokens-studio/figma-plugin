@@ -7,8 +7,8 @@ const baseSchema = z.object({
 }).passthrough();
 
 const dollarPrefixedSchema = z.object({
-  $value: z.any().optional(),
-  $type: z.string().optional(),
+  $value: z.any(),
+  $type: z.string(),
   $description: z.string().optional(),
 }).passthrough();
 
