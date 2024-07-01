@@ -47,7 +47,6 @@ export default function FilePreset({ onCancel }: Props) {
 
   const handleFileOrDirectoryChange = React.useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
-    console.log('files in FilePreset: ', files);
 
     await fetchTokensFromFileOrDirectory({ files, usedTokenSet, activeTheme });
     onCancel();

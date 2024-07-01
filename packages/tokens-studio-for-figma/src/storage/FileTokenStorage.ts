@@ -94,19 +94,12 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
         return await new Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage>((resolve) => {
           reader.onload = async () => {
             const result = reader.result as string;
-            console.log('result in FileTokenStorage: ', result);
-            console.log('IsJSONString(result) in FileTokenStorage: ', IsJSONString(result));
 
             if (result && IsJSONString(result)) {
               const parsedJsonData = JSON.parse(result);
-              console.log('parsedJsonData in FileTokenStorage: ', parsedJsonData);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
-              console.log('validationResult in FileTokenStorage: ', validationResult);
               if (validationResult.success) {
                 const { $themes = [], $metadata, ...data } = validationResult.data;
-                console.log('$themes in FileTokenStorage: ', $themes);
-                console.log('$metadata in FileTokenStorage: ', $metadata);
-                console.log('data in FileTokenStorage: ', data);
                 resolve([
                   {
                     type: 'themes',

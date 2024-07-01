@@ -1,7 +1,15 @@
 import z from 'zod';
 
-export const singleTokenSchema = z.object({
+const baseSchema = z.object({
   value: z.any(),
   type: z.string(),
   description: z.string().optional(),
 }).passthrough();
+
+const dollarPrefixedSchema = z.object({
+  $value: z.any().optional(),
+  $type: z.string().optional(),
+  $description: z.string().optional(),
+}).passthrough();
+
+export const singleTokenSchema = z.union([baseSchema, dollarPrefixedSchema]);
