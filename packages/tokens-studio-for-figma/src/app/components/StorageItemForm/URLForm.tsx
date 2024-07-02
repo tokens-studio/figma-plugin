@@ -76,6 +76,7 @@ export default function URLForm({
             type="text"
             required
           />
+          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="id">{t('providers.url.url')}</Label>

@@ -26,7 +26,7 @@ export default function CreateStorageItemModal({
   const getHeaderText = (storageProvider: StorageProviderType) => {
     const icon = getProviderIcon(storageProvider);
     const providerText = {
-      url: 'URL',
+      url: 'a server URL',
       jsonbin: 'JSONBIN',
       github: 'GitHub',
       gitlab: 'GitLab',
