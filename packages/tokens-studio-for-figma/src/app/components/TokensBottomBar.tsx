@@ -33,9 +33,7 @@ export default function TokensBottomBar({ handleError }: Props) {
 
   const handleSaveJSON = useCallback(() => {
     try {
-      console.log('stringTokens in TokensBottomBar: ', stringTokens);
       const parsedTokens = parseJson(stringTokens);
-      console.log('parsedTokens in TokensBottomBar: ', parsedTokens);
       parseTokenValues(parsedTokens);
       track('Saved in JSON');
       handleJSONUpdate(stringTokens);

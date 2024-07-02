@@ -72,6 +72,7 @@ describe('stringfyTokens', () => {
   const activeTokenSet = 'global';
   it('convert token list to the JSON string with nested structure', () => {
     setFormat(TokenFormatOptions.DTCG);
+    console.log('result: ', stringifyTokens(tokens, activeTokenSet));
     expect(stringifyTokens(tokens, activeTokenSet)).toEqual(
       JSON.stringify(
         {

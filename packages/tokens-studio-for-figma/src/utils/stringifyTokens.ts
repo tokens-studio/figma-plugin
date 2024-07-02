@@ -28,7 +28,7 @@ export default function stringifyTokens(
       } = tokenWithoutName;
       const tokenInJSON: TokenInJSON = tokenWithoutInheritTypeLevel;
       // set type of group level
-      set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenInJSON.type);
+      set(tokenObj, getGroupTypeName(token.name, TokenFormat.format === TokenFormatOptions.DTCG ? inheritTypeLevel : inheritTypeLevel + 1), tokenInJSON.type);
       tokenInJSON[TokenFormat.tokenValueKey] = tokenWithoutName.value;
       tokenInJSON[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
       if (TokenFormat.format === TokenFormatOptions.DTCG) {
@@ -36,6 +36,7 @@ export default function stringifyTokens(
         delete tokenInJSON.value;
         delete tokenInJSON.description;
       }
+      delete tokenInJSON.type;
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     } else {
       const tokenInJSON: TokenInJSON = tokenWithoutName;

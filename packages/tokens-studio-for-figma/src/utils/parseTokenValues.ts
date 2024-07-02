@@ -5,7 +5,6 @@ import convertToTokenArray from './convertTokens';
 import { detectFormat } from './detectFormat';
 
 export default function parseTokenValues(tokens: SetTokenDataPayload['values']): TokenStore['values'] {
-  console.log('tokens in parseTokenValues', tokens);
   // If we receive an array of tokens, move them all to the global set
   if (Array.isArray(tokens)) {
     return {
@@ -34,9 +33,6 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
 
     return prev;
   }, []);
-
-  console.log('reducedTokens in parseTokenValues: ', reducedTokens);
-  console.log('Object.fromEntries(reducedTokens) in parseTokenValues: ', Object.fromEntries(reducedTokens));
 
   return Object.fromEntries(reducedTokens);
 }
