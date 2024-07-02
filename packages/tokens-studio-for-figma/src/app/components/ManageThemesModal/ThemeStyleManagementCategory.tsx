@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Checkbox } from '@tokens-studio/ui';
+import { useTranslation } from 'react-i18next';
 import Box from '../Box';
 import Accordion from '../Accordion';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -9,9 +10,7 @@ import { RootState } from '@/app/store';
 import { StyleInfo, ThemeStyleManagementCategoryStyleEntry } from './ThemeStyleManagementCategoryStyleEntry';
 import Stack from '../Stack';
 import { Count } from '../Count';
-import Checkbox from '../Checkbox';
 import Label from '../Label';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   label: string

@@ -197,6 +197,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   if (!isActive) return null;
 
+  console.log('TOKENSSS !!!');
+
   return (
     <TokensContext.Provider value={tokensContextValue}>
       <Box

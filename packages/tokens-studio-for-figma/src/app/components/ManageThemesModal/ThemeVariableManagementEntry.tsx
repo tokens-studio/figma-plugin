@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { ArrowRightIcon, LinkBreak1Icon, LinkBreak2Icon } from '@radix-ui/react-icons';
-import { Box, IconButton, Tooltip } from '@tokens-studio/ui';
+import {
+  Box, IconButton, Tooltip, Checkbox,
+} from '@tokens-studio/ui';
 import { Flex } from '../Flex';
 import Text from '../Text';
 import ResolvingLoader from '../ResolvingLoader';
 import Stack from '../Stack';
-import Checkbox from '../Checkbox';
 
 export type VariableInfo = {
   id: string

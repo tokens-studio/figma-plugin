@@ -1,11 +1,10 @@
 import React from 'react';
-import { Button } from '@tokens-studio/ui';
+import { Button, Checkbox } from '@tokens-studio/ui';
 import Modal from '../Modal';
 import Stack from '../Stack';
 import Input from '../Input';
 import useTokens from '../../store/useTokens';
 import Box from '../Box';
-import Checkbox from '../Checkbox';
 import Label from '../Label';
 import { UpdateMode } from '@/constants/UpdateMode';
 
