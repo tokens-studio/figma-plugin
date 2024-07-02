@@ -2,10 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ValueNoneIcon } from '@radix-ui/react-icons';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { IconButton, Button } from '@tokens-studio/ui';
+import { IconButton, Button, Checkbox } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from './Box';
-import Checkbox from './Checkbox';
 import useTokens from '../store/useTokens';
 import InspectorResolvedToken from './InspectorResolvedToken';
 import { Dispatch } from '../store';
@@ -120,7 +119,7 @@ export default function InspectorTokenSingle({
           onCheckedChange={onCheckedChanged}
         />
         {
-           (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon />
+          (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon />
         }
         {
           isBrokenLink && token.value !== 'none' && <IconBrokenLink />
