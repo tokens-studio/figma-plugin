@@ -33,6 +33,7 @@ export default function TokensStudioForm({
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
+  const [showTeaser, setShowTeaser] = React.useState(true);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -61,7 +62,27 @@ export default function TokensStudioForm({
     [values, onSubmit],
   );
 
-  return (
+  React.useEffect(() => {
+    if (values.secret) {
+      setShowTeaser(false);
+    }
+  }, [values]);
+
+  const handleDismissTeaser = React.useCallback(() => {
+    setShowTeaser(false);
+  }, []);
+
+    return showTeaser ? (
+      <Stack direction="column" align="start" gap={5}>
+        <StyledTokensStudioWord />
+        <Stack direction="column" gap={3}>
+          <Heading size="large">A dedicated design tokens management platform</Heading>
+          <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
+          <Link href="https://tokens.studio/studio" target="_blank" rel="norefferer">Learn more</Link>
+        </Stack>
+        <Button onClick={handleDismissTeaser}>Already got access?</Button>
+      </Stack>
+    ):(
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.tokensstudio.descriptionFirstPart')}</Text>
