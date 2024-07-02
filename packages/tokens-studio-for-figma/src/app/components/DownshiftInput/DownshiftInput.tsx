@@ -25,6 +25,7 @@ import {
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
+import getColorSwatchStyle from '@/utils/color/getColorSwatchStyle';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -294,7 +295,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                               >
                                 {type === 'color' && (
                                 <StyledItemColorDiv>
-                                  <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                                  <StyledItemColor style={getColorSwatchStyle(token.value.toString())} />
                                 </StyledItemColorDiv>
                                 )}
                                 <StyledItemName truncate>
