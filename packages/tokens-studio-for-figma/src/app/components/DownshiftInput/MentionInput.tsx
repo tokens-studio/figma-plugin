@@ -80,7 +80,7 @@ export default function MentionsInput({
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
   const handleMentionInputChange = React.useCallback((newValue: string) => {
-    handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}'));
+    handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}').trim());
   }, [handleChange, name]);
 
   const handleInputBlur = React.useCallback(() => {
