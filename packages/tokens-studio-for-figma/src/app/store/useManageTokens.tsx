@@ -178,6 +178,7 @@ export default function useManageTokens() {
 
   const deleteDuplicates = useCallback(async (duplicates: { set: string, path: string, index: number }[]) => {
     const userConfirmation = await confirm({
+      formId: 'confirmDeleteDuplicates',
       text: 'Delete duplicate tokens?',
       description: 'Are you sure you want to delete duplicate tokens, keeping only the selected ones?',
       variant: 'danger',

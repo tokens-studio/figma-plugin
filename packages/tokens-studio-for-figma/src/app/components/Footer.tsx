@@ -173,6 +173,7 @@ export default function Footer() {
             <IconButton
               onClick={handleResolveDuplicateOpen}
               icon={<WarningTriangleSolid />}
+              data-testid="resolve-duplicate-modal-open-button"
               variant="invisible"
               size="small"
               tooltip="Duplicate Warning"
