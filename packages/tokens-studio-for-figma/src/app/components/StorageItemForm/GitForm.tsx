@@ -12,7 +12,10 @@ import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
-type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
+type ValidatedFormValues = Extract<
+StorageTypeFormValues<false>,
+{ provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }
+>;
 type Props = {
   values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>;
   onChange: ChangeEventHandler;
@@ -33,43 +36,62 @@ export default function GitForm({
 
   const { t } = useTranslation(['storage']);
 
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const zodSchema = zod.object({
-      provider: zod.string(),
-      name: zod.string(),
-      id: zod.string(),
-      branch: zod.string(),
-      filePath: zod.string(),
-      baseUrl: zod.string().optional(),
-      secret: zod.string(),
-      internalId: zod.string().optional(),
-    });
+      const zodSchema = zod.object({
+        provider: zod.string(),
+        name: zod.string(),
+        id: zod.string(),
+        branch: zod.string(),
+        filePath: zod.string(),
+        baseUrl: zod.string().optional(),
+        secret: zod.string(),
+        internalId: zod.string().optional(),
+      });
 
-    const validationResult = zodSchema.safeParse(values);
-    if (validationResult.success) {
-      const formFields = {
-        ...validationResult.data,
-        internalId: validationResult.data.internalId || generateId(24),
-      } as ValidatedFormValues;
-      onSubmit(formFields);
-    }
-  }, [values, onSubmit]);
+      const validationResult = zodSchema.safeParse(values);
+      if (validationResult.success) {
+        const formFields = {
+          ...validationResult.data,
+          internalId: validationResult.data.internalId || generateId(24),
+        } as ValidatedFormValues;
+        onSubmit(formFields);
+      }
+    },
+    [values, onSubmit],
+  );
 
-  const baseUrlPlaceholder = `https://${values.provider}.acme-inc.com${values.provider === StorageProviderType.GITHUB ? '/api/v3' : ''}`;
+  const baseUrlPlaceholder = `https://${values.provider}.hyma.com`;
+  const gitExplainedText = values.provider === StorageProviderType.GITHUB ? t('gitHubExplained') : t('gitLabExplained');
+  const readMoreText = values.provider === StorageProviderType.GITHUB ? t('readMoreGitHub') : t('readMoreGitLab');
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>
-          {t('gitExplained')}
-          {' '}
-          <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`} target="_blank" rel="noreferrer">{t('readMore')}</Link>
+        <Text muted>{gitExplainedText}</Text>
+        <Text muted css={{ marginTop: '$2' }}>
+          <Link
+            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {readMoreText}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
-          <TextInput autoFocus name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+          <TextInput
+            autoFocus
+            name="name"
+            id="name"
+            value={values.name || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
+          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('pat')}</Label>
@@ -79,33 +101,24 @@ export default function GitForm({
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
-            }
+            trailingAction={(
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
+            )}
             required
           />
         </FormField>
         <FormField>
           <Label htmlFor="id">{t('repo')}</Label>
-          <TextInput
-            name="id"
-            id="id"
-            value={values.id || ''}
-            onChange={onChange}
-            type="text"
-            required
-          />
+          <TextInput name="id" id="id" value={values.id || ''} onChange={onChange} type="text" required />
         </FormField>
         <FormField>
           <Label htmlFor="branch">{t('branch')}</Label>
-          <TextInput
-            name="branch"
-            id="branch"
-            value={values.branch || ''}
-            onChange={onChange}
-            type="text"
-            required
-          />
+          <TextInput name="branch" id="branch" value={values.branch || ''} onChange={onChange} type="text" required />
         </FormField>
         <FormField>
           <Label htmlFor="filePath">{t('filePath')}</Label>
@@ -117,7 +130,9 @@ export default function GitForm({
             onChange={onChange}
             type="text"
           />
-          <Text muted size="xsmall">{t('filePathCaption')}</Text>
+          <Text muted size="xsmall">
+            {t('filePathCaption')}
+          </Text>
         </FormField>
         <FormField>
           <Label htmlFor="baseUrl">{t('baseUrl')}</Label>
@@ -129,6 +144,7 @@ export default function GitForm({
             onChange={onChange}
             type="text"
           />
+          <Text muted>{t('baseUrlHelpText')}</Text>
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
@@ -139,11 +155,7 @@ export default function GitForm({
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-          <ErrorMessage data-testid="provider-modal-error">
-            {errorMessage}
-          </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );
