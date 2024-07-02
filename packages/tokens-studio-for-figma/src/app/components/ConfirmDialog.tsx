@@ -31,7 +31,9 @@ const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
 function ConfirmDialog() {
   const confirmButton = React.useRef<HTMLButtonElement | null>(null);
   const firstInput = React.useRef<HTMLInputElement | null>(null);
-  const { onConfirm, onCancel, confirmState } = useConfirm();
+  const {
+    onConfirm, onCancel, confirmState,
+  } = useConfirm();
   const [chosen, setChosen] = React.useState<string[]>([]);
   const [inputValue, setInputValue] = React.useState('');
 
@@ -86,7 +88,7 @@ function ConfirmDialog() {
 
   return confirmState.show ? (
     <Modal isOpen close={onCancel} title={confirmState?.text && confirmState.text}>
-      <form onSubmit={handleConfirm}>
+      <form id={confirmState.formId} onSubmit={handleConfirm}>
         <Stack direction="column" justify="start" gap={4}>
           <Stack direction="column" gap={4}>
             {confirmState?.description && (
