@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "es2020",
     "outDir": "dist",
-    "jsx": "react",
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -20,31 +19,11 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
-    ],
-    "paths": {
-      "@emotion/core": [
-        "./emotion.d.ts"
-      ],
-      "@/*": [
-        "src/*"
-      ]
-    },
   },
   "exclude": [
     "**/node_modules",
-    "./storybook",
-    "storybook-static"
   ],
   "include": [
-    "css.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "benchmark/**/*.ts",
-    "benchmark/index.js",
-    "benchmark/tests/baseline.ts",
     "scripts/bundle.ts",
   ]
 }

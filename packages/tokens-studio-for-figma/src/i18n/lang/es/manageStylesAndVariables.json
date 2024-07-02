@@ -1,0 +1,80 @@
+{
+  "modalTitle": "Administrar Estilos y Variables",
+  "buttonLabel": "Estilos y Variables",
+  "actions": {
+    "export": "Exportar a Figma",
+    "import": "Importar desde Figma",
+    "options": "Opciones",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "createThemes": "Crear Temas",
+    "getPRO": "Obtener PRO",
+    "manageThemes": "Administrar Temas",
+    "changeSets": "Cambiar Conjuntos"
+  },
+  "docs": {
+    "exportToFigmaOptions": "Opciones de Exportación a Figma",
+    "stylesAndVariables": "Estilos y Variables",
+    "referenceOnlyMode": "Modo Solo Referencia Habilitado"
+  },
+  "generic": {
+    "learnMore": "Aprende más",
+    "themes": "Temas",
+    "noGroup": "Sin Grupo",
+    "selectAll": "Seleccionar Todo",
+    "variables": "variables",
+    "styles": "Estilos"
+  },
+  "tabs": {
+    "exportThemes": "Temas",
+    "exportSets": "Conjuntos de Tokens"
+  },
+  "options": {
+    "title": "Opciones",
+    "whichVariablesShouldBeCreatedAndUpdated": "¿Qué variables deben ser creadas y actualizadas?",
+    "whichStylesShouldBeCreatedAndUpdated": "¿Qué estilos deben ser creados y actualizados?",
+    "tokensExportedToFigmaShould": "Los tokens exportados a Figma deben:",
+    "ignorePrefix": "Ignorar la primera parte del nombre del token para estilos",
+    "ignorePrefixExplanation": "Útil si quieres ignorar 'colors' en un token llamado 'colors.blue.500' para tus estilos",
+    "prefixStyles": "Prefijar estilos con el nombre del tema activo",
+    "prefixStylesExplanation": "Agrega el nombre del tema activo a cualquier estilo creado. Nota: Usar esto con temas multidimensionales dará resultados inesperados.",
+    "renameExistingStylesAndVariables": "Sobrescribir estilos y variables existentes",
+    "renameExistingStylesAndVariablesExplanation": "Los estilos y variables existentes con el mismo nombre serán sobrescritos",
+    "scopeVariablesByTokenType": "Limitar Variables por tipo de token",
+    "scopeVariablesByTokenTypeExplanation": "Los ámbitos de las variables se inferirán del tipo de token y el uso previsto",
+    "createStylesWithVariableReferences": "Crear estilos con referencias a variables",
+    "createStylesWithVariableReferencesExplanation": "Se crearán estilos que contengan referencias a variables",
+    "intro": "Cree estilos o variables basados ​​en sus temas o conjuntos de tokens. Primero, elija qué tipos de tokens deben crearse como estilos o variables.",
+    "createAndUpdate": "Crear y actualizar",
+    "renameExisting": "Actualizar estilos existentes y nombres de variables",
+    "renameExistingExplanation": "Se cambiará el nombre de los estilos y variables existentes para que coincidan con el nombre del token.",
+    "removeWithoutConnection": "Eliminar estilos y variables sin conexión a un token",
+    "removeWithoutConnectionExplanation": "Se eliminarán los estilos y variables que no estén conectados a un token."
+  },
+  "variables": {
+    "color": "Color",
+    "number": "Número",
+    "boolean": "Booleano",
+    "string": "Cadena"
+  },
+  "styles": {
+    "color": "Color",
+    "typography": "Tipografía",
+    "effects": "Efectos"
+  },
+  "exportThemesTab": {
+    "headingPro": "Crea Temas para comenzar",
+    "headingBasic": "Crear Temas es una función Pro",
+    "introPro": "Las combinaciones de conjuntos de tokens crean temas. Usa Temas para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño como modos de color claro u oscuro, múltiples marcas, productos o plataformas. O cambia a Conjuntos para exportar sin usar Temas",
+    "introBasic": "Las combinaciones de conjuntos de tokens crean temas. Usa Temas para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño como modos de color claro u oscuro, múltiples marcas, productos o plataformas.",
+    "confirmThemes": "Confirmar Temas",
+    "combinationsOfSetsMakeThemes": "Las combinaciones de conjuntos de tokens crean temas"
+  },
+  "exportSetsTab": {
+    "changeSetsHeading": "Los conjuntos habilitados se exportarán a Figma",
+    "confirmSets": "Confirmar Conjuntos",
+    "intro": "Puedes usar conjuntos de tokens para administrar tus estilos y variables. Usa Temas (Pro) para crear múltiples colecciones de variables o estilos para cambiar fácilmente entre conceptos de diseño.",
+    "setsSelectedForExport": "Conjuntos seleccionados para exportar"
+  },
+  "optionsModalTitle": "Exportar a Figma: Opciones"
+}

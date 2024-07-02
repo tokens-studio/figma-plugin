@@ -7,6 +7,7 @@ on: [pull_request]
 
 env:
   TOKEN_FLOW_APP_URL: ${{ secrets.TOKEN_FLOW_APP_URL }}
+  LICENSE_API_URL: ${{ secrets.LICENSE_API_URL }}
 
 jobs:
   # install dependencies and store artifact
@@ -14,30 +15,17 @@ jobs:
     name: Create Package
     runs-on: ubuntu-22.04
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-      # 2: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # 3: Install dependencies
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile  --immutable
+
       # 5: Build package
       - name: Build Package
         run: npm run build
@@ -47,38 +35,23 @@ jobs:
         with:
           name: package
           path: |
-            dist
-            manifest.json
+            packages/tokens-studio-for-figma/dist
+            packages/tokens-studio-for-figma/manifest.json
   # install dependencies and run test command
   test:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-      # 2: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # 3: Install dependencies.
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile  --immutable
       # 4: Run tests
       - name: Run test command
         run: npm run test
@@ -87,94 +60,71 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-22.04
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-      # 2: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # 3: Install dependencies.
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
-
-      # 4: Run test coverage report
+        run: yarn  --frozen-lockfile  --immutable
       - name: Run test coverage report
         id: testCoverage
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
-          runCommand: 'LAUNCHDARKLY_FLAGS=tokenThemes,gitBranchSelector,multiFileSync,tokenFlowButton npx jest --collectCoverageFrom=''["src/**/*.{js,jsx,ts,tsx}"]'' --coverage --collectCoverage=true --coverageDirectory=''./'' --coverageReporters=''json-summary'' --forceExit --detectOpenHandles ' 
-          afterSwitchCommand: npm ci
+          runCommand: "cd packages/tokens-studio-for-figma && npm run test:coverage:ci"
+          afterSwitchCommand: yarn
           useSameComment: true
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-22.04
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-      # 2: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # 3: Install dependencies.
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile  --immutable
 
       # 4: Build package
       - name: build:transform
+        working-directory: packages/tokens-studio-for-figma
         run: npm run build-transform
 
       # 5: Install dependencies
       - name: Install dependencies - transformer
-        run: cd token-transformer && npm ci
+        working-directory: packages/tokens-studio-for-figma/token-transformer
+        run: npm ci
 
       # 6: Run tests
       - name: Run test command
-        run: cd token-transformer && npm run test
+        working-directory: packages/tokens-studio-for-figma/token-transformer
+        run: npm run test
   cypress-run:
     name: Cypress
     runs-on: ubuntu-22.04
     steps:
-      # 1: Checkout repository
       - name: Checkout
-        uses: actions/checkout@v2
-      # 2: Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
+      - name: Install dependencies
+        run: yarn  --frozen-lockfile  --immutable
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
+          working-directory: ./packages/tokens-studio-for-figma
           build: npm run build:cy
           start: npm run serve
 
@@ -182,31 +132,17 @@ jobs:
     name: Performance
     runs-on: ubuntu-22.04
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-      # 2: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # 3: Install dependencies.
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # This is very unlikely to happen, but we include it anyway in case some cache flushing happens
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile  --immutable
       # 4: Build package
       - name: Run benchmark
+        working-directory: packages/tokens-studio-for-figma
         run: npm run benchmark:build && npm run benchmark:run

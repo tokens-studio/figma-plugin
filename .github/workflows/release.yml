@@ -32,14 +32,6 @@ jobs:
         name: ${{ inputs.environment }}
     runs-on: ubuntu-22.04
     steps:
-      # 1: Setup node
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-      #  Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
       # Pull secrets from vault
       - name: Import Secrets
         id: secrets
@@ -54,26 +46,21 @@ jobs:
             ${{ vars.VAULT_PATH }} STORYBLOK_ACCESS_TOKEN | STORYBLOK_ACCESS_TOKEN;
             ${{ vars.VAULT_PATH }} SUPABASE_ANON_KEY | SUPABASE_ANON_KEY;
             ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;            
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
         with:
-          # caching node_modules
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.cache-name }}-
-      # Install dependencies
+          node-version: '16.x'
+          cache: yarn
+          cache-dependency-path: '**/yarn.lock'
       - name: Install dependencies
-        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-        run: npm ci
+        run: yarn  --frozen-lockfile  --immutable
       # Generate the expected env file
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
         with:
-          file_name: .env.production
+          file_name: packages/tokens-studio-for-figma/.env.production
           envkey_ENVIRONMENT: ${{ inputs.environment }}
           envkey_LICENSE_API_URL: ${{ vars.LICENSE_API_URL }}
           envkey_SECOND_SCREEN_APP_URL: ${{ vars.SECOND_SCREEN_APP_URL }}
