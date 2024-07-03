@@ -17,8 +17,6 @@ import JSONEditor from './JSONEditor';
 import Box from './Box';
 import IconListing from '@/icons/listing.svg';
 import useTokens from '../store/useTokens';
-import parseTokenValues from '@/utils/parseTokenValues';
-import parseJson from '@/utils/parseJson';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
@@ -33,6 +31,7 @@ import { getAliasValue } from '@/utils/alias';
 import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
+import { IconJson } from '@/icons';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -127,12 +126,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
 
   const handleChangeJSON = React.useCallback((val: string) => {
     setError(null);
-    try {
-      const parsedTokens = parseJson(val);
-      parseTokenValues(parsedTokens);
-    } catch (e) {
-      setError(`Unable to read JSON: ${JSON.stringify(e)}`);
-    }
     dispatch.tokenState.setStringTokens(val);
   }, [dispatch.tokenState]);
 
@@ -179,7 +172,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
     // because of specific logic requirements
     setError(null);
     dispatch.tokenState.setStringTokens(getStringTokens());
-  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState, getStringTokens]);
+  }, [tokens, activeTokenSet, tokenFormat, tokenType, dispatch.tokenState]); // getStringTokens removed to fix bug around first paste/edit (useEffect was being triggered)
 
   React.useEffect(() => {
     // @README these dependencies aren't exhaustive
@@ -245,6 +238,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
             }}
           >
             <ToggleGroup
+              size="small"
               type="single"
               value={activeTokensTabToggleState}
               onValueChange={handleSetTokensTab}
@@ -252,8 +246,8 @@ function Tokens({ isActive }: { isActive: boolean }) {
               <ToggleGroup.Item value="list">
                 <IconListing />
               </ToggleGroup.Item>
-              <ToggleGroup.Item value="json" iconOnly={false}>
-                JSON
+              <ToggleGroup.Item value="json">
+                <IconJson />
               </ToggleGroup.Item>
             </ToggleGroup>
           </Box>
@@ -311,9 +305,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
           </Box>
           {manageThemesModalOpen && <ManageThemesModal />}
         </Box>
-        <TokensBottomBar
-          hasJSONError={!!error}
-        />
+        <TokensBottomBar handleError={setError} />
       </Box>
     </TokensContext.Provider>
   );

@@ -12,8 +12,13 @@ describe('setColorValuesOnTarget', () => {
         value: '#ff0000',
         rawValue: '#ff0000',
         description: 'Red',
-      },
-      {
+      },{
+        name: 'black',
+        type: TokenTypes.COLOR,
+        value: '#000000',
+        rawValue: '#000000',
+        description: 'Black',
+      }, {
         name: 'gradient',
         type: TokenTypes.COLOR,
         value: 'linear-gradient(90deg, #000000 0%, #ffffff 100%)',
@@ -24,6 +29,11 @@ describe('setColorValuesOnTarget', () => {
         value: '#ff0000',
         rawValue: '{red}',
         description: 'Referenced Red',
+      }, {
+        name: 'gradient1',
+        type: TokenTypes.COLOR,
+        value: 'linear-gradient(90deg, #ff0000 0%, #000000 100%)',
+        rawValue: 'linear-gradient(90deg, {red} 0%, {black} 100%)',
       }],
       variableReferences: new Map([['red', '123']]),
       createStylesWithVariableReferences: true,
@@ -125,6 +135,39 @@ describe('setColorValuesOnTarget', () => {
       id: 'VariableID:3456', key: '34567', name: 'fg/subtle', variableCollectionId: 'VariableCollectionId:23:23456',
     });
   });
+
+  // Test a linear gradient token with references
+  it('should handle a linear gradient token with references correctly', async () => {
+    const mockStyle = {
+      paints: []
+    } as unknown as PaintStyle;
+
+    await setColorValuesOnTarget({ target: mockStyle, token: 'gradient1', key: 'paints' });
+
+    expect(mockStyle.paints).toEqual([{
+      type: 'GRADIENT_LINEAR',
+      gradientStops: [
+        {
+          color: {
+            r: 1,
+            g: 0,
+            b: 0,
+            a: 1
+          },
+          position: 0
+        }, {
+          color: {
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 1
+          },
+          position: 1
+        }
+      ],
+      gradientTransform: [[1, 0, 0], [0, 1, 0]]
+    }])
+  })
 
   // Test when token reference is not found
   it('should handle missing token references by applying the hex value', async () => {

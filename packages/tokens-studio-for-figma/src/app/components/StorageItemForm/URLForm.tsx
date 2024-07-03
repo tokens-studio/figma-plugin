@@ -59,7 +59,7 @@ export default function URLForm({
         <Text muted>
           {t('providers.url.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/url?ref=addprovider">{t('readMore')}</Link>
+          <Link href="https://docs.tokens.studio/sync/url?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>

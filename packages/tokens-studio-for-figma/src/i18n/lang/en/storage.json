@@ -3,6 +3,7 @@
   "youCanAlwaysGoBack": "You can always go back to remote storage.",
   "addNewSyncProvider": "Add new sync provider",
   "editCredentials": "Edit sync provider credentials",
+  "choose": "Choose",
   "name": "Name",
   "pat": "Personal Access Token",
   "gitExplained": "Read your tokens that are stored on your repository, close to your code.",
@@ -61,6 +62,11 @@
       "appPassword": "App Password",
       "projectName": "Project Name (optional)",
       "repository": "Repository (workspace/repo)"
+    },
+    "tokensstudio": {
+      "name": "Name",
+      "apikey": "API key",
+      "urn": "Connection URN"
     }
   },
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",

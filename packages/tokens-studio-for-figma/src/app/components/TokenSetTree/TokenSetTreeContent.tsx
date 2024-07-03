@@ -14,7 +14,9 @@ type TreeItem<ItemType = unknown> = {
   key: string
   level: number
   parent: string | null
-  isLeaf: boolean
+  isLeaf: boolean,
+  label: string
+  id: string
 } & ItemType;
 
 type SharedProps<T extends TreeItem> = {
@@ -53,7 +55,7 @@ export function TokenSetTreeContent<T extends TreeItem>({
   return (
     <>
       {mappedItems.map(({ item, onToggleCollapsed }) => (
-        <RenderItem key={item.key} item={item}>
+        <RenderItem key={item.id} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
               {(!item.isLeaf) && (
@@ -62,11 +64,11 @@ export function TokenSetTreeContent<T extends TreeItem>({
                   onClick={onToggleCollapsed}
                   size={keyPosition === 'start' ? 'small' : 'default'}
                 >
-                  {keyPosition === 'start' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
+                  {keyPosition === 'start' ? <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel> : null}
                   <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                     <IconExpandArrow />
                   </StyledFolderButtonChevronBox>
-                  {keyPosition === 'end' ? <StyledThemeLabel variant="folder">{item.key.split('/').pop()}</StyledThemeLabel> : null}
+                  {keyPosition === 'end' ? <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel> : null}
                 </StyledFolderButton>
               )}
             </RenderItemContent>

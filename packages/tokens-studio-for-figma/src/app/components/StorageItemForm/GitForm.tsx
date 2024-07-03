@@ -65,7 +65,7 @@ export default function GitForm({
         <Text muted>
           {t('gitExplained')}
           {' '}
-          <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`} target="_blank">{t('readMore')}</Link>
+          <Link href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`} target="_blank" rel="noreferrer">{t('readMore')}</Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>

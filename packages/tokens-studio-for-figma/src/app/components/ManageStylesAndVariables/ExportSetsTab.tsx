@@ -35,32 +35,40 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
 
   const store = useStore<RootState>();
 
-  const [showChangeSets, setShowChangeSets] = React.useState(false);
-
-  const allSets = useSelector(allTokenSetsSelector);
-
   const selectedTokenSets = React.useMemo(() => (
     usedTokenSetSelector(store.getState())
   ), [store]);
+
+  const {
+    control, getValues, reset,
+  } = useForm<FormValues>({
+    defaultValues: {
+      tokenSets: { ...selectedTokenSets },
+    },
+  });
+
+  const [showChangeSets, setShowChangeSets] = React.useState(false);
+  const [previousSetSelection, setPreviousSetSelection] = React.useState({});
+
+  const allSets = useSelector(allTokenSetsSelector);
 
   const availableTokenSets = useSelector(allTokenSetsSelector);
 
   const setsTree = React.useMemo(() => tokenSetListToTree(availableTokenSets), [availableTokenSets]);
 
   const handleCancelChangeSets = React.useCallback(() => {
-    // DO NOT SAVE THE SET CHANGES
+    reset(previousSetSelection);
+    setShowChangeSets(false);
+  }, [previousSetSelection, reset]);
+
+  const handleSaveChangeSets = React.useCallback(() => {
     setShowChangeSets(false);
   }, []);
 
   const handleShowChangeSets = React.useCallback(() => {
     setShowChangeSets(true);
-  }, []);
-
-  const { control, getValues } = useForm<FormValues>({
-    defaultValues: {
-      tokenSets: { ...selectedTokenSets },
-    },
-  });
+    setPreviousSetSelection(getValues());
+  }, [getValues]);
 
   const TokenSetThemeItemInput = React.useCallback((props: React.PropsWithChildren<{ item: TreeItem }>) => (
     <Controller
@@ -134,7 +142,25 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           <Button variant="secondary" size="small" onClick={handleShowChangeSets}>{t('actions.changeSets')}</Button>
         </Stack>
       </StyledCard>
-      <Modal size="fullscreen" full compact isOpen={showChangeSets} close={handleCancelChangeSets} backArrow title="Styles and Variables / Export Sets">
+      <Modal
+        size="fullscreen"
+        full
+        compact
+        isOpen={showChangeSets}
+        close={handleCancelChangeSets}
+        backArrow
+        title="Styles and Variables / Export Sets"
+        footer={(
+          <Stack direction="row" gap={4} justify="between">
+            <Button variant="secondary" onClick={handleCancelChangeSets}>
+              {t('actions.cancel')}
+            </Button>
+            <Button variant="primary" onClick={handleSaveChangeSets}>
+              {t('actions.confirm')}
+            </Button>
+          </Stack>
+          )}
+      >
         <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
         <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
         <Stack

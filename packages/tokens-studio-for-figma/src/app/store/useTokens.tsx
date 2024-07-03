@@ -4,7 +4,7 @@ import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
-import useConfirm, { ResolveCallbackPayload } from '../hooks/useConfirm';
+import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
 import { checkIfAlias, getAliasValue } from '@/utils/alias';
@@ -16,7 +16,6 @@ import {
   tokensSelector,
   uiStateSelector,
   updateModeSelector,
-  usedTokenSetSelector,
   themesListSelector,
 } from '@/selectors';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
@@ -35,9 +34,7 @@ import { wrapTransaction } from '@/profiling/transaction';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat } from '@/plugin/TokenFormatStoreClass';
-import { theme } from '@/stitches.config';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
-import { ThemeObject } from '@/types';
 
 type ConfirmResult = ('textStyles' | 'colorStyles' | 'effectStyles' | string)[] | string;
 
@@ -61,7 +58,6 @@ export type TokensToRenamePayload = {
 
 export default function useTokens() {
   const dispatch = useDispatch<Dispatch>();
-  const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTokenSet = useSelector(activeTokenSetSelector);
   const updateMode = useSelector(updateModeSelector);
   const tokens = useSelector(tokensSelector);
@@ -177,7 +173,7 @@ export default function useTokens() {
 
   const pullVariables = useCallback(async () => {
     const userDecision = await confirm({
-      text: 'Import variables',
+      text: 'Import Variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
         { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },

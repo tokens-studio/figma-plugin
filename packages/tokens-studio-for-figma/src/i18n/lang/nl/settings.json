@@ -35,5 +35,7 @@
   "language": "Taal",
   "languageExplainer": "Tokens Studio is automatisch vertaald, daarom kunnen vertalingen onnauwkeurig lijken.\n Zie je je taal niet? Dien een functieverzoek in",
   "liveSyncActive": "Live synchronisatie actief",
-  "chooseANewToken": "Voer een nieuwe waarde in of kies een token"
+  "chooseANewToken": "Voer een nieuwe waarde in of kies een token",
+  "change": "Wijziging",
+  "confirm": "Bevestigen"
 }

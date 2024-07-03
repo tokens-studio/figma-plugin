@@ -431,6 +431,30 @@ export const tokenState = createModel<RootModel>()({
 
       return newState;
     },
+    deleteDuplicateTokens: (state, data: DeleteTokenPayload) => {
+      let i = 0;
+      const newState = {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          [data.parent]: typeof data.index === 'number'
+            ? state.tokens[data.parent].filter((token) => {
+              if (token.name === data.path) {
+                if (i === data.index) {
+                  i += 1;
+                  return true;
+                }
+                i += 1;
+                return false;
+              }
+              return (token.name !== data.path);
+            })
+            : state.tokens[data.parent].filter((token) => token.name !== data.path),
+        },
+      };
+
+      return newState;
+    },
     deleteTokenGroup: (state, data: DeleteTokenGroupPayload) => {
       const newState = {
         ...state,
@@ -607,6 +631,9 @@ export const tokenState = createModel<RootModel>()({
           data: payload,
         });
       }
+    },
+    deleteDuplicateTokens() {
+      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     deleteTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });

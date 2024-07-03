@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  CheckIcon,
-} from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import { DropdownMenu } from '@tokens-studio/ui';
 import Box from './Box';
 
@@ -28,7 +26,7 @@ export const MultiSelectCheckboxItem: React.FunctionComponent<React.PropsWithChi
     >
       <Box css={{ width: '$5' }}>
         <DropdownMenu.ItemIndicator css={{ position: 'inherit' }}>
-          <CheckIcon />
+          <Check />
         </DropdownMenu.ItemIndicator>
       </Box>
       <Box>
