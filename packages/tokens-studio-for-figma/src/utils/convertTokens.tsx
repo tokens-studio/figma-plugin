@@ -8,7 +8,7 @@ import {
   isSingleTypographyToken,
 } from './is';
 import { TokenGroupInJSON, isTokenGroupWithType } from './is/isTokenGroupWithType';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { isSingleTokenInJSON } from './is/isSingleTokenInJson';
 
 // This is a token as it is incoming, so we can't be sure of the values or types
@@ -92,6 +92,9 @@ function checkForTokens({
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
       returnValue.type = token[TokenFormat.tokenTypeKey];
+      if (inheritType === token[TokenFormat.tokenTypeKey]) {
+        returnValue.inheritTypeLevel = currentTypeLevel as number;
+      }
     }
   } else if (
     isSingleTypographyToken(token)

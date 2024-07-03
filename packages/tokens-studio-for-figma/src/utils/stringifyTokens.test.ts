@@ -142,13 +142,13 @@ describe('stringfyTokens', () => {
           name: 'scale.small',
           type: 'spacing',
           value: '4px',
-          inheritTypeLevel: 1
+          inheritTypeLevel: 2
         },
         {
           name: 'scale.medium',
           type: 'spacing',
           value: '8px',
-          inheritTypeLevel: 1
+          inheritTypeLevel: 2
         },
         {
           name: 'scale.large',
