@@ -7,11 +7,12 @@ import { useStore } from 'react-redux';
 
 import { RootState } from '../store';
 import { AsyncMessageChannel } from '../../AsyncMessageChannel';
+import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 // eslint-disable-next-line
 const PREVIEW_ENV = process.env.PREVIEW_ENV;
 
 function PreviewApp({ children }: { children: ReactNode }) {
-  const isConnected = AsyncMessageChannel.ReactInstance.isWsConnected;
+  const isConnected = (AsyncMessageChannel.ReactInstance as AsyncMessageChannelPreview).isWsConnected;
 
   const store = useStore<RootState>();
 
@@ -34,9 +35,9 @@ function PreviewApp({ children }: { children: ReactNode }) {
         direction="row"
         css={{
           paddingTop: '$2',
-          paddingBottom:  '$2',
-          paddingLeft:  '$3',
-          paddingRight:  '$3',
+          paddingBottom: '$2',
+          paddingLeft: '$3',
+          paddingRight: '$3',
           alignItems: 'center',
           border: `1px solid ${isConnected ? '$successFg' : '$dangerFg'}`,
           backgroundColor: isConnected ? '$successBg' : '$dangerBg',
