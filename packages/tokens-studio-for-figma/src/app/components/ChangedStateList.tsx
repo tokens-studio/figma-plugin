@@ -57,14 +57,14 @@ function ChangedStateList() {
                   <Text bold size="small">{theme.name}</Text>
                   {
                     theme.importType === 'REMOVE' && (
-                    <StyledDiff size="small" type="danger">
+                    <StyledDiff type="danger">
                       {t('configurationRemoved')}
                     </StyledDiff>
                     )
                   }
                   {
                     (theme.importType === 'NEW' || theme.importType === 'UPDATE') && (
-                    <StyledDiff size="small" type="success">
+                    <StyledDiff type="success">
                       {theme.importType === 'NEW' ? t('configuration-added') : t('configurationChanged') }
                     </StyledDiff>
                     )
@@ -86,7 +86,7 @@ function ChangedStateList() {
                 align="end"
                 css={{ padding: '$1 $4' }}
               >
-                <StyledDiff size="small" type="danger">
+                <StyledDiff type="danger">
                   {t('configurationChanged')}
                 </StyledDiff>
               </Stack>

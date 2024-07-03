@@ -23,12 +23,14 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
+import { getFormat } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
 import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
+import { notifyToUI } from '@/plugin/notifiers';
 
 export type PushOverrides = { branch: string, commitMessage: string };
 
@@ -147,6 +149,10 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
       if (remoteData?.status === 'success') {
+        if (activeTab !== Tabs.LOADING) {
+          const format = getFormat();
+          dispatch.tokenState.setTokenFormat(format);
+        }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
           if (activeTab !== Tabs.LOADING) {
@@ -320,33 +326,37 @@ export default function useRemoteTokens() {
     async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       track('pushTokens', { provider: context.provider, isFolder });
+      let pushResult;
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
-          await pushTokensToGitHub(context, overrides);
+          pushResult = await pushTokensToGitHub(context, overrides);
           break;
         }
         case StorageProviderType.GITLAB: {
-          await pushTokensToGitLab(context);
+          pushResult = await pushTokensToGitLab(context);
           break;
         }
         case StorageProviderType.BITBUCKET: {
-          await pushTokensToBitbucket(context);
+          pushResult = await pushTokensToBitbucket(context);
           break;
         }
         case StorageProviderType.ADO: {
-          await pushTokensToADO(context);
+          pushResult = await pushTokensToADO(context);
           break;
         }
         case StorageProviderType.SUPERNOVA: {
-          await pushTokensToSupernova(context);
+          pushResult = await pushTokensToSupernova(context);
           break;
         }
         case StorageProviderType.TOKENS_STUDIO: {
-          await pushTokensToTokensStudio(context);
+          pushResult = await pushTokensToTokensStudio(context);
           break;
         }
         default:
           throw new Error('Not implemented');
+      }
+      if (pushResult.status && pushResult.status === 'failure') {
+        notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
     [

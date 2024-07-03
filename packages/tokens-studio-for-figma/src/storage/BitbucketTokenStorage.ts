@@ -1,13 +1,14 @@
+/* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/indent */
 /* eslint "@typescript-eslint/no-unused-vars": off */
-import { Bitbucket } from 'bitbucket';
+import { Bitbucket, Schema } from 'bitbucket';
 import compact from 'just-compact';
 import {
   RemoteTokenStorageFile,
   RemoteTokenStorageMetadata,
   RemoteTokenstorageErrorMessage,
 } from './RemoteTokenStorage';
-import { GitMultiFileObject, GitTokenStorage } from './GitTokenStorage';
+import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -73,15 +74,15 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    */
   public async createBranch(branch: string, source?: string) {
     try {
-      const originRef = `refs/${source || this.branch}`;
-      const newRef = `refs/${branch}`;
-
       const originBranch = await this.bitbucketClient.repositories.listRefs({
         workspace: this.owner,
         repo_slug: this.repository,
       });
 
-      if (!originBranch.data.values || !originBranch.data.values[0] || !originBranch.data.values[0].target) {
+      const sourceBranchName = source || this.branch;
+      const sourceBranch = originBranch.data.values.find((branchValue: Schema.Branch) => branchValue.name === sourceBranchName);
+
+      if (!originBranch.data || !originBranch.data.values || !sourceBranch || !sourceBranch.target || !sourceBranch.target.hash) {
         throw new Error('Could not retrieve origin branch');
       }
 
@@ -90,7 +91,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         _body: {
           name: branch, // branch name
           target: {
-            hash: originBranch.data.values[0].target.hash, // hash of the commit the new branch should point to
+            hash: sourceBranch.target.hash, // hash of the commit the new branch should point to
           },
         },
         repo_slug: this.repository,
@@ -150,53 +151,73 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       const data = await response.json();
 
-        if (data.values && Array.isArray(data.values)) {
-          // Filter out the JSON files
-          const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
+      if (data.values && Array.isArray(data.values)) {
+        // Filter out the JSON files
+        const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
 
-          // Fetch the content of each JSON file
-          const jsonFileContents = await Promise.all(
-            jsonFiles.map((file: any) => fetch(file.links.self.href, {
-              headers: {
-                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-              },
-            }).then((response) => response.text())),
-          );
-          // Process the content of each JSON file
-          return jsonFileContents.map((fileContent, index) => {
-            const { path } = jsonFiles[index];
-            const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
-            let name = filePath.substring(this.path.length).replace(/^\/+/, '');
-            name = name.replace('.json', '');
-            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+        // Fetch the content of each JSON file
+        const jsonFileContents = await Promise.all(
+          jsonFiles.map((file: any) => fetch(file.links.self.href, {
+            headers: {
+              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+            },
+          }).then((rsp) => rsp.text())),
+        );
+        // Process the content of each JSON file
+        return jsonFileContents.map((fileContent, index) => {
+          const { path } = jsonFiles[index];
+          const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
+          let name = filePath.substring(this.path.length).replace(/^\/+/, '');
+          name = name.replace('.json', '');
+          const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-            if (name === SystemFilenames.THEMES) {
-              return {
-                path: filePath,
-                type: 'themes',
-                data: parsed as ThemeObjectsList,
-              };
-            }
-
-            if (name === SystemFilenames.METADATA) {
-              return {
-                path: filePath,
-                type: 'metadata',
-                data: parsed as RemoteTokenStorageMetadata,
-              };
-            }
-
+          if (name === SystemFilenames.THEMES) {
             return {
               path: filePath,
-              name,
-              type: 'tokenSet',
-              data: parsed as AnyTokenSet<false>,
+              type: 'themes',
+              data: parsed as ThemeObjectsList,
             };
-          });
-        }
-        return {
-          errorMessage: ErrorMessages.VALIDATION_ERROR,
-        };
+          }
+
+          if (name === SystemFilenames.METADATA) {
+            return {
+              path: filePath,
+              type: 'metadata',
+              data: parsed as RemoteTokenStorageMetadata,
+            };
+          }
+
+          return {
+            path: filePath,
+            name,
+            type: 'tokenSet',
+            data: parsed as AnyTokenSet<false>,
+          };
+        });
+      } else if (data) {
+        const parsed = data as GitSingleFileObject;
+        const parsedData = (Object.entries(parsed).filter(([key]) => (
+          !Object.values<string>(SystemFilenames).includes(key)
+        )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+          name,
+          type: 'tokenSet',
+          path: `${this.path}/${name}.json`,
+          data: tokenSet,
+        }));
+        return [
+          ...(parsed.$metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: parsed.$metadata,
+            },
+          ] : []),
+          ...parsedData,
+        ];
+      }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (e) {
       console.error('Error', e);
       return [];

@@ -1,6 +1,6 @@
 // stitches.config.ts
 import { createStitches } from '@stitches/react';
-import { lightTheme, darkFigmaTheme as darkTheme, core } from '@tokens-studio/tokens';
+import { lightFigmaTheme as lightTheme, darkFigmaTheme as darkTheme, core } from '@tokens-studio/tokens';
 
 export const stitchesInstance = createStitches({
   theme: {
@@ -22,11 +22,11 @@ export const stitchesInstance = createStitches({
       ...core.fontSizes,
       // TODO: We should remove this once we have a way to choose density / font size
       xxsmall: '11px !important',
-      xsmall: '12px !important',
-      small: '13px !important',
-      base: '14px !important',
-      medium: '14px !important',
-      large: '16px !important',
+      xsmall: '11px !important',
+      small: '12px !important',
+      base: '13px !important',
+      medium: '13px !important',
+      large: '14px !important',
     },
     radii: {
       ...core.radii,

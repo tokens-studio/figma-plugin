@@ -28,16 +28,13 @@
   border-right: 0;
   border-radius: 0;
   background: transparent;
-  font-size: var(--fontSizes-small);
+  font-size: var(--fontSizes-xsmall);
+  padding-top: var(--space-2);
 }
 
 .mentions-no-prefix > textarea {
   border-top-left-radius: var(--radii-small);
   border-bottom-left-radius: var(--radii-small);
-}
-
-.rc-mentions > textarea::placeholder {
-  color: var(--colors-fgSubtle);
 }
 
 .rc-mentions > textarea:focus-within {
@@ -58,7 +55,6 @@
 .rc-mentions-dropdown {
   position: absolute;
   border-radius: var(--radii-medium);
-  z-index: 10;
 }
 
 .rc-mentions-dropdown-menu {
@@ -78,7 +74,6 @@
   box-shadow: var(--shadows-contextMenu);
   background: var(--colors-bgCanvas);
   cursor: pointer;
-  z-index: 10;
 }
 
 .rc-mentions-dropdown-menu-item {

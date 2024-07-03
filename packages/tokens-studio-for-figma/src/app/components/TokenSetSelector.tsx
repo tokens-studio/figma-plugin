@@ -140,6 +140,9 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
       onResizeStop={handleResize}
       minWidth={100}
       maxWidth="50vw"
+      enable={{
+        right: true,
+      }}
     >
       <Box
         css={{
@@ -225,7 +228,12 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             </Stack>
           </form>
         </Modal>
-        <Stack direction="column" css={{ padding: '$3' }}>
+        <Stack
+          direction="column"
+          css={{
+            padding: '$3', backgroundColor: '$bgDefault', position: 'sticky', bottom: 0, zIndex: 10,
+          }}
+        >
           <Button
             icon={<IconAdd />}
             size="small"

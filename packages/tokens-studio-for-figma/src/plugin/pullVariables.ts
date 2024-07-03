@@ -94,14 +94,16 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
           if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
             const alias = figma.variables.getVariableById(value.id);
             tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else if (options.useDimensions && options.useRem) {
-            tokenValue = `${Number(tokenValue) / baseRem}rem`;
-          } else {
-            tokenValue = `${tokenValue}px`;
+          } else if (typeof value === 'number') {
+            if (options.useRem) {
+              tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
+            } else if (options.useDimensions) {
+              tokenValue = `${tokenValue}px`;
+            }
           }
           const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
 
-          if (options.useDimensions) {
+          if (options.useDimensions || options.useRem) {
             dimensions.push({
               name: variableName,
               value: tokenValue as string,
@@ -112,7 +114,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
           } else {
             numbers.push({
               name: variableName,
-              value: value.toString(),
+              value: tokenValue as string,
               type: TokenTypes.NUMBER,
               parent: `${collection?.name}/${modeName}`,
               description: variable.description,

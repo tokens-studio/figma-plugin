@@ -122,6 +122,7 @@ export function TokenGroupHeading({
         onClose={handleRenameTokenGroupModalClose}
         handleRenameTokenGroupSubmit={handleRenameTokenGroupSubmit}
         handleNewTokenGroupNameChange={handleNewTokenGroupNameChange}
+        type={type}
       />
 
       <DuplicateTokenGroupModal

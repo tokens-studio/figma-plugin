@@ -35,5 +35,7 @@
   "language": "Idioma",
   "languageExplainer": "Tokens Studio ha sido traducido automáticamente, por lo tanto, las traducciones pueden parecer inexactas.\n ¿No ves tu idioma? Enviar una solicitud de función",
   "liveSyncActive": "Sincronización en vivo activa",
-  "chooseANewToken": "Ingrese un nuevo valor o elija un token"
+  "chooseANewToken": "Ingrese un nuevo valor o elija un token",
+  "change": "Cambiar",
+  "confirm": "Confirmar"
 }

@@ -1,16 +1,26 @@
 import React, { useMemo } from 'react';
 import Mentions from 'rc-mentions';
+import {
+  Stack,
+  Tooltip,
+} from '@tokens-studio/ui';
+import { SingleToken } from '@/types/tokens';
+import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
+
+// Styles
+import {
+  StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
+} from './StyledDownshiftInput';
+import './mentions.css';
+
+// Utils
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
-import { Properties } from '@/constants/Properties';
-import { SingleToken } from '@/types/tokens';
-import { TokenTypes } from '@/constants/TokenTypes';
-import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
-import './mentions.css';
-import {
-  StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart, StyledItemInfo,
-} from './StyledDownshiftInput';
 import getResolvedTextValue from '@/utils/getResolvedTextValue';
+
+// Constants
+import { Properties } from '@/constants/Properties';
+import { TokenTypes } from '@/constants/TokenTypes';
 
 export interface SuggestionDataItem {
   id: string;
@@ -106,22 +116,29 @@ export default function MentionsInput({
         value={suggestion.id as string}
         className="mentions-item"
       >
-        <StyledItem
-          css={{ display: 'block' }}
-          className="dropdown-item"
+        <Tooltip
+          side="bottom"
+          label={(
+            <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+              <StyledItemName css={{ color: '$tooltipFg' }}>
+                {getHighlightedText(resolvedToken?.name ?? '', value || '')}
+              </StyledItemName>
+              {resolvedToken && (
+                <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
+                  <span>
+                    {getResolvedTextValue(resolvedToken)}
+                  </span>
+                </StyledItemValue>
+              )}
+            </Stack>
+          )}
         >
-          <StyledItemInfo>
-            <StyledItemName>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
-          </StyledItemInfo>
-          {
-            resolvedToken && (
-            <StyledItemInfo>
-              {type === 'color' && (<StyledItemColorDiv><StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} /></StyledItemColorDiv>)}
-              <StyledItemValue>{getResolvedTextValue(resolvedToken)}</StyledItemValue>
-            </StyledItemInfo>
-            )
-          }
-        </StyledItem>
+          <StyledItem className="dropdown-item">
+            {type === 'color' && <StyledItemColorDiv><StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} /></StyledItemColorDiv>}
+            <StyledItemName truncate>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
+            {resolvedToken && <StyledItemValue truncate>{getResolvedTextValue(resolvedToken)}</StyledItemValue>}
+          </StyledItem>
+        </Tooltip>
       </Option>
     );
   }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
@@ -138,7 +155,6 @@ export default function MentionsInput({
       value={value}
       placeholder={placeholder}
       prefix={['{']}
-      split=""
       placement="bottom"
       autoFocus={autoFocus}
       onChange={handleMentionInputChange}

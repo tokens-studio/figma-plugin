@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { Check } from 'iconoir-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { inspectStateSelector } from '@/selectors';
@@ -36,7 +36,7 @@ export default function InspectSearchOptionDropdown() {
             onCheckedChange={handleIsShowBrokenReferences}
           >
             <DropdownMenu.ItemIndicator>
-              <CheckIcon />
+              <Check />
             </DropdownMenu.ItemIndicator>
             {t('showBrokenReferences')}
           </DropdownMenu.CheckboxItem>
@@ -46,7 +46,7 @@ export default function InspectSearchOptionDropdown() {
             onCheckedChange={handleIsShowResolvedReferences}
           >
             <DropdownMenu.ItemIndicator>
-              <CheckIcon />
+              <Check />
             </DropdownMenu.ItemIndicator>
             {t('showResolvedReferences')}
           </DropdownMenu.CheckboxItem>

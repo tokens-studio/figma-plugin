@@ -18,7 +18,7 @@ export const StyledThemeLabel = styled(Box, {
     },
     variant: {
       folder: {
-        color: '$fgMuted',
+        color: '$fgSubtle',
         fontWeight: '$sansBold',
       },
       leaf: {},

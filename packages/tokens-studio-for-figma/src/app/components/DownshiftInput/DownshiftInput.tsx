@@ -181,6 +181,8 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
     setShowAutoSuggest(false);
   }, []);
 
+  const hasPrefix = inlineLabel || Boolean(prefix);
+
   return (
     <Downshift onSelect={handleSelect} isOpen={showAutoSuggest}>
       {({
@@ -207,7 +209,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
               handleBlur={handleBlur}
               handleOnFocus={handleOnFocus}
               onSubmit={onSubmit}
-              hasPrefix={!!prefix}
+              hasPrefix={hasPrefix}
             />
             {suffix && (
             <Popover.Root open={showAutoSuggest} onOpenChange={setShowAutoSuggest}>
