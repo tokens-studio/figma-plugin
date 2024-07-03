@@ -134,4 +134,50 @@ describe('stringfyTokens', () => {
     );
     expect(stringifyTokens(emptyTokens, activeTokenSet)).toEqual('{}');
   });
+
+  it('convert legacy token list to the JSON string with nested structure', () => {
+    const input = {
+      global: [
+        {
+          name: 'scale.small',
+          type: 'spacing',
+          value: '4px',
+          inheritTypeLevel: 1
+        },
+        {
+          name: 'scale.medium',
+          type: 'spacing',
+          value: '8px',
+          inheritTypeLevel: 1
+        },
+        {
+          name: 'scale.large',
+          value: '12px',
+          type: 'sizing'
+        },
+      ]
+    };
+    setFormat(TokenFormatOptions.Legacy);
+    expect(stringifyTokens(input, activeTokenSet)).toEqual(
+      JSON.stringify(
+        {
+          scale: {
+            type: 'spacing',
+            small: {
+              value: '4px'
+            },
+            medium: {
+              value: '8px'
+            },
+            large: {
+              value: '12px',
+              type: 'sizing'
+            }
+          }
+        },
+        null,
+        2
+      )
+    );
+  });
 });
