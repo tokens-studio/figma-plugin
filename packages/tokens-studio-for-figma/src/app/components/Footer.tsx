@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
+import { WarningTriangleSolid } from 'iconoir-react';
 import { IconButton } from '@tokens-studio/ui';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -15,6 +16,7 @@ import {
   usedTokenSetSelector,
   projectURLSelector,
   activeThemeSelector,
+  tokensSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -29,6 +31,7 @@ import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import ResolveDuplicateTokensModal from './modals/ResolveDuplicateTokensModal';
 
 export default function Footer() {
   const [hasRemoteChange, setHasRemoteChange] = useState(false);
@@ -41,6 +44,24 @@ export default function Footer() {
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges } = useChangedState();
+  const tokens = useSelector(tokensSelector);
+  const [showResolveDuplicateTokensModal, setShowResolveDuplicateTokensModal] = React.useState<boolean>(false);
+
+  const hasDuplicates = useMemo(
+    () => Object.keys(tokens).some((setName) => {
+      const currentSetTokens = tokens[setName];
+      const seenNames = new Set();
+
+      return currentSetTokens.some((token) => {
+        if (seenNames.has(token.name)) {
+          return true;
+        }
+        seenNames.add(token.name);
+        return false;
+      });
+    }),
+    [tokens],
+  );
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -56,6 +77,14 @@ export default function Footer() {
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
+
+  const handleResolveDuplicateTokensModalClose = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(false);
+  }, []);
+
+  const handleResolveDuplicateOpen = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(true);
+  }, []);
 
   return (
     <Box
@@ -140,6 +169,15 @@ export default function Footer() {
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
+          {hasDuplicates && (
+            <IconButton
+              onClick={handleResolveDuplicateOpen}
+              icon={<WarningTriangleSolid />}
+              variant="invisible"
+              size="small"
+              tooltip="Duplicate Warning"
+            />
+          )}
           <ProBadge />
           <IconButton
             as="a"
@@ -161,7 +199,12 @@ export default function Footer() {
           />
         </Stack>
       </Stack>
-
+      {showResolveDuplicateTokensModal && (
+        <ResolveDuplicateTokensModal
+          isOpen={showResolveDuplicateTokensModal}
+          onClose={handleResolveDuplicateTokensModalClose}
+        />
+      )}
     </Box>
   );
 }
