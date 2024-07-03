@@ -75,9 +75,10 @@ jobs:
         uses: anuraag016/Jest-Coverage-Diff@master
         with:
           fullCoverageDiff: false
-          runCommand: "cd packages/tokens-studio-for-figma && npm run test:coverage:ci"
+          runCommand: "cd packages/tokens-studio-for-figma && npm run test:coverage:ci && cd ../.. && mv packages/tokens-studio-for-figma/coverage-summary.json coverage-summary.json"
           afterSwitchCommand: yarn
           useSameComment: true
+          delta: 1
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-22.04
