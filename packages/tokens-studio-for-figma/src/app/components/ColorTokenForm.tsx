@@ -265,7 +265,7 @@ export default function ColorTokenForm({
             }}
             >
               <Select data-testid="colortokenform-operation-selector" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'} onValueChange={onOperationSelected}>
-                <Select.Trigger label="Operation" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'} />
+                <Select.Trigger data-testid="colortokenform-operation-button" label="Operation" value={internalEditToken?.$extensions?.['studio.tokens']?.modify?.type || 'Choose an operation'} />
                 <Select.Content>
                   {Object.values(ColorModifierTypes).map((operation, index) => <Select.Item key={`operation-${seed(index)}`} value={operation}>{operation}</Select.Item>)}
                 </Select.Content>
