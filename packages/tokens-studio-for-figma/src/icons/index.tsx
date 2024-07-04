@@ -5,7 +5,6 @@ import IconBlend from './blend.svg';
 import IconBlendEmpty from './blendempty.svg';
 import IconBrokenLink from './brokenlink.svg';
 import IconCaretDown from './caretdown.svg';
-import IconCheck from './check.svg';
 import IconChevronDown from './chevrondown.svg';
 import IconChevronRight from './chevronright.svg';
 import IconCode from './code.svg';
@@ -28,7 +27,6 @@ import IconHorizontalPadding from './horizontalpadding.svg';
 import IconTrash from './IconTrash.svg';
 import IconImport from './import.svg';
 import IconIndeterminateAlt from './indeterminate-alt.svg';
-import IconIndeterminate from './indeterminate.svg';
 import IconJson from './json.svg';
 import IconLayers from './layers.svg';
 import IconLibrary from './library.svg';
@@ -77,7 +75,6 @@ export {
   IconBlendEmpty,
   IconBrokenLink,
   IconCaretDown,
-  IconCheck,
   IconChevronDown,
   IconChevronRight,
   IconCode,
@@ -98,7 +95,6 @@ export {
   IconHelp,
   IconHorizontalPadding,
   IconImport,
-  IconIndeterminate,
   IconIndeterminateAlt,
   IconJson,
   IconLayers,
