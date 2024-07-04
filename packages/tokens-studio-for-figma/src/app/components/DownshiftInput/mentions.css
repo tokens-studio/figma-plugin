@@ -33,8 +33,8 @@
 }
 
 .mentions-no-prefix > textarea {
-  border-top-left-radius: var(--radii-small);
-  border-bottom-left-radius: var(--radii-small);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .rc-mentions > textarea:focus-within {
