@@ -367,7 +367,7 @@ describe('TokenListing', () => {
     });
     cy.get('@postMessage').should('be.calledThrice');
   });
-  it('click outside select in modal doesn’t close modal', () => {
+  it('click outside modify select color create modal doesn’t close modal', () => {
     cy.startup(mockStartupParams);
     cy.get('[data-testid="button-configure"]').should('be.visible')
     cy.receiveSetTokens({
@@ -403,7 +403,15 @@ describe('TokenListing', () => {
     cy.get('[data-testid=button-add-new-modify]').click();
     cy.get('[data-testid=colortokenform-operation-button]').click();
 
+    cy.get('span:contains("darken")').parent().should('be.visible');
+    cy.get('span:contains("darken")').click();
+    cy.get('[data-testid=colortokenform-operation-button]').click();
+    cy.get('span:contains("darken")').parent().should('be.visible');
+
     cy.get('body').type('{esc}');
+
+    cy.get('span:contains("alpha")').should('not.exist');
+    cy.get('[data-testid="colortokenform-operation-button"]').should('be.visible');
 
     fillInputNth({
       input: 'value',
@@ -414,6 +422,59 @@ describe('TokenListing', () => {
       input: 'value',
       value: '0.5',
       nth: 1,
+      submit: true,
+    });
+    cy.get('@postMessage').should('be.calledThrice');
+  });
+  it('click outside select in composition create modal doesn’t close modal', () => {
+    cy.startup(mockStartupParams);
+    cy.get('[data-testid="button-configure"]').should('be.visible')
+    cy.receiveSetTokens({
+      version: '5',
+      values: {
+        options: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }, {
+          name: 'opacity.30',
+          value: '30%',
+          type: 'opacity'
+        }, {
+          name: 'font-size.4',
+          value: '4px',
+          type: 'fontSizes'
+        }],
+        global: [{
+          name: 'sizing.xs',
+          value: 4,
+          type: 'sizing'
+        }],
+      },
+    });
+    cy.get('[data-testid=tokenlisting-composition] [data-testid=button-add-new-token]').click();
+
+    fillInput({
+      input: 'name',
+      value: 'compositionToken',
+    });
+
+    cy.get('[data-testid="composition-token-dropdown"]').click();
+
+    cy.get('span:contains("minWidth")').parent().should('be.visible');
+    cy.get('span:contains("minWidth")').parent().click();
+    cy.get('[data-testid="composition-token-dropdown"]').click();
+    
+
+    cy.get('body').type('{esc}');
+
+    cy.get('span:contains("darken")').should('not.exist');
+    cy.get('[data-testid="composition-token-dropdown"]').should('be.visible');
+
+    fillInputNth({
+      input: 'value',
+      value: '#000000',
+      nth: 0,
       submit: true,
     });
     cy.get('@postMessage').should('be.calledThrice');
