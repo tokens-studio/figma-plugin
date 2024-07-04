@@ -52,6 +52,7 @@ export default function InspectorResolvedToken({ token }: { token: Props }) {
             borderRadius: '100%',
             border: '1px solid $borderMuted',
             fontSize: 0,
+            flexShrink: 0,
           }}
         />
       );

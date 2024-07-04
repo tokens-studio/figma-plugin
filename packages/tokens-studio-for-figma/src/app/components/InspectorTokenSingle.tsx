@@ -114,15 +114,16 @@ export default function InspectorTokenSingle({
         }}
       >
         <Checkbox
+          style={{ flexShrink: 0 }}
           checked={isChecked}
           id={`${token.category}-${token.value}`}
           onCheckedChange={onCheckedChanged}
         />
         {
-          (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon />
+          (token.value === 'none' || tokenToDisplay?.value === 'none') && <ValueNoneIcon style={{ flexShrink: 0 }} />
         }
         {
-          isBrokenLink && token.value !== 'none' && <IconBrokenLink />
+          isBrokenLink && token.value !== 'none' && <IconBrokenLink style={{ flexShrink: 0 }} />
         }
         {(tokenToDisplay && tokenToDisplay.value !== 'none' && tokenToDisplay.name !== 'none') && (
           <InspectorResolvedToken token={tokenToDisplay} />
