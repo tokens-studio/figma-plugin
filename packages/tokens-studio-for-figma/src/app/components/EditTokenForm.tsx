@@ -183,12 +183,14 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      setError(null);
       if (internalEditToken) {
+        if (internalEditToken.type === TokenTypes.DIMENSION && isValidDimensionToken) {
+          setError(null);
+        }
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
-    [internalEditToken],
+    [internalEditToken, isValidDimensionToken],
   );
 
   const handleBlur = React.useCallback(() => {
