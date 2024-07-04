@@ -183,14 +183,12 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleNameChange = React.useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
+      setError(null);
       if (internalEditToken) {
-        if (internalEditToken.type === TokenTypes.DIMENSION && isValidDimensionToken) {
-          setError(null);
-        }
         setInternalEditToken({ ...internalEditToken, [e.target.name]: e.target.value });
       }
     },
-    [internalEditToken, isValidDimensionToken],
+    [internalEditToken],
   );
 
   const handleBlur = React.useCallback(() => {
@@ -510,6 +508,11 @@ function EditTokenForm({ resolvedTokens }: Props) {
     }
   }, [dispatch, isValid, internalEditToken, submitTokenValue, isValidDimensionToken]);
 
+  const handleFormSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    checkAndSubmitTokenValue?.();
+  }, [checkAndSubmitTokenValue]);
+
   const handleSaveShortcut = React.useCallback(
     (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey) {
@@ -640,7 +643,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
   };
 
   return (
-    <form onSubmit={checkAndSubmitTokenValue}>
+    <form onSubmit={handleFormSubmit}>
       <Stack gap={3} direction="column" justify="start">
         <Input
           required
