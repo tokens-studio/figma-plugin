@@ -510,7 +510,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
 
   const handleFormSubmit = React.useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    checkAndSubmitTokenValue?.();
+    checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
   const handleSaveShortcut = React.useCallback(
