@@ -430,11 +430,6 @@ export default function useTokens() {
       effectStyles: settings.stylesEffect,
     });
 
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_CREATE_STYLES,
-      isInfinite: true,
-    });
-
     const selectedSets = themes.reduce((acc, curr) => {
       if (selectedThemes.includes(curr.id)) {
         acc = {
@@ -453,6 +448,11 @@ export default function useTokens() {
       notifyToUI('No styles created. Make sure themes are active.', { error: true });
       return;
     }
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
+    });
 
     const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
 
