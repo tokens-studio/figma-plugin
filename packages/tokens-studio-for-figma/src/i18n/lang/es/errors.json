@@ -5,7 +5,7 @@
   "readHow": "Lea cómo",
   "tokenNamesMustBeUnique": "Los nombres de los tokens deben ser únicos",
   "mustNotUseNameOfAnotherGroup": "No debe usar el nombre de otro grupo",
-  "tokensCantShareNameWithGroup": "Los tokens no pueden compartir el nombre con un grupo",
+  "cantCreateGroupThatSharesNameWithExistingToken": "No se puede crear un grupo que comparta un nombre con un token existente",
   "valueMustIncludePxOrRem": "El valor debe incluir px o rem",
   "tokenNamesCantStartWithDollar": "No puedo comenzar con un signo de dólar ($)",
   "tokenNamesCantContainCurlyBraces": "No puede contener llaves '{}'"

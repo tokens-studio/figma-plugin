@@ -5,7 +5,7 @@
   "readHow": "पढ़ें कैसे",
   "tokenNamesMustBeUnique": "टोकन नाम अद्वितीय होने चाहिए",
   "mustNotUseNameOfAnotherGroup": "किसी अन्य समूह के नाम का उपयोग नहीं करना चाहिए",
-  "tokensCantShareNameWithGroup": "टोकन किसी समूह के साथ नाम साझा नहीं कर सकते",
+  "cantCreateGroupThatSharesNameWithExistingToken": "ऐसा समूह नहीं बनाया जा सकता जो किसी मौजूदा टोकन के साथ नाम साझा करता हो",
   "valueMustIncludePxOrRem": "मान में या तो px या rem शामिल होना चाहिए",
   "tokenNamesCantStartWithDollar": "डॉलर ($) चिह्न से प्रारंभ नहीं किया जा सकता",
   "tokenNamesCantContainCurlyBraces": "ब्रेसिज़ शामिल नहीं हो सकते '{}'"
