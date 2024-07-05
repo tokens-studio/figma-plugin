@@ -138,6 +138,11 @@ const StyledPrefix = styled('div', {
         minWidth: '60px',
       },
     },
+    isComposition: {
+      true: {
+        padding: '0'
+      }
+    }
   },
 });
 

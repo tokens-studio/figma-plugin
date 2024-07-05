@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Sentry from '@sentry/react';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Checkbox } from '@tokens-studio/ui';
 import Box from '../Box';
 import Accordion from '../Accordion';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -11,7 +11,6 @@ import { isWaitingForBackgroundJobSelector, themeByIdSelector, tokensSelector } 
 import { Dispatch, RootState } from '@/app/store';
 import Stack from '../Stack';
 import { Count } from '../Count';
-import Checkbox from '../Checkbox';
 import Label from '../Label';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
