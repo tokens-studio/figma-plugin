@@ -32,6 +32,7 @@ export type ConfirmProps = {
     type: 'text';
     placeholder: string;
   };
+  formId?: string;
 };
 
 export type AddJobTasksPayload = {
@@ -175,6 +176,7 @@ export const uiState = createModel<RootModel>()({
           type: 'text';
           placeholder: string;
         };
+        formId?: string;
       },
     ) => ({
       ...state,
@@ -187,6 +189,7 @@ export const uiState = createModel<RootModel>()({
         cancelAction: data.cancelAction || defaultConfirmState.cancelAction,
         input: data.input,
         variant: data.variant,
+        formId: data.formId,
       },
     }),
     setSelectedLayers: (state, data: number) => ({

@@ -25,6 +25,7 @@ import {
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
+import getColorSwatchStyle from '@/utils/color/getColorSwatchStyle';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 
@@ -41,6 +42,7 @@ interface DownShiftProps {
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
   externalFontFamily?: string;
+  isComposition?: boolean;
   setInputValue(value: string): void;
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
@@ -58,6 +60,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
   prefix,
   suffix,
   placeholder,
+  isComposition,
   setInputValue,
   resolvedTokens,
   externalFontFamily,
@@ -197,7 +200,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
             {!!inlineLabel && !prefix && (
               <Tooltip label={name}><StyledPrefix isText css={{ height: 'auto' }}>{label}</StyledPrefix></Tooltip>
             )}
-            {!!prefix && <StyledPrefix css={{ height: 'auto' }}>{prefix}</StyledPrefix>}
+            {!!prefix && <StyledPrefix isComposition={isComposition} css={{ height: 'auto' }}>{prefix}</StyledPrefix>}
             <MentionsInput
               name={name}
               type={type}
@@ -294,7 +297,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
                               >
                                 {type === 'color' && (
                                 <StyledItemColorDiv>
-                                  <StyledItemColor style={{ backgroundColor: token.value.toString() }} />
+                                  <StyledItemColor style={getColorSwatchStyle(token.value.toString())} />
                                 </StyledItemColorDiv>
                                 )}
                                 <StyledItemName truncate>
