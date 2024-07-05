@@ -431,6 +431,7 @@ export default function useTokens() {
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: tokensToCreate,
       settings,
+      selectedThemes
     }));
 
     dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);

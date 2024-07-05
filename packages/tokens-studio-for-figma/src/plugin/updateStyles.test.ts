@@ -100,7 +100,7 @@ describe('updateStyles', () => {
     await updateStyles([...colorTokens], {
       prefixStylesWithThemeName: true,
       stylesColor: true,
-    } as SettingsState, false);
+    } as SettingsState, false, ['light']);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,
