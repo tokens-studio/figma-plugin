@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { CheckedState } from '@radix-ui/react-checkbox';
 import { useTranslation } from 'react-i18next';
 import {
   Box, Link, Text, Button, Heading, Label, Stack, Switch,
@@ -22,6 +21,9 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import { useFlags } from '../LaunchDarkly';
 import { ExplainerModal } from '../ExplainerModal';
+
+// TODO: expose types from @tokens-studio/ui/checkbox
+type CheckedState = boolean | 'indeterminate';
 
 function Settings() {
   const { t } = useTranslation(['settings']);

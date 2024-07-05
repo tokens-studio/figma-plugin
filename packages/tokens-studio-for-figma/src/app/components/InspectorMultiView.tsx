@@ -113,7 +113,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
         }}
         >
           <Box css={{
-            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small', flexBasis: '80px',
+            display: 'flex', alignItems: 'center', gap: '$3', fontSize: '$small', flexBasis: '80px', flexShrink: 0,
           }}
           >
             <Checkbox

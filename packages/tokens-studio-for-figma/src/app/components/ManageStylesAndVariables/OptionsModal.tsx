@@ -8,7 +8,6 @@ import {
   ChevronLeftIcon,
 } from '@primer/octicons-react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { CheckedState } from '@radix-ui/react-checkbox';
 import { Modal } from '../Modal/Modal';
 import { LabelledCheckbox } from './LabelledCheckbox';
 import { ExplainerModal } from '../ExplainerModal';
@@ -33,6 +32,9 @@ import { Dispatch } from '../../store';
 const StyledCheckboxGrid = styled(Box, {
   display: 'grid', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center',
 });
+
+// TODO: expose types from @tokens-studio/ui/checkbox
+type CheckedState = boolean | 'indeterminate';
 
 export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: boolean, title: string, closeAction: () => void }) {
   const rulesRemoveStylesAndVariablesWithoutConnection = useSelector(removeStylesAndVariablesWithoutConnectionSelector);
