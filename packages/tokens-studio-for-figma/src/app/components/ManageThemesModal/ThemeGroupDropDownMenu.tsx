@@ -44,7 +44,7 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
       <DropdownMenu.Trigger asChild>
         {
           selectedGroup ? (
-            <Button variant="secondary" asDropdown>
+            <Button variant="secondary" asDropdown size="small">
               <span>{selectedGroup}</span>
             </Button>
           ) : (
@@ -54,10 +54,9 @@ export const ThemeGroupDropDownMenu: React.FC<React.PropsWithChildren<React.Prop
                 variant="secondary"
                 icon={<IconPlus />}
                 size="small"
-                css={{ display: 'flex', alignItems: 'center', height: '28px' }}
                 asDropdown
               >
-                Add&nbsp;group
+                {t('addGroup')}
               </Button>
             </Box>
           )

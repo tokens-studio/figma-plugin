@@ -17,6 +17,7 @@ import './mentions.css';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import getResolvedTextValue from '@/utils/getResolvedTextValue';
+import getColorSwatchStyle from '@/utils/color/getColorSwatchStyle';
 
 // Constants
 import { Properties } from '@/constants/Properties';
@@ -134,7 +135,7 @@ export default function MentionsInput({
           )}
         >
           <StyledItem className="dropdown-item">
-            {type === 'color' && <StyledItemColorDiv><StyledItemColor style={{ backgroundColor: resolvedToken?.value.toString() }} /></StyledItemColorDiv>}
+            {type === 'color' && <StyledItemColorDiv><StyledItemColor style={resolvedToken?.value ? getColorSwatchStyle(resolvedToken?.value.toString()) : {}} /></StyledItemColorDiv>}
             <StyledItemName truncate>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
             {resolvedToken && <StyledItemValue truncate>{getResolvedTextValue(resolvedToken)}</StyledItemValue>}
           </StyledItem>
@@ -155,7 +156,6 @@ export default function MentionsInput({
       value={value}
       placeholder={placeholder}
       prefix={['{']}
-      split=""
       placement="bottom"
       autoFocus={autoFocus}
       onChange={handleMentionInputChange}

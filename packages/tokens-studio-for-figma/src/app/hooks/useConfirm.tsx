@@ -26,6 +26,7 @@ function useConfirm<C = any>() {
       choices,
       input,
       variant,
+      formId,
     } = opts;
 
     dispatch.uiState.setShowConfirm({
@@ -36,6 +37,7 @@ function useConfirm<C = any>() {
       text: text ?? '',
       choices: choices ?? [],
       variant,
+      formId,
     });
 
     return new Promise<ResolveCallbackPayload<C>>((res) => {

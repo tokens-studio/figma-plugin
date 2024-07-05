@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Heading } from '@tokens-studio/ui';
+import { Button, Heading, Checkbox } from '@tokens-studio/ui';
+import { useTranslation } from 'react-i18next';
 import Box from '../Box';
 import Accordion from '../Accordion';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -9,7 +10,6 @@ import { RootState } from '@/app/store';
 import { StyleInfo, ThemeStyleManagementCategoryStyleEntry } from './ThemeStyleManagementCategoryStyleEntry';
 import Stack from '../Stack';
 import { Count } from '../Count';
-import Checkbox from '../Checkbox';
 import Label from '../Label';
 
 type Props = {
@@ -33,6 +33,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
     isWaitingForBackgroundJobSelector(state, BackgroundJobs.UI_ATTACHING_LOCAL_STYLES)
   ), []));
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const { t } = useTranslation(['tokens', 'errors']);
 
   const stylesEntries = useMemo(() => Object.entries(styles), [styles]);
 
@@ -74,7 +75,7 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
           disabled={isAttachingLocalStyles}
           onClick={onAttachLocalStyles}
         >
-          Attach local styles
+          {t('attachLocalStyles')}
         </Button>
       )}
       isOpenByDefault={false}
@@ -100,12 +101,12 @@ export const ThemeStyleManagementCategory: React.FC<React.PropsWithChildren<Reac
                 onCheckedChange={handleSelectAll}
               />
               <Label htmlFor="detachSelected" css={{ fontSize: '$small', fontWeight: '$sansBold' }}>
-                Select all
+                {t('selectAll')}
               </Label>
             </Stack>
             <Stack gap={1}>
               <Button onClick={handleDisconnectSelectedStyles} disabled={selectedStyles.length === 0} variant="danger" size="small">
-                Detach selected
+                {t('detachSelected')}
               </Button>
             </Stack>
           </Stack>
