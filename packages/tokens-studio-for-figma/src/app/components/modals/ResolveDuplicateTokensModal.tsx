@@ -101,7 +101,7 @@ export default function ResolveDuplicateTokensModal({
               {t('cancel')}
             </Button>
             <Button type="submit" variant="primary" disabled={!canResolve}>
-              Resolve Duplicates
+              {t('resolveDuplicateTokensModal.submit')}
             </Button>
           </Stack>
         </form>
