@@ -376,11 +376,6 @@ export default function useTokens() {
       effectStyles: settings.stylesEffect,
     });
 
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_CREATE_STYLES,
-      isInfinite: true,
-    });
-
     const enabledTokenSets = selectedSets
       .filter((set) => set.status === TokenSetStatus.ENABLED)
       .map((tokenSet) => tokenSet.set);
@@ -389,6 +384,11 @@ export default function useTokens() {
       notifyToUI('No styles created. Make sure token sets are active.', { error: true });
       return;
     }
+
+    dispatch.uiState.startJob({
+      name: BackgroundJobs.UI_CREATE_STYLES,
+      isInfinite: true,
+    });
 
     const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
 
