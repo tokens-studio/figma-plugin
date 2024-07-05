@@ -81,8 +81,8 @@ export default function SingleCompositionTokenForm({
         value={property || t('chooseAProperty')}
         size="small"
         css={{
-          borderTopRightRadius: '$0',
-          borderBottomRightRadius: '$0',
+          borderTopRightRadius: '0',
+          borderBottomRightRadius: '0',
           height: 'auto',
           alignSelf: 'stretch',
           width: '150px',
