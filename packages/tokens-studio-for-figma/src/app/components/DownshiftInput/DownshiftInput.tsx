@@ -42,6 +42,7 @@ interface DownShiftProps {
   suffix?: boolean;
   resolvedTokens: ResolveTokenValuesResult[];
   externalFontFamily?: string;
+  isComposition?: boolean;
   setInputValue(value: string): void;
   handleChange: (property: string, value: string) => void;
   handleBlur?: () => void;
@@ -59,6 +60,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
   prefix,
   suffix,
   placeholder,
+  isComposition,
   setInputValue,
   resolvedTokens,
   externalFontFamily,
@@ -198,7 +200,7 @@ export const DownshiftInput: React.FunctionComponent<React.PropsWithChildren<Rea
             {!!inlineLabel && !prefix && (
               <Tooltip label={name}><StyledPrefix isText css={{ height: 'auto' }}>{label}</StyledPrefix></Tooltip>
             )}
-            {!!prefix && <StyledPrefix css={{ height: 'auto' }}>{prefix}</StyledPrefix>}
+            {!!prefix && <StyledPrefix isComposition={isComposition} css={{ height: 'auto' }}>{prefix}</StyledPrefix>}
             <MentionsInput
               name={name}
               type={type}
