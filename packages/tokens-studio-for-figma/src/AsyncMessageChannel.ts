@@ -145,6 +145,6 @@ class AsyncMessageChannel {
   }
 }
 
-const ExportedAsyncMessageChannel = process.env.PREVIEW_ENV ? AsyncMessageChannelPreview : AsyncMessageChannel;
+const ExportedAsyncMessageChannel = !process.env.PREVIEW_ENV ? AsyncMessageChannel : AsyncMessageChannelPreview;
 
 export { ExportedAsyncMessageChannel as AsyncMessageChannel };

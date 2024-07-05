@@ -1,4 +1,5 @@
 import { AsyncMessageChannel } from './AsyncMessageChannel';
+import { AsyncMessageChannelPreview } from './AsyncMessageChannelPreview';
 import { INTERNAL_THEMES_NO_GROUP } from './constants/InternalTokenGroup';
 import {
   AsyncMessageTypes, GetThemeInfoMessageResult,
@@ -6,7 +7,7 @@ import {
 
 describe('Testing the mock functionality of the AsyncMessageChannel', () => {
   it('should be able to communicate between UI and plugin', async () => {
-    const runAfter: (() => void)[] = [];
+    const runAfter: ((() => void) | null)[] = [];
 
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
@@ -31,11 +32,11 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    runAfter.forEach((fn) => fn());
+    runAfter.forEach((fn) => fn?.());
   });
 
   it('should be able to communicate between plugin and UI', async () => {
-    const runAfter: (() => void)[] = [];
+    const runAfter: ((() => void) | null)[] = [];
 
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
       type: AsyncMessageTypes.GET_THEME_INFO,
@@ -60,11 +61,11 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
       themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
     });
 
-    runAfter.forEach((fn) => fn());
+    runAfter.forEach((fn) => fn?.());
   });
 
   it('should handle errors', async () => {
-    const runAfter: (() => void)[] = [];
+    const runAfter: ((() => void) | null)[] = [];
 
     const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => {
       throw new Error('error');
@@ -78,6 +79,34 @@ describe('Testing the mock functionality of the AsyncMessageChannel', () => {
       type: AsyncMessageTypes.GET_THEME_INFO,
     })).rejects.toEqual(new Error('error'));
 
-    runAfter.forEach((fn) => fn());
+    runAfter.forEach((fn) => fn?.());
+  });
+  it('should handle browser preview communication between UI and plugin', async () => {
+    const runAfter: ((() => void) | null)[] = [];
+
+    const getThemeInfoHandler = async (): Promise<GetThemeInfoMessageResult> => ({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
+      themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
+    });
+
+    runAfter.push(AsyncMessageChannelPreview.PluginInstance.connect());
+    AsyncMessageChannelPreview.PluginInstance.handle(AsyncMessageTypes.GET_THEME_INFO, getThemeInfoHandler);
+
+    runAfter.push(AsyncMessageChannelPreview.ReactInstance.connect());
+    const result = await AsyncMessageChannelPreview.ReactInstance.message({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+    });
+    expect(result).toEqual({
+      type: AsyncMessageTypes.GET_THEME_INFO,
+      activeTheme: {
+        [INTERNAL_THEMES_NO_GROUP]: 'light',
+      },
+      themes: [{ id: 'light', name: 'Light', selectedTokenSets: {} }],
+    });
+
+    runAfter.forEach((fn) => fn?.());
   });
 });
