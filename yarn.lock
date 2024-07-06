@@ -6089,10 +6089,10 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.7.tgz#75d3f00c129b523bd62943c17b29d0749e1ebf48"
-  integrity sha512-TuG9WF1mNvDrxg4uAcw9lxQdkhq+6X0XnXGKz+zXvEhnE/HH4D5nmXZvSkxdguv01lUEy/go2+ennE3DZ2yiDw==
+"@tokens-studio/tokens@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.8.tgz#54701a5aff1c4453b3c7b18dbd2a1d16067751ee"
+  integrity sha512-NqBMhhMn0pfwJTmGBny56hpkb01fM3VDoAWILyJ3+9rMeja84c7mKAvjqQdLEDwf69kugXechRHNwwen6o2SrA==
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
