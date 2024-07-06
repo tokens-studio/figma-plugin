@@ -78,7 +78,7 @@ export default function TokensStudioForm({
         <Stack direction="column" gap={3}>
           <Heading size="large">A dedicated design tokens management platform</Heading>
           <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
-          <Link href="https://tokens.studio/studio" target="_blank" rel="norefferer">Learn more</Link>
+          <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">Learn more</Link>
         </Stack>
         <Button onClick={handleDismissTeaser}>Already got access?</Button>
       </Stack>
