@@ -430,59 +430,52 @@ export default function useTokens() {
       effectStyles: settings.stylesEffect,
     });
 
-    const selectedSets = themes.reduce((acc, curr) => {
-      if (selectedThemes.includes(curr.id)) {
-        acc = {
-          ...acc,
-          ...curr.selectedTokenSets,
-        };
-      }
-      return acc;
-    }, {});
-
-    const enabledTokenSets = Object.keys(selectedSets)
-      .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-      .map((tokenSet) => tokenSet);
-
-    if (enabledTokenSets.length === 0) {
-      notifyToUI('No styles created. Make sure themes are active.', { error: true });
-      return;
-    }
-
     dispatch.uiState.startJob({
       name: BackgroundJobs.UI_CREATE_STYLES,
       isInfinite: true,
     });
 
-    const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
+    for (const themeId of selectedThemes) {
+      const selectedSets = themes.find((theme) => theme.id === themeId)?.selectedTokenSets || {};
 
-    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
-    const withoutSourceTokens = resolved.filter((token) => (
-      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-    ));
-
-    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-      const shouldCreate = [
-        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && curr.type === TokenTypes.COLOR,
-        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled);
-      if (shouldCreate) {
-        if (!acc.find((token) => curr.name === token.name && curr.internal__Parent === token.internal__Parent)) {
-          acc.push(curr);
-        }
+      const enabledTokenSets = Object.keys(selectedSets)
+        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+        .map((tokenSet) => tokenSet);
+  
+      if (enabledTokenSets.length === 0) {
+        notifyToUI('No styles created. Make sure themes are active.', { error: true });
+        return;
       }
-      return acc;
-    }, []);
-
-    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_STYLES,
-      tokens: tokensToCreate,
-      settings,
-      selectedThemes
-    }));
-
-    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+  
+      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
+  
+      const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+      const withoutSourceTokens = resolved.filter((token) => (
+        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
+      ));
+  
+      const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+        const shouldCreate = [
+          settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+          settings.stylesColor && curr.type === TokenTypes.COLOR,
+          settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+        ].some((isEnabled) => isEnabled);
+        if (shouldCreate) {
+          if (!acc.find((token) => curr.name === token.name && curr.internal__Parent === token.internal__Parent)) {
+            acc.push(curr);
+          }
+        }
+        return acc;
+      }, []);
+  
+      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREATE_STYLES,
+        tokens: tokensToCreate,
+        settings,
+        selectedThemes: [themeId]
+      }));
+      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
+    }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
   }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
 
