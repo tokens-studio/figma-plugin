@@ -98,6 +98,11 @@ export type SupernovaStorageType = GenericStorageType<StorageProviderType.SUPERN
   mapping: string; // Mapping configuration
 }>;
 
+export type WebSocketStorageType = GenericStorageType<StorageProviderType.WEB_SOCKET, {
+  id: string;
+  name: string;
+}>;
+
 export enum GenericVersionedStorageFlow {
   READ_WRITE_CREATE = 'Read/Write/Create',
   READ_WRITE = 'Read/Write',
@@ -120,7 +125,8 @@ export type StorageType =
   | ADOStorageType
   | BitbucketStorageType
   | SupernovaStorageType
-  | TokensStudioStorageType;
+  | TokensStudioStorageType
+  | WebSocketStorageType;
 
 export type StorageTypeCredentials =
   | StorageTypeCredential<URLStorageType>
@@ -131,7 +137,8 @@ export type StorageTypeCredentials =
   | StorageTypeCredential<BitbucketStorageType>
   | StorageTypeCredential<ADOStorageType>
   | StorageTypeCredential<SupernovaStorageType>
-  | StorageTypeCredential<TokensStudioStorageType>;
+  | StorageTypeCredential<TokensStudioStorageType>
+  | StorageTypeCredential<WebSocketStorageType>;
 
 export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.URL } & OptionalPartial<
@@ -169,6 +176,10 @@ export type StorageTypeFormValues<Incomplete extends boolean = false> =
   | ({ new?: boolean; provider: StorageProviderType.TOKENS_STUDIO } & OptionalPartial<
   Incomplete,
   Omit<StorageTypeCredential<TokensStudioStorageType>, 'provider'>
+  >)
+  | ({ new?: boolean; provider: StorageProviderType.WEB_SOCKET } & OptionalPartial<
+  Incomplete,
+  Omit<StorageTypeCredential<WebSocketStorageType>, 'provider'>
   >)
   | { new?: boolean; provider: StorageProviderType.LOCAL };
 export { StorageProviderType };

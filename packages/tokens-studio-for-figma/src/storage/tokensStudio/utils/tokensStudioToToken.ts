@@ -65,7 +65,7 @@ export const tokensStudioToToken = (raw: RawToken) => {
   } else if (raw.value.boxShadow) {
     // @ts-ignore
     combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
-  } else if (raw.type === TokenType.composition) {
+  } else if (raw.type === 'composition') {
     combined.value = raw.value?.value && JSON.parse(raw.value.value);
   } else if (raw.value?.value) {
     combined.value = parseValue(raw.value.value);

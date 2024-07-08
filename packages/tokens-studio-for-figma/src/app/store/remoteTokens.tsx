@@ -31,6 +31,7 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { useWebSocket } from './providers/websocket';
 
 export type PushOverrides = { branch: string, commitMessage: string };
 
@@ -98,6 +99,7 @@ export default function useRemoteTokens() {
     createADOBranch,
     fetchADOBranches,
   } = useADO();
+  const { tokens: webSocketTokens, connect: connectWebSocket, addNewWebSocketCredentials } = useWebSocket();
   const { pullTokensFromURL } = useURL();
   const { readTokensFromFileOrDirectory } = useFile();
 
@@ -143,6 +145,10 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           remoteData = await pullTokensFromTokensStudio(context);
+          break;
+        }
+        case StorageProviderType.WEB_SOCKET: {
+          await connectWebSocket(context);
           break;
         }
         default:
@@ -352,6 +358,10 @@ export default function useRemoteTokens() {
           pushResult = await pushTokensToTokensStudio(context);
           break;
         }
+        case StorageProviderType.WEB_SOCKET: {
+          // TODO: implement
+          break;
+        }
         default:
           throw new Error('Not implemented');
       }
@@ -432,6 +442,10 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           content = await addNewTokensStudioCredentials(credentials);
+          break;
+        }
+        case StorageProviderType.WEB_SOCKET: {
+          content = await addNewWebSocketCredentials(credentials);
           break;
         }
         default:

@@ -67,6 +67,11 @@
       "name": "Name",
       "apikey": "API key",
       "urn": "Connection URN"
+    },
+    "websocket": {
+      "name": "Name",
+      "address": "Address",
+      "secret": "Secret"
     }
   },
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@tokens-studio/ui';
 import GitForm from './StorageItemForm/GitForm';
 import ADOForm from './StorageItemForm/ADOForm';
 import JSONBinForm from './StorageItemForm/JSONBinForm';
@@ -11,6 +12,7 @@ import { StorageTypeFormValues } from '@/types/StorageType';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import SupernovaForm from './StorageItemForm/SupernovaForm';
 import TokensStudioForm from './StorageItemForm/TokensStudioForm';
+import WebSocketForm from './StorageItemForm/WebSocketForm';
 
 type Props = {
   values: StorageTypeFormValues<true>;
@@ -116,6 +118,18 @@ export default function StorageItemForm({
     case StorageProviderType.TOKENS_STUDIO: {
       return (
         <TokensStudioForm
+          onChange={onChange}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          values={values}
+          hasErrored={hasErrored}
+          errorMessage={errorMessage}
+        />
+      );
+    }
+    case StorageProviderType.WEB_SOCKET: {
+      return (
+        <WebSocketForm
           onChange={onChange}
           onSubmit={onSubmit}
           onCancel={onCancel}

@@ -62,6 +62,11 @@ const SyncSettings = () => {
       type: StorageProviderType.TOKENS_STUDIO,
       beta: true,
     },
+    {
+      text: 'WebSocket',
+      type: StorageProviderType.WEB_SOCKET,
+      beta: true,
+    },
   ], [t]);
 
   const apiProviders = useSelector(apiProvidersSelector);

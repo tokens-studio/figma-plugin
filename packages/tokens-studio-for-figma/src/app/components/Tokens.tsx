@@ -3,7 +3,9 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, IconButton, Label } from '@tokens-studio/ui';
+import {
+  ToggleGroup, IconButton, Label, Stack,
+} from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -20,7 +22,7 @@ import useTokens from '../store/useTokens';
 import AttentionIcon from '@/icons/attention.svg';
 import { TokensContext } from '@/context';
 import {
-  activeTokenSetSelector, aliasBaseFontSizeSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
+  activeTokenSetSelector, aliasBaseFontSizeSelector, apiProvidersSelector, manageThemesModalOpenSelector, scrollPositionSetSelector, showEditFormSelector, tokenFilterSelector, tokensSelector, tokenTypeSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
@@ -32,6 +34,8 @@ import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { IconJson } from '@/icons';
+import { StorageProviderType } from '@/constants/StorageProviderType';
+import { WebSocket } from './WebSocket';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -94,6 +98,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const scrollPositionSet = useSelector(scrollPositionSetSelector);
   const tokenFilter = useSelector(tokenFilterSelector);
   const aliasBaseFontSize = useSelector(aliasBaseFontSizeSelector);
+  const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
@@ -196,6 +201,12 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [dispatch, scrollPositionSet]);
 
   if (!isActive) return null;
+
+  const isWebSocket = apiProviders.some((provider) => provider.provider === StorageProviderType.WEB_SOCKET);
+
+  if (isWebSocket) {
+    return <WebSocket />;
+  }
 
   return (
     <TokensContext.Provider value={tokensContextValue}>

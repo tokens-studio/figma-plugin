@@ -9,4 +9,5 @@ export enum StorageProviderType {
   URL = 'url',
   BITBUCKET = 'bitbucket',
   TOKENS_STUDIO = 'tokensstudio',
+  WEB_SOCKET = 'websocket',
 }
