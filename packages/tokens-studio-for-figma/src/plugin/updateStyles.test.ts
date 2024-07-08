@@ -66,6 +66,55 @@ describe('updateStyles', () => {
     expect(effectSpy).not.toHaveBeenCalled();
   });
 
+  it('returns if no text values are given', async () => {
+    await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: [{
+        name: 'primary.500',
+        path: 'light/primary/500',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        styleId: '1234',
+        internal__Parent: 'global',
+      }],
+      settings: {} as SettingsState,
+    });
+    expect(colorSpy).toHaveBeenCalled();
+    expect(textSpy).not.toHaveBeenCalled();
+    expect(effectSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns if no effect values are given', async () => {
+    await AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREATE_STYLES,
+      tokens: [
+        {
+          name: 'primary.500',
+          path: 'light/primary/500',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          styleId: '1234',
+          internal__Parent: 'global',
+        },
+        {
+          name: 'heading.h1',
+          path: 'heading/h1',
+          value: {
+            fontFamily: 'Inter',
+            fontWeight: 'Regular',
+            fontSize: '24',
+          },
+          type: TokenTypes.TYPOGRAPHY,
+          styleId: '',
+        }
+      ],
+      settings: {} as SettingsState
+    });
+    expect(colorSpy).toHaveBeenCalled();
+    expect(textSpy).toHaveBeenCalled();
+    expect(effectSpy).not.toHaveBeenCalled();
+  });
+
   it('calls update functions with correct tokens and theme prefix', async () => {
     const colorTokens = [
       {
