@@ -111,8 +111,6 @@ export default function TokensBottomBar({ handleError }: Props) {
               <StylesDropdown />
             </Stack>
             <Stack direction="row" gap={1}>
-              <ApplySelector />
-              <SettingsDropdown />
               {hasDuplicates && (
                 <IconButton
                   onClick={handleResolveDuplicateOpen}
@@ -121,8 +119,11 @@ export default function TokensBottomBar({ handleError }: Props) {
                   variant="invisible"
                   size="small"
                   tooltip="Duplicate Tokens Found"
+                  css={{ outline: '1px solid $dangerFg', color: '$dangerFg', marginRight: '$2' }}
                 />
               )}
+              <ApplySelector />
+              <SettingsDropdown />
             </Stack>
           </Stack>
         )}
