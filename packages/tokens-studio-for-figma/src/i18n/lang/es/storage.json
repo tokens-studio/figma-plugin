@@ -27,17 +27,22 @@
       "readWriteCreate": "Leer / Escribir / Crear",
       "additionalHeaders": "Encabezados adicionales",
       "name": "Nombre",
-      "value": "Valor"
+      "value": "Valor",
+      "readMore": "Lea la guía de sincronización de la versión genérica."
     },
     "url": {
       "title": "URL",
       "description": "Los tokens almacenados en un servidor le permiten agregarlos como proveedor de solo lectura.",
       "url": "URL",
-      "headers": "Encabezados"
+      "headers": "Encabezados",
+      "readMore": "Lea la guía de sincronización de URL."
     },
     "jsonbin": {
       "title": "JSONBIN",
-      "description": "Acceda a tokens almacenados en JSONBin.io, un servicio de almacenamiento JSON gratuito para sincronización bidireccional."
+      "description": "Acceda a tokens almacenados en JSONBin.io, un servicio de almacenamiento JSON gratuito para sincronización bidireccional.",
+      "readMore": "Lea la guía de sincronización de JSONBin.",
+      "apiKey": "Clave API",
+      "idHelp": "Si está vacío, Tokens Studio creará un nuevo contenedor para usted."
     },
     "github": {
       "title": "GitHub"
@@ -48,14 +53,16 @@
     "supernova": {
       "accessToken": "Token de acceso a supernova",
       "dsUrl": "URL del sistema de diseño",
-      "description": "Le permite insertar tokens en una marca y un tema específicos en un sistema de diseño seleccionado."
+      "description": "Le permite insertar tokens en una marca y un tema específicos en un sistema de diseño seleccionado.",
+      "readMore": "Lea la guía de sincronización de Supernova."
     },
     "ado": {
       "description": "Acceda a los tokens almacenados en su repositorio, envíe y extraiga tokens en una sincronización bidireccional.",
       "pat": "Token de acceso personal",
       "orgUrl": "URL de la organización",
       "repositoryName": "Nombre del repositorio",
-      "projectName": "Nombre del proyecto (opcional)"
+      "projectName": "Nombre del proyecto (opcional)",
+      "readMore": "Lea la guía de sincronización de Azure DevOps."
     },
     "bitbucket": {
       "appPassword": "Contraseña de la aplicación",
@@ -66,7 +73,13 @@
     "tokensstudio": {
       "name": "Name",
       "apikey": "API key",
-      "urn": "Connection URN"
+      "urn": "Connection URN",
+      "descriptionFirstPart": "Tokens Studio tiene una plataforma web independiente para la creación y gestión dinámica de decisiones de diseño, ¡actualmente en Beta!",
+      "signupText": "Regístrese para acceder a la versión beta aquí.",
+      "descriptionSecondPart": "Si ya está utilizando la plataforma Studio y necesita ayuda para configurar la sincronización, lea el",
+      "tokensStudioSyncGuide": "Guía de sincronización de Tokens Studio aquí.",
+      "pat": "Token de acceso personal",
+      "id": "ID de conexión"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
@@ -88,5 +101,13 @@
   "converttow3c": "Convertir al formato W3C DTCG",
   "converttolegacy": "Convertir a formato heredado",
   "pushfirsterror": "Empuje sus cambios no guardados antes de realizar la conversión",
-  "readmoreformat": "Leer más"
+  "readmoreformat": "Leer más",
+  "gitLabExplained": "Conecte su repositorio de código Gitlab con Tokens Studio para almacenamiento remoto de tokens con control de versiones y sincronización bidireccional controlada dentro del complemento.",
+  "gitHubExplained": "Conecte su repositorio de código de GitHub con Tokens Studio para el almacenamiento remoto de tokens con control de versiones y sincronización bidireccional controlada dentro del complemento.",
+  "bitBucketExplained": "Conecte su repositorio de código de Bitbucket con Tokens Studio para el almacenamiento remoto de tokens con control de versiones y sincronización bidireccional controlada dentro del complemento.",
+  "nameHelpText": "Este apodo aparece en la página de configuración del complemento para ayudar a identificar este proveedor de sincronización en su lista.",
+  "readMoreBitBucket": "Lea la guía de sincronización de Bitbucket.",
+  "readMoreGitHub": "Lea la guía de sincronización de GitHub.",
+  "readMoreGitLab": "Lea la guía de sincronización de GitLab.",
+  "baseUrlHelpText": "Agregue si su organización ejecuta un servidor empresarial"
 }
