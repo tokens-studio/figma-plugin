@@ -32,6 +32,7 @@ export default function TokensStudioForm({
   onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
 }: Props) {
   const { t } = useTranslation(['storage']);
+  const syncGuideUrl = 'tokens-studio';
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
 
@@ -98,7 +99,7 @@ export default function TokensStudioForm({
         <Text muted css={{ marginTop: '$2' }}>
           {t('providers.tokensstudio.descriptionSecondPart')}
           <Link
-            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            href={`https://docs.tokens.studio/sync/${syncGuideUrl}?ref=addprovider`}
             target="_blank"
             rel="noreferrer"
           >
