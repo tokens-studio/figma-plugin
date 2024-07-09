@@ -31,7 +31,7 @@ export default function CreateStorageItemModal({
       github: 'GitHub',
       gitlab: 'GitLab',
       ado: 'Azure DevOps',
-      bitbucket: 'BitBucket',
+      bitbucket: 'Bitbucket',
       supernova: 'Supernova',
       genericVersionedStorage: 'Generic Versioned Storage',
       tokensstudio: 'Tokens Studio',

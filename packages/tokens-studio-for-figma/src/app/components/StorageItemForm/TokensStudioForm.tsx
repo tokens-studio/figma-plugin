@@ -85,9 +85,25 @@ export default function TokensStudioForm({
     ):(
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>{t('providers.tokensstudio.descriptionFirstPart')}</Text>
+      <Text muted>
+          {t('providers.tokensstudio.descriptionFirstPart')}{' '}
+          <Link
+            href="https://q2gsw2tok1e.typeform.com/to/pJCwLVh2?typeform-source=tokens.studio"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('providers.tokensstudio.signupText')}
+          </Link>
+        </Text>
         <Text muted css={{ marginTop: '$2' }}>
           {t('providers.tokensstudio.descriptionSecondPart')}
+          <Link
+            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('providers.tokensstudio.tokensStudioSyncGuide')}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('providers.tokensstudio.name')}</Label>
