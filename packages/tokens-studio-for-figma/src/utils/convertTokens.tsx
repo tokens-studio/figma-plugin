@@ -92,6 +92,9 @@ function checkForTokens({
       returnValue.inheritTypeLevel = currentTypeLevel as number;
     } else {
       returnValue.type = token[TokenFormat.tokenTypeKey];
+      if (inheritType === token[TokenFormat.tokenTypeKey] && currentTypeLevel > 0) {
+        returnValue.inheritTypeLevel = currentTypeLevel as number;
+      }
     }
   } else if (
     isSingleTypographyToken(token)
