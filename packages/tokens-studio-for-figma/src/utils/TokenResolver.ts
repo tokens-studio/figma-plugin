@@ -113,8 +113,8 @@ class TokenResolver {
     // We use the name as the memo key, if it exists
     const memoKey = token.name || undefined;
 
-    // If we have a cache hit, we can return it, also need to check if the parent is the same, as we might have the same token name in different groups
-    if (memoKey && this.memo.has(memoKey) && token.internal__Parent === this.memo.get(memoKey)?.internal__Parent) {
+    // If we have a cache hit, we can return it
+    if (memoKey && this.memo.has(memoKey)) {
       const cacheResult = this.memo.get(memoKey);
       if (cacheResult) {
         return cacheResult;
