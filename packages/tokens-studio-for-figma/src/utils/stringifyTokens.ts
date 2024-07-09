@@ -36,6 +36,7 @@ export default function stringifyTokens(
         delete tokenInJSON.value;
         delete tokenInJSON.description;
       }
+      delete tokenInJSON.type;
       set(tokenObj, token.name, tokenInJSON, { merge: true });
     } else {
       const tokenInJSON: TokenInJSON = tokenWithoutName;
