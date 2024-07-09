@@ -228,12 +228,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             </Stack>
           </form>
         </Modal>
-        <Stack
-          direction="column"
-          css={{
-            padding: '$3', backgroundColor: '$bgDefault', position: 'sticky', bottom: 0, zIndex: 10,
-          }}
-        >
+        <Stack direction="column" css={{ padding: '$3' }}>
           <Button
             icon={<IconAdd />}
             size="small"

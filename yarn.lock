@@ -6089,10 +6089,10 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.6.tgz#48d9839627befc5b057ee9111463cbcb6fb58f92"
-  integrity sha512-/U1R4bWi957SvrMb+vWRez4uPFbezhzfa34Xu1LIojZzwa+rLeG/PNrABvL6tzX0vhx2MN5lwn2vKJQLRLZUEw==
+"@tokens-studio/tokens@0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.8.tgz#54701a5aff1c4453b3c7b18dbd2a1d16067751ee"
+  integrity sha512-NqBMhhMn0pfwJTmGBny56hpkb01fM3VDoAWILyJ3+9rMeja84c7mKAvjqQdLEDwf69kugXechRHNwwen6o2SrA==
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
@@ -6104,10 +6104,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
   integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
-"@tokens-studio/ui@0.6.8":
-  version "0.6.8"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.6.8.tgz#dea217d4461ac73c3b8b6edadabfb36226ad9e0b"
-  integrity sha512-K3yaHEDH/rohALVnPJwrW8yCbXp7osK0uxWHxlXBv2hTMKmrn0YOVMQEdv9DJrp2LMi2otkubQlAzgUY6sX+Ww==
+"@tokens-studio/ui@0.6.9":
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.6.9.tgz#5d889526a697e41b436363a11074b4c6df224965"
+  integrity sha512-3StYQeq8cpX+sGrf6qFMdzTydsPVJr263j7merFKo42Jtq8KqzlDFleeWIaF90BU0TMqBDx5yiynpLJq+jEdEQ==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -18614,9 +18614,9 @@ react-window@^1.8.8:
     memoize-one ">=3.1.1 <6"
 
 react@^18, react@^18.2.0:
-  version "18.2.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"
-  integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
+  version "18.3.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
+  integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
   dependencies:
     loose-envify "^1.1.0"
 
