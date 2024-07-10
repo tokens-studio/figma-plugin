@@ -204,13 +204,19 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
       values = { ...tokensInCompositionToken, ...objExcludedCompositionToken };
     }
   }
-  if (values && values.border && !values.borderColor) {
+  if (values && values.border && !values.borderColor && !values.borderWidth) {
     // if we have a border token we must convert the color variable out of it given how our resolution logic works
     const resolvedToken = tokens.get(values.border as string);
     if (resolvedToken && resolvedToken.resolvedValueWithReferences) {
-      if (typeof resolvedToken.resolvedValueWithReferences === 'object' && 'color' in resolvedToken.resolvedValueWithReferences) {
-        const borderColorTokenName = (resolvedToken.resolvedValueWithReferences.color as string).replace('{', '').replace('}', '');
-        values.borderColor = borderColorTokenName;
+      if (typeof resolvedToken.resolvedValueWithReferences === 'object') {
+        if ('color' in resolvedToken.resolvedValueWithReferences) {
+          const borderColorTokenName = (resolvedToken.resolvedValueWithReferences.color as string).replace('{', '').replace('}', '');
+          values.borderColor = borderColorTokenName;
+        }
+        if ('width' in resolvedToken.resolvedValueWithReferences) {
+          const borderWidthTokenName = (resolvedToken.resolvedValueWithReferences.width as string).replace('{', '').replace('}', '');
+          values.borderWidth = borderWidthTokenName;
+        }
       }
     }
     values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
