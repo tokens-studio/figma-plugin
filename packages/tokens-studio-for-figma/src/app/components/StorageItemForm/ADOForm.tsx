@@ -11,9 +11,9 @@ import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
-type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
+type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO }>;
 type Props = {
-  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.ADO; }>;
+  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.ADO }>;
   onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
@@ -31,28 +31,31 @@ export default function ADOForm({
     setIsMasked((prev) => !prev);
   }, []);
 
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const zodSchema = zod.object({
-      provider: zod.string(),
-      name: zod.string().optional(),
-      id: zod.string(),
-      branch: zod.string(),
-      filePath: zod.string(),
-      baseUrl: zod.string(),
-      secret: zod.string(),
-      internalId: zod.string().optional(),
-    });
-    const validationResult = zodSchema.safeParse(values);
-    if (validationResult.success) {
-      const formFields = {
-        ...validationResult.data,
-        internalId: validationResult.data.internalId || generateId(24),
-      } as ValidatedFormValues;
-      onSubmit(formFields);
-    }
-  }, [values, onSubmit]);
+      const zodSchema = zod.object({
+        provider: zod.string(),
+        name: zod.string().optional(),
+        id: zod.string(),
+        branch: zod.string(),
+        filePath: zod.string(),
+        baseUrl: zod.string(),
+        secret: zod.string(),
+        internalId: zod.string().optional(),
+      });
+      const validationResult = zodSchema.safeParse(values);
+      if (validationResult.success) {
+        const formFields = {
+          ...validationResult.data,
+          internalId: validationResult.data.internalId || generateId(24),
+        } as ValidatedFormValues;
+        onSubmit(formFields);
+      }
+    },
+    [values, onSubmit],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -60,14 +63,16 @@ export default function ADOForm({
         <Text muted>
           {t('providers.ado.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
+          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider" target="_blank" rel="noreferrer">
+            {t('providers.ado.readMore')}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="baseUrl">{t('providers.ado.orgUrl')}</Label>
           <TextInput
             autoFocus
             value={values.baseUrl || ''}
-            placeholder="https://dev.azure.com/yourOrgName"
+            placeholder="https://dev.azure.com/my_organization_name"
             onChange={onChange}
             type="text"
             name="baseUrl"
@@ -76,14 +81,23 @@ export default function ADOForm({
           />
         </FormField>
         <FormField>
+          <Label htmlFor="name">{t('providers.ado.projectName')}</Label>
+          <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
+        </FormField>
+        <FormField>
           <Label htmlFor="secret">{t('providers.ado.pat')}</Label>
           <TextInput
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
-            }
+            trailingAction={(
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
+            )}
             name="secret"
             id="secret"
             required
@@ -91,25 +105,11 @@ export default function ADOForm({
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.ado.repositoryName')}</Label>
-          <TextInput
-            value={values.id || ''}
-            onChange={onChange}
-            type="text"
-            name="id"
-            id="id"
-            required
-          />
+          <TextInput value={values.id || ''} onChange={onChange} type="text" name="id" id="id" required />
         </FormField>
         <FormField>
           <Label htmlFor="branch">{t('branch')}</Label>
-          <TextInput
-            name="branch"
-            id="branch"
-            value={values.branch || ''}
-            onChange={onChange}
-            type="text"
-            required
-          />
+          <TextInput name="branch" id="branch" value={values.branch || ''} onChange={onChange} type="text" required />
         </FormField>
         <FormField>
           <Label htmlFor="filePath">{t('filePath')}</Label>
@@ -121,18 +121,9 @@ export default function ADOForm({
             id="filePath"
             required
           />
+          <Text muted>{t('filePathCaption')}</Text>
         </FormField>
-        <FormField>
-          <Label htmlFor="name">{t('providers.ado.projectName')}</Label>
-          <TextInput
-            value={values.name || ''}
-            onChange={onChange}
-            type="text"
-            name="name"
-            id="name"
-            required
-          />
-        </FormField>
+
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
@@ -142,11 +133,7 @@ export default function ADOForm({
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-        <ErrorMessage data-testid="provider-modal-error">
-          {errorMessage}
-        </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );
