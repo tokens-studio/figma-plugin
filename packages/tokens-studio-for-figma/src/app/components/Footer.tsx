@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
