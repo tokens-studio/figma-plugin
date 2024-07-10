@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
@@ -73,7 +73,11 @@ export default function Footer() {
   }, [checkRemoteChange]);
 
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
-  const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
+  const onPullButtonClicked = React.useCallback(() => {
+    pullTokens({ usedTokenSet, activeTheme }).then(() => {
+      setHasRemoteChange(false);
+    });
+  }, [pullTokens, usedTokenSet, activeTheme]);
   const handlePullTokens = useCallback(() => {
     pullTokens({ usedTokenSet, activeTheme });
   }, [pullTokens, usedTokenSet, activeTheme]);
