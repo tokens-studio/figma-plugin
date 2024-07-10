@@ -5,7 +5,7 @@
   "readHow": "Lees hoe",
   "tokenNamesMustBeUnique": "Tokennamen moeten uniek zijn",
   "mustNotUseNameOfAnotherGroup": "Mag geen naam van een andere groep gebruiken",
-  "tokensCantShareNameWithGroup": "Tokens kunnen geen naam delen met een groep",
+  "cantCreateGroupThatSharesNameWithExistingToken": "Kan geen groep maken die een naam deelt met een bestaand token",
   "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten",
   "tokenNamesCantStartWithDollar": "Kan niet beginnen met een dollarteken ($).",
   "tokenNamesCantContainCurlyBraces": "Mag geen accolades '{}' bevatten"
