@@ -5,7 +5,6 @@ import {
 } from './node';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { borderWidth } from 'polished';
 
 const singleShadowToken = {
   type: 'boxShadow',
