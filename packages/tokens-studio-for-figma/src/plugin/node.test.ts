@@ -278,7 +278,7 @@ describe('destructureTokenForAlias', () => {
     });
   });
 
-  it('return extract border width from border token', () => {
+  it('sould return border width from border token', () => {
     const values = {
       border: 'test',
       borderBottom: 'delete',
