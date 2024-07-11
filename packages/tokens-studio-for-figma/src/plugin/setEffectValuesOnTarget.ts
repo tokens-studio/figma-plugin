@@ -64,7 +64,11 @@ async function tryApplyCompositeVariable({
       if (val.toString().startsWith('{') && val.toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(val.slice(1, -1));
         if (variableToApply) {
-          effect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
+          const updatedEffect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
+          effect = {
+            ...effect,
+            boundVariables: updatedEffect.boundVariables
+          }
         }
       }
     }
@@ -82,25 +86,31 @@ export default async function setEffectValuesOnTarget(
 ) {
   try {
     const resolvedToken = defaultTokenValueRetriever.get(token);
+    console.log('resolvedToken in setEffectValues: ', resolvedToken);
     if (typeof resolvedToken === 'undefined') return;
     const { description, value } = resolvedToken;
     const resolvedValue: ResolvedShadowObject = defaultTokenValueRetriever.get(token)?.resolvedValueWithReferences;
+    console.log('resolvedValue in setEffectValues: ', resolvedValue);
     if (typeof resolvedValue === 'undefined') return;
 
     if (Array.isArray(value)) {
+      console.log('11111111111111111 in setEffectValues');
       const effectsArray = await Promise.all(value.map(async (v, i) => {
         const newEffect = await tryApplyCompositeVariable({
           target, value: v, baseFontSize, resolvedValue: resolvedValue[i],
         });
+        console.log('newEffect 111 in setEffectValues: ', newEffect);
         return newEffect;
       }));
 
       if ('effects' in target && key === 'effects') target.effects = effectsArray.reverse();
     } else if (typeof value !== 'string') {
+      console.log('222222222222222222 in setEffectValues');
       if ('effects' in target && key === 'effects') {
         const newEffect = await tryApplyCompositeVariable({
           target, value, baseFontSize, resolvedValue,
         });
+        console.log('newEffect in setEffectValues: ', newEffect);
         target.effects = [
           newEffect,
         ];
