@@ -51,8 +51,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const localVariables = await figma.variables.getLocalVariablesAsync();
 
   localVariables.forEach((variable) => {
-    if (!figmaVariableReferences.has(variable.name)) {
-      const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
+    const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
+    if (!figmaVariableReferences.has(normalizedVariableName)) {
       figmaVariableReferences.set(normalizedVariableName, variable.key);
     }
   });
