@@ -116,10 +116,9 @@ export default function TokensBottomBar({ handleError }: Props) {
                   onClick={handleResolveDuplicateOpen}
                   icon={<WarningTriangleSolid />}
                   data-testid="resolve-duplicate-modal-open-button"
-                  variant="invisible"
+                  variant="danger"
                   size="small"
                   tooltip="Duplicate Tokens Found"
-                  css={{ outline: '1px solid $dangerFg', color: '$dangerFg', marginRight: '$2' }}
                 />
               )}
               <ApplySelector />
