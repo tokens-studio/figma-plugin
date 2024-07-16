@@ -27,17 +27,22 @@
       "readWriteCreate": "Lezen / schrijven / creëren",
       "additionalHeaders": "Extra kopteksten",
       "name": "Naam",
-      "value": "Waarde"
+      "value": "Waarde",
+      "readMore": "Lees de synchronisatiehandleiding voor de algemene versie."
     },
     "url": {
       "title": "URL",
       "description": "Met tokens die op een server zijn opgeslagen, kunt u ze toevoegen als een alleen-lezen provider.",
       "url": "URL",
-      "headers": "Kopteksten"
+      "headers": "Kopteksten",
+      "readMore": "Lees de URL-synchronisatiehandleiding."
     },
     "jsonbin": {
       "title": "JSONBIN",
-      "description": "Toegangstokens opgeslagen op JSONBin.io, een gratis JSON-opslagservice voor tweerichtingssynchronisatie."
+      "description": "Toegangstokens opgeslagen op JSONBin.io, een gratis JSON-opslagservice voor tweerichtingssynchronisatie.",
+      "readMore": "Lees de JSONBin-synchronisatiehandleiding.",
+      "apiKey": "API sleutel",
+      "idHelp": "Indien leeg, zal Tokens Studio een nieuwe bak voor u aanmaken."
     },
     "github": {
       "title": "GitHub"
@@ -48,14 +53,16 @@
     "supernova": {
       "accessToken": "Supernova-toegangstoken",
       "dsUrl": "Ontwerpsysteem-URL",
-      "description": "Hiermee kunt u tokens naar een specifiek merk en thema in een geselecteerd ontwerpsysteem pushen."
+      "description": "Hiermee kunt u tokens naar een specifiek merk en thema in een geselecteerd ontwerpsysteem pushen.",
+      "readMore": "Lees de Supernova-synchronisatiegids."
     },
     "ado": {
       "description": "Krijg toegang tot tokens die zijn opgeslagen in uw repository, push- en pull-tokens in tweerichtingssynchronisatie.",
       "pat": "Persoonlijk toegangstoken",
       "orgUrl": "Organisatie-URL",
       "repositoryName": "Naam van opslagplaats",
-      "projectName": "Projectnaam (optioneel)"
+      "projectName": "Projectnaam (optioneel)",
+      "readMore": "Lees de Azure DevOps-synchronisatiehandleiding."
     },
     "bitbucket": {
       "appPassword": "App-wachtwoord",
@@ -66,7 +73,13 @@
     "tokensstudio": {
       "name": "Name",
       "apikey": "API key",
-      "urn": "Connection URN"
+      "urn": "Connection URN",
+      "descriptionFirstPart": "Tokens Studio heeft een zelfstandig webgebaseerd platform voor dynamische creatie en beheer van ontwerpbeslissingen, momenteel in bèta!",
+      "signupText": "Meld u hier aan voor bètatoegang.",
+      "descriptionSecondPart": "Als u het Studio-platform al gebruikt en hulp nodig heeft bij het instellen van de synchronisatie, lees dan de",
+      "tokensStudioSyncGuide": "Tokens Studio Sync-handleiding hier.",
+      "pat": "Persoonlijk toegangstoken",
+      "id": "Verbindings-ID"
     }
   },
   "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",
@@ -88,5 +101,13 @@
   "converttow3c": "Converteren naar W3C DTCG-formaat",
   "converttolegacy": "Converteren naar verouderd formaat",
   "pushfirsterror": "Push uw niet-opgeslagen wijzigingen voordat u converteert",
-  "readmoreformat": "Lees verder"
+  "readmoreformat": "Lees verder",
+  "gitLabExplained": "Verbind uw Gitlab-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
+  "gitHubExplained": "Verbind uw GitHub-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
+  "bitBucketExplained": "Verbind uw Bitbucket-coderepository met Tokens Studio voor externe tokenopslag met versiebeheer en tweerichtingssynchronisatie geregeld binnen de plug-in.",
+  "nameHelpText": "Deze bijnaam verschijnt op de pagina met plug-ininstellingen om deze synchronisatieprovider uit uw lijst te helpen identificeren.",
+  "readMoreBitBucket": "Lees de Bitbucket-synchronisatiehandleiding.",
+  "readMoreGitHub": "Lees de GitHub-synchronisatiehandleiding.",
+  "readMoreGitLab": "Lees de GitLab-synchronisatiegids.",
+  "baseUrlHelpText": "Voeg toe als uw organisatie een bedrijfsserver gebruikt"
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { IconButton, Button, Heading } from '@tokens-studio/ui';
+import { IconButton, Button } from '@tokens-studio/ui';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
@@ -12,7 +12,6 @@ import TrashIcon from '@/icons/trash.svg';
 import Box from './Box';
 import { ImportToken } from '@/types/tokens';
 import Text from './Text';
-import { UpdateTokenPayload } from '@/types/payloads';
 import Accordion from './Accordion';
 import { Count } from './Count';
 
@@ -114,23 +113,60 @@ export default function ImportedTokensDialog() {
   }, [setNewTokens, newTokens]);
 
   const handleCreateAllClick = React.useCallback(() => {
+    const multipleNewTokens = newTokens.map((token) => ({
+      parent: token.parent || activeTokenSet,
+      name: token.name,
+      value: token.value,
+      type: token.type,
+      description: token.description,
+      shouldUpdateDocument: false,
+    }));
+
     // Create new Tokens
-    importMultipleTokens(newTokens as UpdateTokenPayload[]);
+    importMultipleTokens({ multipleNewTokens });
     setNewTokens([]);
-  }, [newTokens, importMultipleTokens]);
+  }, [activeTokenSet, importMultipleTokens, newTokens]);
 
   const handleUpdateAllClick = React.useCallback(() => {
+    const multipleUpdatedTokens = updatedTokens.map((token) => ({
+      parent: token.parent || activeTokenSet,
+      name: token.name,
+      value: token.value,
+      type: token.type,
+      description: token.description,
+      shouldUpdateDocument: false,
+    }));
+
     // Update all existing tokens
-    importMultipleTokens(updatedTokens as UpdateTokenPayload[]);
+    importMultipleTokens({ multipleUpdatedTokens });
     setUpdatedTokens([]);
-  }, [updatedTokens, importMultipleTokens]);
+  }, [updatedTokens, importMultipleTokens, activeTokenSet]);
 
   const handleImportAllClick = React.useCallback(() => {
+    const multipleUpdatedTokens = updatedTokens.map((token) => ({
+      parent: token.parent || activeTokenSet,
+      name: token.name,
+      value: token.value,
+      type: token.type,
+      description: token.description,
+      shouldUpdateDocument: false,
+    }));
+
+    const multipleNewTokens = newTokens.map((token) => ({
+      parent: token.parent || activeTokenSet,
+      name: token.name,
+      value: token.value,
+      type: token.type,
+      description: token.description,
+      shouldUpdateDocument: false,
+    }));
+
     // Update all existing tokens, and create new ones
-    importMultipleTokens([...newTokens, ...updatedTokens] as UpdateTokenPayload[]);
+    importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
+
     setUpdatedTokens([]);
     setNewTokens([]);
-  }, [importMultipleTokens, newTokens, updatedTokens]);
+  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens]);
 
   const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
