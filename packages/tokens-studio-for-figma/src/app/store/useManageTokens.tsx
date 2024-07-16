@@ -231,11 +231,28 @@ export default function useManageTokens() {
     });
   }, [renameTokenAcrossSets]);
 
-  const importMultipleTokens = useCallback(async (data: UpdateTokenPayload[]) => {
+  const importMultipleTokens = useCallback(async ({ multipleUpdatedTokens, multipleNewTokens }: { multipleUpdatedTokens?: EditSingleTokenData[], multipleNewTokens?: CreateSingleTokenData[] }) => {
     dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
-    dispatch.tokenState.importMultipleTokens(data);
+
+    const hasUpdatedTokens = multipleUpdatedTokens && multipleUpdatedTokens.length > 0;
+    const hasNewTokens = multipleNewTokens && multipleNewTokens.length > 0;
+
+    if (hasUpdatedTokens) {
+      multipleUpdatedTokens.forEach((t) => {
+        editSingleToken(t);
+      });
+    }
+
+    if (hasNewTokens) {
+      if (multipleNewTokens) {
+        multipleNewTokens.forEach((t) => {
+          createSingleToken(t);
+        });
+      }
+    }
+
     dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
-  }, [dispatch.uiState, dispatch.tokenState]);
+  }, [dispatch.uiState, createSingleToken, editSingleToken]);
 
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens, deleteDuplicates,

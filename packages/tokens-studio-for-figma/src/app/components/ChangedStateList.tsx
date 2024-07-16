@@ -31,7 +31,7 @@ function ChangedStateList() {
   return (
     <Stack direction="column" gap={1} css={{ padding: '$4' }}>
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
-        <Box key={tokenSet}>
+        <Box key={tokenSet} css={{ maxWidth: '100%' }}>
           <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
           {!collapsedChangedStateList.includes(tokenSet) && tokenList && (
             tokenList.map((token) => (

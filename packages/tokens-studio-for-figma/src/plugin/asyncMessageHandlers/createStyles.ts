@@ -18,7 +18,7 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
       applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
     });
-    const styleIds = await updateStyles(msg.tokens, msg.settings, true);
+    const styleIds = await updateStyles(msg.tokens, msg.settings, true, msg.selectedThemes);
 
     return {
       styleIds,
