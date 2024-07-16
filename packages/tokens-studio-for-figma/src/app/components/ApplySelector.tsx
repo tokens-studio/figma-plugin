@@ -56,27 +56,22 @@ export default function ApplySelector() {
       </Button>
       <DropdownMenu>
         <DropdownMenu.Trigger
-          css={{
-            borderTopRightRadius: '$medium',
-            borderBottomRightRadius: '$medium',
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            backgroundColor: '$buttonPrimaryBgRest',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '$controlSmall',
-            borderLeft: '1px solid rgba(150, 150, 150, 0.3)',
-            position: 'relative',
-            boxShadow: '$buttonPrimaryShadow',
-            color: '$buttonPrimaryFg',
-            '&:hover, &:focus-visible': { backgroundColor: '$buttonPrimaryBgHover', boxShadow: '$buttonPrimaryShadow' },
-          }}
+          asChild
           data-testid="apply-selector"
         >
-          <IconChevronDown />
+          <Button
+            variant="primary"
+            size="small"
+            css={{
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              width: '$controlSmall',
+              justifyContent: 'center',
+            }}
+          >
+            <IconChevronDown />
+          </Button>
         </DropdownMenu.Trigger>
-
         <DropdownMenu.Portal>
           <DropdownMenu.Content side="top" css={{ maxWidth: '350px' }}>
             <DropdownMenu.Label>{t('applyTo.applyCurrentTokensTo')}</DropdownMenu.Label>
