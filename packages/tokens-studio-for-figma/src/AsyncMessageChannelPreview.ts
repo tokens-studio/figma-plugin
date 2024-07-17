@@ -53,7 +53,6 @@ const sendMessageToUi = (pluginMessage) => {
 const parseWsEvent = (event) => {
   try {
     const msg = JSON.parse(event.data);
-    console.log({ msg });
     if (msg.src === 'server') {
       const temp = JSON.parse(msg.message);
       return temp;
