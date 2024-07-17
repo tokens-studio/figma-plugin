@@ -1,6 +1,5 @@
 import React, {
   FormEvent,
-  // useState, useEffect, useRef, useCallback,
   ReactNode,
   useCallback,
   useEffect,
@@ -8,7 +7,6 @@ import React, {
 } from 'react';
 import {
   Box, Button, DropdownMenu, IconButton, Stack, Text,
-  TextInput,
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 // import axe from 'axe-core';
@@ -19,7 +17,7 @@ import { Editor } from '@monaco-editor/react';
 import { CSS } from '@stitches/react';
 import { Dispatch } from '../store';
 import { AsyncMessageChannel } from '../../AsyncMessageChannel';
-import { AsyncMessageChannelPreview, WEBSOCKET_SERVER_URL } from '../../AsyncMessageChannelPreview';
+import { AsyncMessageChannelPreview } from '../../AsyncMessageChannelPreview';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { SavedSettings } from '@/plugin/notifiers';
 import { UpdateMode } from '@/constants/UpdateMode';
@@ -31,7 +29,6 @@ import { settingsStateSelector, uiStateSelector } from '@/selectors';
 import { Tabs } from '@/constants/Tabs';
 import { setFigmaBrowserTheme } from './previewUtils';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
-import Label from '../components/Label';
 import { usePreviewState } from './usePreviewState';
 
 // eslint-disable-next-line
@@ -199,6 +196,11 @@ const PreviewMockMessageModal = ({ type, handleClose }: { type: string | undefin
 const PreviewPluginWindow = ({
   height = 600, width = '100%', children, css = {}, fullscreen, updateHash,
 }: { children: ReactNode, height?: number | string, width?: number | string, css: CSS | undefined, fullscreen?: boolean, updateHash: any }) => {
+  useEffect(() => {
+    AsyncMessageChannelPreview.ReactInstance.message({
+      type: AsyncMessageTypes.PREVIEW_REQUEST_STARTUP,
+    });
+  }, []);
   const toggleFullscreen = useCallback(() => {
     updateHash({ fullscreen: !fullscreen });
   }, [fullscreen, updateHash]);
@@ -288,7 +290,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
       tab, action, subAction, theme, fullscreen,
     }, updateHash,
   } = usePreviewState();
-  const [websocketsServer, setWebsocketsServer] = useState(WEBSOCKET_SERVER_URL);
+  // const [websocketsServer, setWebsocketsServer] = useState(WEBSOCKET_SERVER_URL);
 
   useEffect(() => {
     // if (tab && tab !== 'loading') {
@@ -460,7 +462,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
       ) : (
         <>
           {previewHeader}
-          <Stack
+          {/* <Stack
             css={{
               color: '$fgMuted',
               backgroundColor: '$bgSurface',
@@ -487,7 +489,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
               />
               <Button>Connect</Button>
             </Stack>
-          </Stack>
+          </Stack> */}
         </>
       )}
     </Box>

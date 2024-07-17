@@ -70,6 +70,7 @@ export enum AsyncMessageTypes {
   RENAME_VARIABLES = 'async/rename-variables',
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
+  PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -335,6 +336,9 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 }
 >;
 
+export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
+export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -378,6 +382,7 @@ export type AsyncMessages =
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
   | UpdateVariablesAsyncMessage
+  | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage;
 
 export type AsyncMessageResults =
@@ -423,6 +428,7 @@ export type AsyncMessageResults =
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
   | UpdateVariablesAsyncMessageResult
+  | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult;
 
 export type AsyncMessagesMap = {
