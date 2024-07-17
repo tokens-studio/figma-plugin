@@ -14,14 +14,14 @@ export const setFigmaBrowserTheme = (theme, updateHash) => {
   switch (theme) {
     case 'light': {
       if (isDark) {
-        document.documentElement.classList.remove('figma-dark');
+        htmlClassList.remove('figma-dark');
       }
 
       break;
     }
     case 'dark': {
       if (!isDark) {
-        document.documentElement.classList.add('figma-dark');
+        htmlClassList.add('figma-dark');
       }
 
       break;
@@ -29,9 +29,9 @@ export const setFigmaBrowserTheme = (theme, updateHash) => {
     case 'system': {
       const systemTheme = getPreferredColorScheme();
       if (systemTheme === 'dark' && !isDark) {
-        document.documentElement.classList.add('figma-dark');
+        htmlClassList.add('figma-dark');
       } else if (systemTheme === 'light' && isDark) {
-        document.documentElement.classList.remove('figma-dark');
+        htmlClassList.remove('figma-dark');
       }
       break;
     }
