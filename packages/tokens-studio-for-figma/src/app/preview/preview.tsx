@@ -9,7 +9,6 @@ import {
   Box, Button, DropdownMenu, IconButton, Stack, Text,
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
-// import axe from 'axe-core';
 import hash from 'object-hash';
 import { Code, Expand, Collapse } from 'iconoir-react';
 
@@ -18,7 +17,7 @@ import { CSS } from '@stitches/react';
 import { Dispatch } from '../store';
 import { AsyncMessageChannel } from '../../AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '../../AsyncMessageChannelPreview';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
 import { SavedSettings } from '@/plugin/notifiers';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { StorageProviderType } from '@/constants/StorageProviderType';
@@ -30,6 +29,7 @@ import { Tabs } from '@/constants/Tabs';
 import { setFigmaBrowserTheme } from './previewUtils';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import { usePreviewState } from './usePreviewState';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 // eslint-disable-next-line
 const PREVIEW_ENV = process.env.PREVIEW_ENV;
@@ -56,12 +56,16 @@ const mockSettings: SavedSettings = {
 };
 
 // const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
-const mockStartupParams: any = {
+const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   type: AsyncMessageTypes.STARTUP,
   activeTheme: {},
   lastOpened: Date.now(),
+  initialLoad: true,
+  usedEmail: null,
+  authData: null,
   onboardingExplainer: {
     sets: true,
+    exportSets: true,
     inspect: true,
     syncProviders: true,
   },
@@ -72,12 +76,14 @@ const mockStartupParams: any = {
   },
   user: mockUser,
   localTokenData: {
-    activeTheme: {},
+    activeTheme: '',
     checkForChanges: true,
     themes: [],
-    usedTokenSet: {},
+    usedTokenSet: null,
     updatedAt: new Date().toISOString(),
     values: {},
+    collapsedTokenSets: null,
+    tokenFormat: TokenFormatOptions.Legacy,
     version: '91',
   },
 };
@@ -138,6 +144,7 @@ const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: ()
           minHeight: '$8', position: 'relative', flexGrow: 1, height: '100%',
         }}
       >
+        <Text>WIP</Text>
         <Box
           css={{
             display: 'flex',
