@@ -6089,10 +6089,12 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.8.tgz#54701a5aff1c4453b3c7b18dbd2a1d16067751ee"
-  integrity sha512-NqBMhhMn0pfwJTmGBny56hpkb01fM3VDoAWILyJ3+9rMeja84c7mKAvjqQdLEDwf69kugXechRHNwwen6o2SrA==
+"@tokens-studio/tokens@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.2.2.tgz#3215dcec312fae7eb924e0a62a13139c75121527"
+  integrity sha512-GEHNipIMCRWHHg/6qt3APYe4TznLNn1fzYReETj9REP2DXYWyLuoBfDzcemU0zGjovesMZwCD47FVls5b9PPQw==
+  dependencies:
+    deepmerge-ts "^7.0.3"
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
@@ -6104,10 +6106,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
   integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
 
-"@tokens-studio/ui@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.7.0.tgz#5d7c3352190cb3cccb2d256bf5e6683537be64ae"
-  integrity sha512-VJKCFpztBQHC75ctVFVCws+/xeGUGX8vOk1ESKbtTZMqmK5bhOdgwTelJeElQhnpsf+IILo/j9Xk06X518/PnA==
+"@tokens-studio/ui@0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/ui/-/ui-0.7.1.tgz#37708bd75398708f14ea3e2f2c0b06e76b87e0ff"
+  integrity sha512-6yB/hl5yP5uWZMLjhASF5sUg8L0DioYFyUJA3WgD0DzzqcW8D+QvM8+Z+1KLy5xuYQ/Q1NnS0YSZL5M2nX1DPQ==
   dependencies:
     "@iconicicons/react" "^1.5.1"
     "@radix-ui/react-accordion" "^1.1.2"
@@ -10623,6 +10625,11 @@ deepmerge-ts@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-5.1.0.tgz#c55206cc4c7be2ded89b9c816cf3608884525d7a"
   integrity sha512-eS8dRJOckyo9maw9Tu5O5RUi/4inFLrnoLkBe3cPfDMx3WZioXtmOew4TXQaxq7Rhl4xjDtR7c6x8nNTxOvbFw==
+
+deepmerge-ts@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-7.0.3.tgz#0cc3ac9f370915d55126cd3b216788d786e6e714"
+  integrity sha512-dxFbFO2RSIhPNBPL/j8Nvdt6/vrkW9+uGf1NLah/QxBGAVbK9fj2fGTO+HwdHpPAyFAsyT9iEn/1SI9SUvespw==
 
 deepmerge@^4.2.2, deepmerge@^4.3.1:
   version "4.3.1"
