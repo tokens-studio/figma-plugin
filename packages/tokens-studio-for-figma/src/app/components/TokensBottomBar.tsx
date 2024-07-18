@@ -110,7 +110,7 @@ export default function TokensBottomBar({ handleError }: Props) {
               <ToolsDropdown />
               <StylesDropdown />
             </Stack>
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap={2}>
               {hasDuplicates && (
                 <IconButton
                   onClick={handleResolveDuplicateOpen}
