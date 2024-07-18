@@ -69,7 +69,7 @@ export default function ApplySelector() {
             css={{
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
-              borderLeftColor: 'rgba(255, 255, 255, 0.1)',
+              borderLeftColor: 'rgba(255, 255, 255, 0.2)',
               width: '$controlSmall',
               justifyContent: 'center',
             }}
