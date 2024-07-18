@@ -95,6 +95,7 @@ export default function ResolveDuplicateTokensModal({
       title={t('resolveDuplicateTokensModal.title')}
       isOpen={isOpen}
       close={onClose}
+      showClose
       size="large"
       footer={(
         <form id="resolveDuplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
