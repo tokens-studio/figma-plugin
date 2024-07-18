@@ -47,7 +47,11 @@ export default function ApplySelector() {
         data-testid="update-button"
         variant="primary"
         size="small"
-        css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+        css={{
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+          borderRightColor: 'transparent',
+        }}
         onClick={handleUpdate}
       >
         {t('applyTo.button')}
@@ -65,6 +69,7 @@ export default function ApplySelector() {
             css={{
               borderTopLeftRadius: 0,
               borderBottomLeftRadius: 0,
+              borderLeftColor: 'rgba(255, 255, 255, 0.1)',
               width: '$controlSmall',
               justifyContent: 'center',
             }}

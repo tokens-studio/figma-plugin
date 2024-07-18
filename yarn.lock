@@ -6089,10 +6089,12 @@
     eslint "^8.31.0"
     prettier "^2.8.3"
 
-"@tokens-studio/tokens@0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.1.8.tgz#54701a5aff1c4453b3c7b18dbd2a1d16067751ee"
-  integrity sha512-NqBMhhMn0pfwJTmGBny56hpkb01fM3VDoAWILyJ3+9rMeja84c7mKAvjqQdLEDwf69kugXechRHNwwen6o2SrA==
+"@tokens-studio/tokens@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/tokens/-/tokens-0.2.1.tgz#1617b2dd915aa10cec4b57e14099fa8d586ff5c5"
+  integrity sha512-OEFln9Iq62LUu+UVOeZDtQh9gpoSw5JHo7xUuZx0WwaHF20ZBJ7T1h4dlsLv5RGFJ1cy1sLHYi93zyP0+FDkeA==
+  dependencies:
+    deepmerge-ts "^7.0.3"
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
@@ -10623,6 +10625,11 @@ deepmerge-ts@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-5.1.0.tgz#c55206cc4c7be2ded89b9c816cf3608884525d7a"
   integrity sha512-eS8dRJOckyo9maw9Tu5O5RUi/4inFLrnoLkBe3cPfDMx3WZioXtmOew4TXQaxq7Rhl4xjDtR7c6x8nNTxOvbFw==
+
+deepmerge-ts@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/deepmerge-ts/-/deepmerge-ts-7.0.3.tgz#0cc3ac9f370915d55126cd3b216788d786e6e714"
+  integrity sha512-dxFbFO2RSIhPNBPL/j8Nvdt6/vrkW9+uGf1NLah/QxBGAVbK9fj2fGTO+HwdHpPAyFAsyT9iEn/1SI9SUvespw==
 
 deepmerge@^4.2.2, deepmerge@^4.3.1:
   version "4.3.1"
