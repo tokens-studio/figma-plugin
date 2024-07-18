@@ -9,6 +9,7 @@ import { tokensSelector } from '@/selectors';
 import ResolveDuplicateTokenGroup from '../DuplicateResolver/ResolveDuplicateTokenGroup';
 import { SingleToken } from '@/types/tokens';
 import useManageTokens from '@/app/store/useManageTokens';
+import { track } from '@/utils/analytics';
 
 type Props = {
   isOpen: boolean;
@@ -82,6 +83,7 @@ export default function ResolveDuplicateTokensModal({
         listToDel.push({ set, path: duplicateName, index });
       });
     });
+    track('Duplicate tokens removed', { count: listToDel.length });
     await deleteDuplicates(listToDel);
     onClose();
   }, [duplicateTokensToDelete, onClose, deleteDuplicates]);
@@ -93,6 +95,7 @@ export default function ResolveDuplicateTokensModal({
       title={t('resolveDuplicateTokensModal.title')}
       isOpen={isOpen}
       close={onClose}
+      showClose
       size="large"
       footer={(
         <form id="resolveDuplicateTokenGroup" onSubmit={handleDuplicateTokenGroupSubmit}>
@@ -101,7 +104,7 @@ export default function ResolveDuplicateTokensModal({
               {t('cancel')}
             </Button>
             <Button type="submit" variant="primary" disabled={!canResolve}>
-              Resolve Duplicates
+              {t('resolveDuplicateTokensModal.submit')}
             </Button>
           </Stack>
         </form>
