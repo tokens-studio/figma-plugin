@@ -3,6 +3,7 @@ import type { TokenState } from '@/app/store/models/tokenState';
 import type { AnyTokenList } from '@/types/tokens';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { tokenSetListToTree } from './tokenSetListToTree';
+import { findParentIndexToInsertSet } from './findParentIndexToInsertSet';
 
 export function updateTokenSetsInState(
   state: TokenState,
@@ -29,7 +30,7 @@ export function updateTokenSetsInState(
   }, []);
 
   newTokenSets.forEach((newSet) => {
-    const insertAt = newSet.length === 3 ? newSet[2] : entries.length;
+    const insertAt = newSet.length === 3 ? newSet[2] : findParentIndexToInsertSet(entries, newSet[0]);
     entries.splice(insertAt, 0, [newSet[0], newSet?.[1] ?? []]);
   });
 
