@@ -52,7 +52,7 @@ function StartScreen() {
   const onSetDefaultTokens = React.useCallback(() => {
     track('Start with exmaple set');
     dispatch.uiState.setActiveTab(Tabs.TOKENS);
-    dispatch.tokenState.setDefaultTokens();
+    // dispatch.tokenState.setDefaultTokens();
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {

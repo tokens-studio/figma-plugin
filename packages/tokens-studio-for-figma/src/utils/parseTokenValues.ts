@@ -16,6 +16,7 @@ export default function parseTokenValues(tokens: SetTokenDataPayload['values']):
   // reducing them down to a entries list which can be picked up using Object.fromEntries
   type TokenEntry = [string, AnyTokenList | Record<string, Partial<Record<TokenTypes, Record<string, SingleToken<false>>>>>];
   const reducedTokens = Object.entries(tokens).reduce<[string, AnyTokenList][]>((prev, group: TokenEntry) => {
+    if (['$themes', '$metadata'].includes(group[0])) return prev;
     const parsedGroup = group[1];
 
     if (Array.isArray(parsedGroup)) {

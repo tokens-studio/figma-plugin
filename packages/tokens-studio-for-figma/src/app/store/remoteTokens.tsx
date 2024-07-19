@@ -31,6 +31,8 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import parseTokenValues from '@/utils/parseTokenValues';
+import { SetTokenDataPayload } from '@/types/payloads';
 
 export type PushOverrides = { branch: string, commitMessage: string };
 
@@ -204,17 +206,17 @@ export default function useRemoteTokens() {
             // remove those active thems that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                    acc[key] = activeTheme[key];
-                  }
-                  return acc;
-                }, {} as Record<string, string>)
+                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                  acc[key] = activeTheme[key];
+                }
+                return acc;
+              }, {} as Record<string, string>)
               : {};
 
             dispatch.tokenState.setRemoteData({
               tokens: remoteData.tokens,
               themes: remoteData.themes,
-              metadata: remoteData.metadata
+              metadata: remoteData.metadata,
             });
 
             dispatch.tokenState.setTokenData({
@@ -565,6 +567,37 @@ export default function useRemoteTokens() {
     [dispatch, readTokensFromFileOrDirectory],
   );
 
+  const fetchTokensFromJSON = useCallback(
+    async ({
+      json,
+    }: {
+      json: SetTokenDataPayload['values'] & { $metadata?: { tokenSetOrder: string[] }, $themes?: ThemeObject[] };
+    }) => {
+      track('fetchTokensFromJSON');
+
+      if (json) {
+        const parsedTokens = parseTokenValues(json);
+        const sortedTokens = applyTokenSetOrder(
+          parsedTokens,
+          json.$metadata?.tokenSetOrder ?? Object.keys(parsedTokens),
+        );
+        dispatch.tokenState.setTokenData({
+          values: sortedTokens,
+          themes: json.$themes,
+          activeTheme: {},
+          usedTokenSet: {},
+        });
+        // track('Launched with token sets', {
+        //   count: Object.keys(remoteData.tokens).length,
+        //   setNames: Object.keys(remoteData.tokens),
+        // });
+        return json;
+      }
+      return null;
+    },
+    [dispatch],
+  );
+
   const checkRemoteChange = useCallback(
     async (context: StorageTypeCredentials = api): Promise<boolean> => {
       let hasChange = false;
@@ -617,6 +650,7 @@ export default function useRemoteTokens() {
       addNewBranch,
       fetchTokensFromFileOrDirectory,
       checkRemoteChange,
+      fetchTokensFromJSON,
     }),
     [
       restoreStoredProvider,
@@ -628,6 +662,7 @@ export default function useRemoteTokens() {
       addNewBranch,
       fetchTokensFromFileOrDirectory,
       checkRemoteChange,
+      fetchTokensFromJSON,
     ],
   );
 }

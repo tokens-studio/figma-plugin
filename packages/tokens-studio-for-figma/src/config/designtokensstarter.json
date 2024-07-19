@@ -1,0 +1,2299 @@
+{
+  "global / color": {
+    "xx": {
+      "global": {
+        "color": {
+          "mint": {
+            "50": {
+              "value": "#F6FEFB",
+              "type": "color",
+              "description": "global color mint of weight 50"
+            },
+            "100": {
+              "value": "#C5F8EA",
+              "type": "color",
+              "description": "global color mint of weight 100"
+            },
+            "200": {
+              "value": "#55EBCE",
+              "type": "color",
+              "description": "global color mint of weight 200"
+            },
+            "300": {
+              "value": "#00D4B6",
+              "type": "color",
+              "description": "global color mint of weight 300"
+            },
+            "400": {
+              "value": "#0AB29A",
+              "type": "color",
+              "description": "global color mint of weight 400"
+            },
+            "500": {
+              "value": "#188675",
+              "type": "color",
+              "description": "global color mint of weight 500"
+            },
+            "600": {
+              "value": "#1A6A5D",
+              "type": "color",
+              "description": "global color mint of weight 600"
+            },
+            "700": {
+              "value": "#19544B",
+              "type": "color",
+              "description": "global color mint of weight 700"
+            },
+            "800": {
+              "value": "#174039",
+              "type": "color",
+              "description": "global color mint of weight 800"
+            },
+            "900": {
+              "value": "#142C28",
+              "type": "color",
+              "description": "global color mint of weight 900"
+            }
+          },
+          "violet": {
+            "50": {
+              "value": "#FCFCFE",
+              "type": "color",
+              "description": "global color viola of weight 50"
+            },
+            "100": {
+              "value": "#ECEDFA",
+              "type": "color",
+              "description": "global color viola of weight 100"
+            },
+            "200": {
+              "value": "#D0D2F3",
+              "type": "color",
+              "description": "global color viola of weight 200"
+            },
+            "300": {
+              "value": "#B6B8EB",
+              "type": "color",
+              "description": "global color viola of weight 300"
+            },
+            "400": {
+              "value": "#9598E0",
+              "type": "color",
+              "description": "global color viola of weight 400"
+            },
+            "500": {
+              "value": "#686FC8",
+              "type": "color",
+              "description": "global color viola of weight 500"
+            },
+            "600": {
+              "value": "#57579C",
+              "type": "color",
+              "description": "global color viola of weight 600"
+            },
+            "700": {
+              "value": "#49457A",
+              "type": "color",
+              "description": "global color viola of weight 700"
+            },
+            "800": {
+              "value": "#39345A",
+              "type": "color",
+              "description": "global color viola of weight 800"
+            },
+            "900": {
+              "value": "#29253C",
+              "type": "color",
+              "description": "global color viola of weight 900"
+            }
+          },
+          "gold": {
+            "50": {
+              "value": "#FFFCF5",
+              "type": "color",
+              "description": "global color gold of weight 50"
+            },
+            "100": {
+              "value": "#FDECC3",
+              "type": "color",
+              "description": "global color gold of weight 100"
+            },
+            "200": {
+              "value": "#F0D36B",
+              "type": "color",
+              "description": "global color gold of weight 200"
+            },
+            "300": {
+              "value": "#D4BB5F",
+              "type": "color",
+              "description": "global color gold of weight 300"
+            },
+            "400": {
+              "value": "#B19D51",
+              "type": "color",
+              "description": "global color gold of weight 400"
+            },
+            "500": {
+              "value": "#84773F",
+              "type": "color",
+              "description": "global color gold of weight 500"
+            },
+            "600": {
+              "value": "#685E34",
+              "type": "color",
+              "description": "global color gold of weight 600"
+            },
+            "700": {
+              "value": "#534B2B",
+              "type": "color",
+              "description": "global color gold of weight 700"
+            },
+            "800": {
+              "value": "#3E3922",
+              "type": "color",
+              "description": "global color gold of weight 800"
+            },
+            "900": {
+              "value": "#2B2819",
+              "type": "color",
+              "description": "global color gold of weight 900"
+            }
+          },
+          "red": {
+            "50": {
+              "value": "#FFFBFB",
+              "type": "color",
+              "description": "global color red of weight 50"
+            },
+            "100": {
+              "value": "#FFE9E5",
+              "type": "color",
+              "description": "global color red of weight 100"
+            },
+            "200": {
+              "value": "#FFC7BF",
+              "type": "color",
+              "description": "global color red of weight 200"
+            },
+            "300": {
+              "value": "#FCA69C",
+              "type": "color",
+              "description": "global color red of weight 300"
+            },
+            "400": {
+              "value": "#F37A73",
+              "type": "color",
+              "description": "global color red of weight 400"
+            },
+            "500": {
+              "value": "#BA5A56",
+              "type": "color",
+              "description": "global color red of weight 500"
+            },
+            "600": {
+              "value": "#934846",
+              "type": "color",
+              "description": "global color red of weight 600"
+            },
+            "700": {
+              "value": "#743A3A",
+              "type": "color",
+              "description": "global color red of weight 700"
+            },
+            "800": {
+              "value": "#572D2D",
+              "type": "color",
+              "description": "global color red of weight 800"
+            },
+            "900": {
+              "value": "#3B2020",
+              "type": "color",
+              "description": "global color red of weight 900"
+            }
+          },
+          "green": {
+            "50": {
+              "value": "#f7fbeb",
+              "type": "color",
+              "description": "global color green of weight 50"
+            },
+            "100": {
+              "value": "#DFF3DC",
+              "type": "color",
+              "description": "global color green of weight 100"
+            },
+            "200": {
+              "value": "#B0E1AA",
+              "type": "color",
+              "description": "global color green of weight 200"
+            },
+            "300": {
+              "value": "#7FCE7A",
+              "type": "color",
+              "description": "global color green of weight 300"
+            },
+            "400": {
+              "value": "#69AD65",
+              "type": "color",
+              "description": "global color green of weight 400"
+            },
+            "500": {
+              "value": "#51834E",
+              "type": "color",
+              "description": "global color green of weight 500"
+            },
+            "600": {
+              "value": "#42673F",
+              "type": "color",
+              "description": "global color green of weight 600"
+            },
+            "700": {
+              "value": "#365233",
+              "type": "color",
+              "description": "global color green of weight 700"
+            },
+            "800": {
+              "value": "#2A3E28",
+              "type": "color",
+              "description": "global color green of weight 800"
+            },
+            "900": {
+              "value": "#1E2B1D",
+              "type": "color",
+              "description": "global color green of weight 900"
+            }
+          },
+          "neutral": {
+            "50": {
+              "value": "#FCFCFC",
+              "type": "color",
+              "description": "global color neutral of weight 50"
+            },
+            "100": {
+              "value": "#EDEDED",
+              "type": "color",
+              "description": "global color neutral of weight 100"
+            },
+            "200": {
+              "value": "#D4D4D4",
+              "type": "color",
+              "description": "global color neutral of weight 200"
+            },
+            "300": {
+              "value": "#BCBCBC",
+              "type": "color",
+              "description": "global color neutral of weight 300"
+            },
+            "400": {
+              "value": "#9E9E9E",
+              "type": "color",
+              "description": "global color neutral of weight 400"
+            },
+            "500": {
+              "value": "#777777",
+              "type": "color",
+              "description": "global color neutral of weight 500"
+            },
+            "600": {
+              "value": "#5E5E5E",
+              "type": "color",
+              "description": "global color neutral of weight 600"
+            },
+            "700": {
+              "value": "#4B4B4B",
+              "type": "color",
+              "description": "global color neutral of weight 700"
+            },
+            "800": {
+              "value": "#393939",
+              "type": "color",
+              "description": "global color neutral of weight 800"
+            },
+            "900": {
+              "value": "#282828",
+              "type": "color",
+              "description": "global color neutral of weight 900"
+            },
+            "950": {
+              "value": "#1C1C1E",
+              "type": "color",
+              "description": "global color neutral of weight 950"
+            }
+          }
+        }
+      }
+    }
+  },
+  "global / dimension": {
+    "xx": {
+      "global": {
+        "dimensions": {
+          "1": {
+            "value": "2px",
+            "type": "dimension",
+            "description": "1st step of global dimensions sequence"
+          },
+          "2": {
+            "value": "4px",
+            "type": "dimension",
+            "description": "2nd step of global dimensions sequence"
+          },
+          "3": {
+            "value": "8px",
+            "type": "dimension",
+            "description": "3rd step of global dimensions sequence"
+          },
+          "4": {
+            "value": "12px",
+            "type": "dimension",
+            "description": "4th step of global dimensions sequence"
+          },
+          "5": {
+            "value": "16px",
+            "type": "dimension",
+            "description": "5th step of global dimensions sequence"
+          },
+          "6": {
+            "value": "20px",
+            "type": "dimension",
+            "description": "6th step of global dimensions sequence"
+          },
+          "7": {
+            "value": "24px",
+            "type": "dimension",
+            "description": "7th step of global dimensions sequence"
+          },
+          "8": {
+            "value": "32px",
+            "type": "dimension",
+            "description": "8th step of global dimensions sequence"
+          },
+          "9": {
+            "value": "44px",
+            "type": "dimension",
+            "description": "9th step of global dimensions sequence"
+          },
+          "10": {
+            "value": "48px",
+            "type": "dimension",
+            "description": "10th step of global dimensions sequence"
+          },
+          "11": {
+            "value": "52px",
+            "type": "dimension",
+            "description": "11th step of global dimensions sequence"
+          },
+          "12": {
+            "value": "60px",
+            "type": "dimension",
+            "description": "12th step of global dimensions sequence"
+          },
+          "13": {
+            "value": "64px",
+            "type": "dimension",
+            "description": "13th step of global dimensions sequence"
+          },
+          "14": {
+            "value": "72px",
+            "type": "dimension",
+            "description": "14th step of global dimensions sequence"
+          },
+          "15": {
+            "value": "80px",
+            "type": "dimension",
+            "description": "15th step of global dimensions sequence"
+          }
+        }
+      }
+    }
+  },
+  "global / font": {
+    "xx": {
+      "global": {
+        "font": {
+          "fontFamilies": {
+            "display": {
+              "value": "Inter Display",
+              "type": "fontFamilies",
+              "description": "Font family for display fonts"
+            },
+            "content": {
+              "value": "Inter",
+              "type": "fontFamilies",
+              "description": "Font family for content fonts"
+            }
+          },
+          "fontWeight": {
+            "black": {
+              "value": "Black",
+              "type": "fontWeights",
+              "description": "heaviest weight for fonts"
+            },
+            "bold": {
+              "value": "Bold",
+              "type": "fontWeights",
+              "description": "bold weight for fonts"
+            },
+            "semiBold": {
+              "value": "Semi Bold",
+              "type": "fontWeights",
+              "description": "semibold weight for fonts"
+            },
+            "default": {
+              "value": "Medium",
+              "type": "fontWeights",
+              "description": "default weight for fonts"
+            }
+          },
+          "fontSize": {
+            "xxxs": {
+              "value": "12",
+              "type": "fontSizes",
+              "description": "extra extra extra small font size unit"
+            },
+            "xxs": {
+              "value": "14",
+              "type": "fontSizes",
+              "description": "extra extra small font size unit"
+            },
+            "xs": {
+              "value": "16",
+              "type": "fontSizes",
+              "description": "extra small font size unit"
+            },
+            "sm": {
+              "value": "20",
+              "type": "fontSizes",
+              "description": "small font size unit"
+            },
+            "md": {
+              "value": "24",
+              "type": "fontSizes",
+              "description": "medium font size unit"
+            },
+            "ml": {
+              "value": "28",
+              "type": "fontSizes",
+              "description": "medium large font size unit"
+            },
+            "lg": {
+              "value": "32",
+              "type": "fontSizes",
+              "description": "large font size unit"
+            },
+            "xl": {
+              "value": "40",
+              "type": "fontSizes",
+              "description": "extra large font size unit"
+            },
+            "xxl": {
+              "value": "80",
+              "type": "fontSizes",
+              "description": "extra extra large font size unit"
+            },
+            "xxxl": {
+              "value": "100",
+              "type": "fontSizes",
+              "description": "extra extra extra large font size unit"
+            }
+          },
+          "letterSpacing": {
+            "xs": {
+              "value": "-0.16",
+              "type": "letterSpacing",
+              "description": "extra small letter spacing unit"
+            },
+            "sm": {
+              "value": "0",
+              "type": "letterSpacing",
+              "description": "small letter spacing unit"
+            },
+            "md": {
+              "value": "0.08",
+              "type": "letterSpacing",
+              "description": "medium letter spacing unit"
+            },
+            "lg": {
+              "value": "0.16",
+              "type": "letterSpacing",
+              "description": "large letter spacing unit"
+            }
+          },
+          "lineHeight": {
+            "xxxs": {
+              "value": "20",
+              "type": "lineHeights",
+              "description": "extra extra extra small line height unit"
+            },
+            "xxs": {
+              "value": "22",
+              "type": "lineHeights",
+              "description": "extra extra small line height unit"
+            },
+            "xs": {
+              "value": "24",
+              "type": "lineHeights",
+              "description": "extra small line height unit"
+            },
+            "sm": {
+              "value": "26",
+              "type": "lineHeights",
+              "description": "small line height unit"
+            },
+            "md": {
+              "value": "32",
+              "type": "lineHeights",
+              "description": "medium line height unit"
+            },
+            "ml": {
+              "value": "40",
+              "type": "lineHeights",
+              "description": "medium large line height unit"
+            },
+            "lg": {
+              "value": "48",
+              "type": "lineHeights",
+              "description": "large line height unit"
+            },
+            "xl": {
+              "value": "56",
+              "type": "lineHeights",
+              "description": "extra large line height unit"
+            },
+            "xxl": {
+              "value": "100",
+              "type": "lineHeights",
+              "description": "extra extra large line height unit"
+            },
+            "xxxl": {
+              "value": "120",
+              "type": "lineHeights",
+              "description": "extra extra extra large line height unit"
+            }
+          },
+          "paragraphSpacing": {
+            "sm": {
+              "value": "16",
+              "type": "paragraphSpacing",
+              "description": "small paragraph spacing unit"
+            }
+          },
+          "textCase": {
+            "none": {
+              "value": "none",
+              "type": "textCase",
+              "description": "default text case of none"
+            },
+            "upper": {
+              "value": "uppercase",
+              "type": "textCase",
+              "description": "paragraph style for uppercase "
+            }
+          },
+          "textDecoration": {
+            "none": {
+              "value": "none",
+              "type": "textDecoration",
+              "description": "text decoration of none"
+            },
+            "underline": {
+              "value": "underline",
+              "type": "textDecoration",
+              "description": "Text decoration for displaying textlinks"
+            }
+          }
+        }
+      }
+    }
+  },
+  "alias / border": {
+    "xx": {
+      "alias": {
+        "border": {
+          "width": {
+            "sm": {
+              "value": "{xx.global.dimensions.1}",
+              "type": "borderWidth",
+              "description": "small thickness for borders"
+            },
+            "md": {
+              "value": "{xx.global.dimensions.2}",
+              "type": "borderWidth",
+              "description": "medium border thickness"
+            }
+          },
+          "focusOutline": {
+            "value": {
+              "color": "{xx.alias.color.border.focusOutline}",
+              "width": "{xx.alias.border.width.md}",
+              "style": "solid"
+            },
+            "type": "border",
+            "description": "default outline for focused elements"
+          },
+          "radius": {
+            "sm": {
+              "value": "{xx.global.dimensions.2}",
+              "type": "borderRadius",
+              "description": "small border radius"
+            },
+            "md": {
+              "value": "{xx.global.dimensions.3}",
+              "type": "borderRadius",
+              "description": "medium border radius"
+            },
+            "lg": {
+              "value": "{xx.global.dimensions.5}",
+              "type": "borderRadius",
+              "description": "large border radius"
+            }
+          }
+        }
+      }
+    }
+  },
+  "alias / color-dark": {
+    "xx": {
+      "alias": {
+        "color": {
+          "primary": {
+            "interaction": {
+              "value": "{xx.global.color.mint.200}",
+              "type": "color",
+              "description": "Color that indicates interactions"
+            },
+            "onInteraction": {
+              "value": "{xx.global.color.mint.900}",
+              "type": "color",
+              "description": "color for elements that are placed on interactive background colors"
+            },
+            "brand": {
+              "value": "{xx.global.color.neutral.950}",
+              "type": "color",
+              "onPrimary": {
+                "value": "{xx.global.color.mint.100}",
+                "type": "color",
+                "description": "color for elements that are placed on primary brand color"
+              },
+              "description": "background color for primary brand elements "
+            },
+            "onBrand": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "color for elements that are placed on brand background color"
+            }
+          },
+          "purpose": {
+            "infoHighEmphasis": {
+              "value": "{xx.global.color.violet.400}",
+              "type": "color",
+              "description": "color for elements with informational purpose of high emphasis"
+            },
+            "infoLowEmphasis": {
+              "value": "{xx.global.color.violet.200}",
+              "type": "color",
+              "description": "color for elements with informational purpose of low emphasis"
+            },
+            "onInfo": {
+              "value": "{xx.global.color.violet.800}",
+              "type": "color",
+              "description": "color for elements placed on informational purpose background"
+            },
+            "successHighEmphasis": {
+              "value": "{xx.global.color.green.400}",
+              "type": "color",
+              "description": "color for elements with success purpose of high emphasis"
+            },
+            "successLowEmphasis": {
+              "value": "{xx.global.color.green.200}",
+              "type": "color",
+              "description": "color for elements with success purpose of low emphasis"
+            },
+            "onSuccess": {
+              "value": "{xx.global.color.green.800}",
+              "type": "color",
+              "description": "color for elements placed on success purpose background"
+            },
+            "warningHighEmphasis": {
+              "value": "{xx.global.color.gold.200}",
+              "type": "color",
+              "description": "color for elements with warning purpose of high emphasis"
+            },
+            "warningLowEmphasis": {
+              "value": "{xx.global.color.gold.400}",
+              "type": "color",
+              "description": "color for elements with warning purpose of low emphasis"
+            },
+            "onWarning": {
+              "value": "{xx.global.color.gold.800}",
+              "type": "color",
+              "description": "color for elements placed on warning purpose background"
+            },
+            "criticalHighEmphasis": {
+              "value": "{xx.global.color.red.400}",
+              "type": "color",
+              "description": "color for elements with critical purpose of high emphasis"
+            },
+            "criticalLowEmphasis": {
+              "value": "{xx.global.color.red.500}",
+              "type": "color",
+              "description": "color for elements with critical purpose of low emphasis"
+            },
+            "onCritical": {
+              "value": "{xx.global.color.red.900}",
+              "type": "color",
+              "description": "color for elements placed on critical purpose background"
+            }
+          },
+          "background": {
+            "body": {
+              "value": "{xx.global.color.neutral.900}",
+              "type": "color",
+              "description": "Body background color"
+            },
+            "highEmphasis": {
+              "value": "{xx.global.color.neutral.700}",
+              "type": "color",
+              "description": "Background Color for components with high emphasis"
+            },
+            "lowEmphasis": {
+              "value": "{xx.global.color.neutral.800}",
+              "type": "color",
+              "description": "background color for elements with a low emphasis"
+            }
+          },
+          "text": {
+            "default": {
+              "value": "{xx.global.color.neutral.50}",
+              "type": "color",
+              "description": "Default text color "
+            },
+            "inverted": {
+              "value": "{xx.global.color.neutral.900}",
+              "type": "color",
+              "description": "Inverted text color"
+            },
+            "subtle": {
+              "value": "{xx.global.color.neutral.400}",
+              "type": "color",
+              "description": "Text color in subtle weight"
+            }
+          },
+          "state": {
+            "disable": {
+              "value": "{xx.global.color.neutral.300}",
+              "type": "color",
+              "description": "background color for disabled elements"
+            },
+            "onDisable": {
+              "value": "{xx.global.color.neutral.700}",
+              "type": "color",
+              "description": "color for elements that are palced on disabled background color"
+            },
+            "hover": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.16",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a hovered element"
+            },
+            "focus": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.16",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a focused element"
+            },
+            "press": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.08",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a pressed element"
+            },
+            "select": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "background color for selected elements"
+            },
+            "onSelect": {
+              "value": "{xx.global.color.mint.600}",
+              "type": "color",
+              "description": "Foreground color for selected elements"
+            },
+            "selectInverted": {
+              "value": "{xx.global.color.mint.600}",
+              "type": "color",
+              "description": "Inverted background color for selected elements"
+            },
+            "onSelectInverted": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "inverted color for elements on selected backgrounds"
+            }
+          },
+          "border": {
+            "subtle": {
+              "value": "{xx.global.color.neutral.700}",
+              "type": "color",
+              "description": "subtle border color"
+            },
+            "medium": {
+              "value": "{xx.global.color.neutral.500}",
+              "type": "color",
+              "description": "medium border color"
+            },
+            "heavy": {
+              "value": "{xx.global.color.neutral.200}",
+              "type": "color",
+              "description": "heavy border color"
+            },
+            "focusOutline": {
+              "value": "{xx.global.color.violet.500}",
+              "type": "color",
+              "description": "color for default focus outline"
+            }
+          }
+        }
+      }
+    }
+  },
+  "alias / color-light": {
+    "xx": {
+      "alias": {
+        "color": {
+          "primary": {
+            "interaction": {
+              "value": "{xx.global.color.mint.600}",
+              "type": "color",
+              "description": "Color that indicates interactions"
+            },
+            "onInteraction": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "color for elements that are placed on interactive background colors"
+            },
+            "brand": {
+              "value": "{xx.global.color.neutral.950}",
+              "type": "color",
+              "onPrimary": {
+                "value": "{xx.global.color.mint.100}",
+                "type": "color",
+                "description": "color for elements that are placed on primary brand color"
+              },
+              "description": "background color for primary brand elements "
+            },
+            "onBrand": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "color for elements that are placed on brand background color"
+            }
+          },
+          "purpose": {
+            "infoHighEmphasis": {
+              "value": "{xx.global.color.violet.400}",
+              "type": "color",
+              "description": "color for elements with informational purpose of high emphasis"
+            },
+            "infoLowEmphasis": {
+              "value": "{xx.global.color.violet.200}",
+              "type": "color",
+              "description": "color for elements with informational purpose of low emphasis"
+            },
+            "onInfo": {
+              "value": "{xx.global.color.violet.800}",
+              "type": "color",
+              "description": "color for elements placed on informational purpose background"
+            },
+            "successHighEmphasis": {
+              "value": "{xx.global.color.green.400}",
+              "type": "color",
+              "description": "color for elements with success purpose of high emphasis"
+            },
+            "successLowEmphasis": {
+              "value": "{xx.global.color.green.200}",
+              "type": "color",
+              "description": "color for elements with success purpose of low emphasis"
+            },
+            "onSuccess": {
+              "value": "{xx.global.color.green.800}",
+              "type": "color",
+              "description": "color for elements placed on success purpose background"
+            },
+            "warningHighEmphasis": {
+              "value": "{xx.global.color.gold.200}",
+              "type": "color",
+              "description": "color for elements with warning purpose of high emphasis"
+            },
+            "warningLowEmphasis": {
+              "value": "{xx.global.color.gold.400}",
+              "type": "color",
+              "description": "color for elements with warning purpose of low emphasis"
+            },
+            "onWarning": {
+              "value": "{xx.global.color.gold.800}",
+              "type": "color",
+              "description": "color for elements placed on warning purpose background"
+            },
+            "criticalHighEmphasis": {
+              "value": "{xx.global.color.red.400}",
+              "type": "color",
+              "description": "color for elements with critical purpose of high emphasis"
+            },
+            "criticalLowEmphasis": {
+              "value": "{xx.global.color.red.500}",
+              "type": "color",
+              "description": "color for elements with critical purpose of low emphasis"
+            },
+            "onCritical": {
+              "value": "{xx.global.color.red.900}",
+              "type": "color",
+              "description": "color for elements placed on critical purpose background"
+            }
+          },
+          "background": {
+            "body": {
+              "value": "{xx.global.color.neutral.300}",
+              "type": "color",
+              "description": "body background color"
+            },
+            "highEmphasis": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "description": "background Color for components with high emphasis"
+            },
+            "lowEmphasis": {
+              "value": "{xx.global.color.neutral.300}",
+              "type": "color",
+              "description": "background color for elements with a low emphasis"
+            }
+          },
+          "text": {
+            "default": {
+              "value": "{xx.global.color.neutral.900}",
+              "type": "color",
+              "description": "Default text color "
+            },
+            "inverted": {
+              "value": "{xx.global.color.neutral.50}",
+              "type": "color",
+              "description": "Inverted text color"
+            },
+            "subtle": {
+              "value": "{xx.global.color.neutral.600}",
+              "type": "color",
+              "description": "Text color in subtle weight"
+            }
+          },
+          "state": {
+            "disable": {
+              "value": "{xx.global.color.neutral.300}",
+              "type": "color",
+              "description": "background color for disabled elements"
+            },
+            "onDisable": {
+              "value": "{xx.global.color.neutral.700}",
+              "type": "color",
+              "description": "color for elements that are palced on disabled background color"
+            },
+            "hover": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.16",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a hovered element"
+            },
+            "focus": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.16",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a focused element"
+            },
+            "press": {
+              "value": "{xx.global.color.neutral.100}",
+              "type": "color",
+              "$extensions": {
+                "studio.tokens": {
+                  "modify": {
+                    "type": "alpha",
+                    "value": "0.08",
+                    "space": "srgb"
+                  }
+                }
+              },
+              "description": "Background color for state overlay of a pressed element"
+            },
+            "select": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "background color for selected elements"
+            },
+            "onSelect": {
+              "value": "{xx.global.color.mint.600}",
+              "type": "color",
+              "description": "Foreground color for selected elements"
+            },
+            "selectInverted": {
+              "value": "{xx.global.color.mint.600}",
+              "type": "color",
+              "description": "Inverted background color for selected elements"
+            },
+            "onSelectInverted": {
+              "value": "{xx.global.color.mint.100}",
+              "type": "color",
+              "description": "inverted color for elements on selected backgrounds"
+            }
+          },
+          "border": {
+            "subtle": {
+              "value": "{xx.global.color.neutral.700}",
+              "type": "color",
+              "description": "subtle border color"
+            },
+            "medium": {
+              "value": "{xx.global.color.neutral.500}",
+              "type": "color",
+              "description": "medium border color"
+            },
+            "heavy": {
+              "value": "{xx.global.color.neutral.200}",
+              "type": "color",
+              "description": "heavy border color"
+            },
+            "focusOutline": {
+              "value": "{xx.global.color.violet.500}",
+              "type": "color",
+              "description": "color for default focus outline"
+            }
+          }
+        }
+      }
+    }
+  },
+  "alias / dimension": {
+    "xx": {
+      "alias": {
+        "size": {
+          "xxxs": {
+            "value": "{xx.global.dimensions.4}",
+            "type": "sizing",
+            "description": "extra extra extra small size unit"
+          },
+          "xxs": {
+            "value": "{xx.global.dimensions.5}",
+            "type": "sizing",
+            "description": "extra extra small size unit"
+          },
+          "xs": {
+            "value": "{xx.global.dimensions.6}",
+            "type": "sizing",
+            "description": "extra small size unit"
+          },
+          "sm": {
+            "value": "{xx.global.dimensions.7}",
+            "type": "sizing",
+            "description": "small size unit"
+          },
+          "md": {
+            "value": "{xx.global.dimensions.8}",
+            "type": "sizing",
+            "description": "medium size unit"
+          },
+          "lg": {
+            "value": "{xx.global.dimensions.10}",
+            "type": "sizing",
+            "description": "large size unit"
+          },
+          "xl": {
+            "value": "{xx.global.dimensions.11}",
+            "type": "sizing",
+            "description": "extra large size unit"
+          },
+          "xxl": {
+            "value": "{xx.global.dimensions.13}",
+            "type": "sizing",
+            "description": "extra extra large size unit"
+          },
+          "xxxl": {
+            "value": "{xx.global.dimensions.14}",
+            "type": "sizing",
+            "description": "extra extra extra large size unit"
+          }
+        },
+        "spacing": {
+          "xxxs": {
+            "value": "{xx.global.dimensions.1}",
+            "type": "spacing",
+            "description": "extra extra extra small spacing unit"
+          },
+          "xxs": {
+            "value": "{xx.global.dimensions.2}",
+            "type": "spacing",
+            "description": "extra extra small spacing unit"
+          },
+          "xs": {
+            "value": "{xx.global.dimensions.3}",
+            "type": "spacing",
+            "description": "extra small spacing unit"
+          },
+          "sm": {
+            "value": "{xx.global.dimensions.4}",
+            "type": "spacing",
+            "description": "small spacing unit"
+          },
+          "md": {
+            "value": "{xx.global.dimensions.5}",
+            "type": "spacing",
+            "description": "medium spacing unit"
+          },
+          "lg": {
+            "value": "{xx.global.dimensions.7}",
+            "type": "spacing",
+            "description": "large spacing unit"
+          },
+          "xl": {
+            "value": "{xx.global.dimensions.8}",
+            "type": "spacing",
+            "description": "extra large spacing unit"
+          },
+          "xxl": {
+            "value": "{xx.global.dimensions.10}",
+            "type": "spacing",
+            "description": "extra extra small spacing unit"
+          },
+          "xxxl": {
+            "value": "{xx.global.dimensions.13}",
+            "type": "spacing",
+            "description": "extra extra extra small spacing unit"
+          }
+        }
+      }
+    }
+  },
+  "alias / font-screen-lg": {
+    "xx": {
+      "alias": {
+        "font-screen-lg": {
+          "display": {
+            "1": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.display}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxl}",
+                "fontSize": "{xx.global.font.fontSize.xxxl}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "display font for highest possible emphasis"
+            },
+            "2": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.display}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.xxl}",
+                "fontSize": "{xx.global.font.fontSize.xxl}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "display font for high emphasis headlines"
+            }
+          },
+          "headline": {
+            "1": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.lg}",
+                "fontSize": "{xx.global.font.fontSize.lg}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 01"
+            },
+            "2": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.lg}",
+                "fontSize": "{xx.global.font.fontSize.md}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headline level 02"
+            },
+            "3": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.ml}",
+                "fontSize": "{xx.global.font.fontSize.sm}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headline level 03\n"
+            },
+            "4": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 04"
+            },
+            "5": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.black}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xxs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 05"
+            }
+          },
+          "label": {
+            "short": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.semiBold}",
+                "lineHeight": "{xx.global.font.lineHeight.xs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.md}"
+              },
+              "type": "typography",
+              "description": "labels that are single lined"
+            },
+            "long": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.semiBold}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.md}"
+              },
+              "type": "typography",
+              "description": "labels that are going over multiple lines"
+            }
+          },
+          "body": {
+            "short": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}"
+              },
+              "type": "typography",
+              "description": "single line paragraph texts"
+            },
+            "long": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}"
+              },
+              "type": "typography",
+              "description": "paragraphs that are going over multiple lines"
+            },
+            "small": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xxxs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}"
+              },
+              "type": "typography",
+              "description": "small paragraph texts"
+            }
+          },
+          "hyperlink": {
+            "default": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textDecoration": "{xx.global.font.textDecoration.underline}"
+              },
+              "type": "typography",
+              "description": "default for hyperlinks"
+            },
+            "hover": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textDecoration": "{xx.global.font.textDecoration.none}"
+              },
+              "type": "typography",
+              "description": "hover for hyperlinks"
+            }
+          }
+        }
+      }
+    }
+  },
+  "components / section-message": {
+    "xx": {
+      "component": {
+        "sectionMessage": {
+          "success": {
+            "background": {
+              "value": "{xx.alias.color.purpose.successHighEmphasis}",
+              "type": "color",
+              "description": "background color for success section messages "
+            },
+            "text": {
+              "value": "{xx.alias.color.purpose.onSuccess}",
+              "type": "color",
+              "description": "text color for success section messages"
+            },
+            "icon": {
+              "value": "{xx.alias.color.purpose.onSuccess}",
+              "type": "color",
+              "description": "icon color for success section messages"
+            }
+          },
+          "warning": {
+            "background": {
+              "value": "{xx.alias.color.purpose.warningHighEmphasis}",
+              "type": "color",
+              "description": "background color for warning section messages"
+            },
+            "text": {
+              "value": "{xx.alias.color.purpose.onWarning}",
+              "type": "color",
+              "description": "text color for warning section messages"
+            },
+            "icon": {
+              "value": "{xx.alias.color.purpose.onWarning}",
+              "type": "color",
+              "description": "icon color for warning section messages"
+            }
+          },
+          "height": {
+            "min": {
+              "value": "{xx.alias.size.md}",
+              "type": "sizing",
+              "description": "min height of section messages"
+            }
+          },
+          "spacing": {
+            "innerY": {
+              "value": "{xx.alias.spacing.md}",
+              "type": "spacing",
+              "description": "top and bottom inner spacing for section messages"
+            },
+            "innerX": {
+              "value": "{xx.alias.spacing.sm}",
+              "type": "spacing",
+              "description": "left and right inner spacing for section messages"
+            },
+            "gap": {
+              "value": "{xx.alias.spacing.xs}",
+              "type": "spacing",
+              "description": "gap for separating elements in section message"
+            }
+          },
+          "borderRadius": {
+            "value": "{xx.alias.border.radius.md}",
+            "type": "borderRadius",
+            "description": "border radius for section messages"
+          }
+        }
+      }
+    }
+  },
+  "wl-themes / client_theme_template": {
+    "xx": {
+      "global": {
+        "font": {
+          "fontFamilies": {
+            "display": {
+              "value": "IBM Plex Sans",
+              "type": "fontFamilies",
+              "description": "Font family for display fonts"
+            },
+            "content": {
+              "value": "IBM Plex Sans",
+              "type": "fontFamilies",
+              "description": "Font family for content fonts"
+            }
+          },
+          "fontWeight": {
+            "black": {
+              "value": "Bold",
+              "type": "fontWeights",
+              "description": "heaviest weight for fonts"
+            },
+            "bold": {
+              "value": "Bold",
+              "type": "fontWeights",
+              "description": "bold weight for fonts"
+            },
+            "semiBold": {
+              "value": "SemiBold",
+              "type": "fontWeights",
+              "description": "semibold weight for fonts"
+            },
+            "default": {
+              "value": "Regular",
+              "type": "fontWeights",
+              "description": "default weight for fonts"
+            }
+          }
+        }
+      },
+      "alias": {
+        "border": {
+          "width": {
+            "sm": {
+              "value": "1px",
+              "type": "borderWidth",
+              "description": "small thickness for borders"
+            },
+            "md": {
+              "value": "3px",
+              "type": "borderWidth",
+              "description": "medium border thickness"
+            }
+          },
+          "focusOutline": {
+            "value": {
+              "color": "{xx.alias.color.border.focusOutline}",
+              "width": "{xx.alias.border.width.md}",
+              "style": "solid"
+            },
+            "type": "border",
+            "description": "default outline for focused elements"
+          },
+          "radius": {
+            "sm": {
+              "value": "0",
+              "type": "borderRadius",
+              "description": "small border radius"
+            },
+            "md": {
+              "value": "4px",
+              "type": "borderRadius",
+              "description": "medium border radius"
+            },
+            "lg": {
+              "value": "8px",
+              "type": "borderRadius",
+              "description": "large border radius"
+            }
+          }
+        },
+        "color": {
+          "primary": {
+            "interaction": {
+              "value": "#DC7258",
+              "type": "color",
+              "description": "Color that indicates interactions"
+            },
+            "onInteraction": {
+              "value": "#f5f5fa",
+              "type": "color",
+              "description": "color for elements that are placed on interactive background colors"
+            },
+            "brand": {
+              "value": "#3333C2",
+              "type": "color",
+              "onPrimary": {
+                "value": "{xx.global.color.mint.100}",
+                "type": "color",
+                "description": "color for elements that are placed on primary brand color"
+              },
+              "description": "background color for primary brand elements "
+            },
+            "onBrand": {
+              "value": "#f5f5fa",
+              "type": "color",
+              "description": "color for elements that are placed on brand background color"
+            }
+          },
+          "purpose": {
+            "infoHighEmphasis": {
+              "value": "#2980b9",
+              "type": "color",
+              "description": "color for elements with informational purpose of high emphasis"
+            },
+            "infoLowEmphasis": {
+              "value": "#2980b9",
+              "type": "color",
+              "description": "color for elements with informational purpose of low emphasis"
+            },
+            "onInfo": {
+              "value": "#ffffff",
+              "type": "color",
+              "description": "color for elements placed on informational purpose background"
+            },
+            "successHighEmphasis": {
+              "value": "#2ecc71",
+              "type": "color",
+              "description": "color for elements with success purpose of high emphasis"
+            },
+            "successLowEmphasis": {
+              "value": "#2ecc71",
+              "type": "color",
+              "description": "color for elements with success purpose of low emphasis"
+            },
+            "onSuccess": {
+              "value": "#ffffff",
+              "type": "color",
+              "description": "color for elements placed on success purpose background"
+            },
+            "warningHighEmphasis": {
+              "value": "#f1c40f",
+              "type": "color",
+              "description": "color for elements with warning purpose of high emphasis"
+            },
+            "warningLowEmphasis": {
+              "value": "#f1c40f",
+              "type": "color",
+              "description": "color for elements with warning purpose of low emphasis"
+            },
+            "onWarning": {
+              "value": "#ffffff",
+              "type": "color",
+              "description": "color for elements placed on warning purpose background"
+            },
+            "criticalHighEmphasis": {
+              "value": "#e74c3c",
+              "type": "color",
+              "description": "color for elements with critical purpose of high emphasis"
+            },
+            "criticalLowEmphasis": {
+              "value": "#e74c3c",
+              "type": "color",
+              "description": "color for elements with critical purpose of low emphasis"
+            },
+            "onCritical": {
+              "value": "#ffffff",
+              "type": "color",
+              "description": "color for elements placed on critical purpose background"
+            }
+          },
+          "background": {
+            "body": {
+              "value": "#E3E6E9",
+              "type": "color",
+              "description": "body background color"
+            },
+            "highEmphasis": {
+              "value": "#ffffff",
+              "type": "color",
+              "description": "background Color for components with high emphasis"
+            },
+            "lowEmphasis": {
+              "value": "#F6F7F8",
+              "type": "color",
+              "description": "background color for elements with a low emphasis"
+            }
+          },
+          "text": {
+            "default": {
+              "value": "#353535",
+              "type": "color",
+              "description": "Default text color "
+            },
+            "inverted": {
+              "value": "#f5f5fa",
+              "type": "color",
+              "description": "Inverted text color"
+            },
+            "subtle": {
+              "value": "#9E9E9E",
+              "type": "color",
+              "description": "Text color in subtle weight"
+            }
+          },
+          "state": {
+            "disable": {
+              "value": "#bdc3c7",
+              "type": "color",
+              "description": "background color for disabled elements"
+            },
+            "onDisable": {
+              "value": "#7f8c8d",
+              "type": "color",
+              "description": "color for elements that are palced on disabled background color"
+            },
+            "select": {
+              "value": "#B4B4F2",
+              "type": "color",
+              "description": "background color for selected elements"
+            },
+            "onSelect": {
+              "value": "#0707D3",
+              "type": "color",
+              "description": "Foreground color for selected elements"
+            },
+            "selectInverted": {
+              "value": "#0707D3",
+              "type": "color",
+              "description": "Inverted background color for selected elements"
+            },
+            "onSelectInverted": {
+              "value": "#B4B4F2",
+              "type": "color",
+              "description": "inverted color for elements on selected backgrounds"
+            }
+          },
+          "border": {
+            "subtle": {
+              "value": "#C3C9D0",
+              "type": "color",
+              "description": "subtle border color"
+            },
+            "medium": {
+              "value": "#9AA5B1",
+              "type": "color",
+              "description": "medium border color"
+            },
+            "heavy": {
+              "value": "#728090",
+              "type": "color",
+              "description": "heavy border color"
+            },
+            "focusOutline": {
+              "value": "#0505A3",
+              "type": "color",
+              "description": "color for default focus outline"
+            }
+          }
+        },
+        "font-screen-lg": {
+          "display": {
+            "1": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.display}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxl}",
+                "fontSize": "{xx.global.font.fontSize.xxxl}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "display font for highest possible emphasis"
+            },
+            "2": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.display}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.xxl}",
+                "fontSize": "{xx.global.font.fontSize.xxl}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "display font for high emphasis headlines"
+            }
+          },
+          "headline": {
+            "1": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.lg}",
+                "fontSize": "{xx.global.font.fontSize.lg}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 01"
+            },
+            "2": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.lg}",
+                "fontSize": "{xx.global.font.fontSize.md}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headline level 02"
+            },
+            "3": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.ml}",
+                "fontSize": "{xx.global.font.fontSize.sm}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headline level 03\n"
+            },
+            "4": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 04"
+            },
+            "5": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.bold}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xxs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}",
+                "textCase": "{xx.global.font.textCase.none}"
+              },
+              "type": "typography",
+              "description": "headlines level 05"
+            }
+          },
+          "label": {
+            "short": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.semiBold}",
+                "lineHeight": "{xx.global.font.lineHeight.xs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.md}"
+              },
+              "type": "typography",
+              "description": "labels that are single lined"
+            },
+            "long": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.semiBold}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.md}"
+              },
+              "type": "typography",
+              "description": "labels that are going over multiple lines"
+            }
+          },
+          "body": {
+            "short": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}"
+              },
+              "type": "typography",
+              "description": "single line paragraph texts"
+            },
+            "long": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.sm}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}"
+              },
+              "type": "typography",
+              "description": "paragraphs that are going over multiple lines"
+            },
+            "small": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xxxs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.sm}"
+              },
+              "type": "typography",
+              "description": "small paragraph texts"
+            }
+          },
+          "hyperlink": {
+            "default": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textDecoration": "{xx.global.font.textDecoration.underline}"
+              },
+              "type": "typography",
+              "description": "default for hyperlinks"
+            },
+            "hover": {
+              "value": {
+                "fontFamily": "{xx.global.font.fontFamilies.content}",
+                "fontWeight": "{xx.global.font.fontWeight.default}",
+                "lineHeight": "{xx.global.font.lineHeight.xxxs}",
+                "fontSize": "{xx.global.font.fontSize.xs}",
+                "letterSpacing": "{xx.global.font.letterSpacing.xs}",
+                "textDecoration": "{xx.global.font.textDecoration.none}"
+              },
+              "type": "typography",
+              "description": "hover for hyperlinks"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$themes": [
+    {
+      "id": "8e72e033522435e5f59c84ad4b5eb566503124cb",
+      "name": "Brand",
+      "$figmaStyleReferences": {
+        "xx.global.shadow.neutral.sm": "S:b5b83aafa37d435ec54cdba4e5c31c9871ab865f,",
+        "xx.global.shadow.neutral.md": "S:c04edb7af19b6c7123d2376dccbfb813fe937cdb,",
+        "xx.global.shadow.neutral.lg": "S:7c696d5f42ec4081859a402e6983f32c8154ad13,",
+        "xx.global.shadow.neutral.xl": "S:0ab8e735da757b0caf4998d2a0370a9bf14efeb9,"
+      },
+      "selectedTokenSets": {
+        "global / font": "enabled",
+        "global / dimension": "enabled",
+        "global / color": "enabled"
+      },
+      "$figmaCollectionId": "VariableCollectionId:1506:1670",
+      "$figmaModeId": "1506:0",
+      "$figmaVariableReferences": {
+        "xx.global.dimensions.1": "c2a39e6be19cc50474dfefaf209b18763edfcc9a",
+        "xx.global.dimensions.2": "da646b2cd3ce5e6719b62021da27a102e6502b7b",
+        "xx.global.dimensions.3": "8b0e4e5f9d474f2b8eaf0b44a1ef20fb23abe0a8",
+        "xx.global.dimensions.4": "fe69201dcdc9974f37e07d59931b7c72cbabd664",
+        "xx.global.dimensions.5": "cedc498b3be2c92f9a7ed3825e24ab7906448a11",
+        "xx.global.dimensions.6": "885efa353af9ff9de5559ee2f6b47cde8d3e3f3c",
+        "xx.global.dimensions.7": "7b2cf5035c5db4de4b2b2e376f2c1cdd53e1f168",
+        "xx.global.dimensions.8": "b7b9e262790b62455d1ced3da14363d24e5cc3ab",
+        "xx.global.dimensions.9": "aea7e4f8b3ea41f5977958da40799bc4e7123f28",
+        "xx.global.dimensions.10": "8bc5ac099941ca4cdeda2c4739d95a9dbea77125",
+        "xx.global.dimensions.11": "39aa7458d66ce9f079d4461cd7229b92e67e7253",
+        "xx.global.dimensions.12": "49ed66a9ce85ebee0e030efd9da64ee1f37c545b",
+        "xx.global.dimensions.13": "4ee56c4256a64c9b5d745a5862aac78e39c919ac",
+        "xx.global.dimensions.14": "f21734702f5660d99ee6709922e61f37411949a8",
+        "xx.global.dimensions.15": "08bbc5f403e938cc75c9a65ab2ade60f1ba2e969",
+        "xx.global.color.mint.50": "700bbebd4642326247b1b4e863b9873b1e853373",
+        "xx.global.color.mint.100": "2b003d17cd64b2da8b9734ea82c409605d819c4a",
+        "xx.global.color.mint.200": "ef83fd03b53b98c3d80542a3cc225b0fd2522e94",
+        "xx.global.color.mint.300": "6dfdfb8948b5460991cdd363f2b4c4489ca05227",
+        "xx.global.color.mint.400": "fd73ad9b770e16e1d27c573ee5e94188c186d4a3",
+        "xx.global.color.mint.500": "baade598f040dd0f5e733d55fc3d120ca88e9041",
+        "xx.global.color.mint.600": "78b9362b899c5c42e410416a73f57059601e244b",
+        "xx.global.color.mint.700": "2f925000fe14f80c0fe6acde84ce644ba39d7ec8",
+        "xx.global.color.mint.800": "c02d3c6d4b603ae33dd20fd7e9425de83073054b",
+        "xx.global.color.mint.900": "a87d114c99393dd5ba189ff479a003f711d8b7fc",
+        "xx.global.color.violet.50": "b5b678ad4a16e99a8626810423c228e069409a0a",
+        "xx.global.color.violet.100": "0ff1f8f6d705ee386bcf7ac6801c2f45b6b06221",
+        "xx.global.color.violet.200": "11c798f50d7b7abac1327a53a8eb9c952fda98b9",
+        "xx.global.color.violet.300": "3bff32b0b2b87583d55ed70e4c6ee13ee8c46e3c",
+        "xx.global.color.violet.400": "2025ec8b21e5d8740651738b5cc9f35939a9c4eb",
+        "xx.global.color.violet.500": "6b6778d0d82310cb1bb8b297d0ab2b659266a5ad",
+        "xx.global.color.violet.600": "e6cb33700965d411d4e85ea8c65cb588a3bb80bf",
+        "xx.global.color.violet.700": "7471a13c7e0997ce191925f3b066c22555d5d9c7",
+        "xx.global.color.violet.800": "e35e7a7a74b54ae9ce3d4020372e482d2762c815",
+        "xx.global.color.violet.900": "fdc6980dce196e3e42769de00139d7aebd367667",
+        "xx.global.color.gold.50": "a199685016cb1c13985784f9c6ca68cfc5c72b38",
+        "xx.global.color.gold.100": "8039b2b0f89be3ce81de05b90f691e14b8f8c0c2",
+        "xx.global.color.gold.200": "3fb3b75f6e54bb671042cd2abc30a0c774754f8d",
+        "xx.global.color.gold.300": "babdfada9f773e5316294813f23188aacab91713",
+        "xx.global.color.gold.400": "ed28da35ed79ba43ca0663fa9d056e425d10e9a6",
+        "xx.global.color.gold.500": "983a16e5f52790b2800792fb11c5f65d2472a0e2",
+        "xx.global.color.gold.600": "031595db424fe4fbf35ccc0e60192dd878a91f8a",
+        "xx.global.color.gold.700": "443a3c8ca91e31eb4638f449cadba23d06015db2",
+        "xx.global.color.gold.800": "93d157a435a8d0a5f971310f1650e5b3baa2c5fb",
+        "xx.global.color.gold.900": "2a2a905bf7970c6a4d5a92da2818a57f4afbed78",
+        "xx.global.color.red.50": "46a04a0a2af0b30128e6d579f7b28291b11dad8d",
+        "xx.global.color.red.100": "e503ac63063a501732104ab0be77f46a0230fce8",
+        "xx.global.color.red.200": "7326fdad8d756a822e83e57453b1c62d621dabdb",
+        "xx.global.color.red.300": "991e905ce0141fbc730c4dacebeb00b88e5ac980",
+        "xx.global.color.red.400": "07057f1f9fd3a9189f21e8ed430ea51a61ad1c23",
+        "xx.global.color.red.500": "3361544bd889f9e6703e5bc38ea823ec337be307",
+        "xx.global.color.red.600": "cebc42b730c4a798d48f6b043c5d24adb6aeeaa4",
+        "xx.global.color.red.700": "6d381c2aa043577a168d533f9aaf615abda9ae1c",
+        "xx.global.color.red.800": "ae767d73e9a70e0c4b70f2bbe7a947621a1aeae2",
+        "xx.global.color.red.900": "948e421ebb9a7fce33f09aefa7feccf80d4ea685",
+        "xx.global.color.green.50": "feac211a088787965598740ebb6855a19e36886c",
+        "xx.global.color.green.100": "b3bb9922091ba0ca0e660ac15e10aef85fe70733",
+        "xx.global.color.green.200": "1538de2234f8bdfab338431f7434aa86ed4f066e",
+        "xx.global.color.green.300": "2bba7063badda0dbd83e1cf9808e078a4905069a",
+        "xx.global.color.green.400": "97b7c2cc7bf0a5358a48e1c74b132d174cac7144",
+        "xx.global.color.green.500": "4b21b7508c16e9247a60c6e8fab7f8bca11f9e93",
+        "xx.global.color.green.600": "4fd7495753e829ca9fafe8c8d33a5727ca45a1b2",
+        "xx.global.color.green.700": "48983deb2e05988eb33790f33462078206ca034f",
+        "xx.global.color.green.800": "f0c7705366fa76582c6e415fc3345147273dadea",
+        "xx.global.color.green.900": "22ed944f21eeb867b35ffb0fde36863616dc7c38",
+        "xx.global.color.neutral.50": "a5efdea9dc4a9c27eb8af93efdec79bc01714662",
+        "xx.global.color.neutral.100": "7d9cc3aba7c5f1be8467993cc19f62464c255736",
+        "xx.global.color.neutral.200": "c2231a29c9a57e1856e7caf12de9d3d7518ce7b0",
+        "xx.global.color.neutral.300": "1104d79ca90d43f5ea4fda9a94d83daedfdab0f4",
+        "xx.global.color.neutral.400": "78aaab198838db29cc5771874b4989c338c2ebd6",
+        "xx.global.color.neutral.500": "2bbfaac841d890b7683040ad96d787687f6863a2",
+        "xx.global.color.neutral.600": "067a746c6ce70f5d09f9ddad85549a2f5516daba",
+        "xx.global.color.neutral.700": "a6a8d64f4e51a0e4cbd13c7e6336b71021ea676b",
+        "xx.global.color.neutral.800": "e50e0f62bac3342a04acadde9af135a463c1e9ef",
+        "xx.global.color.neutral.900": "a646d42f028ccfc90dd5885efa616da0dff43fcd",
+        "xx.global.color.neutral.950": "639d48d57cc1298b17470d28dd00dee2ebbfcf28"
+      },
+      "group": "Global"
+    },
+    {
+      "id": "25cbdcf068c79666fd8b2cb625264a2a6d774a31",
+      "name": "Light Mode",
+      "$figmaStyleReferences": {
+        "xx.alias.font-screen-lg.display.1": "S:27c817a76a0c12dce5939a3046e6b76da2e46e01,",
+        "xx.alias.font-screen-lg.display.2": "S:d5dd1162293b1ec24add304083e0795f5fabd4d7,",
+        "xx.alias.font-screen-lg.headline.1": "S:f9bd184ddc2db4bee08bb861614da9ab54fdcec7,",
+        "xx.alias.font-screen-lg.headline.2": "S:0525baf34aa99ae35bc889ef42a6d86517ffdf07,",
+        "xx.alias.font-screen-lg.headline.3": "S:159ec11161f2e9a9162744a8fd674eaba90171cb,",
+        "xx.alias.font-screen-lg.headline.4": "S:2cafdbebed2693fa732f0e16175d3bd548141a4e,",
+        "xx.alias.font-screen-lg.headline.5": "S:2b91ecc09dfe5b318d6e2f72941553bd0716fff1,",
+        "xx.alias.font-screen-lg.label.short": "S:70569265e075fbc5e79f34e59b2afbf667b2ba33,",
+        "xx.alias.font-screen-lg.label.long": "S:c214af745d5fca91bd7bd26e1ad7f5c3d42f482f,",
+        "xx.alias.font-screen-lg.body.short": "S:5fd066625f116bbfac60818470e8fd288832d125,",
+        "xx.alias.font-screen-lg.body.long": "S:2e22b07cebb53946c73103efeaa0cfb94cf4105b,",
+        "xx.alias.font-screen-lg.body.small": "S:3fd33e341ec9db618ae7a49bad14fc8b8c38bf3c,",
+        "xx.alias.font-screen-lg.hyperlink.default": "S:ba117d7f7d2006ad05e6b04d6c6f5e0be2bf40d7,",
+        "xx.alias.font-screen-lg.hyperlink.hover": "S:c7504219db77cd7be44d5482f490a3ce304f5070,"
+      },
+      "selectedTokenSets": {
+        "alias / border": "enabled",
+        "global / font": "source",
+        "alias / color-light": "enabled",
+        "alias / dimension": "enabled",
+        "global / dimension": "source",
+        "global / color": "source",
+        "alias / font-screen-lg": "enabled"
+      },
+      "$figmaCollectionId": "VariableCollectionId:1506:1747",
+      "$figmaModeId": "1506:1",
+      "$figmaVariableReferences": {
+        "xx.alias.size.xxxs": "78d67d276ccb59f15f9dc053b5126f3e39a425c0",
+        "xx.alias.size.xxs": "7bb2f19388611c678f82f782cb6abefa9976f18b",
+        "xx.alias.size.xs": "54e7fb5fc8a479665cbce76bec56888c0a6a4b39",
+        "xx.alias.size.sm": "201ec7b5b87c4ad5e2447973c73d10694557c107",
+        "xx.alias.size.md": "081d2078b70e0e092b6e2a05d783eac9165c2c2d",
+        "xx.alias.size.lg": "f3de2bad2fcad758bf0d56d1e9273e334a6c3538",
+        "xx.alias.size.xl": "c2f8cf3957996cc336265e88f069da718dd89d4b",
+        "xx.alias.size.xxl": "077cd1eb81ad7a8413ece0432545d0a9eb4e4e13",
+        "xx.alias.size.xxxl": "2e11a3cdae8d72c612dce5da7362ba24a36bca91",
+        "xx.alias.spacing.xxxs": "6fe76b2d52e5e062abb6bb1548a9d22e1d0e28eb",
+        "xx.alias.spacing.xxs": "5353f8d8e677d9b8ca712108f1575868c448aff0",
+        "xx.alias.spacing.xs": "5ae050bfa4c14b283d9b77b52d503daf50f713bd",
+        "xx.alias.spacing.sm": "99f885bc258b9959ad6ad91a5683b45a870ceca2",
+        "xx.alias.spacing.md": "1cc34718f17c65cbbb61d960af9b3f184ed63831",
+        "xx.alias.spacing.lg": "17db5d4a30cae90eadb93d3075d3f96ac40f80a2",
+        "xx.alias.spacing.xl": "65e790b34efea1bf824ad963823df10d6aed2371",
+        "xx.alias.spacing.xxl": "fbd10b352a31aab33ae9cd28de0c2c019473897b",
+        "xx.alias.spacing.xxxl": "3a48a2e5fdb39992e2ac79f693f0d9f58f1b2161",
+        "xx.alias.color.primary.interaction": "c0c38977b0c64618be32ddf2b289f849dd3869d6",
+        "xx.alias.color.primary.onInteraction": "e5c6b7f0d740ab5ea88744004d3f7cb1d4346194",
+        "xx.alias.color.primary.brand": "7731d0adb790c6c44e62f28f7097896742769e5a",
+        "xx.alias.color.primary.onBrand": "a6812d589d1ecd56c774c81c0d5a837f0c7ea7bc",
+        "xx.alias.color.purpose.infoHighEmphasis": "3de02a4e262bc83456244e53b02c9971a6565c58",
+        "xx.alias.color.purpose.infoLowEmphasis": "0188188ccab5cba788414cb8e3e0414d37a67d6a",
+        "xx.alias.color.purpose.onInfo": "3aac39dd6ecf5ce580a3168b0bd559efb60ef73b",
+        "xx.alias.color.purpose.successHighEmphasis": "38529ea8854769a4f78ad74a3a35db3f86d3c2ac",
+        "xx.alias.color.purpose.successLowEmphasis": "3c465ebdbb425142348ea2e23d603451da5ab4a9",
+        "xx.alias.color.purpose.onSuccess": "6ceac3f8ee2315b8f61f5949f4e2b88fd1522667",
+        "xx.alias.color.purpose.warningHighEmphasis": "7495951cd664d42a38b0ba9ee8b477bf25b871ca",
+        "xx.alias.color.purpose.warningLowEmphasis": "02712effc1ab9c32502e3482695f2097fb23ff1b",
+        "xx.alias.color.purpose.onWarning": "aed53bc5777205785ac88c5d36f960abe4bd3da3",
+        "xx.alias.color.purpose.criticalHighEmphasis": "1698e45816f1be464aef2d48b41df225f8760549",
+        "xx.alias.color.purpose.criticalLowEmphasis": "19476d8e778695c667628033437b2eb6ecbf246e",
+        "xx.alias.color.purpose.onCritical": "7aa10a0364c43e0f687add585fb74631ce7f5fb6",
+        "xx.alias.color.background.body": "31e527319a45afc7c72002e62dca4320c1ea39e4",
+        "xx.alias.color.background.highEmphasis": "74460ede50be0bd477bcc1e4b06299c94f67fd08",
+        "xx.alias.color.background.lowEmphasis": "1a6e6a63c4aa193d8efaa4d7998cafb8d5d25d80",
+        "xx.alias.color.text.default": "898ff2cdca7a541ed697c43a929ac64bc4b7d114",
+        "xx.alias.color.text.inverted": "a920f54abba8940e4ab5fc1da39c7ca303fafb29",
+        "xx.alias.color.text.subtle": "4e429aec6512aa293f2ed1a97c5b49167295017f",
+        "xx.alias.color.state.disable": "e77e19b4dd782e42bd81aed3c640cd51198ed380",
+        "xx.alias.color.state.onDisable": "a35b42ee26e4ab2ffdd0b227dd08f8f4f31e216c",
+        "xx.alias.color.state.hover": "2a24ff807c03c4ca915bafe6bb3c66f3779ce044",
+        "xx.alias.color.state.focus": "0d8cd5e6c306100faa801b1242ea1d2b75e1b836",
+        "xx.alias.color.state.press": "431fe6c909080b0a09232d33a04b927d3597d50d",
+        "xx.alias.color.state.select": "392cb0e49be073a5ff5ca48941f4edc2fc722a46",
+        "xx.alias.color.state.onSelect": "7fd36a475cecb66ff6e09b517754a276f9d622f7",
+        "xx.alias.color.state.selectInverted": "b78f1cf14494f7a8c9c1639d6fb0d7ce0ee7f208",
+        "xx.alias.color.state.onSelectInverted": "bcad192840b07fc7703378fc5fa9a069b91cbc8e",
+        "xx.alias.color.border.subtle": "86bd69f716e84a7ca06defa408f9c0a7ecac0ebe",
+        "xx.alias.color.border.medium": "d5ed4e35b386cac24fe5c3c51ec8d0ff98f66890",
+        "xx.alias.color.border.heavy": "a521401c3883605523c5f33ff88953d7e89ce7ed",
+        "xx.alias.color.border.focusOutline": "f3dd128a48f09ae4d6f1c55d38543c7436119a0d",
+        "xx.alias.border.width.sm": "3530f87086a2e484a0bfb4208e70edf99d172c30",
+        "xx.alias.border.width.md": "6ceb948862234ac015498b22a09a887449123b9e",
+        "xx.alias.border.radius.sm": "cf668a3756e0e02e9f459d9b520c7fd16e324cc3",
+        "xx.alias.border.radius.md": "38cff1c0e6d2b1b8cfbc7d95d8a51a97e37f969e",
+        "xx.alias.border.radius.lg": "b0bf7ee6bc1f9237a39a0e4d75d8bb23637ee979"
+      },
+      "group": "Alias"
+    },
+    {
+      "id": "7b0270b681481507f925d6bffe81715cea63efd5",
+      "name": "Dark Mode",
+      "$figmaStyleReferences": {
+        "xx.alias.font-screen-lg.display.1": "S:27c817a76a0c12dce5939a3046e6b76da2e46e01,",
+        "xx.alias.font-screen-lg.display.2": "S:d5dd1162293b1ec24add304083e0795f5fabd4d7,",
+        "xx.alias.font-screen-lg.headline.1": "S:f9bd184ddc2db4bee08bb861614da9ab54fdcec7,",
+        "xx.alias.font-screen-lg.headline.2": "S:0525baf34aa99ae35bc889ef42a6d86517ffdf07,",
+        "xx.alias.font-screen-lg.headline.3": "S:159ec11161f2e9a9162744a8fd674eaba90171cb,",
+        "xx.alias.font-screen-lg.headline.4": "S:2cafdbebed2693fa732f0e16175d3bd548141a4e,",
+        "xx.alias.font-screen-lg.headline.5": "S:2b91ecc09dfe5b318d6e2f72941553bd0716fff1,",
+        "xx.alias.font-screen-lg.label.short": "S:70569265e075fbc5e79f34e59b2afbf667b2ba33,",
+        "xx.alias.font-screen-lg.label.long": "S:c214af745d5fca91bd7bd26e1ad7f5c3d42f482f,",
+        "xx.alias.font-screen-lg.body.short": "S:5fd066625f116bbfac60818470e8fd288832d125,",
+        "xx.alias.font-screen-lg.body.long": "S:2e22b07cebb53946c73103efeaa0cfb94cf4105b,",
+        "xx.alias.font-screen-lg.body.small": "S:3fd33e341ec9db618ae7a49bad14fc8b8c38bf3c,",
+        "xx.alias.font-screen-lg.hyperlink.default": "S:ba117d7f7d2006ad05e6b04d6c6f5e0be2bf40d7,",
+        "xx.alias.font-screen-lg.hyperlink.hover": "S:c7504219db77cd7be44d5482f490a3ce304f5070,"
+      },
+      "selectedTokenSets": {
+        "alias / color-dark": "enabled",
+        "alias / border": "enabled",
+        "global / font": "source",
+        "alias / dimension": "enabled",
+        "global / dimension": "source",
+        "global / color": "source",
+        "alias / font-screen-lg": "enabled"
+      },
+      "$figmaCollectionId": "VariableCollectionId:1506:1747",
+      "$figmaModeId": "1506:2",
+      "$figmaVariableReferences": {
+        "xx.alias.size.xxxs": "78d67d276ccb59f15f9dc053b5126f3e39a425c0",
+        "xx.alias.size.xxs": "7bb2f19388611c678f82f782cb6abefa9976f18b",
+        "xx.alias.size.xs": "54e7fb5fc8a479665cbce76bec56888c0a6a4b39",
+        "xx.alias.size.sm": "201ec7b5b87c4ad5e2447973c73d10694557c107",
+        "xx.alias.size.md": "081d2078b70e0e092b6e2a05d783eac9165c2c2d",
+        "xx.alias.size.lg": "f3de2bad2fcad758bf0d56d1e9273e334a6c3538",
+        "xx.alias.size.xl": "c2f8cf3957996cc336265e88f069da718dd89d4b",
+        "xx.alias.size.xxl": "077cd1eb81ad7a8413ece0432545d0a9eb4e4e13",
+        "xx.alias.size.xxxl": "2e11a3cdae8d72c612dce5da7362ba24a36bca91",
+        "xx.alias.spacing.xxxs": "6fe76b2d52e5e062abb6bb1548a9d22e1d0e28eb",
+        "xx.alias.spacing.xxs": "5353f8d8e677d9b8ca712108f1575868c448aff0",
+        "xx.alias.spacing.xs": "5ae050bfa4c14b283d9b77b52d503daf50f713bd",
+        "xx.alias.spacing.sm": "99f885bc258b9959ad6ad91a5683b45a870ceca2",
+        "xx.alias.spacing.md": "1cc34718f17c65cbbb61d960af9b3f184ed63831",
+        "xx.alias.spacing.lg": "17db5d4a30cae90eadb93d3075d3f96ac40f80a2",
+        "xx.alias.spacing.xl": "65e790b34efea1bf824ad963823df10d6aed2371",
+        "xx.alias.spacing.xxl": "fbd10b352a31aab33ae9cd28de0c2c019473897b",
+        "xx.alias.spacing.xxxl": "3a48a2e5fdb39992e2ac79f693f0d9f58f1b2161",
+        "xx.alias.color.primary.interaction": "c0c38977b0c64618be32ddf2b289f849dd3869d6",
+        "xx.alias.color.primary.onInteraction": "e5c6b7f0d740ab5ea88744004d3f7cb1d4346194",
+        "xx.alias.color.primary.brand": "7731d0adb790c6c44e62f28f7097896742769e5a",
+        "xx.alias.color.primary.onBrand": "a6812d589d1ecd56c774c81c0d5a837f0c7ea7bc",
+        "xx.alias.color.purpose.infoHighEmphasis": "3de02a4e262bc83456244e53b02c9971a6565c58",
+        "xx.alias.color.purpose.infoLowEmphasis": "0188188ccab5cba788414cb8e3e0414d37a67d6a",
+        "xx.alias.color.purpose.onInfo": "3aac39dd6ecf5ce580a3168b0bd559efb60ef73b",
+        "xx.alias.color.purpose.successHighEmphasis": "38529ea8854769a4f78ad74a3a35db3f86d3c2ac",
+        "xx.alias.color.purpose.successLowEmphasis": "3c465ebdbb425142348ea2e23d603451da5ab4a9",
+        "xx.alias.color.purpose.onSuccess": "6ceac3f8ee2315b8f61f5949f4e2b88fd1522667",
+        "xx.alias.color.purpose.warningHighEmphasis": "7495951cd664d42a38b0ba9ee8b477bf25b871ca",
+        "xx.alias.color.purpose.warningLowEmphasis": "02712effc1ab9c32502e3482695f2097fb23ff1b",
+        "xx.alias.color.purpose.onWarning": "aed53bc5777205785ac88c5d36f960abe4bd3da3",
+        "xx.alias.color.purpose.criticalHighEmphasis": "1698e45816f1be464aef2d48b41df225f8760549",
+        "xx.alias.color.purpose.criticalLowEmphasis": "19476d8e778695c667628033437b2eb6ecbf246e",
+        "xx.alias.color.purpose.onCritical": "7aa10a0364c43e0f687add585fb74631ce7f5fb6",
+        "xx.alias.color.background.body": "31e527319a45afc7c72002e62dca4320c1ea39e4",
+        "xx.alias.color.background.highEmphasis": "74460ede50be0bd477bcc1e4b06299c94f67fd08",
+        "xx.alias.color.background.lowEmphasis": "1a6e6a63c4aa193d8efaa4d7998cafb8d5d25d80",
+        "xx.alias.color.text.default": "898ff2cdca7a541ed697c43a929ac64bc4b7d114",
+        "xx.alias.color.text.inverted": "a920f54abba8940e4ab5fc1da39c7ca303fafb29",
+        "xx.alias.color.text.subtle": "4e429aec6512aa293f2ed1a97c5b49167295017f",
+        "xx.alias.color.state.disable": "e77e19b4dd782e42bd81aed3c640cd51198ed380",
+        "xx.alias.color.state.onDisable": "a35b42ee26e4ab2ffdd0b227dd08f8f4f31e216c",
+        "xx.alias.color.state.hover": "2a24ff807c03c4ca915bafe6bb3c66f3779ce044",
+        "xx.alias.color.state.focus": "0d8cd5e6c306100faa801b1242ea1d2b75e1b836",
+        "xx.alias.color.state.press": "431fe6c909080b0a09232d33a04b927d3597d50d",
+        "xx.alias.color.state.select": "392cb0e49be073a5ff5ca48941f4edc2fc722a46",
+        "xx.alias.color.state.onSelect": "7fd36a475cecb66ff6e09b517754a276f9d622f7",
+        "xx.alias.color.state.selectInverted": "b78f1cf14494f7a8c9c1639d6fb0d7ce0ee7f208",
+        "xx.alias.color.state.onSelectInverted": "bcad192840b07fc7703378fc5fa9a069b91cbc8e",
+        "xx.alias.color.border.subtle": "86bd69f716e84a7ca06defa408f9c0a7ecac0ebe",
+        "xx.alias.color.border.medium": "d5ed4e35b386cac24fe5c3c51ec8d0ff98f66890",
+        "xx.alias.color.border.heavy": "a521401c3883605523c5f33ff88953d7e89ce7ed",
+        "xx.alias.color.border.focusOutline": "f3dd128a48f09ae4d6f1c55d38543c7436119a0d",
+        "xx.alias.border.width.sm": "3530f87086a2e484a0bfb4208e70edf99d172c30",
+        "xx.alias.border.width.md": "6ceb948862234ac015498b22a09a887449123b9e",
+        "xx.alias.border.radius.sm": "cf668a3756e0e02e9f459d9b520c7fd16e324cc3",
+        "xx.alias.border.radius.md": "38cff1c0e6d2b1b8cfbc7d95d8a51a97e37f969e",
+        "xx.alias.border.radius.lg": "b0bf7ee6bc1f9237a39a0e4d75d8bb23637ee979"
+      },
+      "group": "Alias"
+    },
+    {
+      "id": "c5f588da0f9c372e8636867d00843918aa5533db",
+      "name": "Section Message",
+      "$figmaStyleReferences": {},
+      "selectedTokenSets": {
+        "global / dimension": "source",
+        "global / font": "source",
+        "alias / border": "source",
+        "alias / color-dark": "source",
+        "alias / color-light": "source",
+        "alias / dimension": "source",
+        "components / section-message": "enabled",
+        "global / color": "source",
+        "alias / font-screen-lg": "source"
+      },
+      "$figmaCollectionId": "VariableCollectionId:1506:1817",
+      "$figmaModeId": "1506:3",
+      "$figmaVariableReferences": {
+        "xx.component.sectionMessage.success.background": "2e7693c056375b23e4ec6be791e44fe409f145cf",
+        "xx.component.sectionMessage.success.text": "977353e06ff2aff0034e53c487b593e85a743842",
+        "xx.component.sectionMessage.success.icon": "23bf9672a0709362c6b23730d2f1e7b354c3535e",
+        "xx.component.sectionMessage.warning.background": "be379e98033212035b1875a2c5e2bccd3e15a788",
+        "xx.component.sectionMessage.warning.text": "7fdfc3e364cde17c376a6c77494830ae7c12c5a9",
+        "xx.component.sectionMessage.warning.icon": "b30db9c3cdf7f87e74b4f52f2d0a4c9f0fa4e3f5",
+        "xx.component.sectionMessage.height.min": "085a72f660f332902f2ee4a453e80813ac604d9b",
+        "xx.component.sectionMessage.spacing.innerY": "5943bf67cff523f762557220c09e2f5b705f71a2",
+        "xx.component.sectionMessage.spacing.innerX": "956454713d04a90b3c76e6143b6216efeb66ad37",
+        "xx.component.sectionMessage.spacing.gap": "5d1f778a2015b42fdca5176ab93a5953e614eb7c",
+        "xx.component.sectionMessage.borderRadius": "c10527b1b865cdedc47ad7ee771f01a048bfe325"
+      },
+      "group": "Components"
+    },
+    {
+      "id": "720769760dea84760d0bf13726c0f5ee0cd26848",
+      "name": "Client Theme Template",
+      "$figmaStyleReferences": {
+        "xx.alias.font-screen-lg.display.1": "S:16427621250432bc475122cdf3d1e49cb1067303,",
+        "xx.alias.font-screen-lg.display.2": "S:5ffce009aa16c2327c0933f8cc993b5aeb7e049d,",
+        "xx.alias.font-screen-lg.headline.1": "S:2f23fed79617df09a4157afa3c1c86d1cd34ebe1,",
+        "xx.alias.font-screen-lg.headline.2": "S:3037967a80fcc77d354dbbdec2acc09d9ae6bb83,",
+        "xx.alias.font-screen-lg.headline.3": "S:328b7ac74786ec65a1cbec0b27e13863406a390a,",
+        "xx.alias.font-screen-lg.headline.4": "S:907d18aa21a2d39a7de734830f94a23e34bf0608,",
+        "xx.alias.font-screen-lg.headline.5": "S:e5851777b51e52329fff928c27b12ab8eac66e97,",
+        "xx.alias.font-screen-lg.label.short": "S:5a6967128177f48d7ba99afee86ece8fc1dccabe,",
+        "xx.alias.font-screen-lg.label.long": "S:5709d9e32ec1bb5df1e7c10bef226806b1798fa2,",
+        "xx.alias.font-screen-lg.body.short": "S:d2bac761e0d376ffa77d7b0520cf78cc139b374a,",
+        "xx.alias.font-screen-lg.body.long": "S:11f63f8c5db1106612c05de6c9118517b14e1ae3,",
+        "xx.alias.font-screen-lg.body.small": "S:35cefdbbb7bfb7463731a6bcbbcb5122980dc810,",
+        "xx.alias.font-screen-lg.hyperlink.default": "S:1e3d0d32976e0f59c10ea5d893218bd1fd2ce134,",
+        "xx.alias.font-screen-lg.hyperlink.hover": "S:0deed7a0d5d902e8676522eac85302d6cf723f48,"
+      },
+      "selectedTokenSets": {
+        "global / color": "source",
+        "global / dimension": "source",
+        "global / font": "source",
+        "alias / border": "source",
+        "alias / color-light": "source",
+        "alias / dimension": "source",
+        "wl-themes / client_theme_template": "enabled",
+        "alias / font-screen-lg": "source"
+      },
+      "$figmaCollectionId": "VariableCollectionId:1506:1829",
+      "$figmaModeId": "1506:4",
+      "$figmaVariableReferences": {
+        "xx.alias.border.width.sm": "1c376a2944ae0a011aa03a0d381ff94b6e7f890b",
+        "xx.alias.border.width.md": "3531950e7dcb4b8b90ef887a35e2eb6f556c3155",
+        "xx.alias.border.radius.sm": "8e515e07704e2fe4977a163b901c77b009f8de65",
+        "xx.alias.border.radius.md": "28e04c30e356cf7a3e84e47bf686069d6fe74e81",
+        "xx.alias.border.radius.lg": "6ee2d8009414397e8eed569cbd1d2a0b79212f27",
+        "xx.alias.color.primary.interaction": "64a9f65d3a7074026cd35669893092e6a5f760d6",
+        "xx.alias.color.primary.onInteraction": "1e5dbc479f4f831fc37d8ed00f1d05fc3dc8977e",
+        "xx.alias.color.primary.brand": "797b7582db4745e29c7c0ade7bc321411090f88b",
+        "xx.alias.color.primary.onBrand": "979cf26b8de6e8c820656aa21bb3b13b3f37acd5",
+        "xx.alias.color.purpose.infoHighEmphasis": "8ba2c105b59c214fb6d9e4d6114073ebd59aae86",
+        "xx.alias.color.purpose.infoLowEmphasis": "cb9ac92fedece10bbdeb61899ef932f5f016fc37",
+        "xx.alias.color.purpose.onInfo": "be63de02bf0552647e7b47f1e4e657ef90e3499f",
+        "xx.alias.color.purpose.successHighEmphasis": "696d6888f1760145be477f1345c1218288ffe3be",
+        "xx.alias.color.purpose.successLowEmphasis": "369598eed8a3c7e14bd437f99732f3a188390ce2",
+        "xx.alias.color.purpose.onSuccess": "604f1642403588ec28e2a0943e16d4216984e7cb",
+        "xx.alias.color.purpose.warningHighEmphasis": "eeb90eaf0d6b9d6b4564133a880e6843006915a8",
+        "xx.alias.color.purpose.warningLowEmphasis": "332759a4d53a54a81193f1009b31fc37792243e1",
+        "xx.alias.color.purpose.onWarning": "4f425aa5aac412b5eb16e755e7ff4fdb0e94aa23",
+        "xx.alias.color.purpose.criticalHighEmphasis": "7f1c46fafdaf581e9ef9ca332e1d8a6c762aed16",
+        "xx.alias.color.purpose.criticalLowEmphasis": "628c2996144e49a82b78f8a001a351cfb65043fc",
+        "xx.alias.color.purpose.onCritical": "8d97bd7e80f083e860e25f2fa9a897ae877035c5",
+        "xx.alias.color.background.body": "0bfa197b7a8c1be89d90599c948b5575edbe72db",
+        "xx.alias.color.background.highEmphasis": "90b262dde67043a7fb108e46b81d525cddff1dbd",
+        "xx.alias.color.background.lowEmphasis": "31f3bc8e68e86f00ee79f7f48b6ba7aa0f8c9f61",
+        "xx.alias.color.text.default": "829e2c6ce85807bb23a3b99ad6376022d935530d",
+        "xx.alias.color.text.inverted": "575a84566191e42fae69366a763ae693e0036f35",
+        "xx.alias.color.text.subtle": "e91edf3b8be8f3b94693aeab128fc591fbc17ed3",
+        "xx.alias.color.state.disable": "f24e7a25e37135264d7a54da6c36382542d57ccd",
+        "xx.alias.color.state.onDisable": "9a56f7cc4d72a0a574804058ed8b5f0e99dfafbc",
+        "xx.alias.color.state.select": "f825d122f49ba438a26fe960144256186ea8db19",
+        "xx.alias.color.state.onSelect": "b083c7e189b9ffa79ffa717cb92989c25b5dff6e",
+        "xx.alias.color.state.selectInverted": "001f9ae8ba6c3fe2eeb49a3ae17f6fbdd356af2c",
+        "xx.alias.color.state.onSelectInverted": "11da3da12edc52f73060170c6767680c0b5ce647",
+        "xx.alias.color.border.subtle": "40518f53a8badd8697798e5ccf35769f37a16db6",
+        "xx.alias.color.border.medium": "8a3a0f57c9fcd6adf929daa856b33db68d1b2055",
+        "xx.alias.color.border.heavy": "743f058f1dffd579dd69518f4af50491de431180",
+        "xx.alias.color.border.focusOutline": "9e2ed72adde6caeb242ed9db86fb63622f448d75"
+      },
+      "group": "White Label"
+    }
+  ],
+  "$metadata": {
+    "tokenSetOrder": [
+      "global / color",
+      "global / dimension",
+      "global / font",
+      "alias / border",
+      "alias / color-dark",
+      "alias / color-light",
+      "alias / dimension",
+      "alias / font-screen-lg",
+      "components / section-message",
+      "wl-themes / client_theme_template"
+    ]
+  }
+}
