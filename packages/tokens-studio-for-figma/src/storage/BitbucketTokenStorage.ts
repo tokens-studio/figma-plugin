@@ -85,11 +85,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       );
 
       if (
-        !originBranch.data ||
-        !originBranch.data.values ||
-        !sourceBranch ||
-        !sourceBranch.target ||
-        !sourceBranch.target.hash
+        !originBranch.data
+        || !originBranch.data.values
+        || !sourceBranch
+        || !sourceBranch.target
+        || !sourceBranch.target.hash
       ) {
         throw new Error('Could not retrieve origin branch');
       }
@@ -165,13 +165,11 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
         // Fetch the content of each JSON file
         const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) =>
-            fetch(file.links.self.href, {
+          jsonFiles.map((file: any) => fetch(file.links.self.href, {
               headers: {
                 Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
               },
-            }).then((rsp) => rsp.text()),
-          ),
+            }).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
@@ -274,7 +272,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * };
    * const response = await createOrUpdateFiles(params);
    */
-  public async createOrUpdateFiles({ owner, repo, branch, changes }: CreatedOrUpdatedFileType) {
+  public async createOrUpdateFiles({
+ owner, repo, branch, changes,
+}: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
 
     const data = new FormData();
