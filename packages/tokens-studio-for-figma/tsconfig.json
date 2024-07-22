@@ -34,7 +34,10 @@
       ],
       "@/*": [
         "src/*"
-      ]
+      ],
+      "@sync-providers/*": [
+        "../sync-providers/src/*"
+      ],
     },
   },
   "exclude": [

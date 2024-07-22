@@ -127,6 +127,7 @@ module.exports = wrapper((env, argv) => {
         Types: path.resolve(__dirname, 'types'),
         '@types': path.resolve(__dirname, 'types'),
         '@': path.resolve(__dirname, 'src'),
+        '@sync-providers': path.resolve(__dirname, '../sync-providers/src'),
         'react-redux': 'react-redux/dist/react-redux.js',
       },
       fallback: {
