@@ -28,7 +28,7 @@ const StyledCountLabel = styled('span', {
     content: "'·'",
     paddingRight: '$1',
     marginRight: '$1',
-    color: '$fgSubtle',
+    color: '$fgMuted',
   },
   variants: {
     variant: {

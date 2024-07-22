@@ -119,7 +119,7 @@ const RemConfiguration = () => {
           <Label
             css={{
               fontSize: '$xsmall',
-              color: '$fgSubtle',
+              color: '$fgMuted',
               marginLeft: aliasBaseFontSize.startsWith('{') ? '$3' : '',
             }}
           >

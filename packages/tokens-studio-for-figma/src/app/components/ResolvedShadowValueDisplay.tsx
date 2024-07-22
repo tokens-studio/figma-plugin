@@ -9,7 +9,7 @@ type Props = {
 };
 
 const StyledIndexItem = styled('div', {
-  color: '$fgSubtle',
+  color: '$fgMuted',
   marginBottom: '$2',
 });
 
