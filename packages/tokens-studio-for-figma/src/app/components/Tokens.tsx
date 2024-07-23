@@ -54,8 +54,9 @@ const StatusToast = ({ open, error }: { open: boolean; error: string | null }) =
           >
             <Box
               css={{
-                background: '$dangerFg',
-                color: '$fgOnEmphasis',
+                background: '$dangerBg',
+                border: '1px solid $dangerBorder',
+                color: '$dangerFg',
                 fontSize: '$xsmall',
                 fontWeight: '$sansBold',
                 padding: '$3 $4',

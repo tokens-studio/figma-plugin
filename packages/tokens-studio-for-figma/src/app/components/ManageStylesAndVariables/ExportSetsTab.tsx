@@ -124,7 +124,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
                 <Heading>{t('exportSetsTab.confirmSets')}</Heading>
                 <ExplainerModal title={t('exportSetsTab.confirmSets')}>
                   {t('exportSetsTab.intro')}
-                  <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link>
+                  {/* Commenting out until we have those docs ready <Link target="_blank" href={docsLinks.stylesAndVariables}>{`${t('generic.learnMore')} – ${t('docs.stylesAndVariables')}`}</Link> */}
                 </ExplainerModal>
               </Stack>
             )}
@@ -162,7 +162,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           )}
       >
         <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
-        <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link>
+        {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
           gap={2}

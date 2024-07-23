@@ -34,6 +34,6 @@ export default function ProBadge({ compact }: Props) {
   const { t } = useTranslation(['licence']);
 
   return (
-    <StyledProBadge href="https://tokens.studio" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
+    <StyledProBadge href="https://tokens.studio/plugin" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
   );
 }
