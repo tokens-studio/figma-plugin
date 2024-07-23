@@ -2,7 +2,7 @@ import { SingleToken } from '@/types/tokens';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 export type SingleTokenWithoutName = Omit<SingleToken, 'name'>;
-export type SingleTokenWithoutType = Omit<SingleToken, 'type'>;
+export type SingleTokenWithoutNameOrType = Omit<SingleToken, 'name' | 'type'>;
 
 export enum FormatSensitiveTokenKeys {
   TYPE = 'type',
