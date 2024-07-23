@@ -152,7 +152,7 @@ export default function Footer() {
           />
           <IconButton
             as="a"
-            href="https://github.com/tokens-studio/figma-plugin"
+            href="https://tokensstudio.featurebase.app"
             icon={<FeedbackIcon />}
             variant="invisible"
             size="small"
