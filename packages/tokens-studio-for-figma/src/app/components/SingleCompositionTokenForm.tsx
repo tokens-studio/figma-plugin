@@ -85,7 +85,8 @@ export default function SingleCompositionTokenForm({
           borderBottomRightRadius: '0',
           height: 'auto',
           alignSelf: 'stretch',
-          width: '150px',
+          minWidth: '150px',
+          maxWidth: 'fit-content',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}
