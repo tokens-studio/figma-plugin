@@ -152,7 +152,7 @@ export default function Footer() {
           />
           <IconButton
             as="a"
-            href="https://tokensstudio.featurebase.app"
+            href="https://tokensstudio.featurebase.app/?b=65971b8c143e3c7207d29602"
             icon={<FeedbackIcon />}
             variant="invisible"
             size="small"
