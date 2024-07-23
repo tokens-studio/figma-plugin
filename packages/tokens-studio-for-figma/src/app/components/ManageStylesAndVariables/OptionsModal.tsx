@@ -173,7 +173,7 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       <Stack direction="column" align="start" gap={4}>
         <Stack direction="column" align="start" gap={3}>
           <Text>{t('options.intro')}</Text>
-          <Link target="_blank" href="https://docs.tokens.studio/">{`${t('generic.learnMore')} – ${t('docs.exportToFigmaOptions')}`}</Link>
+          {/* Commenting out until we have docs <Link target="_blank" href="https://docs.tokens.studio/">{`${t('generic.learnMore')} – ${t('docs.exportToFigmaOptions')}`}</Link> */}
         </Stack>
         <form>
           <Stack direction="column" gap={6}>
