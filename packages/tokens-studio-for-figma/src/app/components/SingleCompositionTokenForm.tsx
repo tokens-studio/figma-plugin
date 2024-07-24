@@ -85,9 +85,10 @@ export default function SingleCompositionTokenForm({
           borderBottomRightRadius: '0',
           height: 'auto',
           alignSelf: 'stretch',
-          width: '150px',
+          width: '155px',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
+          border: 'none', // We're using a wrapper that controls the border
         }}
         data-testid="composition-token-dropdown"
       />
@@ -96,7 +97,7 @@ export default function SingleCompositionTokenForm({
               && properties.map((prop, idx) => <Select.Item data-testid={`item-dropdown-menu-element-${prop}`} key={`property-${seed(idx)}`} value={prop}>{prop}</Select.Item>)}
       </Select.Content>
     </Select>
-  )
+  );
 
   return (
     <Box css={{
