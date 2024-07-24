@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useMemo, useState, useRef, useEffect,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
@@ -45,6 +45,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
+  const [themeListScrollPosition, setThemeListScrollPosition] = useState(0);
+  const themeListRef = useRef<HTMLDivElement>(null);
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
 
@@ -67,6 +69,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const handleToggleThemeEditor = useCallback((theme?: ThemeObject) => {
     if (theme && typeof theme !== 'boolean') {
       const nextState = theme.id === themeEditorOpen ? false : theme.id;
+      if (nextState) {
+        if (themeListRef.current) {
+          setThemeListScrollPosition(themeListRef.current.scrollTop);
+        }
+      }
       setThemeEditorOpen(nextState);
     } else {
       setThemeEditorOpen(!themeEditorOpen);
@@ -151,6 +158,18 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     return nextOrder;
   }, []);
 
+  useEffect(() => {
+    if (themeListRef.current) {
+      themeListRef.current.scrollTop = themeListScrollPosition;
+    }
+  }, [themeEditorOpen, themeListScrollPosition]);
+
+  const handleThemeListScroll = useCallback(() => {
+    if (themeListRef.current) {
+      setThemeListScrollPosition(themeListRef.current.scrollTop);
+    }
+  }, []);
+
   return (
     <Modal
       isOpen
@@ -215,7 +234,11 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         />
       )}
       {!!themes.length && !themeEditorOpen && (
-        <Box css={{ padding: '$3 $2 $3 0' }}>
+        <Box
+          ref={themeListRef}
+          css={{ padding: '$3 $2 $3 0', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
+          onScroll={handleThemeListScroll}
+        >
           <StyledReorderGroup
             layoutScroll
             values={treeItems}
