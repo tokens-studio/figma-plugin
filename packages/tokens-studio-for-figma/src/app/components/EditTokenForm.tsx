@@ -436,7 +436,7 @@ function EditTokenForm({ resolvedTokens }: Props) {
           if (themes.length > 0 && tokenTypesToCreateVariable.includes(internalEditToken.type)) {
             choices.push({
               key: ModalOptions.RENAME_VARIABLE,
-              label: 'Rename variable',
+              label: 'Rename variables',
             });
           }
           if (
