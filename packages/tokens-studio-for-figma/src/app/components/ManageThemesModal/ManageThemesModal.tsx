@@ -236,8 +236,9 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       {!!themes.length && !themeEditorOpen && (
         <Box
           ref={themeListRef}
-          css={{ padding: '$3 $2 $3 0', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
+          css={{ padding: '$3 $2 $3 0', overflowY: 'scroll', maxHeight: 'calc(100vh - 200px)' }}
           onScroll={handleThemeListScroll}
+          className="content scroll-container"
         >
           <StyledReorderGroup
             layoutScroll
