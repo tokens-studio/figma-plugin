@@ -89,6 +89,9 @@ export default function SingleCompositionTokenForm({
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           border: 'none', // We're using a wrapper that controls the border
+          '& * svg': property ? { // Hides the arrow for properties
+            display: 'none',
+          } : {},
         }}
         data-testid="composition-token-dropdown"
       />
