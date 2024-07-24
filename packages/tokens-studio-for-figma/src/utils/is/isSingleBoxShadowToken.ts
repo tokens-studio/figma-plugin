@@ -1,5 +1,4 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleToken, SingleBoxShadowToken, SingleBoxShadowTokenInJSON } from '@/types/tokens';
 import { TokenInJSON, Tokens } from '../convertTokens';
 
