@@ -20,17 +20,19 @@ import { SingleColorValueDisplay } from './SingleColorValueDisplay';
 
 type Props = {
   token: SingleToken;
+  ignoreResolvedValue?: boolean;
 };
 
 // Returns token value in display format
-export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token }) => {
+export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ token, ignoreResolvedValue }) => {
   const seed = useUIDSeed();
   const tokensContext = React.useContext(TokensContext);
   const { getTokenValue } = useTokens();
-  const resolvedValue = React.useMemo(() => getTokenValue(token.name, tokensContext.resolvedTokens)?.value, [
+  const resolvedValue = React.useMemo(() => (ignoreResolvedValue ? undefined : getTokenValue(token.name, tokensContext.resolvedTokens)?.value), [
     token,
     getTokenValue,
     tokensContext.resolvedTokens,
+    ignoreResolvedValue,
   ]);
 
   if (isSingleTypographyToken(token)) {
@@ -43,7 +45,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
   }
 
   if (
-    resolvedValue
+    (resolvedValue || ignoreResolvedValue)
     && typeof resolvedValue !== 'string'
     && !Array.isArray(resolvedValue)
     && isSingleCompositionToken(token)
@@ -56,7 +58,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
             property={property}
             value={value}
             // @TODO strengthen the type checking here
-            resolvedValue={get(resolvedValue, property) as CompositionTokenValue}
+            resolvedValue={ignoreResolvedValue ? false : get(resolvedValue as SingleToken, property) as CompositionTokenValue}
           />
         ))}
       </Stack>

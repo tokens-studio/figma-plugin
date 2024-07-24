@@ -2,11 +2,20 @@ import React from 'react';
 import {
   Heading, RadioGroup, RadioIndicator, RadioItem, RadioItemBefore,
   Stack,
-  Text,
   Tooltip,
 } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from '../Box';
+import TooltipProperty from '../TokenTooltip/TooltipProperty';
+import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
+import { TokenTooltipContentValue } from '../TokenTooltip/TokenTooltipContentValue';
+
+export const CompositionValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<{ property: string, value: CompositionTokenValue | number }>>> = ({ property, value }) => (
+  <TooltipProperty
+    label={property}
+    value={typeof value === 'string' || typeof value === 'number' ? value : '…'}
+  />
+);
 
 function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
   return (
@@ -20,9 +29,7 @@ function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
           border: (typeof token.value === 'string' && (token.value as string).startsWith('#')) ? `1px solid ${token.value as string}` : undefined,
         }}
       >
-        <Text>
-          {token.value as string}
-        </Text>
+        <TokenTooltipContentValue token={token} ignoreResolvedValue />
       </Box>
     </Tooltip>
   );
@@ -47,7 +54,10 @@ export default function ResolveDuplicateTokenGroup({
       key={`${groupKey}`}
     >
       <Stack direction="row" css={{ marginBottom: '$4' }}>
-        <Heading size="small"><Box as="span" css={{ minWidth: '$9', display: 'inline-flex' }}>Token</Box>{groupKey}</Heading>
+        <Heading size="small">
+          <Box as="span" css={{ minWidth: '$9', display: 'inline-flex' }}>Token</Box>
+          {groupKey}
+        </Heading>
       </Stack>
       <Stack direction="row">
         <Heading size="small" css={{ minWidth: '$9' }}>Value</Heading>
