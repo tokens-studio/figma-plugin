@@ -104,6 +104,22 @@ describe('TokenBottomBar', () => {
                 },
               ],
             },
+            {
+              name: 'composition.default',
+              type: TokenTypes.COMPOSITION,
+              value: {
+                height: '20px',
+                minHeight: '20px',
+              },
+            },
+            {
+              name: 'composition.default',
+              type: TokenTypes.COMPOSITION,
+              value: {
+                height: '40px',
+                minHeight: '40px',
+              },
+            },
           ],
         },
       },
