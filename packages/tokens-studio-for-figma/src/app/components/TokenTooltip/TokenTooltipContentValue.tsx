@@ -33,7 +33,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     tokensContext.resolvedTokens,
   ]);
 
-  if (isSingleTypographyToken(token)) {
+  if (isSingleTypographyToken(token, true)) {
     return (
       <SingleTypographyValueDisplay
         value={token.value as TokenTypographyValue}
@@ -46,7 +46,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     resolvedValue
     && typeof resolvedValue !== 'string'
     && !Array.isArray(resolvedValue)
-    && isSingleCompositionToken(token)
+    && isSingleCompositionToken(token, true)
   ) {
     return (
       <Stack direction="column" align="start" gap={2} wrap>
@@ -63,7 +63,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     );
   }
 
-  if (isSingleBoxShadowToken(token)) {
+  if (isSingleBoxShadowToken(token, true)) {
     if (Array.isArray(resolvedValue)) {
       return (
         <Stack direction="column" align="start" gap={3} wrap>
@@ -99,7 +99,7 @@ export const TokenTooltipContentValue: React.FC<React.PropsWithChildren<React.Pr
     );
   }
 
-  if (isSingleBorderToken(token)) {
+  if (isSingleBorderToken(token, true)) {
     return (
       <SingleBorderValueDisplay
         value={token.value as TokenBorderValue}

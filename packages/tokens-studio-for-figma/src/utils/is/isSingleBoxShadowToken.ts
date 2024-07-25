@@ -1,16 +1,28 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { SingleToken, SingleBoxShadowToken, SingleBoxShadowTokenInJSON } from '@/types/tokens';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { SingleBoxShadowToken, SingleBoxShadowTokenInJSON, SingleToken } from '@/types/tokens';
 import { TokenInJSON, Tokens } from '../convertTokens';
 
-const tokenTypeKey = 'type';
-const tokenValueKey = 'value';
+function getTokenTypeKey(ignoreTokenFormat: boolean): string {
+  const key = TokenFormat.tokenTypeKey;
+  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
+}
 
-export function isSingleBoxShadowToken(token: SingleToken | any): token is SingleBoxShadowToken {
+function getTokenValueKey(ignoreTokenFormat: boolean): string {
+  const key = TokenFormat.tokenValueKey;
+  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
+}
+
+export function isSingleBoxShadowToken(
+  token: SingleToken | any,
+  ignoreTokenFormat: boolean = false,
+): token is SingleBoxShadowToken {
   if (typeof token !== 'object') return false;
+  const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
+  const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
   return (
     token[tokenTypeKey] === TokenTypes.BOX_SHADOW &&
     (typeof token[tokenValueKey] === 'string' ||
-      Array.isArray(token[tokenValueKey]) ||
       (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
   );
 }
@@ -18,9 +30,9 @@ export function isSingleBoxShadowToken(token: SingleToken | any): token is Singl
 export function isSingleBoxShadowTokenInJSON(token: TokenInJSON | Tokens): token is SingleBoxShadowTokenInJSON {
   if (typeof token !== 'object') return false;
   return (
-    token[tokenTypeKey] === TokenTypes.BOX_SHADOW &&
-    (typeof token[tokenValueKey] === 'string' ||
-      Array.isArray(token[tokenValueKey]) ||
-      (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    token[TokenFormat.tokenTypeKey] === TokenTypes.BOX_SHADOW &&
+    (typeof token[TokenFormat.tokenValueKey] === 'string' ||
+      (typeof token[TokenFormat.tokenValueKey] === 'object' &&
+        !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
 }

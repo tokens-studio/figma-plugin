@@ -1,12 +1,25 @@
 import { TokenTypes } from '@/constants/TokenTypes';
-import { SingleToken, SingleTypographyToken, SingleTypographyTokenInJSON } from '@/types/tokens';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { SingleTypographyToken, SingleTypographyTokenInJSON, SingleToken } from '@/types/tokens';
 import { TokenInJSON, Tokens } from '../convertTokens';
 
-const tokenTypeKey = 'type';
-const tokenValueKey = 'value';
+function getTokenTypeKey(ignoreTokenFormat: boolean): string {
+  const key = TokenFormat.tokenTypeKey;
+  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
+}
 
-export function isSingleTypographyToken(token: SingleToken | any): token is SingleTypographyToken {
+function getTokenValueKey(ignoreTokenFormat: boolean): string {
+  const key = TokenFormat.tokenValueKey;
+  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
+}
+
+export function isSingleTypographyToken(
+  token: SingleToken | any,
+  ignoreTokenFormat: boolean = false,
+): token is SingleTypographyToken {
   if (typeof token !== 'object') return false;
+  const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
+  const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
   return (
     token[tokenTypeKey] === TokenTypes.TYPOGRAPHY &&
     (typeof token[tokenValueKey] === 'string' ||
@@ -17,8 +30,9 @@ export function isSingleTypographyToken(token: SingleToken | any): token is Sing
 export function isSingleTypographyTokenInJSON(token: TokenInJSON | Tokens): token is SingleTypographyTokenInJSON {
   if (typeof token !== 'object') return false;
   return (
-    token[tokenTypeKey] === TokenTypes.TYPOGRAPHY &&
-    (typeof token[tokenValueKey] === 'string' ||
-      (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    token[TokenFormat.tokenTypeKey] === TokenTypes.TYPOGRAPHY &&
+    (typeof token[TokenFormat.tokenValueKey] === 'string' ||
+      (typeof token[TokenFormat.tokenValueKey] === 'object' &&
+        !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
 }
