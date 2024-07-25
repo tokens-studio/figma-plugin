@@ -5,6 +5,7 @@ import { createMockStore, render, waitFor } from '../../../../tests/config/setup
 import { TokenTypes } from '@/constants/TokenTypes';
 
 import TokensBottomBar from '../TokensBottomBar';
+import { BoxShadowTypes } from '@/constants/BoxShadowTypes';
 
 function emptyFunc() {}
 
@@ -58,6 +59,50 @@ describe('TokenBottomBar', () => {
               type: TokenTypes.COLOR,
               value: '#000000',
               description: 'regular color token',
+            },
+            {
+              name: 'boxShadow.default',
+              type: TokenTypes.BOX_SHADOW,
+              value: [
+                {
+                  x: '4',
+                  y: '0',
+                  blur: '0',
+                  spread: '0',
+                  color: '#000000',
+                  type: BoxShadowTypes.INNER_SHADOW,
+                },
+                {
+                  x: '4',
+                  y: '0',
+                  blur: '0',
+                  spread: '0',
+                  color: '#000000',
+                  type: BoxShadowTypes.INNER_SHADOW,
+                },
+              ],
+            },
+            {
+              name: 'boxShadow.default',
+              type: TokenTypes.BOX_SHADOW,
+              value: [
+                {
+                  x: '2',
+                  y: '0',
+                  blur: '0',
+                  spread: '0',
+                  color: '#000000',
+                  type: BoxShadowTypes.INNER_SHADOW,
+                },
+                {
+                  x: '2',
+                  y: '0',
+                  blur: '0',
+                  spread: '0',
+                  color: '#000000',
+                  type: BoxShadowTypes.INNER_SHADOW,
+                },
+              ],
             },
           ],
         },

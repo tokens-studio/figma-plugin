@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUIDSeed } from 'react-uid';
 import {
   Heading, RadioGroup, RadioIndicator, RadioItem, RadioItemBefore,
   Stack,
@@ -6,18 +7,13 @@ import {
 } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import Box from '../Box';
-import TooltipProperty from '../TokenTooltip/TooltipProperty';
-import { CompositionTokenValue } from '@/types/CompositionTokenProperty';
 import { TokenTooltipContentValue } from '../TokenTooltip/TokenTooltipContentValue';
-
-export const CompositionValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<{ property: string, value: CompositionTokenValue | number }>>> = ({ property, value }) => (
-  <TooltipProperty
-    label={property}
-    value={typeof value === 'string' || typeof value === 'number' ? value : '…'}
-  />
-);
+import { isSingleBoxShadowToken } from '@/utils/is';
+import { SingleShadowValueDisplay } from '../TokenTooltip/SingleShadowValueDisplay';
+import { TokenBoxshadowValue } from '@/types/values';
 
 function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
+  const seed = useUIDSeed();
   return (
     <Tooltip label={`Type: ${token.type}`}>
       <Box
@@ -29,7 +25,19 @@ function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
           border: (typeof token.value === 'string' && (token.value as string).startsWith('#')) ? `1px solid ${token.value as string}` : undefined,
         }}
       >
-        <TokenTooltipContentValue token={token} ignoreResolvedValue />
+        {(isSingleBoxShadowToken(token) && Array.isArray(token.value)) ? (
+          <Stack direction="column" align="start" gap={3} wrap>
+            {token.value.map((t, index) => (
+              <SingleShadowValueDisplay
+                key={seed(t)}
+                value={Array.isArray(token.value) ? token.value[index] as TokenBoxshadowValue : undefined}
+                resolvedValue={t as TokenBoxshadowValue}
+              />
+            ))}
+          </Stack>
+        ) : (
+          <TokenTooltipContentValue token={token} ignoreResolvedValue />
+        )}
       </Box>
     </Tooltip>
   );
