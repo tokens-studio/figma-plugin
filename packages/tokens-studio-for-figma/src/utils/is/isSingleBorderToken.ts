@@ -21,18 +21,18 @@ export function isSingleBorderToken(
   const tokenTypeKey = getTokenTypeKey(ignoreTokenFormat);
   const tokenValueKey = getTokenValueKey(ignoreTokenFormat);
   return (
-    token[tokenTypeKey] === TokenTypes.BORDER &&
-    (typeof token[tokenValueKey] === 'string' ||
-      (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
+    token[tokenTypeKey] === TokenTypes.BORDER
+    && (typeof token[tokenValueKey] === 'string'
+      || (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
   );
 }
 
 export function isSingleBorderTokenInJSON(token: TokenInJSON | Tokens): token is SingleBorderTokenInJSON {
   if (typeof token !== 'object') return false;
   return (
-    token[TokenFormat.tokenTypeKey] === TokenTypes.BORDER &&
-    (typeof token[TokenFormat.tokenValueKey] === 'string' ||
-      (typeof token[TokenFormat.tokenValueKey] === 'object' &&
-        !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
+    token[TokenFormat.tokenTypeKey] === TokenTypes.BORDER
+    && (typeof token[TokenFormat.tokenValueKey] === 'string'
+      || (typeof token[TokenFormat.tokenValueKey] === 'object'
+        && !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
 }
