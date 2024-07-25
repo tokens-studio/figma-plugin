@@ -23,6 +23,7 @@ export function isSingleBoxShadowToken(
   return (
     token[tokenTypeKey] === TokenTypes.BOX_SHADOW &&
     (typeof token[tokenValueKey] === 'string' ||
+      Array.isArray(token[tokenValueKey]) ||
       (typeof token[tokenValueKey] === 'object' && !(tokenValueKey in token[tokenValueKey])))
   );
 }
@@ -32,6 +33,7 @@ export function isSingleBoxShadowTokenInJSON(token: TokenInJSON | Tokens): token
   return (
     token[TokenFormat.tokenTypeKey] === TokenTypes.BOX_SHADOW &&
     (typeof token[TokenFormat.tokenValueKey] === 'string' ||
+      Array.isArray(token[TokenFormat.tokenValueKey]) ||
       (typeof token[TokenFormat.tokenValueKey] === 'object' &&
         !(TokenFormat.tokenValueKey in token[TokenFormat.tokenValueKey])))
   );
