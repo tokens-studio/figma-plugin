@@ -10,7 +10,7 @@ env:
   LICENSE_API_URL: ${{ secrets.LICENSE_API_URL }}
 
 jobs:
-  # install dependencies and store artifact
+  # Install dependencies and store artifact
   package:
     name: Create Package
     runs-on: ubuntu-22.04
@@ -55,7 +55,7 @@ jobs:
           body: |
             ⤵️ 📦 ✨ The artifact was successfully created! Want to test it? [Download it here](${{steps.store_artifact.outputs.artifact-url}}) 👀 🎁
           edit-mode: replace
-  # install dependencies and run test command
+  # Install dependencies and run test command
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -70,7 +70,6 @@ jobs:
           cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
-      # 4: Run tests
       - name: Run test command
         run: npm run test
   coverage:
@@ -161,7 +160,6 @@ jobs:
           cache-dependency-path: "**/yarn.lock"
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
-      # 4: Build package
       - name: Run benchmark
         working-directory: packages/tokens-studio-for-figma
         run: npm run benchmark:build && npm run benchmark:run
