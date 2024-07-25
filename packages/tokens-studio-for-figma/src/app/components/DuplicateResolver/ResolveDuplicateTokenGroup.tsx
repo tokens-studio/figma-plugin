@@ -3,6 +3,7 @@ import { useUIDSeed } from 'react-uid';
 import {
   Heading, RadioGroup, RadioIndicator, RadioItem, RadioItemBefore,
   Stack,
+  Text,
   Tooltip,
 } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
@@ -36,7 +37,12 @@ function ResolveDuplicateTokenSingle({ token }: { token: SingleToken }) {
             ))}
           </Stack>
         ) : (
-          <TokenTooltipContentValue token={token} ignoreResolvedValue />
+          <>
+            {/* Comment to avoid nested ternary warning */}
+            {typeof token.value === 'string' ? <Text>{token.value as string}</Text>
+              : <TokenTooltipContentValue token={token} ignoreResolvedValue />}
+          </>
+
         )}
       </Box>
     </Tooltip>
