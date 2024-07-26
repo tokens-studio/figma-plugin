@@ -28,7 +28,7 @@ const StyledCountLabel = styled('span', {
     content: "'·'",
     paddingRight: '$1',
     marginRight: '$1',
-    color: '$fgSubtle',
+    color: '$fgMuted',
   },
   variants: {
     variant: {
@@ -83,6 +83,7 @@ export const SingleThemeEntry: React.FC<React.PropsWithChildren<React.PropsWithC
         gridTemplateColumns: 'min-content auto repeat(3, max-content) min-content',
         alignItems: 'center',
         gridGap: '$2',
+        flex: 1,
       }}
     >
 

@@ -80,9 +80,17 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       });
 
       const sourceBranchName = source || this.branch;
-      const sourceBranch = originBranch.data.values.find((branchValue: Schema.Branch) => branchValue.name === sourceBranchName);
+      const sourceBranch = originBranch.data.values.find(
+        (branchValue: Schema.Branch) => branchValue.name === sourceBranchName,
+      );
 
-      if (!originBranch.data || !originBranch.data.values || !sourceBranch || !sourceBranch.target || !sourceBranch.target.hash) {
+      if (
+        !originBranch.data
+        || !originBranch.data.values
+        || !sourceBranch
+        || !sourceBranch.target
+        || !sourceBranch.target.hash
+      ) {
         throw new Error('Could not retrieve origin branch');
       }
 
@@ -158,10 +166,10 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         // Fetch the content of each JSON file
         const jsonFileContents = await Promise.all(
           jsonFiles.map((file: any) => fetch(file.links.self.href, {
-            headers: {
-              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-            },
-          }).then((rsp) => rsp.text())),
+              headers: {
+                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+              },
+            }).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
@@ -196,23 +204,32 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         });
       } else if (data) {
         const parsed = data as GitSingleFileObject;
-        const parsedData = (Object.entries(parsed).filter(([key]) => (
-          !Object.values<string>(SystemFilenames).includes(key)
-        )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-          name,
-          type: 'tokenSet',
-          path: `${this.path}/${name}.json`,
-          data: tokenSet,
-        }));
         return [
-          ...(parsed.$metadata ? [
-            {
-              type: 'metadata' as const,
-              path: this.path,
-              data: parsed.$metadata,
-            },
-          ] : []),
-          ...parsedData,
+          {
+            type: 'themes',
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
+            data: parsed.$themes ?? [],
+          },
+          ...(parsed.$metadata
+            ? [
+                {
+                  type: 'metadata' as const,
+                  path: this.path,
+                  data: parsed.$metadata,
+                },
+              ]
+            : []),
+          ...(
+            Object.entries(parsed).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
+              string,
+              AnyTokenSet<false>,
+            ][]
+          ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+            name,
+            type: 'tokenSet',
+            path: `${this.path}/${name}.json`,
+            data: tokenSet,
+          })),
         ];
       }
       return {

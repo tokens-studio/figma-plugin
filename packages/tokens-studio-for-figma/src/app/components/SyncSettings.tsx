@@ -159,7 +159,7 @@ const SyncSettings = () => {
                             color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
                           }}
                           >
-                            <Box css={{ color: '$fgSubtle' }}>{getProviderIcon(provider.type)}</Box>
+                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
                             {provider.text}
                             {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
                           </Box>

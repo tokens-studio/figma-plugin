@@ -89,7 +89,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
           return (
             filteredThemes.length > 0 && (
               <DropdownMenu.RadioGroup key={groupName} value={typeof activeTheme[groupName] !== 'undefined' ? activeTheme[groupName] : ''}>
-                <Text css={{ color: '$fgSubtle', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
+                <Text css={{ color: '$fgMuted', padding: '$2 $3' }}>{groupName === INTERNAL_THEMES_NO_GROUP ? INTERNAL_THEMES_NO_GROUP_LABEL : groupName}</Text>
                 {
                   renderThemeOption(filteredThemes)
                 }
@@ -107,7 +107,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
         <Button variant="invisible" asDropdown css={{ flexShrink: 1, overflow: 'hidden' }}>
           <Box css={{
             marginRight: '$2',
-            color: '$fgSubtle',
+            color: '$fgMuted',
             fontWeight: '$sansRegular',
           }}
           >

@@ -3,7 +3,7 @@
   display: inline-block;
   position: relative;
   white-space: pre-wrap;
-  --mentions-color-muted: var(--colors-fgSubtle);
+  --mentions-color-muted: var(--colors-fgMuted);
 }
 
 .rc-mentions > textarea,

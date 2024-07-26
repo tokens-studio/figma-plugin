@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { useDragControls, useMotionValue } from 'framer-motion';
+import { Stack } from '@tokens-studio/ui';
 import { useSelector } from 'react-redux';
+
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { ReorderItem } from '@/motion/ReorderItem';
@@ -30,5 +32,9 @@ export function DragItem<T>({ item, children }: Props<T>) {
         </ReorderItem>
       </DragControlsContext.Provider>
     )
-    : React.createElement(React.Fragment, {}, children);
+    : (
+      <Stack direction="row">
+        {children}
+      </Stack>
+    );
 }

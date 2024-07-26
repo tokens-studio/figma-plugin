@@ -27,17 +27,22 @@
       "readWriteCreate": "读/写/创建",
       "additionalHeaders": "附加标头",
       "name": "姓名",
-      "value": "价值"
+      "value": "价值",
+      "readMore": "阅读通用版本同步指南。"
     },
     "url": {
       "title": "网址",
       "description": "存储在服务器上的令牌允许您将它们添加为只读提供程序。",
       "url": "网址",
-      "headers": "标头"
+      "headers": "标头",
+      "readMore": "阅读 URL 同步指南。"
     },
     "jsonbin": {
       "title": "JSONBIN",
-      "description": "访问存储在 JSONBin.io 上的令牌，这是一种用于双向同步的免费 JSON 存储服务。"
+      "description": "访问存储在 JSONBin.io 上的令牌，这是一种用于双向同步的免费 JSON 存储服务。",
+      "readMore": "阅读 JSONBin 同步指南。",
+      "apiKey": "API密钥",
+      "idHelp": "如果为空，Tokens Studio 将为您创建一个新的垃圾箱。"
     },
     "github": {
       "title": "GitHub"
@@ -48,14 +53,16 @@
     "supernova": {
       "accessToken": "超新星访问令牌",
       "dsUrl": "设计系统网址",
-      "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。"
+      "description": "允许您将令牌推送到选定设计系统中的特定品牌和主题。",
+      "readMore": "阅读 Supernova 同步指南。"
     },
     "ado": {
       "description": "访问存储在存储库中的令牌，以双向同步方式推送和拉取令牌。",
       "pat": "个人访问令牌",
       "orgUrl": "组织网址",
       "repositoryName": "存储库名称",
-      "projectName": "项目名称（可选）"
+      "projectName": "项目名称（可选）",
+      "readMore": "阅读 Azure DevOps 同步指南。"
     },
     "bitbucket": {
       "appPassword": "应用程序密码",
@@ -66,7 +73,13 @@
     "tokensstudio": {
       "name": "名称",
       "apikey": "API 密钥",
-      "urn": "连接 URN"
+      "urn": "连接 URN",
+      "descriptionFirstPart": "Tokens Studio 有一个独立的基于网络的平台，用于动态创建和管理设计决策，目前处于测试阶段！",
+      "signupText": "在此注册测试版访问权限。",
+      "descriptionSecondPart": "如果您已经在使用 Studio 平台并需要设置同步方面的帮助，请阅读",
+      "tokensStudioSyncGuide": "Tokens Studio 同步指南请参见此处。",
+      "pat": "个人访问令牌",
+      "id": "连接ID"
     }
   },
   "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
@@ -88,5 +101,13 @@
   "converttow3c": "转换为 W3C DTCG 格式",
   "converttolegacy": "转换为旧格式",
   "pushfirsterror": "转换前推送未保存的更改",
-  "readmoreformat": "阅读更多"
+  "readmoreformat": "阅读更多",
+  "gitLabExplained": "将您的 Gitlab 代码存储库与 Tokens Studio 连接起来，通过插件内的版本控制和双向同步进行远程令牌存储。",
+  "gitHubExplained": "将 GitHub 代码存储库与 Tokens Studio 连接，以通过插件内的版本控制和双向同步进行远程令牌存储。",
+  "bitBucketExplained": "将您的 Bitbucket 代码存储库与 Tokens Studio 连接，以通过插件内的版本控制和双向同步进行远程令牌存储。",
+  "nameHelpText": "此昵称显示在插件设置页面上，以帮助从您的列表中识别此同步提供商。",
+  "readMoreBitBucket": "阅读 Bitbucket 同步指南。",
+  "readMoreGitHub": "阅读 GitHub 同步指南。",
+  "readMoreGitLab": "阅读 GitLab 同步指南。",
+  "baseUrlHelpText": "如果您的组织正在运行企业服务器，请添加"
 }

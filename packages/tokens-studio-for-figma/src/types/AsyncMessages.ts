@@ -178,6 +178,7 @@ export type CreateAnnotationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.
 export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   tokens: AnyTokenList;
   settings: SettingsState;
+  selectedThemes?: string[];
 }>;
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;

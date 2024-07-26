@@ -4,15 +4,14 @@ import {
   Link1Icon, LinkBreak1Icon, EnterIcon, ExitIcon, ExternalLinkIcon,
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Button, Heading } from '@tokens-studio/ui';
+import {
+  Box, Stack, Button, Heading, Switch,
+} from '@tokens-studio/ui';
 import { useAuth } from '@/context/AuthContext';
-import Box from '../Box';
-import Stack from '../Stack';
 import { secondScreenSelector } from '@/selectors/secondScreenSelector';
 import { Dispatch } from '@/app/store';
 import { styled } from '@/stitches.config';
 import { track } from '@/utils/analytics';
-import { Switch, SwitchThumb } from '../Switch';
 import { Divider } from '../Divider';
 
 export const StyledBetaBadge = styled('span', {
@@ -59,7 +58,7 @@ export default function SecondScreen() {
   let statusColor;
 
   if (!user) {
-    statusColor = '$fgSubtle';
+    statusColor = '$fgMuted';
   } else if (isEnabled && user) {
     statusColor = '$successFg';
   } else {
@@ -117,9 +116,7 @@ export default function SecondScreen() {
 
                   </Stack>
 
-                  <Switch disabled={user === null} id="syncswitch" checked={isEnabled && !!user} onCheckedChange={onSyncClick}>
-                    <SwitchThumb />
-                  </Switch>
+                  <Switch disabled={user === null} id="syncswitch" checked={isEnabled && !!user} onCheckedChange={onSyncClick} />
                 </Stack>
                 <Box>
                   <Button disabled={user == null} variant="secondary" size="small" icon={<ExternalLinkIcon />} onClick={handleOpenSecondScreen}>
