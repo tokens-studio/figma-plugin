@@ -2,16 +2,8 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { SingleBorderToken, SingleBorderTokenInJSON, SingleToken } from '@/types/tokens';
 import { TokenInJSON, Tokens } from '../convertTokens';
-
-function getTokenTypeKey(ignoreTokenFormat: boolean): string {
-  const key = TokenFormat.tokenTypeKey;
-  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
-}
-
-function getTokenValueKey(ignoreTokenFormat: boolean): string {
-  const key = TokenFormat.tokenValueKey;
-  return ignoreTokenFormat && key.startsWith('$') ? key.slice(1) : key;
-}
+import { getTokenTypeKey } from '../getTokenTypeKey';
+import { getTokenValueKey } from '../getTokenValueKey';
 
 export function isSingleBorderToken(
   token: SingleToken | any,
