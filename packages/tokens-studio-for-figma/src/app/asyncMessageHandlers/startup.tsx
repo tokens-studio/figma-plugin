@@ -10,7 +10,7 @@ import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
 import { ErrorFallback } from '../components/ErrorFallback';
 import { RootState, store } from '../store';
 import { AppContainer } from '../components/AppContainer';
-import PreviewApp from './preview';
+import PreviewApp from '../preview/preview';
 import FigmaLoading from '../components/FigmaLoading';
 
 // eslint-disable-next-line

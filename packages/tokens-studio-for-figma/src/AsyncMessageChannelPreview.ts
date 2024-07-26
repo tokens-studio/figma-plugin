@@ -26,7 +26,7 @@ export type AsyncMessageChannelHandlers = {
   >
 };
 
-const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
+export const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
 
 const sendWsMessage = <Message>(ws, msg: Message) => {
   const message = JSON.stringify(msg);
@@ -70,6 +70,17 @@ enum Environment {
   BROWSER = 'BROWSER',
 }
 
+enum WebSocketsSource {
+  browser = 'browser',
+  ui = 'ui',
+  figma = 'figma',
+}
+
+enum PreviewEnvVar {
+  browser = 'browser',
+  figma = 'figma',
+}
+
 export class AsyncMessageChannelPreview {
   public static PluginInstance: AsyncMessageChannelPreview = new AsyncMessageChannelPreview(true);
 
@@ -91,7 +102,7 @@ export class AsyncMessageChannelPreview {
     this.isInFigmaSandbox = inFigmaSandbox;
     if (inFigmaSandbox) {
       this.environment = Environment.PLUGIN;
-    } else if (process.env.PREVIEW_ENV === 'browser') {
+    } else if (process.env.PREVIEW_ENV === PreviewEnvVar.browser) {
       this.environment = Environment.BROWSER;
     } else {
       this.environment = Environment.UI;
@@ -103,11 +114,11 @@ export class AsyncMessageChannelPreview {
   }
 
   private sendMessageToBrowser = (msg) => {
-    sendWsMessage(this.ws, { ...msg, src: 'ui' });
+    sendWsMessage(this.ws, { ...msg, src: WebSocketsSource.ui });
   };
 
   private sendMessageFromBrowser = (msg) => {
-    sendWsMessage(this.ws, { ...msg, src: 'browser' });
+    sendWsMessage(this.ws, { ...msg, src: WebSocketsSource.browser });
   };
 
   public getWs() {
@@ -178,14 +189,14 @@ export class AsyncMessageChannelPreview {
     };
   }
 
-  private onMessageEvent = async (msg: { id?: string; message?: AsyncMessages, src?: 'browser' | 'ui' | 'controller' }) => {
+  private onMessageEvent = async (msg: { id?: string; message?: AsyncMessages, src?: WebSocketsSource }) => {
     // This appears to be related to the monaco editor being opened. It appears to post a message to the window message event listener with no data.
     if (!msg || !msg.id || !msg.message || !msg.message.type.startsWith('async/')) {
       // eslint-disable-next-line no-console
       // console.warn('Invalid message received', msg);
       if ((msg as any)?.type && this.environment === Environment.UI) {
-        if (msg.src !== 'browser') {
-          this.sendMessageToBrowser({ ...msg, src: 'ui' });
+        if (msg.src !== WebSocketsSource.browser) {
+          this.sendMessageToBrowser({ ...msg, src: WebSocketsSource.ui });
         } else {
           sendMessageToController(msg);
         }
@@ -195,8 +206,8 @@ export class AsyncMessageChannelPreview {
     }
     const handler = this.$handlers[msg.message.type] as AsyncMessageChannelHandlers[AsyncMessageTypes] | undefined;
     if (this.environment === Environment.UI && this.isPreview) {
-      if (msg.src !== 'browser') {
-        this.sendMessageToBrowser({ ...msg, src: 'ui' });
+      if (msg.src !== WebSocketsSource.browser) {
+        this.sendMessageToBrowser({ ...msg, src: WebSocketsSource.ui });
       } else {
         sendMessageToController(msg);
       }
@@ -218,7 +229,7 @@ export class AsyncMessageChannelPreview {
           });
         } else { // eslint-disable-next-line
           if (this.environment === Environment.BROWSER) {
-            this.sendMessageFromBrowser({ ...msg, src: 'browser' });
+            this.sendMessageFromBrowser({ id: msg.id, message: payload, src: WebSocketsSource.browser });
           } else {
             sendMessageToController({ id: msg.id, message: payload });
           }
@@ -259,7 +270,7 @@ export class AsyncMessageChannelPreview {
     });
     const promise = new Promise<AsyncMessageResults & { type: Message['type'] }>((resolve, reject) => {
       this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
-        if (msg.id === messageId) {
+        if (msg?.id === messageId) {
           if ('message' in msg) {
             resolve(msg.message);
           } else {
@@ -272,7 +283,7 @@ export class AsyncMessageChannelPreview {
     });
     switch (this.environment) {
       case Environment.PLUGIN: {
-        sendMessageToUi({ id: messageId, message, src: 'figma' });
+        sendMessageToUi({ id: messageId, message, src: WebSocketsSource.figma });
         break;
       }
       case Environment.UI: {

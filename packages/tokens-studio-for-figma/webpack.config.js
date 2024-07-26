@@ -26,6 +26,7 @@ const wrapper = (callback) => {
 };
 
 module.exports = wrapper((env, argv) => {
+  const isDevServer = process.env.WEBPACK_DEV_SERVER;
 
   //Needed to load the process.env variables for sentry
   dotenv.config({
@@ -59,7 +60,7 @@ module.exports = wrapper((env, argv) => {
       rules: [
         // Converts TypeScript code to JavaScript
         // Development fast reload
-        ...(argv.PREVIEW_ENV === 'browser' ? [{
+        ...(argv.PREVIEW_ENV === 'browser' && isDevServer ? [{
           test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           use: [
@@ -147,11 +148,11 @@ module.exports = wrapper((env, argv) => {
       publicPath: '',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
-      path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
+      path: path.resolve(__dirname, argv.PREVIEW_ENV === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
-      argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
+      isDevServer && argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
