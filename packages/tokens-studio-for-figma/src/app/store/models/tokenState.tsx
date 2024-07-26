@@ -3,12 +3,10 @@ import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
-import { deepmerge } from 'deepmerge-ts';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
-import { replaceReferences } from '@/utils/findReferences';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
@@ -227,36 +225,6 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       tokens: addIdPropertyToTokens(newTokens),
     }),
-    importMultipleTokens: (state, data: UpdateTokenPayload[]) => {
-      const { activeTokenSet } = state;
-      const existingTokens = { ...state.tokens };
-      const importTokens: Record<string, AnyTokenList> = { };
-      data.forEach((token) => {
-        let { parent } = token;
-
-        if (!parent) {
-          parent = activeTokenSet;
-        }
-
-        // Check if the token already exists in the respective parent token set
-        const existingToken = existingTokens[parent] && existingTokens[parent].find((existingToken) => existingToken.name === token.name);
-        if (existingToken) {
-          existingTokens[parent][existingTokens[parent].indexOf(existingToken)] = token;
-        } else {
-          // Check if there is a parent for the token
-          if (!importTokens[parent]) {
-            importTokens[parent] = [];
-          }
-          importTokens[parent].push(token);
-        }
-      });
-
-      const merged = deepmerge(existingTokens, importTokens);
-      return {
-        ...state,
-        tokens: merged,
-      };
-    },
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
 
@@ -617,9 +585,6 @@ export const tokenState = createModel<RootModel>()({
           data: payload,
         });
       }
-    },
-    importMultipleTokens() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });

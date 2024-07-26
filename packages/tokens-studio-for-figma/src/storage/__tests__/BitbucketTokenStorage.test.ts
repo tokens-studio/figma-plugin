@@ -121,6 +121,11 @@ describe('BitbucketTokenStorage', () => {
     const result = await storageProvider.read();
     expect(result).toEqual([
       {
+        path: '/$themes.json',
+        type: 'themes',
+        data: [],
+      },
+      {
         path: '/global.json',
         name: 'global',
         type: 'tokenSet',
@@ -137,6 +142,11 @@ describe('BitbucketTokenStorage', () => {
     storageProvider.changePath('data/core.json');
 
     expect(result).toEqual([
+      {
+        path: '/$themes.json',
+        type: 'themes',
+        data: [],
+      },
       {
         path: '/global.json',
         name: 'global',

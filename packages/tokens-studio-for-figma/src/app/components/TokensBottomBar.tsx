@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 // Components
-import { Button } from '@tokens-studio/ui';
+import { Button, IconButton } from '@tokens-studio/ui';
+import { WarningTriangleSolid } from 'iconoir-react';
 import ApplySelector from './ApplySelector';
 import Box from './Box';
 import StylesDropdown from './StylesDropdown';
@@ -13,13 +14,14 @@ import ToolsDropdown from './ToolsDropdown';
 
 // State
 import useTokens from '../store/useTokens';
-import { hasUnsavedChangesSelector } from '@/selectors';
+import { hasUnsavedChangesSelector, tokensSelector } from '@/selectors';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 
 // Utils
 import { track } from '@/utils/analytics';
 import parseTokenValues from '@/utils/parseTokenValues';
 import parseJson from '@/utils/parseJson';
+import ResolveDuplicateTokensModal from './modals/ResolveDuplicateTokensModal';
 
 type Props = {
   handleError: (error: string) => void;
@@ -28,8 +30,34 @@ type Props = {
 export default function TokensBottomBar({ handleError }: Props) {
   const hasUnsavedChanges = useSelector(hasUnsavedChangesSelector);
   const stringTokens = useSelector(stringTokensSelector);
+  const tokens = useSelector(tokensSelector);
+  const [showResolveDuplicateTokensModal, setShowResolveDuplicateTokensModal] = React.useState<boolean>(false);
+
+  const handleResolveDuplicateTokensModalClose = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(false);
+  }, []);
+
+  const handleResolveDuplicateOpen = React.useCallback(() => {
+    setShowResolveDuplicateTokensModal(true);
+  }, []);
 
   const { handleJSONUpdate } = useTokens();
+
+  const hasDuplicates = useMemo(
+    () => Object.keys(tokens).some((setName) => {
+      const currentSetTokens = tokens[setName];
+      const seenNames = new Set();
+
+      return currentSetTokens.some((token) => {
+        if (seenNames.has(token.name)) {
+          return true;
+        }
+        seenNames.add(token.name);
+        return false;
+      });
+    }),
+    [tokens],
+  );
 
   const handleSaveJSON = useCallback(() => {
     try {
@@ -82,12 +110,28 @@ export default function TokensBottomBar({ handleError }: Props) {
               <ToolsDropdown />
               <StylesDropdown />
             </Stack>
-            <Stack direction="row" gap={1}>
+            <Stack direction="row" gap={2}>
+              {hasDuplicates && (
+                <IconButton
+                  onClick={handleResolveDuplicateOpen}
+                  icon={<WarningTriangleSolid />}
+                  data-testid="resolve-duplicate-modal-open-button"
+                  variant="danger"
+                  size="small"
+                  tooltip="Duplicate Tokens Found"
+                />
+              )}
               <ApplySelector />
               <SettingsDropdown />
             </Stack>
           </Stack>
         )}
+      {showResolveDuplicateTokensModal && (
+        <ResolveDuplicateTokensModal
+          isOpen={showResolveDuplicateTokensModal}
+          onClose={handleResolveDuplicateTokensModalClose}
+        />
+      )}
     </Box>
   );
 }

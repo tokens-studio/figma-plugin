@@ -11,9 +11,9 @@ import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
 
-type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN; }>;
+type ValidatedFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.JSONBIN }>;
 type Props = {
-  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.JSONBIN; }>
+  values: Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.JSONBIN }>;
   onChange: ChangeEventHandler;
   onCancel: () => void;
   onSubmit: (values: ValidatedFormValues) => void;
@@ -23,7 +23,13 @@ type Props = {
 };
 
 export default function JSONBinForm({
-  isNew = false, onChange, onSubmit, onCancel, values, hasErrored, errorMessage,
+  isNew = false,
+  onChange,
+  onSubmit,
+  onCancel,
+  values,
+  hasErrored,
+  errorMessage,
 }: Props) {
   const { t } = useTranslation(['storage']);
   const [isMasked, setIsMasked] = React.useState(true);
@@ -32,63 +38,74 @@ export default function JSONBinForm({
     setIsMasked((prev) => !prev);
   }, []);
 
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const zodSchema = zod.object({
-      provider: zod.string(),
-      name: zod.string().optional(),
-      id: zod.string().optional(),
-      secret: zod.string(),
-      internalId: zod.string().optional(),
-    });
-    const validationResult = zodSchema.safeParse(values);
-    if (validationResult.success) {
-      const formFields = {
-        ...validationResult.data,
-        provider: StorageProviderType.JSONBIN,
-        internalId: validationResult.data.internalId || generateId(24),
-      } as ValidatedFormValues;
-      onSubmit(formFields);
-    }
-  }, [values, onSubmit]);
+      const zodSchema = zod.object({
+        provider: zod.string(),
+        name: zod.string().optional(),
+        id: zod.string().optional(),
+        secret: zod.string(),
+        internalId: zod.string().optional(),
+      });
+      const validationResult = zodSchema.safeParse(values);
+      if (validationResult.success) {
+        const formFields = {
+          ...validationResult.data,
+          provider: StorageProviderType.JSONBIN,
+          internalId: validationResult.data.internalId || generateId(24),
+        } as ValidatedFormValues;
+        onSubmit(formFields);
+      }
+    },
+    [values, onSubmit],
+  );
 
   return (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-        <Text muted>
-          {t('providers.jsonbin.description')}
-          {' '}
-          <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider" target="_blank" rel="noreferrer">{t('readMore')}</Link>
+        <Text muted>{t('providers.jsonbin.description')}</Text>
+        <Text muted css={{ marginTop: '$2' }}>
+          <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider" target="_blank" rel="noreferrer">
+            {t('providers.jsonbin.readMore')}
+          </Link>
         </Text>
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
-          <TextInput autoFocus name="name" id="name" value={values.name || ''} onChange={onChange} type="text" required />
+          <TextInput
+            autoFocus
+            name="name"
+            id="name"
+            value={values.name || ''}
+            onChange={onChange}
+            type="text"
+            required
+          />
         </FormField>
         <FormField>
-          <Label htmlFor="secret">{t('secret')}</Label>
+          <Label htmlFor="secret">{t('providers.jsonbin.apiKey')}</Label>
           <TextInput
             name="secret"
             id="secret"
             value={values.secret || ''}
             onChange={onChange}
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
-            }
+            trailingAction={(
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
+            )}
             required
           />
         </FormField>
         <FormField>
           <Label htmlFor="id">{`ID${isNew ? ' (optional)' : ''}`}</Label>
-          <TextInput
-            name="id"
-            id="id"
-            value={values.id || ''}
-            onChange={onChange}
-            type="text"
-            required={!isNew}
-          />
+          <TextInput name="id" id="id" value={values.id || ''} onChange={onChange} type="text" required={!isNew} />
+          <Text muted>{t('providers.jsonbin.idHelp')}</Text>
         </FormField>
         <Stack direction="row" justify="end" gap={4}>
           <Button variant="secondary" onClick={onCancel}>
@@ -99,11 +116,7 @@ export default function JSONBinForm({
             {t('save')}
           </Button>
         </Stack>
-        {hasErrored && (
-          <ErrorMessage data-testid="provider-modal-error">
-            {errorMessage}
-          </ErrorMessage>
-        )}
+        {hasErrored && <ErrorMessage data-testid="provider-modal-error">{errorMessage}</ErrorMessage>}
       </Stack>
     </form>
   );

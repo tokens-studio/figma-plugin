@@ -68,7 +68,7 @@ export class TokenValueRetriever {
   public async getVariableReference(tokenName: string) {
     let variable;
     const storedToken = this.tokens.get(tokenName);
-    const isUsingReference = storedToken?.rawValue?.startsWith('{') && storedToken?.rawValue?.endsWith('}');
+    const isUsingReference = storedToken?.rawValue?.startsWith?.('{') && storedToken?.rawValue?.endsWith?.('}');
     const hasCachedVariable = this.cachedVariableReferences.has(tokenName);
     if (hasCachedVariable) {
       variable = this.cachedVariableReferences.get(tokenName);

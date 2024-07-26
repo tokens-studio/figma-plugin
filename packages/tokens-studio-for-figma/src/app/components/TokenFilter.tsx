@@ -75,7 +75,7 @@ const TokenFilter = () => {
           <IconButton
             onClick={handleResetSearchString}
             icon={<XCircleFillIcon />}
-            css={{ color: '$fgSubtle' }}
+            css={{ color: '$fgMuted' }}
             variant="invisible"
             size="small"
           />
