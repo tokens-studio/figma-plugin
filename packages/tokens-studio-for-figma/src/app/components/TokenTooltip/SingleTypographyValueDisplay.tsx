@@ -5,7 +5,7 @@ import Stack from '../Stack';
 
 type Props = {
   value: TokenTypographyValue;
-  resolvedValue: TokenTypographyValue;
+  resolvedValue?: TokenTypographyValue;
 };
 
 export const SingleTypographyValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue }) => (
