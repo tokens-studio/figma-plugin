@@ -71,6 +71,7 @@ AsyncMessageChannel.PluginInstance.handle(
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STARTUP, asyncHandlers.previewRequestStartup);
 
 figma.on('close', () => {
   defaultWorker.stop();
