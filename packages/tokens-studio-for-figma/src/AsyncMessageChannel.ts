@@ -3,6 +3,8 @@ import {
   AsyncMessageResults, AsyncMessageResultsMap, AsyncMessages, AsyncMessagesMap, AsyncMessageTypes,
 } from './types/AsyncMessages';
 
+import { AsyncMessageChannelPreview } from './AsyncMessageChannelPreview';
+
 // credits goes to https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887
 type IsTypeOnlyObject<Obj extends Record<PropertyKey, unknown>> = [keyof Obj] extends ['type'] ? true : false;
 
@@ -26,7 +28,7 @@ export type AsyncMessageChannelHandlers = {
   >
 };
 
-export class AsyncMessageChannel {
+class AsyncMessageChannel {
   public static PluginInstance: AsyncMessageChannel = new AsyncMessageChannel(true);
 
   public static ReactInstance: AsyncMessageChannel = new AsyncMessageChannel(false);
@@ -142,3 +144,7 @@ export class AsyncMessageChannel {
     return promise;
   }
 }
+
+const ExportedAsyncMessageChannel = !process.env.PREVIEW_ENV ? AsyncMessageChannel : AsyncMessageChannelPreview;
+
+export { ExportedAsyncMessageChannel as AsyncMessageChannel };

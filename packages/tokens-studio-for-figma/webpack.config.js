@@ -3,6 +3,10 @@ const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 const dotenv = require('dotenv');
@@ -11,7 +15,18 @@ const dotenv = require('dotenv');
 
 const { version } = require('./package.json');
 
-module.exports = (env, argv) => {
+const wrapper = (callback) => {
+  const measureSpeed = false;
+  if (!measureSpeed) { // Set to true to enable SpeedMeasurePlugin (breaks Figma UI build)
+      return callback;
+  }
+  const smp = new SpeedMeasurePlugin();
+
+  return smp.wrap(callback);
+};
+
+module.exports = wrapper((env, argv) => {
+  const isDevServer = process.env.WEBPACK_DEV_SERVER;
 
   //Needed to load the process.env variables for sentry
   dotenv.config({
@@ -29,17 +44,48 @@ module.exports = (env, argv) => {
       code: './src/plugin/controller.ts', // The entry point for your plugin code
     },
 
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      compress: true,
+      open: false,
+      // openPage: '/ui.html',
+      hot: true,
+      inline: true,
+      historyApiFallback: true,
+      port: 9000,
+      overlay: false,
+    },
+
     module: {
       rules: [
         // Converts TypeScript code to JavaScript
-        {
+        // Development fast reload
+        ...(argv.PREVIEW_ENV === 'browser' && isDevServer ? [{
+          test: /\.[jt]sx?$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: 'swc-loader',
+              options: {
+                jsc: {
+                  transform: {
+                    react: {
+                      development: argv.mode === 'development',
+                      refresh: argv.mode === 'development'
+                    }
+                  }
+                }
+              }
+            },
+          ],
+        }] : [{
           test: /\.tsx?$/,
           use: [
             {
               loader: 'swc-loader',
             },
           ],
-          exclude: /node_modules/,
+          exclude: /(node_modules|.*\.test\.(js|ts))/
         },
         {
           test: /\.c?js$/,
@@ -50,7 +96,7 @@ module.exports = (env, argv) => {
               loader: 'swc-loader',
             },
           ],
-        },
+        }]),
         // Enables including CSS by doing "import './file.css'" in your TypeScript code
         { test: /\.css$/, use: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
         // Imports webfonts
@@ -102,10 +148,11 @@ module.exports = (env, argv) => {
       publicPath: '',
       filename: '[name].js',
       sourceMapFilename: "[name].js.map",
-      path: path.resolve(__dirname, 'dist'), // Compile into a folder called "dist"
+      path: path.resolve(__dirname, argv.PREVIEW_ENV === 'browser' && !isDevServer ? 'preview' : 'dist'), // Compile into a folder called "dist"
     },
     // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
     plugins: [
+      isDevServer && argv.PREVIEW_ENV === 'browser' && new ReactRefreshPlugin({ overlay: false }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
@@ -145,10 +192,11 @@ module.exports = (env, argv) => {
         chunks: ['ui'],
         cache: argv.mode === 'production',
       }),
-      new HtmlInlineScriptPlugin({
+      argv.PREVIEW_ENV !== 'browser' && new HtmlInlineScriptPlugin({
         assetPreservePattern: [/\.js$/],
       }),
       new webpack.DefinePlugin({
+        'process.env.PREVIEW_ENV': JSON.stringify(argv.PREVIEW_ENV),
         'process.env.LAUNCHDARKLY_FLAGS': JSON.stringify(process.env.LAUNCHDARKLY_FLAGS),
       }),
       new ForkTsCheckerWebpackPlugin({
@@ -160,7 +208,8 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       }),
-
+      argv.ANALYZE_BUNDLE && new BundleAnalyzerPlugin({ openAnalyzer: false }),
     ].filter(Boolean),
   }
-};
+});
+// });
