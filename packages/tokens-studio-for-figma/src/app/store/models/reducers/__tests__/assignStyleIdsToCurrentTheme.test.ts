@@ -21,10 +21,10 @@ describe('assignStyleIdsToCurrentTheme', () => {
         { id: 'theme2', selectedTokenSets: {}, $figmaStyleReferences: { token1: 'style1' } },
       ],
     };
-    expect(assignStyleIdsToCurrentTheme(state, styleIds, tokens)).toEqual(expectedState);
+    expect(assignStyleIdsToCurrentTheme(state, { styleIds, tokens, selectedThemes: ['theme1'] })).toEqual(expectedState);
   });
 
-  it('should not update the state if there is no active theme', () => {
+  it('should not update the state if there is no selected theme', () => {
     const state = {
       activeTheme: {},
       themes: [
@@ -34,10 +34,10 @@ describe('assignStyleIdsToCurrentTheme', () => {
     } as unknown as TokenState;
     const styleIds = { token1: 'style2' };
     const tokens = [{ name: 'token1', internal__Parent: 'set1' }] as unknown as ResolveTokenValuesResult[];
-    expect(assignStyleIdsToCurrentTheme(state, styleIds, tokens)).toEqual(state);
+    expect(assignStyleIdsToCurrentTheme(state, { styleIds, tokens, selectedThemes: [] })).toEqual(state);
   });
 
-  it('should not update the state if the token is not used in any active theme', () => {
+  it('should not update the state if the token is not used in any selected theme', () => {
     const state = {
       activeTheme: { id: 'theme1' },
       themes: [
@@ -47,6 +47,6 @@ describe('assignStyleIdsToCurrentTheme', () => {
     } as unknown as TokenState;
     const styleIds = { token1: 'style2' };
     const tokens = [{ name: 'token1', internal__Parent: 'set1' }] as unknown as ResolveTokenValuesResult[];
-    expect(assignStyleIdsToCurrentTheme(state, styleIds, tokens)).toEqual(state);
+    expect(assignStyleIdsToCurrentTheme(state, { styleIds, tokens, selectedThemes: ['theme1'] })).toEqual(state);
   });
 });
