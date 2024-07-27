@@ -15,7 +15,7 @@ export default async function updateStyles(
   tokens: AnyTokenList,
   settings: SettingsState,
   shouldCreate = false,
-  selectedThemes?: string[]
+  selectedThemes?: string[],
 ): Promise<Record<string, string>> {
   // Big O (n * m * l): (n = amount of tokens, m = amount of active themes, l = amount of tokenSets)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
@@ -24,7 +24,7 @@ export default async function updateStyles(
   const activeThemes = themeInfo.themes.filter((theme) => selectedThemes?.includes(theme.id));
   const styleTokens = tokens.map((token) => {
     // When multiple theme has the same active Token set then the last activeTheme wins
-    const activeTheme = activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));
+    const activeTheme = selectedThemes?.length === 1 ? activeThemes.find((theme) => theme.id === selectedThemes[0]) : activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));
     const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
     const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);

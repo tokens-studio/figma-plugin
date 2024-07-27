@@ -361,8 +361,8 @@ export default function useTokens() {
         }
       }
     },
-    [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]
-);
+    [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings],
+  );
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
   const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
@@ -436,24 +436,31 @@ export default function useTokens() {
     });
 
     for (const themeId of selectedThemes) {
-      const selectedSets = themes.find((theme) => theme.id === themeId)?.selectedTokenSets || {};
+      const selectedSets = themes.reduce((acc, curr) => {
+        if (selectedThemes.includes(curr.id)) {
+          acc = {
+            ...acc,
+            ...curr.selectedTokenSets,
+          };
+        }
+        return acc;
+      }, {});
 
       const enabledTokenSets = Object.keys(selectedSets)
         .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
         .map((tokenSet) => tokenSet);
-  
       if (enabledTokenSets.length === 0) {
         notifyToUI('No styles created. Make sure themes are active.', { error: true });
         return;
       }
-  
-      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
-  
+
+      const tokensToResolve = mergeTokenGroups(tokens, selectedSets);
+
       const resolved = defaultTokenResolver.setTokens(tokensToResolve);
       const withoutSourceTokens = resolved.filter((token) => (
         !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
       ));
-  
+
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
@@ -467,17 +474,17 @@ export default function useTokens() {
         }
         return acc;
       }, []);
-  
+
       const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
         settings,
-        selectedThemes: [themeId]
+        selectedThemes: [themeId],
       }));
       dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
     }
     dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
-  }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
+  }, [settings, dispatch.uiState, dispatch.tokenState, themes, tokens]);
 
   const renameStylesFromTokens = useCallback(
     async (tokensToRename: TokensToRenamePayload[], parent: string) => {
