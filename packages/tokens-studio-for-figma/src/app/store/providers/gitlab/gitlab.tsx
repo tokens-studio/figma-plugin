@@ -93,7 +93,11 @@ export function useGitLab() {
           activeTheme,
           hasChangedRemote: true,
         });
-
+        dispatch.tokenState.setRemoteData({
+          tokens,
+          themes,
+          metadata,
+        });
         pushDialog({ state: 'success' });
         return {
           status: 'success',
