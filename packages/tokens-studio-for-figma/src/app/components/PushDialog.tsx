@@ -19,7 +19,12 @@ import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Modal from './Modal';
-import { FormatSelector } from './FormatSelector';
+
+export enum PushDialogTabs {
+  COMMIT = 'commit',
+  DIFF = 'diff',
+  JSON = 'json',
+}
 
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
@@ -28,7 +33,11 @@ function PushDialog() {
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
-  const [activeTab, setActiveTab] = React.useState('commit');
+  const [activeTab, setActiveTab] = React.useState(PushDialogTabs.COMMIT);
+
+  const handleToggleValueChange = React.useCallback((value: PushDialogTabs) => {
+    if (value) setActiveTab(value);
+  }, []);
 
   const redirectHref = React.useMemo(() => {
     let redirectHref = '';
@@ -135,14 +144,14 @@ function PushDialog() {
           )}
         >
           <Stack direction="column" align="start">
-            <ToggleGroup type="single" value={activeTab} onValueChange={setActiveTab} css={{ marginLeft: '$3', marginTop: '$3' }}>
-              <ToggleGroup.Item iconOnly={false} value="commit">
+            <ToggleGroup type="single" value={activeTab} onValueChange={handleToggleValueChange} css={{ marginLeft: '$3', marginTop: '$3' }}>
+              <ToggleGroup.Item iconOnly={false} value={PushDialogTabs.COMMIT}>
                 {t('commit')}
               </ToggleGroup.Item>
-              <ToggleGroup.Item iconOnly={false} value="diff">
+              <ToggleGroup.Item iconOnly={false} value={PushDialogTabs.DIFF}>
                 {t('diff')}
               </ToggleGroup.Item>
-              <ToggleGroup.Item iconOnly={false} value="json">
+              <ToggleGroup.Item iconOnly={false} value={PushDialogTabs.JSON}>
                 JSON
               </ToggleGroup.Item>
             </ToggleGroup>
