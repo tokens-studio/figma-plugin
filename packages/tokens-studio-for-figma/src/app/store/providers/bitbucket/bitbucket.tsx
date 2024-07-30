@@ -215,10 +215,15 @@ export function useBitbucket() {
             if (userDecision) {
               const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
               dispatch.tokenState.setTokenData({
-                values: content.tokens,
+                values: sortedValues,
                 themes: content.themes,
                 activeTheme,
                 usedTokenSet,
+              });
+              dispatch.tokenState.setRemoteData({
+                tokens: sortedValues,
+                themes: content.themes,
+                metadata: content.metadata,
               });
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');

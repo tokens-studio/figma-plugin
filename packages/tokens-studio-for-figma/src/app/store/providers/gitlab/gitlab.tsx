@@ -230,6 +230,11 @@ export function useGitLab() {
               activeTheme,
               hasChangedRemote: true,
             });
+            dispatch.tokenState.setRemoteData({
+              tokens: sortedValues,
+              themes: content.themes,
+              metadata: content.metadata,
+            });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
             notifyToUI('Pulled tokens from GitLab');

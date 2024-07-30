@@ -207,6 +207,11 @@ export const useADO = () => {
               activeTheme,
               hasChangedRemote: true,
             });
+            dispatch.tokenState.setRemoteData({
+              tokens: sortedValues,
+              themes: content.themes,
+              metadata: content.metadata,
+            });
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }

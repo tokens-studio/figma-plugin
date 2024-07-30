@@ -218,6 +218,11 @@ export function useGitHub() {
               usedTokenSet,
               hasChangedRemote: true,
             });
+            dispatch.tokenState.setRemoteData({
+              tokens: sortedValues,
+              themes: content.themes,
+              metadata: content.metadata,
+            });
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
             notifyToUI('Pulled tokens from GitHub');
