@@ -150,6 +150,7 @@
     "@babel/preset-typescript": "^7.12.16",
     "@changesets/cli": "^2.26.2",
     "@figma/plugin-typings": "^1.96.0",
+    "@playwright/test": "^1.45.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.13",
     "@sentry/webpack-plugin": "^2.2.0",
     "@storybook/addon-actions": "^6.5.8",

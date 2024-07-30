@@ -300,6 +300,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
   // const [websocketsServer, setWebsocketsServer] = useState(WEBSOCKET_SERVER_URL);
 
   useEffect(() => {
+    document.title = 'Tokens Studio for Figma – Web Preview';
     // if (tab && tab !== 'loading') {
     if (action) {
       if (mockActions[action][subAction]) {
