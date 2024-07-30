@@ -209,7 +209,7 @@ export default function useRemoteTokens() {
                 break;
             }
             const remoteThemes: ThemeObject[] = remoteData.themes || [];
-            // remove those active thems that are no longer present in remoteThemes
+            // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
                 if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
@@ -219,7 +219,7 @@ export default function useRemoteTokens() {
               }, {} as Record<string, string>)
               : {};
 
-            if (updateLocalTokens) {
+            if (updateLocalTokens || shouldOverride) {
               dispatch.tokenState.setTokenData({
                 values: remoteData.tokens,
                 themes: remoteData.themes,
