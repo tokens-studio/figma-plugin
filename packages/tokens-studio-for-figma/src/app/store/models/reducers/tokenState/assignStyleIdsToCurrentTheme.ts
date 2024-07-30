@@ -2,12 +2,12 @@ import type { TokenState } from '../../tokenState';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 
-export function assignStyleIdsToCurrentTheme(state: TokenState, styleIds: Record<string, string>, tokens: ResolveTokenValuesResult[]): TokenState {
-  // ignore if there is no active themes
-  if (Object.keys(state.activeTheme).length < 1) return state;
+export function assignStyleIdsToCurrentTheme(state: TokenState, { styleIds, tokens, selectedThemes }: { styleIds: Record<string, string>, tokens: ResolveTokenValuesResult[], selectedThemes: string[] }): TokenState {
+  // ignore if there is no selectedThemes
+  if (selectedThemes.length < 1) return state;
 
   const updatedThemes = [...state.themes];
-  const activeThemes = state.themes.filter((theme) => Object.values(state.activeTheme).some((v) => v === theme.id)).reverse();
+  const activeThemes = state.themes.filter((theme) => selectedThemes.some((v) => v === theme.id)).reverse();
   Object.entries(styleIds).forEach(([tokenName, styleId]) => {
     // Find the activeTheme object which involved this token
     const activeTheme = activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED
