@@ -15,13 +15,12 @@ export default async function updateStyles(
   tokens: AnyTokenList,
   settings: SettingsState,
   shouldCreate = false,
-  selectedThemes?: string[]
 ): Promise<Record<string, string>> {
   // Big O (n * m * l): (n = amount of tokens, m = amount of active themes, l = amount of tokenSets)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const activeThemes = themeInfo.themes.filter((theme) => selectedThemes?.includes(theme.id));
+  const activeThemes = themeInfo.themes.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id)).reverse();
   const styleTokens = tokens.map((token) => {
     // When multiple theme has the same active Token set then the last activeTheme wins
     const activeTheme = activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));

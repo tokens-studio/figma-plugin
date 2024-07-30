@@ -13,7 +13,9 @@ export default function ExportModal({ onClose }: Props) {
   const [exportMode, setExportMode] = React.useState<string>(ExportProviderType.SINGLE);
 
   const handleModeChange = React.useCallback((mode: ExportProviderType.SINGLE | ExportProviderType.MULTIPLE) => {
-    setExportMode(mode);
+    if (mode) {
+      setExportMode(mode);
+    }
   }, []);
 
   return (

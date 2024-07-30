@@ -106,9 +106,9 @@ describe('updateStyles', () => {
           },
           type: TokenTypes.TYPOGRAPHY,
           styleId: '',
-        }
+        },
       ],
-      settings: {} as SettingsState
+      settings: {} as SettingsState,
     });
     expect(colorSpy).toHaveBeenCalled();
     expect(textSpy).toHaveBeenCalled();
@@ -149,7 +149,7 @@ describe('updateStyles', () => {
     await updateStyles([...colorTokens], {
       prefixStylesWithThemeName: true,
       stylesColor: true,
-    } as SettingsState, false, ['light']);
+    } as SettingsState, false);
     expect(colorSpy).toHaveBeenCalledWith(
       colorTokens,
       false,

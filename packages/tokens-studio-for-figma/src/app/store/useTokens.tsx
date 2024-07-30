@@ -361,99 +361,43 @@ export default function useTokens() {
         }
       }
     },
-    [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings]
-);
+    [activeTokenSet, tokens, confirm, handleBulkRemap, dispatch.tokenState, settings],
+  );
 
   // Asks user which styles to create, then calls Figma with all tokens to create styles
-  const createStylesFromSelectedTokenSets = useCallback(async (selectedSets: ExportTokenSet[]) => {
-    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0);
-    if (!shouldCreateStyles) return;
+  const createStylesFromSelectedTokenSets = useCallback(
+    async (selectedSets: ExportTokenSet[]) => {
+      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
+      if (!shouldCreateStyles) return;
 
-    track('createStyles', {
-      type: 'sets',
-      textStyles: settings.stylesTypography,
-      colorStyles: settings.stylesColor,
-      effectStyles: settings.stylesEffect,
-    });
+      track('createStyles', {
+        type: 'sets',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+      });
 
-    const enabledTokenSets = selectedSets
-      .filter((set) => set.status === TokenSetStatus.ENABLED)
-      .map((tokenSet) => tokenSet.set);
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_CREATE_STYLES,
+        isInfinite: true,
+      });
 
-    if (enabledTokenSets.length === 0) {
-      notifyToUI('No styles created. Make sure token sets are active.', { error: true });
-      return;
-    }
+      const enabledTokenSets = selectedSets
+        .filter((set) => set.status === TokenSetStatus.ENABLED)
+        .map((tokenSet) => tokenSet.set);
 
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_CREATE_STYLES,
-      isInfinite: true,
-    });
-
-    const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
-
-    const resolved = defaultTokenResolver.setTokens(tokensToResolve);
-    const withoutSourceTokens = resolved.filter((token) => (
-      !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-    ));
-
-    const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-      const shouldCreate = [
-        settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-        settings.stylesColor && curr.type === TokenTypes.COLOR,
-        settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-      ].some((isEnabled) => isEnabled);
-      if (shouldCreate) {
-        acc.push(curr);
-      }
-      return acc;
-    }, []);
-
-    const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.CREATE_STYLES,
-      tokens: tokensToCreate,
-      settings,
-    }));
-
-    dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
-  }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
-
-  const createStylesFromSelectedThemes = useCallback(async (selectedThemes: string[]) => {
-    const shouldCreateStyles = ((settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0);
-    if (!shouldCreateStyles) return;
-
-    track('createStyles', {
-      type: 'themes',
-      textStyles: settings.stylesTypography,
-      colorStyles: settings.stylesColor,
-      effectStyles: settings.stylesEffect,
-    });
-
-    dispatch.uiState.startJob({
-      name: BackgroundJobs.UI_CREATE_STYLES,
-      isInfinite: true,
-    });
-
-    for (const themeId of selectedThemes) {
-      const selectedSets = themes.find((theme) => theme.id === themeId)?.selectedTokenSets || {};
-
-      const enabledTokenSets = Object.keys(selectedSets)
-        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-        .map((tokenSet) => tokenSet);
-  
       if (enabledTokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure themes are active.', { error: true });
+        notifyToUI('No styles created. Make sure token sets are active.', { error: true });
         return;
       }
-  
-      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
-  
+
+      const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
+
       const resolved = defaultTokenResolver.setTokens(tokensToResolve);
-      const withoutSourceTokens = resolved.filter((token) => (
-        !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent) // filter out SOURCE tokens
-      ));
-  
+      const withoutSourceTokens = resolved.filter(
+        (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
+      );
+
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
@@ -461,23 +405,90 @@ export default function useTokens() {
           settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
         ].some((isEnabled) => isEnabled);
         if (shouldCreate) {
-          if (!acc.find((token) => curr.name === token.name && curr.internal__Parent === token.internal__Parent)) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+
+      await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.CREATE_STYLES,
+        tokens: tokensToCreate,
+        settings,
+      }));
+
+      dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+    },
+    [tokens, settings, dispatch.uiState],
+  );
+
+  const createStylesFromSelectedThemes = useCallback(
+    async (selectedThemes: string[]) => {
+      const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
+      if (!shouldCreateStyles) return;
+
+      track('createStyles', {
+        type: 'themes',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+      });
+
+      const selectedSets = themes.reduce((acc, curr) => {
+        if (selectedThemes.includes(curr.id)) {
+          acc = {
+            ...acc,
+            ...curr.selectedTokenSets,
+          };
+        }
+        return acc;
+      }, {});
+
+      const enabledTokenSets = Object.keys(selectedSets)
+        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+        .map((tokenSet) => tokenSet);
+
+      if (enabledTokenSets.length === 0) {
+        notifyToUI('No styles created. Make sure some sets are active.', { error: true });
+        return;
+      }
+
+      dispatch.uiState.startJob({
+        name: BackgroundJobs.UI_CREATE_STYLES,
+        isInfinite: true,
+      });
+
+      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
+
+      const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+      const withoutSourceTokens = resolved.filter(
+        (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
+      );
+
+      const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+        const shouldCreate = [
+          settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+          settings.stylesColor && curr.type === TokenTypes.COLOR,
+          settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+        ].some((isEnabled) => isEnabled);
+        if (shouldCreate) {
+          if (!acc.find((token) => curr.name === token.name)) {
             acc.push(curr);
           }
         }
         return acc;
       }, []);
-  
+
       const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
         settings,
-        selectedThemes: [themeId]
       }));
-      dispatch.tokenState.assignStyleIdsToCurrentTheme(createStylesResult.styleIds, tokensToCreate);
-    }
-    dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
-  }, [tokens, settings, dispatch.tokenState, dispatch.uiState]);
+
+      dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+      dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
+    },
+    [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
+  );
 
   const renameStylesFromTokens = useCallback(
     async (tokensToRename: TokensToRenamePayload[], parent: string) => {
