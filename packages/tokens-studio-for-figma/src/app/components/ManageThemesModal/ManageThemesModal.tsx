@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import omit from 'just-omit';
+import debounce from 'lodash.debounce';
 import { Button, EmptyState } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +46,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const activeTheme = useSelector(activeThemeSelector);
   const { confirm } = useConfirm();
   const [themeEditorOpen, setThemeEditorOpen] = useState<boolean | string>(false);
-  const [themeListScrollPosition, setThemeListScrollPosition] = useState(0);
+  const [themeListScrollPosition, setThemeListScrollPosition] = useState<number>(0);
   const themeListRef = useRef<HTMLDivElement>(null);
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
@@ -170,6 +171,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
     }
   }, []);
 
+  const debouncedHandleThemeListScroll = useMemo(() => debounce(handleThemeListScroll, 200), [handleThemeListScroll]);
+
   return (
     <Modal
       isOpen
@@ -236,8 +239,8 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       )}
       {!!themes.length && !themeEditorOpen && (
         <Box
-          css={{ padding: '$3 $2 $3 0'}}
-          onScroll={handleThemeListScroll}
+          css={{ padding: '$3 $2 $3 0' }}
+          onScroll={debouncedHandleThemeListScroll}
         >
           <StyledReorderGroup
             layoutScroll
