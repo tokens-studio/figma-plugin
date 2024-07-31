@@ -18,7 +18,6 @@ const getDefaultStore = () => ({
     tokens: {
       global: [
         {
-          $extensions: { 'studio.tokens': {} },
           name: 'light',
           type: 'typography',
           value: {
@@ -72,7 +71,6 @@ const getDefaultStore = () => ({
           },
         },
         {
-          $extensions: { 'studio.tokens': {} },
           name: 'opacity.50',
           type: 'opacity',
           value: '30%',
@@ -126,7 +124,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -169,7 +166,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -179,7 +175,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'opacity.50',
             type: 'opacity',
             value: '50%',
@@ -239,7 +234,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -249,7 +243,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'opacity.50',
             type: 'opacity',
             value: '50%',
@@ -300,7 +293,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -310,7 +302,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'opacity.50',
             type: 'opacity',
             value: '50%',
@@ -337,7 +328,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {
@@ -347,7 +337,6 @@ describe('ImportedTokensDialog', () => {
             },
           },
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'opacity.50',
             type: 'opacity',
             value: '30%',
@@ -378,7 +367,6 @@ describe('ImportedTokensDialog', () => {
       expect(mockStore.getState().tokenState.tokens.global).toEqual(
         [
           {
-            $extensions: { 'studio.tokens': {} },
             name: 'light',
             type: 'typography',
             value: {

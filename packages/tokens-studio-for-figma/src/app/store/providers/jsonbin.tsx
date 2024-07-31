@@ -212,6 +212,11 @@ export function useJSONbin() {
         activeTheme,
         hasChangedRemote: true,
       });
+      dispatch.tokenState.setRemoteData({
+        tokens: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+        themes: content.themes,
+        metadata: { tokenSetOrder: Object.keys(tokens) },
+      });
       return content;
     }
     return content;
