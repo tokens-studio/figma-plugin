@@ -30,6 +30,7 @@ export const initializeSentry = () => {
   switch (process.env.ENVIRONMENT) {
     case 'alpha':
     case 'beta':
+    case 'development':
     case 'production':
       Sentry.init({
         dsn: DSN,
