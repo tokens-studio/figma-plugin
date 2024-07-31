@@ -6,6 +6,7 @@ import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { transformValue } from './helpers';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -18,6 +19,7 @@ export default async function setValuesOnVariable(
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
   mode: string,
+  baseFontSize: string,
   shouldRename = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
@@ -57,9 +59,11 @@ export default async function setValuesOnVariable(
               setColorValuesOnVariable(variable, mode, token.value);
             }
             break;
-          case 'FLOAT':
-            setNumberValuesOnVariable(variable, mode, Number(token.value));
+          case 'FLOAT': {
+            const transformedValue = transformValue(String(token.value), token.type, baseFontSize);
+            setNumberValuesOnVariable(variable, mode, Number(transformedValue));
             break;
+          }
           case 'STRING':
             if (typeof token.value === 'string') {
               setStringValuesOnVariable(variable, mode, token.value);
