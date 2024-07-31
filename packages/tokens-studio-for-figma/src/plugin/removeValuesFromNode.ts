@@ -175,9 +175,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       }
       break;
     case 'borderTop':
-      if ('strokes' in node && typeof node.strokes !== 'undefined') {
-        node.strokes = [];
-      }
       if ('strokeTopWeight' in node && typeof node.strokeTopWeight !== 'undefined') {
         node.strokeTopWeight = 0;
       }
@@ -186,9 +183,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       }
       break;
     case 'borderRight':
-      if ('strokes' in node && typeof node.strokes !== 'undefined') {
-        node.strokes = [];
-      }
       if ('strokeRightWeight' in node && typeof node.strokeRightWeight !== 'undefined') {
         node.strokeRightWeight = 0;
       }
@@ -197,9 +191,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       }
       break;
     case 'borderBottom':
-      if ('strokes' in node && typeof node.strokes !== 'undefined') {
-        node.strokes = [];
-      }
       if ('strokeBottomWeight' in node && typeof node.strokeBottomWeight !== 'undefined') {
         node.strokeBottomWeight = 0;
       }
@@ -208,9 +199,6 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
       }
       break;
     case 'borderLeft':
-      if ('strokes' in node && typeof node.strokes !== 'undefined') {
-        node.strokes = [];
-      }
       if ('strokeLeftWeight' in node && typeof node.strokeLeftWeight !== 'undefined') {
         node.strokeLeftWeight = 0;
       }
