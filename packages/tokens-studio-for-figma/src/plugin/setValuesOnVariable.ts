@@ -60,7 +60,7 @@ export default async function setValuesOnVariable(
             }
             break;
           case 'FLOAT': {
-            const transformedValue = transformValue(String(token.value), token.type, baseFontSize);
+            const transformedValue = transformValue(String(token.value), token.type, baseFontSize, true);
             setNumberValuesOnVariable(variable, mode, Number(transformedValue));
             break;
           }
