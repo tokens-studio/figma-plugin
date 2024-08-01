@@ -78,14 +78,16 @@ export function pullTokensFactory(
           dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
           dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
 
+          const remoteData = await useRemoteTokensResult.pullTokens({
+            context: matchingSet,
+            featureFlags: flags,
+            activeTheme,
+            usedTokenSet: params.localTokenData?.usedTokenSet,
+            collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
+            updateLocalTokens: shouldPull,
+          });
+
           if (shouldPull) {
-            const remoteData = await useRemoteTokensResult.pullTokens({
-              context: matchingSet,
-              featureFlags: flags,
-              activeTheme,
-              usedTokenSet: params.localTokenData?.usedTokenSet,
-              collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
-            });
             // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
             if (!remoteData) {
               notifyToUI('Failed to fetch tokens from remote storage', { error: true });

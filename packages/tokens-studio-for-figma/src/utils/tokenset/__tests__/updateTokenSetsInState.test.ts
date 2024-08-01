@@ -32,7 +32,7 @@ describe('updateTokenSetsInState', () => {
     } as unknown as TokenState;
   });
 
-  it('can delete token sets and update the state appropriately', () => {
+  it('should delete token sets and update the state appropriately', () => {
     const nextState = updateTokenSetsInState(
       defaultTokenState,
       (name, tokenList) => {
@@ -63,7 +63,7 @@ describe('updateTokenSetsInState', () => {
     });
   });
 
-  it('can rename token sets and update the state appropriately', () => {
+  it('should rename token sets and update the state appropriately', () => {
     const nextState = updateTokenSetsInState(
       defaultTokenState,
       (name, tokenList) => {
@@ -97,7 +97,7 @@ describe('updateTokenSetsInState', () => {
     });
   });
 
-  it('re-sets the activeTokenSet when no token sets are left', () => {
+  it('should reset the activeTokenSet when no token sets are left', () => {
     const nextState = updateTokenSetsInState(
       defaultTokenState,
       () => null,
@@ -119,7 +119,7 @@ describe('updateTokenSetsInState', () => {
     });
   });
 
-  it('can add new tokenSets', () => {
+  it('should add a copied token set next to its origin', () => {
     const nextState = updateTokenSetsInState(
       {
         tokens: {
@@ -140,17 +140,69 @@ describe('updateTokenSetsInState', () => {
         ],
       } as unknown as TokenState,
       null,
-      ['dark'],
+      ['global_Copy', [], 1],
     );
 
     expect(nextState).toEqual({
       tokens: {
         global: [],
+        global_Copy: [],
+      },
+      activeTokenSet: 'global',
+      usedTokenSet: {
+        global: TokenSetStatus.ENABLED,
+        global_Copy: TokenSetStatus.DISABLED,
+      },
+      themes: [
+        {
+          id: 'dark',
+          name: 'Dark',
+          selectedTokenSets: {
+            global: TokenSetStatus.ENABLED,
+            global_Copy: TokenSetStatus.DISABLED,
+          },
+        },
+      ],
+    });
+  });
+
+  it('should add new token set next to its parent, if nested', () => {
+    const nextState = updateTokenSetsInState(
+      {
+        tokens: {
+          global: [],
+          dark: [],
+        },
+        activeTokenSet: 'global',
+        usedTokenSet: {
+          global: TokenSetStatus.ENABLED,
+          dark: TokenSetStatus.DISABLED,
+        },
+        themes: [
+          {
+            id: 'dark',
+            name: 'Dark',
+            selectedTokenSets: {
+              global: TokenSetStatus.ENABLED,
+              dark: TokenSetStatus.DISABLED,
+            },
+          },
+        ],
+      } as unknown as TokenState,
+      null,
+      ['global/light', []],
+    );
+
+    expect(nextState).toEqual({
+      tokens: {
+        global: [],
+        'global/light': [],
         dark: [],
       },
       activeTokenSet: 'global',
       usedTokenSet: {
         global: TokenSetStatus.ENABLED,
+        'global/light': TokenSetStatus.DISABLED,
         dark: TokenSetStatus.DISABLED,
       },
       themes: [
@@ -159,6 +211,7 @@ describe('updateTokenSetsInState', () => {
           name: 'Dark',
           selectedTokenSets: {
             global: TokenSetStatus.ENABLED,
+            'global/light': TokenSetStatus.DISABLED,
             dark: TokenSetStatus.DISABLED,
           },
         },

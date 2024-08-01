@@ -9,7 +9,7 @@ export async function tryApplyVariableId(node: SceneNode, type: VariableBindable
 
   if (variable && type in node) {
     try {
-      node.setBoundVariable(type, variable.id);
+      node.setBoundVariable(type, variable);
       if (node.boundVariables?.[type] !== undefined) {
         const valueOnVariable = variable.resolveForConsumer(node).value;
         const valueOnNode = node[type as keyof typeof node];

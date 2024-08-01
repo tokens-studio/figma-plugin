@@ -32,7 +32,7 @@ function PullDialog() {
           title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
           showClose
           full
-          size="fullscreen"
+          size="large"
           isOpen
           close={onCancel}
           stickyFooter

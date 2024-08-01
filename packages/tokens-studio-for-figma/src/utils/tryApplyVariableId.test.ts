@@ -17,6 +17,14 @@ describe('tryApplyVariableId', () => {
       },
     },
   } as unknown as SceneNode;
+  const mockVariable = {
+    id: 'VariableID:519:32875',
+    key: '12345',
+    variableCollectionId: 'VariableCollectionId:12:12345',
+    name: 'token',
+    value: '8',
+    resolveForConsumer: mockResolveForConsumer,
+  };
 
   afterEach(() => {
     defaultTokenValueRetriever.clearCache();
@@ -39,14 +47,6 @@ describe('tryApplyVariableId', () => {
   });
 
   it('when there is a matching variable, should try to apply variable', async () => {
-    const mockVariable = {
-      id: 'VariableID:519:32875',
-      key: '12345',
-      variableCollectionId: 'VariableCollectionId:12:12345',
-      name: 'token',
-      value: '8',
-      resolveForConsumer: mockResolveForConsumer,
-    };
     mockImportVariableByKeyAsync.mockImplementationOnce(() => mockVariable);
     mockResolveForConsumer.mockImplementationOnce(() => mockVariable);
     const variableReferences = new Map();
@@ -56,6 +56,6 @@ describe('tryApplyVariableId', () => {
     });
     expect(await tryApplyVariableId(node, 'width', 'token')).toBe(true);
     expect(mockImportVariableByKeyAsync).toBeCalledWith('VariableID:519:32875');
-    expect(mockSetBoundVariable).toBeCalledWith('width', 'VariableID:519:32875');
+    expect(mockSetBoundVariable).toBeCalledWith('width', mockVariable);
   });
 });

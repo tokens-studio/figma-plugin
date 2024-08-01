@@ -28,7 +28,7 @@ const StyledButton = styled('button', {
   alignItems: 'center',
   gap: '$2',
   cursor: 'pointer',
-  color: '$fgSubtle',
+  color: '$fgMuted',
   opacity: 0.7,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',

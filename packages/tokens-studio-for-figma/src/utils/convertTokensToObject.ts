@@ -3,7 +3,7 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { AnyTokenList, AnyTokenSet } from '@/types/tokens';
 import { getGroupTypeName } from './stringifyTokens';
 import removeTokenId from './removeTokenId';
-import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { setTokenKey, FormatSensitiveTokenKeys } from './setTokenKey';
 
 export default function convertTokensToObject(tokens: Record<string, AnyTokenList>, storeTokenIdInJsonEditor: boolean) {
   const tokenObj = Object.entries(tokens).reduce<Record<string, AnyTokenSet<false>>>((acc, [key, val]) => {
@@ -17,22 +17,27 @@ export default function convertTokensToObject(tokens: Record<string, AnyTokenLis
 
       // Directly work with tokenWithoutName to preserve order
       if (tokenWithoutName.inheritTypeLevel) {
-        // If inheritTypeLevel exists, handle it specifically
-        const { inheritTypeLevel, ...tokenWithoutTypeLevel } = tokenWithoutName;
+        // Remove the type key and if inheritTypeLevel exists, handle it specifically
+        const { inheritTypeLevel, type, ...tokenWithoutTypeLevel } = tokenWithoutName;
 
         // Set type of group level without altering the order of tokenWithoutName
         set(tokenGroupObj, getGroupTypeName(name, inheritTypeLevel), tokenWithoutName.type);
 
         // Add value and description keys directly to preserve order
-        tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
-        tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
+        setTokenKey(tokenWithoutTypeLevel, FormatSensitiveTokenKeys.VALUE);
+        // Only add the description key if it exists
+        if (tokenWithoutTypeLevel.description) {
+          setTokenKey(tokenWithoutTypeLevel, FormatSensitiveTokenKeys.DESCRIPTION);
+        }
         set(tokenGroupObj, name, tokenWithoutTypeLevel, { merge: true });
       } else {
         // For tokens without inheritTypeLevel, directly add type, value, and description to preserve order
-        tokenWithoutName[TokenFormat.tokenTypeKey] = tokenWithoutName.type;
-        tokenWithoutName[TokenFormat.tokenValueKey] = tokenWithoutName.value;
-        tokenWithoutName[TokenFormat.tokenDescriptionKey] = tokenWithoutName.description;
-
+        setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.TYPE);
+        setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.VALUE);
+        // Only add the description key if it exists
+        if (tokenWithoutName.description) {
+          setTokenKey(tokenWithoutName, FormatSensitiveTokenKeys.DESCRIPTION);
+        }
         set(tokenGroupObj, name, tokenWithoutName, { merge: true });
       }
     });
