@@ -54,7 +54,7 @@ export default function Footer() {
   const onPushButtonClicked = React.useCallback(() => pushTokens(), [pushTokens]);
   const onPullButtonClicked = React.useCallback(() => pullTokens({ usedTokenSet, activeTheme }), [pullTokens, usedTokenSet, activeTheme]);
   const handlePullTokens = useCallback(() => {
-    pullTokens({ usedTokenSet, activeTheme });
+    pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
   return (

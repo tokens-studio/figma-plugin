@@ -64,6 +64,11 @@ export default function useURL() {
             usedTokenSet: usedTokenSets,
             activeTheme,
           });
+          dispatch.tokenState.setRemoteData({
+            tokens: applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder),
+            themes: content.themes,
+            metadata: content.metadata,
+          });
           dispatch.tokenState.setEditProhibited(true);
           return content;
         }
