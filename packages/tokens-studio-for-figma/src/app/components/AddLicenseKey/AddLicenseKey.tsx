@@ -144,7 +144,7 @@ export default function AddLicenseKey() {
             validationStatus={licenseKeyError ? 'error' : undefined}
           />
           {licenseKeyError && (
-            <Box css={{ marginTop: '$2' }}>
+            <Box css={{ paddingTop: '$2' }}>
               <ErrorMessage>{licenseKeyError}</ErrorMessage>
             </Box>
           )}
