@@ -40,6 +40,7 @@ type PullTokensOptions = {
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: Record<string, string>;
   collapsedTokenSets?: string[] | null;
+  updateLocalTokens?: boolean;
 };
 
 // @TODO typings and hooks
@@ -103,7 +104,7 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(
     async ({
-      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
+      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
     }: PullTokensOptions) => {
       track('pullTokens', { provider: context.provider });
       showPullDialog('loading');
@@ -149,9 +150,16 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
       if (remoteData?.status === 'success') {
+        dispatch.tokenState.setRemoteData({
+          tokens: remoteData.tokens,
+          themes: remoteData.themes,
+          metadata: remoteData.metadata,
+        });
         if (activeTab !== Tabs.LOADING) {
-          const format = getFormat();
-          dispatch.tokenState.setTokenFormat(format);
+          if (updateLocalTokens) {
+            const format = getFormat();
+            dispatch.tokenState.setTokenFormat(format);
+          }
         }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
@@ -201,31 +209,27 @@ export default function useRemoteTokens() {
                 break;
             }
             const remoteThemes: ThemeObject[] = remoteData.themes || [];
-            // remove those active thems that are no longer present in remoteThemes
+            // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                    acc[key] = activeTheme[key];
-                  }
-                  return acc;
-                }, {} as Record<string, string>)
+                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                  acc[key] = activeTheme[key];
+                }
+                return acc;
+              }, {} as Record<string, string>)
               : {};
 
-            dispatch.tokenState.setRemoteData({
-              tokens: remoteData.tokens,
-              themes: remoteData.themes,
-              metadata: remoteData.metadata
-            });
+            if (updateLocalTokens || shouldOverride) {
+              dispatch.tokenState.setTokenData({
+                values: remoteData.tokens,
+                themes: remoteData.themes,
+                activeTheme: filteredThemes,
+                usedTokenSet: usedTokenSet ?? {},
+                hasChangedRemote: true,
+              });
 
-            dispatch.tokenState.setTokenData({
-              values: remoteData.tokens,
-              themes: remoteData.themes,
-              activeTheme: filteredThemes,
-              usedTokenSet: usedTokenSet ?? {},
-              hasChangedRemote: true,
-            });
-
-            dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+              dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+            }
             track('Launched with token sets', {
               count: Object.keys(remoteData.tokens).length,
               setNames: Object.keys(remoteData.tokens),

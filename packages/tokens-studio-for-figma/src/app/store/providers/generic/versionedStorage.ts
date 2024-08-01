@@ -267,6 +267,13 @@ export function useGenericVersionedStorage() {
           activeTheme,
           hasChangedRemote: true,
         });
+        dispatch.tokenState.setRemoteData({
+          tokens: content.tokens,
+          themes: content.themes,
+          metadata: {
+            tokenSetOrder: Object.keys(content.tokens),
+          },
+        });
         return content;
       }
 
