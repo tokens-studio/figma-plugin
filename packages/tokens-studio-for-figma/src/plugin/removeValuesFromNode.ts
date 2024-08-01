@@ -1,6 +1,16 @@
 import { Properties } from '@/constants/Properties';
 import { resetNodeRotation } from '@/plugin/rotateNode';
 
+function removeStrokeIfEmptySides(node) {
+  const sides = {
+    left: node.strokeLeftWeight, right: node.strokeRightWeight, top: node.strokeTopWeight, bottom: node.strokeBottomWeight,
+  };
+
+  if (!Object.values(sides).some((value) => value > 0)) {
+    node.strokes = [];
+  }
+}
+
 export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
   // BORDER RADIUS
   switch (prop) {
@@ -177,6 +187,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'borderTop':
       if ('strokeTopWeight' in node && typeof node.strokeTopWeight !== 'undefined') {
         node.strokeTopWeight = 0;
+        removeStrokeIfEmptySides(node);
       }
       if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
         node.dashPattern = [0, 0];
@@ -185,6 +196,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'borderRight':
       if ('strokeRightWeight' in node && typeof node.strokeRightWeight !== 'undefined') {
         node.strokeRightWeight = 0;
+        removeStrokeIfEmptySides(node);
       }
       if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
         node.dashPattern = [0, 0];
@@ -193,6 +205,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'borderBottom':
       if ('strokeBottomWeight' in node && typeof node.strokeBottomWeight !== 'undefined') {
         node.strokeBottomWeight = 0;
+        removeStrokeIfEmptySides(node);
       }
       if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
         node.dashPattern = [0, 0];
@@ -201,6 +214,7 @@ export default function removeValuesFromNode(node: BaseNode, prop: Properties) {
     case 'borderLeft':
       if ('strokeLeftWeight' in node && typeof node.strokeLeftWeight !== 'undefined') {
         node.strokeLeftWeight = 0;
+        removeStrokeIfEmptySides(node);
       }
       if ('dashPattern' in node && typeof node.dashPattern !== 'undefined') {
         node.dashPattern = [0, 0];
