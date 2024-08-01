@@ -44,7 +44,6 @@ export const initializeSentry = () => {
         replaysOnErrorSampleRate: 1.0,
         integrations: [],
       });
-      // Sentry.addTracingExtensions();
       break;
     case 'development':
       Sentry.init({
