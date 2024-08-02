@@ -29,7 +29,7 @@ export default async function updateVariables({
     }
   });
 
-  const variableObj = await setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.renameExistingStylesAndVariables);
+  const variableObj = await setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.baseFontSize, settings.renameExistingStylesAndVariables);
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme
