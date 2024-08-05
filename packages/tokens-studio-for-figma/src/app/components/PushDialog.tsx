@@ -105,7 +105,12 @@ function PushDialog() {
     [handlePushChanges, showPushDialog],
   );
 
-  useShortcut(['Enter'], handleSaveShortcut);
+  React.useEffect(() => {
+    if (showPushDialog?.state === 'initial') {
+      useShortcut(['Enter'], handleSaveShortcut);
+      console.log("Registered");
+    }
+  }, [showPushDialog, handleSaveShortcut]);
 
   switch (showPushDialog?.state) {
     case 'dtcgconversion':
