@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
@@ -17,6 +18,7 @@ import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageTy
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export async function updateJSONBinTokens({
   tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor, dispatch,
@@ -217,6 +219,8 @@ export function useJSONbin() {
         themes: content.themes,
         metadata: { tokenSetOrder: Object.keys(tokens) },
       });
+      const stringifiedRemoteTokens = JSON.stringify(compact([applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder), content.themes, TokenFormat.format]), null, 2);
+      dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
       return content;
     }
     return content;

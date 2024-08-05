@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -23,7 +24,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
-import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -155,6 +156,8 @@ export default function useRemoteTokens() {
           themes: remoteData.themes,
           metadata: remoteData.metadata,
         });
+        const stringifiedRemoteTokens = JSON.stringify(compact([remoteData.tokens, remoteData.themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
             const format = getFormat();
