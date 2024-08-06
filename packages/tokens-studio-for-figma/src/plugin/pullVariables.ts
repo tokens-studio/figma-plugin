@@ -21,110 +21,115 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     });
   }
 
+  // eslint-disable-next-line consistent-return
   figma.variables.getLocalVariables().forEach((variable) => {
     const variableName = variable.name.replace(/\//g, '.');
-    const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
-    switch (variable.resolvedType) {
-      case 'COLOR':
-        Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          let tokenValue;
+    try {
+      const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+      switch (variable.resolvedType) {
+        case 'COLOR':
+          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            let tokenValue;
 
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-            const alias = figma.variables.getVariableById(value.id);
-            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else {
-            tokenValue = figmaRGBToHex(value as RGBA);
-          }
-
-          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-          if (tokenValue) {
-            colors.push({
-              name: variableName,
-              value: tokenValue as string,
-              type: TokenTypes.COLOR,
-              parent: `${collection?.name}/${modeName}`,
-              description: variable.description,
-            });
-          }
-        });
-        break;
-      case 'BOOLEAN':
-        Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-          let tokenValue;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-            const alias = figma.variables.getVariableById(value.id);
-            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else {
-            tokenValue = JSON.stringify(value);
-          }
-
-          booleans.push({
-            name: variableName,
-            value: tokenValue,
-            type: TokenTypes.BOOLEAN,
-            parent: `${collection?.name}/${modeName}`,
-            description: variable.description,
-          });
-        });
-        break;
-      case 'STRING':
-        Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
-          let tokenValue;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-            const alias = figma.variables.getVariableById(value.id);
-            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else {
-            tokenValue = value;
-          }
-
-          strings.push({
-            name: variableName,
-            value: tokenValue as string,
-            type: TokenTypes.TEXT,
-            parent: `${collection?.name}/${modeName}`,
-            description: variable.description,
-          });
-        });
-        break;
-      case 'FLOAT':
-        Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
-          let tokenValue: string | number = value as number;
-          if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
-            const alias = figma.variables.getVariableById(value.id);
-            tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
-          } else if (typeof value === 'number') {
-            if (options.useRem) {
-              tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
-            } else if (options.useDimensions) {
-              tokenValue = `${tokenValue}px`;
+            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+              const alias = figma.variables.getVariableById(value.id);
+              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+            } else {
+              tokenValue = figmaRGBToHex(value as RGBA);
             }
-          }
-          const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
 
-          if (options.useDimensions || options.useRem) {
-            dimensions.push({
+            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+            if (tokenValue) {
+              colors.push({
+                name: variableName,
+                value: tokenValue as string,
+                type: TokenTypes.COLOR,
+                parent: `${collection?.name}/${modeName}`,
+                description: variable.description,
+              });
+            }
+          });
+          break;
+        case 'BOOLEAN':
+          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+            let tokenValue;
+            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+              const alias = figma.variables.getVariableById(value.id);
+              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+            } else {
+              tokenValue = JSON.stringify(value);
+            }
+
+            booleans.push({
               name: variableName,
-              value: tokenValue as string,
-              type: TokenTypes.DIMENSION,
+              value: tokenValue,
+              type: TokenTypes.BOOLEAN,
               parent: `${collection?.name}/${modeName}`,
               description: variable.description,
             });
-          } else {
-            numbers.push({
+          });
+          break;
+        case 'STRING':
+          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+            let tokenValue;
+            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+              const alias = figma.variables.getVariableById(value.id);
+              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+            } else {
+              tokenValue = value;
+            }
+
+            strings.push({
               name: variableName,
               value: tokenValue as string,
-              type: TokenTypes.NUMBER,
+              type: TokenTypes.TEXT,
               parent: `${collection?.name}/${modeName}`,
               description: variable.description,
             });
-          }
-        });
-        break;
-      default: return null;
+          });
+          break;
+        case 'FLOAT':
+          Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
+            let tokenValue: string | number = value as number;
+            if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+              const alias = figma.variables.getVariableById(value.id);
+              tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
+            } else if (typeof value === 'number') {
+              if (options.useRem) {
+                tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
+              } else if (options.useDimensions) {
+                tokenValue = `${tokenValue}px`;
+              }
+            }
+            const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
+
+            if (options.useDimensions || options.useRem) {
+              dimensions.push({
+                name: variableName,
+                value: tokenValue as string,
+                type: TokenTypes.DIMENSION,
+                parent: `${collection?.name}/${modeName}`,
+                description: variable.description,
+              });
+            } else {
+              numbers.push({
+                name: variableName,
+                value: tokenValue as string,
+                type: TokenTypes.NUMBER,
+                parent: `${collection?.name}/${modeName}`,
+                description: variable.description,
+              });
+            }
+          });
+          break;
+        default: return null;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error while processing variable:', variableName, error);
     }
-    return null;
   });
 
   const stylesObject = {
