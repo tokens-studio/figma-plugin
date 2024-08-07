@@ -219,9 +219,10 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         .getLocalEffectStyles()
         .filter((style) => style.effects.every((effect) => ['DROP_SHADOW', 'INNER_SHADOW'].includes(effect.type)))
         .map((style) => {
-          const effects = style.effects as DropShadowEffect[];
+          const styleEffects = style.effects as DropShadowEffect[];
+          const reversedEffects = [...styleEffects].reverse();
           // convert paint to object containg x, y, spread, color
-          const shadows: TokenBoxshadowValue[] = effects.map((effect) => {
+          const shadows: TokenBoxshadowValue[] = reversedEffects.map((effect) => {
             const effectObject: TokenBoxshadowValue = {} as TokenBoxshadowValue;
 
             effectObject.color = figmaRGBToHex(effect.color);
