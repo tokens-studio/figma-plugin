@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -21,6 +22,7 @@ import { RemoteResponseData } from '../../../../types/RemoteResponseData';
 import { ErrorMessages } from '../../../../constants/ErrorMessages';
 import { applyTokenSetOrder } from '../../../../utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type SupernovaCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.SUPERNOVA }>;
 type SupernovaFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.SUPERNOVA }>;
@@ -75,6 +77,8 @@ export function useSupernova() {
             themes,
             metadata,
           });
+          const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+          dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
           pushDialog({ state: 'success' });
           return {
             status: 'success',

@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -19,6 +20,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type AdoCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO; }>;
 type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.ADO; }>;
@@ -87,6 +89,8 @@ export const useADO = () => {
           themes,
           metadata,
         });
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
 
         return {
@@ -212,6 +216,8 @@ export const useADO = () => {
               themes: content.themes,
               metadata: content.metadata,
             });
+            const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
+            dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             notifyToUI('Pulled tokens from ADO');
           }

@@ -94,7 +94,7 @@ export default async function setColorValuesOnTarget({
       const valueToApply = fallbackValue ?? givenValue;
 
       if (!successfullyAppliedVariable) {
-        const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : givenValue || '');
+        const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
         const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
         await unbindVariableFromTarget(target, key, newPaint);
         if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {

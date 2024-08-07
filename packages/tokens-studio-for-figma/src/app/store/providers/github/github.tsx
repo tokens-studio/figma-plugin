@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -21,6 +22,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -88,6 +90,8 @@ export function useGitHub() {
           themes,
           metadata,
         });
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {
           status: 'success',
@@ -223,6 +227,8 @@ export function useGitHub() {
               themes: content.themes,
               metadata: content.metadata,
             });
+            const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+            dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
             notifyToUI('Pulled tokens from GitHub');
