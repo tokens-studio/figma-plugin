@@ -25,7 +25,7 @@ export default async function updateStyles(
     // When multiple theme has the same active Token set then the last activeTheme wins
     const activeTheme = activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));
     const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
-    const slice = settings?.ignoreFirstPartForStyles ? 1 : 0;
+    const slice = settings?.ignoreFirstPartForStyles && token.name.split('.').length > 1 ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);
     return {
       ...token,
