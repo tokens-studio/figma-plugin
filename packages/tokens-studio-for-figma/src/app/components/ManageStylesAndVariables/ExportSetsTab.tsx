@@ -145,7 +145,6 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
       <Modal
         size="fullscreen"
         full
-        compact
         isOpen={showChangeSets}
         close={handleCancelChangeSets}
         backArrow
@@ -165,7 +164,6 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
         {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
-          gap={2}
           css={{
             marginBlockStart: '$4',
           }}

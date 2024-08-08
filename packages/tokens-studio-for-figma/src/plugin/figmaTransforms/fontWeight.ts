@@ -1,4 +1,8 @@
-export function convertFontWeightToFigma(value: string) {
+export function convertFontWeightToFigma(value: string, shouldOutputForVariables = false): string[] {
+  if (shouldOutputForVariables) {
+    return [value];
+  }
+
   switch (value) {
     case '100':
       return ['Thin', 'Hairline'];
