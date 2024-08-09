@@ -101,7 +101,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
-      <StyledNameInputBox css={{ width: '100%', position: 'fixed', zIndex: 100 }}>
+      <StyledNameInputBox css={{ width: '100%', position: 'sticky', top: 0, zIndex: 2 }}>
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
             tooltip={t('returnToOverview')}
@@ -190,7 +190,7 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
       )}
       <Stack direction="column" gap={1}>
         {activeTab === ThemeFormTabs.SETS && (
-        <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3', marginTop: '50px' }}>
+        <Stack direction="column" gap={1} css={{ padding: '$3 $4 $3' }}>
           <TokenSetTreeContent
             items={treeOrListItems}
             renderItemContent={TokenSetThemeItemInput}
