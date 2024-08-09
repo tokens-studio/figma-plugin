@@ -156,6 +156,7 @@ export default function useRemoteTokens() {
           themes: remoteData.themes,
           metadata: remoteData.metadata,
         });
+        dispatch.uiState.setHasRemoteChange(false);
         const stringifiedRemoteTokens = JSON.stringify(compact([remoteData.tokens, remoteData.themes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         if (activeTab !== Tabs.LOADING) {
@@ -608,9 +609,10 @@ export default function useRemoteTokens() {
           hasChange = false;
           break;
       }
+      dispatch.uiState.setHasRemoteChange(hasChange);
       return hasChange;
     },
-    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab],
+    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab, dispatch.uiState],
   );
 
   return useMemo(

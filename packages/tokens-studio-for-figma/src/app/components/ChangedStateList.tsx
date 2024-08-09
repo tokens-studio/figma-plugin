@@ -6,11 +6,14 @@ import ChangedTokenItem from './ChangedTokenItem';
 import { StyledDiff } from './StyledDiff';
 import { useChangedState } from '@/hooks/useChangedState';
 
-function ChangedStateList() {
-  const { changedState } = useChangedState();
+function ChangedStateList({ type }: { type: 'push' | 'pull' }) {
+  const { changedPullState, changedPushState } = useChangedState();
   const [collapsed, setCollapsed] = React.useState(false);
   const { t } = useTranslation(['tokens']);
   const [collapsedChangedStateList, setCollapsedChangedStateList] = React.useState<Array<string>>([]);
+
+  const changedState = type === 'push' ? changedPushState : changedPullState;
+
   const handleSetIntCollapsed = React.useCallback((e: React.MouseEvent<HTMLButtonElement>, tokenSet: string) => {
     e.stopPropagation();
     if (e.altKey) {
@@ -29,7 +32,7 @@ function ChangedStateList() {
   }, [collapsedChangedStateList, changedState.tokens, collapsed]);
 
   return (
-    <Stack direction="column" gap={1} css={{ padding: '$4' }}>
+    <Stack direction="column" gap={1} css={{ padding: '$4', width: '100%' }}>
       {Object.entries(changedState.tokens).length > 0 && Object.entries(changedState.tokens)?.map(([tokenSet, tokenList]) => (
         <Box key={tokenSet} css={{ maxWidth: '100%' }}>
           <ChangeStateListingHeading count={tokenList.length} onCollapse={handleSetIntCollapsed} set={tokenSet} label={tokenSet} isCollapsed={collapsedChangedStateList.includes(tokenSet)} />
