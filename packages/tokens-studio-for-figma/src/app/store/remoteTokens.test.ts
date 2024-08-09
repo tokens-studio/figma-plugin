@@ -42,6 +42,7 @@ const mockResetChangedState = jest.fn();
 const mockGetCommitSha = jest.fn();
 const mockGetLatestCommitDate = jest.fn();
 const mockSetRemoteData = jest.fn();
+const mockSetHasRemoteChange = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -83,6 +84,7 @@ jest.mock('react-redux', () => ({
       setApiData: mockSetApiData,
       setStorage: mockSetStorage,
       setShowConfirm: mockSetShowConfirm,
+      setHasRemoteChange: mockSetHasRemoteChange,
     },
     tokenState: {
       setLastSyncedState: mockSetLastSyncedState,
