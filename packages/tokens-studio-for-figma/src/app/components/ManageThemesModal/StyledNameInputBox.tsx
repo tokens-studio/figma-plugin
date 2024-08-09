@@ -5,4 +5,5 @@ export const StyledNameInputBox = styled(Box, {
   padding: '0 $4',
   borderBottomColor: '$borderSubtle',
   borderBottomWidth: '1px',
+  backgroundColor: '$bgDefault'
 });
