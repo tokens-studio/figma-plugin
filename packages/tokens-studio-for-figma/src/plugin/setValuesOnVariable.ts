@@ -50,22 +50,25 @@ export default async function setValuesOnVariable(
 
         switch (variableType) {
           case 'BOOLEAN':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'COLOR':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setColorValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'FLOAT': {
-            const transformedValue = transformValue(String(token.value), token.type, baseFontSize, true);
-            setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+            const value = String(token.value);
+            if (typeof value === 'string' && !value.includes('{')) {
+              const transformedValue = transformValue(value, token.type, baseFontSize, true);
+              setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+            }
             break;
           }
           case 'STRING':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setStringValuesOnVariable(variable, mode, token.value);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.
