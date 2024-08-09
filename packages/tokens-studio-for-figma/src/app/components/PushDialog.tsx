@@ -180,7 +180,7 @@ function PushDialog() {
                 handleCommitMessageChange={handleCommitMessageChange}
               />
             )}
-            {activeTab === 'diff' && <ChangedStateList />}
+            {activeTab === 'diff' && <ChangedStateList type="push" />}
             {activeTab === 'json' && <PushJSON />}
           </Stack>
         </Modal>
