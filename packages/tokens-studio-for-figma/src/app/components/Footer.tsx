@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import {
   usedTokenSetSelector,
   projectURLSelector,
   activeThemeSelector,
+  uiStateSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -29,24 +30,24 @@ import { DirtyStateBadgeWrapper } from './DirtyStateBadgeWrapper';
 import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import { isEqual } from '@/utils/isEqual';
 
 export default function Footer() {
-  const [hasRemoteChange, setHasRemoteChange] = useState(false);
   const storageType = useSelector(storageTypeSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const projectURL = useSelector(projectURLSelector);
+  const uiState = useSelector(uiStateSelector, isEqual);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
-  const { hasChanges } = useChangedState();
+  const { hasChanges: hasLocalChange } = useChangedState();
+  const { hasRemoteChange } = uiState;
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      checkRemoteChange().then((response: boolean) => {
-        setHasRemoteChange(response);
-      });
+      checkRemoteChange();
     }, 60000);
     return () => clearInterval(interval);
   }, [checkRemoteChange]);
@@ -89,7 +90,7 @@ export default function Footer() {
                 }
               />
             </DirtyStateBadgeWrapper>
-            <DirtyStateBadgeWrapper badge={hasChanges}>
+            <DirtyStateBadgeWrapper badge={hasLocalChange}>
               <IconButton
                 data-testid="footer-push-button"
                 icon={<UploadIcon />}
@@ -97,7 +98,7 @@ export default function Footer() {
                 variant="invisible"
                 size="small"
                 tooltipSide="top"
-                disabled={editProhibited || !hasChanges}
+                disabled={editProhibited || !hasLocalChange}
                 tooltip={
                   t('pushTo', {
                     provider: transformProviderName(storageType.provider),
