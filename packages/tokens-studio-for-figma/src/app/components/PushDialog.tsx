@@ -108,7 +108,6 @@ function PushDialog() {
   React.useEffect(() => {
     if (showPushDialog?.state === 'initial') {
       useShortcut(['Enter'], handleSaveShortcut);
-      console.log("Registered");
     }
   }, [showPushDialog, handleSaveShortcut]);
 
