@@ -246,7 +246,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           } else if (data.type === TokenTypes.TYPOGRAPHY) {
             input.typography = data.value;
           } else if (data.type === TokenTypes.COMPOSITION) {
-            input.value = JSON.stringify(data.value);
+            input.composition = data.value;
           } else {
             input.value = data.value;
           }
