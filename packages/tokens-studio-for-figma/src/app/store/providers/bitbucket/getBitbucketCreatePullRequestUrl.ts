@@ -8,7 +8,7 @@ export function getBitbucketCreatePullRequestUrl({
   repo: string;
   branch?: string;
 }) {
-  const baseUrl = base && base !== '' ? base : 'https://bitbucket.org/';
+  const baseUrl = base && base !== '' ? base : 'https://bitbucket.org';
 
   return `${baseUrl}/${repo}/pull-requests/new?source=${branch}`;
 }
