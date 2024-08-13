@@ -1,0 +1,111 @@
+{
+  "setToDocumentStorage": "Set to document storage?",
+  "youCanAlwaysGoBack": "You can always go back to remote storage.",
+  "addNewSyncProvider": "Add new sync provider",
+  "editCredentials": "Edit sync provider credentials",
+  "choose": "Choose",
+  "name": "Name",
+  "pat": "Personal Access Token",
+  "gitLabExplained": "Connect your Gitlab code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
+  "gitHubExplained": "Connect your GitHub code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
+  "bitBucketExplained": "Connect your Bitbucket code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
+  "nameHelpText": "This nickname appears on the plugin settings page to help identify this sync provider from your list.",
+  "readMoreBitBucket": "Read the Bitbucket sync guide.",
+  "readMoreGitHub": "Read the GitHub sync guide.",
+  "readMoreGitLab": "Read the GitLab sync guide.",
+  "readMore": "Read more",
+  "cancel": "Cancel",
+  "repo": "Repository (owner/repo)",
+  "branch": "Branch",
+  "baseUrl": "Base URL - Enterprise (optional)",
+  "baseUrlHelpText": "Add if your organization is running an enterprise server",
+  "secret": "Secret",
+  "filePath": "Token storage location (file/folder path)",
+  "filePathCaption": "To store all tokens in a single JSON file, write the file name (Ex: tokens.json). Pro features, like themes, require a multi-file sync with tokens stored in a folder by writing the folder path (Ex: tokens).",
+  "syncProviders": "Sync providers",
+  "providers": {
+    "generic": {
+      "title": "Generic Versioned",
+      "url": "URL",
+      "description": "Connect your Generic Versioned provider with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
+      "readMore": "Read the Generic Version sync guide.",
+      "flowType": "Flow type",
+      "readOnly": "Read Only",
+      "readWrite": "Read / Write",
+      "readWriteCreate": "Read / Write / Create",
+      "additionalHeaders": "Additional headers",
+      "name": "Name",
+      "value": "Value"
+    },
+    "url": {
+      "title": "URL",
+      "description": "Token files stored locally on a server can be accessed in the plugin (read only) by syncing with the URL.",
+      "url": "URL",
+      "readMore": "Read the URL sync guide.",
+      "headers": "Headers"
+    },
+    "jsonbin": {
+      "title": "JSONBIN",
+      "description": "Access tokens stored on JSONBin.io, a free JSON storage service for two-way sync.",
+      "readMore": "Read the JSONBin sync guide.",
+      "apiKey": "API key",
+      "idHelp": "If empty, Tokens Studio will create a new bin for you."
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Supernova Access Token",
+      "dsUrl": "Design System URL",
+      "description": "Connect your Supernova account with Tokens Studio to keep your design token documentation in sync.",
+      "readMore": "Read the Supernova sync guide."
+    },
+    "ado": {
+      "description": "Connect your Azure DevOps code repository with Tokens Studio for remote token storage with version control and two-way sync controlled within the plugin.",
+      "pat": "Personal Access Token",
+      "orgUrl": "Organization Url",
+      "readMore": "Read the Azure DevOps sync guide.",
+      "repositoryName": "Repository Name",
+      "projectName": "Project Name"
+    },
+    "bitbucket": {
+      "username": "Bitbucket username",
+      "appPassword": "App Password",
+      "projectName": "Project Name (optional)",
+      "repository": "Repository (workspace/repo)"
+    },
+    "tokensstudio": {
+      "name": "Name",
+      "apikey": "API key",
+      "descriptionFirstPart": "Tokens Studio has a standalone web-based platform for dynamic creation and management of design decisions, currently in Beta!",
+      "signupText": "Sign up for beta access here.",
+      "descriptionSecondPart": "If you are already using the Studio platform and need help setting up the sync, read the ",
+      "tokensStudioSyncGuide": "Tokens Studio Sync guide here.",
+      "pat": "Personal Access Token",
+      "id": "Connection ID"
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",
+  "localDocument": "Local document",
+  "apply": "Apply",
+  "confirmDelete": "Do you really want to delete this?",
+  "active": "Active",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
+  "format": "Format",
+  "w3cformat": "W3C DTCG format",
+  "legacyformat": "Legacy format",
+  "legacyformattooltip": "Legacy format, click to open W3C DTCG conversion",
+  "w3cconverttitle": "Convert to W3C DTCG format",
+  "w3cformatmodaltitle": "Using the W3C DTCG Format",
+  "w3cformatmodaldescription": "Your tokens are stored in the W3C Design Tokens Community Group format. If you need to convert them back again, you can do so here. If you need to adjust your development pipeline, read all about it below.",
+  "legacyformatmodaldescription": " Your tokens are currently stored in the legacy format. If you want to use the new W3C DTCG format, you can convert them here. Read all about changing the format below, including helpful advice on how to migrate your development pipeline.",
+  "converttow3c": "Convert to W3C DTCG format",
+  "converttolegacy": "Convert to legacy format",
+  "pushfirsterror": "Push your unsaved changes before converting",
+  "readmoreformat": "Read more"
+}

@@ -1,0 +1,113 @@
+{
+  "setToDocumentStorage": "Prêt à stocker des documents ?",
+  "youCanAlwaysGoBack": "Vous pouvez toujours revenir au stockage distant.",
+  "addNewSyncProvider": "Ajouter un nouveau fournisseur de synchronisation",
+  "editCredentials": "Modifier les informations d'identification du fournisseur de synchronisation",
+  "choose": "Choisir",
+  "name": "Nom",
+  "pat": "Jeton d'accès personnel",
+  "gitExplained": "Lisez vos jetons stockés sur votre référentiel, à proximité de votre code.",
+  "readMore": "En savoir plus",
+  "cancel": "Annuler",
+  "repo": "Dépôt (propriétaire/repo)",
+  "branch": "Bifurquer",
+  "baseUrl": "URL de base (facultatif)",
+  "secret": "Secrète",
+  "filePath": "Chemin du fichier",
+  "filePathCaption": "src/tokens pour la synchronisation avec un dossier, ajoutez .json à la fin pour synchroniser avec un seul fichier",
+  "syncProviders": "Fournisseurs de synchronisation",
+  "providers": {
+    "generic": {
+      "title": "Version générique",
+      "url": "URL",
+      "description": "Jetons d'accès stockés sur votre propre fournisseur de stockage, permettant des opérations de synchronisation bidirectionnelle, de création et de lecture seule.",
+      "flowType": "Type de flux",
+      "readOnly": "Lecture seulement",
+      "readWrite": "Lire écrire",
+      "readWriteCreate": "Lire / Écrire / Créer",
+      "additionalHeaders": "En-têtes supplémentaires",
+      "name": "Nom",
+      "value": "Valeur",
+      "readMore": "Lisez le guide de synchronisation de la version générique."
+    },
+    "url": {
+      "title": "URL",
+      "description": "Les jetons stockés sur un serveur vous permettent de les ajouter en tant que fournisseur en lecture seule.",
+      "url": "URL",
+      "headers": "En-têtes",
+      "readMore": "Lisez le guide de synchronisation d'URL."
+    },
+    "jsonbin": {
+      "title": "JSONBIN",
+      "description": "Jetons d'accès stockés sur JSONBin.io, un service de stockage JSON gratuit pour une synchronisation bidirectionnelle.",
+      "readMore": "Lisez le guide de synchronisation JSONBin.",
+      "apiKey": "Clé API",
+      "idHelp": "S'il est vide, Tokens Studio créera un nouveau bac pour vous."
+    },
+    "github": {
+      "title": "GitHub"
+    },
+    "gitlab": {
+      "title": "GitLab"
+    },
+    "supernova": {
+      "accessToken": "Jeton d'accès Supernova",
+      "dsUrl": "URL du système de conception",
+      "description": "Vous permet d'insérer des jetons dans une marque et un thème spécifiques dans un système de conception sélectionné.",
+      "readMore": "Lisez le guide de synchronisation Supernova."
+    },
+    "ado": {
+      "description": "Accédez aux jetons stockés sur votre référentiel, poussez et extrayez les jetons dans une synchronisation bidirectionnelle.",
+      "pat": "Jeton d'accès personnel",
+      "orgUrl": "URL de l’organisation",
+      "repositoryName": "Nom du référentiel",
+      "projectName": "Nom du projet (facultatif)",
+      "readMore": "Lisez le guide de synchronisation Azure DevOps."
+    },
+    "bitbucket": {
+      "appPassword": "Mot de passe de l'application",
+      "projectName": "Nom du projet (facultatif)",
+      "repository": "Dépôt (espace de travail/dépôt)",
+      "username": "Nom d'utilisateur Bitbucket"
+    },
+    "tokensstudio": {
+      "name": "Name",
+      "apikey": "API key",
+      "urn": "Connection URN",
+      "descriptionFirstPart": "Tokens Studio dispose d'une plate-forme Web autonome pour la création dynamique et la gestion des décisions de conception, actuellement en version bêta !",
+      "signupText": "Inscrivez-vous pour un accès bêta ici.",
+      "descriptionSecondPart": "Si vous utilisez déjà la plateforme Studio et avez besoin d'aide pour configurer la synchronisation, lisez le",
+      "tokensStudioSyncGuide": "Guide de synchronisation de Tokens Studio ici.",
+      "pat": "Jeton d'accès personnel",
+      "id": "ID de connexion"
+    }
+  },
+  "selectALayerToSeeAppliedTokens": "Sélectionnez un calque pour voir les jetons appliqués",
+  "localDocument": "Document local",
+  "apply": "Appliquer",
+  "confirmDelete": "Voulez-vous vraiment supprimer ceci ?",
+  "active": "Actif",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "save": "Sauvegarder",
+  "format": "Format",
+  "w3cformat": "Format W3C DTCG",
+  "legacyformat": "Format hérité",
+  "legacyformattooltip": "Format hérité, cliquez pour ouvrir la conversion W3C DTCG",
+  "w3cconverttitle": "Convertir au format W3C DTCG",
+  "w3cformatmodaltitle": "Utilisation du format DTCG du W3C",
+  "w3cformatmodaldescription": "Vos jetons sont stockés au format W3C Design Tokens Community Group. Si vous devez les reconvertir, vous pouvez le faire ici. Si vous devez ajuster votre pipeline de développement, lisez tout ci-dessous.",
+  "legacyformatmodaldescription": "Vos jetons sont actuellement stockés dans le format existant. Si vous souhaitez utiliser le nouveau format DTCG du W3C, vous pouvez les convertir ici. Découvrez ci-dessous tout ce qui concerne la modification du format, y compris des conseils utiles sur la façon de migrer votre pipeline de développement.",
+  "converttow3c": "Convertir au format W3C DTCG",
+  "converttolegacy": "Convertir au format existant",
+  "pushfirsterror": "Poussez vos modifications non enregistrées avant la conversion",
+  "readmoreformat": "En savoir plus",
+  "gitLabExplained": "Connectez votre référentiel de code Gitlab à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
+  "gitHubExplained": "Connectez votre référentiel de code GitHub à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
+  "bitBucketExplained": "Connectez votre référentiel de code Bitbucket à Tokens Studio pour le stockage de jetons à distance avec contrôle de version et synchronisation bidirectionnelle contrôlée dans le plugin.",
+  "nameHelpText": "Ce surnom apparaît sur la page des paramètres du plugin pour vous aider à identifier ce fournisseur de synchronisation dans votre liste.",
+  "readMoreBitBucket": "Lisez le guide de synchronisation Bitbucket.",
+  "readMoreGitHub": "Lisez le guide de synchronisation GitHub.",
+  "readMoreGitLab": "Lisez le guide de synchronisation GitLab.",
+  "baseUrlHelpText": "Ajoutez si votre organisation exécute un serveur d'entreprise"
+}

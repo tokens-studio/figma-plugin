@@ -1,0 +1,80 @@
+{
+  "modalTitle": "Gérer les styles et les variables",
+  "buttonLabel": "Styles et variables",
+  "actions": {
+    "export": "Exporter vers Figma",
+    "import": "Importer depuis Figma",
+    "options": "Options",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "createThemes": "Créer des thèmes",
+    "getPRO": "Obtenir PRO",
+    "manageThemes": "Gérer les thèmes",
+    "changeSets": "Modifier les ensembles"
+  },
+  "docs": {
+    "exportToFigmaOptions": "Options d'exportation vers Figma",
+    "stylesAndVariables": "Styles et variables",
+    "referenceOnlyMode": "Mode de référence uniquement activé"
+  },
+  "generic": {
+    "learnMore": "En savoir plus",
+    "themes": "Thèmes",
+    "noGroup": "Aucun groupe",
+    "selectAll": "Sélectionner tout",
+    "variables": "Variables",
+    "styles": "modes"
+  },
+  "tabs": {
+    "exportThemes": "Thèmes",
+    "exportSets": "Ensembles de jetons"
+  },
+  "options": {
+    "title": "Options",
+    "whichVariablesShouldBeCreatedAndUpdated": "Quelles variables doivent être créées et mises à jour ?",
+    "whichStylesShouldBeCreatedAndUpdated": "Quels styles doivent être créés et mis à jour ?",
+    "tokensExportedToFigmaShould": "Les jetons exportés vers Figma doivent :",
+    "ignorePrefix": "Ignorer la première partie du nom du jeton pour les styles",
+    "ignorePrefixExplanation": "Utile si vous souhaitez ignorer 'couleurs' dans un jeton appelé 'couleurs.bleu.500' pour vos styles",
+    "prefixStyles": "Préfixer les styles avec le nom du thème actif",
+    "prefixStylesExplanation": "Ajoute le nom du thème actif à tous les styles créés. Remarque : l'utilisation de cette option avec des thèmes multidimensionnels entraînera des résultats inattendus.",
+    "renameExistingStylesAndVariables": "Écraser les styles et les variables existants",
+    "renameExistingStylesAndVariablesExplanation": "Les styles et les variables existants portant le même nom seront écrasés",
+    "scopeVariablesByTokenType": "Définir la portée des variables en fonction du type de jeton",
+    "scopeVariablesByTokenTypeExplanation": "Les portées des variables seront déduites du type de jeton et de l'utilisation prévue",
+    "createStylesWithVariableReferences": "Créer des styles avec des références de variables",
+    "createStylesWithVariableReferencesExplanation": "Les styles seront créés contenant des références aux variables",
+    "intro": "Créez des styles ou des variables en fonction de vos thèmes ou ensembles de jetons. Tout d’abord, choisissez quels types de jetons doivent être créés en tant que styles ou variables.",
+    "createAndUpdate": "Créer et mettre à jour",
+    "renameExisting": "Mettre à jour les styles et les noms de variables existants",
+    "renameExistingExplanation": "Les styles et variables existants seront renommés pour correspondre au nom du jeton",
+    "removeWithoutConnection": "Supprimer les styles et les variables sans connexion à un jeton",
+    "removeWithoutConnectionExplanation": "Les styles et variables qui ne sont pas connectés à un jeton seront supprimés"
+  },
+  "variables": {
+    "color": "Couleur",
+    "number": "Nombre",
+    "boolean": "Booléen",
+    "string": "Chaîne de caractères"
+  },
+  "styles": {
+    "color": "Couleur",
+    "typography": "Typographie",
+    "effects": "Effets"
+  },
+  "exportThemesTab": {
+    "headingPro": "Créez des thèmes pour commencer",
+    "headingBasic": "La création de thèmes est une fonctionnalité Pro",
+    "introPro": "Les combinaisons d'ensembles de jetons créent des thèmes. Utilisez les thèmes pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design tels que les modes de couleur clair ou sombre, plusieurs marques, produits ou plates-formes. Ou passez aux ensembles pour exporter sans utiliser de thèmes.",
+    "introBasic": "Les combinaisons d'ensembles de jetons créent des thèmes. Utilisez les thèmes pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design tels que les modes de couleur clair ou sombre, plusieurs marques, produits ou plates-formes.",
+    "confirmThemes": "Confirmer les thèmes",
+    "combinationsOfSetsMakeThemes": "Les combinaisons d'ensembles de jetons créent des thèmes"
+  },
+  "exportSetsTab": {
+    "changeSetsHeading": "Les ensembles activés seront exportés vers Figma",
+    "confirmSets": "Confirmer les ensembles",
+    "intro": "Vous pouvez utiliser des ensembles de jetons pour gérer vos styles et vos variables. Utilisez les thèmes (Pro) pour créer plusieurs collections de variables ou de styles pour basculer facilement entre des concepts de design.",
+    "setsSelectedForExport": "Ensembles sélectionnés pour l'exportation"
+  },
+  "optionsModalTitle": "Exporter vers Figma : Options"
+}

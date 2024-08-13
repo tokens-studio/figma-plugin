@@ -1,0 +1,12 @@
+{
+  "wentWrong": "कुछ गलत हो गया!",
+  "reset": "यदि ऐसा होता रहता है, तो आपको अपने टोकन रीसेट करने होंगे।",
+  "restart": "प्लगइन पुनः आरंभ करें और पुनः प्रयास करें।",
+  "readHow": "पढ़ें कैसे",
+  "tokenNamesMustBeUnique": "टोकन नाम अद्वितीय होने चाहिए",
+  "mustNotUseNameOfAnotherGroup": "किसी अन्य समूह के नाम का उपयोग नहीं करना चाहिए",
+  "cantCreateGroupThatSharesNameWithExistingToken": "ऐसा समूह नहीं बनाया जा सकता जो किसी मौजूदा टोकन के साथ नाम साझा करता हो",
+  "valueMustIncludePxOrRem": "मान में या तो px या rem शामिल होना चाहिए",
+  "tokenNamesCantStartWithDollar": "डॉलर ($) चिह्न से प्रारंभ नहीं किया जा सकता",
+  "tokenNamesCantContainCurlyBraces": "ब्रेसिज़ शामिल नहीं हो सकते '{}'"
+}

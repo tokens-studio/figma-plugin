@@ -1,0 +1,12 @@
+{
+  "wentWrong": "Er is iets fout gegaan!",
+  "reset": "Als dit blijft gebeuren, moet u uw tokens opnieuw instellen.",
+  "restart": "Start de plug-in opnieuw en probeer het opnieuw.",
+  "readHow": "Lees hoe",
+  "tokenNamesMustBeUnique": "Tokennamen moeten uniek zijn",
+  "mustNotUseNameOfAnotherGroup": "Mag geen naam van een andere groep gebruiken",
+  "cantCreateGroupThatSharesNameWithExistingToken": "Kan geen groep maken die een naam deelt met een bestaand token",
+  "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten",
+  "tokenNamesCantStartWithDollar": "Kan niet beginnen met een dollarteken ($).",
+  "tokenNamesCantContainCurlyBraces": "Mag geen accolades '{}' bevatten"
+}

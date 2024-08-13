@@ -1,0 +1,12 @@
+{
+  "wentWrong": "¡Algo salió mal!",
+  "reset": "Si esto sigue sucediendo, debe restablecer sus tokens.",
+  "restart": "Reinicie el complemento y vuelva a intentarlo.",
+  "readHow": "Lea cómo",
+  "tokenNamesMustBeUnique": "Los nombres de los tokens deben ser únicos",
+  "mustNotUseNameOfAnotherGroup": "No debe usar el nombre de otro grupo",
+  "cantCreateGroupThatSharesNameWithExistingToken": "No se puede crear un grupo que comparta un nombre con un token existente",
+  "valueMustIncludePxOrRem": "El valor debe incluir px o rem",
+  "tokenNamesCantStartWithDollar": "No puedo comenzar con un signo de dólar ($)",
+  "tokenNamesCantContainCurlyBraces": "No puede contener llaves '{}'"
+}

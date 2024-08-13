@@ -1,0 +1,12 @@
+{
+  "wentWrong": "Quelque chose s'est mal passé!",
+  "reset": "Si cela continue, vous devez réinitialiser vos jetons.",
+  "restart": "Redémarrez le plugin et réessayez.",
+  "readHow": "Lisez comment",
+  "tokenNamesMustBeUnique": "Les noms de jeton doivent être uniques",
+  "mustNotUseNameOfAnotherGroup": "Ne doit pas utiliser le nom d'un autre groupe",
+  "cantCreateGroupThatSharesNameWithExistingToken": "Impossible de créer un groupe partageant un nom avec un jeton existant",
+  "valueMustIncludePxOrRem": "La valeur doit inclure px ou rem",
+  "tokenNamesCantStartWithDollar": "Je ne peux pas commencer par un signe dollar ($)",
+  "tokenNamesCantContainCurlyBraces": "Ne peut pas contenir d'accolades '{}'"
+}
