@@ -246,7 +246,10 @@ describe('Tokens Studio sync', () => {
     {
       type: TokenTypes.COMPOSITION,
       valueObj: {
-        value: '{"width":"100px","height":"200px"}',
+        composition: {
+          width: '100px',
+          height: '200px',
+        },
       },
       input: {
         name: 'brand.newComposition',

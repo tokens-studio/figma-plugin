@@ -6075,10 +6075,10 @@
     semver-compare "^1.0.0"
     token-transformer "^0.0.33"
 
-"@tokens-studio/sdk@1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.1.5.tgz#ccd2268979ccbd611d3acc00a89156a39e9ae559"
-  integrity sha512-C0J/cNJCd8ayM7SNnfQmy7JHc3oEa5eADkujp+4yoOHNlv6ikTI0CKVn3ptqHphY1hRTwM6k41Auz1DVyHQNtw==
+"@tokens-studio/sdk@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.2.1.tgz#ae08cc93039d0801ba13bc596f23744dda110b59"
+  integrity sha512-pslv54WbBS0G5sqXUDOMHrkdE7x0yCFlC7ErD5mG2BN/16D9sZqZqLYU4yU11INgTkU/HEACIKwVz8NFCMihsQ==
   dependencies:
     "@aws-amplify/api" "^5.0.19"
     "@aws-amplify/auth" "^5.1.13"
@@ -6095,6 +6095,11 @@
   integrity sha512-gVqHNGI7MmWnHEORQ0f3/+rpWn+GIaPbMpNogCfV/Sjn0uPlCMbhIqpmHcZg7cTM1U7wDI8hbjvpph0t4aARcw==
   dependencies:
     deepmerge-ts "^7.0.3"
+
+"@tokens-studio/types@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.5.1.tgz#5037e58c4b2c306762f12e8d9685e9aeebb21685"
+  integrity sha512-LdCF9ZH5ej4Gb6n58x5fTkhstxjXDZc1SWteMWY6EiddLQJVONMIgYOrWrf1extlkSLjagX8WS0B63bAqeltnA==
 
 "@tokens-studio/types@^0.2.3":
   version "0.2.5"
