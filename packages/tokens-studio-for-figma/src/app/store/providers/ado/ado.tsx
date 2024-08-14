@@ -101,10 +101,10 @@ export const useADO = () => {
       } catch (e) {
         closePushDialog();
         console.log('Error pushing to ADO', e);
-        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+        if (e instanceof Error && e.message) {
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            errorMessage: e.message,
           };
         }
         return {
