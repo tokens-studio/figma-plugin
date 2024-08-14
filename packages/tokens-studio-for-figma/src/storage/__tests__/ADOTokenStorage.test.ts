@@ -294,7 +294,16 @@ describe('ADOTokenStorage', () => {
       }),
     })).mockImplementationOnce(() => Promise.resolve({
       ok: true,
-    }));
+      json: () => Promise.resolve({
+        count: 1,
+        value: [
+          { commitId: '123abc' },
+        ],
+      }),
+    }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+      }));
 
     storageProvider.selectBranch('main');
     storageProvider.changePath('data/tokens.json');
@@ -333,7 +342,7 @@ describe('ADOTokenStorage', () => {
       commitMessage: 'Initial commit',
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
-      4,
+      5,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
       {
         method: 'POST',
@@ -345,7 +354,7 @@ describe('ADOTokenStorage', () => {
           refUpdates: [
             {
               name: 'refs/heads/main',
-              oldObjectId: 'main',
+              oldObjectId: '123abc',
             },
           ],
           commits: [
@@ -402,7 +411,7 @@ describe('ADOTokenStorage', () => {
         value: [
           {
             name: 'refs/heads/main',
-            objectId: 'main',
+            objectId: '123abc',
           },
         ],
       }),
@@ -419,6 +428,15 @@ describe('ADOTokenStorage', () => {
         ],
       }),
     }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { commitId: '123abc' },
+          ],
+        }),
+      }))
       .mockImplementationOnce(() => Promise.resolve({ ok: true }))
       .mockImplementationOnce(() => Promise.resolve({ ok: true }));
 
@@ -474,7 +492,7 @@ describe('ADOTokenStorage', () => {
       commitMessage: 'Initial commit',
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
-      4,
+      5,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
       {
         method: 'POST',
@@ -486,7 +504,7 @@ describe('ADOTokenStorage', () => {
           refUpdates: [
             {
               name: 'refs/heads/main',
-              oldObjectId: 'main',
+              oldObjectId: '123abc',
             },
           ],
           commits: [
