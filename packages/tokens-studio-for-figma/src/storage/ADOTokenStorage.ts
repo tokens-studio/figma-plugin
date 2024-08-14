@@ -25,7 +25,7 @@ enum ContentType {
 
 interface FetchGit {
   body?: string
-  gitResource: 'refs' | 'items' | 'pushes'
+  gitResource: 'refs' | 'items' | 'pushes' | 'commits'
   method?: 'GET' | 'POST'
   orgUrl?: string
   params?: Record<string, string | boolean>
@@ -336,12 +336,33 @@ export class ADOTokenStorage extends GitTokenStorage {
   private async postPushes({
     branch, changes, commitMessage = 'Commit from Figma', oldObjectId,
   }: PostPushesArgs): Promise<GitInterfaces.GitPush> {
-    const response = await this.fetchGit({
+    // We need to get the latest commit ID to push to the correct branch
+    const commitsResponse = await this.fetchGit({
+      gitResource: 'commits',
+      method: 'GET',
+      orgUrl: this.orgUrl,
+      projectId: this.projectId,
+      repositoryId: this.repository,
+      token: this.secret,
+      params: {
+        'searchCriteria.$top': '1',
+        'searchCriteria.itemVersion.version': branch,
+      },
+    }).then((res) => res.json());
+
+    if (!commitsResponse.value) {
+      const errorMessage = commitsResponse.message || ErrorMessages.ADO_CREDENTIAL_ERROR;
+      throw new Error(errorMessage);
+    }
+
+    const latestCommitId = commitsResponse.value[0]?.commitId;
+
+    const pushesResponse = await this.fetchGit({
       body: JSON.stringify({
         refUpdates: [
           {
             name: `refs/heads/${branch}`,
-            oldObjectId,
+            oldObjectId: latestCommitId ?? oldObjectId,
           },
         ],
         commits: [
@@ -358,7 +379,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       repositoryId: this.repository,
       token: this.secret,
     });
-    return response;
+    return pushesResponse;
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
