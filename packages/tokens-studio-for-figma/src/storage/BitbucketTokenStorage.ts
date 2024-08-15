@@ -153,40 +153,35 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     }
 
     const data = await response.json();
-    if (data.values && Array.isArray(data.values))
-    {
+    if (data.values && Array.isArray(data.values)) {
       let jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
 
       const subDirectoryFiles = await Promise.all(
         data.values
           .filter((file: any) => file.type === 'commit_directory')
-          .map(async (directory: any) => {
-            return await this.fetchJsonFilesFromDirectory(directory.links.self.href);
-          })
+          .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
       );
 
       jsonFiles = jsonFiles.concat(...subDirectoryFiles);
       return jsonFiles;
         }
-      return [];  
+      return [];
   }
-  
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
-      let jsonFiles = await this.fetchJsonFilesFromDirectory(url);
+      const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
       if (jsonFiles.length > 0) {
       const jsonFileContents = await Promise.all(
-        jsonFiles.map((file: any) =>
-          fetch(file.links.self.href, {
+        jsonFiles.map((file: any) => fetch(file.links.self.href, {
             headers: {
               Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
             },
-          }).then((rsp) => rsp.text())
-        )
+          }).then((rsp) => rsp.text())),
       );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
