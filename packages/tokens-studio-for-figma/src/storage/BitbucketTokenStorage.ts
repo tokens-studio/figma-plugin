@@ -11,7 +11,6 @@ import {
 import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 
 type CreatedOrUpdatedFileType = {
@@ -141,52 +140,54 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * @returns A promise that resolves to an array of `RemoteTokenStorageFile` objects or a `RemoteTokenstorageErrorMessage` object.
    * @throws Will throw an error if the operation fails.
    */
+
+  private async fetchJsonFilesFromDirectory(url: string): Promise<any[]> {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (data.values && Array.isArray(data.values))
+    {
+      let jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
+
+      const subDirectoryFiles = await Promise.all(
+        data.values
+          .filter((file: any) => file.type === 'commit_directory')
+          .map(async (directory: any) => {
+            return await this.fetchJsonFilesFromDirectory(directory.links.self.href);
+          })
+      );
+
+      jsonFiles = jsonFiles.concat(...subDirectoryFiles);
+      return jsonFiles;
+        }
+      return [];  
+  }
+  
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+      let jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.values && Array.isArray(data.values)) {
-        // Filter out the JSON files
-        let jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
-
-        const directoryFiles = await Promise.all(
-          data.values
-            .filter((file: any) => file.type === 'commit_directory')
-            .map(async (directory: any) => {
-              const dirResponse = await fetch(directory.links.self.href, {
-                headers: {
-                  Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-                },
-              });
-              const dirData = await dirResponse.json();
-              return dirData.values.filter((file: any) => file.path.endsWith('.json'));
-            }),
-        );
-
-        jsonFiles = jsonFiles.concat(...directoryFiles);
-
-        // Fetch the content of each JSON file
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => fetch(file.links.self.href, {
-              headers: {
-                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-              },
-            }).then((rsp) => rsp.text())),
-        );
+      if (jsonFiles.length > 0) {
+      const jsonFileContents = await Promise.all(
+        jsonFiles.map((file: any) =>
+          fetch(file.links.self.href, {
+            headers: {
+              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+            },
+          }).then((rsp) => rsp.text())
+        )
+      );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
           const { path } = jsonFiles[index];
@@ -218,8 +219,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } else if (data) {
-        const parsed = data as GitSingleFileObject;
+      } else {
+        const parsed = await fetch(url, {
+          headers: {
+            Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+          },
+        }).then((rsp) => rsp.json()) as GitSingleFileObject;
         return [
           {
             type: 'themes',
@@ -248,9 +253,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           })),
         ];
       }
-      return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
-      };
     } catch (e) {
       console.error('Error', e);
       return [];
