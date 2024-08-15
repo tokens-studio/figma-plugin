@@ -217,7 +217,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } else if(jsonFiles) {
+      } else if (jsonFiles) {
         const parsed = jsonFiles as GitSingleFileObject;
         return [
           {
@@ -247,7 +247,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           })),
         ];
       }
-      return{
+      return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
     } catch (e) {
