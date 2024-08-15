@@ -28,7 +28,7 @@ type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StoragePr
 export const useADO = () => {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const localApiState = useSelector(localApiStateSelector);
+  const localApiState = useSelector(localApiStateSelector) as AdoCredentials;
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
@@ -245,6 +245,9 @@ export const useADO = () => {
 
   const addNewADOCredentials = React.useCallback(
     async (context: AdoFormValues): Promise<RemoteResponseData> => {
+      if (localApiState.branch !== context.branch) {
+        context = { ...context, previousSourceBranch: localApiState.branch };
+      }
       const data = await syncTokensWithADO(context);
 
       if (data.status === 'success') {

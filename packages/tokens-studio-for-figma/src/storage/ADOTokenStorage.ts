@@ -54,18 +54,22 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   protected source: string = 'main';
 
+  protected previousSourceBranch: string;
+
   constructor({
     baseUrl: orgUrl = '',
     secret,
     id: repositoryId,
     name: projectId,
+    previousSourceBranch = 'main',
   }: Pick<
   Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
-  'baseUrl' | 'secret' | 'id' | 'name'
+  'baseUrl' | 'secret' | 'id' | 'name' | 'previousSourceBranch'
   >) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
     this.projectId = projectId;
+    this.previousSourceBranch = previousSourceBranch;
   }
 
   public setSource(source: string) {
@@ -183,7 +187,8 @@ export class ADOTokenStorage extends GitTokenStorage {
         branches.set(val.name.replace(/^refs\/heads\//, ''), val);
       }
     }
-    return shouldCreateBranch ? branches.get(this.source)?.objectId : branches.get(branch)?.objectId;
+    const sourceBranch = this.previousSourceBranch || this.source;
+    return shouldCreateBranch ? branches.get(sourceBranch)?.objectId : branches.get(branch)?.objectId;
   }
 
   private itemsDefault(): Omit<FetchGit, 'body' | 'params'> {
@@ -424,6 +429,13 @@ export class ADOTokenStorage extends GitTokenStorage {
 
       return !!response;
     }
+
+    // Create branch in remote if it does not already exist
+    const existingBranches = await this.fetchBranches();
+    if (!existingBranches.includes(branch)) {
+      await this.createBranch(branch, this.previousSourceBranch);
+    }
+
     const response = await this.postPushes({
       branch,
       changes: changesForUpdateOrCreate,
