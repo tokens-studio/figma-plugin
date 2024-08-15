@@ -89,6 +89,8 @@ export const useADO = () => {
           themes,
           metadata,
         });
+        const branches = await storage.fetchBranches();
+        dispatch.branchState.setBranches(branches);
         const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
