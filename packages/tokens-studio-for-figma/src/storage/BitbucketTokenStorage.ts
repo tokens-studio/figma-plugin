@@ -161,7 +161,23 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
       if (data.values && Array.isArray(data.values)) {
         // Filter out the JSON files
-        const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
+        let jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
+
+        const directoryFiles = await Promise.all(
+          data.values
+            .filter((file: any) => file.type === 'commit_directory')
+            .map(async (directory: any) => {
+              const dirResponse = await fetch(directory.links.self.href, {
+                headers: {
+                  Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+                },
+              });
+              const dirData = await dirResponse.json();
+              return dirData.values.filter((file: any) => file.path.endsWith('.json'));
+            })
+        );
+
+        jsonFiles = jsonFiles.concat(...directoryFiles);
 
         // Fetch the content of each JSON file
         const jsonFileContents = await Promise.all(
