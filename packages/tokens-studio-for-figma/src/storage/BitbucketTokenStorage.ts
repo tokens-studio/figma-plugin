@@ -174,7 +174,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
               });
               const dirData = await dirResponse.json();
               return dirData.values.filter((file: any) => file.path.endsWith('.json'));
-            })
+            }),
         );
 
         jsonFiles = jsonFiles.concat(...directoryFiles);
