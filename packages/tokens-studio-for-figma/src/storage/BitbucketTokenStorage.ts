@@ -12,6 +12,7 @@ import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitT
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
 import { SystemFilenames } from '@/constants/SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -23,6 +24,8 @@ type CreatedOrUpdatedFileType = {
     files: Record<string, string>;
   }[];
 };
+
+type FetchJsonResult = any[] | Record<string, any>;
 
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
@@ -141,7 +144,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * @throws Will throw an error if the operation fails.
    */
 
-  private async fetchJsonFilesFromDirectory(url: string): Promise<any[]> {
+  private async fetchJsonFilesFromDirectory(url: string): Promise<FetchJsonResult> {
     const response = await fetch(url, {
       headers: {
         Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
@@ -165,7 +168,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       jsonFiles = jsonFiles.concat(...subDirectoryFiles);
       return jsonFiles;
         }
-      return [];
+      return data;
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
@@ -175,7 +178,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
       const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-      if (jsonFiles.length > 0) {
+      if (Array.isArray(jsonFiles)) {
       const jsonFileContents = await Promise.all(
         jsonFiles.map((file: any) => fetch(file.links.self.href, {
             headers: {
@@ -214,12 +217,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } else {
-        const parsed = await fetch(url, {
-          headers: {
-            Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-          },
-        }).then((rsp) => rsp.json()) as GitSingleFileObject;
+      } else if(jsonFiles) {
+        const parsed = jsonFiles as GitSingleFileObject;
         return [
           {
             type: 'themes',
@@ -248,6 +247,9 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           })),
         ];
       }
+      return{
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (e) {
       console.error('Error', e);
       return [];
