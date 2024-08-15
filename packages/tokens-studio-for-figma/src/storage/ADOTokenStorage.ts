@@ -52,24 +52,26 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   protected projectId?: string;
 
-  protected source: string = 'main';
+  protected source: string;
 
-  protected previousSourceBranch: string;
+  protected previousSourceBranch?: string;
 
   constructor({
     baseUrl: orgUrl = '',
     secret,
     id: repositoryId,
     name: projectId,
+    branch,
     previousSourceBranch = 'main',
   }: Pick<
   Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
-  'baseUrl' | 'secret' | 'id' | 'name' | 'previousSourceBranch'
+  'baseUrl' | 'secret' | 'id' | 'name' | 'branch' | 'previousSourceBranch'
   >) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
     this.projectId = projectId;
     this.previousSourceBranch = previousSourceBranch;
+    this.source = branch;
   }
 
   public setSource(source: string) {
