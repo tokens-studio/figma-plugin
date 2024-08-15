@@ -118,8 +118,8 @@ export const useADO = () => {
 
     return {
       status: 'success',
-      tokens,
-      themes,
+      tokens: {},
+      themes: [],
     };
   }, [
     dispatch,
@@ -247,10 +247,23 @@ export const useADO = () => {
 
   const addNewADOCredentials = React.useCallback(
     async (context: AdoFormValues): Promise<RemoteResponseData> => {
-      if (localApiState.branch !== context.branch) {
-        context = { ...context, previousSourceBranch: localApiState.branch };
+      const previousBranch = localApiState.branch;
+      const previousFilePath = localApiState.filePath;
+
+      if (previousBranch !== context.branch) {
+        context = { ...context, previousSourceBranch: previousBranch };
       }
       const data = await syncTokensWithADO(context);
+
+      // User cancelled pushing to the remote
+      if (data.status === 'success' && data.themes.length === 0) {
+        dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
+
+        return {
+          status: 'failure',
+          errorMessage: 'Push to remote cancelled!',
+        };
+      }
 
       if (data.status === 'success') {
         AsyncMessageChannel.ReactInstance.message({
