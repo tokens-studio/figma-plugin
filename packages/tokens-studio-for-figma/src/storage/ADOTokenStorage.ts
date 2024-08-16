@@ -407,6 +407,13 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         });
       });
+
+    // Create branch in remote if it does not already exist
+    const existingBranches = await this.fetchBranches();
+    if (!existingBranches.includes(branch)) {
+      await this.createBranch(branch, this.previousSourceBranch);
+    }
+
     if (!this.path.endsWith('.json')) {
       const jsonFiles = value?.filter((file) => (file.path?.endsWith('.json')))?.map((val) => val.path) ?? [];
       const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile && jsonFile.endsWith(item)))
@@ -430,12 +437,6 @@ export class ADOTokenStorage extends GitTokenStorage {
       });
 
       return !!response;
-    }
-
-    // Create branch in remote if it does not already exist
-    const existingBranches = await this.fetchBranches();
-    if (!existingBranches.includes(branch)) {
-      await this.createBranch(branch, this.previousSourceBranch);
     }
 
     const response = await this.postPushes({
