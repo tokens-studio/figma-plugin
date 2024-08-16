@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 2.0.1
+
+### Patch Changes
+
+- 27d40280: Fixed several issues related to Azure DevOps related to pushing and creating branches other than the default one as well as switching between single file and multi file.
+- dcb41eb1: Fixed an issue with Bitbucket sync that caused sets that are in folders to not be pulled correctly
+- 3405929e: Fixed an issue with UI appearing broken, related to the debug session recording feature
+
 ## 2.0.0
 
 ### Major Changes
