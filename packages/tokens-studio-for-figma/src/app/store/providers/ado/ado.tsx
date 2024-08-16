@@ -28,7 +28,7 @@ type AdoFormValues = Extract<StorageTypeFormValues<false>, { provider: StoragePr
 export const useADO = () => {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const localApiState = useSelector(localApiStateSelector);
+  const localApiState = useSelector(localApiStateSelector) as AdoCredentials;
   const activeTheme = useSelector(activeThemeSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
@@ -89,6 +89,8 @@ export const useADO = () => {
           themes,
           metadata,
         });
+        const branches = await storage.fetchBranches();
+        dispatch.branchState.setBranches(branches);
         const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
@@ -101,10 +103,10 @@ export const useADO = () => {
       } catch (e) {
         closePushDialog();
         console.log('Error pushing to ADO', e);
-        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+        if (e instanceof Error && e.message) {
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
+            errorMessage: e.message,
           };
         }
         return {
@@ -116,8 +118,8 @@ export const useADO = () => {
 
     return {
       status: 'success',
-      tokens,
-      themes,
+      tokens: {},
+      themes: [],
     };
   }, [
     dispatch,
@@ -245,7 +247,23 @@ export const useADO = () => {
 
   const addNewADOCredentials = React.useCallback(
     async (context: AdoFormValues): Promise<RemoteResponseData> => {
+      const previousBranch = localApiState.branch;
+      const previousFilePath = localApiState.filePath;
+
+      if (previousBranch !== context.branch) {
+        context = { ...context, previousSourceBranch: previousBranch };
+      }
       const data = await syncTokensWithADO(context);
+
+      // User cancelled pushing to the remote
+      if (data.status === 'success' && data.themes.length === 0) {
+        dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
+
+        return {
+          status: 'failure',
+          errorMessage: 'Push to remote cancelled!',
+        };
+      }
 
       if (data.status === 'success') {
         AsyncMessageChannel.ReactInstance.message({
