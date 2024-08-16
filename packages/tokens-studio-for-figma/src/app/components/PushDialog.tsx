@@ -221,7 +221,7 @@ function PushDialog() {
               </Text>
             </Stack>
             {/* @ts-ignore Exception for Button to accept target */}
-            <Button as="a" target="_blank" variant="primary" href={redirectHref}>
+            <Button as="a" target="_blank" rel="noopener noreferrer" variant="primary" href={redirectHref}>
               {localApiState.provider === StorageProviderType.SUPERNOVA ? (
                 <>{t('openSupernovaWorkspace')}</>
               ) : (

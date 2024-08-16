@@ -718,7 +718,7 @@ describe('remoteTokens', () => {
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(context === adoContext ? { errorMessage: 'Error syncing with ADO, check credentials', status: 'failure' } : {
           status: 'success',
         });
       });
@@ -765,7 +765,7 @@ describe('remoteTokens', () => {
         expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
-          errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+          errorMessage: context === adoContext ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
         });
       });
     }
@@ -784,6 +784,7 @@ describe('remoteTokens', () => {
                 commitMessage: 'Initial commit',
               },
               status: 'success',
+              themes: [],
             },
           )
         ));
@@ -791,12 +792,20 @@ describe('remoteTokens', () => {
           Promise.resolve(true)
         ));
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        expect(notifyToUI).toBeCalledTimes(2);
-        expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
-        expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          status: 'success',
-        });
+        if (context !== adoContext) {
+          expect(notifyToUI).toBeCalledTimes(2);
+          expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            status: 'success',
+          });
+        } else {
+          expect(notifyToUI).toBeCalledTimes(1);
+          expect(notifyToUI).toBeCalledWith('Pulled tokens from ADO');
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            status: 'failure',
+            errorMessage: 'Push to remote cancelled!',
+          });
+        }
       });
     } else {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no tokens on remote`, async () => {

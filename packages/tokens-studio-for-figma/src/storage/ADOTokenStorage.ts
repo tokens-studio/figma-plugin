@@ -25,7 +25,7 @@ enum ContentType {
 
 interface FetchGit {
   body?: string
-  gitResource: 'refs' | 'items' | 'pushes'
+  gitResource: 'refs' | 'items' | 'pushes' | 'commits'
   method?: 'GET' | 'POST'
   orgUrl?: string
   params?: Record<string, string | boolean>
@@ -52,20 +52,26 @@ export class ADOTokenStorage extends GitTokenStorage {
 
   protected projectId?: string;
 
-  protected source: string = 'main';
+  protected source: string;
+
+  protected previousSourceBranch?: string;
 
   constructor({
     baseUrl: orgUrl = '',
     secret,
     id: repositoryId,
     name: projectId,
+    branch,
+    previousSourceBranch = 'main',
   }: Pick<
   Extract<StorageTypeCredentials, { provider: StorageProviderType.ADO }>,
-  'baseUrl' | 'secret' | 'id' | 'name'
+  'baseUrl' | 'secret' | 'id' | 'name' | 'branch' | 'previousSourceBranch'
   >) {
     super(secret, '', repositoryId, orgUrl);
     this.orgUrl = orgUrl;
     this.projectId = projectId;
+    this.previousSourceBranch = previousSourceBranch;
+    this.source = branch;
   }
 
   public setSource(source: string) {
@@ -183,7 +189,8 @@ export class ADOTokenStorage extends GitTokenStorage {
         branches.set(val.name.replace(/^refs\/heads\//, ''), val);
       }
     }
-    return shouldCreateBranch ? branches.get(this.source)?.objectId : branches.get(branch)?.objectId;
+    const sourceBranch = this.previousSourceBranch || this.source;
+    return shouldCreateBranch ? branches.get(sourceBranch)?.objectId : branches.get(branch)?.objectId;
   }
 
   private itemsDefault(): Omit<FetchGit, 'body' | 'params'> {
@@ -336,12 +343,33 @@ export class ADOTokenStorage extends GitTokenStorage {
   private async postPushes({
     branch, changes, commitMessage = 'Commit from Figma', oldObjectId,
   }: PostPushesArgs): Promise<GitInterfaces.GitPush> {
-    const response = await this.fetchGit({
+    // We need to get the latest commit ID to push to the correct branch
+    const commitsResponse = await this.fetchGit({
+      gitResource: 'commits',
+      method: 'GET',
+      orgUrl: this.orgUrl,
+      projectId: this.projectId,
+      repositoryId: this.repository,
+      token: this.secret,
+      params: {
+        'searchCriteria.$top': '1',
+        'searchCriteria.itemVersion.version': branch,
+      },
+    }).then((res) => res.json());
+
+    if (!commitsResponse.value) {
+      const errorMessage = commitsResponse.message || ErrorMessages.ADO_CREDENTIAL_ERROR;
+      throw new Error(errorMessage);
+    }
+
+    const latestCommitId = commitsResponse.value[0]?.commitId;
+
+    const pushesResponse = await this.fetchGit({
       body: JSON.stringify({
         refUpdates: [
           {
             name: `refs/heads/${branch}`,
-            oldObjectId,
+            oldObjectId: latestCommitId ?? oldObjectId,
           },
         ],
         commits: [
@@ -358,7 +386,7 @@ export class ADOTokenStorage extends GitTokenStorage {
       repositoryId: this.repository,
       token: this.secret,
     });
-    return response;
+    return pushesResponse;
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch: boolean = false): Promise<boolean> {
@@ -379,6 +407,13 @@ export class ADOTokenStorage extends GitTokenStorage {
           },
         });
       });
+
+    // Create branch in remote if it does not already exist
+    const existingBranches = await this.fetchBranches();
+    if (!existingBranches.includes(branch)) {
+      await this.createBranch(branch, this.previousSourceBranch);
+    }
+
     if (!this.path.endsWith('.json')) {
       const jsonFiles = value?.filter((file) => (file.path?.endsWith('.json')))?.map((val) => val.path) ?? [];
       const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => jsonFile && jsonFile.endsWith(item)))
@@ -403,6 +438,7 @@ export class ADOTokenStorage extends GitTokenStorage {
 
       return !!response;
     }
+
     const response = await this.postPushes({
       branch,
       changes: changesForUpdateOrCreate,
