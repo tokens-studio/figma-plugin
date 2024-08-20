@@ -57,6 +57,7 @@ StorageProviderType.GITLAB,
   filePath: string; // this is the path to the token file or files (depends on multifile support)
   baseUrl?: string; // this is the base API url. This is important for self hosted environments
   commitDate?: Date; // this is the commit sha of the current file or folder
+  previousSourceBranch?: string; // optional: allows pushing changes to remote based on an existing branch
 }
 >;
 
