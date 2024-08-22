@@ -703,7 +703,7 @@ describe('remoteTokens', () => {
   Object.values(contextMap).forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
-        mockFetchBranches.mockImplementationOnce(() => (
+        mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
         ));
         mockRetrieve.mockImplementation(() => (
@@ -718,7 +718,7 @@ describe('remoteTokens', () => {
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual(context === adoContext ? { errorMessage: 'Error syncing with ADO, check credentials', status: 'failure' } : {
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'success',
         });
       });
@@ -765,7 +765,7 @@ describe('remoteTokens', () => {
         expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
-          errorMessage: context === adoContext ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
+          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
         });
       });
     }
@@ -792,7 +792,7 @@ describe('remoteTokens', () => {
           Promise.resolve(true)
         ));
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        if (context !== adoContext) {
+        if (context !== adoContext && context !== gitLabContext) {
           expect(notifyToUI).toBeCalledTimes(2);
           expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
@@ -800,7 +800,7 @@ describe('remoteTokens', () => {
           });
         } else {
           expect(notifyToUI).toBeCalledTimes(1);
-          expect(notifyToUI).toBeCalledWith('Pulled tokens from ADO');
+          expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
           expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
             status: 'failure',
             errorMessage: 'Push to remote cancelled!',

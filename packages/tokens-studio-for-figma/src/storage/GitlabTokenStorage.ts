@@ -30,11 +30,17 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
   protected repoPathWithNamespace: string;
 
+  protected source?: string;
+
+  protected previousSourceBranch?: string;
+
   constructor(
     secret: string,
     repository: string,
     repoPathWithNamespace: string,
     baseUrl?: string,
+    branch = 'main',
+    previousSourceBranch = 'main',
   ) {
     super(secret, '', repository, baseUrl);
 
@@ -43,6 +49,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
       token: this.secret,
       host: this.baseUrl || undefined,
     });
+    this.source = branch;
+    this.previousSourceBranch = previousSourceBranch;
   }
 
   public async assignProjectId() {
@@ -204,6 +212,24 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const rootPath = this.path.endsWith('.json')
       ? this.path.split('/').slice(0, -1).join('/')
       : this.path;
+    if (shouldCreateBranch && !branches.includes(branch)) {
+      const sourceBranch = this.previousSourceBranch || this.source;
+      await this.createBranch(branch, sourceBranch);
+    }
+    // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
+    const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
+    try {
+      await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
+    } catch (e) {
+      await this.gitlabClient.RepositoryFiles.create(
+        this.projectId,
+        pathToCreate,
+        branch,
+        '{}',
+        'Initial commit',
+      );
+    }
+
     const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
       path: rootPath,
       ref: branch,
@@ -235,9 +261,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
         branch,
         message,
         gitlabActions,
-        shouldCreateBranch ? {
-          startBranch: branches[0],
-        } : undefined,
       );
       return !!response;
     } catch (e: any) {
