@@ -83,7 +83,7 @@ export default function ResolveDuplicateTokenGroup({
           {groupValue.map((uniqueToken, i) => (
             // eslint-disable-next-line react/no-array-index-key
             <RadioItem key={`${uniqueToken.name}-${i}`} value={`${setName}:${uniqueToken.name}:${i}`} css={{ alignItems: 'center' }}>
-              <RadioItemBefore data-state={checkedToken === `${setName}:${uniqueToken.name}:${i}` ? 'checked' : 'unchecked'}>
+              <RadioItemBefore data-state={checkedToken === `${setName}:${uniqueToken.name}:${i}` ? 'checked' : 'unchecked'} css={{ flexShrink: 0 }}>
                 <RadioIndicator />
               </RadioItemBefore>
               <ResolveDuplicateTokenSingle token={uniqueToken} />
