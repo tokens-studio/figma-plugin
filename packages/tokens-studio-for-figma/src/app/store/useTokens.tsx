@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo, useContext } from 'react';
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
@@ -441,18 +442,18 @@ export default function useTokens() {
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
         if (!selectedTheme) continue;
-  
+
         const selectedSets = selectedTheme.selectedTokenSets;
-  
+
         const enabledTokenSets = Object.keys(selectedSets)
-        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-        .map((tokenSet) => tokenSet);
+          .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+          .map((tokenSet) => tokenSet);
 
         if (enabledTokenSets.length === 0) {
-          notifyToUI('No styles created for theme: ' + selectedTheme.name + '. Make sure some sets are enabled.', { error: true });
+          notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
           continue;
         }
-  
+
         const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
 
         const resolved = defaultTokenResolver.setTokens(tokensToResolve);
@@ -466,21 +467,21 @@ export default function useTokens() {
           if (shouldCreate) {
             if (!acc.find((token) => curr.name === token.name)) {
               acc.push(curr);
+            }
           }
-        }
-  
+
           return acc;
-        }, []);      
+        }, []);
 
-      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        settings,
-        selectedTheme: selectedTheme
-      }));
+        const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.CREATE_STYLES,
+          tokens: tokensToCreate,
+          settings,
+          selectedTheme,
+        }));
 
-      dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
-    }
+        dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+      }
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],

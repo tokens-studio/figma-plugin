@@ -8,28 +8,26 @@ import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { notifyUI } from './notifiers';
-import { act } from 'react-dom/test-utils';
 import { ThemeObject } from '@/types';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
   settings: SettingsState,
   shouldCreate = false,
-  selectedTheme?: ThemeObject
+  selectedTheme?: ThemeObject,
 ): Promise<Record<string, string>> {
   // Big O (n * m * l): (n = amount of tokens, m = amount of active themes, l = amount of tokenSets)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const activeThemes =  themeInfo.themes
-      .filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id))
-      .reverse();
-    
+  const activeThemes = themeInfo.themes
+    .filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id))
+    .reverse();
+
   const styleTokens = tokens.map((token) => {
     // When multiple theme has the same active Token set then the last activeTheme wins
-    const activeTheme = selectedTheme ? selectedTheme : activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet]) => tokenSet === token.internal__Parent));
+    const activeTheme = selectedTheme || activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet]) => tokenSet === token.internal__Parent));
 
     const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
     const slice = settings?.ignoreFirstPartForStyles && token.name.split('.').length > 1 ? 1 : 0;
@@ -41,10 +39,6 @@ export default async function updateStyles(
       styleId: activeTheme?.$figmaStyleReferences ? activeTheme?.$figmaStyleReferences[token.name] : '',
     } as SingleToken<true, { path: string, styleId: string }>;
   }).filter((token) => token.path);
-
-  //console.log("style tokens is", styleTokens);
-  //const foundTokeninstyled = styleTokens.filter((token) => token.name === tokenNameToFind);
-      //console.log("foundtoken is", foundTokeninstyled);
 
   const colorTokens = styleTokens.filter((n) => [TokenTypes.COLOR].includes(n.type)) as Extract<
     typeof styleTokens[number],
@@ -72,7 +66,7 @@ export default async function updateStyles(
     notifyUI('Some styles were ignored due to "Ignore first part of token name" export setting', { error: true });
   }
 
-  console.log("all style ids are", allStyleIds);
+  console.log('all style ids are', allStyleIds);
 
   // Remove styles that aren't in the theme or in the exposed token object
   if (settings.removeStylesAndVariablesWithoutConnection) {

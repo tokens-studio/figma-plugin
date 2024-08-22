@@ -36,7 +36,7 @@ export class TokenValueRetriever {
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
     applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-    selectedTheme
+    selectedTheme,
   }: { tokens: AnyTokenList,
     variableReferences?: RawVariableReferenceMap,
     styleReferences?: Map<string,

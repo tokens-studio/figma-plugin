@@ -26,7 +26,7 @@
     "serve": "serve dist -p 58630",
     "changeset": "changeset",
     "translate": "node  ./scripts/translate.mjs",
-    "lint": "eslint . --quiet --fix",
+    "lint": "eslint src/types/AsyncMessages.ts --quiet --fix",
     "lint:nofix": "eslint .",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
