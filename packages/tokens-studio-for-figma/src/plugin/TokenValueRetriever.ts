@@ -23,14 +23,14 @@ export class TokenValueRetriever {
   public selectedTheme;
 
   private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1 
-        ? tokenName.split('.').slice(1).join('.') 
-        : tokenName;
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
+      ? tokenName.split('.').slice(1).join('.')
+      : tokenName;
 
     const withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
 
     return withPrefix;
-}
+  }
 
   public initiate({
     tokens,
