@@ -443,11 +443,12 @@ export default function useTokens() {
         return acc;
       }, {});
 
-      const enabledTokenSets = Object.keys(selectedSets)
-        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-        .map((tokenSet) => tokenSet);
+      const tokenSets = Object.keys(selectedSets)
+  .map((key) => selectedSets[key].set);
 
-      if (enabledTokenSets.length === 0) {
+      console.log(tokenSets);
+
+      if (tokenSets.length === 0) {
         notifyToUI('No styles created. Make sure some sets are active.', { error: true });
         return;
       }
@@ -457,26 +458,35 @@ export default function useTokens() {
         isInfinite: true,
       });
 
-      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
-
-      const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
+      console.log("tokens to resolve are", tokensToResolve);
+      const resolved = tokensToResolve;
+      console.log("resolved are", resolved);
       const withoutSourceTokens = resolved.filter(
-        (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
+        (token) => !token.internal__Parent || tokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
       );
+      console.log("without source tokens are", withoutSourceTokens);
 
-      const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+      const tokensToCreate = resolved.reduce((acc: SingleToken[], curr) => {
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
           settings.stylesColor && curr.type === TokenTypes.COLOR,
           settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
         ].some((isEnabled) => isEnabled);
         if (shouldCreate) {
-          if (!acc.find((token) => curr.name === token.name)) {
+          const existingToken = acc.find((token) => curr.name === token.name);
+      
+          // If there's an existing token with the same name and the style prefix is enabled, push the current token
+          if (!existingToken || settings.prefixStylesWithThemeName) {
             acc.push(curr);
           }
         }
+      
         return acc;
       }, []);
+
+      console.log("tokens to create are", tokensToCreate);
+
 
       const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
