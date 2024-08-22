@@ -433,68 +433,54 @@ export default function useTokens() {
         effectStyles: settings.stylesEffect,
       });
 
-      const selectedSets = themes.reduce((acc, curr) => {
-        if (selectedThemes.includes(curr.id)) {
-          acc = {
-            ...acc,
-            ...curr.selectedTokenSets,
-          };
-        }
-        return acc;
-      }, {});
-
-      const tokenSets = Object.keys(selectedSets)
-  .map((key) => selectedSets[key].set);
-
-      console.log(tokenSets);
-
-      if (tokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure some sets are active.', { error: true });
-        return;
-      }
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATE_STYLES,
         isInfinite: true,
       });
 
-      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
-      console.log("tokens to resolve are", tokensToResolve);
-      const resolved = tokensToResolve;
-      console.log("resolved are", resolved);
-      const withoutSourceTokens = resolved.filter(
-        (token) => !token.internal__Parent || tokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
-      );
-      console.log("without source tokens are", withoutSourceTokens);
+      for (const themeId of selectedThemes) {
+        const selectedTheme = themes.find((theme) => theme.id === themeId);
+        if (!selectedTheme) continue;
+  
+        const selectedSets = selectedTheme.selectedTokenSets;
+  
+        const enabledTokenSets = Object.keys(selectedSets)
+        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+        .map((tokenSet) => tokenSet);
 
-      const tokensToCreate = resolved.reduce((acc: SingleToken[], curr) => {
-        const shouldCreate = [
-          settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-          settings.stylesColor && curr.type === TokenTypes.COLOR,
-          settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-        ].some((isEnabled) => isEnabled);
-        if (shouldCreate) {
-          const existingToken = acc.find((token) => curr.name === token.name);
-      
-          // If there's an existing token with the same name and the style prefix is enabled, push the current token
-          if (!existingToken || settings.prefixStylesWithThemeName) {
-            acc.push(curr);
+        if (enabledTokenSets.length === 0) {
+          notifyToUI('No styles created for theme: ' + selectedTheme.name + '. Make sure some sets are enabled.', { error: true });
+          continue;
+        }
+  
+        const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
+
+        const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+
+        const tokensToCreate = resolved.reduce((acc: SingleToken[], curr) => {
+          const shouldCreate = [
+            settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+            settings.stylesColor && curr.type === TokenTypes.COLOR,
+            settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+          ].some((isEnabled) => isEnabled);
+          if (shouldCreate) {
+            if (!acc.find((token) => curr.name === token.name)) {
+              acc.push(curr);
           }
         }
-      
-        return acc;
-      }, []);
-
-      console.log("tokens to create are", tokensToCreate);
-
+  
+          return acc;
+        }, []);      
 
       const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
         settings,
+        selectedTheme: selectedTheme
       }));
 
       dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+    }
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
