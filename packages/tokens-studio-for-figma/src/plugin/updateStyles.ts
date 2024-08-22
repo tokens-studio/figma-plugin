@@ -66,8 +66,6 @@ export default async function updateStyles(
     notifyUI('Some styles were ignored due to "Ignore first part of token name" export setting', { error: true });
   }
 
-  console.log('all style ids are', allStyleIds);
-
   // Remove styles that aren't in the theme or in the exposed token object
   if (settings.removeStylesAndVariablesWithoutConnection) {
     const [allLocalPaintStyles, allLocalTextStyles, allLocalEffectStyles] = await Promise.all([
