@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "1.38.6",
+  "version": "2.0.1",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
@@ -61,9 +61,10 @@
     "@supabase/supabase-js": "^2.0.5",
     "@supernovaio/supernova-sdk": "^1.9.3",
     "@tokens-studio/graph-engine": "^0.17.5",
-    "@tokens-studio/sdk": "1.1.5",
+    "@tokens-studio/sdk": "^1.2.1",
     "@tokens-studio/tokens": "0.2.5",
-    "@tokens-studio/ui": "0.8.3",
+    "@tokens-studio/types": "0.5.1",
+    "@tokens-studio/ui": "0.9.0",
     "@types/chroma-js": "^2.1.4",
     "@types/color": "^3.0.3",
     "@types/file-saver": "^2.0.5",
@@ -142,6 +143,7 @@
     "zod": "^3.22.3"
   },
   "devDependencies": {
+    "0x": "^5.7.0",
     "@babel/core": "^7.12.16",
     "@babel/plugin-proposal-private-methods": "^7.18.6",
     "@babel/plugin-transform-export-namespace-from": "^7.24.1",
@@ -184,7 +186,6 @@
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
-    "0x": "^5.7.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "changeset": "^0.2.6",

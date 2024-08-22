@@ -32,7 +32,7 @@ export default async function setColorValuesOnTarget({
       existingPaint = target.strokes[0] ?? null;
     }
 
-    if (resolvedValue.startsWith('linear-gradient')) {
+    if (resolvedValue.startsWith?.('linear-gradient')) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
       const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
 
@@ -53,8 +53,8 @@ export default async function setColorValuesOnTarget({
                   color: {
                     type: 'VARIABLE_ALIAS',
                     id: referenceVariableExists.id,
-                  }
-                }
+                  },
+                },
               };
             }
             return stop;
@@ -94,7 +94,7 @@ export default async function setColorValuesOnTarget({
       const valueToApply = fallbackValue ?? givenValue;
 
       if (!successfullyAppliedVariable) {
-        const { color, opacity } = convertToFigmaColor(valueToApply);
+        const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
         const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
         await unbindVariableFromTarget(target, key, newPaint);
         if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {

@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
@@ -23,7 +24,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
-import { getFormat } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -40,6 +41,7 @@ type PullTokensOptions = {
   usedTokenSet?: UsedTokenSetsMap | null;
   activeTheme?: Record<string, string>;
   collapsedTokenSets?: string[] | null;
+  updateLocalTokens?: boolean;
 };
 
 // @TODO typings and hooks
@@ -103,7 +105,7 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(
     async ({
-      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets,
+      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
     }: PullTokensOptions) => {
       track('pullTokens', { provider: context.provider });
       showPullDialog('loading');
@@ -149,9 +151,19 @@ export default function useRemoteTokens() {
           throw new Error('Not implemented');
       }
       if (remoteData?.status === 'success') {
+        dispatch.tokenState.setRemoteData({
+          tokens: remoteData.tokens,
+          themes: remoteData.themes,
+          metadata: remoteData.metadata,
+        });
+        dispatch.uiState.setHasRemoteChange(false);
+        const stringifiedRemoteTokens = JSON.stringify(compact([remoteData.tokens, remoteData.themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         if (activeTab !== Tabs.LOADING) {
-          const format = getFormat();
-          dispatch.tokenState.setTokenFormat(format);
+          if (updateLocalTokens) {
+            const format = getFormat();
+            dispatch.tokenState.setTokenFormat(format);
+          }
         }
         if (activeTab === Tabs.LOADING || !isEqual(tokens, remoteData.tokens) || !isEqual(themes, remoteData.themes)) {
           let shouldOverride = false;
@@ -201,31 +213,27 @@ export default function useRemoteTokens() {
                 break;
             }
             const remoteThemes: ThemeObject[] = remoteData.themes || [];
-            // remove those active thems that are no longer present in remoteThemes
+            // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                    acc[key] = activeTheme[key];
-                  }
-                  return acc;
-                }, {} as Record<string, string>)
+                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                  acc[key] = activeTheme[key];
+                }
+                return acc;
+              }, {} as Record<string, string>)
               : {};
 
-            dispatch.tokenState.setRemoteData({
-              tokens: remoteData.tokens,
-              themes: remoteData.themes,
-              metadata: remoteData.metadata
-            });
+            if (updateLocalTokens || shouldOverride) {
+              dispatch.tokenState.setTokenData({
+                values: remoteData.tokens,
+                themes: remoteData.themes,
+                activeTheme: filteredThemes,
+                usedTokenSet: usedTokenSet ?? {},
+                hasChangedRemote: true,
+              });
 
-            dispatch.tokenState.setTokenData({
-              values: remoteData.tokens,
-              themes: remoteData.themes,
-              activeTheme: filteredThemes,
-              usedTokenSet: usedTokenSet ?? {},
-              hasChangedRemote: true,
-            });
-
-            dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+              dispatch.tokenState.setCollapsedTokenSets(collapsedTokenSets || []);
+            }
             track('Launched with token sets', {
               count: Object.keys(remoteData.tokens).length,
               setNames: Object.keys(remoteData.tokens),
@@ -601,9 +609,10 @@ export default function useRemoteTokens() {
           hasChange = false;
           break;
       }
+      dispatch.uiState.setHasRemoteChange(hasChange);
       return hasChange;
     },
-    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab],
+    [api, checkRemoteChangeForGitHub, checkRemoteChangeForGitLab, dispatch.uiState],
   );
 
   return useMemo(

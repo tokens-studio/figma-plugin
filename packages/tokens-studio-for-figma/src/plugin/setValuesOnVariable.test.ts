@@ -3,6 +3,8 @@ import { SingleToken } from '@/types/tokens';
 import setValuesOnVariable from './setValuesOnVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
 
+const baseFontSize = '16px';
+
 // TODO: A lot of these tests could be rearranged and grouped follow the order of logic of each file, to see better what happy / sad paths are being covered.
 
 describe('SetValuesOnVariable', () => {
@@ -36,7 +38,7 @@ describe('SetValuesOnVariable', () => {
         variableId: '123',
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
-    setValuesOnVariable(variablesInFigma, tokens, collection, mode);
+    setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
   });
 
@@ -50,7 +52,7 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.SIZING,
       },
     ] as SingleToken<true, { path: string, variableId: string }>[];
-    setValuesOnVariable(variablesInFigma, tokens, collection, mode);
+    setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('button/primary/width', collection, 'FLOAT');
   });
 
@@ -65,7 +67,7 @@ describe('SetValuesOnVariable', () => {
         variableId: '123',
       },
     ];
-    const result = await setValuesOnVariable(variablesInFigma, tokens, collection, mode, true);
+    const result = await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize, true);
     expect(result.renamedVariableKeys).toEqual(['123']);
     expect(variablesInFigma[0].name).toEqual('button/primary/height');
     expect(mockCreateVariable).not.toBeCalled();
@@ -78,9 +80,9 @@ describe('SetValuesOnVariable', () => {
       value: 300,
       rawValue: 300,
       type: TokenTypes.FONT_WEIGHTS,
-      variableId: '1234'
+      variableId: '1234',
     }];
-    await setValuesOnVariable(variablesInFigma, tokens, collection, mode);
+    await setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
     expect(mockCreateVariable).toBeCalledWith('global/fontWeight', collection, 'FLOAT');
-  })
+  });
 });
