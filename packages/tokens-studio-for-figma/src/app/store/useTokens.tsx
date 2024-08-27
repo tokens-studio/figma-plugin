@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useCallback, useMemo, useContext } from 'react';
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
@@ -441,46 +440,47 @@ export default function useTokens() {
 
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
-        if (!selectedTheme) continue;
 
-        const selectedSets = selectedTheme.selectedTokenSets;
+        if (selectedTheme) {
+          const selectedSets = selectedTheme.selectedTokenSets;
 
-        const enabledTokenSets = Object.keys(selectedSets)
-          .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-          .map((tokenSet) => tokenSet);
+          const enabledTokenSets = Object.keys(selectedSets)
+            .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
+            .map((tokenSet) => tokenSet);
 
-        if (enabledTokenSets.length > 0) {
-          const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
+          if (enabledTokenSets.length > 0) {
+            const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
 
-          const resolved = defaultTokenResolver.setTokens(tokensToResolve);
+            const resolved = defaultTokenResolver.setTokens(tokensToResolve);
 
-          const withoutSourceTokens = resolved.filter(
-            (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
-          );
+            const withoutSourceTokens = resolved.filter(
+              (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
+            );
 
-          const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-            const shouldCreate = [
-              settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-              settings.stylesColor && curr.type === TokenTypes.COLOR,
-              settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-            ].some((isEnabled) => isEnabled);
-            if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
-              acc.push(curr);
-            }
+            const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+              const shouldCreate = [
+                settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+                settings.stylesColor && curr.type === TokenTypes.COLOR,
+                settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+              ].some((isEnabled) => isEnabled);
+              if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
+                acc.push(curr);
+              }
 
-            return acc;
-          }, []);
+              return acc;
+            }, []);
 
-          const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-            type: AsyncMessageTypes.CREATE_STYLES,
-            tokens: tokensToCreate,
-            settings,
-            selectedTheme,
-          }));
+            const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+              type: AsyncMessageTypes.CREATE_STYLES,
+              tokens: tokensToCreate,
+              settings,
+              selectedTheme,
+            }));
 
-          dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
-        } else {
-          notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+            dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+          } else {
+            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+          }
         }
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
