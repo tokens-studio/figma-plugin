@@ -9,7 +9,7 @@ import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
 import { notifyUI } from './notifiers';
-import { ThemeObject } from '@/types';
+import type { ThemeObject } from '@/types';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
