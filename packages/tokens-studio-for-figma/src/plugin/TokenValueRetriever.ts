@@ -1,5 +1,4 @@
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
-import { ThemeObject } from '@/types';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { AnyTokenList } from '@/types/tokens';
 
@@ -20,8 +19,6 @@ export class TokenValueRetriever {
 
   public createStylesWithVariableReferences;
 
-  public selectedTheme;
-
   private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
       ? tokenName.split('.').slice(1).join('.')
@@ -40,7 +37,6 @@ export class TokenValueRetriever {
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
     applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-    selectedTheme,
   }: { tokens: AnyTokenList,
     variableReferences?: RawVariableReferenceMap,
     styleReferences?: Map<string,
@@ -49,7 +45,6 @@ export class TokenValueRetriever {
     ignoreFirstPartForStyles?: boolean,
     createStylesWithVariableReferences?: boolean,
     applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues,
-    selectedTheme?: ThemeObject,
   }) {
     this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
@@ -58,7 +53,6 @@ export class TokenValueRetriever {
     this.variableReferences = variableReferences || new Map();
     this.cachedVariableReferences = new Map();
     this.applyVariablesStylesOrRawValue = applyVariablesStylesOrRawValue;
-    this.selectedTheme = selectedTheme;
 
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);
@@ -116,7 +110,6 @@ export class TokenValueRetriever {
     if (this.stylePathPrefix) this.stylePathPrefix = undefined;
     if (this.ignoreFirstPartForStyles) this.ignoreFirstPartForStyles = undefined;
     if (this.createStylesWithVariableReferences) this.createStylesWithVariableReferences = undefined;
-    if (this.selectedTheme) this.selectedTheme = undefined;
   }
 }
 
