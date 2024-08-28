@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 2.0.2
+
+### Patch Changes
+
+- 1784f101: Fixes issues when synchronizing data with GitLab, which prevented creating new branches on the fly and switching between single and multi-file setups.
+- 2dc668cc: Fixes the issue where only active themes were being exported as styles, even when multiple themes were selected in the options modal.
+
+  Fixes the problem where applied styles were not being displayed in figma when the core/global theme was being activated.
+
+- 22018a93: Fix a visual bug in the Resolve Duplicate Tokens modal
+
 ## 2.0.1
 
 ### Patch Changes
