@@ -24,14 +24,14 @@ export class TokenValueRetriever {
     ? tokenName.split('.').slice(1).join('.')
     : tokenName;
 
-  let withPrefix;
-  if(this.stylePathPrefix){
-   withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
-  }
-  else
-  withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n)=> n).join('.');
+    let withPrefix = withIgnoredFirstPart;
+    
+    if (this.stylePathPrefix) {
+        const prefix = internalParent || this.stylePathPrefix;
+        withPrefix = [prefix, withIgnoredFirstPart].filter(Boolean).join('.');
+    }
 
-  return withPrefix;
+    return withPrefix;
 }
 
   public initiate({
