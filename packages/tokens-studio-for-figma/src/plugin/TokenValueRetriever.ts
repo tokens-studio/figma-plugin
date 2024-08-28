@@ -21,13 +21,19 @@ export class TokenValueRetriever {
 
   private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
-      ? tokenName.split('.').slice(1).join('.')
-      : tokenName;
-
-    const withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
-
-    return withPrefix;
+    ? tokenName.split('.').slice(1).join('.')
+    : tokenName;
+    //console.log("ignrefirstpart is", this.ignoreFirstPartForStyles);
+    //console.log(withIgnoredFirstPart);
+  let withPrefix;
+  if(this.stylePathPrefix){
+   withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
   }
+  else
+  withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n)=> n).join('.');
+
+  return withPrefix;
+}
 
   public initiate({
     tokens,
