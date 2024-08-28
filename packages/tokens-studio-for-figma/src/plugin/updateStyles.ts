@@ -8,22 +8,27 @@ import { transformValue } from './helpers';
 import updateColorStyles from './updateColorStyles';
 import updateEffectStyles from './updateEffectStyles';
 import updateTextStyles from './updateTextStyles';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { notifyUI } from './notifiers';
+import type { ThemeObject } from '@/types';
 
 export default async function updateStyles(
   tokens: AnyTokenList,
   settings: SettingsState,
   shouldCreate = false,
+  selectedTheme?: ThemeObject,
 ): Promise<Record<string, string>> {
   // Big O (n * m * l): (n = amount of tokens, m = amount of active themes, l = amount of tokenSets)
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const activeThemes = themeInfo.themes.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id)).reverse();
+  const activeThemes = themeInfo.themes
+    .filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id))
+    .reverse();
+
   const styleTokens = tokens.map((token) => {
     // When multiple theme has the same active Token set then the last activeTheme wins
-    const activeTheme = activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet, status]) => status === TokenSetStatus.ENABLED && tokenSet === token.internal__Parent));
+    const activeTheme = selectedTheme || activeThemes.find((theme) => Object.entries(theme.selectedTokenSets).some(([tokenSet]) => tokenSet === token.internal__Parent));
+
     const prefix = settings.prefixStylesWithThemeName && activeTheme ? activeTheme.name : null;
     const slice = settings?.ignoreFirstPartForStyles && token.name.split('.').length > 1 ? 1 : 0;
     const path = convertTokenNameToPath(token.name, prefix, slice);
