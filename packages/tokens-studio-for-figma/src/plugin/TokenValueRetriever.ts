@@ -21,18 +21,18 @@ export class TokenValueRetriever {
 
   private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
-    ? tokenName.split('.').slice(1).join('.')
-    : tokenName;
+      ? tokenName.split('.').slice(1).join('.')
+      : tokenName;
 
     let withPrefix = withIgnoredFirstPart;
-    
+
     if (this.stylePathPrefix) {
-        const prefix = internalParent || this.stylePathPrefix;
-        withPrefix = [prefix, withIgnoredFirstPart].filter(Boolean).join('.');
+      const prefix = internalParent || this.stylePathPrefix;
+      withPrefix = [prefix, withIgnoredFirstPart].filter(Boolean).join('.');
     }
 
     return withPrefix;
-}
+  }
 
   public initiate({
     tokens,
