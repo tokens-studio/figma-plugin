@@ -23,8 +23,7 @@ export class TokenValueRetriever {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
     ? tokenName.split('.').slice(1).join('.')
     : tokenName;
-    //console.log("ignrefirstpart is", this.ignoreFirstPartForStyles);
-    //console.log(withIgnoredFirstPart);
+
   let withPrefix;
   if(this.stylePathPrefix){
    withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');

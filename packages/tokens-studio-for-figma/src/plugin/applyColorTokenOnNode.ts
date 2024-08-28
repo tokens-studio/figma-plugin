@@ -18,9 +18,7 @@ export async function applyColorTokenOnNode(node: BaseNode, data: NodeTokenRefMa
     && !(await tryApplyColorVariableId(node, tokenName, ColorPaintType.FILLS))
   ) {
     const resolvedToken = defaultTokenValueRetriever.get(tokenName);
-    //console.log("resolved token is", resolvedToken);
     let matchingStyleId = resolvedToken?.styleId;
-    //console.log("matching style id is", matchingStyleId);
 
     // Note: We should remove "backup style id" logic from here (this part). This was relevant before we had Themes, where style ids could not be saved to a token yet.
     if (!matchingStyleId) {
