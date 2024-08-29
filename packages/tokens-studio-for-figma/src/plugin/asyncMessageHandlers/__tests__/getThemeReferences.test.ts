@@ -54,6 +54,7 @@ describe('getThemeReferences', () => {
     expect(result).toEqual({
       figmaStyleReferences: new Map([['token2', 'style1']]),
       figmaVariableReferences: new Map([['token1', 'variable1']]),
+      potentialStylePathPrefixes: Array ['theme1'],
     });
   });
 
