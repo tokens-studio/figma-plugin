@@ -20,13 +20,9 @@ export class TokenValueRetriever {
   public createStylesWithVariableReferences;
 
   private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
-      ? tokenName.split('.').slice(1).join('.')
-      : tokenName;
-
     const matchingStylePathPrefix = this.potentialStylePathPrefixes?.find((prefix) => prefix === internalParent);
 
-    const withPrefix = [matchingStylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+    const withPrefix = [matchingStylePathPrefix, tokenName].filter((n) => n).join('.');
 
     return withPrefix;
   }
@@ -68,6 +64,8 @@ export class TokenValueRetriever {
   }
 
   public get(tokenName: string) {
+    
+    console.log("prefixes", this.potentialStylePathPrefixes);
     return this.tokens.get(tokenName);
   }
 
