@@ -24,7 +24,7 @@ export class TokenValueRetriever {
       ? tokenName.split('.').slice(1).join('.')
       : tokenName;
 
-      const matchingStylePathPrefix = this.potentialStylePathPrefixes?.find((prefix) => prefix === internalParent);
+    const matchingStylePathPrefix = this.potentialStylePathPrefixes?.find((prefix) => prefix === internalParent);
 
     const withPrefix = [matchingStylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
 
@@ -48,7 +48,7 @@ export class TokenValueRetriever {
     createStylesWithVariableReferences?: boolean,
     applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues,
   }) {
-    this.potentialStylePathPrefixes = typeof potentialStylePathPrefixes !== 'undefined' ? potentialStylePathPrefixes: null;
+    this.potentialStylePathPrefixes = typeof potentialStylePathPrefixes !== 'undefined' ? potentialStylePathPrefixes : null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
     this.createStylesWithVariableReferences = createStylesWithVariableReferences;
     this.styleReferences = styleReferences || new Map();
