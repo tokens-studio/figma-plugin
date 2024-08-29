@@ -11,7 +11,7 @@ export class TokenValueRetriever {
 
   private styleReferences;
 
-  private stylePathPrefix;
+  private potentialStylePathPrefixes;
 
   private ignoreFirstPartForStyles;
 
@@ -19,12 +19,14 @@ export class TokenValueRetriever {
 
   public createStylesWithVariableReferences;
 
-  private getAdjustedTokenName(tokenName: string): string {
+  private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
     const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
       ? tokenName.split('.').slice(1).join('.')
       : tokenName;
 
-    const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+      const matchingStylePathPrefix = this.potentialStylePathPrefixes?.find((prefix) => prefix === internalParent);
+
+    const withPrefix = [matchingStylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
 
     return withPrefix;
   }
@@ -33,7 +35,7 @@ export class TokenValueRetriever {
     tokens,
     variableReferences,
     styleReferences,
-    stylePathPrefix,
+    potentialStylePathPrefixes,
     ignoreFirstPartForStyles = false,
     createStylesWithVariableReferences = false,
     applyVariablesStylesOrRawValue = ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
@@ -41,12 +43,12 @@ export class TokenValueRetriever {
     variableReferences?: RawVariableReferenceMap,
     styleReferences?: Map<string,
     string>,
-    stylePathPrefix?: string,
+    potentialStylePathPrefixes?: string[],
     ignoreFirstPartForStyles?: boolean,
     createStylesWithVariableReferences?: boolean,
     applyVariablesStylesOrRawValue?: ApplyVariablesStylesOrRawValues,
   }) {
-    this.stylePathPrefix = typeof stylePathPrefix !== 'undefined' ? stylePathPrefix : null;
+    this.potentialStylePathPrefixes = typeof potentialStylePathPrefixes !== 'undefined' ? potentialStylePathPrefixes: null;
     this.ignoreFirstPartForStyles = ignoreFirstPartForStyles;
     this.createStylesWithVariableReferences = createStylesWithVariableReferences;
     this.styleReferences = styleReferences || new Map();
@@ -57,7 +59,7 @@ export class TokenValueRetriever {
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
-      const adjustedTokenName = this.getAdjustedTokenName(token.name);
+      const adjustedTokenName = this.getAdjustedTokenName(token.name, token.internal__Parent);
       const styleId = styleReferences?.get(adjustedTokenName);
       return [token.name, {
         ...token, variableId, styleId, adjustedTokenName,
@@ -107,7 +109,7 @@ export class TokenValueRetriever {
     if (this.tokens) this.tokens.clear();
     if (this.variableReferences) this.variableReferences.clear();
     if (this.styleReferences) this.styleReferences.clear();
-    if (this.stylePathPrefix) this.stylePathPrefix = undefined;
+    if (this.potentialStylePathPrefixes) this.potentialStylePathPrefixes = undefined;
     if (this.ignoreFirstPartForStyles) this.ignoreFirstPartForStyles = undefined;
     if (this.createStylesWithVariableReferences) this.createStylesWithVariableReferences = undefined;
   }

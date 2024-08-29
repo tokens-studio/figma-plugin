@@ -15,7 +15,11 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const figmaVariableReferences: RawVariableReferenceMap = new Map();
 
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[activeThemes.length - 1].name : undefined;
+  /*Changed Styled Path prefix to an array of active theme names, since, any references to the last or first theme was causing
+     other active themes to mangle with the accurate prefix name thereby causing an issue later in style resolution */
+  const potentialStylePathPrefixes = prefixStylesWithThemeName && activeThemes.length > 0 
+  ? activeThemes.map((theme) => theme.name)
+  : [];
 
   activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
@@ -71,6 +75,6 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   return {
-    figmaStyleReferences, figmaVariableReferences, stylePathPrefix,
+    figmaStyleReferences, figmaVariableReferences, potentialStylePathPrefixes,
   };
 }
