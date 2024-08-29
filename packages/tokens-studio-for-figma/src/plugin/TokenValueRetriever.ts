@@ -64,8 +64,7 @@ export class TokenValueRetriever {
   }
 
   public get(tokenName: string) {
-    
-    console.log("prefixes", this.potentialStylePathPrefixes);
+    console.log('prefixes', this.potentialStylePathPrefixes);
     return this.tokens.get(tokenName);
   }
 
