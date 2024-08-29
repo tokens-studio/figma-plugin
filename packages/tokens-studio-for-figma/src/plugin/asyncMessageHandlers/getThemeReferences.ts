@@ -15,7 +15,8 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const figmaVariableReferences: RawVariableReferenceMap = new Map();
 
   const activeThemes = themeInfo.themes?.filter((theme) => Object.values(themeInfo.activeTheme).some((v) => v === theme.id));
-  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[0].name : undefined;
+  //console.log("active themes is", activeThemes);
+  const stylePathPrefix = prefixStylesWithThemeName && activeThemes.length > 0 ? activeThemes[activeThemes.length -1].name : undefined;
 
   activeThemes?.forEach((theme) => {
     Object.entries(theme.$figmaVariableReferences ?? {}).forEach(([token, variableId]) => {
