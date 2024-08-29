@@ -432,7 +432,7 @@ describe('Can set values on node', () => {
         },
       ],
       styleReferences: new Map([['light.shadows.default', '123']]),
-      stylePathPrefix: 'light',
+      potentialStylePathPrefixes: ['light'],
     });
     await setValuesOnNode(
       {
