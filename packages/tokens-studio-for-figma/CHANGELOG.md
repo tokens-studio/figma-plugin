@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 2.0.3
+
+### Patch Changes
+
+- 9f8c0360: Fixes an issue where applied styles are not displaying in Figma, when the themes have been exported as non-prefixed styles from the plugin.
+
+  Fixes the issue where applied styles are not displaying in Figma, when the themes have been exported with both 'prefix styles with active theme name' and 'ignore first part of token name for styles' options have been checked
+
 ## 2.0.2
 
 ### Patch Changes
