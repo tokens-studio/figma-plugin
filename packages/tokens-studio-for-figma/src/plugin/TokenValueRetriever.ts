@@ -19,12 +19,8 @@ export class TokenValueRetriever {
 
   public createStylesWithVariableReferences;
 
-  private getAdjustedTokenName(tokenName: string, internalParent: string | undefined): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
-      ? tokenName.split('.').slice(1).join('.')
-      : tokenName;
-
-    const withPrefix = [internalParent || this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+  private getAdjustedTokenName(tokenName: string): string {
+    const withPrefix = [this.stylePathPrefix, tokenName].filter((n) => n).join('.');
 
     return withPrefix;
   }
@@ -57,8 +53,8 @@ export class TokenValueRetriever {
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
-      const adjustedTokenName = this.getAdjustedTokenName(token.name, token.internal__Parent);
-      const styleId = styleReferences?.get(adjustedTokenName);
+      const adjustedTokenName = this.getAdjustedTokenName(token.name);
+      const styleId = styleReferences?.get(token.name);
       return [token.name, {
         ...token, variableId, styleId, adjustedTokenName,
       }];
