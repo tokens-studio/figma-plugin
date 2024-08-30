@@ -12,14 +12,14 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
       const tokensMap = tokenArrayGroupToMap(msg.tokens);
       const nodes = figma.currentPage.selection;
       const {
-        figmaVariableReferences, figmaStyleReferences, potentialStylePathPrefixes,
+        figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
       } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
 
       await defaultTokenValueRetriever.initiate({
         tokens: msg.tokens,
         variableReferences: figmaVariableReferences,
         styleReferences: figmaStyleReferences,
-        potentialStylePathPrefixes,
+        stylePathPrefix,
         ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
         applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
       });

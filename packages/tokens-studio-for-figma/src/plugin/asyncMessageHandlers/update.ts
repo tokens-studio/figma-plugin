@@ -25,13 +25,13 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
   }
   if (msg.tokens) {
     const {
-      figmaVariableReferences, figmaStyleReferences, potentialStylePathPrefixes,
+      figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
     defaultTokenValueRetriever.initiate({
       tokens: msg.tokens,
       variableReferences: figmaVariableReferences,
       styleReferences: figmaStyleReferences,
-      potentialStylePathPrefixes,
+      stylePathPrefix,
       ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
       applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
