@@ -54,7 +54,6 @@ describe('getThemeReferences', () => {
     expect(result).toEqual({
       figmaStyleReferences: new Map([['token2', 'style1']]),
       figmaVariableReferences: new Map([['token1', 'variable1']]),
-      potentialStylePathPrefixes: [],
     });
   });
 
@@ -85,7 +84,6 @@ describe('getThemeReferences', () => {
         ['token1', 'variable1'],
         ['local.variable1', 'localVariable1'],
       ]),
-      potentialStylePathPrefixes: [],
     });
   });
 
@@ -108,7 +106,6 @@ describe('getThemeReferences', () => {
       figmaVariableReferences: new Map([
         ['token1', 'variable1'],
       ]),
-      potentialStylePathPrefixes: [],
     });
   });
 });
