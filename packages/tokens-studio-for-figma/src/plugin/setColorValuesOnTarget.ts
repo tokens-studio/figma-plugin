@@ -34,7 +34,7 @@ export default async function setColorValuesOnTarget({
 
     if (resolvedValue.startsWith?.('linear-gradient')) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
-      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
+      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue, target);
 
       const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
       let gradientStopsWithReferences = gradientStops;
