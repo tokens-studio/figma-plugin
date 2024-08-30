@@ -160,12 +160,19 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           </Stack>
           )}
       >
-        <Heading>{t('exportSetsTab.changeSetsHeading')}</Heading>
+        <Heading css={{
+          padding: '$3 $4 $2 $4',
+        }}
+        >
+          {t('exportSetsTab.changeSetsHeading')}
+        </Heading>
         {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
         <Stack
           direction="column"
+          gap={1}
           css={{
             marginBlockStart: '$4',
+            padding: '$3 $4 $3 $4',
           }}
         >
           <TokenSetTreeContent items={setsTree} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
