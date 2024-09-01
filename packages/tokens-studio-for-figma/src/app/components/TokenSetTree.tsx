@@ -7,6 +7,7 @@ import {
   activeTokenSetSelector,
   collapsedTokenSetsSelector,
   editProhibitedSelector,
+  tokenFilterSelector,
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
@@ -55,16 +56,36 @@ export default function TokenSetTree({
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const externalItems = useMemo(() => tokenSetListToTree(tokenSets), [tokenSets]);
   const [items, setItems] = React.useState<TreeItem[]>(externalItems);
+  const tokenFilter = useSelector(tokenFilterSelector);
 
   const debouncedOnReorder = React.useMemo(() => debounce(onReorder, 500), [onReorder]);
+
+  const filteredSetItems = React.useMemo(() => {
+    const tokenSetsContainingItemsThatMatchFilter = new Set<string>();
+
+    Object.entries(tokens).forEach(([setName, setContent]) => {
+      if (setContent.some((token) => token.name.toLowerCase().includes(tokenFilter.toLowerCase()))
+          || setName.toLowerCase().includes(tokenFilter.toLowerCase())) {
+        // Add the matching set and all its parent folders
+        let currentPath = setName;
+        while (currentPath) {
+          tokenSetsContainingItemsThatMatchFilter.add(currentPath);
+          currentPath = currentPath.split('/').slice(0, -1).join('/');
+        }
+      }
+    });
+
+    return externalItems.filter((item) => tokenSetsContainingItemsThatMatchFilter.has(item.path));
+  }, [externalItems, tokenFilter, tokens]);
 
   React.useEffect(() => {
     // Compare saved tokenSet order with GUI tokenSet order and update the tokenSet if there is a difference
     if (!isEqual(Object.keys(tokens), externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
-      debouncedOnReorder(externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
+      debouncedOnReorder(filteredSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
     }
-    setItems(externalItems);
-  }, [externalItems, tokens, debouncedOnReorder]);
+    // Filter externalItems based on tokenFilter. Filter on the children as well as the name of the set
+    setItems(filteredSetItems);
+  }, [externalItems, tokens, debouncedOnReorder, tokenFilter, filteredSetItems]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {
