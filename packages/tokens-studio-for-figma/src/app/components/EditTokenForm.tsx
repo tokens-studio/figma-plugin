@@ -357,6 +357,18 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const usedReferences = React.useMemo(() => {
+    // From the token value which is a string, there can be references inside, from all those that have a pure reference - such as {colors.gray.500} or {spacing.16}, find the tokens from the resolvedTokens array and return them
+
+    const editTokenValue = internalEditToken?.value;
+
+    // Use a regex to extract all the names of all references used
+    if (typeof editTokenValue === 'string') {
+      return resolvedTokens.filter((t) => editTokenValue.includes(`{${t.name}}`));
+    }
+    return [];
+  }, [internalEditToken, resolvedTokens]);
+
   const resolvedValue = React.useMemo(() => {
     if (internalEditToken) {
       return typeof internalEditToken?.value === 'string'
@@ -502,6 +514,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
       }
     }
   };
+
+  const handleReferenceSetClick = React.useCallback(
+    (tokenSet?: string) => {
+      if (!tokenSet) return;
+      dispatch.tokenState.setActiveTokenSet(tokenSet);
+      dispatch.uiState.setShowEditForm(false);
+    },
+    [dispatch.tokenState, dispatch.uiState],
+  );
 
   const checkAndSubmitTokenValue = React.useCallback(() => {
     if (internalEditToken.type === TokenTypes.DIMENSION && !isValidDimensionToken) {
@@ -664,6 +685,53 @@ function EditTokenForm({ resolvedTokens }: Props) {
           placeholder={t('uniqueName')}
         />
         {renderTokenForm()}
+
+        {checkIfContainsAlias(internalEditToken.value) && (
+          <details>
+            <summary>
+              Used references (
+              {usedReferences.length}
+              )
+            </summary>
+            <Box
+              css={{
+                padding: '$3',
+                marginTop: '$3',
+                fontFamily: '$mono',
+                color: '$fgMuted',
+                backgroundColor: '$bgSubtle',
+                borderColor: '$borderSubtle',
+                borderRadius: '$medium',
+                fontSize: '$xxs',
+                alignItems: 'center',
+              }}
+            >
+              <div>
+                final value with current config:
+                {' '}
+                {resolvedValue?.toString()}
+              </div>
+              used references:
+              {usedReferences.map((ref) => (
+                <div>
+                  {ref.name}
+                  {': '}
+                  {JSON.stringify(ref.value)}
+                  {ref.rawValue !== ref.value && <span> / raw: JSON.stringify(ref.rawValue)</span>}
+                  {ref.internal__Parent && (
+                  <span>
+                    {' '}
+                    from
+                    {' '}
+                    <button type="button" onClick={() => handleReferenceSetClick(ref.internal__Parent)}>{ref.internal__Parent}</button>
+                  </span>
+                  )}
+                </div>
+              ))}
+            </Box>
+          </details>
+
+        )}
 
         {internalEditToken?.schema?.explainer && (
           <Text muted size="small">
