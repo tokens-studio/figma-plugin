@@ -1,3 +1,4 @@
+import { SingleToken } from '@tokens-studio/types';
 import { isPaintEqual } from '@/utils/isPaintEqual';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 import { convertStringToFigmaGradient } from './figmaTransforms/gradients';
@@ -5,6 +6,10 @@ import { defaultTokenValueRetriever } from './TokenValueRetriever';
 import { ColorPaintType, tryApplyColorVariableId } from '@/utils/tryApplyColorVariableId';
 import { unbindVariableFromTarget } from './unbindVariableFromTarget';
 import { getReferenceTokensFromGradient } from '@/utils/color';
+
+function hasModifier(token: SingleToken) {
+  return token.$extensions?.['studio.tokens']?.modify;
+}
 
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,
@@ -79,7 +84,8 @@ export default async function setColorValuesOnTarget({
       const containsReferenceVariable = resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}');
       const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(resolvedValue.slice(1, -1));
 
-      if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables) {
+      console.log('setting', resolvedToken);
+      if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables && !hasModifier(resolvedToken)) {
         try {
           successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
         } catch (e) {

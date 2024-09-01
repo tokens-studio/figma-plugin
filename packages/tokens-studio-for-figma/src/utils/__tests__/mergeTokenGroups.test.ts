@@ -95,6 +95,12 @@ describe('mergeTokenGroups', () => {
         value: '#ffffff',
       },
       {
+        internal__Parent: 'v0',
+        type: TokenTypes.COLOR,
+        name: 'color.secondary',
+        value: '#ffffff',
+      },
+      {
         internal__Parent: 'v1',
         type: TokenTypes.COMPOSITION,
         name: 'composition.container',
@@ -126,12 +132,6 @@ describe('mergeTokenGroups', () => {
             spread: 0,
           },
         ],
-      },
-      {
-        internal__Parent: 'v0',
-        type: TokenTypes.COLOR,
-        name: 'color.secondary',
-        value: '#ffffff',
       },
     ];
     expect(mergeTokenGroups(input)).toEqual(output);
