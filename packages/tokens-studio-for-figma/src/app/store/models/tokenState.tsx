@@ -51,6 +51,7 @@ import {
 } from '@/storage/tokensStudio';
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
+import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -237,6 +238,36 @@ export const tokenState = createModel<RootModel>()({
           ],
         };
       }
+
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          ...newTokens,
+        },
+      };
+    },
+    createMultipleTokens: (state, data: CreateSingleTokenData[] | EditSingleTokenData[]) => {
+      const newTokens: TokenStore['values'] = {};
+
+      console.log('creating multiple', data);
+
+      data.forEach((token) => {
+        const parentTokens = state.tokens[token.parent] || [];
+        const existingTokenIndex = parentTokens.findIndex((n) => n.name === token.name);
+        if (existingTokenIndex === -1) {
+          if (!newTokens[token.parent]) {
+            newTokens[token.parent] = [...parentTokens];
+          }
+          newTokens[token.parent].push(
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+          );
+        } else {
+          newTokens[token.parent][existingTokenIndex] = updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4());
+        }
+      });
+
+      console.log('newTokens', newTokens);
 
       return {
         ...state,
