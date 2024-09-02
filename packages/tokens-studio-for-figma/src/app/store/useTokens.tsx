@@ -449,6 +449,8 @@ export default function useTokens() {
       // Iterate over all given selectedThemes, and combine the selectedTokenSets.
       const overallConfig = getOverallConfig(themes, selectedThemes);
 
+      const allStyleIds = {};
+
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
 
@@ -485,12 +487,37 @@ export default function useTokens() {
               selectedTheme,
             }));
 
+            Object.assign(allStyleIds, createStylesResult.styleIds);
+
             dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
           } else {
             notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
           }
         }
       }
+
+      // Remove styles that aren't in the theme or in the exposed token object
+      if (settings.removeStylesAndVariablesWithoutConnection) {
+        const promises: Promise<PaintStyle[] | TextStyle[] | EffectStyle[]>[] = [];
+        if (settings.stylesColor) {
+          promises.push(figma.getLocalPaintStylesAsync());
+        }
+        if (settings.stylesTypography) {
+          promises.push(figma.getLocalTextStylesAsync());
+        }
+        if (settings.stylesEffect) {
+          promises.push(figma.getLocalEffectStylesAsync());
+        }
+
+        const allLocalStyles = (await Promise.all(promises)).flat();
+
+        allLocalStyles
+          .filter((style) => !Object.values(allStyleIds).includes(style.id))
+          .forEach((style) => {
+            style.remove();
+          });
+      }
+
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
