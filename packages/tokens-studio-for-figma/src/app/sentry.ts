@@ -33,25 +33,18 @@ export const setupReplay = () => {
 };
 
 export const initializeSentry = () => {
-  switch (process.env.ENVIRONMENT) {
-    case 'alpha':
-    case 'beta':
-    case 'production':
-      Sentry.init({
-        dsn: DSN,
-        release: `figma-tokens@${pjs.version}`,
-        environment: process.env.ENVIRONMENT,
-        tracesSampleRate: SAMPLING,
-        // @ts-ignore Note: This gives an error. No clue why 🤷
-        profilesSampleRate: PROFILE_RATE,
-        replaysSessionSampleRate: REPLAY_RATE,
-        // We always want to replay errors
-        replaysOnErrorSampleRate: 1.0,
-        integrations: [],
-      });
-      Sentry.addTracingExtensions();
-      break;
-    default:
-      break;
-  }
+  Sentry.init({
+    dsn: DSN,
+    enabled: process.env.ENVIRONMENT !== 'development',
+    release: `figma-tokens@${pjs.version}`,
+    environment: process.env.ENVIRONMENT,
+    tracesSampleRate: SAMPLING,
+    // @ts-ignore Note: This gives an error. No clue why 🤷
+    profilesSampleRate: PROFILE_RATE,
+    replaysSessionSampleRate: REPLAY_RATE,
+    // We always want to replay errors
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [],
+  });
+  Sentry.addTracingExtensions();
 };
