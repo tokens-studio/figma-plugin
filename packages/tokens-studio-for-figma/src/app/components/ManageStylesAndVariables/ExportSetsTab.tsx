@@ -145,6 +145,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
       <Modal
         size="fullscreen"
         full
+        compact
         isOpen={showChangeSets}
         close={handleCancelChangeSets}
         backArrow
@@ -160,10 +161,7 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           </Stack>
           )}
       >
-        <Heading css={{
-          padding: '$3 $4 $2 $4',
-        }}
-        >
+        <Heading>
           {t('exportSetsTab.changeSetsHeading')}
         </Heading>
         {/* Commenting until we have docs <Link target="_blank" href={docsLinks.sets}>{`${t('generic.learnMore')} – ${t('docs.referenceOnlyMode')}`}</Link> */}
@@ -172,7 +170,6 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
           gap={1}
           css={{
             marginBlockStart: '$4',
-            padding: '$3 $4 $3 $4',
           }}
         >
           <TokenSetTreeContent items={setsTree} renderItemContent={TokenSetThemeItemInput} keyPosition="end" />
