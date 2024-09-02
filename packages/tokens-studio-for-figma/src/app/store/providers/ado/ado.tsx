@@ -117,9 +117,8 @@ export const useADO = () => {
     }
 
     return {
-      status: 'success',
-      tokens: {},
-      themes: [],
+      status: 'failure',
+      errorMessage: 'Push to remote cancelled!',
     };
   }, [
     dispatch,
@@ -255,16 +254,6 @@ export const useADO = () => {
       }
       const data = await syncTokensWithADO(context);
 
-      // User cancelled pushing to the remote
-      if (data.status === 'success' && data.themes.length === 0) {
-        dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
-
-        return {
-          status: 'failure',
-          errorMessage: 'Push to remote cancelled!',
-        };
-      }
-
       if (data.status === 'success') {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
@@ -274,6 +263,8 @@ export const useADO = () => {
           notifyToUI('No tokens stored on remote');
         }
       } else {
+        // Go back to the previous setup if the user cancelled pushing to the remote or there was an error
+        dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
         return {
           status: 'failure',
           errorMessage: data.errorMessage,
