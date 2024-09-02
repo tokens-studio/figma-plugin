@@ -25,6 +25,12 @@ export class TokenValueRetriever {
     return withPrefix;
   }
 
+  private getAdjustedTokenNameWithIgnoreFirstPart(tokenName: string): string {
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1 ? tokenName.split('.').slice(1).join('.') : tokenName;
+    const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+    return withPrefix;
+  }
+
   public initiate({
     tokens,
     variableReferences,
@@ -54,7 +60,17 @@ export class TokenValueRetriever {
       const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
       const adjustedTokenName = this.getAdjustedTokenName(token.name);
-      const styleId = styleReferences?.get(token.name);
+      const adjustedTokenNameWithIgnoreFirstPart = this.getAdjustedTokenNameWithIgnoreFirstPart(token.name);
+     // console.log("style references is", Array.from(styleReferences?.values() ?? []));
+     let styleId = styleReferences?.get(token.name);
+    
+     // If styleId is not found, try with the adjusted token name that ignores the first part
+     if (!styleId) {
+       styleId = styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart);
+       return [token.name, {
+        ...token, variableId, styleId, adjustedTokenNameWithIgnoreFirstPart,
+      }]
+     }     
       return [token.name, {
         ...token, variableId, styleId, adjustedTokenName,
       }];
