@@ -1,6 +1,6 @@
 import { FileDirectoryIcon } from '@primer/octicons-react';
 import {
-  Tabs, Stack, Heading, Button, Link,
+  Tabs, Stack, Heading, Button,
 } from '@tokens-studio/ui';
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
