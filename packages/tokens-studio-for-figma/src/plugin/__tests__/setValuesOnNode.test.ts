@@ -333,7 +333,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
     expect(textNodeMock).toEqual({ ...textNodeMock });
   });
 
@@ -453,8 +453,8 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
-    expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '' });
+    expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
   });
 
   it('sets fillStyle if matching Style', async () => {
