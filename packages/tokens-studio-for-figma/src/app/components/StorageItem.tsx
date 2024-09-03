@@ -5,14 +5,16 @@ import { DotsVerticalIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons
 import {
   Button, Box, Badge, Stack, IconButton, DropdownMenu,
 } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
+import type { StorageProviderType } from '@sync-providers/types';
+import { getProviderIcon } from '@sync-providers/utils';
 import isSameCredentials from '@/utils/isSameCredentials';
 import useRemoteTokens from '../store/remoteTokens';
 import { storageTypeSelector } from '@/selectors';
 import { StyledStorageItem } from './StyledStorageItem';
-import { StorageProviderType, type StorageTypeCredentials } from '@/types/StorageType';
+import type { StorageTypeCredentials } from '@/types/StorageType';
 import { isGitProvider } from '@/utils/is';
 import useConfirm from '../hooks/useConfirm';
-import { getProviderIcon } from '@/utils/getProviderIcon';
 import useStorage from '../store/useStorage';
 import { Dispatch } from '../store';
 import { TokenFormatBadge } from './TokenFormatBadge';
@@ -48,9 +50,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
     if (await askUserIfDelete()) {
       deleteProvider(item);
       dispatch.tokenState.setEditProhibited(false);
-      dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
+      dispatch.uiState.setLocalApiState({ provider: AVAILABLE_PROVIDERS.LOCAL });
       setStorageType({
-        provider: { provider: StorageProviderType.LOCAL },
+        provider: { provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL },
         shouldSetInDocument: true,
       });
     }

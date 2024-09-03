@@ -3,11 +3,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, DropdownMenu, IconButton } from '@tokens-studio/ui';
 import { Check, Settings } from 'iconoir-react';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { Dispatch } from '../store';
 import { settingsStateSelector, localApiStateSelector } from '@/selectors';
 import { isEqual } from '@/utils/isEqual';
-
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export default function SettingsDropdown() {
   const localApiState = useSelector(localApiStateSelector);
@@ -54,7 +53,7 @@ export default function SettingsDropdown() {
               {t('update.onChange.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
-          {localApiState?.provider === StorageProviderType.JSONBIN ? (
+          {localApiState?.provider === AVAILABLE_PROVIDERS.JSONBIN ? (
             <DropdownMenu.CheckboxItem
               data-testid="update-remote"
               checked={updateRemote}

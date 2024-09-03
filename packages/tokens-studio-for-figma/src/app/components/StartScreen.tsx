@@ -5,6 +5,7 @@ import {
 } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Button, Heading } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import TokensStudioLogo from '@/icons/tokensstudio-full.svg';
 import Text from './Text';
 import Callout from './Callout';
@@ -13,11 +14,13 @@ import { apiProvidersSelector, storageTypeSelector } from '@/selectors';
 import Stack from './Stack';
 import { styled } from '@/stitches.config';
 import { Tabs } from '@/constants/Tabs';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
+import {
+  URLStorageType, JSONBinStorageType, GitHubStorageType, GitLabStorageType,
+} from '@/types/StorageType';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -40,7 +43,8 @@ function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['startScreen']);
 
-  const storageType = useSelector(storageTypeSelector);
+  type StorageWithInternalId = URLStorageType | JSONBinStorageType | GitHubStorageType | GitLabStorageType;
+  const storageType = useSelector(storageTypeSelector) as StorageWithInternalId;
   const apiProviders = useSelector(apiProvidersSelector);
 
   const onSetEmptyTokens = React.useCallback(() => {
@@ -56,7 +60,7 @@ function StartScreen() {
   }, [dispatch]);
 
   const onSetSyncClick = React.useCallback(() => {
-    if (storageType.provider === StorageProviderType.LOCAL) {
+    if (storageType.provider === AVAILABLE_PROVIDERS.LOCAL) {
       return;
     }
     const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
@@ -116,7 +120,7 @@ function StartScreen() {
               </HelpfulLink>
             </Stack>
           </Stack>
-          {storageType?.provider !== StorageProviderType.LOCAL ? (
+          {storageType?.provider !== AVAILABLE_PROVIDERS.LOCAL ? (
             <Callout
               id="callout-action-setupsync"
               heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}

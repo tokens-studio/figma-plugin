@@ -1,4 +1,5 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -21,7 +22,7 @@ describe('pullTokensFactory', () => {
     id: 'github',
     internalId: 'github',
     name: 'Github',
-    provider: StorageProviderType.GITHUB,
+    provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
     branch: 'main',
     filePath: 'data/tokens.json',
   };
@@ -39,7 +40,7 @@ describe('pullTokensFactory', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: {
-          provider: StorageProviderType.LOCAL,
+          provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
         },
       },
     });
@@ -83,7 +84,7 @@ describe('pullTokensFactory', () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: {
-          provider: StorageProviderType.LOCAL,
+          provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
         },
       },
     });

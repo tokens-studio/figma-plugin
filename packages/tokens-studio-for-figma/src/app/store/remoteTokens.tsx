@@ -2,12 +2,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
+import { StorageProviderType } from '@sync-providers/types';
+import { useGitHub } from '@sync-providers/providers';
 import { track } from '@/utils/analytics';
 import { useJSONbin } from './providers/jsonbin';
 import useURL from './providers/url';
 import { Dispatch } from '../store';
 import useStorage from './useStorage';
-import { useGitHub } from './providers/github';
+// import { useGitHub } from './providers/github';
 import { useGitLab } from './providers/gitlab';
 import { useSupernova } from './providers/supernova';
 import { useBitbucket } from './providers/bitbucket';
@@ -15,12 +17,12 @@ import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import {
-  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
+  activeTabSelector, apiSelector, themesListSelector, tokensSelector, activeThemeSelector,
+  storeTokenIdInJsonEditorSelector, localApiStateSelector, usedTokenSetSelector,
 } from '@/selectors';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
@@ -32,6 +34,9 @@ import usePullDialog from '../hooks/usePullDialog';
 import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
+import useConfirm from '@/app/hooks/useConfirm';
+import usePushDialog from '@/app/hooks/usePushDialog';
 
 export type PushOverrides = { branch: string, commitMessage: string };
 
@@ -47,16 +52,31 @@ type PullTokensOptions = {
 // @TODO typings and hooks
 
 export default function useRemoteTokens() {
+  const isProUser = useIsProUser();
+
   const dispatch = useDispatch<Dispatch>();
   const api = useSelector(apiSelector);
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
+  const activeTheme = useSelector(activeThemeSelector);
+  const localApiState = useSelector(localApiStateSelector);
+  const usedTokenSet = useSelector(usedTokenSetSelector);
+  const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const { showPullDialog, closePullDialog } = usePullDialog();
+  const { pushDialog, closePushDialog } = usePushDialog();
+  const { confirm } = useConfirm();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
   const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
+
+  const asyncMessageCredentialsCallback = useCallback((context: any) => {
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.CREDENTIALS,
+      credential: context,
+    });
+  }, []);
   const {
     addNewGitHubCredentials,
     syncTokensWithGitHub,
@@ -65,7 +85,9 @@ export default function useRemoteTokens() {
     createGithubBranch,
     fetchGithubBranches,
     checkRemoteChangeForGitHub,
-  } = useGitHub();
+  } = useGitHub({
+    isProUser, dispatch, confirm, pushDialog, closePushDialog, tokens, themes, activeTheme, usedTokenSet, storeTokenIdInJsonEditor, localApiState, notifyToUI, asyncMessageCredentialsCallback,
+  });
   const {
     addNewGitLabCredentials,
     syncTokensWithGitLab,

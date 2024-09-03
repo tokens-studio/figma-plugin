@@ -5,6 +5,7 @@ import {
   Heading,
   ContextMenu,
 } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import Stack from '../Stack';
 import useManageTokens from '../../store/useManageTokens';
 import { activeApiProviderSelector, activeTokenSetReadOnlySelector, editProhibitedSelector } from '@/selectors';
@@ -16,7 +17,6 @@ import { ShowNewFormOptions } from '@/types';
 import useTokens from '../../store/useTokens';
 import RenameTokenGroupModal from '../modals/RenameTokenGroupModal';
 import DuplicateTokenGroupModal from '../modals/DuplicateTokenGroupModal';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export type Props = {
   id: string
@@ -40,7 +40,7 @@ export function TokenGroupHeading({
   const dispatch = useDispatch<Dispatch>();
   const collapsed = useSelector(collapsedTokensSelector);
   const { remapTokensInGroup } = useTokens();
-  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
+  const isTokensStudioProvider = activeApiProvider === AVAILABLE_PROVIDERS.TOKENS_STUDIO;
 
   const canEdit = !editProhibited && !activeTokenSetReadOnly && !isTokensStudioProvider;
 

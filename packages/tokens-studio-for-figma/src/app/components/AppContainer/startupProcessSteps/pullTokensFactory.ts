@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/react';
 import type { LDFlagSet } from 'launchdarkly-js-client-sdk';
 import { Store } from 'redux';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { INTERNAL_THEMES_NO_GROUP } from '../../../../constants/InternalTokenGroup';
 import type { StartupMessage } from '@/types/AsyncMessages';
 import type { Dispatch, RootState } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
 import { storageTypeSelector } from '@/selectors';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '@/app/hooks/useConfirm';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
@@ -37,15 +37,15 @@ export function pullTokensFactory(
     const state = store.getState();
     const storageType = storageTypeSelector(state);
     const isRemoteStorage = [
-      StorageProviderType.ADO,
-      StorageProviderType.GITHUB,
-      StorageProviderType.GITLAB,
-      StorageProviderType.BITBUCKET,
-      StorageProviderType.JSONBIN,
-      StorageProviderType.GENERIC_VERSIONED_STORAGE,
-      StorageProviderType.URL,
-      StorageProviderType.SUPERNOVA,
-      StorageProviderType.TOKENS_STUDIO,
+      AVAILABLE_PROVIDERS.ADO,
+      AVAILABLE_PROVIDERS.GITHUB,
+      AVAILABLE_PROVIDERS.GITLAB,
+      AVAILABLE_PROVIDERS.BITBUCKET,
+      AVAILABLE_PROVIDERS.JSONBIN,
+      AVAILABLE_PROVIDERS.GENERIC_VERSIONED_STORAGE,
+      AVAILABLE_PROVIDERS.URL,
+      AVAILABLE_PROVIDERS.SUPERNOVA,
+      AVAILABLE_PROVIDERS.TOKENS_STUDIO,
     ].includes(storageType.provider);
 
     if (isRemoteStorage) {
@@ -63,10 +63,10 @@ export function pullTokensFactory(
           }
 
           if (
-            matchingSet.provider === StorageProviderType.GITHUB
-            || matchingSet.provider === StorageProviderType.GITLAB
-            || matchingSet.provider === StorageProviderType.ADO
-            || matchingSet.provider === StorageProviderType.BITBUCKET
+            matchingSet.provider === AVAILABLE_PROVIDERS.GITHUB
+            || matchingSet.provider === AVAILABLE_PROVIDERS.GITLAB
+            || matchingSet.provider === AVAILABLE_PROVIDERS.ADO
+            || matchingSet.provider === AVAILABLE_PROVIDERS.BITBUCKET
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
@@ -136,7 +136,7 @@ export function pullTokensFactory(
       if (
         !checkForChanges
         || (
-          (storageType && storageType.provider !== StorageProviderType.LOCAL)
+          (storageType && storageType.provider !== AVAILABLE_PROVIDERS.LOCAL)
           && checkForChanges && (!await askUserIfRecoverLocalChanges())
         )
       ) {

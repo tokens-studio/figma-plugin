@@ -4,13 +4,14 @@ import { useSelector } from 'react-redux';
 import {
   Button, Heading, Spinner, Stack, Text, ToggleGroup,
 } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
+import { StorageProviderType } from '@sync-providers/types';
 import { localApiStateSelector, storageTypeSelector } from '@/selectors';
 import usePushDialog from '../hooks/usePushDialog';
 import { getBitbucketCreatePullRequestUrl } from '../store/providers/bitbucket';
 import { getGithubCreatePullRequestUrl } from '../store/providers/github';
 import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import { useShortcut } from '@/hooks/useShortcut';
 import { transformProviderName } from '@/utils/transformProviderName';
@@ -19,6 +20,7 @@ import PushJSON from './PushJSON';
 import PushSettingForm from './PushSettingForm';
 import { getSupernovaOpenCloud } from '../store/providers/supernova/getSupernovaOpenCloud';
 import Modal from './Modal';
+import { URLStorageType, StorageTypeCredential, JSONBinStorageType } from '@/types/StorageType';
 
 export enum PushDialogTabs {
   COMMIT = 'commit',
@@ -29,7 +31,7 @@ export enum PushDialogTabs {
 function PushDialog() {
   const { onConfirm, onCancel, showPushDialog } = usePushDialog();
   const { t } = useTranslation(['sync']);
-  const localApiState = useSelector(localApiStateSelector);
+  const localApiState = useSelector(localApiStateSelector) as URLStorageType | StorageTypeCredential<any, any> | JSONBinStorageType;
   const storageType = useSelector(storageTypeSelector);
   const [commitMessage, setCommitMessage] = React.useState('');
   const [branch, setBranch] = React.useState((isGitProvider(localApiState) ? localApiState.branch : '') || '');
@@ -43,25 +45,25 @@ function PushDialog() {
     let redirectHref = '';
     if (localApiState && 'id' in localApiState && localApiState.id) {
       switch (localApiState.provider) {
-        case StorageProviderType.GITHUB:
+        case AVAILABLE_PROVIDERS.GITHUB:
           redirectHref = getGithubCreatePullRequestUrl({
             base: localApiState.baseUrl,
             repo: localApiState.id,
             branch,
           });
           break;
-        case StorageProviderType.BITBUCKET:
+        case AVAILABLE_PROVIDERS.BITBUCKET:
           redirectHref = getBitbucketCreatePullRequestUrl({
             base: localApiState.baseUrl,
             repo: localApiState.id,
             branch,
           });
           break;
-        case StorageProviderType.GITLAB: {
+        case AVAILABLE_PROVIDERS.GITLAB: {
           redirectHref = getGitlabCreatePullRequestUrl(localApiState.id, localApiState.baseUrl);
           break;
         }
-        case StorageProviderType.ADO:
+        case AVAILABLE_PROVIDERS.ADO:
           redirectHref = getADOCreatePullRequestUrl({
             branch,
             projectId: localApiState.name,
@@ -72,7 +74,7 @@ function PushDialog() {
         default:
           break;
       }
-    } else if (localApiState.provider === StorageProviderType.SUPERNOVA) {
+    } else if (localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA) {
       redirectHref = getSupernovaOpenCloud(localApiState.designSystemUrl);
     }
     return redirectHref;
@@ -100,7 +102,7 @@ function PushDialog() {
   }, [showPushDialog, localApiState]);
 
   const handlePushChanges = React.useCallback(() => {
-    if (localApiState.provider === StorageProviderType.SUPERNOVA || (commitMessage && branch)) {
+    if (localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA || (commitMessage && branch)) {
       onConfirm(commitMessage, branch);
     }
   }, [branch, commitMessage, onConfirm, localApiState]);
@@ -135,7 +137,7 @@ function PushDialog() {
               <Button
                 variant="primary"
                 data-testid="push-dialog-button-push-changes"
-                disabled={localApiState.provider !== StorageProviderType.SUPERNOVA && (!commitMessage || !branch)}
+                disabled={localApiState.provider !== AVAILABLE_PROVIDERS.SUPERNOVA && (!commitMessage || !branch)}
                 onClick={handlePushChanges}
               >
                 {t('pushChanges')}
@@ -155,7 +157,7 @@ function PushDialog() {
                 JSON
               </ToggleGroup.Item>
             </ToggleGroup>
-            {activeTab !== 'commit' && localApiState.provider === StorageProviderType.SUPERNOVA && (
+            {activeTab !== 'commit' && localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA && (
               <Stack direction="row" gap={2} align="center" css={{ display: 'inline', padding: '$4' }}>
                 {t('thisWillPushYourLocalChangesToTheBranch')}
                 {' '}
@@ -193,11 +195,11 @@ function PushDialog() {
             <Spinner />
             <Heading size="medium">
               {t('pushingTo')}
-              {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
-              {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
-              {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
-              {localApiState.provider === StorageProviderType.ADO && ' ADO'}
-              {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
+              {localApiState.provider === AVAILABLE_PROVIDERS.GITHUB && ' GitHub'}
+              {localApiState.provider === AVAILABLE_PROVIDERS.GITLAB && ' GitLab'}
+              {localApiState.provider === AVAILABLE_PROVIDERS.BITBUCKET && ' Bitbucket'}
+              {localApiState.provider === AVAILABLE_PROVIDERS.ADO && ' ADO'}
+              {localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA && ' Supernova.io'}
             </Heading>
           </Stack>
         </Modal>
@@ -213,11 +215,11 @@ function PushDialog() {
               </Heading>
               <Text size="small">
                 {t('changesPushedTo')}
-                {localApiState.provider === StorageProviderType.GITHUB && ' GitHub'}
-                {localApiState.provider === StorageProviderType.GITLAB && ' GitLab'}
-                {localApiState.provider === StorageProviderType.BITBUCKET && ' Bitbucket'}
-                {localApiState.provider === StorageProviderType.ADO && ' ADO'}
-                {localApiState.provider === StorageProviderType.SUPERNOVA && ' Supernova.io'}
+                {localApiState.provider === AVAILABLE_PROVIDERS.GITHUB && ' GitHub'}
+                {localApiState.provider === AVAILABLE_PROVIDERS.GITLAB && ' GitLab'}
+                {localApiState.provider === AVAILABLE_PROVIDERS.BITBUCKET && ' Bitbucket'}
+                {localApiState.provider === AVAILABLE_PROVIDERS.ADO && ' ADO'}
+                {localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA && ' Supernova.io'}
               </Text>
             </Stack>
             {/* @ts-ignore Exception for Button to accept target */}

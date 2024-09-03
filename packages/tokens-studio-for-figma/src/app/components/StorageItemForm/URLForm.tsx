@@ -5,7 +5,8 @@ import {
   Button, TextInput, Stack, Text, Link, Label, IconButton, FormField,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
@@ -47,7 +48,7 @@ export default function URLForm({
       if (validationResult.success) {
         const formFields = {
           ...validationResult.data,
-          provider: StorageProviderType.URL,
+          provider: AVAILABLE_PROVIDERS.URL,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
         onSubmit(formFields);

@@ -1,6 +1,7 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageProviderType } from '@sync-providers/types';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
+// TODO: fix StorageProviderType usage
 function isSameCredentials(
   credential: StorageTypeCredentials,
   stored: StorageType | StorageTypeFormValues<false>,

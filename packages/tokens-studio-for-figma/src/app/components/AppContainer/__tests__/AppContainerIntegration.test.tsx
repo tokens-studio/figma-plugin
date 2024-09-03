@@ -1,7 +1,8 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { Entitlements } from '@/app/store/models/userState';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
@@ -86,7 +87,7 @@ const mockValues: Record<string, AnyTokenList> = {
 };
 
 const mockGithubStoragetype: StorageType = {
-  provider: StorageProviderType.GITHUB,
+  provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
   id: 'github',
   internalId: 'github',
   name: 'Github',
@@ -96,7 +97,7 @@ const mockGithubStoragetype: StorageType = {
 
 const mockGithubApiProviders: StorageTypeCredentials[] = [
   {
-    provider: StorageProviderType.GITHUB,
+    provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
     id: 'github',
     internalId: 'github',
     name: 'Github',
@@ -128,7 +129,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
   localApiProviders: [],
   settings: mockSettings,
   storageType: {
-    provider: StorageProviderType.LOCAL,
+    provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
   },
   user: mockUser,
   localTokenData: {
@@ -405,7 +406,7 @@ describe('AppContainer (integration)', () => {
       checkForChanges: false,
     },
     storageType: {
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB,
       branch: 'main',
       filePath: 'data/tokens.json',
       id: 'github',

@@ -5,7 +5,7 @@ import {
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';

@@ -1,4 +1,5 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import * as generateId from '@/utils/generateId';
 import { removeSingleCredential, updateCredentials } from './credentials';
 
@@ -15,7 +16,7 @@ describe('updateCredentials', () => {
       id: '123',
       secret: 'foo',
       name: 'mytokens',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     figma.clientStorage.getAsync
       .mockResolvedValueOnce(undefined)
@@ -35,14 +36,14 @@ describe('updateCredentials', () => {
         id: '123',
         secret: 'abc',
         name: 'mytokens',
-        provider: StorageProviderType.JSONBIN,
+        provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
       },
     ];
     const newObject = {
       id: '456',
       secret: 'foo',
       name: 'mytokens',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const newArray = [
       ...apiArray,
@@ -63,14 +64,14 @@ describe('updateCredentials', () => {
         id: '123',
         secret: 'abc',
         name: 'mytokens',
-        provider: StorageProviderType.JSONBIN,
+        provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
       },
     ];
     const newObject = {
       id: '123',
       secret: 'abc',
       name: 'my new name',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const newArray = [newObject];
     figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
@@ -85,7 +86,7 @@ describe('updateCredentials', () => {
         internalId: 'abc',
         secret: 'abc',
         name: 'mytokens',
-        provider: StorageProviderType.JSONBIN,
+        provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
       },
     ];
     const newObject = {
@@ -93,8 +94,7 @@ describe('updateCredentials', () => {
       internalId: 'abc',
       secret: 'abc',
       name: 'my new name',
-      provider: StorageProviderType.JSONBIN,
-    };
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     const newArray = [newObject];
     figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(apiArray));
     await updateCredentials(newObject);
@@ -111,7 +111,7 @@ describe('removeSingleCredential', () => {
       id: '123',
       secret: 'foo',
       name: 'mytokens',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const oldArray = [apiObject];
     figma.clientStorage.getAsync.mockResolvedValue(JSON.stringify(oldArray));
@@ -125,13 +125,13 @@ describe('removeSingleCredential', () => {
       id: '123',
       secret: 'foo',
       name: 'mytokens',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const otherObject = {
       id: '456',
       secret: 'bar',
       name: 'mytokens',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const oldArray = [apiObject, otherObject];
     figma.clientStorage.getAsync.mockResolvedValueOnce(JSON.stringify(oldArray));

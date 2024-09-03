@@ -15,9 +15,10 @@ import {
   FormField,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StorageTypeFormValues, GenericVersionedStorageFlow } from '@/types/StorageType';
 import XIcon from '@/icons/x.svg';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
@@ -71,7 +72,7 @@ export default function GenericVersionedForm({
       if (validationResult.success) {
         const formFields = {
           ...validationResult.data,
-          provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+          provider: AVAILABLE_PROVIDERS.GENERIC_VERSIONED_STORAGE,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
         onSubmit(formFields);

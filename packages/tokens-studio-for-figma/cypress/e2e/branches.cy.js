@@ -1,13 +1,11 @@
-import {
-  StorageProviderType
-} from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { UpdateMode } from '@/constants/UpdateMode';
 import MockEnv from '../support/mockEnv'
 import { fillTokenForm } from './helpers/utils';
 
 describe('Branch switcher', () => {
   const provider = {
-    provider: StorageProviderType.GITHUB,
+    provider: AVAILABLE_PROVIDERS.GITHUB,
     id: '122/figma-tokens',
     secret: '456',
     name: 'dummy 2',

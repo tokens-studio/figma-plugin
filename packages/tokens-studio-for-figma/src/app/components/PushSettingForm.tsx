@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next';
 import {
   Heading, Textarea, Stack, Box, Text, TextInput, FormField, Label,
 } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { localApiStateSelector } from '@/selectors';
 
 import PushDialogSupernovaConfirm from './PushDialogSupernovaConfirm';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@/types/StorageType';
 
 type Props = {
   commitMessage: string,
@@ -19,7 +20,7 @@ type Props = {
 function PushSettingForm({
   commitMessage, branch, handleCommitMessageChange, handleBranchChange,
 }: Props) {
-  const localApiState = useSelector(localApiStateSelector);
+  const localApiState = useSelector(localApiStateSelector) as { provider: StorageProviderType; id: string; designSystemUrl?: string };
 
   const handleMessageChange = useCallback((value: string) => {
     handleCommitMessageChange(value);
@@ -27,7 +28,7 @@ function PushSettingForm({
 
   const { t } = useTranslation(['sync']);
 
-  return localApiState.provider === StorageProviderType.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
+  return localApiState.provider === AVAILABLE_PROVIDERS.SUPERNOVA ? <PushDialogSupernovaConfirm designSystemUrl={localApiState.designSystemUrl} /> : (
     <Stack direction="column" gap={3} css={{ padding: '$4', width: '100%' }}>
       <Text size="small">{t('pushYourLocalChangesToYourRepository')}</Text>
       <Box css={{

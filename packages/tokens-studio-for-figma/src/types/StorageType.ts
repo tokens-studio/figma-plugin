@@ -1,4 +1,4 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
 import { OptionalPartial } from './OptionalPartial';
 import { GenericVersionedAdditionalHeaders } from '../storage/GenericVersionedStorage';
 

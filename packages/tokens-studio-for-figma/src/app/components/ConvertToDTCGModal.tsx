@@ -4,6 +4,7 @@ import {
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
@@ -15,7 +16,6 @@ import useRemoteTokens from '../store/remoteTokens';
 import w3cConvertImage from '@/app/assets/hints/w3cformat.png';
 import legacyConvertImage from '@/app/assets/hints/legacyformat.png';
 import { storageTypeSelector } from '@/selectors';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 export function ConvertToDTCGModal() {
   const dispatch = useDispatch<Dispatch>();
@@ -35,7 +35,7 @@ export function ConvertToDTCGModal() {
   const handleConvert = React.useCallback(() => {
     dispatch.tokenState.setTokenFormat(isDTCG ? TokenFormatOptions.Legacy : TokenFormatOptions.DTCG);
     dispatch.uiState.setShowConvertTokenFormatModal(false);
-    if (storageType.provider === StorageProviderType.LOCAL) return;
+    if (storageType.provider === AVAILABLE_PROVIDERS.LOCAL) return;
     pushTokens({
       overrides: isDTCG ? {
         branch: 'w3c-dtcg-conversion-revert',
@@ -47,7 +47,7 @@ export function ConvertToDTCGModal() {
     });
   }, [dispatch, pushTokens, isDTCG, storageType]);
 
-  const hasRemoteChanges = hasChanges && storageType.provider !== StorageProviderType.LOCAL;
+  const hasRemoteChanges = hasChanges && storageType.provider !== AVAILABLE_PROVIDERS.LOCAL;
 
   return (
     <Modal title={isDTCG ? t('w3cformatmodaltitle') : t('w3cconverttitle')} isOpen={showConvertTokenFormatModal} close={handleClose} showClose>

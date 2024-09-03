@@ -1,4 +1,4 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { updateThemeGroupsInTokensStudio } from '@/storage/tokensStudio/updateThemeGroupsInTokensStudio';
 
 const actionsToTriggerUpdateInTokensStudio = [
@@ -19,7 +19,7 @@ export const tokenStateMiddleware = (store) => (next) => (action) => {
   const nextState = store.getState();
 
   if (
-    nextState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO
+    nextState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO
       && actionsToTriggerUpdateInTokensStudio.includes(action.type)
   ) {
     updateThemeGroupsInTokensStudio({

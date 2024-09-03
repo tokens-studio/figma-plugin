@@ -1,3 +1,5 @@
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import { updateGenericVersionedTokens } from '../generic/versionedStorage';
@@ -6,7 +8,6 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
-  StorageProviderType,
   GenericVersionedStorageFlow,
   GenericVersionedStorageType,
   StorageTypeCredentials,
@@ -61,7 +62,7 @@ describe('Generic Versioned Storage', () => {
     id: 'http://test.com',
     flow: GenericVersionedStorageFlow.READ_WRITE_CREATE,
     additionalHeaders: [],
-    provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+    provider: AVAILABLE_PROVIDERS.GENERIC_VERSIONED_STORAGE as StorageProviderType.GENERIC_VERSIONED_STORAGE,
 
   };
 

@@ -1,4 +1,5 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 
 export function isGitProvider<
@@ -10,9 +11,9 @@ export function isGitProvider<
   | Extract<T, { provider: StorageProviderType.GITHUB | StorageProviderType.GITLAB }>
   | Extract<T, { provider: StorageProviderType.BITBUCKET }> {
   return (
-    provider.provider === StorageProviderType.ADO
-    || provider.provider === StorageProviderType.GITHUB
-    || provider.provider === StorageProviderType.GITLAB
-    || provider.provider === StorageProviderType.BITBUCKET
+    provider.provider === AVAILABLE_PROVIDERS.ADO
+    || provider.provider === AVAILABLE_PROVIDERS.GITHUB
+    || provider.provider === AVAILABLE_PROVIDERS.GITLAB
+    || provider.provider === AVAILABLE_PROVIDERS.BITBUCKET
   );
 }

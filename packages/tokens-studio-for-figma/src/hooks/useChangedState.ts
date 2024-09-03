@@ -1,5 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useMemo } from 'react';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
+import { StorageProviderType } from '@sync-providers/types';
 import {
   lastSyncedStateSelector,
   remoteDataSelector,
@@ -8,7 +10,6 @@ import {
   tokensSelector,
 } from '@/selectors';
 import { findDifferentState } from '@/utils/findDifferentState';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 
@@ -26,7 +27,7 @@ export function useChangedState() {
     return findDifferentState(remoteData, {
       tokens,
       themes,
-      metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+      metadata: storageType.provider !== AVAILABLE_PROVIDERS.LOCAL ? { tokenSetOrder } : {},
     });
   }, [remoteData, tokens, themes, storageType]);
 

@@ -1,6 +1,6 @@
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import compact from 'just-compact';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitTokenStorage } from './GitTokenStorage';
 import {

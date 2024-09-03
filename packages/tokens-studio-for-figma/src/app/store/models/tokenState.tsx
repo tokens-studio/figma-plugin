@@ -3,6 +3,7 @@ import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
 import { v4 as uuidv4 } from 'uuid';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import * as tokenStateReducers from './reducers/tokenState';
 import * as tokenStateEffects from './effects/tokenState';
 import parseTokenValues from '@/utils/parseTokenValues';
@@ -32,7 +33,6 @@ import { RootModel } from '@/types/RootModel';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { isEqual } from '@/utils/isEqual';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { updateTokenSetsInState } from '@/utils/tokenset/updateTokenSetsInState';
 import { TokenTypes } from '@/constants/TokenTypes';
 import tokenTypes from '@/config/tokenType.defs.json';
@@ -578,7 +578,7 @@ export const tokenState = createModel<RootModel>()({
         dispatch.tokenState.updateDocument({ shouldUpdateNodes: rootState.settings.updateOnChange });
       }
 
-      if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (payload.shouldUpdate && rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'EDIT_TOKEN',
@@ -589,7 +589,7 @@ export const tokenState = createModel<RootModel>()({
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'DELETE_TOKEN',
@@ -606,7 +606,7 @@ export const tokenState = createModel<RootModel>()({
     addTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         createTokenSetInTokensStudio({
           rootState,
           name,
@@ -623,7 +623,7 @@ export const tokenState = createModel<RootModel>()({
     renameTokenSet(data: { oldName: string, newName: string }, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         updateTokenSetInTokensStudio({
           rootState,
           data,
@@ -634,7 +634,7 @@ export const tokenState = createModel<RootModel>()({
     deleteTokenSet(name: string, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         deleteTokenSetFromTokensStudio({
           rootState,
           name,
@@ -645,7 +645,7 @@ export const tokenState = createModel<RootModel>()({
     setTokenSetOrder(data: string[], rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'UPDATE_TOKEN_SET_ORDER',
@@ -673,7 +673,7 @@ export const tokenState = createModel<RootModel>()({
     duplicateToken(payload: DuplicateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         duplicateTokenInTokensStudio({
           rootState,
           payload,
@@ -684,7 +684,7 @@ export const tokenState = createModel<RootModel>()({
     createToken(payload: UpdateTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
-      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+      if (rootState.uiState.api?.provider === AVAILABLE_PROVIDERS.TOKENS_STUDIO) {
         createTokenInTokensStudio({
           rootState,
           payload,
@@ -739,7 +739,7 @@ export const tokenState = createModel<RootModel>()({
             settings: rootState.settings,
             updatedAt: new Date().toISOString(),
             lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
-            isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+            isLocal: rootState.uiState.storageType.provider === AVAILABLE_PROVIDERS.LOCAL,
             editProhibited: rootState.tokenState.editProhibited,
             api: rootState.uiState.api,
             storageType: rootState.uiState.storageType,

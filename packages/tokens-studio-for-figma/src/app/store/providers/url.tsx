@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../plugin/notifiers';
 import { UrlTokenStorage } from '@/storage/UrlTokenStorage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { activeThemeSelector, usedTokenSetSelector } from '@/selectors';
@@ -55,7 +56,7 @@ export default function useURL() {
             internalId,
             name,
             secret,
-            provider: StorageProviderType.URL,
+            provider: AVAILABLE_PROVIDERS.URL as StorageProviderType.URL,
           },
         });
 

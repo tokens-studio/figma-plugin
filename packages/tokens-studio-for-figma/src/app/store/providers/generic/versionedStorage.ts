@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import * as pjs from '../../../../../package.json';
@@ -13,7 +15,6 @@ import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
   StorageTypeCredentials,
   StorageTypeFormValues,
@@ -141,7 +142,7 @@ export function useGenericVersionedStorage() {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: {
-            provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+            provider: AVAILABLE_PROVIDERS.GENERIC_VERSIONED_STORAGE as StorageProviderType.GENERIC_VERSIONED_STORAGE,
             id,
             flow,
             internalId,
@@ -181,7 +182,7 @@ export function useGenericVersionedStorage() {
             id,
             flow,
             additionalHeaders,
-            provider: StorageProviderType.GENERIC_VERSIONED_STORAGE,
+            provider: AVAILABLE_PROVIDERS.GENERIC_VERSIONED_STORAGE as StorageProviderType.GENERIC_VERSIONED_STORAGE,
           },
         });
         if (data?.status === 'failure') {
