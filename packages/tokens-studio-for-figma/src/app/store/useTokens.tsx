@@ -498,24 +498,22 @@ export default function useTokens() {
 
       // Remove styles that aren't in the theme or in the exposed token object
       if (settings.removeStylesAndVariablesWithoutConnection) {
-        const promises: Promise<PaintStyle[] | TextStyle[] | EffectStyle[]>[] = [];
-        if (settings.stylesColor) {
-          promises.push(figma.getLocalPaintStylesAsync());
-        }
-        if (settings.stylesTypography) {
-          promises.push(figma.getLocalTextStylesAsync());
-        }
-        if (settings.stylesEffect) {
-          promises.push(figma.getLocalEffectStylesAsync());
-        }
+        const { styles } = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.GET_LOCAL_STYLES,
+        });
 
-        const allLocalStyles = (await Promise.all(promises)).flat();
+        const styleIdIncludedinTouchedStyles = (id) => Object.values(allStyleIds).includes(id);
 
-        allLocalStyles
-          .filter((style) => !Object.values(allStyleIds).includes(style.id))
-          .forEach((style) => {
+        styles.forEach((style) => {
+          const shouldRemove = !styleIdIncludedinTouchedStyles(style.id) && (
+            (settings.stylesTypography && style.type === 'TEXT')
+            || (settings.stylesColor && style.type === 'PAINT')
+            || (settings.stylesEffect && style.type === 'EFFECT')
+          );
+          if (shouldRemove) {
             style.remove();
-          });
+          }
+        });
       }
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);

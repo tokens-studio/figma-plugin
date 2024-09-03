@@ -35,10 +35,23 @@ export async function tryApplyTypographyCompositeVariable({
       if (resolvedValue[originalKey].toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(resolvedValue[originalKey].toString().slice(1, -1));
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
+        if (key === 'fontFamily') {
+          const firstVariableValue = Object.values(variableToApply.valuesByMode)[0];
+          if (firstVariableValue) {
+            const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);
+            for (const font of fontsMatching) {
+              await figma.loadFontAsync(font.fontName);
+            }
+          }
+        }
         if (variableToApply) {
           if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-          target.setBoundVariable(key, variableToApply);
-          successfullyAppliedVariable = true;
+          try {
+            target.setBoundVariable(key, variableToApply);
+            successfullyAppliedVariable = true;
+          } catch (e) {
+            console.error('unable to apply variable', key, variableToApply, e);
+          }
         }
       }
       // If there's no variable we apply the value directly
