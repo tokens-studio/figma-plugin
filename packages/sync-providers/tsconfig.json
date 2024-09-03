@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "outDir": "dist",
+    "jsx": "react",
+    "noEmit": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "experimentalDecorators": true,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "types": [
+      "jest"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@figma"
+    ],
+    "paths": {
+      "@emotion/core": [
+        "./emotion.d.ts"
+      ],
+      "@/*": [
+        "src/*"
+      ],
+      "@sync-providers/*": [
+        "../sync-providers/src/*"
+      ],
+    },
+  },
+  "exclude": [
+    "**/node_modules",
+    "./storybook",
+    "storybook-static",
+  ],
+  "include": [
+    "flags.d.ts",
+    "jest.config.ts",
+    "src/app/components/custom.d.ts",
+    "css.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "benchmark/**/*.ts",
+    "benchmark/index.js",
+    "benchmark/tests/baseline.ts"
+  ]
+}
