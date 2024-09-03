@@ -24,9 +24,9 @@ export class TokenValueRetriever {
       ? tokenName.split('.').slice(1).join('.')
       : tokenName;
 
-      const adjustedTokenName = [this.stylePathPrefix, tokenName].filter((n) => n).join('.');
-      const adjustedTokenNameWithIgnoreFirstPart = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
-  
+    const adjustedTokenName = [this.stylePathPrefix, tokenName].filter((n) => n).join('.');
+    const adjustedTokenNameWithIgnoreFirstPart = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+
     return [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart];
   }
 
@@ -59,13 +59,15 @@ export class TokenValueRetriever {
       const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
       const [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart] = this.getAdjustedTokenName(token.name);
-     // console.log("style references is", Array.from(styleReferences?.values() ?? []));
-     const styleId = styleReferences?.get(adjustedTokenName) 
-     || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart);
-    
+      // console.log("style references is", Array.from(styleReferences?.values() ?? []));
+      const styleId = styleReferences?.get(adjustedTokenName) || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart);
+      const finalAdjustedTokenName = styleReferences?.has(adjustedTokenName) ? adjustedTokenName : adjustedTokenNameWithIgnoreFirstPart;
+
       return [token.name, {
-        ...token, variableId, styleId, 
-        adjustedTokenName: styleId ? (styleReferences?.get(adjustedTokenName) ? adjustedTokenName : adjustedTokenNameWithIgnoreFirstPart) : adjustedTokenName,
+        ...token,
+        variableId,
+        styleId,
+        adjustedTokenName: styleId ? finalAdjustedTokenName : adjustedTokenName,
       }];
     }));
   }
