@@ -24,11 +24,7 @@ export async function tryApplyTypographyCompositeVariable({
   if (typeof value === 'string') return;
 
   try {
-    // First we set font family and weight without variables, we do this because to apply those values we need their combination
-    if ('fontName' in target && ('fontWeight' in value || 'fontFamily' in value)) {
-      setFontStyleOnTarget({ target, value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight }, baseFontSize });
-    }
-    // Then we iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
+    // We iterate over all keys of the typography object and apply variables if available, otherwise we apply the value directly
     for (const [originalKey, val] of Object.entries(value).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       if (typeof val === 'undefined') return;
       let successfullyAppliedVariable = false;
@@ -55,11 +51,18 @@ export async function tryApplyTypographyCompositeVariable({
         }
       }
       // If there's no variable we apply the value directly
-      if (!successfullyAppliedVariable && originalKey !== 'fontFamily' && originalKey !== 'fontWeight') {
-        if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-        const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
-        if (transformedValue !== null) {
-          target[originalKey] = transformedValue;
+      if (!successfullyAppliedVariable) {
+        // First we set font family and weight without variables, we do this because to apply those values we need their combination
+        if (originalKey === 'fontFamily' || originalKey === 'fontWeight') {
+          if ('fontName' in target && ('fontWeight' in value || 'fontFamily' in value)) {
+            setFontStyleOnTarget({ target, value: { fontFamily: value.fontFamily, fontWeight: value.fontWeight }, baseFontSize });
+          }
+        } else {
+          if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+          const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
+          if (transformedValue !== null) {
+            target[originalKey] = transformedValue;
+          }
         }
       }
     }
