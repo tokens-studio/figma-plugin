@@ -45,7 +45,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.COLOR,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             }
           });
@@ -66,7 +66,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               value: tokenValue,
               type: TokenTypes.BOOLEAN,
               parent: `${collection?.name}/${modeName}`,
-              description: variable.description,
+              ...(variable.description ? { description: variable.description } : {}),
             });
           });
           break;
@@ -86,7 +86,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               value: tokenValue as string,
               type: TokenTypes.TEXT,
               parent: `${collection?.name}/${modeName}`,
-              description: variable.description,
+              ...(variable.description ? { description: variable.description } : {}),
             });
           });
           break;
@@ -111,7 +111,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             } else {
               numbers.push({
@@ -119,7 +119,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             }
           });
