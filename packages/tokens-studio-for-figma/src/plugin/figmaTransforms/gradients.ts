@@ -17,6 +17,11 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
   return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
 }
 
+const roundToPrecision = (value, precision = 10) => {
+  const roundToPrecision = 10**precision;
+  return Math.round((value + Number.EPSILON) * roundToPrecision) / roundToPrecision;
+}
+
 export function convertStringToFigmaGradient(value: string, node?: BaseNode | PaintStyle) {
   const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
 
@@ -75,13 +80,13 @@ export function convertStringToFigmaGradient(value: string, node?: BaseNode | Pa
 
   let scale = 1;
 
-  if (['RECTANGLE', 'FRAME'].includes(node?.type || '')) {
-    const normalisedCos = Math.cos(normalizedAngleRad);
-    scale = normalisedCos;
-  } else {
-    // FIXME: fallback, but might break paintStyleMatchesColorToken
-    scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
-  }
+  const normalisedCos = Math.cos(normalizedAngleRad);
+  scale = normalisedCos;
+  // Implement fallback if bugs are caused by obscure node types. This appears to be unnecessary
+  // if (!['RECTANGLE', 'FRAME', 'VECTOR'].includes(node?.type || '')) {
+    //   Old scale computation: 
+    //   scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
+  // }
 
   const scaledCos = cos * scale;
   const scaledSin = sin * scale;
@@ -92,8 +97,8 @@ export function convertStringToFigmaGradient(value: string, node?: BaseNode | Pa
   const ty = 0.5 - 0.5 * scaledSin - 0.5 * scaledCos;
 
   const transformationMatrix = new Matrix([
-    [scaledCos, -scaledSin, tx],
-    [scaledSin, scaledCos, ty],
+    [roundToPrecision(scaledCos), roundToPrecision(-scaledSin), roundToPrecision(tx)],
+    [roundToPrecision(scaledSin), roundToPrecision(scaledCos), roundToPrecision(ty)],
     [0, 0, 1],
   ]);
 
