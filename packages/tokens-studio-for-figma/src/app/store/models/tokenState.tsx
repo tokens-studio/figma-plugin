@@ -247,34 +247,43 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    createMultipleTokens: (state, data: CreateSingleTokenData[] | EditSingleTokenData[]) => {
-      const newTokens: TokenStore['values'] = {};
-
-      console.log('creating multiple', data);
-
+    createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
       data.forEach((token) => {
-        const parentTokens = state.tokens[token.parent] || [];
-        const existingTokenIndex = parentTokens.findIndex((n) => n.name === token.name);
+        if (!newTokens[token.parent]) {
+          newTokens[token.parent] = [];
+        }
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex === -1) {
-          if (!newTokens[token.parent]) {
-            newTokens[token.parent] = [...parentTokens];
-          }
           newTokens[token.parent].push(
             updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
           );
-        } else {
-          newTokens[token.parent][existingTokenIndex] = updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4());
         }
       });
 
-      console.log('newTokens', newTokens);
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
+    editMultipleTokens: (state, data: EditSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      data.forEach((token) => {
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        if (existingTokenIndex > -1) {
+          newTokens[token.parent] = [
+            ...newTokens[token.parent].slice(0, existingTokenIndex),
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+            ...newTokens[token.parent].slice(existingTokenIndex + 1),
+          ];
+        }
+      });
 
       return {
         ...state,
-        tokens: {
-          ...state.tokens,
-          ...newTokens,
-        },
+        tokens: newTokens,
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
