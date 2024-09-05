@@ -37,19 +37,19 @@ export async function tryApplyTypographyCompositeVariable({
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
         if (variableToApply) {
           if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-            target.setBoundVariable(key, variableToApply);
-            successfullyAppliedVariable = true;
+          target.setBoundVariable(key, variableToApply);
+          successfullyAppliedVariable = true;
         }
       }
       // If there's no variable we apply the value directly
       if (!successfullyAppliedVariable && originalKey !== 'fontFamily' && originalKey !== 'fontWeight') {
-          if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
-          const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
-          if (transformedValue !== null) {
-            target[originalKey] = transformedValue;
-          }
+        if (target.fontName !== figma.mixed) await figma.loadFontAsync(target.fontName);
+        const transformedValue = transformValue(value[originalKey], originalKey, baseFontSize);
+        if (transformedValue !== null) {
+          target[originalKey] = transformedValue;
         }
       }
+    }
   } catch (e) {
     console.error(e);
   }
