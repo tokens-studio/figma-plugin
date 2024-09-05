@@ -10,7 +10,7 @@ query Project($urn: String!) {
       projectUrn
       generatorUrn
       orderIndex
-      tokens(limit: 400) {
+      tokens(limit: 3000) {
         ${TOKEN_FRAGMENT}
       }
     }
