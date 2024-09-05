@@ -334,7 +334,7 @@ describe('Can set values on node', () => {
       },
     );
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
-    expect(textNodeMock).toEqual({ ...textNodeMock });
+    expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
 
   it('sets effectStyle if matching Style is found', async () => {
