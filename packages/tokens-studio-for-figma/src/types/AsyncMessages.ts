@@ -63,6 +63,7 @@ export enum AsyncMessageTypes {
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
   GET_FIGMA_FONTS = 'async/get-figma-fonts',
+  GET_LOCAL_STYLES = 'async/get-local-styles',
   CREATE_LOCAL_VARIABLES = 'async/create-local-variables',
   CREATE_LOCAL_VARIABLES_WITHOUT_MODES = 'async/create-local-variables-without-modes',
   RESOLVE_VARIABLE_INFO = 'async/resolve-variable-info',
@@ -261,6 +262,10 @@ export type GetFigmaFontsMessage = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONT
 export type GetFigmaFontsMessageResult = AsyncMessage<AsyncMessageTypes.GET_FIGMA_FONTS, {
   fonts: Array<Font>
 }>;
+export type GetLocalStylesMessage = AsyncMessage<AsyncMessageTypes.GET_LOCAL_STYLES>;
+export type GetLocalStylesMessageResult = AsyncMessage<AsyncMessageTypes.GET_LOCAL_STYLES, {
+  styles: Array<PaintStyle | TextStyle | EffectStyle>
+}>;
 export type SetAuthDataMessage = AsyncMessage<AsyncMessageTypes.SET_AUTH_DATA, {
   auth: AuthData | null
 }>;
@@ -379,7 +384,8 @@ export type AsyncMessages =
   | AttachLocalVariablesToTheme
   | RenameVariablesAsyncMessage
   | UpdateVariablesAsyncMessage
-  | RemoveRelaunchDataMessage;
+  | RemoveRelaunchDataMessage
+  | GetLocalStylesMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -424,7 +430,8 @@ export type AsyncMessageResults =
   | AttachLocalVariablesToThemeResult
   | RenameVariablesAsyncMessageResult
   | UpdateVariablesAsyncMessageResult
-  | RemoveRelaunchDataMessageResult;
+  | RemoveRelaunchDataMessageResult
+  | GetLocalStylesMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
