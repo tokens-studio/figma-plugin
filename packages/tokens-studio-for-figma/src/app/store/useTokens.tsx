@@ -447,8 +447,6 @@ export default function useTokens() {
       // Iterate over all given selectedThemes, and combine the selectedTokenSets.
       const overallConfig = getOverallConfig(themes, selectedThemes);
 
-      const allStyleIds = {};
-
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
 
@@ -485,35 +483,12 @@ export default function useTokens() {
               selectedTheme,
             }));
 
-            Object.assign(allStyleIds, createStylesResult.styleIds);
-
             dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
           } else {
             notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
           }
         }
       }
-
-      // Remove styles that aren't in the theme or in the exposed token object
-      if (settings.removeStylesAndVariablesWithoutConnection) {
-        const { styles } = await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.GET_LOCAL_STYLES,
-        });
-
-        const styleIdIncludedinTouchedStyles = (id) => Object.values(allStyleIds).includes(id);
-
-        styles.forEach((style) => {
-          const shouldRemove = !styleIdIncludedinTouchedStyles(style.id) && (
-            (settings.stylesTypography && style.type === 'TEXT')
-            || (settings.stylesColor && style.type === 'PAINT')
-            || (settings.stylesEffect && style.type === 'EFFECT')
-          );
-          if (shouldRemove) {
-            style.remove();
-          }
-        });
-      }
-
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
