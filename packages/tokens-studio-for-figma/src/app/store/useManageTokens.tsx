@@ -241,7 +241,7 @@ export default function useManageTokens() {
       const hasNewTokens = multipleNewTokens && multipleNewTokens.length > 0;
 
       if (hasUpdatedTokens) {
-        dispatch.tokenState.createMultipleTokens(multipleUpdatedTokens);
+        dispatch.tokenState.editMultipleTokens(multipleUpdatedTokens);
       }
 
       if (hasNewTokens) {
