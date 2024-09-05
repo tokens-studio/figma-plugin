@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '@tokens-studio/ui';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Stack from './Stack';
@@ -21,7 +22,6 @@ import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
 import FeedbackIcon from '@/icons/feedback.svg';
 import Tooltip from './Tooltip';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
 import IconLibrary from '@/icons/library.svg';
 import ProBadge from './ProBadge';
@@ -71,7 +71,7 @@ export default function Footer() {
     >
 
       <Stack direction="row" align="center" gap={2}>
-        {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
+        {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === AVAILABLE_PROVIDERS.SUPERNOVA) && (
           <>
             <BranchSelector />
             <TokenFormatBadge />
@@ -108,15 +108,15 @@ export default function Footer() {
             </DirtyStateBadgeWrapper>
           </>
         )}
-        {storageType.provider !== StorageProviderType.LOCAL
-          && storageType.provider !== StorageProviderType.GITHUB
-          && storageType.provider !== StorageProviderType.GITLAB
-          && storageType.provider !== StorageProviderType.ADO
-          && storageType.provider !== StorageProviderType.BITBUCKET
-          && storageType.provider !== StorageProviderType.SUPERNOVA
+        {storageType.provider !== AVAILABLE_PROVIDERS.LOCAL
+          && storageType.provider !== AVAILABLE_PROVIDERS.GITHUB
+          && storageType.provider !== AVAILABLE_PROVIDERS.GITLAB
+          && storageType.provider !== AVAILABLE_PROVIDERS.ADO
+          && storageType.provider !== AVAILABLE_PROVIDERS.BITBUCKET
+          && storageType.provider !== AVAILABLE_PROVIDERS.SUPERNOVA
           ? (
             <Stack align="center" direction="row" gap={2}>
-              {storageType.provider === StorageProviderType.JSONBIN && (
+              {storageType.provider === AVAILABLE_PROVIDERS.JSONBIN && (
                 <Tooltip label={t('goTo', {
                   provider: transformProviderName(storageType.provider),
                 }) as string}

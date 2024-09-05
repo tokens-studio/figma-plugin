@@ -1,11 +1,11 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import zod from 'zod';
 import {
   Button, FormField, Stack, Text, Link, IconButton, Label, TextInput,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
 import { StorageTypeFormValues } from '@/types/StorageType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';

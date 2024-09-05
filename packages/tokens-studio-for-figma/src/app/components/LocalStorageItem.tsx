@@ -5,14 +5,15 @@ import {
 } from '@tokens-studio/ui';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { IconFile } from '@/icons';
 import { StyledStorageItem } from './StyledStorageItem';
 import { Dispatch } from '../store';
 import useStorage from '../store/useStorage';
 import { storageTypeSelector } from '@/selectors';
 import useConfirm from '../hooks/useConfirm';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenFormatBadge } from './TokenFormatBadge';
+import type { StorageProviderType } from '@/types/StorageType';
 
 const LocalStorageItem = () => {
   const { t } = useTranslation(['storage']);
@@ -22,17 +23,17 @@ const LocalStorageItem = () => {
   const { setStorageType } = useStorage();
 
   const handleSubmitLocalStorage = React.useCallback(() => {
-    dispatch.uiState.setLocalApiState({ provider: StorageProviderType.LOCAL });
-    // setStorageProvider(StorageProviderType.LOCAL);
+    dispatch.uiState.setLocalApiState({ provider: AVAILABLE_PROVIDERS.LOCAL });
+    // setStorageProvider(AVAILABLE_PROVIDERS.LOCAL);
     setStorageType({
-      provider: { provider: StorageProviderType.LOCAL },
+      provider: { provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL },
       shouldSetInDocument: true,
     });
     dispatch.tokenState.setEditProhibited(false);
   }, [dispatch.tokenState, dispatch.uiState, setStorageType]);
 
   const handleSetLocalStorage = React.useCallback(async () => {
-    if (storageType?.provider !== StorageProviderType.LOCAL) {
+    if (storageType?.provider !== AVAILABLE_PROVIDERS.LOCAL) {
       const confirmResult = await confirm({
         text: t('setToDocumentStorage') as string,
         description: t('youCanAlwaysGoBack') as string,
@@ -44,7 +45,7 @@ const LocalStorageItem = () => {
     }
   }, [confirm, handleSubmitLocalStorage, storageType?.provider, t]);
 
-  const isActive = storageType.provider === StorageProviderType.LOCAL;
+  const isActive = storageType.provider === AVAILABLE_PROVIDERS.LOCAL;
 
   return (
     <StyledStorageItem active={isActive}>

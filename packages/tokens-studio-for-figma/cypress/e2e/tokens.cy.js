@@ -1,6 +1,4 @@
-import {
-  StorageProviderType
-} from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { UpdateMode } from '@/constants/UpdateMode';
 import MockEnv from '../support/mockEnv';
 import { fillTokenForm, fillInputNth, fillValueInput, fillInput } from './helpers/utils';
@@ -28,7 +26,7 @@ describe('TokenListing', () => {
       updateRemote: true,
       updateStyles: true,
     },
-    storageType: { provider: StorageProviderType.LOCAL },
+    storageType: { provider: AVAILABLE_PROVIDERS.LOCAL },
     user: {
       figmaId: 'figma:1234',
       userId: 'uid:1234',
@@ -464,7 +462,7 @@ describe('TokenListing', () => {
     cy.get('span:contains("minWidth")').parent().should('be.visible');
     cy.get('span:contains("minWidth")').parent().click();
     cy.get('[data-testid="composition-token-dropdown"]').click();
-    
+
 
     cy.get('body').type('{esc}');
 

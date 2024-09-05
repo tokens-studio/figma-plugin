@@ -1,68 +1,28 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Heading, Button, Box, Stack, Text, Dialog,
+  Heading, Button, Box, Stack, Dialog,
 } from '@tokens-studio/ui';
+import { LIST_OF_PROVIDERS } from '@sync-providers/constants';
+import { StorageProviderType } from '@sync-providers/types';
+import { getProviderIcon } from '@sync-providers/utils';
 import { track } from '@/utils/analytics';
 import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from '@/selectors';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { apiProvidersSelector, localApiStateSelector } from '@/selectors';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import LocalStorageItem from './LocalStorageItem';
-import { getProviderIcon } from '@/utils/getProviderIcon';
 import { StyledBetaBadge } from './SecondScreen';
 
 const SyncSettings = () => {
   const localApiState = useSelector(localApiStateSelector);
 
   const { t } = useTranslation(['storage']);
-
-  const providers = useMemo(() => [
-    {
-      text: t('providers.url.title'),
-      type: StorageProviderType.URL,
-    },
-    {
-      text: t('providers.jsonbin.title'),
-      type: StorageProviderType.JSONBIN,
-    },
-    {
-      text: 'GitHub',
-      type: StorageProviderType.GITHUB,
-    },
-    {
-      text: 'GitLab',
-      type: StorageProviderType.GITLAB,
-    },
-    {
-      text: 'Azure DevOps',
-      type: StorageProviderType.ADO,
-    },
-    {
-      text: 'BitBucket',
-      type: StorageProviderType.BITBUCKET,
-      beta: true,
-    },
-    {
-      text: 'Supernova',
-      type: StorageProviderType.SUPERNOVA,
-    },
-    {
-      text: t('providers.generic.title'),
-      type: StorageProviderType.GENERIC_VERSIONED_STORAGE,
-    },
-    {
-      text: 'Tokens Studio',
-      type: StorageProviderType.TOKENS_STUDIO,
-      beta: true,
-    },
-  ], [t]);
 
   const apiProviders = useSelector(apiProvidersSelector);
   const dispatch = useDispatch<Dispatch>();
@@ -152,24 +112,26 @@ const SyncSettings = () => {
 
                   <Stack direction="column" gap={4}>
                     {
-                    providers.map((provider) => (
-                      <Stack direction="row" justify="between" align="center" key={provider.text}>
+                    LIST_OF_PROVIDERS.map(({
+                      text, i18n, type, beta,
+                    }) => (
+                      <Stack direction="row" justify="between" align="center" key={text}>
                         <Stack direction="column">
                           <Box css={{
                             color: '$fgDefault', display: 'inline-flex', gap: '$2', alignItems: 'center',
                           }}
                           >
-                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(provider.type)}</Box>
-                            {provider.text}
-                            {provider.beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
+                            <Box css={{ color: '$fgMuted' }}>{getProviderIcon(type)}</Box>
+                            {i18n ? t(text) : text}
+                            {beta && <StyledBetaBadge>BETA</StyledBetaBadge>}
                           </Box>
                         </Stack>
                         <Button
-                          key={provider.type}
-                          onClick={handleProviderClick(provider.type)}
+                          key={type}
+                          onClick={handleProviderClick(type)}
                           variant="secondary"
                           size="small"
-                          data-testid={`add-${provider.text}-credential`}
+                          data-testid={`add-${text}-credential`}
                         >
                           {t('choose')}
                         </Button>

@@ -1,4 +1,6 @@
 import compact from 'just-compact';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
@@ -6,7 +8,7 @@ import { isSingleToken } from '@/utils/is';
 import { ThemeObjectsList } from '@/types';
 import { CompositionTokenProperty } from '@/types/CompositionTokenProperty';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+
 import { StorageType } from '@/types/StorageType';
 import {
   ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
@@ -166,7 +168,7 @@ export async function getSavedStorageType(): Promise<StorageType> {
   if (storageType) {
     return storageType;
   }
-  return { provider: StorageProviderType.LOCAL };
+  return { provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL };
 }
 
 export function goToNode(id: string) {

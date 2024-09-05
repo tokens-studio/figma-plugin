@@ -1,4 +1,5 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { mockUiPostMessage } from '../../../tests/__mocks__/figmaMock';
@@ -35,7 +36,7 @@ describe('notifySetTokens', () => {
       activeTheme: {},
       themes: [],
       storageType: {
-        provider: StorageProviderType.LOCAL,
+        provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
       },
     };
     notifySetTokens(mockStoreValues);

@@ -5,8 +5,9 @@ import {
   Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StorageTypeFormValues } from '@/types/StorageType';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { generateId } from '@/utils/generateId';
 import { ChangeEventHandler } from './types';
 import { ErrorMessage } from '../ErrorMessage';
@@ -53,7 +54,7 @@ export default function JSONBinForm({
       if (validationResult.success) {
         const formFields = {
           ...validationResult.data,
-          provider: StorageProviderType.JSONBIN,
+          provider: AVAILABLE_PROVIDERS.JSONBIN,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
         onSubmit(formFields);

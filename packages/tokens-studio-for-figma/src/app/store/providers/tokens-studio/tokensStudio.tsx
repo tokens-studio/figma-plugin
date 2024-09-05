@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import type { StorageProviderType } from '@sync-providers/types';
 import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -14,7 +15,6 @@ import {
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokensStudioTokenStorage } from '../../../../storage/TokensStudioTokenStorage'; // todo
 import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';

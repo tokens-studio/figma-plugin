@@ -2,6 +2,7 @@ import React, {
   useCallback, useContext,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { TokenSetItem } from './TokenSetItem';
 import {
   activeApiProviderSelector,
@@ -11,7 +12,6 @@ import {
 } from '@/selectors';
 import { TreeItem } from '@/utils/tokenset';
 import { DragControlsContext } from '@/context';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 type ExtendedTreeItem = TreeItem & {
   tokenSets: string[];
@@ -39,7 +39,7 @@ export function TokenSetTreeItemContent({
   const tokenSetMetadata = useSelector(tokenSetMetadataSelector);
   const activeApiProvider = useSelector(activeApiProviderSelector);
 
-  const isTokensStudioProvider = activeApiProvider === StorageProviderType.TOKENS_STUDIO;
+  const isTokensStudioProvider = activeApiProvider === AVAILABLE_PROVIDERS.TOKENS_STUDIO;
 
   const handleClick = useCallback((set: TreeItem) => {
     if (set.isLeaf) {

@@ -1,5 +1,6 @@
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { mockRootSetSharedPluginData } from '../../tests/__mocks__/figmaMock';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import {
   mapValuesToTokens, returnValueToLookFor, saveStorageType, saveOnboardingExplainerSets, saveOnboardingExplainerInspect, saveOnboardingExplainerSyncProviders, destructureTokenForAlias,
 } from './node';
@@ -392,7 +393,7 @@ describe('storage type', () => {
     const apiContext = {
       id: 'gh',
       internalId: 'gh',
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
       branch: 'main',
       filePath: 'data/tokens.json',
       name: 'Github',

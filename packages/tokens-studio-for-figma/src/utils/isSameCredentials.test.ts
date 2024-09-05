@@ -1,30 +1,31 @@
 // write a test for isSameCredentials function
 
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import isSameCredentials from './isSameCredentials';
 
 describe('isSameCredentials', () => {
   it('should return true if the credentials are the same', () => {
     const storedJSONBin = {
       id: '123',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
     };
     const storedGitHub = {
       id: 'six7/figma-tokens',
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
       filePath: 'tokens.json',
       branch: 'main',
       internalId: '123',
     };
     const correctCredentials = {
       id: '123',
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
       secret: 'abc',
       name: 'foo',
     };
     const correctGitHubCredentials = {
       id: 'six7/figma-tokens',
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
       secret: 'abc',
       name: 'figmatokens',
       filePath: 'tokens.json',
@@ -32,7 +33,7 @@ describe('isSameCredentials', () => {
     };
     const gitHubCredentialsWithDifferentBranch = {
       id: 'six7/figma-tokens',
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
       secret: 'abc',
       name: 'figmatokens',
       filePath: 'tokens.json',

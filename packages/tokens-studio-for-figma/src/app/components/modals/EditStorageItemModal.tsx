@@ -4,7 +4,7 @@ import Modal from '../Modal';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
 import Stack from '../Stack';
-import { StorageTypeFormValues } from '@/types/StorageType';
+import { StorageProviderType, StorageTypeFormValues } from '@/types/StorageType';
 import { Eventlike } from '../StorageItemForm/types';
 
 type Props = {
@@ -44,7 +44,7 @@ export default function EditStorageItemModal({
           onChange={handleChange}
           onSubmit={handleSubmit}
           onCancel={onClose}
-          values={formFields}
+          values={formFields as Extract<StorageTypeFormValues<true>, { provider: StorageProviderType.URL }>}
           hasErrored={hasErrored}
           errorMessage={errorMessage}
         />

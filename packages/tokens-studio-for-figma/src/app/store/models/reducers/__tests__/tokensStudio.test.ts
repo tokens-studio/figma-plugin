@@ -1,8 +1,9 @@
 import { init, RematchStore } from '@rematch/core';
 import { Graphql } from '@tokens-studio/sdk';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { RootModel } from '@/types/RootModel';
 import { ColorModifier } from '@/types/Modifier';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { models } from '../../index';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -129,10 +130,10 @@ const storeInitialState = {
         api: {
           id: 'apiId',
           secret: 'apiSecret',
-          provider: StorageProviderType.TOKENS_STUDIO,
+          provider: AVAILABLE_PROVIDERS.TOKENS_STUDIO as StorageProviderType.TOKENS_STUDIO,
         },
         storageType: {
-          provider: StorageProviderType.TOKENS_STUDIO,
+          provider: AVAILABLE_PROVIDERS.TOKENS_STUDIO as StorageProviderType.TOKENS_STUDIO,
         },
       },
       settings: {
@@ -833,7 +834,7 @@ describe('Tokens Studio sync - Api provider is not Tokens Studio', () => {
             ...storeInitialState.redux.initialState.uiState,
             api: {
               ...storeInitialState.redux.initialState.uiState.api,
-              provider: StorageProviderType.LOCAL,
+              provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
             },
           },
         },

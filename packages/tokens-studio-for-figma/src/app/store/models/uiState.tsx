@@ -1,5 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { createModel } from '@rematch/core';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { track } from '@/utils/analytics';
 import type { RootModel } from '@/types/RootModel';
 import fetchChangelog from '@/utils/storyblok';
@@ -8,7 +10,6 @@ import { SelectionGroup, StoryblokStory } from '@/types';
 import { Tabs } from '@/constants/Tabs';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { EditTokenObject } from '@/types/tokens';
 import { TokenTypes } from '@/constants/TokenTypes';
@@ -114,12 +115,12 @@ export const uiState = createModel<RootModel>()({
     activeTokensTab: 'list',
     projectURL: '',
     storageType: {
-      provider: StorageProviderType.LOCAL,
+      provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
     },
     api: null,
     apiProviders: [],
     localApiState: {
-      provider: StorageProviderType.LOCAL,
+      provider: AVAILABLE_PROVIDERS.LOCAL as StorageProviderType.LOCAL,
       new: false,
       format: TokenFormatOptions.Legacy,
     },

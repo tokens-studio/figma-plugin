@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
+import type { StorageProviderType } from '@sync-providers/types';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -11,11 +12,9 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
-import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { SupernovaTokenStorage } from '../../../../storage/SupernovaTokenStorage';
 import usePushDialog from '../../../hooks/usePushDialog';
 import { RemoteResponseData } from '../../../../types/RemoteResponseData';

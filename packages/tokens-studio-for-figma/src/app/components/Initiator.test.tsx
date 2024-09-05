@@ -1,5 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import {
   render, fireEvent, resetStore, createMockStore,
 } from '../../../tests/config/setupTest';
@@ -7,7 +8,6 @@ import App from './App';
 import { store } from '../store';
 import { Initiator } from './Initiator';
 import { TokenTypes } from '@/constants/TokenTypes';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { Tabs } from '@/constants/Tabs';
 import { UpdateMode } from '@/constants/UpdateMode';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
@@ -224,7 +224,7 @@ describe('Initiator', () => {
               activeTheme: {},
               themes: [],
               storageType: {
-                provider: StorageProviderType.LOCAL,
+                provider: AVAILABLE_PROVIDERS.LOCAL,
               },
             },
           },
@@ -268,7 +268,7 @@ describe('Initiator', () => {
               activeTheme: {},
               themes: [],
               storageType: {
-                provider: StorageProviderType.LOCAL,
+                provider: AVAILABLE_PROVIDERS.LOCAL,
               },
             },
           },
@@ -296,7 +296,7 @@ describe('Initiator', () => {
             type: 'apiProviders',
             providers: [
               {
-                provider: StorageProviderType.GITHUB,
+                provider: AVAILABLE_PROVIDERS.GITHUB,
               },
             ],
           },
@@ -307,7 +307,7 @@ describe('Initiator', () => {
     const state = mockStore.getState();
     expect(state.uiState.apiProviders).toEqual([
       {
-        provider: StorageProviderType.GITHUB,
+        provider: AVAILABLE_PROVIDERS.GITHUB,
       },
     ]);
   });

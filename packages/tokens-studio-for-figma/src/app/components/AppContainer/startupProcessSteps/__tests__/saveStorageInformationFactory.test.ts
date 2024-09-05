@@ -1,4 +1,4 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StartupMessage } from '@/types/AsyncMessages';
 import { createMockStore } from '../../../../../../tests/config/setupTest';
 import { saveStorageInformationFactory } from '../saveStorageInformationFactory';
@@ -7,10 +7,10 @@ describe('saveStorageInformationFactory', () => {
   it('should work', async () => {
     const mockStore = createMockStore({});
     const mockParams = {
-      storageType: StorageProviderType.GITHUB,
+      storageType: AVAILABLE_PROVIDERS.GITHUB,
       localApiProviders: [
         {
-          provider: StorageProviderType.GITHUB,
+          provider: AVAILABLE_PROVIDERS.GITHUB,
         },
       ],
     } as unknown as StartupMessage;
@@ -23,7 +23,7 @@ describe('saveStorageInformationFactory', () => {
 
     expect(mockSetStorageFn).toBeCalledTimes(1);
     expect(mockSetStorageFn).toBeCalledWith({
-      provider: StorageProviderType.GITHUB,
+      provider: AVAILABLE_PROVIDERS.GITHUB,
     });
     expect(mockStore.getState().uiState.apiProviders).toEqual(mockParams.localApiProviders);
   });

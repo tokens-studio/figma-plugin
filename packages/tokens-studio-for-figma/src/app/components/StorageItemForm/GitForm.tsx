@@ -5,7 +5,8 @@ import {
   Button, FormField, IconButton, Label, Link, Stack, Text, TextInput,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { StorageTypeFormValues } from '@/types/StorageType';
 
 import { generateId } from '@/utils/generateId';
@@ -64,8 +65,8 @@ export default function GitForm({
   );
 
   const baseUrlPlaceholder = `https://${values.provider}.hyma.com`;
-  const gitExplainedText = values.provider === StorageProviderType.GITHUB ? t('gitHubExplained') : t('gitLabExplained');
-  const readMoreText = values.provider === StorageProviderType.GITHUB ? t('readMoreGitHub') : t('readMoreGitLab');
+  const gitExplainedText = values.provider === AVAILABLE_PROVIDERS.GITHUB ? t('gitHubExplained') : t('gitLabExplained');
+  const readMoreText = values.provider === AVAILABLE_PROVIDERS.GITHUB ? t('readMoreGitHub') : t('readMoreGitLab');
 
   return (
     <form onSubmit={handleSubmit}>

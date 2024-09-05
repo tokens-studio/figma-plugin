@@ -1,5 +1,6 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { StorageProviderType } from '@sync-providers/types';
 
+// TODO: fix StorageProviderType usage
 export const transformProviderName = (provider: StorageProviderType) => {
   switch (provider) {
     case StorageProviderType.JSONBIN:

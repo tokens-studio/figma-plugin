@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import compact from 'just-compact';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../plugin/notifiers';
 import * as pjs from '../../../../package.json';
@@ -13,7 +15,6 @@ import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { JSONBinTokenStorage } from '@/storage';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
@@ -102,7 +103,7 @@ export function useJSONbin() {
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
           credential: {
-            provider: StorageProviderType.JSONBIN,
+            provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
             id: result.metadata.id,
             internalId,
             name,
@@ -143,7 +144,7 @@ export function useJSONbin() {
           internalId,
           name,
           secret,
-          provider: StorageProviderType.JSONBIN,
+          provider: AVAILABLE_PROVIDERS.JSONBIN as StorageProviderType.JSONBIN,
         },
       });
       if (data?.status === 'failure') {

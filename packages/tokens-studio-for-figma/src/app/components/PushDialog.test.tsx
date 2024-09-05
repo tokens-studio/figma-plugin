@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import {
   act, render, resetStore, createMockStore, fireEvent,
 } from '../../../tests/config/setupTest';
@@ -17,7 +17,7 @@ describe('PushDialog', () => {
         showPushDialog: { state: 'initial' },
         localApiState: {
           branch: 'main',
-          provider: StorageProviderType.GITHUB,
+          provider: AVAILABLE_PROVIDERS.GITHUB,
           id: '1234',
         },
       },
@@ -39,7 +39,7 @@ describe('PushDialog', () => {
         showPushDialog: { state: 'success' },
         localApiState: {
           branch: 'main',
-          provider: StorageProviderType.GITHUB,
+          provider: AVAILABLE_PROVIDERS.GITHUB,
         },
       },
     });
@@ -61,7 +61,7 @@ describe('PushDialog', () => {
         showPushDialog: { state: 'initial' },
         localApiState: {
           branch: 'main',
-          provider: StorageProviderType.GITHUB,
+          provider: AVAILABLE_PROVIDERS.GITHUB,
         },
       },
     });
@@ -99,7 +99,7 @@ describe('PushDialog', () => {
       uiState: {
         showPushDialog: { state: 'initial' },
         localApiState: {
-          provider: StorageProviderType.SUPERNOVA,
+          provider: AVAILABLE_PROVIDERS.SUPERNOVA,
         },
       },
     });

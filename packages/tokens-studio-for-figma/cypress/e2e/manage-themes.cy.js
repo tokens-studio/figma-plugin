@@ -1,6 +1,4 @@
-import {
-  StorageProviderType
-} from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { UpdateMode } from '@/constants/UpdateMode';
 import MockEnv from '../support/mockEnv';
 
@@ -33,7 +31,7 @@ describe('TokenListing', () => {
       updateRemote: true,
       updateStyles: true,
     },
-    storageType: { provider: StorageProviderType.LOCAL },
+    storageType: { provider: AVAILABLE_PROVIDERS.LOCAL },
     user: {
       figmaId: 'figma:1234',
       userId: 'uid:1234',

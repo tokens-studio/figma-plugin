@@ -1,4 +1,5 @@
-import { StorageProviderType } from '@/constants/StorageProviderType';
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { updateCredentials } from '@/utils/credentials';
 import { credentials } from '../credentials';
@@ -17,7 +18,7 @@ describe('credentials', () => {
         id: 'six7/figma-tokens',
         internalId: '1234',
         name: 'general',
-        provider: StorageProviderType.GITHUB,
+        provider: AVAILABLE_PROVIDERS.GITHUB as StorageProviderType.GITHUB,
         secret: 'ghp_2345',
       },
     });

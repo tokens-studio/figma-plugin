@@ -1,3 +1,5 @@
+import type { StorageProviderType } from '@sync-providers/types';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import { ThemeObjectsList } from '@/types';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { SingleToken } from '@/types/tokens';
@@ -5,9 +7,7 @@ import { updateJSONBinTokens } from '../jsonbin';
 import * as pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
-import {
-  StorageProviderType,
-} from '@/constants/StorageProviderType';
+
 import { notifyToUI } from '@/plugin/notifiers';
 
 const mockRetrieve = jest.fn();
@@ -52,7 +52,7 @@ describe('jsonbin', () => {
   const context: Partial<StorageTypeCredentials> = {
     name: 'six7',
     id: 'six7/figma-tokens',
-    provider: StorageProviderType.JSONBIN,
+    provider: AVAILABLE_PROVIDERS.JSONBING as StorageProviderType.JSONBIN,
     secret: 'jsonbin',
   };
   it('return old data when remote data is older', async () => {

@@ -2,12 +2,12 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import {
   createMockStore,
   render,
 } from '../../../tests/config/setupTest';
 import SyncSettings from './SyncSettings';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { GitHubStorageType, StorageTypeCredential } from '@/types/StorageType';
 
 const mockConfirm = jest.fn();
@@ -26,20 +26,20 @@ describe('ConfirmDialog', () => {
         branch: 'main',
         filePath: 'data/tokens.json',
         id: 'six7/figma-tokens',
-        provider: 'github' as StorageProviderType,
+        provider: AVAILABLE_PROVIDERS.GITHUB,
       },
       storageType: {
         branch: 'main',
         filePath: 'data/tokens.json',
         id: 'six7/figma-tokens',
-        provider: 'github',
+        provider: AVAILABLE_PROVIDERS.GITHUB,
       } as GitHubStorageType,
       apiProviders: [
         {
           branch: 'main',
           filePath: 'data/tokens.json',
           id: 'six7/figma-tokens',
-          provider: 'github',
+          provider: AVAILABLE_PROVIDERS.GITHUB,
         } as StorageTypeCredential<GitHubStorageType>,
       ],
     },

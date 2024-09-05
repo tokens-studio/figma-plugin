@@ -1,4 +1,5 @@
 import { startTransaction } from '@sentry/react';
+import { StorageProviderType } from '@sync-providers/types';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../plugin/notifiers';
@@ -10,11 +11,11 @@ import type { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import type { SettingsState } from './models/settings';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
+// TODO: fix StorageProviderType usage
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
   tokens: Record<string, AnyTokenList>;

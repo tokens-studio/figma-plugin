@@ -1,15 +1,16 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import userEvent from '@testing-library/user-event';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
+
 import { createMockStore, render, waitFor } from '../../../tests/config/setupTest';
 import SettingsDropdown from './SettingsDropdown';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 
 const mockStore = createMockStore({});
 const mockStoreJSONBin = createMockStore({
   uiState: {
     localApiState: {
-      provider: StorageProviderType.JSONBIN,
+      provider: AVAILABLE_PROVIDERS.JSONBIN,
     },
   },
 });

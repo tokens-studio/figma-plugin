@@ -1,6 +1,4 @@
-import {
-  StorageProviderType
-} from '@/constants/StorageProviderType';
+import { AVAILABLE_PROVIDERS } from '@sync-providers/constants';
 import {
   TokenTypes
 } from '@/constants/TokenTypes';
@@ -29,7 +27,7 @@ describe('Loads application', () => {
       updateRemote: true,
       updateStyles: true,
     },
-    storageType: { provider: StorageProviderType.LOCAL },
+    storageType: { provider: AVAILABLE_PROVIDERS.LOCAL },
     user: {
       figmaId: 'figma:1234',
       userId: 'uid:1234',

@@ -14,13 +14,13 @@ import { Code, Expand, Collapse } from 'iconoir-react';
 
 import { Editor } from '@monaco-editor/react';
 import { CSS } from '@stitches/react';
+import { StorageProviderType } from '@sync-providers/types';
 import { Dispatch } from '../store';
 import { AsyncMessageChannel } from '../../AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '../../AsyncMessageChannelPreview';
 import { AsyncMessageTypes, StartupMessage } from '@/types/AsyncMessages';
 import { SavedSettings } from '@/plugin/notifiers';
 import { UpdateMode } from '@/constants/UpdateMode';
-import { StorageProviderType } from '@/constants/StorageProviderType';
 import Modal from '../components/Modal';
 
 import './preview.css';
