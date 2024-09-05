@@ -84,7 +84,6 @@ export default async function setColorValuesOnTarget({
       const containsReferenceVariable = resolvedValue.toString().startsWith('{') && resolvedValue.toString().endsWith('}');
       const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(resolvedValue.slice(1, -1));
 
-      console.log('setting', resolvedToken);
       if (containsReferenceVariable && referenceVariableExists && shouldCreateStylesWithVariables && !hasModifier(resolvedToken)) {
         try {
           successfullyAppliedVariable = await tryApplyColorVariableId(target, resolvedValue.slice(1, -1), ColorPaintType.PAINTS);
