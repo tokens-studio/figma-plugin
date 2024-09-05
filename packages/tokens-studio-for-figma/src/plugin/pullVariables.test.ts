@@ -35,7 +35,6 @@ describe('pullStyles', () => {
           name: 'Color',
           remote: false,
           resolvedType: 'COLOR',
-
           valuesByMode: {
             '1:0': {
               r: 1, g: 1, b: 1, a: 1,
@@ -55,7 +54,6 @@ describe('pullStyles', () => {
         {
           name: 'Number1',
           remote: false,
-
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 24,
@@ -67,7 +65,6 @@ describe('pullStyles', () => {
         {
           name: 'Number2',
           remote: false,
-
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 16,
@@ -80,7 +77,6 @@ describe('pullStyles', () => {
           name: 'String',
           remote: false,
           resolvedType: 'STRING',
-
           valuesByMode: {
             '1:0': 'Hello',
             '1:1': 'Hello',
@@ -93,7 +89,6 @@ describe('pullStyles', () => {
           name: 'Boolean',
           remote: false,
           resolvedType: 'BOOLEAN',
-
           valuesByMode: {
             '1:0': true,
             '1:1': true,
@@ -112,28 +107,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -142,56 +133,48 @@ describe('pullStyles', () => {
       ],
       numbers: [
         {
-
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'number',
           value: 24,
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'number',
           value: 24,
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'number',
           value: 24,
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'number',
           value: 24,
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'number',
           value: 16,
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'number',
           value: 16,
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'number',
           value: 16,
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'number',
@@ -225,28 +208,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -255,56 +234,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '24px',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '24px',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '24px',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '24px',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '16px',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '16px',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '16px',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
@@ -338,28 +309,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -368,56 +335,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
@@ -451,28 +410,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -481,56 +436,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1rem',
         },
         {
-
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
