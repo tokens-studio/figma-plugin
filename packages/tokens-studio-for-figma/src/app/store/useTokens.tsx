@@ -403,8 +403,6 @@ export default function useTokens() {
         (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
       );
 
-      console.log('Settings to create are', tokens, settings.stylesColor, settings.stylesEffect, settings.stylesTypography);
-
       const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
         const shouldCreate = [
           settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,

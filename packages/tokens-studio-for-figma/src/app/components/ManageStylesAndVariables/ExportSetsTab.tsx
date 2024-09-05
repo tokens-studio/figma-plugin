@@ -145,7 +145,6 @@ export default function ExportSetsTab({ selectedSets, setSelectedSets }: { selec
       <Modal
         size="fullscreen"
         full
-        compact
         isOpen={showChangeSets}
         close={handleCancelChangeSets}
         backArrow

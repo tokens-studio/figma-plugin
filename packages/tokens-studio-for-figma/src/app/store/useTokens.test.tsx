@@ -505,11 +505,11 @@ describe('useToken test', () => {
         },
       ];
 
-      const mockStore = createMockStore({
+      const newMockStore = createMockStore({
         tokenState: {
           tokens: {
-            global: tokens.filter(token => token.internal__Parent === 'global'),
-            light: tokens.filter(token => token.internal__Parent === 'light'),
+            global: tokens.filter((token) => token.internal__Parent === 'global'),
+            light: tokens.filter((token) => token.internal__Parent === 'light'),
           },
         },
         settings: {
@@ -519,9 +519,9 @@ describe('useToken test', () => {
         },
       });
 
-      const { result } = renderHook(() => useTokens(), {
+      const { result: newResult } = renderHook(() => useTokens(), {
         wrapper: ({ children }) => (
-          <Provider store={mockStore}>
+          <Provider store={newMockStore}>
             {children}
           </Provider>
         ),
@@ -574,7 +574,7 @@ describe('useToken test', () => {
       ];
 
       await act(async () => {
-        await result.current.createStylesFromSelectedTokenSets(selectedSets);
+        await newResult.current.createStylesFromSelectedTokenSets(selectedSets);
       });
 
       expect(messageSpy).toBeCalledWith({
@@ -609,10 +609,10 @@ describe('useToken test', () => {
         },
       ];
 
-      const mockStore = createMockStore({
+      const newMockStore = createMockStore({
         tokenState: {
           tokens: {
-            global: tokens
+            global: tokens,
           },
         },
         settings: {
@@ -622,9 +622,9 @@ describe('useToken test', () => {
         },
       });
 
-      const { result } = renderHook(() => useTokens(), {
+      const { result: newResult } = renderHook(() => useTokens(), {
         wrapper: ({ children }) => (
-          <Provider store={mockStore}>
+          <Provider store={newMockStore}>
             {children}
           </Provider>
         ),
@@ -642,9 +642,9 @@ describe('useToken test', () => {
       ];
 
       defaultTokenValueRetriever.initiate({ tokens });
-      
+
       await act(async () => {
-        await result.current.createStylesFromSelectedTokenSets(selectedSets);
+        await newResult.current.createStylesFromSelectedTokenSets(selectedSets);
       });
 
       const initialTokens = [
@@ -678,7 +678,7 @@ describe('useToken test', () => {
           internal__Parent: 'global',
           rawValue: '#ffffff',
         },
-      ]
+      ];
 
       const tokensToCreate = initialTokens.filter((token) => token.type === 'typography');
 
