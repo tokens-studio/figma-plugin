@@ -686,7 +686,7 @@ describe('useToken test', () => {
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
         sourceTokens: initialTokens,
-        settings: mockStore.getState().settings,
+        settings: newMockStore.getState().settings,
       });
     });
 

@@ -43,8 +43,20 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     return 0;
   };
 
-  const overallSets = Object.keys(tokens).sort((a, b) => sortSets(a, b, overallConfig));
-  const usedSetsList = Object.keys(usedSets).sort((a, b) => sortSets(a, b, usedSets));
+  // Do not consider DISABLED for used sets. These are only enabled or source.
+  const usedSetsList = Object.keys(usedSets)
+    .filter((key) => usedSets[key] !== TokenSetStatus.DISABLED)
+    .sort((a, b) => sortSets(a, b, usedSets));
+  // Filter out duplicates from overall sets (those that will later be used from usedSetList anyway)
+  const overallSets = Object.keys(tokens)
+    .filter((set) => !usedSetsList.includes(set))
+    .sort((a, b) => sortSets(a, b, overallConfig));
+
+  // Helper to determine if a token should be merged. We only merge object tokens if the current set is enabled (to avoid accidental merges)
+  const shouldMerge = (
+    currentSet: string,
+    existingToken: SingleToken,
+  ) => usedSetsList.includes(currentSet) && existingToken.internal__Parent && !overallSets.includes(existingToken.internal__Parent);
 
   const tokenSetsOrder = [...overallSets, ...usedSetsList];
 
@@ -52,15 +64,27 @@ export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets
     const setTokens = tokens[setName] || [];
     setTokens.forEach((token) => {
       const existingIndex = mergedTokens.findIndex((t) => t.name === token.name);
+      const existingToken = mergedTokens[existingIndex];
       const newToken = {
         ...appendTypeToToken(token),
         internal__Parent: setName,
       } as SingleToken;
 
       if (existingIndex === -1) {
+        // If the token does not exist yet, add it.
         mergedTokens.push(newToken);
+      } else if (shouldMerge(setName, existingToken) && existingIndex > -1 && typeof existingToken.value === 'object' && typeof newToken.value === 'object'
+      && !Array.isArray(existingToken.value) && !Array.isArray(newToken.value)) {
+        // If the token should be merged, and is an object - and not an array, merge them (e.g. composition, typography)
+        mergedTokens.splice(existingIndex, 1, {
+          ...newToken,
+          value: {
+            ...existingToken.value,
+            ...newToken.value,
+          },
+        } as SingleToken);
       } else {
-        // Always replace existing tokens
+        // In all other cases, just replace.
         mergedTokens[existingIndex] = newToken;
       }
     });
