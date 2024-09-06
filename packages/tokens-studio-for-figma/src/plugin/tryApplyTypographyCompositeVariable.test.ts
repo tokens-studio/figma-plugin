@@ -177,4 +177,26 @@ describe('tryApplyTypographyCompositeVariable', () => {
       target, value, resolvedValue, baseFontSize,
     });
   });
+
+  it('should apply transformed value when no variable is available', async () => {
+    target = {
+      fontName: {
+        family: 'Arial',
+        style: 'Regular',
+      },
+    } as TextNode | TextStyle;
+    value = {
+      letterSpacing: '0.5em',
+    };
+    resolvedValue = {
+      letterSpacing: '0.5em',
+    };
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
+
+    await tryApplyTypographyCompositeVariable({
+      target, value, resolvedValue, baseFontSize,
+    });
+
+    expect(target.letterSpacing).toEqual({ unit: 'PIXELS', value: 8 });
+  });
 });
