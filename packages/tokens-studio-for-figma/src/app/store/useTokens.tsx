@@ -438,7 +438,18 @@ export default function useTokens() {
         isInfinite: true,
       });
 
-      const allStyleIds = {};
+      const allStyleIds: Record<string, string[]> = {};
+
+      const allExistingStyleReferences: string[] = themes.reduce((acc, theme) => {
+        if (theme.$figmaStyleReferences) {
+          Object.keys(theme.$figmaStyleReferences).forEach((key) => {
+            if (theme.$figmaStyleReferences && theme.$figmaStyleReferences[key]) {
+              acc.push(theme.$figmaStyleReferences[key]);
+            }
+          });
+        }
+        return acc;
+      }, [] as string[]);
 
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
@@ -490,22 +501,18 @@ export default function useTokens() {
 
       // Remove styles that aren't in the theme or in the exposed token object
       if (settings.removeStylesAndVariablesWithoutConnection) {
-        const { styles } = await AsyncMessageChannel.ReactInstance.message({
-          type: AsyncMessageTypes.GET_LOCAL_STYLES,
+        console.log('Should remove!', Object.values(allStyleIds));
+        const uniqueMergedStyleIds: string[] = Array.from(new Set([
+          ...Object.values(allExistingStyleReferences).flat(),
+          ...Object.values(allStyleIds).flat(),
+        ]));
+        const { countOfRemovedStyles } = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+          usedStyleIds: uniqueMergedStyleIds,
         });
-
-        const styleIdIncludedinTouchedStyles = (id) => Object.values(allStyleIds).includes(id);
-
-        styles.forEach((style) => {
-          const shouldRemove = !styleIdIncludedinTouchedStyles(style.id) && (
-            (settings.stylesTypography && style.type === 'TEXT')
-            || (settings.stylesColor && style.type === 'PAINT')
-            || (settings.stylesEffect && style.type === 'EFFECT')
-          );
-          if (shouldRemove) {
-            style.remove();
-          }
-        });
+        if (countOfRemovedStyles > 0) {
+          notifyToUI(`${countOfRemovedStyles} styles removed`);
+        }
       }
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);

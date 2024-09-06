@@ -38,4 +38,4 @@ export * from './attachLocalVariablesToTheme';
 export * from './renameVariables';
 export * from './updateVariables';
 export * from './setInitialLoad';
-export * from './getLocalStyles';
+export * from './removeStylesWithoutConnection';
