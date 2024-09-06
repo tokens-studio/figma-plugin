@@ -1,9 +1,25 @@
 {
   "name": "sync-providers",
+  "private": true,
   "version": "1.0.0",
   "description": "A collection of helper functions for syncing data between different providers",
-  "main": "index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
   "scripts": {
+    "build": "tsup",
     "lint": "eslint . --quiet --fix",
     "lint:nofix": "eslint ."
   },
@@ -24,6 +40,7 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.99.0",
+    "@types/jest": "^29.5.12",
     "@types/node": "^22.5.2",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
@@ -35,6 +52,7 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.4.0",
-    "eslint-plugin-validate-jsx-nesting": "^0.1.1"
+    "eslint-plugin-validate-jsx-nesting": "^0.1.1",
+    "tsup": "^8.2.4"
   }
 }
