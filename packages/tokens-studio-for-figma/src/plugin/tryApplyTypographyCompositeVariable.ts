@@ -28,13 +28,13 @@ export async function tryApplyTypographyCompositeVariable({
     for (const [originalKey, val] of Object.entries(value).filter(([_, keyValue]) => typeof keyValue !== 'undefined')) {
       if (typeof val === 'undefined') return;
       let successfullyAppliedVariable = false;
-      if (resolvedValue[originalKey].toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
+      if (resolvedValue[originalKey]?.toString().startsWith('{') && resolvedValue[originalKey].toString().endsWith('}') && shouldCreateStylesWithVariables) {
         const variableToApply = await defaultTokenValueRetriever.getVariableReference(resolvedValue[originalKey].toString().slice(1, -1));
         const key = transformTypographyKeyToFigmaVariable(originalKey, variableToApply);
         // If we're dealing with a variable, we fetch all available font weights for the current font and load them.
         // This is needed because we have numerical weights, but we need to apply the string ones. We dont know them from Figma, so we need to load all.
         // e.g. font weight = 600, we dont know that we need to load "Bold".
-        if (key === 'fontFamily') {
+        if (key === 'fontFamily' && variableToApply) {
           const firstVariableValue = Object.values(variableToApply.valuesByMode)[0];
           if (firstVariableValue) {
             const fontsMatching = (await figma.listAvailableFontsAsync() || []).filter((font) => font.fontName.family === firstVariableValue);

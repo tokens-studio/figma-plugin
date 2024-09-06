@@ -53,18 +53,20 @@ describe('tryApplyTypographyCompositeVariable', () => {
       fontFamily: '{fontFamily.default}',
       fontWeight: '{fontWeight.default}',
     };
-    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue('Roboto');
+    const familyVariable = { valuesByMode: { default: ['Roboto'] } };
+    const weightVariable = { valuesByMode: { default: ['Bold'] } };
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(familyVariable);
     defaultTokenValueRetriever.getVariableReference = jest.fn()
-      .mockResolvedValueOnce('Roboto')
-      .mockResolvedValueOnce('Bold');
+      .mockResolvedValueOnce(familyVariable)
+      .mockResolvedValueOnce(weightVariable);
 
     await tryApplyTypographyCompositeVariable({
       target, value, resolvedValue, baseFontSize,
     });
 
     expect(target.setBoundVariable).toHaveBeenCalledTimes(2);
-    expect(target.setBoundVariable).toHaveBeenNthCalledWith(1, 'fontFamily', 'Roboto');
-    expect(target.setBoundVariable).toHaveBeenNthCalledWith(2, 'fontStyle', 'Bold');
+    expect(target.setBoundVariable).toHaveBeenNthCalledWith(1, 'fontFamily', familyVariable);
+    expect(target.setBoundVariable).toHaveBeenNthCalledWith(2, 'fontStyle', weightVariable);
   });
 
   it('should apply values directly if no variables are available', async () => {
@@ -86,6 +88,8 @@ describe('tryApplyTypographyCompositeVariable', () => {
       fontSize: '{fontSizeVariable}',
       lineHeight: '1.5',
     };
+
+    defaultTokenValueRetriever.getVariableReference = jest.fn().mockResolvedValue(undefined);
 
     await tryApplyTypographyCompositeVariable({
       target, value, resolvedValue, baseFontSize,
