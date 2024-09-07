@@ -112,7 +112,7 @@ jobs:
       - name: Install dependencies
         run: yarn  --frozen-lockfile  --immutable
       - name: Run coverage
-        run: yarn test:coverage:deepsource
+        run: cd packages/tokens-studio-for-figma && yarn test:coverage:deepsource
       - name: Install CLI
         run: curl https://deepsource.io/cli | sh
       - name: Run test coverage report
