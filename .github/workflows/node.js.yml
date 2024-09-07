@@ -96,6 +96,27 @@ jobs:
           afterSwitchCommand: yarn
           useSameComment: true
           delta: 1
+  coveragedeepsource:
+    name: Test coverage (deepsource)
+    continue-on-error: true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
+      - name: Install dependencies
+        run: yarn  --frozen-lockfile  --immutable
+      - name: Run coverage
+        run: yarn test:coverage:deepsource
+      - name: Install CLI
+        run: curl https://deepsource.io/cli | sh
+      - name: Run test coverage report
+        run: ./bin/deepsource report --analyzer test-coverage --key javascript --value-file ./packages/tokens-studio-for-figma/coverage/cobertura-coverage.xml
   test-transform:
     name: Transformer Tests
     runs-on: ubuntu-22.04

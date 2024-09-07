@@ -42,6 +42,7 @@ export default {
     'text',
     'lcov',
     'clover',
+    'cobertura',
   ],
 
   // An object that configures minimum threshold enforcement for coverage results

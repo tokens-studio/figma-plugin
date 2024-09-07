@@ -1,6 +1,6 @@
 {
   "name": "@tokens-studio/figma-plugin",
-  "version": "2.0.3",
+  "version": "2.0.3-themefallback",
   "description": "Tokens Studio plugin for Figma",
   "license": "MIT",
   "private": true,
@@ -21,6 +21,7 @@
     "test:quiet": "npm run test -- --reporters=jest-silent-reporter --coverage=false",
     "test:coverage": "npm run test -- --collectCoverageFrom='[\"src/**/*.{js,jsx,ts,tsx}\"]' --coverage --collectCoverage=true --coverageDirectory='./' --forceExit --detectOpenHandles",
     "test:coverage:ci": "npm run test:coverage -- --reporters=jest-silent-reporter --coverageReporters='json-summary'",
+    "test:coverage:deepsource": "npm run test:coverage -- --coverageReporters=cobertura",
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
     "serve": "serve dist -p 58630",
