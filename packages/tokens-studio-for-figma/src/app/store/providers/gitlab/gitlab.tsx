@@ -127,10 +127,8 @@ export function useGitLab() {
       }
     }
     return {
-      status: 'success',
-      tokens: {},
-      themes: [],
-      metadata: {},
+      status: 'failure',
+      errorMessage: 'Push to remote cancelled!',
     };
   }, [
     dispatch,
@@ -276,15 +274,6 @@ export function useGitLab() {
     }
     const data = await syncTokensWithGitLab(context);
 
-    // User cancelled pushing to the remote
-    if (data.status === 'success' && data.themes.length === 0) {
-      dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
-
-      return {
-        status: 'failure',
-        errorMessage: 'Push to remote cancelled!',
-      };
-    }
 
     if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
@@ -295,6 +284,8 @@ export function useGitLab() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
+      // Go back to the previous setup if the user cancelled pushing to the remote or there was an error
+      dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
       return {
         status: 'failure',
         errorMessage: data.errorMessage,
