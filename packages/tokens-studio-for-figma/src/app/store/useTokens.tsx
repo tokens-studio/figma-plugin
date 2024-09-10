@@ -3,7 +3,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { getEnabledTokenSets, getOverallConfig, mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -391,7 +391,12 @@ export default function useTokens() {
         return;
       }
 
-      const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
+      const selectedSetsMap = selectedSets.reduce((acc, set) => {
+        acc[set.set] = set.status;
+        return acc;
+      }, {});
+
+      const tokensToResolve = mergeTokenGroups(tokens, selectedSetsMap);
 
       const resolved = defaultTokenResolver.setTokens(tokensToResolve);
       const withoutSourceTokens = resolved.filter(
@@ -413,6 +418,7 @@ export default function useTokens() {
       await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
+        sourceTokens: resolved,
         settings,
       }));
 
@@ -438,6 +444,9 @@ export default function useTokens() {
         isInfinite: true,
       });
 
+      // Iterate over all given selectedThemes, and combine the selectedTokenSets.
+      const overallConfig = getOverallConfig(themes, selectedThemes);
+
       const allStyleIds: Record<string, string[]> = {};
 
       const allExistingStyleReferences: string[] = themes.reduce((acc, theme) => {
@@ -456,21 +465,17 @@ export default function useTokens() {
 
         if (selectedTheme) {
           const selectedSets = selectedTheme.selectedTokenSets;
-
-          const enabledTokenSets = Object.keys(selectedSets)
-            .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-            .map((tokenSet) => tokenSet);
+          const enabledTokenSets = getEnabledTokenSets(selectedSets);
 
           if (enabledTokenSets.length > 0) {
-            const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: selectedSets[key] }));
+            const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
+            const allTokens = defaultTokenResolver.setTokens(tokensToResolve);
 
-            const resolved = defaultTokenResolver.setTokens(tokensToResolve);
-
-            const withoutSourceTokens = resolved.filter(
-              (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
+            const tokensFromEnabledSets = allTokens.filter(
+              (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // only use enabled sets
             );
 
-            const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
+            const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
               const shouldCreate = [
                 settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
                 settings.stylesColor && curr.type === TokenTypes.COLOR,
@@ -486,6 +491,7 @@ export default function useTokens() {
             const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
               type: AsyncMessageTypes.CREATE_STYLES,
               tokens: tokensToCreate,
+              sourceTokens: allTokens,
               settings,
               selectedTheme,
             }));

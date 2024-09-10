@@ -59,6 +59,7 @@ describe('updateStyles', () => {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: [{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).not.toHaveBeenCalled();
@@ -77,6 +78,7 @@ describe('updateStyles', () => {
         styleId: '1234',
         internal__Parent: 'global',
       }],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).toHaveBeenCalled();
@@ -108,6 +110,7 @@ describe('updateStyles', () => {
           styleId: '',
         },
       ],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).toHaveBeenCalled();
