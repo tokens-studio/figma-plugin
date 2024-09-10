@@ -501,7 +501,6 @@ export default function useTokens() {
 
       // Remove styles that aren't in the theme or in the exposed token object
       if (settings.removeStylesAndVariablesWithoutConnection) {
-        console.log('Should remove!', Object.values(allStyleIds));
         const uniqueMergedStyleIds: string[] = Array.from(new Set([
           ...Object.values(allExistingStyleReferences).flat(),
           ...Object.values(allStyleIds).flat(),
