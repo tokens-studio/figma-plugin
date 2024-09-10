@@ -446,6 +446,19 @@ export default function useTokens() {
 
       // Iterate over all given selectedThemes, and combine the selectedTokenSets.
       const overallConfig = getOverallConfig(themes, selectedThemes);
+  
+      const allStyleIds: Record<string, string[]> = {};
+
+      const allExistingStyleReferences: string[] = themes.reduce((acc, theme) => {
+        if (theme.$figmaStyleReferences) {
+          Object.keys(theme.$figmaStyleReferences).forEach((key) => {
+            if (theme.$figmaStyleReferences && theme.$figmaStyleReferences[key]) {
+              acc.push(theme.$figmaStyleReferences[key]);
+            }
+          });
+        }
+        return acc;
+      }, [] as string[]);
 
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
@@ -483,12 +496,30 @@ export default function useTokens() {
               selectedTheme,
             }));
 
+            Object.assign(allStyleIds, createStylesResult.styleIds);
+
             dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
           } else {
             notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
           }
         }
       }
+
+      // Remove styles that aren't in the theme or in the exposed token object
+      if (settings.removeStylesAndVariablesWithoutConnection) {
+        const uniqueMergedStyleIds: string[] = Array.from(new Set([
+          ...Object.values(allExistingStyleReferences).flat(),
+          ...Object.values(allStyleIds).flat(),
+        ]));
+        const { countOfRemovedStyles } = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+          usedStyleIds: uniqueMergedStyleIds,
+        });
+        if (countOfRemovedStyles > 0) {
+          notifyToUI(`${countOfRemovedStyles} styles removed`);
+        }
+      }
+
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],

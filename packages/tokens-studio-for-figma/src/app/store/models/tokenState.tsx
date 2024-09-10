@@ -51,6 +51,7 @@ import {
 } from '@/storage/tokensStudio';
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
+import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -244,6 +245,45 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...newTokens,
         },
+      };
+    },
+    createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      data.forEach((token) => {
+        if (!newTokens[token.parent]) {
+          newTokens[token.parent] = [];
+        }
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        if (existingTokenIndex === -1) {
+          newTokens[token.parent].push(
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+          );
+        }
+      });
+
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
+    editMultipleTokens: (state, data: EditSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      data.forEach((token) => {
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        if (existingTokenIndex > -1) {
+          newTokens[token.parent] = [
+            ...newTokens[token.parent].slice(0, existingTokenIndex),
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+            ...newTokens[token.parent].slice(existingTokenIndex + 1),
+          ];
+        }
+      });
+
+      return {
+        ...state,
+        tokens: newTokens,
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {

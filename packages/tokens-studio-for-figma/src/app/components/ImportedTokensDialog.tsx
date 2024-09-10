@@ -204,11 +204,11 @@ export default function ImportedTokensDialog() {
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
-  const ListLength = 15;
+  const ListLength = 50;
 
   return (
     <Modal
-      title={t('imported', { ns: 'tokens' })}
+      title={t('importVariables', { ns: 'tokens' })}
       size="large"
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
