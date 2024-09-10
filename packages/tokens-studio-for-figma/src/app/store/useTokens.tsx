@@ -446,7 +446,7 @@ export default function useTokens() {
 
       // Iterate over all given selectedThemes, and combine the selectedTokenSets.
       const overallConfig = getOverallConfig(themes, selectedThemes);
-  
+
       const allStyleIds: Record<string, string[]> = {};
 
       const allExistingStyleReferences: string[] = themes.reduce((acc, theme) => {
