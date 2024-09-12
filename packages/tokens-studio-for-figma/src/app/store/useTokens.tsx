@@ -189,7 +189,7 @@ export default function useTokens() {
 
   const pullVariables = useCallback(async () => {
     const userDecision = await confirm({
-      text: 'Import Variables',
+      text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
         { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
@@ -199,7 +199,6 @@ export default function useTokens() {
     });
 
     if (userDecision) {
-      track('Import variables');
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.PULL_VARIABLES,
         options: {
@@ -370,13 +369,6 @@ export default function useTokens() {
       const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
       if (!shouldCreateStyles) return;
 
-      track('createStyles', {
-        type: 'sets',
-        textStyles: settings.stylesTypography,
-        colorStyles: settings.stylesColor,
-        effectStyles: settings.stylesEffect,
-      });
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATE_STYLES,
         isInfinite: true,
@@ -416,6 +408,15 @@ export default function useTokens() {
         settings,
       }));
 
+      track('createStyles', {
+        type: 'sets',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+        setCount: selectedSets.length,
+        totalStyles: tokensToCreate.length,
+      });
+
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [tokens, settings, dispatch.uiState],
@@ -426,17 +427,12 @@ export default function useTokens() {
       const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
       if (!shouldCreateStyles) return;
 
-      track('createStyles', {
-        type: 'themes',
-        textStyles: settings.stylesTypography,
-        colorStyles: settings.stylesColor,
-        effectStyles: settings.stylesEffect,
-      });
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATE_STYLES,
         isInfinite: true,
       });
+
+      let totalTokensToCreate = 0;
 
       for (const themeId of selectedThemes) {
         const selectedTheme = themes.find((theme) => theme.id === themeId);
@@ -470,6 +466,8 @@ export default function useTokens() {
               return acc;
             }, []);
 
+            totalTokensToCreate += tokensToCreate.length;
+
             const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
               type: AsyncMessageTypes.CREATE_STYLES,
               tokens: tokensToCreate,
@@ -483,6 +481,15 @@ export default function useTokens() {
           }
         }
       }
+
+      track('createStyles', {
+        type: 'themes',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+        themesCount: selectedThemes.length,
+        totalTokens: totalTokensToCreate,
+      });
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
@@ -600,9 +607,6 @@ export default function useTokens() {
         && selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
-      track('createVariables', {
-        type: 'sets',
-      });
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
@@ -613,6 +617,11 @@ export default function useTokens() {
           statExtractor: async (result, transaction) => {
             const data = await result;
             if (data) {
+              track('createVariables', {
+                type: 'sets',
+                totalVariables: data.totalVariables,
+                setCount: selectedSets.length,
+              });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
           },
@@ -639,10 +648,6 @@ export default function useTokens() {
         && selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 
-      track('createVariables', {
-        type: 'themes',
-      });
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
@@ -653,6 +658,15 @@ export default function useTokens() {
           statExtractor: async (result, transaction) => {
             const data = await result;
             if (data) {
+              track('createVariables', {
+                type: 'themes',
+                totalVariables: data.totalVariables,
+                themeCount: selectedThemes.length,
+                variablesColor: settings.variablesColor,
+                variablesNumber: settings.variablesNumber,
+                variablesString: settings.variablesString,
+                variablesBoolean: settings.variablesBoolean,
+              });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
           },

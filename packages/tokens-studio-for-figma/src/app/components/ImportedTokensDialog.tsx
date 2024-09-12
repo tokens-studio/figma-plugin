@@ -14,6 +14,7 @@ import { ImportToken } from '@/types/tokens';
 import Text from './Text';
 import Accordion from './Accordion';
 import { Count } from './Count';
+import { track } from '@/utils/analytics';
 
 function NewOrExistingToken({
   token,
@@ -164,6 +165,27 @@ export default function ImportedTokensDialog() {
     // Update all existing tokens, and create new ones
     importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
 
+    const combinedTokens = [...multipleUpdatedTokens, ...multipleNewTokens];
+
+    const uniqueCollectionCount = combinedTokens.reduce((acc, token) => {
+      if (token.parent && !acc.includes(token.parent)) {
+        acc.push(token.parent);
+      }
+      return acc;
+    }, [] as string[]).length;
+
+    track('Import variables', {
+      totalCount: multipleUpdatedTokens.length + multipleNewTokens.length,
+      updatedCount: multipleUpdatedTokens.length,
+      newCount: multipleNewTokens.length,
+      colorTokens: combinedTokens.filter((token) => token.type === 'color').length,
+      textTokens: combinedTokens.filter((token) => token.type === 'text').length,
+      numberTokens: combinedTokens.filter((token) => token.type === 'number').length,
+      booleanTokens: combinedTokens.filter((token) => token.type === 'boolean').length,
+      dimensionTokens: combinedTokens.filter((token) => token.type === 'dimension').length,
+      collectionCount: uniqueCollectionCount,
+    });
+
     setUpdatedTokens([]);
     setNewTokens([]);
   }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens]);
@@ -178,6 +200,7 @@ export default function ImportedTokensDialog() {
       description: token.description,
       shouldUpdateDocument: false,
     });
+    track('Import single variable', { type: token.type });
     setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
   }, [newTokens, activeTokenSet, createSingleToken]);
 
@@ -191,6 +214,8 @@ export default function ImportedTokensDialog() {
       description: token.description,
       shouldUpdateDocument: false,
     });
+    track('Update single variable', { type: token.type });
+
     setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
   }, [updatedTokens, editSingleToken, activeTokenSet]);
 
@@ -208,7 +233,7 @@ export default function ImportedTokensDialog() {
 
   return (
     <Modal
-      title={t('imported', { ns: 'tokens' })}
+      title={t('importVariables', { ns: 'tokens' })}
       size="large"
       showClose
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
