@@ -245,9 +245,9 @@ export default function useRemoteTokens() {
           const setCount = Object.keys(remoteData.tokens).length;
           const tokensCount = Object.values(remoteData.tokens).reduce((acc, set) => acc + set.length, 0);
           const themeCount = Object.keys(remoteData.themes).length;
-          console.log({ setCount, tokensCount, themeCount });
+          const tokenFormat = getFormat();
           track('pullTokens', {
-            provider: context.provider, setCount, tokensCount, themeCount,
+            provider: context.provider, setCount, tokensCount, themeCount, tokenFormat,
           });
         } else {
           track('pullTokens failure', { provider: context.provider });
@@ -382,9 +382,9 @@ export default function useRemoteTokens() {
           const setCount = Object.keys(tokens).length;
           const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
           const themeCount = Object.keys(themes).length;
-          console.log('pushResult', { setCount, tokensCount, themeCount });
+          const tokenFormat = getFormat();
           track('pushTokens', {
-            provider: context.provider, isFolder, setCount, tokensCount, themeCount,
+            provider: context.provider, isFolder, setCount, tokensCount, themeCount, tokenFormat,
           });
         } else {
           track('pushTokens failure', { provider: context.provider, isFolder });

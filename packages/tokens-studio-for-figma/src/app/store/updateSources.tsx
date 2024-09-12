@@ -13,7 +13,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
-import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -62,6 +62,7 @@ async function updateRemoteTokens({
   const setCount = Object.keys(tokens)?.length;
   const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
   const themeCount = Object.keys(themes).length;
+  const tokenFormat = getFormat();
   switch (provider) {
     case StorageProviderType.JSONBIN: {
       notifyToUI('Updating JSONBin...');
@@ -75,7 +76,7 @@ async function updateRemoteTokens({
         dispatch,
       });
       track('pushTokens', {
-        provider: StorageProviderType.JSONBIN, setCount, tokensCount, themeCount,
+        provider: StorageProviderType.JSONBIN, setCount, tokensCount, themeCount, tokenFormat,
       });
 
       break;
@@ -93,7 +94,7 @@ async function updateRemoteTokens({
       });
 
       track('pushTokens', {
-        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE, setCount, tokensCount, themeCount,
+        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE, setCount, tokensCount, themeCount, tokenFormat,
       });
 
       break;

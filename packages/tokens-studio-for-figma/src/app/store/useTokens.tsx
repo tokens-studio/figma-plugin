@@ -415,6 +415,11 @@ export default function useTokens() {
         effectStyles: settings.stylesEffect,
         setCount: selectedSets.length,
         totalStyles: tokensToCreate.length,
+        removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+        renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+        ignoreFirstPartForStyles: settings.ignoreFirstPartForStyles,
+        prefixStylesWithThemeName: settings.prefixStylesWithThemeName,
+        createStylesWithVariableReferences: settings.createStylesWithVariableReferences,
       });
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
@@ -489,6 +494,11 @@ export default function useTokens() {
         effectStyles: settings.stylesEffect,
         themesCount: selectedThemes.length,
         totalTokens: totalTokensToCreate,
+        removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+        renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+        ignoreFirstPartForStyles: settings.ignoreFirstPartForStyles,
+        prefixStylesWithThemeName: settings.prefixStylesWithThemeName,
+        createStylesWithVariableReferences: settings.createStylesWithVariableReferences,
       });
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
@@ -621,6 +631,12 @@ export default function useTokens() {
                 type: 'sets',
                 totalVariables: data.totalVariables,
                 setCount: selectedSets.length,
+                variablesColor: settings.variablesColor,
+                variablesNumber: settings.variablesNumber,
+                variablesString: settings.variablesString,
+                variablesBoolean: settings.variablesBoolean,
+                removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+                renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
               });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
@@ -666,6 +682,8 @@ export default function useTokens() {
                 variablesNumber: settings.variablesNumber,
                 variablesString: settings.variablesString,
                 variablesBoolean: settings.variablesBoolean,
+                removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+                renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
               });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
