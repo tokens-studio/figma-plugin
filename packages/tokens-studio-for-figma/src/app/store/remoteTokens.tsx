@@ -333,7 +333,6 @@ export default function useRemoteTokens() {
   const pushTokens = useCallback(
     async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
-      track('pushTokens', { provider: context.provider, isFolder });
       let pushResult;
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
@@ -363,6 +362,7 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
+      track('pushTokens', { provider: context.provider, isFolder });
       if (pushResult.status && pushResult.status === 'failure') {
         notifyToUI(pushResult.errorMessage, { error: true });
       }
