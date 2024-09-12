@@ -1,7 +1,7 @@
 {
-  "name": "sync-providers",
+  "name": "@tokens-studio/sync-providers",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A collection of helper functions for syncing data between different providers",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -15,6 +15,16 @@
       "require": {
         "types": "./dist/types/index.d.cts",
         "default": "./dist/index.cjs"
+      }
+    },
+    "./types": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/types/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/types/index.cjs"
       }
     }
   },
