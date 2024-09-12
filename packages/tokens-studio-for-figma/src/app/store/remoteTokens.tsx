@@ -107,7 +107,6 @@ export default function useRemoteTokens() {
     async ({
       context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
     }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
       showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
       switch (context.provider) {
@@ -241,6 +240,22 @@ export default function useRemoteTokens() {
           }
         }
       }
+      try {
+        if (remoteData?.status === 'success') {
+          const setCount = Object.keys(remoteData.tokens).length;
+          const tokensCount = Object.values(remoteData.tokens).reduce((acc, set) => acc + set.length, 0);
+          const themeCount = Object.keys(remoteData.themes).length;
+          console.log({ setCount, tokensCount, themeCount });
+          track('pullTokens', {
+            provider: context.provider, setCount, tokensCount, themeCount,
+          });
+        } else {
+          track('pullTokens failure', { provider: context.provider });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       dispatch.tokenState.resetChangedState();
       closePullDialog();
       return remoteData;
@@ -362,20 +377,26 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
-      track('pushTokens', { provider: context.provider, isFolder });
+      try {
+        if (pushResult?.status === 'success') {
+          const setCount = Object.keys(tokens).length;
+          const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
+          const themeCount = Object.keys(themes).length;
+          console.log('pushResult', { setCount, tokensCount, themeCount });
+          track('pushTokens', {
+            provider: context.provider, isFolder, setCount, tokensCount, themeCount,
+          });
+        } else {
+          track('pushTokens failure', { provider: context.provider, isFolder });
+        }
+      } catch (e) {
+        console.error(e);
+      }
       if (pushResult.status && pushResult.status === 'failure') {
         notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
-    [
-      api,
-      pushTokensToGitHub,
-      pushTokensToGitLab,
-      pushTokensToBitbucket,
-      pushTokensToADO,
-      pushTokensToSupernova,
-      pushTokensToTokensStudio,
-    ],
+    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO, pushTokensToSupernova, pushTokensToTokensStudio, tokens, themes],
   );
 
   const addNewProviderItem = useCallback(

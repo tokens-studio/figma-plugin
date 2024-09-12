@@ -59,10 +59,11 @@ async function updateRemoteTokens({
   dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
+  const setCount = Object.keys(tokens)?.length;
+  const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
+  const themeCount = Object.keys(themes).length;
   switch (provider) {
     case StorageProviderType.JSONBIN: {
-      track('pushTokens', { provider: StorageProviderType.JSONBIN });
-
       notifyToUI('Updating JSONBin...');
       await updateJSONBinTokens({
         themes,
@@ -73,10 +74,13 @@ async function updateRemoteTokens({
         storeTokenIdInJsonEditor,
         dispatch,
       });
+      track('pushTokens', {
+        provider: StorageProviderType.JSONBIN, setCount, tokensCount, themeCount,
+      });
+
       break;
     }
     case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
-      track('pushTokens', { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE });
       notifyToUI('Updating Generic Remote...');
       await updateGenericVersionedTokens({
         themes,
@@ -86,6 +90,10 @@ async function updateRemoteTokens({
         oldUpdatedAt,
         storeTokenIdInJsonEditor,
         dispatch,
+      });
+
+      track('pushTokens', {
+        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE, setCount, tokensCount, themeCount,
       });
 
       break;
