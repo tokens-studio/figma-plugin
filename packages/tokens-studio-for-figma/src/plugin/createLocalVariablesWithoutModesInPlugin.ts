@@ -93,8 +93,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += (await getVariablesWithoutZombies()).length;
-  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections().length;
+  figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
+  const figmaVariableCollectionsAfterCreate = (await figma.variables.getLocalVariableCollectionsAsync())?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');

@@ -30,11 +30,18 @@ describe('pullStyles', () => {
           { name: 'Custom', modeId: '1:3' },
         ],
       }),
-      getLocalVariables: jest.fn().mockReturnValue([
+      getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([
+        {
+          id: 'coll1',
+          name: 'Collection 1',
+        },
+      ]),
+      getLocalVariablesAsync: jest.fn().mockResolvedValue([
         {
           name: 'Color',
           remote: false,
           resolvedType: 'COLOR',
+          variableCollectionId: 'coll1',
           valuesByMode: {
             '1:0': {
               r: 1, g: 1, b: 1, a: 1,
@@ -54,6 +61,7 @@ describe('pullStyles', () => {
         {
           name: 'Number1',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 24,
@@ -65,6 +73,7 @@ describe('pullStyles', () => {
         {
           name: 'Number2',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 16,
@@ -76,6 +85,7 @@ describe('pullStyles', () => {
         {
           name: 'String',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'STRING',
           valuesByMode: {
             '1:0': 'Hello',
@@ -88,6 +98,7 @@ describe('pullStyles', () => {
         {
           name: 'Boolean',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'BOOLEAN',
           valuesByMode: {
             '1:0': true,
@@ -405,7 +416,7 @@ describe('pullStyles', () => {
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
-    await pullVariables({ useDimensions: 'true', useRem: 'true' });
+    await pullVariables({ useDimensions: true, useRem: true });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [

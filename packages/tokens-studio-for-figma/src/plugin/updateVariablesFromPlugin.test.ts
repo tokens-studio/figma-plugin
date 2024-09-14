@@ -1,4 +1,6 @@
-import { mockGetLocalVariables, mockSetValueForMode } from '../../tests/__mocks__/figmaMock';
+import {
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockSetValueForMode,
+} from '../../tests/__mocks__/figmaMock';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
@@ -30,6 +32,12 @@ describe('updateVariablesFromPlugin', () => {
   });
   runAfter.push(AsyncMessageChannel.ReactInstance.connect());
   AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfoHandler);
+  const mockLocalVariableCollections = [
+    {
+      id: 'VariableCollectionId:12:12345',
+      name: 'fg',
+    },
+  ];
   const mockLocalVariables = [
     {
       id: 'VariableID:1234',
@@ -75,7 +83,8 @@ describe('updateVariablesFromPlugin', () => {
       type: TokenTypes.COLOR,
       value: '#000000',
     };
-    mockGetLocalVariables.mockImplementation(() => mockLocalVariables);
+    mockGetLocalVariablesAsync.mockImplementation(() => mockLocalVariables);
+    mockGetLocalVariableCollectionsAsync.mockImplementation(() => Promise.resolve(mockLocalVariableCollections));
     await updateVariablesFromPlugin(payload);
     expect(setColorValuesOnVariableSpy).toBeCalledWith(
       {
@@ -101,7 +110,8 @@ describe('updateVariablesFromPlugin', () => {
       type: TokenTypes.COLOR,
       value: '#000000',
     };
-    mockGetLocalVariables.mockImplementation(() => mockLocalVariables);
+    mockGetLocalVariablesAsync.mockImplementation(() => Promise.resolve(mockLocalVariables));
+    mockGetLocalVariableCollectionsAsync.mockImplementation(() => Promise.resolve(mockLocalVariableCollections));
     await updateVariablesFromPlugin(payload);
     expect(mockSetValueForMode).toBeCalledWith('modeID:123', {
       type: 'VARIABLE_ALIAS',
