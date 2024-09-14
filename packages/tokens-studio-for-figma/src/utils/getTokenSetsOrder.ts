@@ -1,13 +1,14 @@
-import { TokenSetStatus } from "@/constants/TokenSetStatus";
-import { UsedTokenSetsMap } from "@/types";
-import { SingleToken } from "@/types/tokens";
-import { sortSets } from "./sortSets";
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { UsedTokenSetsMap } from '@/types';
+import { SingleToken } from '@/types/tokens';
+import { sortSets } from './sortSets';
 
 export function getTokenSetsOrder(
   tokens: Record<string, SingleToken[]>,
   usedSets: UsedTokenSetsMap,
   overallConfig: UsedTokenSetsMap,
-  activeTokenSet?: string): { tokenSetsOrder: string[]; usedSetsList: string[]; overallSets: string[]; } {
+  activeTokenSet?: string,
+): { tokenSetsOrder: string[]; usedSetsList: string[]; overallSets: string[]; } {
   const originalTokenSetOrder = Object.keys(tokens);
   const usedSetsList = originalTokenSetOrder.filter((key) => usedSets[key] === TokenSetStatus.ENABLED || usedSets[key] === TokenSetStatus.SOURCE);
   const overallSets = originalTokenSetOrder
