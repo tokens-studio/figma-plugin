@@ -2,6 +2,7 @@ import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { getTokenSetsOrder } from './getTokenSetsOrder';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
@@ -30,35 +31,13 @@ export function getEnabledTokenSets(usedSets: UsedTokenSetsMap = {}) {
 }
 
 export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}, overallConfig: UsedTokenSetsMap = {}, activeTokenSet?: string): SingleToken[] {
-  const sortSets = (a: string, b: string, config: UsedTokenSetsMap) => {
-    if (a === activeTokenSet) return 1;
-    if (b === activeTokenSet) return -1;
-    const statusA = config[a] || TokenSetStatus.DISABLED;
-    const statusB = config[b] || TokenSetStatus.DISABLED;
-    if (statusA === statusB) return 0;
-    if (statusA === TokenSetStatus.ENABLED) return 1;
-    if (statusB === TokenSetStatus.ENABLED) return -1;
-    if (statusA === TokenSetStatus.SOURCE) return 1;
-    if (statusB === TokenSetStatus.SOURCE) return -1;
-    return 0;
-  };
-
-  // Do not consider DISABLED for used sets. These are only enabled or source.
-  const usedSetsList = Object.keys(usedSets)
-    .filter((key) => usedSets[key] !== TokenSetStatus.DISABLED)
-    .sort((a, b) => sortSets(a, b, usedSets));
-  // Filter out duplicates from overall sets (those that will later be used from usedSetList anyway)
-  const overallSets = Object.keys(tokens)
-    .filter((set) => !usedSetsList.includes(set))
-    .sort((a, b) => sortSets(a, b, overallConfig));
+  const { tokenSetsOrder, usedSetsList, overallSets } = getTokenSetsOrder(tokens, usedSets, overallConfig, activeTokenSet);
 
   // Helper to determine if a token should be merged. We only merge object tokens if the current set is enabled (to avoid accidental merges)
   const shouldMerge = (
     currentSet: string,
     existingToken: SingleToken,
   ) => usedSetsList.includes(currentSet) && existingToken.internal__Parent && !overallSets.includes(existingToken.internal__Parent);
-
-  const tokenSetsOrder = [...overallSets, ...usedSetsList];
 
   return tokenSetsOrder.reduce((mergedTokens, setName) => {
     const setTokens = tokens[setName] || [];
