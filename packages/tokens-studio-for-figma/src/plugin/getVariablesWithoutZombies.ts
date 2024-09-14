@@ -9,7 +9,6 @@ export async function getVariablesWithoutZombies(): Promise<Variable[]> {
     const localVariableCollectionIds = await figma.variables.getLocalVariableCollectionsAsync().then((collections) => collections.map((collection) => collection.id));
     return localVariables.filter((variable) => localVariableCollectionIds.includes(variable.variableCollectionId));
   } catch (error: any) {
-    console.log('ERROR', error);
     notifyException(error?.message ?? 'Unknown error');
     return [];
   }
