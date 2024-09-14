@@ -24,7 +24,6 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
 
   const localVariables = await getVariablesWithoutZombies();
 
-  // eslint-disable-next-line consistent-return
   localVariables.forEach((variable) => {
     const variableName = variable.name.replace(/\//g, '.');
     try {
@@ -127,9 +126,9 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             }
           });
           break;
-        default: return null;
+        default:
+          break;
       }
-      return null;
     } catch (error) {
       console.error('Error while processing variable:', variableName, error);
     }
