@@ -4,7 +4,7 @@ import updateVariables from './updateVariables';
 import { ReferenceVariableType } from './setValuesOnVariable';
 import updateVariablesToReference from './updateVariablesToReference';
 import { notifyUI } from './notifiers';
-import { ThemeObject } from '@/types';
+import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
@@ -46,35 +46,24 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
       }
       return acc;
     }, [] as ThemeObject[]);
-    const themeContainer = selectedSets.reduce((acc: ThemeObject, curr: ExportTokenSet) => {
-      acc.selectedTokenSets = {
-        ...acc.selectedTokenSets,
-        [curr.set]: curr.status,
-      };
-      return acc;
-    }, {} as ThemeObject);
+
     const selectedSetIds = selectedSets.map((set) => set.set);
+
+    const overallConfig = selectedSets.reduce((acc, set) => {
+      acc[set.set] = set.status;
+      return acc;
+    }, {} as UsedTokenSetsMap);
 
     const collections = await createNecessaryVariableCollections(themesToCreateCollections, selectedSetIds);
 
-    const sourceSets = selectedSets.filter((t) => t.status === TokenSetStatus.SOURCE);
-    const sourceTokenSets = sourceSets.reduce((acc, curr) => {
-      acc[curr.set] = tokens[curr.set];
-      return acc;
-    }, {});
-
     await Promise.all(selectedSets.map(async (set: ExportTokenSet, index) => {
       if (set.status === TokenSetStatus.ENABLED) {
-        const setTokens: Record<string, AnyTokenList> = {
-          ...sourceTokenSets,
-          [set.set]: tokens[set.set],
-        };
         const { collection, modeId } = findCollectionAndModeIdForTheme(set.set, set.set, collections);
 
         if (!collection || !modeId) return;
 
         const allVariableObj = await updateVariables({
-          collection, mode: modeId, theme: themeContainer, tokens: setTokens, settings, filterByTokenSet: set.set,
+          collection, mode: modeId, theme: { id: '123', name: set.set, selectedTokenSets: { [set.set]: set.status } }, overallConfig, tokens, settings, filterByTokenSet: set.set,
         });
         figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
         if (Object.keys(allVariableObj.variableIds).length > 0) {

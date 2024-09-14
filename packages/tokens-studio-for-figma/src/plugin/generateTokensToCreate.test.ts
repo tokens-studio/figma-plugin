@@ -2,6 +2,7 @@ import { generateTokensToCreate } from './generateTokensToCreate';
 import { ThemeObject } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { AnyTokenList } from '@/types/tokens';
 
 describe('generateTokensToCreate', () => {
   const theme: ThemeObject = {
@@ -9,7 +10,7 @@ describe('generateTokensToCreate', () => {
     name: 'Light',
     selectedTokenSets: { core: TokenSetStatus.ENABLED, source: TokenSetStatus.SOURCE, disabled: TokenSetStatus.DISABLED },
   };
-  const tokens = {
+  const tokens: Record<string, AnyTokenList> = {
     core: [
       {
         name: 'primary.red',
@@ -30,7 +31,7 @@ describe('generateTokensToCreate', () => {
   };
 
   it('returns the correct tokens for enabled sets', () => {
-    const result = generateTokensToCreate(theme, tokens);
+    const result = generateTokensToCreate({ theme, tokens });
 
     expect(result).toEqual([
       {
@@ -44,17 +45,18 @@ describe('generateTokensToCreate', () => {
   });
 
   it('does not create tokens if their type is not in tokenTypesToCreateVariable', () => {
-    const tokensWithInvalidType = {
+    const tokensWithInvalidType: Record<string, AnyTokenList> = {
       core: [
         {
           name: 'primary.red',
           value: '#ff0000',
+          // @ts-expect-error - invalid type on purpose
           type: 'INVALID_TYPE',
         },
       ],
     };
 
-    const result = generateTokensToCreate(theme, tokensWithInvalidType);
+    const result = generateTokensToCreate({ theme, tokens: tokensWithInvalidType });
 
     expect(result).toEqual([]);
   });
