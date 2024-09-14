@@ -9,6 +9,7 @@ import { notifyUI } from './notifiers';
 import { mergeVariableReferencesWithLocalVariables } from './mergeVariableReferences';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -33,7 +34,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
-  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables()?.length;
+  const figmaVariablesBeforeCreate = (await getVariablesWithoutZombies())?.length;
   const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
 
   let figmaVariablesAfterCreate = 0;
@@ -68,7 +69,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length ?? 0;
+  figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
   const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
