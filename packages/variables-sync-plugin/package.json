@@ -5,9 +5,20 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@tokens-studio/sync-providers": "*"
+    "@octokit/rest": "^21.0.2",
+    "@stitches/react": "^1.2.8",
+    "@tokens-studio/sync-providers": "*",
+    "@tokens-studio/tokens": "^0.2.5",
+    "@tokens-studio/ui": "^0.11.0",
+    "octokit-commit-multiple-files": "^5.0.2"
   },
   "scripts": {
+    "start": "run-s dev",
+    "dev": "run-s watch",
+    "dev:ui-only": "vite -c ./vite.config.ui.ts",
+    "watch": "run-p watch:*",
+    "watch:ui": "npm run build:ui -- --watch --mode=development",
+    "watch:plugin": "npm run build:plugin -- --watch --mode=development",
     "build:ui": "vite build -c ./vite.config.ui.ts",
     "build:plugin": "vite build -c ./vite.config.plugin.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
