@@ -10,7 +10,7 @@ import postcssUrl from "postcss-url";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react(),/* richSvg()*/, viteSingleFile()],
-  root: path.resolve("src/ui"),
+  root: path.resolve("src/app"),
   build: {
     minify: mode === "production",
     cssMinify: mode === "production",
@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: false,
     outDir: path.resolve("dist"),
     rollupOptions: {
-      input: path.resolve("src/ui/index.html"),
+      input: path.resolve("src/app/index.html"),
     },
   },
   css: {
@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@common": path.resolve("src/common"),
-      "@ui": path.resolve("src/ui"),
+      "@ui": path.resolve("src/app"),
     },
   },
 }));
