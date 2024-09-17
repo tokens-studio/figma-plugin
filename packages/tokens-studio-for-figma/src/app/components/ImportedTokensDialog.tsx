@@ -229,7 +229,7 @@ export default function ImportedTokensDialog() {
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
 
-  const ListLength = 15;
+  const ListLength = 50;
 
   return (
     <Modal
