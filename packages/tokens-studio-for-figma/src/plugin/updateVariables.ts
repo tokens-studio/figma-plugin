@@ -1,6 +1,6 @@
 import { AnyTokenList, SingleToken } from '@/types/tokens';
 import { generateTokensToCreate } from './generateTokensToCreate';
-import { ThemeObject } from '@/types';
+import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
@@ -14,14 +14,17 @@ export type CreateVariableTypes = {
   tokens: Record<string, AnyTokenList>;
   settings: SettingsState;
   filterByTokenSet?: string;
+  overallConfig: UsedTokenSetsMap;
 };
 
 export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
 
 export default async function updateVariables({
-  collection, mode, theme, tokens, settings, filterByTokenSet,
+  collection, mode, theme, tokens, settings, filterByTokenSet, overallConfig,
 }: CreateVariableTypes) {
-  const tokensToCreate = generateTokensToCreate(theme, tokens, filterByTokenSet);
+  const tokensToCreate = generateTokensToCreate({
+    theme, tokens, filterByTokenSet, overallConfig,
+  });
   const variablesInCollection = (await getVariablesWithoutZombies()).filter((v) => v.variableCollectionId === collection.id);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {

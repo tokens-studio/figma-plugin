@@ -10,6 +10,7 @@ import { mergeVariableReferencesWithLocalVariables } from './mergeVariableRefere
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { getOverallConfig } from '@/utils/tokenHelpers';
 
 export type LocalVariableInfo = {
   collectionId: string;
@@ -41,6 +42,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
 
   const checkSetting = !settings.variablesBoolean && !settings.variablesColor && !settings.variablesNumber && !settings.variablesString;
   if (!checkSetting && selectedThemes && selectedThemes.length > 0) {
+    const overallConfig = getOverallConfig(themeInfo.themes, selectedThemes);
     const collections = await createNecessaryVariableCollections(themeInfo.themes, selectedThemes);
 
     await Promise.all(selectedThemeObjects.map(async (theme) => {
@@ -49,7 +51,7 @@ export default async function createLocalVariablesInPlugin(tokens: Record<string
       if (!collection || !modeId) return;
 
       const allVariableObj = await updateVariables({
-        collection, mode: modeId, theme, tokens, settings,
+        collection, mode: modeId, theme, tokens, settings, overallConfig,
       });
       figmaVariablesAfterCreate += allVariableObj.removedVariables.length;
       if (Object.keys(allVariableObj.variableIds).length > 0) {
