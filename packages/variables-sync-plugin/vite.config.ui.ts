@@ -3,13 +3,14 @@ import path from "node:path";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import react from '@vitejs/plugin-react-swc';
 // import richSvg from "vite-plugin-react-rich-svg";
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import postcssUrl from "postcss-url";
 
 // import figmaManifest from './figma.manifest';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(),/* richSvg()*/, viteSingleFile()],
+  plugins: [react(),/* richSvg()*/, viteSingleFile(), nodePolyfills()],
   root: path.resolve("src/app"),
   build: {
     minify: mode === "production",

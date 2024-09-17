@@ -1,6 +1,7 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import commitMultipleFiles from 'octokit-commit-multiple-files';
+import OctokitCommitMultipleFiles from 'octokit-commit-multiple-files';
+import octokitCommitMultipleFilesFallback from 'octokit-commit-multiple-files/create-or-update-files';
 
 import type { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from '../../types';
 import { isJSONString, joinPath } from '../../utils';
@@ -42,6 +43,8 @@ const octokitClientDefaultHeaders = {
 
 };
 
+const commitMultipleFiles = octokitClient => async (params) => octokitCommitMultipleFilesFallback(octokitClient, params);
+
 export class GithubTokenStorage extends GitTokenStorage {
   private octokitClient: ExtendedOctokitClient;
 
@@ -57,7 +60,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     };
 
     // eslint-disable-next-line
-    const ExtendedOctokitConstructor = Octokit.plugin(commitMultipleFiles);
+    const ExtendedOctokitConstructor = Octokit.plugin(OctokitCommitMultipleFiles);
     this.octokitClient = new ExtendedOctokitConstructor({
       auth: this.secret,
       baseUrl: this.baseUrl || undefined,
@@ -274,7 +277,9 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
-    const response = await this.octokitClient.repos.createOrUpdateFiles({
+    const createOrUpdateFiles = this.octokitClient.repos.createOrUpdateFiles || commitMultipleFiles(this.octokitClient);
+
+    const response = await createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,
