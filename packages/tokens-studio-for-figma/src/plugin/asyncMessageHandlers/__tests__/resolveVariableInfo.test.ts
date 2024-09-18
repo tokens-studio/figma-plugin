@@ -1,4 +1,6 @@
-import { mockGetLocalVariables, mockImportVariableByKeyAsync } from '../../../../tests/__mocks__/figmaMock';
+import {
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockImportVariableByKeyAsync,
+} from '../../../../tests/__mocks__/figmaMock';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { resolveVariableInfo } from '../resolveVariableInfo';
 
@@ -29,13 +31,24 @@ describe('AttachLocalVariablesToTheme', () => {
         name: 'fg/background',
       },
     ];
+    const mockLocalVariableCollections = [
+      {
+        id: 'VariableCollectionId:12:12345',
+        name: 'fg/default',
+      },
+      {
+        id: 'VariableCollectionId:23:23456',
+        name: 'fg/muted',
+      },
+    ];
     const mockRemoveVariable = {
       id: 'VariableID:3456',
       key: '34567',
       variableCollectionId: 'VariableCollectionId:23:23456',
       name: 'fg/subtle',
     };
-    mockGetLocalVariables.mockImplementationOnce(() => mockLocalVariables);
+    mockGetLocalVariablesAsync.mockImplementationOnce(() => Promise.resolve(mockLocalVariables));
+    mockGetLocalVariableCollectionsAsync.mockImplementationOnce(() => Promise.resolve(mockLocalVariableCollections));
     mockImportVariableByKeyAsync.mockImplementationOnce(() => mockRemoveVariable);
     expect(await resolveVariableInfo({
       type: AsyncMessageTypes.RESOLVE_VARIABLE_INFO,

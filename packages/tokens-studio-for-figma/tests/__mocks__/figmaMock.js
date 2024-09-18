@@ -73,7 +73,7 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
-module.exports.mockGetLocalVariablesAsync = jest.fn(() => ([]));
+module.exports.mockGetLocalVariablesAsync = jest.fn(() => Promise.resolve([]));
 module.exports.mockCreateVariable = jest.fn();
 module.exports.mockGetLocalVariableCollections = jest.fn();
 module.exports.mockGetLocalVariableCollectionsAsync = jest.fn();

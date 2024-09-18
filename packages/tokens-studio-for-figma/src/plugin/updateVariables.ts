@@ -5,6 +5,7 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -24,7 +25,7 @@ export default async function updateVariables({
   const tokensToCreate = generateTokensToCreate({
     theme, tokens, filterByTokenSet, overallConfig,
   });
-  const variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
+  const variablesInCollection = (await getVariablesWithoutZombies()).filter((v) => v.variableCollectionId === collection.id);
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
     if (checkIfTokenCanCreateVariable(token, settings)) {

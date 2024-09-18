@@ -11,6 +11,7 @@ import { mergeVariableReferencesWithLocalVariables } from './mergeVariableRefere
 import { LocalVariableInfo } from './createLocalVariablesInPlugin';
 import { findCollectionAndModeIdForTheme } from './findCollectionAndModeIdForTheme';
 import { createNecessaryVariableCollections } from './createNecessaryVariableCollections';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 /**
 * This function is used to create variables based on token sets, without the use of themes
@@ -27,8 +28,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
   let referenceVariableCandidates: ReferenceVariableType[] = [];
   const updatedVariableCollections: VariableCollection[] = [];
   let updatedVariables: Variable[] = [];
-  const figmaVariablesBeforeCreate = figma.variables.getLocalVariables()?.length;
-  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections()?.length;
+  const figmaVariablesBeforeCreate = (await getVariablesWithoutZombies()).length;
+  const figmaVariableCollectionsBeforeCreate = figma.variables.getLocalVariableCollections().length;
 
   let figmaVariablesAfterCreate = 0;
 
@@ -81,8 +82,8 @@ export default async function createLocalVariablesWithoutModesInPlugin(tokens: R
     updatedVariables = await updateVariablesToReference(existingVariables, referenceVariableCandidates);
   }
 
-  figmaVariablesAfterCreate += figma.variables.getLocalVariables()?.length ?? 0;
-  const figmaVariableCollectionsAfterCreate = figma.variables.getLocalVariableCollections()?.length;
+  figmaVariablesAfterCreate += (await getVariablesWithoutZombies())?.length ?? 0;
+  const figmaVariableCollectionsAfterCreate = (await figma.variables.getLocalVariableCollectionsAsync())?.length;
 
   if (figmaVariablesAfterCreate === figmaVariablesBeforeCreate) {
     notifyUI('No variables were created');
