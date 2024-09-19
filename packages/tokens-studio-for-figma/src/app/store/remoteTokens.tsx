@@ -107,7 +107,6 @@ export default function useRemoteTokens() {
     async ({
       context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
     }: PullTokensOptions) => {
-      track('pullTokens', { provider: context.provider });
       showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
       switch (context.provider) {
@@ -241,6 +240,22 @@ export default function useRemoteTokens() {
           }
         }
       }
+      try {
+        if (remoteData?.status === 'success') {
+          const setCount = Object.keys(remoteData.tokens).length;
+          const tokensCount = Object.values(remoteData.tokens).reduce((acc, set) => acc + set.length, 0);
+          const themeCount = Object.keys(remoteData.themes).length;
+          const tokenFormat = getFormat();
+          track('pullTokens', {
+            provider: context.provider, setCount, tokensCount, themeCount, tokenFormat,
+          });
+        } else {
+          track('pullTokens failure', { provider: context.provider });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
       dispatch.tokenState.resetChangedState();
       closePullDialog();
       return remoteData;
@@ -333,7 +348,6 @@ export default function useRemoteTokens() {
   const pushTokens = useCallback(
     async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
-      track('pushTokens', { provider: context.provider, isFolder });
       let pushResult;
       switch (context.provider) {
         case StorageProviderType.GITHUB: {
@@ -363,19 +377,26 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
+      try {
+        if (pushResult?.status === 'success') {
+          const setCount = Object.keys(tokens).length;
+          const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
+          const themeCount = Object.keys(themes).length;
+          const tokenFormat = getFormat();
+          track('pushTokens', {
+            provider: context.provider, isFolder, setCount, tokensCount, themeCount, tokenFormat,
+          });
+        } else {
+          track('pushTokens failure', { provider: context.provider, isFolder });
+        }
+      } catch (e) {
+        console.error(e);
+      }
       if (pushResult.status && pushResult.status === 'failure') {
         notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
-    [
-      api,
-      pushTokensToGitHub,
-      pushTokensToGitLab,
-      pushTokensToBitbucket,
-      pushTokensToADO,
-      pushTokensToSupernova,
-      pushTokensToTokensStudio,
-    ],
+    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO, pushTokensToSupernova, pushTokensToTokensStudio, tokens, themes],
   );
 
   const addNewProviderItem = useCallback(
