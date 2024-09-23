@@ -296,7 +296,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/`;
     const existingFiles = await this.fetchJsonFilesFromDirectory(url);
-  
+
     const existingTokenSets: Record<string, boolean> = {};
     if (Array.isArray(existingFiles)) {
       existingFiles.forEach((file) => {
@@ -310,7 +310,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     const localTokenSets = Object.keys(files);
 
     const deletedTokenSets = Object.keys(existingTokenSets).filter(
-      (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$')
+      (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
     );
 
     // @README the files object is Record<string, string> here
@@ -328,7 +328,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     deletedTokenSets.forEach((tokenSet) => {
       data.append('files', `${tokenSet}.json`); // Mark for deletion
     });
-
 
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       _body: data,
