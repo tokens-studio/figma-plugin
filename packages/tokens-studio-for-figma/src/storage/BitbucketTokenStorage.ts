@@ -294,18 +294,41 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     const data = new FormData();
 
+    const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/`;
+    const existingFiles = await this.fetchJsonFilesFromDirectory(url);
+  
+    const existingTokenSets: Record<string, boolean> = {};
+    if (Array.isArray(existingFiles)) {
+      existingFiles.forEach((file) => {
+        if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
+          const tokenSetName = file.path.replace('.json', '');
+          existingTokenSets[tokenSetName] = true;
+        }
+      });
+    }
+
+    const localTokenSets = Object.keys(files);
+
+    const deletedTokenSets = Object.keys(existingTokenSets).filter(
+      (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$')
+    );
+
     // @README the files object is Record<string, string> here
     // with the key equal to the filename and the value equal to the new content
     // this actually doesn't take into account deletions - but we can consider this later
     // as per the Bitbucket API we basically need to add these key value pairs to the FormData object "as-is"
     Object.entries(files).forEach(([file, content]) => {
       data.append(file, content);
-
       // we will also add all the "files" parameters so we can perform deletions later down the line
       // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData will be deleted
       // @NOTE we can actually add the files parameter multiple times - this is fine and Bitbucket will pick this up correctly
       data.append('files', file);
     });
+
+    deletedTokenSets.forEach((tokenSet) => {
+      data.append('files', `${tokenSet}.json`); // Mark for deletion
+    });
+
 
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({
       _body: data,
