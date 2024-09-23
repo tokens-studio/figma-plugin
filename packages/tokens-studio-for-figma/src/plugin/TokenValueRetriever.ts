@@ -60,7 +60,7 @@ export class TokenValueRetriever {
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
       const [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart] = this.getAdjustedTokenName(token.name);
 
-      const styleId = styleReferences?.get(adjustedTokenName) || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart);
+      const styleId = styleReferences?.get(adjustedTokenName) || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart) || styleReferences?.get(token.name);
       const finalAdjustedTokenName = styleReferences?.has(adjustedTokenName) ? adjustedTokenName : adjustedTokenNameWithIgnoreFirstPart;
 
       return [token.name, {
