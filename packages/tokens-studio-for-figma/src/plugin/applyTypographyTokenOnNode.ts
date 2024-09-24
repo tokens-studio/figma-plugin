@@ -42,21 +42,61 @@ export async function applyTypographyTokenOnNode(
       node.type === 'TEXT'
       && (!matchingStyleId || (matchingStyleId && !(await trySetStyleId(node, 'text', matchingStyleId))))
     ) {
-      if (isSingleTypographyValue(resolvedToken.value)) {
+      if (isSingleTypographyValue(resolvedToken.value) && 
+      !((values.fontFamilies
+        || values.fontWeights
+        || values.lineHeights
+        || values.fontSizes
+        || values.letterSpacing
+        || values.paragraphSpacing
+        || values.textCase
+        || values.textDecoration))) {
         setTextValuesOnTarget(node, data.typography, baseFontSize);
       }
     }
   }
   if (
-    values.fontFamilies
+    (values.fontFamilies
     || values.fontWeights
     || values.lineHeights
     || values.fontSizes
     || values.letterSpacing
     || values.paragraphSpacing
     || values.textCase
-    || values.textDecoration
+    || values.textDecoration) && data.typography
   ) {
+    console.log("here", data, values);
+    const resolvedToken = defaultTokenValueRetriever.get(data.typography);
+    console.log("resolved Token is", resolvedToken);
+    const resolvedValueObject = {
+      fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
+      fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
+      lineHeight: isPrimitiveValue(data.lineHeights) ? String(data.lineHeights.startsWith('{') ? data.lineHeights : `{${data.lineHeights}}`) : undefined,
+      fontSize: isPrimitiveValue(data.fontSizes) ? String(data.fontSizes.startsWith('{') ? data.fontSizes : `{${data.fontSizes}}`) : undefined,
+      letterSpacing: isPrimitiveValue(data.letterSpacing) ? String(data.letterSpacing.startsWith('{') ? data.letterSpacing : `{${data.letterSpacing}}`) : undefined,
+      paragraphSpacing: isPrimitiveValue(data.paragraphSpacing) ? String(data.paragraphSpacing.startsWith('{') ? data.paragraphSpacing : `{${data.paragraphSpacing}}`) : undefined,
+      textCase: isPrimitiveValue(data.textCase) ? String(data.textCase.startsWith('{') ? data.textCase : `{${data.textCase}}`) : undefined,
+      textDecoration: isPrimitiveValue(data.textDecoration) ? String(data.textDecoration.startsWith('{') ? data.textDecoration : `{${data.textDecoration}}`) : undefined,
+    }
+    const valueObject = {
+      fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : resolvedToken.value.fontFamily,
+      fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : resolvedToken.value.fontWeight,
+      lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : resolvedToken.value.lineHeight,
+      fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : resolvedToken.value.fontSize,
+      letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : resolvedToken.value.letterSpacing,
+      paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : resolvedToken.value.paragraphSpacing,
+      textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : resolvedToken.value.textCase,
+      textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : resolvedToken.value.textDecoration,
+    };
+    await tryApplyTypographyCompositeVariable({
+      target: node,
+      value: valueObject,
+      resolvedValue: resolvedValueObject,
+      baseFontSize,
+    });
+  }
+  else 
+  {
     const resolvedValueObject = {
       fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
       fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
