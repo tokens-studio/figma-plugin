@@ -2,4 +2,4 @@
 "@tokens-studio/figma-plugin": minor
 ---
 
-Fixed a bug where applying a core theme with a prefixed name interfered with the display of applied styles in Figma
+Fixed a bug where applying themes using "Prefix styles with active theme name" didn't correctly apply the right styles.
