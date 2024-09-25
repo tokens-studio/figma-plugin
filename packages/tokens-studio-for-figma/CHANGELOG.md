@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.1.1
+
+### Patch Changes
+
+- f6398c7a: Fixed an issue introduced in 2.1.0 that sometimes caused the order of token sets to not be as expected, meaning sets that acted as overrides didn't correctly get calculated.
+- fe94d6a3: Resolved an issue with Bitbucket sync where deleted sets were still being reflected in the tokens repository.
+- bf8c185a: Fixed a bug where applying themes using "Prefix styles with active theme name" didn't correctly apply the right styles.
+- cddfb5ba: Fixed an issue with "zombie variables". Basically, even though a Figma file shows 0 variables, Figma's plugin API will sometimes tell us there's variables existing - probably ones that existed in the past but should be deleted - Figma seems to report those as existing still. This led to issues around applying and referencing variables where we'd point to those zombies. We now correctly check if the variable's collection still exist, and only then use those as references.
+
 ## 2.1.0
 
 ### Minor Changes
