@@ -23,7 +23,7 @@ function buildResolvedValueObject(data: any) {
 
 function buildValueObject(values: any, resolvedToken: any) {
   const tokenValue = resolvedToken?.value || {};
-  
+
   return {
     fontFamily: isPrimitiveValue(values.fontFamilies) ? String(values.fontFamilies) : tokenValue.fontFamily,
     fontWeight: isPrimitiveValue(values.fontWeights) ? String(values.fontWeights) : tokenValue.fontWeight,
