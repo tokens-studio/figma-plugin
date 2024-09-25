@@ -65,9 +65,7 @@ export async function applyTypographyTokenOnNode(
     || values.textCase
     || values.textDecoration) && data.typography
   ) {
-    console.log("here", data, values);
     const resolvedToken = defaultTokenValueRetriever.get(data.typography);
-    console.log("resolved Token is", resolvedToken);
     const resolvedValueObject = {
       fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
       fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
