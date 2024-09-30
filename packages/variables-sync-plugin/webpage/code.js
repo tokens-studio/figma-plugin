@@ -7,10 +7,12 @@ figma.ui.onmessage = async (message, props) => {
   // if (props.origin !== SITE_URL) {
   //   return;
   // }
-  // if (message.type === 'RELOAD') {
-  //   eval(message.code);
-  //   return;
-  // }
+  if (message.type === 'RELOAD') {
+    if (message.code) {
+      eval(message.code);
+    }
+    return;
+  }
 
   switch (message.type) {
     case "EVAL": {

@@ -32,8 +32,86 @@ export default () => {
     []
   );
 
+  const getVariables = useCallback(async () => {
+    const variablesJSON = await figmaAPI.run(async (figma) => {
+      const collections =
+        await figma.variables.getLocalVariableCollectionsAsync();
+
+      // console.log({ collections });
+
+      async function processCollection({
+        name,
+        modes,
+        variableIds,
+      }: VariableCollection) {
+        const files = [];
+        for (const mode of modes) {
+          const file: any = {
+            fileName: `${name}.${mode.name}.tokens.json`,
+            body: {},
+          };
+          // console.log({ variableIds });
+          for (const variableId of variableIds) {
+            const variable = await figma.variables.getVariableByIdAsync(
+              variableId
+            );
+
+            if (variable) {
+              const { name, resolvedType, valuesByMode } = variable;
+
+              const value = valuesByMode[mode.modeId];
+
+              if (
+                value !== undefined &&
+                ["COLOR", "FLOAT"].includes(resolvedType)
+              ) {
+                let obj = file.body;
+                name.split("/").forEach((groupName) => {
+                  obj[groupName] = obj[groupName] || {};
+                  obj = obj[groupName];
+                });
+                obj.$type = resolvedType === "COLOR" ? "color" : "number";
+                if (
+                  typeof value === "object" &&
+                  (value as VariableAlias)?.type === "VARIABLE_ALIAS"
+                ) {
+                  const currentVar = await figma.variables.getVariableByIdAsync(
+                    (value as VariableAlias).id
+                  );
+                  if (currentVar) {
+                    obj.$value = `{${currentVar.name.replace(/\//g, ".")}}`;
+                  }
+                } else {
+                  obj.$value = value;
+                  // obj.$value = resolvedType === "COLOR" ? rgbToHex(value) : value;
+                }
+              }
+            }
+          }
+          files.push(file);
+        }
+        return files;
+      }
+
+      const files = [];
+      for (const collection of collections) {
+        try {
+          const processedCollection = await processCollection(collection);
+          console.log({ processedCollection });
+          files.push(...processedCollection);
+        } catch (err) {
+          console.log({ err });
+        }
+      }
+      return files;
+    });
+
+    return variablesJSON;
+  });
+
   const pushTokensToGitHub = useCallback(
     async (
+      variables,
       context: GithubCredentials,
       overrides?: PushOverrides
     ): Promise<RemoteResponseData> => {
@@ -46,10 +124,11 @@ export default () => {
 
       const files = variables?.map(({ fileName, body }) => ({
         type: "tokenSet",
-        name: "setName",
+        name: fileName.replace(".json", "").split(".").join("/"),
         path: fileName,
         data: body,
       }));
+      console.log(JSON.stringify({ files }, null, 2));
       if (files.length > 0) {
         storage.write(files, { commitMessage: "test" });
       }
@@ -61,94 +140,11 @@ export default () => {
 
   return (
     <>
+      {/* <Button onClick={async () => {}}>Get Variables</Button> */}
       <Button
         onClick={async () => {
-          const variablesJSON = await figmaAPI.run(async (figma) => {
-            const collections =
-              await figma.variables.getLocalVariableCollectionsAsync();
-
-            console.log({ collections });
-
-            async function processCollection({
-              name,
-              modes,
-              variableIds,
-            }: VariableCollection) {
-              const files = [];
-              for (const mode of modes) {
-                const file: any = {
-                  fileName: `${name}.${mode.name}.tokens.json`,
-                  body: {},
-                };
-                console.log({ variableIds });
-                for (const variableId of variableIds) {
-                  const variable = await figma.variables.getVariableByIdAsync(
-                    variableId
-                  );
-
-                  if (variable) {
-                    const { name, resolvedType, valuesByMode } = variable;
-
-                    const value = valuesByMode[mode.modeId];
-                    console.log({ value });
-                    if (
-                      value !== undefined &&
-                      ["COLOR", "FLOAT"].includes(resolvedType)
-                    ) {
-                      let obj = file.body;
-                      name.split("/").forEach((groupName) => {
-                        obj[groupName] = obj[groupName] || {};
-                        obj = obj[groupName];
-                      });
-                      obj.$type = resolvedType === "COLOR" ? "color" : "number";
-                      if (
-                        typeof value === "object" &&
-                        (value as VariableAlias)?.type === "VARIABLE_ALIAS"
-                      ) {
-                        const currentVar =
-                          await figma.variables.getVariableByIdAsync(
-                            (value as VariableAlias).id
-                          );
-                        if (currentVar) {
-                          obj.$value = `{${currentVar.name.replace(
-                            /\//g,
-                            "."
-                          )}}`;
-                        }
-                      } else {
-                        obj.$value = value;
-                        // obj.$value = resolvedType === "COLOR" ? rgbToHex(value) : value;
-                      }
-                    }
-                  }
-                }
-                files.push(file);
-              }
-              return files;
-            }
-
-            const files = [];
-            for (const collection of collections) {
-              try {
-                const processedCollection = await processCollection(collection);
-                console.log({ processedCollection });
-                files.push(...processedCollection);
-              } catch (err) {
-                console.log({ err });
-              }
-            }
-            return files;
-          });
-
-          console.log({ variablesJSON });
-          setVariables(variablesJSON);
-        }}
-      >
-        Get Variables
-      </Button>
-      <Button
-        onClick={async () => {
-          await pushTokensToGitHub();
+          const variablesJSON = await getVariables();
+          await pushTokensToGitHub(variablesJSON);
         }}
       >
         Push Variables to GitHub

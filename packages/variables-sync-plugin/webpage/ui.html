@@ -204,9 +204,14 @@
     }
     document.querySelector('#refreshButton').onclick = async () => {
       // postMessage('RELOAD');
-      await fetch('./code.js?nocache=' + (new Date()).getTime())
-      .then(response => response.text())
-      .then(code => postMessage({ type: 'RELOAD', code }));
+      try {
+        await fetch('./code.js?nocache=' + (new Date()).getTime())
+        .then(response => response.text())
+        .then(code => postMessage({ type: 'RELOAD', code }));
+      } catch (err) {
+        console.log('TRACE: ', { err })
+        postMessage({ type: 'RELOAD' });
+      }
 
       window.location = 'http://127.0.0.1:8080/webpage/ui.html?nocache=' + (new Date()).getTime();
     }
