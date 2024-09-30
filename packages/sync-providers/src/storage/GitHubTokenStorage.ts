@@ -3,13 +3,13 @@ import { Octokit } from '@octokit/rest';
 import OctokitCommitMultipleFiles from 'octokit-commit-multiple-files';
 import octokitCommitMultipleFilesFallback from 'octokit-commit-multiple-files/create-or-update-files';
 
-import type { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from '../../types';
-import { isJSONString, joinPath } from '../../utils';
+import type { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from '../types';
+import { isJSONString, joinPath } from '../utils';
 import {
   AnyTokenSet, ThemeObjectsList, GitMultiFileObject, GitSingleFileObject,
-} from '../../types';
-import { SystemFilenames, ErrorMessages } from '../../constants';
-import { GitTokenStorage } from '../GitTokenStorage';
+} from '../types';
+import { SystemFilenames, ErrorMessages } from '../constants';
+import { GitTokenStorage } from './GitTokenStorage';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {

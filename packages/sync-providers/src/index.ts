@@ -1,3 +1,3 @@
-import { GithubTokenStorage } from './providers/github/GitHubTokenStorage';
+import { GithubTokenStorage } from './storage/GitHubTokenStorage';
 
 export { GithubTokenStorage };
