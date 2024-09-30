@@ -1,8 +1,8 @@
 // const INTER_BOLD = { family: "Inter", style: "Bold" };
 // figma.loadFontAsync(INTER_BOLD);
 // console.log(123);
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import { createRoot } from "react-dom/client";
 
 // import render from './app';
 
@@ -82,9 +82,8 @@ class FigmaAPI {
    */
   run<T, U>(
     fn: (figma: PluginAPI, params: U) => Promise<T> | T,
-    params?: U,
+    params?: U
   ): Promise<T> {
-
     return new Promise((resolve, reject) => {
       const id = this.id++;
       const cb = (event: MessageEvent) => {
@@ -110,8 +109,8 @@ class FigmaAPI {
               new Error(
                 typeof message === "string"
                   ? message
-                  : "An error occurred in FigmaAPI.run()",
-              ),
+                  : "An error occurred in FigmaAPI.run()"
+              )
             );
           }
         }
@@ -133,7 +132,7 @@ class FigmaAPI {
           try {
             parent.postMessage(msg, origin);
           } catch {}
-        },
+        }
       );
     });
   }
@@ -142,7 +141,7 @@ class FigmaAPI {
 const figmaAPI = new FigmaAPI();
 
 function postMessage(pluginMessage: any) {
-  parent.postMessage({ pluginMessage, pluginId: '*' }, '*');
+  parent.postMessage({ pluginMessage, pluginId: "*" }, "*");
 }
 
 // (async () => {
@@ -251,7 +250,7 @@ function postMessage(pluginMessage: any) {
 //       // // Loop through each collection and fetch variables
 //       // for (const collection of variableCollections) {
 //       //   const variablesInCollection = figma.variables.getVariablesById(collection.id);
-        
+
 //       //   // Format variables for JSON
 //       //   const formattedCollection = {
 //       //     id: collection.id,
@@ -287,21 +286,19 @@ function postMessage(pluginMessage: any) {
 async function bootstrap() {
   try {
     // Bootload code
-    await fetch('./code.js?nocache=' + (new Date()).getTime())
-      .then(response => response.text())
-      .then(code => postMessage(code));
+    await fetch("./code.js?nocache=" + new Date().getTime())
+      .then((response) => response.text())
+      .then((code) => postMessage(code));
   } catch (err) {
     // Silent fail, since we're assuming the remote code.js isn't available and the plugin is falling back to the local build
   }
 
-  const App = (await import("./AppContainer")).default;
+  const App = (await import("./components/App.js")).default;
 
-  const container = document.getElementById('app');
+  const container = document.getElementById("app");
 
   const root = createRoot(container!);
-  root.render(
-    <App />
-  )
+  root.render(<App />);
 }
 
 bootstrap();

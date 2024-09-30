@@ -1,6 +1,5 @@
 class FigmaAPI {
-  // private id = 0;
-  id = 0;
+  private id = 0;
 
   /**
    * Run a function in the Figma plugin context. The function cannot reference

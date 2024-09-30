@@ -19,7 +19,8 @@ figma.ui.onmessage = async (message, props) => {
       const fn = Function(`"use strict"; return ${message.code}`)();
 
       try {
-        const result = await fn(figma, {});
+        // console.log(message.params);
+        const result = await fn(figma, message.params);
         figma.ui.postMessage({
           type: "EVAL_RESULT",
           result,

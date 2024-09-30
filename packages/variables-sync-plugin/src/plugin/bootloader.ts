@@ -1,12 +1,6 @@
 async function checkUrlExists(url: string) { 
   try {
-    const response = await fetch(url, {
-      referrer: 'http://127.0.0.1:8080'
-      // mode: 'no-cors',
-      // headers: {
-      //   Origin: "http://127.0.0.1:8080", 
-      // }
-    });
+    const response = await fetch(url);
     console.log({ response });
     if (!response.ok) {
       return false;
@@ -20,7 +14,7 @@ async function checkUrlExists(url: string) {
 }
 
 async function bootstrap() {
-  const exists = await checkUrlExists('http://127.0.0.1:8080');
+  const exists = await checkUrlExists('http://127.0.0.1:8080/webpage/ui.html?nocache=' + (new Date()).getTime());
   
   console.log({ exists });
   // FIXME: Get this working
@@ -28,14 +22,15 @@ async function bootstrap() {
     figma.showUI(
       `<script>
         window.location = 'http://127.0.0.1:8080/webpage/ui.html?nocache=' + (new Date()).getTime();
-      </script>`
+      </script>`,
+      { themeColors: true }
     );
     figma.ui.onmessage = (code) => {
       eval(code);
     }
 
   } else {
-    figma.showUI(__html__);
+    figma.showUI(__html__, { themeColors: true, width: 400, height: 400 });
 
     figma.loadFontAsync({ family: "Inter", style: "Bold" });
     console.log(123);
@@ -56,7 +51,7 @@ async function bootstrap() {
           const fn = Function(`"use strict"; return ${message.code}`)();
 
           try {
-            const result = await fn(figma, {});
+            const result = await fn(figma, message.params);
             figma.ui.postMessage({
               type: "EVAL_RESULT",
               result,

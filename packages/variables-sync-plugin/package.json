@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@octokit/rest": "^21.0.2",
     "@stitches/react": "^1.2.8",
     "@tokens-studio/sync-providers": "*",
     "@tokens-studio/tokens": "^0.2.5",
     "@tokens-studio/ui": "^0.11.0",
-    "octokit-commit-multiple-files": "^5.0.2"
+    "octokit-commit-multiple-files": "^5.0.2",
+    "react-hook-form": "^7.53.0"
   },
   "scripts": {
     "start": "run-s dev",
@@ -33,6 +35,7 @@
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
+    "http-server": "^14.1.1",
     "postcss-url": "^10.1.3",
     "vite": "^5.4.4",
     "vite-plugin-generate-file": "^0.2.0",
