@@ -11,6 +11,50 @@ function hasModifier(token: SingleToken) {
   return token.$extensions?.['studio.tokens']?.modify;
 }
 
+const applyPaintIfNotEqual = (key, existingPaint, newPaint, target) => {
+  if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
+    if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
+    if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
+    if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
+  }
+}
+
+const getLinearGradientPaint = async (fallbackValue, token) => {
+  const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
+
+  const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
+  let gradientStopsWithReferences = gradientStops;
+
+  const { createStylesWithVariableReferences } = defaultTokenValueRetriever;
+  if (createStylesWithVariableReferences) {
+    const referenceTokens = getReferenceTokensFromGradient(rawValue);
+
+    if (gradientStops && referenceTokens.length > 0) {
+      gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
+        const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
+        if (referenceVariableExists) {
+          return {
+            ...stop,
+            boundVariables: {
+              color: {
+                type: 'VARIABLE_ALIAS',
+                id: referenceVariableExists.id,
+              },
+            },
+          };
+        }
+        return stop;
+      }));
+    }
+  }
+  const newPaint: GradientPaint = {
+    type: 'GRADIENT_LINEAR',
+    gradientTransform,
+    gradientStops: gradientStopsWithReferences,
+  };
+  return newPaint;
+}
+
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,
 }: {
@@ -39,44 +83,8 @@ export default async function setColorValuesOnTarget({
 
     if (resolvedValue.startsWith?.('linear-gradient')) {
       const fallbackValue = defaultTokenValueRetriever.get(token)?.value;
-      const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
-
-      const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
-      let gradientStopsWithReferences = gradientStops;
-
-      const { createStylesWithVariableReferences } = defaultTokenValueRetriever;
-      if (createStylesWithVariableReferences) {
-        const referenceTokens = getReferenceTokensFromGradient(rawValue);
-
-        if (gradientStops && referenceTokens.length > 0) {
-          gradientStopsWithReferences = await Promise.all(gradientStops.map(async (stop, index) => {
-            const referenceVariableExists = await defaultTokenValueRetriever.getVariableReference(referenceTokens[index]);
-            if (referenceVariableExists) {
-              return {
-                ...stop,
-                boundVariables: {
-                  color: {
-                    type: 'VARIABLE_ALIAS',
-                    id: referenceVariableExists.id,
-                  },
-                },
-              };
-            }
-            return stop;
-          }));
-        }
-      }
-      const newPaint: GradientPaint = {
-        type: 'GRADIENT_LINEAR',
-        gradientTransform,
-        gradientStops: gradientStopsWithReferences,
-      };
-
-      if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
-        if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
-        if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
-        if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
-      }
+      const newPaint = await getLinearGradientPaint(fallbackValue, token);
+      applyPaintIfNotEqual(key, existingPaint, newPaint, target);
     } else {
       // If the raw value is a pure reference to another token, we first should try to apply that reference as a variable if it exists.
       let successfullyAppliedVariable = false;
@@ -99,14 +107,16 @@ export default async function setColorValuesOnTarget({
       const valueToApply = fallbackValue ?? givenValue;
 
       if (!successfullyAppliedVariable) {
-        const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
-        const newPaint: SolidPaint = { color, opacity, type: 'SOLID' };
-        await unbindVariableFromTarget(target, key, newPaint);
-        if (!existingPaint || !isPaintEqual(newPaint, existingPaint)) {
-          if (key === 'paints' && 'paints' in target) target.paints = [newPaint];
-          if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
-          if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
+        let newPaint: SolidPaint | GradientPaint;
+        if (valueToApply.startsWith?.('linear-gradient')) {
+          newPaint = await getLinearGradientPaint(fallbackValue, token);
+        } else {
+          const { color, opacity } = convertToFigmaColor(typeof valueToApply === 'string' ? valueToApply : valueToApply?.color || givenValue || '');
+          newPaint = { color, opacity, type: 'SOLID' };
         }
+
+        applyPaintIfNotEqual(key, existingPaint, newPaint, target)
+        await unbindVariableFromTarget(target, key, newPaint);
       }
     }
     if (description && 'description' in target) {
