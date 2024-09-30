@@ -17,7 +17,7 @@ const applyPaintIfNotEqual = (key, existingPaint, newPaint, target) => {
     if (key === 'fills' && 'fills' in target) target.fills = [newPaint];
     if (key === 'strokes' && 'strokes' in target) target.strokes = [newPaint];
   }
-}
+};
 
 const getLinearGradientPaint = async (fallbackValue, token) => {
   const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
@@ -53,7 +53,7 @@ const getLinearGradientPaint = async (fallbackValue, token) => {
     gradientStops: gradientStopsWithReferences,
   };
   return newPaint;
-}
+};
 
 export default async function setColorValuesOnTarget({
   target, token, key, givenValue,
