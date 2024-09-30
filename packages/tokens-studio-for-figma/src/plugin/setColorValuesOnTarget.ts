@@ -115,8 +115,8 @@ export default async function setColorValuesOnTarget({
           newPaint = { color, opacity, type: 'SOLID' };
         }
 
-        applyPaintIfNotEqual(key, existingPaint, newPaint, target)
         await unbindVariableFromTarget(target, key, newPaint);
+        applyPaintIfNotEqual(key, existingPaint, newPaint, target);
       }
     }
     if (description && 'description' in target) {
