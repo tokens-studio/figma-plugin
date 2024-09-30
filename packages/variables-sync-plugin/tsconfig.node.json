@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true
+  },
+  "include": [
+    "*.ts"
+  ]
+}

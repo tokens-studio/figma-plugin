@@ -1,0 +1,45 @@
+{
+  "name": "variables-sync-plugin",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "@octokit/rest": "^21.0.2",
+    "@stitches/react": "^1.2.8",
+    "@tokens-studio/sync-providers": "*",
+    "@tokens-studio/tokens": "^0.2.5",
+    "@tokens-studio/ui": "^0.11.0",
+    "octokit-commit-multiple-files": "^5.0.2",
+    "react-hook-form": "^7.53.0"
+  },
+  "scripts": {
+    "start": "run-s dev",
+    "dev": "run-s watch",
+    "dev:ui-only": "vite -c ./vite.config.ui.ts",
+    "watch": "run-p watch:*",
+    "watch:ui": "npm run build:ui -- --watch --mode=development",
+    "watch:plugin": "npm run build:plugin -- --watch --mode=development",
+    "build:ui": "vite build -c ./vite.config.ui.ts",
+    "build:plugin": "vite build -c ./vite.config.plugin.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.99.0",
+    "@types/node": "^22.5.4",
+    "@types/postcss-url": "^10.0.4",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
+    "http-server": "^14.1.1",
+    "postcss-url": "^10.1.3",
+    "vite": "^5.4.4",
+    "vite-plugin-generate-file": "^0.2.0",
+    "vite-plugin-node-polyfills": "^0.22.0",
+    "vite-plugin-singlefile": "^2.0.2"
+  }
+}

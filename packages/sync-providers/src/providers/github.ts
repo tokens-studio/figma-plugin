@@ -3,14 +3,173 @@ import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
 import compact from 'just-compact';
 import type {
   StorageProviderType, StorageTypeCredentials, StorageTypeFormValues, RemoteResponseData, PushOverrides,
-} from '../../types';
-import { TokenFormat } from '../../classes/TokenFormatStoreClass';
-import { ErrorMessages } from '../../constants';
-import { applyTokenSetOrder, isEqual } from '../../utils';
-import { GithubTokenStorage } from './GitHubTokenStorage';
+} from '../types';
+import { TokenFormat } from '../classes/TokenFormatStoreClass';
+import { ErrorMessages } from '../constants';
+import { applyTokenSetOrder, isEqual } from '../utils';
+import { GithubTokenStorage } from '../storage/GitHubTokenStorage';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
+
+// const storageClientFactory = useCallback((context: GithubCredentials, owner?: string, repo?: string) => {
+//   const splitContextId = context.id.split('/');
+//   const storageClient = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+
+//   if (context.filePath) storageClient.changePath(context.filePath);
+//   if (context.branch) storageClient.selectBranch(context.branch);
+//   if (isProUser) storageClient.enableMultiFile();
+
+//   return storageClient;
+// }, [isProUser]);
+
+interface ProviderState {
+  editProhibited?: boolean;
+  branches?: string[];
+}
+
+class ProviderWithState<State> {
+  private eventListeners: Record<string, EventListener[]> = {};
+  private state: State | null = null;
+
+  constructor(initialState: State) {
+    this.state = initialState;
+  }
+
+  on(event: string, listener: EventListener) {
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(listener);
+  }
+
+  private triggerEvent(event: string, data?: any) {
+    const listeners = this.eventListeners[event];
+    if (listeners) {
+      listeners.forEach((listener) => listener(data));
+    }
+  }
+
+  setState(newState: State) {
+    this.state = newState;
+    this.triggerEvent('stateChange', newState);
+  }
+}
+
+export class GitHubProvider extends ProviderWithState<ProviderState> {
+  private storage;
+  private context;
+
+  constructor(context, owner?: string, repo?: string, isMultiFileEnabled?: boolean) {
+    super({});
+    const splitContextId = context.id.split('/');
+    this.storage = new GithubTokenStorage(context.secret, owner ?? splitContextId[0], repo ?? splitContextId[1], context.baseUrl ?? '');
+    this.context = context;
+    if (context.filePath) this.storage.changePath(context.filePath);
+    if (context.branch) this.storage.selectBranch(context.branch);
+    if (isMultiFileEnabled) this.storage.enableMultiFile();
+  }
+
+  private setEditProhibited(value) {
+    this.setState({
+      ...this.setState,
+      editProhibited: value,
+    });
+  }
+  private setBranches(branches) {
+    this.setState({
+      ...this.setState,
+      branches,
+    });
+  }
+
+  private askUserIfPull(confirm) {
+    // this.on('')
+    const confirmResult = await confirm({
+      text: 'Pull from GitHub?',
+      description: 'Your repo already contains tokens, do you want to pull these now?',
+    });
+    return confirmResult;
+  }
+
+
+
+
+  public checkAndSetAccess(receivedFeatureFlags?: LDProps['flags']) {
+    if (receivedFeatureFlags?.multiFileSync) this.storage.enableMultiFile();
+    const hasWriteAccess = await this.storage.canWrite();
+    this.setEditProhibited(!hasWriteAccess);
+  }
+
+
+  public async syncTokensWithGitHub(confirm) {
+    async (): Promise<RemoteResponseData> => {
+      try {
+        const hasBranches = await this.storage.fetchBranches();
+        this.setBranches(hasBranches);
+        if (!hasBranches || !hasBranches.length) {
+          return {
+            status: 'failure',
+            errorMessage: ErrorMessages.EMPTY_BRANCH_ERROR,
+          };
+        }
+  
+        await this.checkAndSetAccess();
+  
+        const content = await this.storage.retrieve();
+        if (content?.status === 'failure') {
+          return {
+            status: 'failure',
+            errorMessage: content.errorMessage,
+          };
+        }
+        if (content) {
+          if (
+            !isEqual(content.tokens, tokens)
+            || !isEqual(content.themes, themes)
+            || !isEqual(content.metadata?.tokenSetOrder ?? Object.keys(tokens), Object.keys(tokens))
+          ) {
+            const userDecision = await this.askUserIfPull(confirm);
+            // if (userDecision) {
+            //   const commitSha = await this.storage.getCommitSha();
+            //   const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
+            //   if (dispatch) {
+            //     dispatch.tokenState.setTokenData({
+            //       values: sortedValues,
+            //       themes: content.themes,
+            //       activeTheme,
+            //       usedTokenSet,
+            //       hasChangedRemote: true,
+            //     });
+            //     dispatch.tokenState.setRemoteData({
+            //       tokens: sortedValues,
+            //       themes: content.themes,
+            //       metadata: content.metadata,
+            //     });
+            //     const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+            //     dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
+            //     dispatch.tokenState.setCollapsedTokenSets([]);
+            //     dispatch.uiState.setApiData({ ...context, ...(commitSha ? { commitSha } : {}) });
+            //   }
+            //   if (notifyToUI) {
+            //     notifyToUI('Pulled tokens from GitHub');
+            //   }
+            // }
+          }
+          return content;
+        }
+        return await this.pushTokensToGitHub();
+      } catch (e) {
+        // if (notifyToUI) {
+        //   notifyToUI(ErrorMessages.GITHUB_CREDENTIAL_ERROR, { error: true });
+        // }
+        console.log('Error', e);
+        return {
+          status: 'failure',
+          errorMessage: ErrorMessages.GITHUB_CREDENTIAL_ERROR,
+        };
+  }
+}
 
 export function useGitHub({
   isProUser, dispatch, confirm, pushDialog, closePushDialog, tokens, themes, activeTheme, usedTokenSet, storeTokenIdInJsonEditor, localApiState, notifyToUI, asyncMessageCredentialsCallback,
