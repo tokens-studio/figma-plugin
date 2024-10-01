@@ -265,7 +265,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
   it('sets textstyle if matching Style is found', async () => {
