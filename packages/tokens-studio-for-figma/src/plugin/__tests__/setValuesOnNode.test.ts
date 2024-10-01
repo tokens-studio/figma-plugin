@@ -235,7 +235,7 @@ describe('Can set values on node', () => {
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
+  it('does not call setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
     defaultTokenValueRetriever.initiate({
       tokens: [
         {
