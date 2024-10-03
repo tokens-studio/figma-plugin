@@ -6,6 +6,7 @@ import setStringValuesOnVariable from './setStringValuesOnVariable';
 import { convertTokenTypeToVariableType } from '@/utils/convertTokenTypeToVariableType';
 import { checkCanReferenceVariable } from '@/utils/alias/checkCanReferenceVariable';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { transformValue } from './helpers';
 
 export type ReferenceVariableType = {
   variable: Variable;
@@ -18,6 +19,7 @@ export default async function setValuesOnVariable(
   tokens: SingleToken<true, { path: string, variableId: string }>[],
   collection: VariableCollection,
   mode: string,
+  baseFontSize: string,
   shouldRename = false,
 ) {
   const variableKeyMap: Record<string, string> = {};
@@ -48,20 +50,25 @@ export default async function setValuesOnVariable(
 
         switch (variableType) {
           case 'BOOLEAN':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setBooleanValuesOnVariable(variable, mode, token.value);
             }
             break;
           case 'COLOR':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setColorValuesOnVariable(variable, mode, token.value);
             }
             break;
-          case 'FLOAT':
-            setNumberValuesOnVariable(variable, mode, Number(token.value));
+          case 'FLOAT': {
+            const value = String(token.value);
+            if (typeof value === 'string' && !value.includes('{')) {
+              const transformedValue = transformValue(value, token.type, baseFontSize, true);
+              setNumberValuesOnVariable(variable, mode, Number(transformedValue));
+            }
             break;
+          }
           case 'STRING':
-            if (typeof token.value === 'string') {
+            if (typeof token.value === 'string' && !token.value.includes('{')) {
               setStringValuesOnVariable(variable, mode, token.value);
               // Given we cannot determine the combined family of a variable, we cannot use fallback weights from our estimates.
               // This is not an issue because users can set numerical font weights with variables, so we opt-out of the guesswork and just apply the numerical weight.

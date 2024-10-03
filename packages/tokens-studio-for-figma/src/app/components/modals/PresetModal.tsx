@@ -13,7 +13,9 @@ export default function PresetModal({ onClose }: Props) {
   const [importMode, setImportMode] = useState<string>(LoadProviderType.FILE);
 
   const handleValueChange = React.useCallback((provider: LoadProviderType) => {
-    setImportMode(provider);
+    if (provider) {
+      setImportMode(provider);
+    }
   }, []);
 
   return (

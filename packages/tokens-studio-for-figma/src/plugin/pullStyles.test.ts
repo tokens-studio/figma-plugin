@@ -338,10 +338,10 @@ describe('pullStyles', () => {
           value: [
             {
               type: 'dropShadow',
-              color: '#00000080',
+              color: '#000000',
               x: 0,
-              y: 0,
-              blur: 2,
+              y: 8,
+              blur: 16,
               spread: 4,
             },
             {
@@ -354,10 +354,10 @@ describe('pullStyles', () => {
             },
             {
               type: 'dropShadow',
-              color: '#000000',
+              color: '#00000080',
               x: 0,
-              y: 8,
-              blur: 16,
+              y: 0,
+              blur: 2,
               spread: 4,
             },
           ],
@@ -368,11 +368,11 @@ describe('pullStyles', () => {
           description: 'the one with mixed shadows',
           value: [
             {
-              type: 'innerShadow',
-              color: '#00000080',
+              type: 'dropShadow',
+              color: '#000000',
               x: 0,
-              y: 0,
-              blur: 2,
+              y: 8,
+              blur: 16,
               spread: 4,
             },
             {
@@ -384,11 +384,11 @@ describe('pullStyles', () => {
               spread: 4,
             },
             {
-              type: 'dropShadow',
-              color: '#000000',
+              type: 'innerShadow',
+              color: '#00000080',
               x: 0,
-              y: 8,
-              blur: 16,
+              y: 0,
+              blur: 2,
               spread: 4,
             },
           ],

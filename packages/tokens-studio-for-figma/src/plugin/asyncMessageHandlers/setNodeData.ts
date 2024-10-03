@@ -20,7 +20,7 @@ export const setNodeData: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_NODE
         variableReferences: figmaVariableReferences,
         styleReferences: figmaStyleReferences,
         stylePathPrefix,
-        ignoreFirstPartForStyles: msg.settings.prefixStylesWithThemeName,
+        ignoreFirstPartForStyles: msg.settings.ignoreFirstPartForStyles,
         applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
       });
 

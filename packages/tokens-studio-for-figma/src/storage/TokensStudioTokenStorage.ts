@@ -63,7 +63,6 @@ async function getProjectData(urn: string): Promise<ProjectData | null> {
   try {
     const data = await Graphql.exec<ProjectQuery>(
       Graphql.op(GET_PROJECT_DATA_QUERY, {
-        limit: 500,
         urn,
       }),
     );
@@ -247,7 +246,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           } else if (data.type === TokenTypes.TYPOGRAPHY) {
             input.typography = data.value;
           } else if (data.type === TokenTypes.COMPOSITION) {
-            input.value = JSON.stringify(data.value);
+            input.composition = data.value;
           } else {
             input.value = data.value;
           }
@@ -281,15 +280,31 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         }
 
         try {
+          const valueIsString = typeof data.value === 'string';
+          const isComplexTokenType = [
+            TokenTypes.BOX_SHADOW,
+            TokenTypes.BORDER,
+            TokenTypes.TYPOGRAPHY,
+            TokenTypes.COMPOSITION,
+          ].includes(data.type);
+
+          const input = {
+            name: data.name,
+            description: data.description,
+            extensions: JSON.stringify(data.$extensions),
+            value: undefined,
+          };
+
+          if (isComplexTokenType && !valueIsString) {
+            input[data.type.toLowerCase()] = data.value;
+          } else {
+            input.value = data.value;
+          }
+
           const responseData = await Graphql.exec<UpdateTokenMutation>(
             Graphql.op(UPDATE_TOKEN_MUTATION, {
               urn: tokenId,
-              input: {
-                name: data.name,
-                description: data.description,
-                value: data.value,
-                extensions: JSON.stringify(data.$extensions),
-              },
+              input,
             }),
           );
 

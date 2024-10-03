@@ -1,4 +1,4 @@
-import { RawToken, TokenType } from '@tokens-studio/sdk';
+import { RawToken } from '@tokens-studio/sdk';
 import { deepmerge } from 'deepmerge-ts';
 import { SingleToken } from '@/types/tokens';
 
@@ -65,8 +65,10 @@ export const tokensStudioToToken = (raw: RawToken) => {
   } else if (raw.value.boxShadow) {
     // @ts-ignore
     combined.value = (raw as Raw_Token_boxShadow).value!.boxShadow;
-  } else if (raw.type === TokenType.composition) {
-    combined.value = raw.value?.value && JSON.parse(raw.value.value);
+    // @ts-expect-error
+  } else if (raw.value?.composition) {
+    // @ts-expect-error composition exists for composition tokens
+    combined.value = removeNulls((raw as RawToken).value!.composition!);
   } else if (raw.value?.value) {
     combined.value = parseValue(raw.value.value);
   } else {

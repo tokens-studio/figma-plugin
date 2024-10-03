@@ -21,13 +21,25 @@ export function useChangedState() {
   const tokenFormat = useSelector(tokenFormatSelector);
   const dispatch = useDispatch();
 
-  const changedState = useMemo(() => {
+  const changedPushState = useMemo(() => {
     const tokenSetOrder = Object.keys(tokens);
     return findDifferentState(remoteData, {
       tokens,
       themes,
       metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
     });
+  }, [remoteData, tokens, themes, storageType]);
+
+  const changedPullState = useMemo(() => {
+    const tokenSetOrder = Object.keys(tokens);
+    return findDifferentState(
+      {
+        tokens,
+        themes,
+        metadata: storageType.provider !== StorageProviderType.LOCAL ? { tokenSetOrder } : {},
+      },
+      remoteData,
+    );
   }, [remoteData, tokens, themes, storageType]);
 
   const hasChanges = useMemo(() => {
@@ -38,5 +50,5 @@ export function useChangedState() {
     return hasChanged;
   }, [tokens, themes, lastSyncedState, tokenFormat, dispatch.tokenState]);
 
-  return { changedState, hasChanges };
+  return { changedPushState, changedPullState, hasChanges };
 }

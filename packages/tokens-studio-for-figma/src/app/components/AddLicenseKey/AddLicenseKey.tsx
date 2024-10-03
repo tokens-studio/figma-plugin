@@ -41,9 +41,13 @@ export default function AddLicenseKey() {
 
   const addKey = useCallback(async () => {
     if (newKey) {
-      await addLicenseKey(dispatch, { key: newKey, source: AddLicenseSource.UI }, {
-        userId,
-      });
+      await addLicenseKey(
+        dispatch,
+        { key: newKey, source: AddLicenseSource.UI },
+        {
+          userId,
+        },
+      );
     }
   }, [newKey, dispatch, userId]);
 
@@ -98,11 +102,7 @@ export default function AddLicenseKey() {
     </Button>
   );
 
-  const removeLicenseKeyButton = existingKey && (
-    <Button onClick={removeKey}>
-      {t('removeLicenseKey')}
-    </Button>
-  );
+  const removeLicenseKeyButton = existingKey && <Button onClick={removeKey}>{t('removeLicenseKey')}</Button>;
 
   return (
     <Stack direction="column" gap={3} css={{ padding: '0 $4' }}>
@@ -129,16 +129,25 @@ export default function AddLicenseKey() {
         <Box css={{ flexGrow: 1 }}>
           <TextInput
             type={isMasked ? 'password' : 'text'}
-            trailingAction={
-              <IconButton variant="invisible" size="small" onClick={toggleMask} icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />} />
-            }
+            trailingAction={(
+              <IconButton
+                variant="invisible"
+                size="small"
+                onClick={toggleMask}
+                icon={isMasked ? <EyeClosedIcon /> : <EyeOpenIcon />}
+              />
+            )}
             name="license-key"
             data-testid="settings-license-key-input"
             value={newKey || ''}
             onChange={onLicenseKeyChange}
             validationStatus={licenseKeyError ? 'error' : undefined}
           />
-          {licenseKeyError && <ErrorMessage>{licenseKeyError}</ErrorMessage>}
+          {licenseKeyError && (
+            <Box css={{ paddingTop: '$2' }}>
+              <ErrorMessage>{licenseKeyError}</ErrorMessage>
+            </Box>
+          )}
         </Box>
         {addLicenseKeyButton}
         {removeLicenseKeyButton}

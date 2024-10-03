@@ -12,7 +12,7 @@ describe('setColorValuesOnTarget', () => {
         value: '#ff0000',
         rawValue: '#ff0000',
         description: 'Red',
-      },{
+      }, {
         name: 'black',
         type: TokenTypes.COLOR,
         value: '#000000',
@@ -34,6 +34,16 @@ describe('setColorValuesOnTarget', () => {
         type: TokenTypes.COLOR,
         value: 'linear-gradient(90deg, #ff0000 0%, #000000 100%)',
         rawValue: 'linear-gradient(90deg, {red} 0%, {black} 100%)',
+      }, {
+        name: 'border',
+        type: TokenTypes.BORDER,
+        value: {
+          color: '#ff0000',
+          width: '12px',
+          style: 'solid',
+        },
+        rawValue: '#ff0000' as any, // FIXME: Figure out why this is a string in the plugin, are the types incorrect, or should this be resolved as an object instead?
+        description: 'Border',
       }],
       variableReferences: new Map([['red', '123']]),
       createStylesWithVariableReferences: true,
@@ -80,6 +90,21 @@ describe('setColorValuesOnTarget', () => {
     } as unknown as RectangleNode;
 
     await setColorValuesOnTarget({ target: mockNode, token: 'red', key: 'strokes' });
+
+    expect(mockNode.strokes).toEqual([{
+      type: 'SOLID',
+      opacity: 1,
+      color: { r: 1, g: 0, b: 0 },
+    }]);
+  });
+
+  it('should be able to update the strokes on a node from a border style', async () => {
+    const mockNode = {
+      type: 'RECTANGLE',
+      strokes: [],
+    } as unknown as RectangleNode;
+
+    await setColorValuesOnTarget({ target: mockNode, token: 'border', key: 'strokes' });
 
     expect(mockNode.strokes).toEqual([{
       type: 'SOLID',
@@ -139,7 +164,7 @@ describe('setColorValuesOnTarget', () => {
   // Test a linear gradient token with references
   it('should handle a linear gradient token with references correctly', async () => {
     const mockStyle = {
-      paints: []
+      paints: [],
     } as unknown as PaintStyle;
 
     await setColorValuesOnTarget({ target: mockStyle, token: 'gradient1', key: 'paints' });
@@ -152,22 +177,22 @@ describe('setColorValuesOnTarget', () => {
             r: 1,
             g: 0,
             b: 0,
-            a: 1
+            a: 1,
           },
-          position: 0
+          position: 0,
         }, {
           color: {
             r: 0,
             g: 0,
             b: 0,
-            a: 1
+            a: 1,
           },
-          position: 1
-        }
+          position: 1,
+        },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]]
-    }])
-  })
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    }]);
+  });
 
   // Test when token reference is not found
   it('should handle missing token references by applying the hex value', async () => {

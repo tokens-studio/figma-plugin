@@ -191,9 +191,27 @@ describe('pullTokensFactory', () => {
     mockFetchBranches.mockResolvedValueOnce(['main']);
     mockPullTokens.mockResolvedValueOnce({
       tokens: {
+        global: [
+          {
+            value: '12px',
+            type: 'spacing',
+            description: 'first spacing here',
+            name: '1-spacing-token',
+          },
+          {
+            value: '#ff00ff',
+            type: 'color',
+            name: '1-color-token',
+          },
+          {
+            value: '12px',
+            type: 'fontSizes',
+            name: '1-font-size-token',
+          },
+        ],
       },
       themes: [],
-      metadata: {},
+      metadata: { tokenSetOrder: ['global'] },
     });
 
     await fn();
@@ -244,7 +262,7 @@ describe('pullTokensFactory', () => {
     expect(state.uiState.activeTab).toEqual(Tabs.START);
   });
 
-  it('should verify the API credentials without pulling if there are local changes', async () => {
+  it('should verify the API credentials and pull even if there are local changes', async () => {
     const mockStore = createMockStore({
       uiState: {
         storageType: mockStorageType,
@@ -289,10 +307,11 @@ describe('pullTokensFactory', () => {
 
     await fn();
     const state = mockStore.getState();
-    expect(mockUseRemoteTokens.pullTokens).not.toBeCalled();
+    expect(mockUseRemoteTokens.pullTokens).toBeCalledTimes(1);
     expect(state.branchState.branches).toEqual(['main']);
     expect(state.tokenState.tokens).toEqual(mockParams.localTokenData?.values);
     expect(state.uiState.activeTab).toEqual(Tabs.TOKENS);
+    expect(state.tokenState.remoteData).toEqual({ metadata: null, themes: [], tokens: {} });
   });
 
   it('should go to start tab if the localTokenData is missing somehow', async () => {
