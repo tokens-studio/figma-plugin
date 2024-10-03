@@ -46,7 +46,7 @@
     "@radix-ui/react-toolbar": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@rematch/core": "^2.2.0",
-    "@sentry/browser": "^7.54.0",
+    "@sentry/browser": "^8.33.0",
     "@sentry/react": "^7.53.1",
     "@stitches/react": "^1.2.8",
     "@supabase/postgrest-js": "^1.1.0",
