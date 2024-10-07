@@ -1,5 +1,57 @@
 # @tokens-studio/figma-plugin
 
+## 2.0.1
+
+### Patch Changes
+
+- 27d40280: Fixed several issues related to Azure DevOps related to pushing and creating branches other than the default one as well as switching between single file and multi file.
+- dcb41eb1: Fixed an issue with Bitbucket sync that caused sets that are in folders to not be pulled correctly
+- 3405929e: Fixed an issue with UI appearing broken, related to the debug session recording feature
+
+## 2.0.0
+
+### Major Changes
+
+- 9c409b487: We now support the W3C Design Tokens Community Group format! The plugin offers a way to convert your tokens to the new format for remote as well as locally stored tokens. We also auto-detect if you're using the new format in your token files, and will use that format.
+
+### Patch Changes
+
+- 7ff4131a9: You can now use `rem` units in letter spacing tokens
+- 61673a6d1: Fixes an issue where duplicating a token to another set incorrectly displayed an error message about token names needing to be unique.
+- 9ce1434a3: Opacity tokens are now being created properly in Figma and are being applied as variables when available
+- 7ffc30f7e: You can now set max width and height tokens on component instances (not on their children)
+- 7181b1870: Prevent token names from containing { or } or starting with $
+- 467569b42: Fixes an issue that caused going from URL storage to Local storage to be in read-only until plugin restart
+- 890c5b204: Non-local variables: You can now create variables that reference variables from other files, as long as you're using Themes and your variables are attached to tokens.
+- 171823b7b: Fixed an issue that caused updating tokens that contained a modified reference to update multiple modes at once, instead of just the affected one.
+- cdb570853: Using Select all in Inspect view when you were using a filtered view is now correctly only removing tokens that were selected, instead of all.
+- 325d7d2d9: Color styles now contain a color variable as a value if the value is a pure reference to another token and that token is attached to a variable via Themes
+- ffe0d6cc5: Allow users to export variables based on selected sets and export options
+- 7ff4131a9: You can now use negative % values in line height tokens
+- 3728cc19c: Allow users to create variables from selected sets when not using themes
+- 81d2306bd: Provide ability to users to add nested levels to a token
+- 4989732a7: You can now choose if you want variables and styles applied when you're updating your layers. This allows you to effectively make use of the plugin's theme switching even though you've created variables.
+- a2f4479bd: Feature: You can now resize the left sidebar
+- 75260aead: Added support for variables in typography styles
+- 230842255: Fixed an issue with the plugins error boundary, error messages should now show up in the UI again
+- bdddf04df: Typography tokens such as line heights, font sizes, paragrap spacing, paragraph indent and letter spacing now take number and dimension tokens as suggested tokens
+- 483c52622: When you apply a token to a layer, and that token isnt connected to a variable, we will now try to apply the token's reference as a variable. This enables you to apply component tokens and have their semantic variable applied as long as it's a pure reference and that component token has no variable connected.
+- cb230b001: Selecting something when typing { will now no longer insert a space after
+- 0cb557937: Fixed an issue where variable references weren't using references from the current theme but from another theme that was using the same token names. If you are creating multiple collections with the same token structure, it's recommended to create them one by one to avoid reference clashes. For the default scenario of where different theme groups don't share the same tokens (recommended), you can create all themes at once.
+- e83024a34: Options (use rem, convert numbers to dimensions) are now disabled by default for the Import variables dialog
+- a66f76153: When editing a border token and switching from reference to input mode we now populate the contents.
+- 467569b42: Fix: Token suggestions now ignore case, meaning you don't have to type Blue to find a token called blue
+- 49cbdf397: Fixed an issue with 0px borders showing up as 0.001px in Figma's DevMode
+- d4cd4de73: The internal 'id' property is now properly stored on the 'studio.tokens' key in the '$extensions' object of a token
+- 166b487c3: After creating a new token set we now switch to this new set
+- 83712ce40: Fixed an issue where cmd+clicking a token allowed you to edit even without edit rights
+- 19a43d98a: Opacity tokens are now being created as number variables when exported to Figma
+- 19242fdb5: Added regex support to bulk remap
+- 870b0bc10: Allow users to create styles together when creating variables
+- 8cfda9370: Adds support for binding variables to stroke weight and opacity
+- 13b8a96da: Added BitBucket as a provider in Beta
+- e25ddc391: Allow to create variables based on selected themes
+
 ## 1.38.9
 
 ### Patch Changes

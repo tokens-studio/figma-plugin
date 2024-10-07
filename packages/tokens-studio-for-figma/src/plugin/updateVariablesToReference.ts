@@ -12,11 +12,15 @@ export default async function updateVariablesToReference(figmaVariables: Map<str
       console.log('error importing variable', e);
     }
     if (!variable) return;
-    await aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
-      type: 'VARIABLE_ALIAS',
-      id: variable.id,
-    });
-    updatedVariables.push(aliasVariable.variable);
+    try {
+      await aliasVariable.variable.setValueForMode(aliasVariable.modeId, {
+        type: 'VARIABLE_ALIAS',
+        id: variable.id,
+      });
+      updatedVariables.push(aliasVariable.variable);
+    } catch (e) {
+      console.log('error setting value for mode', e, aliasVariable, variable);
+    }
   }));
   return updatedVariables;
 }

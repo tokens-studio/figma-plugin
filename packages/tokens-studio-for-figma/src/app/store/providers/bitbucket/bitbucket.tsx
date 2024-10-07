@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -19,6 +20,7 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type BitbucketCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.BITBUCKET }>;
 type BitbucketFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.BITBUCKET }>;
@@ -89,6 +91,13 @@ export function useBitbucket() {
           activeTheme,
           hasChangedRemote: true,
         });
+        dispatch.tokenState.setRemoteData({
+          tokens,
+          themes,
+          metadata,
+        });
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {
           status: 'success',
@@ -210,11 +219,18 @@ export function useBitbucket() {
             if (userDecision) {
               const sortedValues = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder);
               dispatch.tokenState.setTokenData({
-                values: content.tokens,
+                values: sortedValues,
                 themes: content.themes,
                 activeTheme,
                 usedTokenSet,
               });
+              dispatch.tokenState.setRemoteData({
+                tokens: sortedValues,
+                themes: content.themes,
+                metadata: content.metadata,
+              });
+              const stringifiedRemoteTokens = JSON.stringify(compact([sortedValues, content.themes, TokenFormat.format]), null, 2);
+              dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
               dispatch.tokenState.setCollapsedTokenSets([]);
               notifyToUI('Pulled tokens from Bitbucket');
             }

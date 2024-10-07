@@ -68,10 +68,11 @@ export function transformValue(value: string, type: string, baseFontSize: string
     case 'fontSizes':
     case 'fontSize':
     case 'dimension':
+    case 'number':
       return convertTypographyNumberToFigma(value, baseFontSize);
     case 'fontWeights':
     case 'fontWeight':
-      return convertFontWeightToFigma(value);
+      return convertFontWeightToFigma(value, shouldOutputForVariables);
     case 'letterSpacing':
       return convertLetterSpacingToFigma(value, baseFontSize, shouldOutputForVariables);
     case 'lineHeights':

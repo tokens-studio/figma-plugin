@@ -20,7 +20,7 @@ export class TokenValueRetriever {
   public createStylesWithVariableReferences;
 
   private getAdjustedTokenName(tokenName: string): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles ? tokenName.split('.').slice(1).join('.') : tokenName;
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1 ? tokenName.split('.').slice(1).join('.') : tokenName;
     const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
     return withPrefix;
   }

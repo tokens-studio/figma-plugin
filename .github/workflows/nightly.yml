@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '20.x'
           cache: yarn
           cache-dependency-path: '**/yarn.lock'
       - name: Install dependencies
@@ -70,6 +70,14 @@ jobs:
       - name: Bundle 
         run: npm run bundle
 
+      # Store artifact
+      - name: Store Artifact
+        id: store_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: figma-plugin
+          path: |
+            dist/bundle.zip
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "dist/bundle.zip"

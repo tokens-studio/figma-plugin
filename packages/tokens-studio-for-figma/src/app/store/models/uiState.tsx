@@ -90,6 +90,7 @@ export interface UIState {
   showAutoSuggest: boolean;
   showConvertTokenFormatModal: boolean;
   sidebarWidth: number;
+  hasRemoteChange: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -149,6 +150,7 @@ export const uiState = createModel<RootModel>()({
     showAutoSuggest: false,
     showConvertTokenFormatModal: false,
     sidebarWidth: 150,
+    hasRemoteChange: false,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -162,6 +164,10 @@ export const uiState = createModel<RootModel>()({
     setShowPullDialog: (state, data: string | false) => ({
       ...state,
       showPullDialog: data,
+    }),
+    setHasRemoteChange: (state, data: boolean) => ({
+      ...state,
+      hasRemoteChange: data,
     }),
     setShowConfirm: (
       state,

@@ -88,6 +88,7 @@ StorageProviderType.ADO,
   id: string; // this is the repository identifier; eg {username}/{repo}
   branch: string; // this is the base branch
   filePath: string; // this is the path to the token file or files (depends on multifile support)
+  previousSourceBranch?: string; // optional: allows pushing changes to remote based on an existing branch
 }
 >;
 

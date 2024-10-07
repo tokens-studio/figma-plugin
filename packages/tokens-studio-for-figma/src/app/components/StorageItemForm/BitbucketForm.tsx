@@ -74,6 +74,7 @@ export default function BitbucketForm({
         <FormField>
           <Label htmlFor="name">{t('name')}</Label>
           <TextInput value={values.name || ''} onChange={onChange} type="text" name="name" id="name" required />
+          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="name">{t('providers.bitbucket.username')}</Label>
@@ -85,7 +86,6 @@ export default function BitbucketForm({
             id="username"
             required
           />
-          <Text muted>{t('nameHelpText')}</Text>
         </FormField>
         <FormField>
           <Label htmlFor="secret">{t('providers.bitbucket.appPassword')}</Label>

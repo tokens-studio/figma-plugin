@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import { notifyToUI } from '../../../../plugin/notifiers';
 import * as pjs from '../../../../../package.json';
@@ -21,6 +22,7 @@ import {
 } from '@/types/StorageType';
 import { RemoteResponseData } from '@/types/RemoteResponseData';
 import { ErrorMessages } from '@/constants/ErrorMessages';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export async function updateGenericVersionedTokens({
   tokens,
@@ -267,6 +269,15 @@ export function useGenericVersionedStorage() {
           activeTheme,
           hasChangedRemote: true,
         });
+        dispatch.tokenState.setRemoteData({
+          tokens: content.tokens,
+          themes: content.themes,
+          metadata: {
+            tokenSetOrder: Object.keys(content.tokens),
+          },
+        });
+        const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         return content;
       }
 
