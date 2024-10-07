@@ -88,6 +88,8 @@ jobs:
         if: ${{ inputs.createRelease }}
         id: changesets
         uses: changesets/action@v1
+        with:
+          publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Store artifact for later use
