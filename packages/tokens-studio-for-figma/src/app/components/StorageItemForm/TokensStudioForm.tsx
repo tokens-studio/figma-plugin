@@ -35,6 +35,7 @@ export default function TokensStudioForm({
   const syncGuideUrl = 'tokens-studio';
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -57,7 +58,13 @@ export default function TokensStudioForm({
           ...validationResult.data,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
+        setIsLoading(true);
+
         onSubmit(formFields);
+
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 5000);
       }
     },
     [values, onSubmit],
@@ -73,21 +80,22 @@ export default function TokensStudioForm({
     setShowTeaser(false);
   }, []);
 
-    return showTeaser ? (
-      <Stack direction="column" align="start" gap={5}>
-        <StyledTokensStudioWord />
-        <Stack direction="column" gap={3}>
-          <Heading size="large">A dedicated design tokens management platform</Heading>
-          <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
-          <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">Learn more</Link>
-        </Stack>
-        <Button onClick={handleDismissTeaser}>Already got access?</Button>
+  return showTeaser ? (
+    <Stack direction="column" align="start" gap={5}>
+      <StyledTokensStudioWord />
+      <Stack direction="column" gap={3}>
+        <Heading size="large">A dedicated design tokens management platform</Heading>
+        <Box>We are working a dedicated design tokens management platform built on our powerful node-based graph engine including plug and play token transformation - suitable for enterprises! Still in early access, sign up for the waitlist!</Box>
+        <Link href="https://tokens.studio/studio" target="_blank" rel="noreferrer">Learn more</Link>
       </Stack>
-    ):(
+      <Button onClick={handleDismissTeaser}>Already got access?</Button>
+    </Stack>
+  ) : (
     <form onSubmit={handleSubmit}>
       <Stack direction="column" gap={5}>
-      <Text muted>
-          {t('providers.tokensstudio.descriptionFirstPart')}{' '}
+        <Text muted>
+          {t('providers.tokensstudio.descriptionFirstPart')}
+          {' '}
           <Link
             href="https://q2gsw2tok1e.typeform.com/to/pJCwLVh2?typeform-source=tokens.studio"
             target="_blank"
@@ -138,7 +146,7 @@ export default function TokensStudioForm({
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
+          <Button variant="primary" type="submit" disabled={isLoading || (!values.secret && !values.name)}>
             {t('save')}
           </Button>
         </Stack>
