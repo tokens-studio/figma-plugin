@@ -35,7 +35,6 @@ export default function TokensStudioForm({
   const syncGuideUrl = 'tokens-studio';
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -58,13 +57,8 @@ export default function TokensStudioForm({
           ...validationResult.data,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
-        setIsLoading(true);
 
         onSubmit(formFields);
-
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 5000);
       }
     },
     [values, onSubmit],
@@ -146,7 +140,7 @@ export default function TokensStudioForm({
           <Button variant="secondary" onClick={onCancel}>
             {t('cancel')}
           </Button>
-          <Button variant="primary" type="submit" disabled={isLoading || (!values.secret && !values.name)}>
+          <Button variant="primary" type="submit" disabled={!values.secret && !values.name}>
             {t('save')}
           </Button>
         </Stack>
