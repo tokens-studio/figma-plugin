@@ -85,6 +85,25 @@ const SyncSettings = () => {
     [dispatch.branchState, fetchBranches],
   );
 
+  React.useEffect(() => {
+    if (apiProviders.length > 0) {
+      const uniqueProvidersMap = new Map();
+
+      const uniqueProviders = apiProviders.filter((provider) => {
+        const key = `${provider.provider}-${provider.name}`;
+        if (uniqueProvidersMap.has(key)) {
+          return false; 
+        }
+        uniqueProvidersMap.set(key, true);
+        return true; 
+      });
+
+      if (uniqueProviders.length < apiProviders.length) {
+        dispatch.uiState.setAPIProviders(uniqueProviders);
+      }
+    }
+  }, [apiProviders, dispatch]);
+
   const handleEditClick = React.useCallback(
     (provider: any) => () => {
       track('Edit Credentials');
@@ -102,6 +121,7 @@ const SyncSettings = () => {
 
   const handleProviderClick = React.useCallback(
     (provider: StorageProviderType) => () => {
+      console.log("api providers,", apiProviders);
       setOpen(false);
       setStorageProvider(provider);
       handleShowAddCredentials(provider);
