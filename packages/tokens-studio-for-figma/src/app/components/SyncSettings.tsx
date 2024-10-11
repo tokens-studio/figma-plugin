@@ -121,7 +121,6 @@ const SyncSettings = () => {
 
   const handleProviderClick = React.useCallback(
     (provider: StorageProviderType) => () => {
-      console.log('api providers,', apiProviders);
       setOpen(false);
       setStorageProvider(provider);
       handleShowAddCredentials(provider);
