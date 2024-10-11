@@ -92,10 +92,10 @@ const SyncSettings = () => {
       const uniqueProviders = apiProviders.filter((provider) => {
         const key = `${provider.provider}-${provider.name}`;
         if (uniqueProvidersMap.has(key)) {
-          return false; 
+          return false;
         }
         uniqueProvidersMap.set(key, true);
-        return true; 
+        return true;
       });
 
       if (uniqueProviders.length < apiProviders.length) {
@@ -121,7 +121,7 @@ const SyncSettings = () => {
 
   const handleProviderClick = React.useCallback(
     (provider: StorageProviderType) => () => {
-      console.log("api providers,", apiProviders);
+      console.log('api providers,', apiProviders);
       setOpen(false);
       setStorageProvider(provider);
       handleShowAddCredentials(provider);
