@@ -36,7 +36,7 @@ describe('Branch switcher', () => {
       updateMode: UpdateMode.PAGE,
       updateOnChange: false,
       updateRemote: true,
-      updateStyles: true,
+      shouldUpdateStyles: true,
     },
     storageType: provider,
     user: {

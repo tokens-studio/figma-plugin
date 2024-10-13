@@ -26,7 +26,7 @@ describe('TokenListing', () => {
       updateMode: UpdateMode.PAGE,
       updateOnChange: false,
       updateRemote: true,
-      updateStyles: true,
+      shouldUpdateStyles: true,
     },
     storageType: { provider: StorageProviderType.LOCAL },
     user: {
