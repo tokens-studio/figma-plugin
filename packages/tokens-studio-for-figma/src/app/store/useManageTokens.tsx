@@ -12,9 +12,11 @@ import {
 import useTokens from './useTokens';
 import { StyleOptions } from '@/constants/StyleOptions';
 import { ColorModifier } from '@/types/Modifier';
+import { wrapTransaction } from '@/profiling/transaction';
+
 // @TODO this typing could be more strict in the future
 
-type EditSingleTokenData = {
+export type EditSingleTokenData = {
   parent: string;
   type: TokenTypes;
   name: string;
@@ -32,7 +34,7 @@ type EditSingleTokenData = {
   }
 };
 
-type CreateSingleTokenData = {
+export type CreateSingleTokenData = {
   parent: string;
   type: TokenTypes;
   name: string;
@@ -232,27 +234,23 @@ export default function useManageTokens() {
   }, [renameTokenAcrossSets]);
 
   const importMultipleTokens = useCallback(async ({ multipleUpdatedTokens, multipleNewTokens }: { multipleUpdatedTokens?: EditSingleTokenData[], multipleNewTokens?: CreateSingleTokenData[] }) => {
-    dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
+    wrapTransaction({ name: 'importVariables' }, () => {
+      dispatch.uiState.startJob({ name: BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS, isInfinite: true });
 
-    const hasUpdatedTokens = multipleUpdatedTokens && multipleUpdatedTokens.length > 0;
-    const hasNewTokens = multipleNewTokens && multipleNewTokens.length > 0;
+      const hasUpdatedTokens = multipleUpdatedTokens && multipleUpdatedTokens.length > 0;
+      const hasNewTokens = multipleNewTokens && multipleNewTokens.length > 0;
 
-    if (hasUpdatedTokens) {
-      multipleUpdatedTokens.forEach((t) => {
-        editSingleToken(t);
-      });
-    }
-
-    if (hasNewTokens) {
-      if (multipleNewTokens) {
-        multipleNewTokens.forEach((t) => {
-          createSingleToken(t);
-        });
+      if (hasUpdatedTokens) {
+        dispatch.tokenState.editMultipleTokens(multipleUpdatedTokens);
       }
-    }
 
-    dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
-  }, [dispatch.uiState, createSingleToken, editSingleToken]);
+      if (hasNewTokens) {
+        dispatch.tokenState.createMultipleTokens(multipleNewTokens);
+      }
+
+      dispatch.uiState.completeJob(BackgroundJobs.UI_RENAME_TOKEN_ACROSS_SETS);
+    });
+  }, [dispatch.uiState, dispatch.tokenState]);
 
   return useMemo(() => ({
     editSingleToken, createSingleToken, deleteSingleToken, deleteGroup, duplicateSingleToken, renameGroup, duplicateGroup, renameTokensAcrossSets, importMultipleTokens, deleteDuplicates,
