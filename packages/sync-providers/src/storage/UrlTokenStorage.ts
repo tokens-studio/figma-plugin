@@ -2,11 +2,10 @@ import { ThemeObjectsList } from '@/types';
 import {
   RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile,
 } from './RemoteTokenStorage';
-import { singleFileSchema } from './schemas/singleFileSchema';
-import IsJSONString from '@/utils/isJSONString';
+import { isJSONString } from '@/utils/is/isJSONString';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
-import { complexSingleFileSchema } from './schemas';
+import { complexSingleFileSchema, singleFileSchema } from './schemas';
 import { SaveOption } from './FileTokenStorage';
 
 type UrlData = {
@@ -48,7 +47,7 @@ export class UrlTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
   }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
-    const customHeaders = IsJSONString(this.secret)
+    const customHeaders = isJSONString(this.secret)
       ? JSON.parse(this.secret) as Record<string, string>
       : {};
 

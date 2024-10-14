@@ -1,4 +1,4 @@
-import { complexSingleFileSchema } from '../schemas';
+import { complexSingleFileSchema } from '../../../../sync-providers/src/storage/schemas';
 
 describe('complexSingleFileSchema', () => {
   it('should be valid', () => {

@@ -5,7 +5,7 @@ import { SingleToken } from '@/types/tokens';
 import {
   RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
 } from './RemoteTokenStorage';
-import { singleFileSchema } from './schemas/singleFileSchema';
+import { singleFileSchema } from '../../../sync-providers/src/storage/schemas/singleFileSchema';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';

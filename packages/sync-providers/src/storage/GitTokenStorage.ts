@@ -1,9 +1,9 @@
-import { joinPath } from '../utils';
-import { ErrorMessages, SystemFilenames } from '../constants';
-import type {
-  AnyTokenSet, SingleToken, DeepTokensMap, ThemeObjectsList, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
-} from '../types';
-import { RemoteTokenStorage } from './RemoteTokenStorage';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { AnyTokenSet, SingleToken } from '@/types/tokens';
+import { SystemFilenames } from '@/constants/SystemFilenames';
+import { joinPath } from '@/utils/joinPath';
+import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type StorageFlags = {
   multiFileEnabled: boolean

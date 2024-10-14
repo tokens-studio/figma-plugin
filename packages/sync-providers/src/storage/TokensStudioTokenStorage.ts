@@ -18,7 +18,7 @@ import {
 } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
-import { notifyToUI } from '@/plugin/notifiers';
+// import { notifyToUI } from '@/plugin/notifiers';
 import {
   RemoteTokenStorage,
   RemoteTokenstorageErrorMessage,
@@ -27,7 +27,7 @@ import {
 } from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
-import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+// import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 import {
   GET_PROJECT_DATA_QUERY,
   CREATE_TOKEN_MUTATION,
@@ -41,10 +41,11 @@ import {
   CREATE_THEME_GROUP_MUTATION,
   DELETE_THEME_GROUP_MUTATION,
 } from './tokensStudio/graphql';
-import { track } from '@/utils/analytics';
+// import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { tokensStudioToToken } from './tokensStudio/utils';
+import { TokensStudioAction } from './tokensStudio/createTokenInTokensStudio';
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -262,8 +263,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Create token in Tokens Studio');
-          notifyToUI('Token pushed to Tokens Studio', { error: false });
+          // track('Create token in Tokens Studio');
+          // notifyToUI('Token pushed to Tokens Studio', { error: false });
+          // onPushTokenSuccess()
 
           return responseData.data.createToken;
         } catch (e) {
@@ -312,8 +314,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Edit token in Tokens Studio');
-          notifyToUI('Token updated in Tokens Studio', { error: false });
+          // track('Edit token in Tokens Studio');
+          // notifyToUI('Token updated in Tokens Studio', { error: false });
+          // onUpdateTokenSuccess()
 
           return responseData.data.updateToken;
         } catch (e) {
@@ -338,8 +341,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Delete token from Tokens Studio');
-          notifyToUI('Token removed from Tokens Studio', { error: false });
+          // track('Delete token from Tokens Studio');
+          // notifyToUI('Token removed from Tokens Studio', { error: false });
+          // onTokenRemoveSuccess();
 
           return responseData.data.deleteToken;
         } catch (e) {
@@ -367,8 +371,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Create token set in Tokens Studio');
-          notifyToUI('Token set added in Tokens Studio', { error: false });
+          // track('Create token set in Tokens Studio');
+          // notifyToUI('Token set added in Tokens Studio', { error: false });
+          // onTokenSetAddSuccess();
 
           return responseData.data.createTokenSet;
         } catch (e) {
@@ -398,8 +403,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Update token set in Tokens Studio');
-          notifyToUI('Token set updated in Tokens Studio', { error: false });
+          // track('Update token set in Tokens Studio');
+          // notifyToUI('Token set updated in Tokens Studio', { error: false });
+          // onTokenSetUpdateSuccess()
 
           return responseData.data.updateTokenSet;
         } catch (e) {
@@ -426,8 +432,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Delete token set in Tokens Studio');
-          notifyToUI('Token set deleted from Tokens Studio', { error: false });
+          // track('Delete token set in Tokens Studio');
+          // notifyToUI('Token set deleted from Tokens Studio', { error: false });
+          // onDeleteTokenSetSuccess()
 
           return responseData.data.deleteTokenSet;
         } catch (e) {
@@ -448,8 +455,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Update token set order in Tokens Studio');
-          notifyToUI('Token set order updated in Tokens Studio', { error: false });
+          // track('Update token set order in Tokens Studio');
+          // notifyToUI('Token set order updated in Tokens Studio', { error: false });
+          // onTokenSetOrderUpdateSuccess()
 
           return responseData.data.updateTokenSetOrder;
         } catch (e) {
@@ -474,8 +482,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Create theme group in Tokens Studio');
-          notifyToUI('Theme group created in Tokens Studio', { error: false });
+          // track('Create theme group in Tokens Studio');
+          // notifyToUI('Theme group created in Tokens Studio', { error: false });
+          // onThemeGroupCreateSuccess()
 
           return responseData.data.createThemeGroup;
         } catch (e) {
@@ -500,8 +509,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Update theme group in Tokens Studio');
-          notifyToUI('Theme group updated in Tokens Studio', { error: false });
+          // track('Update theme group in Tokens Studio');
+          // notifyToUI('Theme group updated in Tokens Studio', { error: false });
+          // onThemeGroupUpdateSuccess()
 
           return responseData.data.updateThemeGroup;
         } catch (e) {
@@ -522,8 +532,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
             return null;
           }
 
-          track('Delete theme group in Tokens Studio');
-          notifyToUI('Theme group deleted from Tokens Studio', { error: false });
+          // track('Delete theme group in Tokens Studio');
+          // notifyToUI('Theme group deleted from Tokens Studio', { error: false });
+          // onThemeGroupDeleteSuccess();
           return responseData.data.deleteThemeGroup;
         } catch (e) {
           Sentry.captureException(e);

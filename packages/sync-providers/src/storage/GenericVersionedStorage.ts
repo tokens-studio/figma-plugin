@@ -1,12 +1,12 @@
 import z from 'zod';
+import { singleFileSchema } from '@tokens-studio/sync-providers/src/storage/schemas/singleFileSchema';
+import { tokensMapSchema } from '@tokens-studio/sync-providers/src/storage/schemas/tokensMapSchema';
+import { themeObjectSchema } from '@tokens-studio/sync-providers/src/storage/schemas/themeObjectSchema';
 import * as pjs from '../../package.json';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import { RemoteTokenStorage, RemoteTokenStorageFile } from './RemoteTokenStorage';
-import { singleFileSchema } from './schemas/singleFileSchema';
 import { GenericVersionedStorageFlow } from '@/types/StorageType';
-import { tokensMapSchema } from './schemas/tokensMapSchema';
-import { themeObjectSchema } from './schemas/themeObjectSchema';
 import { SaveOption } from './FileTokenStorage';
 
 const genericVersionedSchema = singleFileSchema.extend({

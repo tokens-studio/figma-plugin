@@ -1,7 +1,7 @@
 import { Gitlab } from '@gitbeaker/rest';
 import compact from 'just-compact';
 import type { CommitAction } from '@gitbeaker/rest';
-import IsJSONString from '@/utils/isJSONString';
+import { isJSONString } from '@/utils/is/isJSONString';
 import {
   GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
 } from './GitTokenStorage';
@@ -126,7 +126,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
         return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
           const { path } = jsonFiles[index];
-          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
+          if (typeof fileContent === 'string' && isJSONString(fileContent)) {
             const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
             const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
@@ -161,7 +161,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
       const stringData = typeof data === 'string' ? data : await data.text();
 
-      if (IsJSONString(stringData)) {
+      if (isJSONString(stringData)) {
         const parsed = JSON.parse(stringData) as GitSingleFileObject;
         return [
           {

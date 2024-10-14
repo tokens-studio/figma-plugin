@@ -1,8 +1,9 @@
-import type {
-  DeepTokensMap, ThemeObjectsList, RemoteResponseData, AnyTokenList, SingleToken,
-} from '../types';
-import { parseTokenValues, convertTokensToObject } from '../utils';
-import { SystemFilenames } from '../constants';
+import { DeepTokensMap, ThemeObjectsList } from '@/types';
+import { RemoteResponseData } from '@/types/RemoteResponseData';
+import type { AnyTokenList, SingleToken } from '@/types/tokens';
+import { convertTokensToObject } from '@/utils/convertTokensToObject';
+import { parseTokenValues } from '@/utils/parseTokenValues';
+import { SystemFilenames } from '@/constants/SystemFilenames';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];

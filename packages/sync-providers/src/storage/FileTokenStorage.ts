@@ -2,7 +2,7 @@ import compact from 'just-compact';
 import {
   RemoteTokenStorage, RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
-import IsJSONString from '@/utils/isJSONString';
+import { isJSONString } from '@/utils/is/isJSONString';
 import { complexSingleFileSchema, multiFileSchema } from './schemas';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SystemFilenames } from '@/constants/SystemFilenames';
@@ -44,7 +44,7 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
           reader.readAsText(file);
           reader.onload = async () => {
             const fileContent = reader.result as string;
-            if (fileContent && IsJSONString(fileContent)) {
+            if (fileContent && isJSONString(fileContent)) {
               const parsedJsonData = JSON.parse(fileContent);
               const validationResult = await multiFileSchema.safeParseAsync(parsedJsonData);
               if (validationResult.success) {
@@ -95,7 +95,7 @@ export class FileTokenStorage extends RemoteTokenStorage<unknown, SaveOption> {
           reader.onload = async () => {
             const result = reader.result as string;
 
-            if (result && IsJSONString(result)) {
+            if (result && isJSONString(result)) {
               const parsedJsonData = JSON.parse(result);
               const validationResult = await complexSingleFileSchema.safeParseAsync(parsedJsonData);
               if (validationResult.success) {

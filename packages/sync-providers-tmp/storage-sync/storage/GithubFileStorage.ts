@@ -1,15 +1,15 @@
 import compact from 'just-compact';
 import { Octokit } from '@octokit/rest';
-import { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
-import IsJSONString from '@/utils/isJSONString';
-import { AnyTokenSet } from '@/types/tokens';
-import { ThemeObjectsList } from '@/types';
+import OctokitCommitMultipleFiles from 'octokit-commit-multiple-files';
+import octokitCommitMultipleFilesFallback from 'octokit-commit-multiple-files/create-or-update-files';
+
+import type { RemoteTokenstorageErrorMessage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from '../types';
+import { isJSONString, joinPath } from '../utils';
 import {
-  GitMultiFileObject, GitSingleFileObject, GitTokenStorage,
-} from './GitTokenStorage';
-import { SystemFilenames } from '@/constants/SystemFilenames';
-import { ErrorMessages } from '@/constants/ErrorMessages';
-import { joinPath } from '@/utils/string';
+  AnyTokenSet, ThemeObjectsList, GitMultiFileObject, GitSingleFileObject,
+} from '../types';
+import { SystemFilenames, ErrorMessages } from '../constants';
+import { GitTokenStorage } from './GitTokenStorage';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -43,7 +43,9 @@ const octokitClientDefaultHeaders = {
 
 };
 
-export class GithubTokenStorage extends GitTokenStorage {
+const commitMultipleFiles = octokitClient => async (params) => octokitCommitMultipleFilesFallback(octokitClient, params);
+
+export class GithubFileStorage extends GitFileStorage {
   private octokitClient: ExtendedOctokitClient;
 
   constructor(
@@ -58,7 +60,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     };
 
     // eslint-disable-next-line
-    const ExtendedOctokitConstructor = Octokit.plugin(require('octokit-commit-multiple-files'));
+    const ExtendedOctokitConstructor = Octokit.plugin(OctokitCommitMultipleFiles);
     this.octokitClient = new ExtendedOctokitConstructor({
       auth: this.secret,
       baseUrl: this.baseUrl || undefined,
@@ -236,7 +238,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         }
       } else if (response.data) {
         const data = response.data as unknown as string;
-        if (IsJSONString(data)) {
+        if (isJSONString(data)) {
           const parsed = JSON.parse(data) as GitSingleFileObject;
           return [
             {
@@ -275,7 +277,9 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   public async createOrUpdate(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean, filesToDelete?: string[], ignoreDeletionFailures?: boolean): Promise<boolean> {
-    const response = await this.octokitClient.repos.createOrUpdateFiles({
+    const createOrUpdateFiles = this.octokitClient.repos.createOrUpdateFiles || commitMultipleFiles(this.octokitClient);
+
+    const response = await createOrUpdateFiles({
       branch,
       owner: this.owner,
       repo: this.repository,

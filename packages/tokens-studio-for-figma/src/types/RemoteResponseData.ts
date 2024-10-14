@@ -1,4 +1,4 @@
-import { RemoteTokenStorageMetadata } from '@/storage/RemoteTokenStorage';
+import { RemoteTokenStorageMetadata } from '@tokens-studio/sync-providers/dist/storage/RemoteTokenStorage';
 import { ThemeObjectsList } from './ThemeObjectsList';
 import { AnyTokenList } from './tokens';
 

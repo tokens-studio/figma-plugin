@@ -1,9 +1,9 @@
-import { DeepTokensMap, ThemeObjectsList } from '@/types';
-import { AnyTokenSet, SingleToken } from '@/types/tokens';
-import { SystemFilenames } from '@/constants/SystemFilenames';
-import { joinPath } from '@/utils/string';
-import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata } from './RemoteTokenStorage';
-import { ErrorMessages } from '@/constants/ErrorMessages';
+import { joinPath } from '../utils';
+import { ErrorMessages, SystemFilenames } from '../constants';
+import type {
+  AnyTokenSet, SingleToken, DeepTokensMap, ThemeObjectsList, RemoteTokenStorageFile, RemoteTokenStorageMetadata,
+} from '../types';
+import { RemoteTokenStorage } from './RemoteTokenStorage';
 
 type StorageFlags = {
   multiFileEnabled: boolean
@@ -27,7 +27,7 @@ export type GitSingleFileObject = Record<string, (
 
 export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | RemoteTokenStorageMetadata;
 
-export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveOptions, GitStorageSaveOption> {
+export abstract class GitFileStorage extends RemoteTokenStorage<GitStorageSaveOptions, GitStorageSaveOption> {
   protected secret: string;
 
   protected owner: string;

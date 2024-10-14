@@ -1,13 +1,13 @@
 import * as GitInterfaces from 'azure-devops-node-api/interfaces/GitInterfaces';
 import compact from 'just-compact';
 import type { StorageProviderType } from '@sync-providers/types';
+import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { GitTokenStorage } from './GitTokenStorage';
 import {
   RemoteTokenstorageErrorMessage,
   RemoteTokenStorageFile, RemoteTokenStorageMetadataFile, RemoteTokenStorageSingleTokenSetFile, RemoteTokenStorageThemesFile,
 } from './RemoteTokenStorage';
-import { multiFileSchema, complexSingleFileSchema } from './schemas';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { AnyTokenSet } from '@/types/tokens';

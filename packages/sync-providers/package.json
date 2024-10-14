@@ -20,6 +20,13 @@
         "default": "./dist/types/index.js"
       },
       "require": "./dist/types/index.cjs"
+    },
+    "./schemas": {
+      "import": {
+        "types": "./dist/storage/schemas/index.d.ts",
+        "default": "./dist/storage/schemas/index.js"
+      },
+      "require": "./dist/storage/schemas/index.cjs"
     }
   },
   "scripts": {
