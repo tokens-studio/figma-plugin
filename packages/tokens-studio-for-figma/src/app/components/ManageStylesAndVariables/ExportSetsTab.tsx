@@ -1,5 +1,7 @@
 import { FileDirectoryIcon } from '@primer/octicons-react';
-import { Tabs, Stack, Heading, Button } from '@tokens-studio/ui';
+import {
+  Tabs, Stack, Heading, Button,
+} from '@tokens-studio/ui';
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
@@ -137,7 +139,9 @@ export default function ExportSetsTab({
             <span>
               {selectedEnabledSets.length}
               {' of '}
-              {allSets.length} {t('exportSetsTab.setsSelectedForExport')}
+              {allSets.length}
+              {' '}
+              {t('exportSetsTab.setsSelectedForExport')}
             </span>
           </Stack>
           <Button variant="secondary" size="small" onClick={handleShowChangeSets}>
