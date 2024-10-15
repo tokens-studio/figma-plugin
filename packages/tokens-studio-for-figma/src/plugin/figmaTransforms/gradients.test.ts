@@ -134,8 +134,8 @@ describe('convertStringtoFigmaGradient', () => {
       ],
       gradientTransform: [
         [0, 1, 0],
-        [-1, 0, 1]
-      ]
+        [-1, 0, 1],
+      ],
     }
   };
 
@@ -191,9 +191,9 @@ describe('convertStringtoFigmaGradient', () => {
       ],
       gradientTransform: [
         [0, 1, 0],
-        [-1, 0, 1]
-      ]
-    }
+        [-1, 0, 1],
+      ],
+    },
   }
 
   const test7 = {
@@ -216,13 +216,13 @@ describe('convertStringtoFigmaGradient', () => {
             b: 1,
             a: 0,
           },
-          position: 0.8941
-        }
+          position: 0.8941,
+        },
       ],
       gradientTransform: [
         [0.9160738743, 0.2772769934, -0.0966754339],
         [-0.2772769934, 0.9160738743, 0.1806015595],
-      ]
+      ],
     }
   }
 

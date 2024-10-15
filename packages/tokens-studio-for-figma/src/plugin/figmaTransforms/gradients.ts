@@ -1,5 +1,5 @@
 import { figmaRGBToHex, extractLinearGradientParamsFromTransform } from '@figma-plugin/helpers';
-import { Matrix, inverse } from 'ml-matrix';
+import { Matrix } from 'ml-matrix';
 import { convertToFigmaColor } from './colors';
 
 export function convertDegreeToNumber(degreeString: string): number {
@@ -18,11 +18,11 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
 }
 
 const roundToPrecision = (value, precision = 10) => {
-  const roundToPrecision = 10**precision;
-  return Math.round((value + Number.EPSILON) * roundToPrecision) / roundToPrecision;
+  const roundToPrecisionVal = 10 ** precision;
+  return Math.round((value + Number.EPSILON) * roundToPrecisionVal) / roundToPrecisionVal;
 }
 
-export function convertStringToFigmaGradient(value: string, node?: BaseNode | PaintStyle) {
+export function convertStringToFigmaGradient(value: string/*, node?: BaseNode | PaintStyle*/) {
   const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
 
   // Default angle is to top (180 degrees)
@@ -84,8 +84,8 @@ export function convertStringToFigmaGradient(value: string, node?: BaseNode | Pa
   scale = normalisedCos;
   // Implement fallback if bugs are caused by obscure node types. This appears to be unnecessary
   // if (!['RECTANGLE', 'FRAME', 'VECTOR'].includes(node?.type || '')) {
-    //   Old scale computation: 
-    //   scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
+  //   // Old scale computation: 
+  //   scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
   // }
 
   const scaledCos = cos * scale;
