@@ -30,12 +30,18 @@ describe('pullStyles', () => {
           { name: 'Custom', modeId: '1:3' },
         ],
       }),
-      getLocalVariables: jest.fn().mockReturnValue([
+      getLocalVariableCollectionsAsync: jest.fn().mockResolvedValue([
+        {
+          id: 'coll1',
+          name: 'Collection 1',
+        },
+      ]),
+      getLocalVariablesAsync: jest.fn().mockResolvedValue([
         {
           name: 'Color',
           remote: false,
           resolvedType: 'COLOR',
-          description: '',
+          variableCollectionId: 'coll1',
           valuesByMode: {
             '1:0': {
               r: 1, g: 1, b: 1, a: 1,
@@ -55,7 +61,7 @@ describe('pullStyles', () => {
         {
           name: 'Number1',
           remote: false,
-          description: '',
+          variableCollectionId: 'coll1',
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 24,
@@ -67,7 +73,7 @@ describe('pullStyles', () => {
         {
           name: 'Number2',
           remote: false,
-          description: '',
+          variableCollectionId: 'coll1',
           resolvedType: 'FLOAT',
           valuesByMode: {
             '1:0': 16,
@@ -79,8 +85,8 @@ describe('pullStyles', () => {
         {
           name: 'String',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'STRING',
-          description: '',
           valuesByMode: {
             '1:0': 'Hello',
             '1:1': 'Hello',
@@ -92,8 +98,8 @@ describe('pullStyles', () => {
         {
           name: 'Boolean',
           remote: false,
+          variableCollectionId: 'coll1',
           resolvedType: 'BOOLEAN',
-          description: '',
           valuesByMode: {
             '1:0': true,
             '1:1': true,
@@ -112,28 +118,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -142,56 +144,48 @@ describe('pullStyles', () => {
       ],
       numbers: [
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'number',
           value: 24,
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'number',
           value: 24,
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'number',
           value: 24,
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'number',
           value: 24,
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'number',
           value: 16,
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'number',
           value: 16,
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'number',
           value: 16,
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'number',
@@ -199,22 +193,22 @@ describe('pullStyles', () => {
         },
       ],
       booleans: [{
-        description: '', name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
       }],
       strings: [{
-        description: '', name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
     });
   });
@@ -225,28 +219,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -255,56 +245,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '24px',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '24px',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '24px',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '24px',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '16px',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '16px',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '16px',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
@@ -312,22 +294,22 @@ describe('pullStyles', () => {
         },
       ],
       booleans: [{
-        description: '', name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
       }],
       strings: [{
-        description: '', name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
     });
   });
@@ -338,28 +320,24 @@ describe('pullStyles', () => {
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -368,56 +346,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
@@ -425,54 +395,50 @@ describe('pullStyles', () => {
         },
       ],
       booleans: [{
-        description: '', name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
       }],
       strings: [{
-        description: '', name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
     });
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
-    await pullVariables({ useDimensions: 'true', useRem: 'true' });
+    await pullVariables({ useDimensions: true, useRem: true });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Default',
           type: 'color',
           value: '#ffffff',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Dark',
           type: 'color',
           value: '#000000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Light',
           type: 'color',
           value: '#ff0000',
         },
         {
-          description: '',
           name: 'Color',
           parent: 'Collection 1/Custom',
           type: 'color',
@@ -481,56 +447,48 @@ describe('pullStyles', () => {
       ],
       dimensions: [
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number1',
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '1.5rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Default',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Dark',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Light',
           type: 'dimension',
           value: '1rem',
         },
         {
-          description: '',
           name: 'Number2',
           parent: 'Collection 1/Custom',
           type: 'dimension',
@@ -538,22 +496,22 @@ describe('pullStyles', () => {
         },
       ],
       booleans: [{
-        description: '', name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Dark', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Light', type: 'boolean', value: 'true',
       }, {
-        description: '', name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
+        name: 'Boolean', parent: 'Collection 1/Custom', type: 'boolean', value: 'true',
       }],
       strings: [{
-        description: '', name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Default', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Dark', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Light', type: 'text', value: 'Hello',
       }, {
-        description: '', name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
+        name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
     });
   });

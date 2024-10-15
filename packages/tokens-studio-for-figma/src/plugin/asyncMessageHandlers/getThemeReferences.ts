@@ -3,6 +3,7 @@ import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { getVariablesWithoutZombies } from '../getVariablesWithoutZombies';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
@@ -49,7 +50,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   });
 
   // We'll also add local variables to the references in case of where we work with local sets
-  const localVariables = await figma.variables.getLocalVariablesAsync();
+  const localVariables = await getVariablesWithoutZombies();
 
   localVariables.forEach((variable) => {
     const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name

@@ -14,8 +14,8 @@ export default async function updateVariablesFromPlugin(payload: UpdateTokenVari
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const variableMap = getVariablesMap();
-  const nameToVariableMap = figma.variables.getLocalVariables().reduce<Record<string, Variable>>((acc, curr) => {
+  const variableMap = await getVariablesMap();
+  const nameToVariableMap = (await figma.variables.getLocalVariablesAsync())?.reduce<Record<string, Variable>>((acc, curr) => {
     acc[curr.name] = curr;
     return acc;
   }, {});
