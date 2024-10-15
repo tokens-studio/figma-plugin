@@ -194,7 +194,7 @@ describe('convertStringtoFigmaGradient', () => {
         [-1, 0, 1],
       ],
     },
-  }
+  };
 
   const test7 = {
     input: 'linear-gradient(106.84deg, #FF0000 5.61%, #cc00ff00 89.41%)',
@@ -231,6 +231,7 @@ describe('convertStringtoFigmaGradient', () => {
   expect(convertStringToFigmaGradient(test3.input)).toEqual(test3.output);
   expect(convertStringToFigmaGradient(test4.input)).toEqual(test4.output);
   expect(convertStringToFigmaGradient(test5.input)).toEqual(test5.output);
+  expect(convertStringToFigmaGradient(test6.input)).toEqual(test6.output);
   expect(convertStringToFigmaGradient(test7.input)).toEqual(test7.output);
 });
 
