@@ -1,5 +1,31 @@
 # @tokens-studio/figma-plugin
 
+## 2.1.1
+
+### Patch Changes
+
+- f6398c7a: Fixed an issue introduced in 2.1.0 that sometimes caused the order of token sets to not be as expected, meaning sets that acted as overrides didn't correctly get calculated.
+- fe94d6a3: Resolved an issue with Bitbucket sync where deleted sets were still being reflected in the tokens repository.
+- bf8c185a: Fixed a bug where applying themes using "Prefix styles with active theme name" didn't correctly apply the right styles.
+- cddfb5ba: Fixed an issue with "zombie variables". Basically, even though a Figma file shows 0 variables, Figma's plugin API will sometimes tell us there's variables existing - probably ones that existed in the past but should be deleted - Figma seems to report those as existing still. This led to issues around applying and referencing variables where we'd point to those zombies. We now correctly check if the variable's collection still exist, and only then use those as references.
+
+## 2.1.0
+
+### Minor Changes
+
+- 0bc599e0: Changed logic around how we create styles or variables around Theming, as well as the logic around token sets and themes. 2.0 introduced some changes that made the whole process more strict. This change now changes things the other way around, we're less strict. Basically, if you export themes and you are exporting multiple themes at once, we now look at the overall configuration of token sets and pass these on as tokens to use for resolution. Meaning, you should not run into issues where you have broken references anymore just because a token set was disabled. If a set contains a token - even if the set is disabled - we will use it to resolve references.
+- e1838a32: Fixes issue where styles are not applied in Figma, when user exports Token Sets as Styles
+
+### Patch Changes
+
+- 417df53c: Raise limit for tokens in Tokens Studio sync to 3000 tokens per set
+- 087b4c1e: Fixed an issue around variable creation where if numerical weights were used we'd display an error that we're unable to apply the font. We now changed this to properly load all weights of the font family and then create styles correctly with variable references to the numerical weight variable
+- 2c60963c: Changed logic when "Remove styles and variables without connection to a token" is enabled where we now look at all created tokens in this session and remove them, instead of looking at each theme individually
+- a81b9a9f: Add missing padding to list of token sets in Export Token Sets Tab
+- fd68d5a5: Prevents falsy errors from displaying when pushing to GitLab and ADO
+- 087b4c1e: Fixes variable creation of color token was using a modifier and using a reference. We now correctly create a raw hex value as Figma doesn't have modifiers. Before we falsely used a reference without the modifier applied
+- 8f97ea63: Optimized the speed of importing variables. Importing should now feel drastically faster
+
 ## 2.0.3
 
 ### Patch Changes

@@ -66,21 +66,5 @@ export default async function updateStyles(
     notifyUI('Some styles were ignored due to "Ignore first part of token name" export setting', { error: true });
   }
 
-  // Remove styles that aren't in the theme or in the exposed token object
-  if (settings.removeStylesAndVariablesWithoutConnection) {
-    const [allLocalPaintStyles, allLocalTextStyles, allLocalEffectStyles] = await Promise.all([
-      figma.getLocalPaintStylesAsync(),
-      figma.getLocalTextStylesAsync(),
-      figma.getLocalEffectStylesAsync(),
-    ]);
-    const allLocalStyles = [...allLocalPaintStyles, ...allLocalTextStyles, ...allLocalEffectStyles];
-
-    allLocalStyles
-      .filter((style) => !Object.values(allStyleIds).includes(style.id))
-      .forEach((style) => {
-        style.remove();
-      });
-  }
-
   return allStyleIds;
 }

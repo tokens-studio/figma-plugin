@@ -4,6 +4,7 @@ import { notifyVariableValues } from './notifiers';
 import { PullVariablesOptions } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 export default async function pullVariables(options: PullVariablesOptions): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -21,8 +22,9 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     });
   }
 
-  // eslint-disable-next-line consistent-return
-  figma.variables.getLocalVariables().forEach((variable) => {
+  const localVariables = await getVariablesWithoutZombies();
+
+  localVariables.forEach((variable) => {
     const variableName = variable.name.replace(/\//g, '.');
     try {
       const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
@@ -45,7 +47,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.COLOR,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             }
           });
@@ -66,7 +68,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               value: tokenValue,
               type: TokenTypes.BOOLEAN,
               parent: `${collection?.name}/${modeName}`,
-              description: variable.description,
+              ...(variable.description ? { description: variable.description } : {}),
             });
           });
           break;
@@ -86,7 +88,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               value: tokenValue as string,
               type: TokenTypes.TEXT,
               parent: `${collection?.name}/${modeName}`,
-              description: variable.description,
+              ...(variable.description ? { description: variable.description } : {}),
             });
           });
           break;
@@ -111,7 +113,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             } else {
               numbers.push({
@@ -119,14 +121,14 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 value: tokenValue as string,
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
-                description: variable.description,
+                ...(variable.description ? { description: variable.description } : {}),
               });
             }
           });
           break;
-        default: return null;
+        default:
+          break;
       }
-      return null;
     } catch (error) {
       console.error('Error while processing variable:', variableName, error);
     }

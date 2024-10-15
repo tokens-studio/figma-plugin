@@ -235,7 +235,7 @@ describe('Can set values on node', () => {
     expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
-  it('calls setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
+  it('does not call setTextValuesOnTarget if text node and composite typography tokens are given', async () => {
     defaultTokenValueRetriever.initiate({
       tokens: [
         {
@@ -265,7 +265,7 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
   });
 
   it('sets textstyle if matching Style is found', async () => {
@@ -333,8 +333,8 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setTextValuesOnTargetSpy).toHaveBeenCalled();
-    expect(textNodeMock).toEqual({ ...textNodeMock });
+    expect(setTextValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(textNodeMock).toEqual({ ...textNodeMock, textStyleId: '456' });
   });
 
   it('sets effectStyle if matching Style is found', async () => {
@@ -453,8 +453,8 @@ describe('Can set values on node', () => {
         },
       },
     );
-    expect(setEffectValuesOnTargetSpy).toHaveBeenCalled();
-    expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '' });
+    expect(setEffectValuesOnTargetSpy).not.toHaveBeenCalled();
+    expect(solidNodeMock).toEqual({ ...solidNodeMock, effectStyleId: '123' });
   });
 
   it('sets fillStyle if matching Style', async () => {

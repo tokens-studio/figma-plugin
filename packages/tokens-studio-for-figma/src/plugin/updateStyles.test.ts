@@ -59,6 +59,7 @@ describe('updateStyles', () => {
     await AsyncMessageChannel.ReactInstance.message({
       type: AsyncMessageTypes.CREATE_STYLES,
       tokens: [{ name: 'borderRadius.small', value: '3', type: TokenTypes.BORDER_RADIUS }],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).not.toHaveBeenCalled();
@@ -77,6 +78,7 @@ describe('updateStyles', () => {
         styleId: '1234',
         internal__Parent: 'global',
       }],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).toHaveBeenCalled();
@@ -108,6 +110,7 @@ describe('updateStyles', () => {
           styleId: '',
         },
       ],
+      sourceTokens: [],
       settings: {} as SettingsState,
     });
     expect(colorSpy).toHaveBeenCalled();
@@ -339,43 +342,5 @@ describe('updateStyles', () => {
     );
     expect(colorSpy).not.toHaveBeenCalled();
     expect(textSpy).not.toHaveBeenCalled();
-  });
-
-  it('removes styles that arent connected if setting is on', async () => {
-    const tokens = [
-      {
-        name: 'primary.500',
-        path: 'light/primary/500',
-        value: '#ff0000',
-        type: 'color',
-        styleId: '1234',
-        internal__Parent: 'global',
-      },
-    ] as ExtendedSingleToken[];
-
-    mockGetThemeInfo.mockImplementationOnce(() => (
-      Promise.resolve({
-        type: AsyncMessageTypes.GET_THEME_INFO,
-        activeTheme: {
-          [INTERNAL_THEMES_NO_GROUP]: 'light',
-        },
-        themes: [{
-          id: 'light',
-          name: 'light',
-          selectedTokenSets: {
-            global: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {
-            'primary.500': '1234',
-          },
-        }],
-      })
-    ));
-
-    await updateStyles(tokens, {
-      removeStylesAndVariablesWithoutConnection: true,
-      stylesColor: true,
-    } as SettingsState, false);
-    expect(mockRemove).toHaveBeenCalledTimes(1);
   });
 });
