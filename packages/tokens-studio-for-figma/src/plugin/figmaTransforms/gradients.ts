@@ -20,9 +20,10 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
 const roundToPrecision = (value, precision = 10) => {
   const roundToPrecisionVal = 10 ** precision;
   return Math.round((value + Number.EPSILON) * roundToPrecisionVal) / roundToPrecisionVal;
-}
+};
 
-export function convertStringToFigmaGradient(value: string/*, node?: BaseNode | PaintStyle*/) {
+// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
+export function convertStringToFigmaGradient(value: string) {
   const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
 
   // Default angle is to top (180 degrees)
@@ -84,7 +85,7 @@ export function convertStringToFigmaGradient(value: string/*, node?: BaseNode | 
   scale = normalisedCos;
   // Implement fallback if bugs are caused by obscure node types. This appears to be unnecessary
   // if (!['RECTANGLE', 'FRAME', 'VECTOR'].includes(node?.type || '')) {
-  //   // Old scale computation: 
+  //   // Old scale computation:
   //   scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
   // }
 

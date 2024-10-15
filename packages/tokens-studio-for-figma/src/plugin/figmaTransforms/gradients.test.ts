@@ -205,7 +205,7 @@ describe('convertStringtoFigmaGradient', () => {
             r: 1,
             g: 0,
             b: 0,
-            a: 1
+            a: 1,
           },
           position: 0.056100000000000004,
         },
