@@ -1,7 +1,3 @@
-// import JSZip from 'jszip';
-// import { glob } from 'glob';
-// import * as fs from 'fs-extra';
-
 const TKN = process.env.FEATUREBASE_TOKEN;
 
 // type CreateChangelogResponse = {
@@ -26,21 +22,18 @@ const TKN = process.env.FEATUREBASE_TOKEN;
 //   success: boolean,
 // }
 
-async function changeset() {
-  const version = '0.0.1';
-  const title = version;
-  const markdownContent = '**Hello, World!**';
+export async function publishChangeset(version, _title, content) {
+  const title = _title || version;
   const url = 'https://do.featurebase.app/v2/changelog';
   const data = {
-    title,
-    markdownContent,
+    title: title,
+    markdownContent: Array.isArray(content) ? content.join('\n') : content,
     // changelogCategories: ['New', 'Fixed', 'Improved'],
     state: 'draft',
     // featuredImage: 'http://example.com/image.png',
   };
 
-  console.log('url', { data });
-
+  console.log('await fetch(url, { ... })', JSON.stringify({ url, data }, null, 2));
 
   // const res = await fetch(url, {
   //   method: 'POST',
@@ -54,7 +47,7 @@ async function changeset() {
 
   // try {
   //   const resJson = await res.json();
-  
+
   //   if (resJson.success) {
   //     console.log('success');
   //   }
@@ -63,5 +56,3 @@ async function changeset() {
   //   console.log(err);
   // }
 }
-
-changeset();

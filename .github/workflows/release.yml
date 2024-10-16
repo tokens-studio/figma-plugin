@@ -98,3 +98,19 @@ jobs:
         with:
           name: package
           path: dist/bundle.zip
+      # Post link to artifact
+      - name: Find artifact comment
+        uses: peter-evans/find-comment@v3
+        id: find_artifact_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: The artifact was successfully created
+      - name: Create or update artifact comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_artifact_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ⤵️ 📦 ✨ The artifact was successfully created! Want to test it? [Download it here](${{steps.store_artifact.outputs.artifact-url}}) 👀 🎁
+          edit-mode: replace

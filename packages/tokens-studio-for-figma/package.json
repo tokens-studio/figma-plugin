@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "bundle": "ts-node ./scripts/bundle.ts",
+    "bundle": "node scripts/bundle.mjs",
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build": "cross-env NODE_ENV=production webpack --mode=production",
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
