@@ -1,5 +1,5 @@
 import { figmaRGBToHex, extractLinearGradientParamsFromTransform } from '@figma-plugin/helpers';
-import { Matrix, inverse } from 'ml-matrix';
+import { Matrix } from 'ml-matrix';
 import { convertToFigmaColor } from './colors';
 
 export function convertDegreeToNumber(degreeString: string): number {
@@ -17,6 +17,12 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
   return `linear-gradient(${angleInDeg + 90}deg, ${gradientStopsString})`;
 }
 
+const roundToPrecision = (value, precision = 10) => {
+  const roundToPrecisionVal = 10 ** precision;
+  return Math.round((value + Number.EPSILON) * roundToPrecisionVal) / roundToPrecisionVal;
+};
+
+// if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
 export function convertStringToFigmaGradient(value: string) {
   const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
 
@@ -63,39 +69,41 @@ export function convertStringToFigmaGradient(value: string) {
 
   const degrees = -(angle - 90);
   const rad = degrees * (Math.PI / 180);
-  const scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
 
-  // start by transforming to the gradient center
+  let normalizedAngleRad = Math.abs(rad) % (Math.PI / 2);
+  if (normalizedAngleRad > Math.PI / 4) {
+    // adjust angle after 45 degrees to scale down correctly towards 90 degrees
+    normalizedAngleRad = Math.PI / 2 - normalizedAngleRad;
+  }
+
+  const sin = Math.sin(rad);
+  const cos = Math.cos(rad);
+
+  let scale = 1;
+
+  const normalisedCos = Math.cos(normalizedAngleRad);
+  scale = normalisedCos;
+  // Implement fallback if bugs are caused by obscure node types. This appears to be unnecessary
+  // if (!['RECTANGLE', 'FRAME', 'VECTOR'].includes(node?.type || '')) {
+  //   // Old scale computation:
+  //   scale = angle % 90 === 0 ? 1 : Math.sqrt(1 + Math.tan(angle * (Math.PI / 180)) ** 2);
+  // }
+
+  const scaledCos = cos * scale;
+  const scaledSin = sin * scale;
+
+  // start by transforming to the gradient center, to keep the gradient centered after scaling
   // which for figma is .5 .5 as it is a relative transform
-  const transformationMatrix = new Matrix([
-    [1, 0, 0.5],
-    [0, 1, 0.5],
-    [0, 0, 1],
-  ]).mmul(
-    // we can then multiply this with the rotation matrix
-    new Matrix([
-      [Math.cos(rad), Math.sin(rad), 0],
-      [-Math.sin(rad), Math.cos(rad), 0],
-      [0, 0, 1],
-    ]),
-  ).mmul(
-    // next we need to multiply it with a scale matrix to fill the entire shape
-    new Matrix([
-      [scale, 0, 0],
-      [0, scale, 0],
-      [0, 0, 1],
-    ]),
-  ).mmul(
-    // lastly we need to translate it back to the 0,0 origin
-    // by negating the center transform
-    new Matrix([
-      [1, 0, -0.5],
-      [0, 1, -0.5],
-      [0, 0, 1],
-    ]),
-  );
+  const tx = 0.5 - 0.5 * scaledCos + 0.5 * scaledSin;
+  const ty = 0.5 - 0.5 * scaledSin - 0.5 * scaledCos;
 
-  const gradientTransformMatrix = inverse(transformationMatrix).to2DArray();
+  const transformationMatrix = new Matrix([
+    [roundToPrecision(scaledCos), roundToPrecision(-scaledSin), roundToPrecision(tx)],
+    [roundToPrecision(scaledSin), roundToPrecision(scaledCos), roundToPrecision(ty)],
+    [0, 0, 1],
+  ]);
+
+  const gradientTransformMatrix = transformationMatrix.to2DArray();
 
   const gradientStops = parts.map((stop, i, arr) => {
     const seperatedStop = stop.split(' ');
