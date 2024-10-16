@@ -1,5 +1,18 @@
 # @tokens-studio/figma-plugin
 
+## 2.2.0
+
+### Minor Changes
+
+- da1886da: Re-introduces "Update styles". If enabled, the plugin will update any local styles when token values or themes change. By default, this setting is off. It's available from the gear menu in the bottom right
+
+### Patch Changes
+
+- 80a5a92b: Fixed an issue where sometimes duplicate sync providers would show up
+- 4fd3f9b1: fix(tokenState): setTokensFromVariables description comparison
+- 7be0b29d: Fixed an issue where referencing a gradient would result in an empty color style; now the style correctly resolves to the gradient.
+- a6eb07de: fixes a bug where applying a typography token to a text node would override individual property changes (like font size or font family) when "Apply to selection/page/document" is clicked.
+
 ## 2.1.1
 
 ### Patch Changes
