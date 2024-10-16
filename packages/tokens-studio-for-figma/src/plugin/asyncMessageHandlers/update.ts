@@ -8,6 +8,7 @@ import { getThemeReferences } from './getThemeReferences';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenFormatOptions } from '../TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import updateStyles from '../updateStyles';
 
 export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = async (msg) => {
   let allWithData: NodeManagerNode[] = [];
@@ -36,6 +37,12 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
       applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
     });
+
+    // If the user has shouldUpdateStyles enabled, we need to upate styles (last used settings will be used, and we're using active themes)
+    if (msg.settings.shouldUpdateStyles) {
+      await updateStyles(msg.tokens, msg.settings, false);
+    }
+
     allWithData = await defaultNodeManager.findBaseNodesWithData({
       updateMode: msg.settings.updateMode,
     });
