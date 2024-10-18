@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "bundle": "ts-node ./scripts/bundle.ts",
+    "bundle": "npx turbo run bundle",
     "build": "npx turbo run build",
     "start": "npx turbo run start",
     "lint": "npx turbo run lint",

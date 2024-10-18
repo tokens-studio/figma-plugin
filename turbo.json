@@ -1,7 +1,7 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "globalDependencies": ["**/.env.*local"],
-    "pipeline": {
+    "tasks": {
       "build": {
         "dependsOn": ["^build"],
         "outputs": [".next/**", "dist/**", "!.next/cache/**"]
@@ -11,6 +11,7 @@
         "cache": false
       },
       "test": {},
-      "test:watch": {}
+      "test:watch": {},
+      "bundle": {}
     }
   }
