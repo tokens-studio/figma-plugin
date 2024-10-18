@@ -11,6 +11,7 @@
         "cache": false
       },
       "test": {},
-      "test:watch": {}
+      "test:watch": {},
+      "bundle": {}
     }
   }

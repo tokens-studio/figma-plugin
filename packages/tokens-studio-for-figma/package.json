@@ -210,6 +210,7 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "eslint-plugin-validate-jsx-nesting": "^0.1.1",
     "express": "^4.19.2",
+    "figcd": "^0.0.16",
     "figma-api-stub": "^0.0.56",
     "figma-plugin-ds": "^1.0.1",
     "file-loader": "^6.2.0",
@@ -265,5 +266,8 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "figma": {
+    "version": "103216"
   }
 }
