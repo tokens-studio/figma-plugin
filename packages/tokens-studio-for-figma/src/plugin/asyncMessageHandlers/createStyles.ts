@@ -10,7 +10,7 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
       figmaVariableReferences, figmaStyleReferences, stylePathPrefix,
     } = await getThemeReferences(msg.settings.prefixStylesWithThemeName);
     defaultTokenValueRetriever.initiate({
-      tokens: msg.tokens,
+      tokens: msg.sourceTokens,
       variableReferences: figmaVariableReferences,
       styleReferences: figmaStyleReferences,
       stylePathPrefix,
@@ -18,7 +18,7 @@ export const createStyles: AsyncMessageChannelHandlers[AsyncMessageTypes.CREATE_
       createStylesWithVariableReferences: msg.settings.createStylesWithVariableReferences,
       applyVariablesStylesOrRawValue: msg.settings.applyVariablesStylesOrRawValue,
     });
-    const styleIds = await updateStyles(msg.tokens, msg.settings, true);
+    const styleIds = await updateStyles(msg.tokens, msg.settings, true, msg.selectedTheme);
 
     return {
       styleIds,

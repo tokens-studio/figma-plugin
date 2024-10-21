@@ -39,3 +39,4 @@ export * from './renameVariables';
 export * from './updateVariables';
 export * from './setInitialLoad';
 export * from './preview';
+export * from './removeStylesWithoutConnection';
