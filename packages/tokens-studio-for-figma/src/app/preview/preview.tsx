@@ -52,7 +52,6 @@ const mockSettings: SavedSettings = {
   updateMode: UpdateMode.PAGE,
   updateOnChange: false,
   updateRemote: true,
-  updateStyles: true,
 };
 
 // const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
