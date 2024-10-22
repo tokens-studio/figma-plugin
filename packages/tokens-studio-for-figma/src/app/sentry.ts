@@ -33,6 +33,7 @@ export const setupReplay = () => {
 };
 
 export const initializeSentry = () => {
+  Sentry.addTracingExtensions();
   switch (process.env.ENVIRONMENT) {
     case 'alpha':
     case 'beta':
@@ -49,7 +50,18 @@ export const initializeSentry = () => {
         replaysOnErrorSampleRate: 1.0,
         integrations: [],
       });
-      Sentry.addTracingExtensions();
+      break;
+    case 'development':
+      Sentry.init({
+        dsn: '',
+        release: `figma-tokens@${pjs.version}`,
+        environment: process.env.ENVIRONMENT,
+        tracesSampleRate: 0,
+        profilesSampleRate: 0,
+        replaysSessionSampleRate: 0,
+        replaysOnErrorSampleRate: 0,
+        integrations: [],
+      });
       break;
     default:
       break;
