@@ -87,7 +87,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
       applyVariablesStylesOrRawValue = typeof data.applyVariablesStylesOrRawValue === 'undefined' ? ApplyVariablesStylesOrRawValues.VARIABLES_STYLES : data.applyVariablesStylesOrRawValue;
-      shouldUpdateStyles = typeof data.shouldUpdateStyles === 'undefined' ? true : data.shouldUpdateStyles;
+      shouldUpdateStyles = typeof data.shouldUpdateStyles === 'undefined' ? false : data.shouldUpdateStyles;
       variablesColor = typeof data.variablesColor === 'undefined' ? true : data.variablesColor;
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
