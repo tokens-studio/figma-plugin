@@ -9,7 +9,3 @@
     ```sh
     npm run preview
     ```
-
-
-
-
