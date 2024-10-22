@@ -20,10 +20,11 @@ const StartupApp = () => {
   const [params, setParams] = useState<StartupMessage | null>(null);
   const rootStore = useStore<RootState>();
   const state = rootStore.getState();
+  const fallbackLanguage = state.settings?.language;
 
   useEffect(() => {
-    i18next.changeLanguage(state?.settings?.language || 'en');
-  }, [state?.settings?.language]);
+    i18next.changeLanguage(params?.settings?.language || fallbackLanguage || 'en');
+  }, [params?.settings?.language, fallbackLanguage]);
 
   useEffect(() => {
     AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, async (startupParams) => {
