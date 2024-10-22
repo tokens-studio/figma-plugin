@@ -51,6 +51,7 @@ import {
 } from '@/storage/tokensStudio';
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
+import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -246,6 +247,45 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      data.forEach((token) => {
+        if (!newTokens[token.parent]) {
+          newTokens[token.parent] = [];
+        }
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        if (existingTokenIndex === -1) {
+          newTokens[token.parent].push(
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+          );
+        }
+      });
+
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
+    editMultipleTokens: (state, data: EditSingleTokenData[]) => {
+      // This is a deep clone of the tokens so that we force an update in the UI even if just the value changes
+      const newTokens: TokenStore['values'] = JSON.parse(JSON.stringify(state.tokens));
+      data.forEach((token) => {
+        const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
+        if (existingTokenIndex > -1) {
+          newTokens[token.parent] = [
+            ...newTokens[token.parent].slice(0, existingTokenIndex),
+            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
+            ...newTokens[token.parent].slice(existingTokenIndex + 1),
+          ];
+        }
+      });
+
+      return {
+        ...state,
+        tokens: newTokens,
+      };
+    },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
       const newTokens: TokenStore['values'] = {};
       Object.keys(state.tokens).forEach((tokenSet) => {
@@ -298,6 +338,7 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: StyleToCreateToken[] = [];
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
+
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -305,10 +346,9 @@ export const tokenState = createModel<RootModel>()({
 
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
-              if (
-                oldValue.description === token.description
-                || (typeof token.description === 'undefined' && oldValue.description === '')
-              ) {
+              const normalizedOldValueDescription = oldValue.description ?? '';
+              const normalizedTokenDescription = token.description ?? '';
+              if (isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
                 existingTokens.push(token);
               } else {
                 updatedTokens.push({
@@ -349,7 +389,9 @@ export const tokenState = createModel<RootModel>()({
             const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
             // If the token already exists
             if (oldValue) {
-              if (isEqual(oldValue.value, token.value) && isEqual(oldValue.description, token.description)) {
+              const normalizedOldValueDescription = oldValue.description ?? '';
+              const normalizedTokenDescription = token.description ?? '';
+              if (isEqual(oldValue.value, token.value) && isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
                 existingTokens.push(token);
               } else {
                 const updatedToken = { ...token };

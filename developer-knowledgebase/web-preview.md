@@ -2,20 +2,10 @@
 
 ## Getting Started
 
-1. Open two Terminal windows/tabs
+1. Open Terminal and run:
 
-    > Terminal 1 (Plugin)
-
-    ```sh
-    npm run preview:plugin
-    ```
-
-    > Terminal 2 (Browser)
+    > Terminal
 
     ```sh
-    npm run preview:browser
+    npm run preview
     ```
-
-
-
-

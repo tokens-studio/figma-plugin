@@ -1,6 +1,10 @@
 import hash from 'object-hash';
 import {
-  AsyncMessageResults, AsyncMessageResultsMap, AsyncMessages, AsyncMessagesMap, AsyncMessageTypes,
+  AsyncMessageResults,
+  AsyncMessageResultsMap,
+  AsyncMessages,
+  AsyncMessagesMap,
+  AsyncMessageTypes,
 } from './types/AsyncMessages';
 
 // credits goes to https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887
@@ -8,22 +12,22 @@ type IsTypeOnlyObject<Obj extends Record<PropertyKey, unknown>> = [keyof Obj] ex
 
 type IncomingMessageEvent<Message = unknown> = {
   data: {
-    pluginMessage: {
-      id: string
-      message: Message
-    } | {
-      id: string
-      error: unknown
+    pluginMessage:
+    | {
+      id: string;
+      message: Message;
     }
-  }
+    | {
+      id: string;
+      error: unknown;
+    };
+  };
 };
 
 export type AsyncMessageChannelHandlers = {
-  [K in AsyncMessageTypes]: (incoming: AsyncMessagesMap[K]) => Promise<
-  IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true
-    ? void
-    : Omit<AsyncMessageResultsMap[K], 'type'>
-  >
+  [K in AsyncMessageTypes]: (
+    incoming: AsyncMessagesMap[K],
+  ) => Promise<IsTypeOnlyObject<AsyncMessageResultsMap[K]> extends true ? void : Omit<AsyncMessageResultsMap[K], 'type'>>;
 };
 
 export const WEBSOCKET_SERVER_URL = 'ws://localhost:9001/ws';
@@ -40,10 +44,7 @@ const sendWsMessage = <Message>(ws, msg: Message) => {
 };
 
 const sendMessageToController = (pluginMessage) => {
-  parent.postMessage(
-    { pluginMessage },
-    '*',
-  );
+  parent.postMessage({ pluginMessage }, '*');
 };
 
 const sendMessageToUi = (pluginMessage) => {
@@ -128,7 +129,7 @@ export class AsyncMessageChannelPreview {
   private listenerFactory<Message>(callback, removeEventListener, parseEvent = (event) => event) {
     const listener = async (msg: Message) => {
       const possiblePromise = callback(parseEvent(msg));
-      if (possiblePromise === false || (possiblePromise && await possiblePromise === false)) {
+      if (possiblePromise === false || (possiblePromise && (await possiblePromise) === false)) {
         removeEventListener('message', listener);
       }
     };
@@ -148,7 +149,11 @@ export class AsyncMessageChannelPreview {
         const wsListener = this.isPreview
           ? this.listenerFactory(callback, this.ws?.removeEventListener, parseWsEvent)
           : null;
-        const listener = this.listenerFactory(callback, window.removeEventListener, (event: { data: { pluginMessage: Message } }) => event.data.pluginMessage);
+        const listener = this.listenerFactory(
+          callback,
+          window.removeEventListener,
+          (event: { data: { pluginMessage: Message } }) => event.data.pluginMessage,
+        );
         window.addEventListener('message', listener);
         if (wsListener) {
           this.ws?.addEventListener('message', wsListener);
@@ -189,11 +194,10 @@ export class AsyncMessageChannelPreview {
     };
   }
 
-  private onMessageEvent = async (msg: { id?: string; message?: AsyncMessages, src?: WebSocketsSource }) => {
+  private onMessageEvent = async (msg: { id?: string; message?: AsyncMessages; src?: WebSocketsSource }) => {
     // This appears to be related to the monaco editor being opened. It appears to post a message to the window message event listener with no data.
     if (!msg || !msg.id || !msg.message || !msg.message.type.startsWith('async/')) {
       // eslint-disable-next-line no-console
-      // console.warn('Invalid message received', msg);
       if ((msg as any)?.type && this.environment === Environment.UI) {
         if (msg.src !== WebSocketsSource.browser) {
           this.sendMessageToBrowser({ ...msg, src: WebSocketsSource.ui });
@@ -218,21 +222,17 @@ export class AsyncMessageChannelPreview {
         // @README need to cast to any to make this work
         // it causes a complex type which can not be resolved due to its depth
         const result = await (handler as any)(msg.message);
-        const payload = result
-          ? { ...result, type: msg.message.type }
-          : { type: msg.message.type };
+        const payload = result ? { ...result, type: msg.message.type } : { type: msg.message.type };
 
         if (this.isInFigmaSandbox) {
           sendMessageToUi({
             id: msg.id,
             message: payload,
           });
-        } else { // eslint-disable-next-line
-          if (this.environment === Environment.BROWSER) {
-            this.sendMessageFromBrowser({ id: msg.id, message: payload, src: WebSocketsSource.browser });
-          } else {
-            sendMessageToController({ id: msg.id, message: payload });
-          }
+        } else if (this.environment === Environment.BROWSER) {
+          this.sendMessageFromBrowser({ id: msg.id, message: payload, src: WebSocketsSource.browser });
+        } else {
+          sendMessageToController({ id: msg.id, message: payload });
         }
       } catch (err) {
         console.error(err);
@@ -256,10 +256,7 @@ export class AsyncMessageChannelPreview {
     return this.attachMessageListener(this.onMessageEvent);
   }
 
-  public handle<T extends AsyncMessageTypes>(
-    type: T,
-    fn: AsyncMessageChannelHandlers[T],
-  ) {
+  public handle<T extends AsyncMessageTypes>(type: T, fn: AsyncMessageChannelHandlers[T]) {
     this.$handlers[type] = fn;
   }
 
@@ -269,17 +266,19 @@ export class AsyncMessageChannelPreview {
       datetime: Date.now(),
     });
     const promise = new Promise<AsyncMessageResults & { type: Message['type'] }>((resolve, reject) => {
-      this.attachMessageListener((msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
-        if (msg?.id === messageId) {
-          if ('message' in msg) {
-            resolve(msg.message);
-          } else {
-            reject(msg.error);
+      this.attachMessageListener(
+        (msg: IncomingMessageEvent<AsyncMessageResults & { type: Message['type'] }>['data']['pluginMessage']) => {
+          if (msg?.id === messageId) {
+            if ('message' in msg) {
+              resolve(msg.message);
+            } else {
+              reject(msg.error);
+            }
+            return false;
           }
-          return false;
-        }
-        return undefined;
-      });
+          return undefined;
+        },
+      );
     });
     switch (this.environment) {
       case Environment.PLUGIN: {

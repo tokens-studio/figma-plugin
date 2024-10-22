@@ -1,4 +1,6 @@
-import { mockGetLocalVariables, mockGetVariableById, mockSetValueForMode } from '../../tests/__mocks__/figmaMock';
+import {
+  mockGetLocalVariableCollectionsAsync, mockGetLocalVariablesAsync, mockGetVariableById, mockSetValueForMode,
+} from '../../tests/__mocks__/figmaMock';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { AsyncMessageTypes, GetThemeInfoMessageResult } from '@/types/AsyncMessages';
@@ -29,7 +31,7 @@ describe('renameVariablesFromPlugin', () => {
   AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, mockGetThemeInfoHandler);
 
   it('should rename variables', async () => {
-    const mockLocalVariables = [
+    const mockLocalVariablesAsync = [
       {
         id: 'VariableID:1234',
         key: '12345',
@@ -64,8 +66,19 @@ describe('renameVariablesFromPlugin', () => {
         setValueForMode: mockSetValueForMode,
       },
     ];
-    mockGetLocalVariables.mockImplementation(() => mockLocalVariables);
-    mockGetVariableById.mockImplementation(() => mockLocalVariables[2]);
+    const mockLocalVariableCollectionsAsync = [
+      {
+        id: 'VariableCollectionId:12:12345',
+        name: 'Collection 1',
+        remote: false,
+        modes: [
+          { name: 'Default', modeId: '123' },
+        ],
+      },
+    ];
+    mockGetLocalVariablesAsync.mockImplementation(() => mockLocalVariablesAsync);
+    mockGetLocalVariableCollectionsAsync.mockImplementation(() => Promise.resolve(mockLocalVariableCollectionsAsync));
+    mockGetVariableById.mockImplementation(() => mockLocalVariablesAsync[2]);
     expect(await renameVariablesFromPlugin([
       {
         oldName: 'fg.default',
@@ -76,6 +89,6 @@ describe('renameVariablesFromPlugin', () => {
       newName: 'fg.default-rename',
       variableIds: ['12345'],
     }]);
-    expect(mockLocalVariables[0].name).toBe('fg/default-rename');
+    expect(mockLocalVariablesAsync[0].name).toBe('fg/default-rename');
   });
 });

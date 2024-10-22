@@ -114,10 +114,7 @@ function Tokens({ isActive }: { isActive: boolean }) {
   }, [activeTokenSet]);
 
   const resolvedTokens = React.useMemo(
-    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, {
-      ...usedTokenSet,
-      [activeTokenSet]: TokenSetStatus.ENABLED,
-    })),
+    () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
     [tokens, usedTokenSet, activeTokenSet],
   );
 

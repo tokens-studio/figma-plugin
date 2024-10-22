@@ -52,7 +52,6 @@ const mockSettings: SavedSettings = {
   updateMode: UpdateMode.PAGE,
   updateOnChange: false,
   updateRemote: true,
-  updateStyles: true,
 };
 
 // const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
@@ -112,8 +111,7 @@ const MockMessageForm = ({ type, handleClose }: { type?: string, handleClose: ()
   const [error, setError] = useState('');
   const handleJsonEditChange = useCallback((val) => {
     try {
-      // eslint-disable-next-line
-      const a = JSON.parse(val);
+      JSON.parse(val);
       if (error) {
         setError('');
       }
@@ -297,10 +295,8 @@ function PreviewApp({ children }: { children: ReactNode }) {
       tab, action, subAction, theme, fullscreen,
     }, updateHash,
   } = usePreviewState();
-  // const [websocketsServer, setWebsocketsServer] = useState(WEBSOCKET_SERVER_URL);
 
   useEffect(() => {
-    // if (tab && tab !== 'loading') {
     if (action) {
       if (mockActions[action][subAction]) {
         dispatchMockMessage(mockActions[action][subAction]);
@@ -326,7 +322,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
 
   const onThemeSelected = useCallback((type) => () => {
     setFigmaBrowserTheme(type, updateHash);
-  }, []);
+  }, [updateHash]);
   const onActionSelected = React.useCallback(
     (type: string) => () => {
       if (type === 'CUSTOM') {
@@ -341,7 +337,7 @@ function PreviewApp({ children }: { children: ReactNode }) {
         }
       }
     },
-    [],
+    [updateHash],
   );
 
   const handleCloseCustomModal = useCallback(() => {
@@ -408,13 +404,13 @@ function PreviewApp({ children }: { children: ReactNode }) {
             className="content scroll-container"
           >
             {
-            [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((action) => (
+            [{ type: 'STARTUP' }, { type: 'CUSTOM' }].map((mockAction) => (
               <DropdownMenu.Item
-                key={action.type}
-                onSelect={onActionSelected(action.type)}
+                key={mockAction.type}
+                onSelect={onActionSelected(mockAction.type)}
                 css={{ display: 'flex', gap: '$3' }}
               >
-                {action.type}
+                {mockAction.type}
               </DropdownMenu.Item>
             ))
           }

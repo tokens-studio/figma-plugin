@@ -30,6 +30,7 @@ export interface SettingsState {
   tokenType?: TokenModeType;
   inspectDeep: boolean;
   shouldSwapStyles: boolean;
+  shouldUpdateStyles: boolean;
   baseFontSize: string;
   aliasBaseFontSize: string;
   /**
@@ -82,6 +83,7 @@ export const settings = createModel<RootModel>()({
     createStylesWithVariableReferences: false,
     inspectDeep: false,
     shouldSwapStyles: false,
+    shouldUpdateStyles: false,
     baseFontSize: defaultBaseFontSize,
     aliasBaseFontSize: defaultBaseFontSize,
     storeTokenIdInJsonEditor: false,
@@ -199,6 +201,12 @@ export const settings = createModel<RootModel>()({
         shouldSwapStyles: payload,
       };
     },
+    setShouldUpdateStyles(state, payload: boolean) {
+      return {
+        ...state,
+        shouldUpdateStyles: payload,
+      };
+    },
     setTokenType(state, payload: TokenModeType) {
       return {
         ...state,
@@ -232,6 +240,9 @@ export const settings = createModel<RootModel>()({
       });
     },
     setShouldSwapStyles: (payload, rootState) => {
+      setUI(rootState.settings);
+    },
+    setShouldUpdateStyles: (payload, rootState) => {
       setUI(rootState.settings);
     },
     setUpdateMode: (payload, rootState) => {

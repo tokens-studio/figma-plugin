@@ -28,7 +28,6 @@ type State = {
 
 export function usePreviewState() {
   const [data, setData] = useState<State>(getHashParams());
-  // const [count, setCount] = useState(0);
 
   useEffect(() => {
     const updateStateFromHash = () => {
@@ -43,13 +42,7 @@ export function usePreviewState() {
       if (Object.keys(statePatch).length > 0) {
         setData((state) => ({ ...state, ...statePatch }));
       }
-      // dispatch({ type: 'UPDATE', payload: statePatch });
-      // setState((s) => ({
-      //   ...s,
-      //   ...statePatch,
-      // }));
     };
-    // updateStateFromHash();
 
     window.addEventListener('hashchange', updateStateFromHash);
 

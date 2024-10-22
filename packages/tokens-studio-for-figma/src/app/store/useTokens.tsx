@@ -3,7 +3,7 @@ import { useCallback, useMemo, useContext } from 'react';
 import { AnyTokenList, SingleToken, TokenToRename } from '@/types/tokens';
 import stringifyTokens from '@/utils/stringifyTokens';
 import formatTokens from '@/utils/formatTokens';
-import { mergeTokenGroups } from '@/utils/tokenHelpers';
+import { getEnabledTokenSets, getOverallConfig, mergeTokenGroups } from '@/utils/tokenHelpers';
 import useConfirm from '../hooks/useConfirm';
 import { Properties } from '@/constants/Properties';
 import { track } from '@/utils/analytics';
@@ -189,7 +189,7 @@ export default function useTokens() {
 
   const pullVariables = useCallback(async () => {
     const userDecision = await confirm({
-      text: 'Import Variables',
+      text: 'Import variables',
       description: 'Sets will be created for each variable mode.',
       choices: [
         { key: 'useDimensions', label: 'Convert numbers to dimensions', enabled: false },
@@ -199,7 +199,6 @@ export default function useTokens() {
     });
 
     if (userDecision) {
-      track('Import variables');
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.PULL_VARIABLES,
         options: {
@@ -370,13 +369,6 @@ export default function useTokens() {
       const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedSets.length > 0;
       if (!shouldCreateStyles) return;
 
-      track('createStyles', {
-        type: 'sets',
-        textStyles: settings.stylesTypography,
-        colorStyles: settings.stylesColor,
-        effectStyles: settings.stylesEffect,
-      });
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATE_STYLES,
         isInfinite: true,
@@ -391,7 +383,12 @@ export default function useTokens() {
         return;
       }
 
-      const tokensToResolve = selectedSets.flatMap((set) => mergeTokenGroups(tokens, { [set.set]: TokenSetStatus.ENABLED }));
+      const selectedSetsMap = selectedSets.reduce((acc, set) => {
+        acc[set.set] = set.status;
+        return acc;
+      }, {});
+
+      const tokensToResolve = mergeTokenGroups(tokens, selectedSetsMap);
 
       const resolved = defaultTokenResolver.setTokens(tokensToResolve);
       const withoutSourceTokens = resolved.filter(
@@ -413,8 +410,23 @@ export default function useTokens() {
       await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
+        sourceTokens: resolved,
         settings,
       }));
+
+      track('createStyles', {
+        type: 'sets',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+        setCount: selectedSets.length,
+        totalStyles: tokensToCreate.length,
+        removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+        renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+        ignoreFirstPartForStyles: settings.ignoreFirstPartForStyles,
+        prefixStylesWithThemeName: settings.prefixStylesWithThemeName,
+        createStylesWithVariableReferences: settings.createStylesWithVariableReferences,
+      });
 
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
@@ -426,65 +438,103 @@ export default function useTokens() {
       const shouldCreateStyles = (settings.stylesTypography || settings.stylesColor || settings.stylesEffect) && selectedThemes.length > 0;
       if (!shouldCreateStyles) return;
 
-      track('createStyles', {
-        type: 'themes',
-        textStyles: settings.stylesTypography,
-        colorStyles: settings.stylesColor,
-        effectStyles: settings.stylesEffect,
-      });
-
-      const selectedSets = themes.reduce((acc, curr) => {
-        if (selectedThemes.includes(curr.id)) {
-          acc = {
-            ...acc,
-            ...curr.selectedTokenSets,
-          };
-        }
-        return acc;
-      }, {});
-
-      const enabledTokenSets = Object.keys(selectedSets)
-        .filter((key) => selectedSets[key] === TokenSetStatus.ENABLED)
-        .map((tokenSet) => tokenSet);
-
-      if (enabledTokenSets.length === 0) {
-        notifyToUI('No styles created. Make sure some sets are active.', { error: true });
-        return;
-      }
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATE_STYLES,
         isInfinite: true,
       });
 
-      const tokensToResolve = Object.keys(selectedSets).flatMap((key) => mergeTokenGroups(tokens, { [key]: TokenSetStatus.ENABLED }));
+      let totalTokensToCreate = 0;
+      // Iterate over all given selectedThemes, and combine the selectedTokenSets.
+      const overallConfig = getOverallConfig(themes, selectedThemes);
 
-      const resolved = defaultTokenResolver.setTokens(tokensToResolve);
-      const withoutSourceTokens = resolved.filter(
-        (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // filter out SOURCE tokens
-      );
+      const allStyleIds: Record<string, string[]> = {};
 
-      const tokensToCreate = withoutSourceTokens.reduce((acc: SingleToken[], curr) => {
-        const shouldCreate = [
-          settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
-          settings.stylesColor && curr.type === TokenTypes.COLOR,
-          settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
-        ].some((isEnabled) => isEnabled);
-        if (shouldCreate) {
-          if (!acc.find((token) => curr.name === token.name)) {
-            acc.push(curr);
-          }
+      const allExistingStyleReferences: string[] = themes.reduce((acc, theme) => {
+        if (theme.$figmaStyleReferences) {
+          Object.keys(theme.$figmaStyleReferences).forEach((key) => {
+            if (theme.$figmaStyleReferences && theme.$figmaStyleReferences[key]) {
+              acc.push(theme.$figmaStyleReferences[key]);
+            }
+          });
         }
         return acc;
-      }, []);
+      }, [] as string[]);
 
-      const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.CREATE_STYLES,
-        tokens: tokensToCreate,
-        settings,
-      }));
+      for (const themeId of selectedThemes) {
+        const selectedTheme = themes.find((theme) => theme.id === themeId);
 
-      dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+        if (selectedTheme) {
+          const selectedSets = selectedTheme.selectedTokenSets;
+          const enabledTokenSets = getEnabledTokenSets(selectedSets);
+
+          if (enabledTokenSets.length > 0) {
+            const tokensToResolve = mergeTokenGroups(tokens, selectedSets, overallConfig);
+            const allTokens = defaultTokenResolver.setTokens(tokensToResolve);
+
+            const tokensFromEnabledSets = allTokens.filter(
+              (token) => !token.internal__Parent || enabledTokenSets.includes(token.internal__Parent), // only use enabled sets
+            );
+
+            const tokensToCreate = tokensFromEnabledSets.reduce((acc: SingleToken[], curr) => {
+              const shouldCreate = [
+                settings.stylesTypography && curr.type === TokenTypes.TYPOGRAPHY,
+                settings.stylesColor && curr.type === TokenTypes.COLOR,
+                settings.stylesEffect && curr.type === TokenTypes.BOX_SHADOW,
+              ].some((isEnabled) => isEnabled);
+              if (shouldCreate && !acc.find((token) => curr.name === token.name)) {
+                acc.push(curr);
+              }
+
+              return acc;
+            }, []);
+
+            totalTokensToCreate += tokensToCreate.length;
+
+            const createStylesResult = await wrapTransaction({ name: 'createStyles' }, async () => AsyncMessageChannel.ReactInstance.message({
+              type: AsyncMessageTypes.CREATE_STYLES,
+              tokens: tokensToCreate,
+              sourceTokens: allTokens,
+              settings,
+              selectedTheme,
+            }));
+
+            Object.assign(allStyleIds, createStylesResult.styleIds);
+
+            dispatch.tokenState.assignStyleIdsToCurrentTheme({ styleIds: createStylesResult.styleIds, tokens: tokensToCreate, selectedThemes });
+          } else {
+            notifyToUI(`No styles created for theme: ${selectedTheme.name}. Make sure some sets are enabled.`, { error: true });
+          }
+        }
+      }
+
+      track('createStyles', {
+        type: 'themes',
+        textStyles: settings.stylesTypography,
+        colorStyles: settings.stylesColor,
+        effectStyles: settings.stylesEffect,
+        themesCount: selectedThemes.length,
+        totalTokens: totalTokensToCreate,
+        removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+        renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+        ignoreFirstPartForStyles: settings.ignoreFirstPartForStyles,
+        prefixStylesWithThemeName: settings.prefixStylesWithThemeName,
+        createStylesWithVariableReferences: settings.createStylesWithVariableReferences,
+      });
+      // Remove styles that aren't in the theme or in the exposed token object
+      if (settings.removeStylesAndVariablesWithoutConnection) {
+        const uniqueMergedStyleIds: string[] = Array.from(new Set([
+          ...Object.values(allExistingStyleReferences).flat(),
+          ...Object.values(allStyleIds).flat(),
+        ]));
+        const { countOfRemovedStyles } = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+          usedStyleIds: uniqueMergedStyleIds,
+        });
+        if (countOfRemovedStyles > 0) {
+          notifyToUI(`${countOfRemovedStyles} styles removed`);
+        }
+      }
+
       dispatch.uiState.completeJob(BackgroundJobs.UI_CREATE_STYLES);
     },
     [dispatch.tokenState, tokens, settings, themes, dispatch.uiState],
@@ -602,9 +652,6 @@ export default function useTokens() {
         && selectedSets.length > 0;
       if (!shouldCreateVariables) return;
 
-      track('createVariables', {
-        type: 'sets',
-      });
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
@@ -615,6 +662,17 @@ export default function useTokens() {
           statExtractor: async (result, transaction) => {
             const data = await result;
             if (data) {
+              track('createVariables', {
+                type: 'sets',
+                totalVariables: data.totalVariables,
+                setCount: selectedSets.length,
+                variablesColor: settings.variablesColor,
+                variablesNumber: settings.variablesNumber,
+                variablesString: settings.variablesString,
+                variablesBoolean: settings.variablesBoolean,
+                removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+                renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+              });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
           },
@@ -641,10 +699,6 @@ export default function useTokens() {
         && selectedThemes.length > 0;
       if (!shouldCreateVariables) return;
 
-      track('createVariables', {
-        type: 'themes',
-      });
-
       dispatch.uiState.startJob({
         name: BackgroundJobs.UI_CREATEVARIABLES,
         isInfinite: true,
@@ -655,6 +709,17 @@ export default function useTokens() {
           statExtractor: async (result, transaction) => {
             const data = await result;
             if (data) {
+              track('createVariables', {
+                type: 'themes',
+                totalVariables: data.totalVariables,
+                themeCount: selectedThemes.length,
+                variablesColor: settings.variablesColor,
+                variablesNumber: settings.variablesNumber,
+                variablesString: settings.variablesString,
+                variablesBoolean: settings.variablesBoolean,
+                removeStylesAndVariablesWithoutConnection: settings.removeStylesAndVariablesWithoutConnection,
+                renameExistingStylesAndVariables: settings.renameExistingStylesAndVariables,
+              });
               transaction.setMeasurement('variables', data.totalVariables, '');
             }
           },
