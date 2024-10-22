@@ -295,10 +295,8 @@ function PreviewApp({ children }: { children: ReactNode }) {
       tab, action, subAction, theme, fullscreen,
     }, updateHash,
   } = usePreviewState();
-  // const [websocketsServer, setWebsocketsServer] = useState(WEBSOCKET_SERVER_URL);
 
   useEffect(() => {
-    // if (tab && tab !== 'loading') {
     if (action) {
       if (mockActions[action][subAction]) {
         dispatchMockMessage(mockActions[action][subAction]);
