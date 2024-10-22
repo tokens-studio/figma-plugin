@@ -78,7 +78,7 @@ describe('uiSettings', () => {
       updateRemote: true,
       updateOnChange: true,
       applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues.VARIABLES_STYLES,
-      shouldUpdateStyles: true,
+      shouldUpdateStyles: false,
       variablesColor: true,
       variablesNumber: true,
       variablesString: true,
