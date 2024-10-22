@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import { LDProps } from 'launchdarkly-react-client-sdk/lib/withLDConsumer';
+import compact from 'just-compact';
 import { Dispatch } from '@/app/store';
 import useConfirm from '@/app/hooks/useConfirm';
 import usePushDialog from '@/app/hooks/usePushDialog';
@@ -22,17 +23,18 @@ import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export type GitlabCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITLAB; }>;
 type GitlabFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITLAB }>;
 
 export const clientFactory = async (context: GitlabCredentials, isProUser: boolean) => {
   const {
-    secret, baseUrl, id: repoPathWithNamespace, filePath, branch,
+    secret, baseUrl, id: repoPathWithNamespace, filePath, branch, previousSourceBranch,
   } = context;
   const { repositoryId } = getRepositoryInformation(repoPathWithNamespace);
 
-  const storageClient = new GitlabTokenStorage(secret, repositoryId, repoPathWithNamespace, baseUrl ?? '');
+  const storageClient = new GitlabTokenStorage(secret, repositoryId, repoPathWithNamespace, baseUrl ?? '', branch, previousSourceBranch);
   if (filePath) storageClient.changePath(filePath);
   if (branch) storageClient.selectBranch(branch);
   if (isProUser) storageClient.enableMultiFile();
@@ -42,7 +44,7 @@ export const clientFactory = async (context: GitlabCredentials, isProUser: boole
 export function useGitLab() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
-  const localApiState = useSelector(localApiStateSelector);
+  const localApiState = useSelector(localApiStateSelector) as GitlabCredentials;
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const activeTheme = useSelector(activeThemeSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
@@ -93,7 +95,15 @@ export function useGitLab() {
           activeTheme,
           hasChangedRemote: true,
         });
-
+        dispatch.tokenState.setRemoteData({
+          tokens,
+          themes,
+          metadata,
+        });
+        const branches = await storage.fetchBranches();
+        dispatch.branchState.setBranches(branches);
+        const stringifiedRemoteTokens = JSON.stringify(compact([tokens, themes, TokenFormat.format]), null, 2);
+        dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         pushDialog({ state: 'success' });
         return {
           status: 'success',
@@ -104,16 +114,10 @@ export function useGitLab() {
       } catch (e: any) {
         closePushDialog();
         console.log('Error pushing to GitLab', e);
-        if (e instanceof Error && e.message === ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR) {
+        if (e instanceof Error) {
           return {
             status: 'failure',
-            errorMessage: ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR,
-          };
-        }
-        if (e instanceof Error && e.message === ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR) {
-          return {
-            status: 'failure',
-            errorMessage: ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR,
+            errorMessage: e.message,
           };
         }
         return {
@@ -123,10 +127,8 @@ export function useGitLab() {
       }
     }
     return {
-      status: 'success',
-      tokens,
-      themes,
-      metadata: {},
+      status: 'failure',
+      errorMessage: 'Push to remote cancelled!',
     };
   }, [
     dispatch,
@@ -226,6 +228,13 @@ export function useGitLab() {
               activeTheme,
               hasChangedRemote: true,
             });
+            dispatch.tokenState.setRemoteData({
+              tokens: sortedValues,
+              themes: content.themes,
+              metadata: content.metadata,
+            });
+            const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+            dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
             dispatch.tokenState.setCollapsedTokenSets([]);
             dispatch.uiState.setApiData({ ...context, ...(latestCommitDate ? { commitDate: latestCommitDate } : {}) });
             notifyToUI('Pulled tokens from GitLab');
@@ -258,7 +267,14 @@ export function useGitLab() {
   ]);
 
   const addNewGitLabCredentials = useCallback(async (context: GitlabFormValues): Promise<RemoteResponseData> => {
+    const previousBranch = localApiState.branch;
+    const previousFilePath = localApiState.filePath;
+    if (previousBranch !== context.branch) {
+      context = { ...context, previousSourceBranch: previousBranch };
+    }
     const data = await syncTokensWithGitLab(context);
+
+
     if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,
@@ -268,6 +284,8 @@ export function useGitLab() {
         notifyToUI('No tokens stored on remote');
       }
     } else {
+      // Go back to the previous setup if the user cancelled pushing to the remote or there was an error
+      dispatch.uiState.setLocalApiState({ ...context, branch: previousBranch, filePath: previousFilePath });
       return {
         status: 'failure',
         errorMessage: data.errorMessage,

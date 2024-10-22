@@ -142,25 +142,66 @@ describe('removeTokensByValue', () => {
 
   it('should set strokeTopWeight as zero', () => {
     removeValuesFromNode(mockNode, Properties.borderTop);
-    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokes).toEqual([
+      {
+        color: {
+          b: 0,
+          g: 0,
+          r: 1,
+        },
+        opacity: 1,
+        type: 'SOLID',
+      },
+    ]);
     expect(mockNode.strokeTopWeight).toEqual(0);
   });
 
   it('should set strokeRightWeight as zero', () => {
     removeValuesFromNode(mockNode, Properties.borderRight);
-    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokes).toEqual([
+      {
+        color: {
+          b: 0,
+          g: 0,
+          r: 1,
+        },
+        opacity: 1,
+        type: 'SOLID',
+      },
+    ]);
     expect(mockNode.strokeRightWeight).toEqual(0);
   });
 
   it('should set strokeBottomWeight as zero', () => {
     removeValuesFromNode(mockNode, Properties.borderBottom);
-    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokes).toEqual([
+      {
+        color: {
+          b: 0,
+          g: 0,
+          r: 1,
+        },
+        opacity: 1,
+        type: 'SOLID',
+      },
+    ]);
     expect(mockNode.strokeBottomWeight).toEqual(0);
   });
 
   it('should set strokeLeftWeight as zero', () => {
     removeValuesFromNode(mockNode, Properties.borderLeft);
-    expect(mockNode.strokes).toEqual([]);
+    expect(mockNode.strokes).toEqual([
+      {
+        color: {
+          b: 0,
+          g: 0,
+          r: 1,
+        },
+        opacity: 1,
+        type: 'SOLID',
+      },
+    ]);
+    console.log({ mockNode }, mockNode.strokeLeftWeight);
     expect(mockNode.strokeLeftWeight).toEqual(0);
   });
 

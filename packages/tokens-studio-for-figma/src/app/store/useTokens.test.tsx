@@ -463,16 +463,7 @@ describe('useToken test', () => {
     AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES, removeStyles);
 
     it('creates all styles', async () => {
-      mockConfirm.mockImplementation(() => Promise.resolve({ data: ['textStyles', 'colorStyles', 'effectStyles'] }));
-
       const tokens = [
-        {
-          internal__Parent: 'light',
-          name: 'bg.default',
-          rawValue: '#ffffff',
-          type: 'color',
-          value: '#ffffff',
-        },
         {
           internal__Parent: 'global',
           name: 'white',
@@ -505,7 +496,36 @@ describe('useToken test', () => {
           type: 'boxShadow',
           value: '{shadows.default}',
         },
+        {
+          internal__Parent: 'light',
+          name: 'bg.default',
+          rawValue: '#ffffff',
+          type: 'color',
+          value: '#ffffff',
+        },
       ];
+
+      const newMockStore = createMockStore({
+        tokenState: {
+          tokens: {
+            global: tokens.filter((token) => token.internal__Parent === 'global'),
+            light: tokens.filter((token) => token.internal__Parent === 'light'),
+          },
+        },
+        settings: {
+          stylesColor: true,
+          stylesEffect: true,
+          stylesTypography: true,
+        },
+      });
+
+      const { result: newResult } = renderHook(() => useTokens(), {
+        wrapper: ({ children }) => (
+          <Provider store={newMockStore}>
+            {children}
+          </Provider>
+        ),
+      });
 
       const tokensToCreate = [
         {
@@ -554,23 +574,60 @@ describe('useToken test', () => {
       ];
 
       await act(async () => {
-        await result.current.createStylesFromSelectedTokenSets(selectedSets);
+        await newResult.current.createStylesFromSelectedTokenSets(selectedSets);
       });
 
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
+        sourceTokens: tokens,
         settings: store.getState().settings,
       });
     });
 
     it('respects decision to only create text styles', async () => {
-      const mockStore = createMockStore({
+      const tokens = [
+        {
+          name: 'white',
+          value: '#ffffff',
+          type: 'color',
+        },
+        {
+          name: 'headline',
+          value: { fontFamily: 'Inter', fontWeight: 'Bold' },
+          type: 'typography',
+        },
+        {
+          name: 'shadow',
+          value: '{shadows.default}',
+          type: 'boxShadow',
+        },
+        {
+          name: 'bg.default',
+          value: '#ffffff',
+          type: 'color',
+        },
+      ];
+
+      const newMockStore = createMockStore({
+        tokenState: {
+          tokens: {
+            global: tokens,
+          },
+        },
         settings: {
           stylesColor: false,
           stylesEffect: false,
           stylesTypography: true,
         },
+      });
+
+      const { result: newResult } = renderHook(() => useTokens(), {
+        wrapper: ({ children }) => (
+          <Provider store={newMockStore}>
+            {children}
+          </Provider>
+        ),
       });
 
       const selectedSets: ExportTokenSet[] = [
@@ -584,11 +641,13 @@ describe('useToken test', () => {
         },
       ];
 
+      defaultTokenValueRetriever.initiate({ tokens });
+
       await act(async () => {
-        await result.current.createStylesFromSelectedTokenSets(selectedSets);
+        await newResult.current.createStylesFromSelectedTokenSets(selectedSets);
       });
 
-      const tokensToCreate = [
+      const initialTokens = [
         {
           name: 'white',
           value: '#ffffff',
@@ -616,15 +675,18 @@ describe('useToken test', () => {
           name: 'bg.default',
           value: '#ffffff',
           type: 'color',
-          internal__Parent: 'light',
+          internal__Parent: 'global',
           rawValue: '#ffffff',
         },
       ];
 
+      const tokensToCreate = initialTokens.filter((token) => token.type === 'typography');
+
       expect(messageSpy).toBeCalledWith({
         type: AsyncMessageTypes.CREATE_STYLES,
         tokens: tokensToCreate,
-        settings: store.getState().settings,
+        sourceTokens: initialTokens,
+        settings: newMockStore.getState().settings,
       });
     });
 

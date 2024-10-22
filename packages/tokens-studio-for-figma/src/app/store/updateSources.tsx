@@ -13,7 +13,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
-import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -59,10 +59,12 @@ async function updateRemoteTokens({
   dispatch,
 }: UpdateRemoteTokensPayload) {
   if (!context) return;
+  const setCount = Object.keys(tokens)?.length;
+  const tokensCount = Object.values(tokens).reduce((acc, set) => acc + set.length, 0);
+  const themeCount = Object.keys(themes).length;
+  const tokenFormat = getFormat();
   switch (provider) {
     case StorageProviderType.JSONBIN: {
-      track('pushTokens', { provider: StorageProviderType.JSONBIN });
-
       notifyToUI('Updating JSONBin...');
       await updateJSONBinTokens({
         themes,
@@ -73,10 +75,13 @@ async function updateRemoteTokens({
         storeTokenIdInJsonEditor,
         dispatch,
       });
+      track('pushTokens', {
+        provider: StorageProviderType.JSONBIN, setCount, tokensCount, themeCount, tokenFormat,
+      });
+
       break;
     }
     case StorageProviderType.GENERIC_VERSIONED_STORAGE: {
-      track('pushTokens', { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE });
       notifyToUI('Updating Generic Remote...');
       await updateGenericVersionedTokens({
         themes,
@@ -86,6 +91,10 @@ async function updateRemoteTokens({
         oldUpdatedAt,
         storeTokenIdInJsonEditor,
         dispatch,
+      });
+
+      track('pushTokens', {
+        provider: StorageProviderType.GENERIC_VERSIONED_STORAGE, setCount, tokensCount, themeCount, tokenFormat,
       });
 
       break;

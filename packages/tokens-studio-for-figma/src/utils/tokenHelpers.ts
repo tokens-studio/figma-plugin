@@ -1,54 +1,72 @@
 import { appendTypeToToken } from '@/app/components/createTokenObj';
 import { SingleToken } from '@/types/tokens';
-import { UsedTokenSetsMap } from '@/types';
+import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { getTokenSetsOrder } from './getTokenSetsOrder';
 
 export type ResolveTokenValuesResult = SingleToken<true, {
   failedToResolve?: boolean
 }>;
 
-export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}): SingleToken[] {
-  // Big O(n * m * l): (n = amount of tokenSets, m = amount of tokens in a tokenSet, l = amount of tokens)
-  const mergedTokens: SingleToken[] = [];
-  // @README we will use both ENABLED and SOURCE sets
-  // we only need to ignore the SOURCE sets when creating styles
-  const tokenSetsToMerge = Object.entries(usedSets)
-    .filter(([, status]) => status === TokenSetStatus.ENABLED || status === TokenSetStatus.SOURCE)
-    .map(([tokenSet]) => tokenSet);
+export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]) {
+  return selectedThemes.reduce((acc, themeId) => {
+    const currentTheme = themes.find((theme) => theme.id === themeId);
+    if (!currentTheme) return acc;
 
-  const tokenSetOrder = tokens?.$metadata?.map(({ value }) => value);
-
-  const tokenEntries = tokenSetOrder ? Object.entries(tokens)
-    .sort((a, b) => tokenSetOrder.indexOf(a[0]) - tokenSetOrder.indexOf(b[0])) : Object.entries(tokens);
-
-  // Reverse token set order (right-most win) and check for duplicates
-  tokenEntries
-    .reverse()
-    .forEach((tokenGroup: [string, SingleToken[]]) => {
-      if (tokenSetsToMerge.length === 0 || tokenSetsToMerge.includes(tokenGroup[0])) {
-        tokenGroup[1].forEach((token) => {
-          const mergedTokenIndex = mergedTokens.findIndex((t) => t.name === token.name);
-          const mergedToken = mergedTokens[mergedTokenIndex];
-          if (mergedTokenIndex < 0) {
-            mergedTokens.push({
-              ...appendTypeToToken(token),
-              internal__Parent: tokenGroup[0],
-            } as SingleToken);
-          }
-          if (mergedTokenIndex > -1 && Array.isArray(mergedToken.value) && Array.isArray(token.value)) {
-            mergedTokens.splice(mergedTokenIndex, 1, mergedToken);
-          } else if (mergedTokenIndex > -1 && typeof mergedToken.value === 'object' && typeof token.value === 'object') {
-            mergedTokens.splice(mergedTokenIndex, 1, {
-              ...mergedToken,
-              value: {
-                ...token.value,
-                ...mergedToken.value,
-              },
-            } as SingleToken);
-          }
-        });
+    Object.entries(currentTheme.selectedTokenSets).forEach(([tokenSet, status]) => {
+    // If the set is enabled, set it. Meaning, it should always win.
+      if (status === TokenSetStatus.ENABLED) {
+        acc[tokenSet] = status;
+        // If the set is source, only set it to source if it wasnt set to enabled.
+      } else if (status === TokenSetStatus.SOURCE && acc[tokenSet] !== TokenSetStatus.ENABLED) {
+        acc[tokenSet] = status;
       }
     });
+    return acc;
+  }, {} as Record<string, TokenSetStatus>);
+}
 
-  return mergedTokens;
+export function getEnabledTokenSets(usedSets: UsedTokenSetsMap = {}) {
+  return Object.keys(usedSets).filter((key) => usedSets[key] === TokenSetStatus.ENABLED).map((tokenSet) => tokenSet);
+}
+
+export function mergeTokenGroups(tokens: Record<string, SingleToken[]>, usedSets: UsedTokenSetsMap = {}, overallConfig: UsedTokenSetsMap = {}, activeTokenSet?: string): SingleToken[] {
+  const { tokenSetsOrder, usedSetsList, overallSets } = getTokenSetsOrder(tokens, usedSets, overallConfig, activeTokenSet);
+
+  // Helper to determine if a token should be merged. We only merge object tokens if the current set is enabled (to avoid accidental merges)
+  const shouldMerge = (
+    currentSet: string,
+    existingToken: SingleToken,
+  ) => usedSetsList.includes(currentSet) && existingToken.internal__Parent && !overallSets.includes(existingToken.internal__Parent);
+
+  return tokenSetsOrder.reduce((mergedTokens, setName) => {
+    const setTokens = tokens[setName] || [];
+    setTokens.forEach((token) => {
+      const existingIndex = mergedTokens.findIndex((t) => t.name === token.name);
+      const existingToken = mergedTokens[existingIndex];
+      const newToken = {
+        ...appendTypeToToken(token),
+        internal__Parent: setName,
+      } as SingleToken;
+
+      if (existingIndex === -1) {
+        // If the token does not exist yet, add it.
+        mergedTokens.push(newToken);
+      } else if (shouldMerge(setName, existingToken) && existingIndex > -1 && typeof existingToken.value === 'object' && typeof newToken.value === 'object'
+      && !Array.isArray(existingToken.value) && !Array.isArray(newToken.value)) {
+        // If the token should be merged, and is an object - and not an array, merge them (e.g. composition, typography)
+        mergedTokens.splice(existingIndex, 1, {
+          ...newToken,
+          value: {
+            ...existingToken.value,
+            ...newToken.value,
+          },
+        } as SingleToken);
+      } else {
+        // In all other cases, just replace.
+        mergedTokens[existingIndex] = newToken;
+      }
+    });
+    return mergedTokens;
+  }, [] as SingleToken[]);
 }

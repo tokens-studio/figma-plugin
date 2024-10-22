@@ -34,10 +34,7 @@ const RemConfiguration = () => {
 
   const resolvedTokens = React.useMemo(
     () => defaultTokenResolver.setTokens(
-      mergeTokenGroups(tokens, {
-        ...usedTokenSet,
-        [activeTokenSet]: TokenSetStatus.ENABLED,
-      }),
+      mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet),
     ),
     [tokens, usedTokenSet, activeTokenSet],
   );

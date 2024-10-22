@@ -42,6 +42,7 @@ const mockResetChangedState = jest.fn();
 const mockGetCommitSha = jest.fn();
 const mockGetLatestCommitDate = jest.fn();
 const mockSetRemoteData = jest.fn();
+const mockSetHasRemoteChange = jest.fn();
 
 // Hide log calls unless they are expected
 jest.spyOn(console, 'log').mockImplementation(() => { });
@@ -54,7 +55,7 @@ const mockSelector = (selector: Selector) => {
           {
             value: '#ffffff',
             type: 'color',
-            name: 'black',
+            name: 'white',
           },
         ],
       };
@@ -83,6 +84,7 @@ jest.mock('react-redux', () => ({
       setApiData: mockSetApiData,
       setStorage: mockSetStorage,
       setShowConfirm: mockSetShowConfirm,
+      setHasRemoteChange: mockSetHasRemoteChange,
     },
     tokenState: {
       setLastSyncedState: mockSetLastSyncedState,
@@ -92,7 +94,7 @@ jest.mock('react-redux', () => ({
       setChangedState: mocksetChangedState,
       resetChangedState: mockResetChangedState,
       setRemoteData: mockSetRemoteData,
-      setTokenFormat: mockSetTokenFormat
+      setTokenFormat: mockSetTokenFormat,
     },
     branchState: {
       setBranches: mockSetBranches,
@@ -308,7 +310,7 @@ describe('remoteTokens', () => {
               {
                 value: '#ffffff',
                 type: 'color',
-                name: 'black',
+                name: 'white',
               },
             ],
           },
@@ -344,7 +346,7 @@ describe('remoteTokens', () => {
               {
                 value: '#ffffff',
                 type: 'color',
-                name: 'black',
+                name: 'white',
               },
             ],
           },
@@ -369,10 +371,21 @@ describe('remoteTokens', () => {
               {
                 value: '#ffffff',
                 type: 'color',
-                name: 'black',
+                name: 'white',
               },
             ],
           },
+        });
+        expect(mockSetRemoteData).toBeCalledWith({
+          tokens: { global: [{ name: 'white', type: 'color', value: '#ffffff' }] },
+          themes: [{
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }],
+          metadata: { commitMessage: 'Initial commit' },
         });
       }
     });
@@ -465,7 +478,7 @@ describe('remoteTokens', () => {
                 {
                   value: '#000000',
                   type: 'color',
-                  name: 'white',
+                  name: 'black',
                 },
               ],
             },
@@ -480,6 +493,18 @@ describe('remoteTokens', () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         expect(notifyToUI).toBeCalledTimes(1);
         expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
+        expect(mockSetRemoteData).toBeCalledTimes(1);
+        expect(mockSetRemoteData).toBeCalledWith({
+          tokens: { global: [{ name: 'black', type: 'color', value: '#000000' }] },
+          themes: [{
+            id: 'black',
+            name: 'Black',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }],
+          metadata: { commitMessage: 'Initial commit' },
+        });
       }
     });
   });
@@ -509,7 +534,7 @@ describe('remoteTokens', () => {
                 {
                   value: '#000000',
                   type: 'color',
-                  name: 'white',
+                  name: 'black',
                 },
               ],
             },
@@ -632,6 +657,22 @@ describe('remoteTokens', () => {
       ));
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         await waitFor(() => { result.current.pushTokens({ context: context as StorageTypeCredentials }); });
+
+        expect(mockSetTokenData).toBeCalledWith({
+          activeTheme: {}, hasChangedRemote: true, themes: [{ id: 'light', name: 'Light', selectedTokenSets: { global: 'enabled' } }], usedTokenSet: {}, values: { global: [{ name: 'white', type: 'color', value: '#ffffff' }] },
+        });
+        expect(mockSetRemoteData).toBeCalledWith({
+          tokens: { global: [{ name: 'white', type: 'color', value: '#ffffff' }] },
+          themes: [{
+            id: 'light',
+            name: 'Light',
+            selectedTokenSets: {
+              global: 'enabled',
+            },
+          }],
+          metadata: { tokenSetOrder: ['global'] },
+        });
+
         expect(mockPushDialog).toBeCalledTimes(2);
         expect(mockPushDialog.mock.calls[1][0].state).toBe('success');
       }
@@ -662,7 +703,7 @@ describe('remoteTokens', () => {
   Object.values(contextMap).forEach((context) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should push tokens and return status data if there is no content`, async () => {
-        mockFetchBranches.mockImplementationOnce(() => (
+        mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
         ));
         mockRetrieve.mockImplementation(() => (
@@ -724,7 +765,7 @@ describe('remoteTokens', () => {
         expect(mockClosePushDialog).toBeCalledTimes(1);
         expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
           status: 'failure',
-          errorMessage: errorMessageMap[contextName as keyof typeof errorMessageMap],
+          errorMessage: (context === adoContext || context === gitLabContext) ? ErrorMessages.GENERAL_CONNECTION_ERROR : errorMessageMap[contextName as keyof typeof errorMessageMap],
         });
       });
     }
@@ -743,6 +784,7 @@ describe('remoteTokens', () => {
                 commitMessage: 'Initial commit',
               },
               status: 'success',
+              themes: [],
             },
           )
         ));
@@ -750,12 +792,11 @@ describe('remoteTokens', () => {
           Promise.resolve(true)
         ));
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-        expect(notifyToUI).toBeCalledTimes(2);
-        expect(notifyToUI).toBeCalledWith(`Pulled tokens from ${contextName}`);
-        expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
-        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-          status: 'success',
-        });
+          expect(notifyToUI).toBeCalledTimes(2);
+          expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
+          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+            status: 'success',
+          });
       });
     } else {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no tokens on remote`, async () => {
@@ -903,7 +944,7 @@ describe('remoteTokens', () => {
   });
 
   Object.values(contextMap).forEach((context) => {
-    it(`fetch branchs on ${context.provider}`, async () => {
+    it(`fetch branches on ${context.provider}`, async () => {
       if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
         mockFetchBranches.mockImplementation(() => (
           Promise.resolve(['main'])
@@ -935,7 +976,7 @@ describe('remoteTokens', () => {
           {
             value: '#ffffff',
             type: 'color',
-            name: 'black',
+            name: 'white',
           },
         ],
       },
@@ -953,7 +994,7 @@ describe('remoteTokens', () => {
     expect(await result.current.fetchTokensFromFileOrDirectory({ files: null })).toEqual(null);
   });
 
-  Object.values(contextMap).forEach((context) => {
+  [...Object.values(contextMap), { provider: 'genericVersionedStorage' }, { provider: 'unknown new provider' }].forEach((context) => {
     it(`checkRemoteChange from ${context.provider}`, async () => {
       if (context === gitHubContext) {
         mockGetCommitSha.mockImplementation(() => (

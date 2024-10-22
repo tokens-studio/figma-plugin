@@ -21,15 +21,19 @@ describe('gitlab client factory', () => {
     const repositoryId = 'test-repo-id';
     const secret = 'test-secret';
     const baseUrl = 'test-url';
+    const branch = 'develop';
+    const previousSourceBranch = 'main';
     const fullPath = `namespace/${repositoryId}`;
     const context = {
       id: fullPath,
       secret,
       baseUrl,
+      branch,
+      previousSourceBranch,
     } as unknown as GitlabCredentials;
     await clientFactory(context, false);
 
-    expect(GitlabTokenStorage).toHaveBeenCalledWith(secret, repositoryId, fullPath, baseUrl);
+    expect(GitlabTokenStorage).toHaveBeenCalledWith(secret, repositoryId, fullPath, baseUrl, branch, previousSourceBranch);
   });
 
   it('should call change path if there is a filepath', async () => {

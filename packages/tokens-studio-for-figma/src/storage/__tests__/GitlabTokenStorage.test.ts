@@ -15,6 +15,7 @@ const mockGetRepositoryFiles = jest.fn();
 const mockCreateCommits = jest.fn();
 const mockShowCommits = jest.fn();
 const mockShowRepositoryFiles = jest.fn();
+const mockCreateRepositoryFiles = jest.fn();
 
 jest.mock('@gitbeaker/rest', () => ({
   Gitlab: jest.fn().mockImplementation(() => ({
@@ -41,6 +42,7 @@ jest.mock('@gitbeaker/rest', () => ({
     RepositoryFiles: {
       showRaw: mockGetRepositoryFiles,
       show: mockShowRepositoryFiles,
+      create: mockCreateRepositoryFiles,
     },
     Commits: {
       create: mockCreateCommits,
@@ -455,7 +457,7 @@ describe('GitlabTokenStorage', () => {
       storeTokenIdInJsonEditor: true,
     });
 
-    expect(mockCreateCommits).toBeCalledWith(
+    expect(mockCreateCommits).toHaveBeenCalledWith(
       35102363,
       'main',
       'Initial commit',
@@ -481,7 +483,6 @@ describe('GitlabTokenStorage', () => {
           filePath: 'data/tokens.json',
         },
       ],
-      undefined,
     );
   });
 

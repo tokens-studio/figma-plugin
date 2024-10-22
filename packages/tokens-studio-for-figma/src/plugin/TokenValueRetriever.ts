@@ -19,10 +19,15 @@ export class TokenValueRetriever {
 
   public createStylesWithVariableReferences;
 
-  private getAdjustedTokenName(tokenName: string): string {
-    const withIgnoredFirstPart = this.ignoreFirstPartForStyles ? tokenName.split('.').slice(1).join('.') : tokenName;
-    const withPrefix = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
-    return withPrefix;
+  private getAdjustedTokenName(tokenName: string): [string, string] {
+    const withIgnoredFirstPart = this.ignoreFirstPartForStyles && tokenName.split('.').length > 1
+      ? tokenName.split('.').slice(1).join('.')
+      : tokenName;
+
+    const adjustedTokenName = [this.stylePathPrefix, tokenName].filter((n) => n).join('.');
+    const adjustedTokenNameWithIgnoreFirstPart = [this.stylePathPrefix, withIgnoredFirstPart].filter((n) => n).join('.');
+
+    return [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart];
   }
 
   public initiate({
@@ -53,10 +58,16 @@ export class TokenValueRetriever {
     this.tokens = new Map<string, any>(tokens.map((token) => {
       const variableId = variableReferences?.get(token.name);
       // For styles, we need to ignore the first part of the token name as well as consider theme prefix
-      const adjustedTokenName = this.getAdjustedTokenName(token.name);
-      const styleId = styleReferences?.get(adjustedTokenName);
+      const [adjustedTokenName, adjustedTokenNameWithIgnoreFirstPart] = this.getAdjustedTokenName(token.name);
+
+      const styleId = styleReferences?.get(adjustedTokenName) || styleReferences?.get(adjustedTokenNameWithIgnoreFirstPart) || styleReferences?.get(token.name);
+      const finalAdjustedTokenName = styleReferences?.has(adjustedTokenName) ? adjustedTokenName : adjustedTokenNameWithIgnoreFirstPart;
+
       return [token.name, {
-        ...token, variableId, styleId, adjustedTokenName,
+        ...token,
+        variableId,
+        styleId,
+        adjustedTokenName: styleId ? finalAdjustedTokenName : adjustedTokenName,
       }];
     }));
   }

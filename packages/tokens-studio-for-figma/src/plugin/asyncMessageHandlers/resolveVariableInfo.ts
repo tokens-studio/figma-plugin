@@ -7,7 +7,7 @@ export type ResolvedVariableInfo = {
   key: string
 };
 export const resolveVariableInfo: AsyncMessageChannelHandlers[AsyncMessageTypes.RESOLVE_VARIABLE_INFO] = async (msg) => {
-  const localVariableMap = getVariablesMap();
+  const localVariableMap = await getVariablesMap();
   const resolvedValues: Record<string, ResolvedVariableInfo> = {};
   await Promise.all(msg.variableIds.map(async (variableId) => {
     if (localVariableMap[variableId]) {

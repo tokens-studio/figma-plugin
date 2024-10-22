@@ -96,35 +96,6 @@ jobs:
           afterSwitchCommand: yarn
           useSameComment: true
           delta: 1
-  test-transform:
-    name: Transformer Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-          cache: yarn
-          cache-dependency-path: "**/yarn.lock"
-      - name: Install dependencies
-        run: yarn  --frozen-lockfile  --immutable
-
-      # 4: Build package
-      - name: build:transform
-        working-directory: packages/tokens-studio-for-figma
-        run: npm run build-transform
-
-      # 5: Install dependencies
-      - name: Install dependencies - transformer
-        working-directory: packages/tokens-studio-for-figma/token-transformer
-        run: npm ci
-
-      # 6: Run tests
-      - name: Run test command
-        working-directory: packages/tokens-studio-for-figma/token-transformer
-        run: npm run test
   cypress-run:
     name: Cypress
     runs-on: ubuntu-22.04

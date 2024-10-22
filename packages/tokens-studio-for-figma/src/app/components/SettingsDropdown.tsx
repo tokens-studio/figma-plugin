@@ -14,11 +14,11 @@ export default function SettingsDropdown() {
   const { t } = useTranslation(['tokens']);
 
   const {
-    updateRemote, updateOnChange, shouldSwapStyles,
+    updateRemote, updateOnChange, shouldSwapStyles, shouldUpdateStyles,
   } = useSelector(settingsStateSelector, isEqual);
 
   const {
-    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles,
+    setUpdateOnChange, setUpdateRemote, setShouldSwapStyles, setShouldUpdateStyles,
   } = useDispatch<Dispatch>().settings;
 
   const handleUpdateOnChange = React.useCallback(() => {
@@ -32,6 +32,10 @@ export default function SettingsDropdown() {
   const handleShouldSwapStyles = React.useCallback(() => {
     setShouldSwapStyles(!shouldSwapStyles);
   }, [shouldSwapStyles, setShouldSwapStyles]);
+
+  const handleShouldUpdateStyles = React.useCallback(() => {
+    setShouldUpdateStyles(!shouldUpdateStyles);
+  }, [shouldUpdateStyles, setShouldUpdateStyles]);
 
   return (
     <DropdownMenu>
@@ -80,6 +84,19 @@ export default function SettingsDropdown() {
             {t('update.swapStyles.title')}
             <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
               {t('update.swapStyles.description')}
+            </Box>
+          </DropdownMenu.CheckboxItem>
+          <DropdownMenu.CheckboxItem
+            data-testid="should-update-styles"
+            checked={shouldUpdateStyles}
+            onCheckedChange={handleShouldUpdateStyles}
+          >
+            <DropdownMenu.ItemIndicator>
+              <Check />
+            </DropdownMenu.ItemIndicator>
+            {t('update.shouldUpdateStyles.title')}
+            <Box css={{ color: '$fgMuted', fontSize: '$xxsmall' }}>
+              {t('update.shouldUpdateStyles.description')}
             </Box>
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>

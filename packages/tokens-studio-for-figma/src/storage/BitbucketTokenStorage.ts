@@ -11,8 +11,8 @@ import {
 import { GitMultiFileObject, GitSingleFileObject, GitTokenStorage } from './GitTokenStorage';
 import { AnyTokenSet } from '@/types/tokens';
 import { ThemeObjectsList } from '@/types';
-import { ErrorMessages } from '@/constants/ErrorMessages';
 import { SystemFilenames } from '@/constants/SystemFilenames';
+import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type CreatedOrUpdatedFileType = {
   owner: string;
@@ -24,6 +24,8 @@ type CreatedOrUpdatedFileType = {
     files: Record<string, string>;
   }[];
 };
+
+type FetchJsonResult = any[] | Record<string, any>;
 
 export class BitbucketTokenStorage extends GitTokenStorage {
   private bitbucketClient;
@@ -141,36 +143,49 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * @returns A promise that resolves to an array of `RemoteTokenStorageFile` objects or a `RemoteTokenstorageErrorMessage` object.
    * @throws Will throw an error if the operation fails.
    */
+
+  private async fetchJsonFilesFromDirectory(url: string): Promise<FetchJsonResult> {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (data.values && Array.isArray(data.values)) {
+      let jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
+
+      const subDirectoryFiles = await Promise.all(
+        data.values
+          .filter((file: any) => file.type === 'commit_directory')
+          .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
+      );
+
+      jsonFiles = jsonFiles.concat(...subDirectoryFiles);
+      return jsonFiles;
+        }
+      return data;
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
+      const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.values && Array.isArray(data.values)) {
-        // Filter out the JSON files
-        const jsonFiles = data.values.filter((file: any) => file.mimetype === 'application/json');
-
-        // Fetch the content of each JSON file
-        const jsonFileContents = await Promise.all(
-          jsonFiles.map((file: any) => fetch(file.links.self.href, {
-              headers: {
-                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-              },
-            }).then((rsp) => rsp.text())),
-        );
+      if (Array.isArray(jsonFiles)) {
+      const jsonFileContents = await Promise.all(
+        jsonFiles.map((file: any) => fetch(file.links.self.href, {
+            headers: {
+              Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+            },
+          }).then((rsp) => rsp.text())),
+      );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
           const { path } = jsonFiles[index];
@@ -202,8 +217,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } else if (data) {
-        const parsed = data as GitSingleFileObject;
+      } else if (jsonFiles) {
+        const parsed = jsonFiles as GitSingleFileObject;
         return [
           {
             type: 'themes',
@@ -279,17 +294,39 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     const data = new FormData();
 
+    const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/`;
+    const existingFiles = await this.fetchJsonFilesFromDirectory(url);
+
+    const existingTokenSets: Record<string, boolean> = {};
+    if (Array.isArray(existingFiles)) {
+      existingFiles.forEach((file) => {
+        if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
+          const tokenSetName = file.path.replace('.json', '');
+          existingTokenSets[tokenSetName] = true;
+        }
+      });
+    }
+
+    const localTokenSets = Object.keys(files);
+
+    const deletedTokenSets = Object.keys(existingTokenSets).filter(
+      (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
+    );
+
     // @README the files object is Record<string, string> here
     // with the key equal to the filename and the value equal to the new content
     // this actually doesn't take into account deletions - but we can consider this later
     // as per the Bitbucket API we basically need to add these key value pairs to the FormData object "as-is"
     Object.entries(files).forEach(([file, content]) => {
       data.append(file, content);
-
       // we will also add all the "files" parameters so we can perform deletions later down the line
       // as per the doc - any specified path in "files" whithout a content definition elsewhere in the FormData will be deleted
       // @NOTE we can actually add the files parameter multiple times - this is fine and Bitbucket will pick this up correctly
       data.append('files', file);
+    });
+
+    deletedTokenSets.forEach((tokenSet) => {
+      data.append('files', `${tokenSet}.json`); // Mark for deletion
     });
 
     const response = await this.bitbucketClient.repositories.createSrcFileCommit({

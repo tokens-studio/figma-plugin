@@ -121,7 +121,6 @@ export function Initiator() {
           case MessageFromPluginTypes.VARIABLES: {
             const { values } = pluginMessage;
             if (values) {
-              track('Import variables');
               dispatch.tokenState.setTokensFromVariables(values);
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }

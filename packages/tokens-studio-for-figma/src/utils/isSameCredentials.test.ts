@@ -16,6 +16,16 @@ describe('isSameCredentials', () => {
       branch: 'main',
       internalId: '123',
     };
+    const storedSupernova = {
+      id: '456',
+      provider: StorageProviderType.SUPERNOVA,
+      designSystemUrl: 'https://example.com',
+      mapping: { foo: 'bar' },
+    };
+    const storedTokensStudio = {
+      id: '789',
+      provider: StorageProviderType.TOKENS_STUDIO,
+    };
     const correctCredentials = {
       id: '123',
       provider: StorageProviderType.JSONBIN,
@@ -39,6 +49,20 @@ describe('isSameCredentials', () => {
       branch: 'default',
       internalId: '123',
     };
+    const correctSupernovaCredentials = {
+      id: '456',
+      provider: StorageProviderType.SUPERNOVA,
+      secret: 'def',
+      name: 'supernova',
+      designSystemUrl: 'https://example.com',
+      mapping: { foo: 'bar' },
+    };
+    const correctTokensStudioCredentials = {
+      id: '789',
+      provider: StorageProviderType.TOKENS_STUDIO,
+      secret: 'ghi',
+      name: 'tokensstudio',
+    };
 
     expect(isSameCredentials(correctCredentials, storedJSONBin)).toBe(true);
     expect(isSameCredentials({ ...correctCredentials, id: '456' }, storedJSONBin)).toBe(false);
@@ -46,5 +70,44 @@ describe('isSameCredentials', () => {
     expect(isSameCredentials({ ...correctGitHubCredentials, filePath: 'tokens2.json' }, storedGitHub)).toBe(false);
     expect(isSameCredentials({ ...correctGitHubCredentials, branch: 'next' }, storedGitHub)).toBe(false);
     expect(isSameCredentials(gitHubCredentialsWithDifferentBranch, storedGitHub)).toBe(true);
+    expect(isSameCredentials(correctSupernovaCredentials, storedSupernova)).toBe(true);
+    expect(isSameCredentials({ ...correctSupernovaCredentials, designSystemUrl: 'https://different.com' }, storedSupernova)).toBe(false);
+    expect(isSameCredentials({ ...correctSupernovaCredentials, mapping: { baz: 'qux' } }, storedSupernova)).toBe(false);
+    expect(isSameCredentials(correctTokensStudioCredentials, storedTokensStudio)).toBe(true);
+    expect(isSameCredentials({ ...correctTokensStudioCredentials, id: '987' }, storedTokensStudio)).toBe(false);
+  });
+
+  it('should use internalId for comparison when available', () => {
+    const storedWithInternalId = {
+      id: 'old-id',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'old-path.json',
+      branch: 'old-branch',
+      internalId: 'internal-123',
+    };
+    const credentialWithInternalId = {
+      id: 'new-id',
+      provider: StorageProviderType.GITHUB,
+      filePath: 'new-path.json',
+      branch: 'new-branch',
+      internalId: 'internal-123',
+    };
+
+    expect(isSameCredentials(credentialWithInternalId, storedWithInternalId)).toBe(true);
+  });
+
+  it('should return false for unsupported provider types', () => {
+    const unsupportedProvider = {
+      id: '999',
+      provider: 'UNSUPPORTED' as StorageProviderType,
+    };
+    const credential = {
+      id: '999',
+      provider: 'UNSUPPORTED' as StorageProviderType,
+      secret: 'xyz',
+      name: 'unsupported',
+    };
+
+    expect(isSameCredentials(credential, unsupportedProvider)).toBe(false);
   });
 });

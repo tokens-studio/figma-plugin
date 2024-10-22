@@ -23,6 +23,7 @@ export type ModalProps = {
   close: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
+  scrollContainerRef?: React.RefObject<HTMLDivElement>;
 };
 
 const StyledBody = styled('div', {
@@ -91,6 +92,7 @@ export function Modal({
   backArrow = false,
   icon,
   onInteractOutside,
+  scrollContainerRef,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
     close();
@@ -182,6 +184,7 @@ export function Modal({
               compact={compact}
               full={full}
               data-testid={id}
+              ref={scrollContainerRef}
               css={{
                 scrollPaddingBlockEnd: footer ? '$4' : 0,
                 marginBottom: footer && size === 'fullscreen' ? 'calc(var(--sizes-controlMedium) + var(--space-6))' : 0, // Size of the fixed footer incl default sized buttons

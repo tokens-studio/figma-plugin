@@ -62,7 +62,7 @@ export type SavedSettings = {
   updateRemote: boolean;
   updateOnChange: boolean;
   applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues;
-  updateStyles: boolean;
+  shouldUpdateStyles: boolean;
   variablesColor: boolean;
   variablesNumber: boolean;
   variablesString: boolean;
@@ -92,7 +92,7 @@ export function notifyUISettings(
     updateMode,
     updateOnChange,
     applyVariablesStylesOrRawValue,
-    updateStyles,
+    shouldUpdateStyles,
     showEmptyGroups,
     variablesColor,
     variablesNumber,
@@ -129,7 +129,7 @@ export function notifyUISettings(
       updateRemote,
       updateOnChange,
       applyVariablesStylesOrRawValue,
-      updateStyles,
+      shouldUpdateStyles,
       variablesColor,
       variablesBoolean,
       variablesNumber,

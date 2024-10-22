@@ -73,7 +73,7 @@ module.exports.mockGetNodeById = jest.fn();
 module.exports.mockScrollAndZoomIntoView = jest.fn();
 module.exports.mockCreateImage = jest.fn();
 module.exports.mockGetLocalVariables = jest.fn(() => ([]));
-module.exports.mockGetLocalVariablesAsync = jest.fn(() => ([]));
+module.exports.mockGetLocalVariablesAsync = jest.fn(() => Promise.resolve([]));
 module.exports.mockCreateVariable = jest.fn();
 module.exports.mockGetLocalVariableCollections = jest.fn();
 module.exports.mockGetLocalVariableCollectionsAsync = jest.fn();
@@ -82,6 +82,7 @@ module.exports.mockImportVariableByKeyAsync = jest.fn();
 module.exports.mockGetVariableById = jest.fn();
 module.exports.mockSetValueForMode = jest.fn();
 module.exports.mockSetBoundVariableForPaint = jest.fn();
+module.exports.mockListAvailableFontsAsync = jest.fn(() => Promise.resolve([{fontName: {family: 'Roboto', style: 'Bold'}}, {fontName: {family: 'Inter', style: 'Regular'}}]));
 
 module.exports.figma = {
   showUI: module.exports.mockShowUI,
@@ -136,7 +137,8 @@ module.exports.figma = {
   createEffectStyle: module.exports.mockCreateEffectStyle,
   importStyleByKeyAsync: module.exports.mockImportStyleByKeyAsync,
   getNodeById: module.exports.mockGetNodeById,
-  createImage: module.exports.mockCreateImage
+  createImage: module.exports.mockCreateImage,
+  listAvailableFontsAsync: module.exports.mockListAvailableFontsAsync,
 };
 
 parent.postMessage = module.exports.mockParentPostMessage;

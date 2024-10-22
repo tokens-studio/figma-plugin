@@ -21,6 +21,10 @@ describe('ADOTokenStorage', () => {
     storageProvider.changePath('tokens.json');
   });
 
+  afterEach(() => {
+    mockFetch.mockClear();
+  });
+
   it('can fetch branches', async () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({
       ok: true,
@@ -278,23 +282,49 @@ describe('ADOTokenStorage', () => {
       json: () => Promise.resolve({
         count: 1,
         value: [
-          {
-            name: 'refs/heads/main',
-            objectId: 'main',
-          },
+          { name: 'refs/heads/main' },
         ],
       }),
-    })).mockImplementationOnce(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({
-        count: 1,
-        value: [
-          { path: '/data/tokens.json' },
-        ],
-      }),
-    })).mockImplementationOnce(() => Promise.resolve({
-      ok: true,
-    }));
+    }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { objectId: 'abc123', path: '/data/tokens.json' },
+          ],
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { name: 'refs/heads/main', objectId: 'abc123' },
+          ],
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { commitId: 'hello123' },
+          ],
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { name: 'refs/heads/main', objectId: 'abc123' },
+          ],
+        }),
+      }));
 
     storageProvider.selectBranch('main');
     storageProvider.changePath('data/tokens.json');
@@ -333,7 +363,7 @@ describe('ADOTokenStorage', () => {
       commitMessage: 'Initial commit',
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
-      4,
+      6,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
       {
         method: 'POST',
@@ -345,7 +375,7 @@ describe('ADOTokenStorage', () => {
           refUpdates: [
             {
               name: 'refs/heads/main',
-              oldObjectId: 'main',
+              oldObjectId: 'hello123',
             },
           ],
           commits: [
@@ -402,7 +432,7 @@ describe('ADOTokenStorage', () => {
         value: [
           {
             name: 'refs/heads/main',
-            objectId: 'main',
+            objectId: '123abc',
           },
         ],
       }),
@@ -418,9 +448,48 @@ describe('ADOTokenStorage', () => {
           { path: '/multifile/$metadata.json' },
         ],
       }),
+    })).mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        count: 1,
+        value: [
+          {
+            name: 'refs/heads/main',
+            objectId: '123abc',
+          },
+        ],
+      }),
     }))
-      .mockImplementationOnce(() => Promise.resolve({ ok: true }))
-      .mockImplementationOnce(() => Promise.resolve({ ok: true }));
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { commitId: 'hello123' },
+          ],
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            { commitId: 'hello123' },
+          ],
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          count: 1,
+          value: [
+            {
+              name: 'refs/heads/main',
+              objectId: '123abc',
+            },
+          ],
+        }),
+      }));
 
     storageProvider.enableMultiFile();
     storageProvider.selectBranch('main');
@@ -474,7 +543,7 @@ describe('ADOTokenStorage', () => {
       commitMessage: 'Initial commit',
     })).toBe(true);
     expect(mockFetch).toHaveBeenNthCalledWith(
-      4,
+      8,
       `${baseUrl}/${projectId}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`,
       {
         method: 'POST',
@@ -486,7 +555,7 @@ describe('ADOTokenStorage', () => {
           refUpdates: [
             {
               name: 'refs/heads/main',
-              oldObjectId: 'main',
+              oldObjectId: 'hello123',
             },
           ],
           commits: [
@@ -494,15 +563,7 @@ describe('ADOTokenStorage', () => {
               comment: 'Initial commit',
               changes: [
                 {
-                  changeType: 'delete',
-                  item: { path: '/multifile/core.json' },
-                },
-                {
-                  changeType: 'delete',
-                  item: { path: '/multifile/internal.json' },
-                },
-                {
-                  changeType: 'edit',
+                  changeType: 'add',
                   item: { path: '/multifile/$metadata.json' },
                   newContent: {
                     content: JSON.stringify({
@@ -512,7 +573,7 @@ describe('ADOTokenStorage', () => {
                   },
                 },
                 {
-                  changeType: 'edit',
+                  changeType: 'add',
                   item: { path: '/multifile/$themes.json' },
                   newContent: {
                     content: JSON.stringify([
@@ -528,7 +589,7 @@ describe('ADOTokenStorage', () => {
                   },
                 },
                 {
-                  changeType: 'edit',
+                  changeType: 'add',
                   item: { path: '/multifile/global.json' },
                   newContent: {
                     content: JSON.stringify({
@@ -555,7 +616,6 @@ describe('ADOTokenStorage', () => {
                     contentType: 'rawtext',
                   },
                 },
-
               ],
             },
           ],

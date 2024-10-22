@@ -47,12 +47,10 @@ function PullDialog() {
             </Stack>
           )}
         >
-          <Stack direction="column" gap={4}>
-            <Stack direction="row" gap={2} css={{ padding: '$4' }}>
-              {t('override')}
-            </Stack>
-            <ChangedStateList />
+          <Stack direction="row" gap={2} css={{ padding: '$4', paddingBottom: 0 }}>
+            {t('override')}
           </Stack>
+          <ChangedStateList type="pull" />
         </Modal>
       );
     }

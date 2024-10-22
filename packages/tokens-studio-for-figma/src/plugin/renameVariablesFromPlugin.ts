@@ -7,7 +7,7 @@ export default async function renameVariablesFromPlugin(tokens: TokenToRename[])
   const themeInfo = await AsyncMessageChannel.PluginInstance.message({
     type: AsyncMessageTypes.GET_THEME_INFO,
   });
-  const variableMap = getVariablesMap();
+  const variableMap = await getVariablesMap();
   const renamedVariableToken = tokens.map((token) => {
     const renamedVariableIds: string[] = [];
     const originalVariableIdsToRename = themeInfo.themes.reduce<string[]>((acc, theme) => {
