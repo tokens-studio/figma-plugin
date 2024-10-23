@@ -32,6 +32,7 @@
     "serve:preview": "serve preview -p 58630",
     "changeset": "changeset",
     "release": "node scripts/release.mjs",
+    "version": "node scripts/version.mjs",
     "publish": "changeset tag && npm run release",
     "translate": "node  ./scripts/translate.mjs",
     "lint": "eslint . --quiet --fix",
@@ -268,6 +269,6 @@
     ]
   },
   "figma": {
-    "version": "103216"
+    "version": "177"
   }
 }

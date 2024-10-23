@@ -1,13 +1,12 @@
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { Octokit } from '@octokit/rest';
+import * as url from 'url';
 
 import { extractChangeset } from './parse-changeset.mjs';
-
-// import * as fs from 'fs-extra';
-import * as url from 'url';
 import { publishChangeset } from './changeset.mjs';
-import { prepare } from './prepare.mjs';
+import { getPluginVersion } from './prepare.mjs';
+import { publishRelease } from './publish-release.mjs';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -20,41 +19,41 @@ async function readJSONFile(filePath) {
 async function main() {
   const packageJson = await readJSONFile(path.join(__dirname, '../package.json'));
 
-  const changes = extractChangeset(packageJson.name, packageJson.version);
+  const currentPluginVersion = await getPluginVersion()
+  if (Number(currentPluginVersion) >= packageJson.figma.version) {
+    throw new Error('Current plugin version is larger than or equal to the Figma plugin version in package.json');
+  }
 
-  console.log(`${changes.join('\n')}`);
+  const changes = extractChangeset(packageJson.name, packageJson.version);
 
   const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN,
-    // baseUrl: this.baseUrl || undefined,
   });
+  const owner = 'tokens-studio';
+  const repo = 'figma-plugin';
 
   const release = await octokit.rest.repos.getReleaseByTag({
-    owner: 'tokens-studio',
-    repo: 'figma-plugin',
-    tag: `v${packageJson.version}`,
-  });
-
-  const releaseZip = await fs.readFileSync(path.join(__dirname, '../dist/release.zip'));
-
-  const uploadReleaseAssetRes = await octokit.rest.repos.uploadReleaseAsset({
     owner,
     repo,
-    url: release.data.upload_url,
-    release_id: release.data.id,
-    data: releaseZip,
-    headers: {
-      'content-type': contentType,
-      'content-length': fs.statSync(asset).size,
-    },
-    name: 'release.zip',
+    tag: `${packageJson.name}@${packageJson.version}`,
   });
 
-  console.log(uploadReleaseAssetRes);
+  await createZipBundle(true);
 
-  // await prepare();
+  await octokit.rest.repos.uploadReleaseAsset({
+    owner,
+    repo,
+    release_id: release.data.id,
+    data: await readFile(path.join(__dirname, '../dist/release.zip')),
+    name: 'release.zip',
+    upload_url: release.data.upload_url,
+  });
 
-  // await publishChangeset(packageJson.version, packageJson.version, changes);
+
+  const featurebaseUrl = await publishChangeset(packageJson.version, packageJson.version, changes);
+
+  console.log('Starting Figma publish');
+  await publishRelease(featurebaseUrl);
 }
 
 main();

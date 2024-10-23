@@ -10,6 +10,12 @@
       "start": {
         "cache": false
       },
+      "release": {
+        "cache": false
+      },
+      "version": {
+        "cache": false
+      },
       "test": {},
       "test:watch": {},
       "bundle": {}

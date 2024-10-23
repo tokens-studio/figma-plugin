@@ -1,6 +1,6 @@
-const TKN = process.env.FEATUREBASE_TOKEN;
-
 export async function publishChangeset(version, _title, content) {
+  const tkn = process.env.FEATUREBASE_TOKEN;
+
   const title = _title || version;
   const url = 'https://do.featurebase.app/v2/changelog';
   const data = {
@@ -14,7 +14,7 @@ export async function publishChangeset(version, _title, content) {
   const res = await fetch(url, {
     method: 'POST',
     headers: {
-      'X-API-Key': TKN,
+      'X-API-Key': tkn,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -22,12 +22,10 @@ export async function publishChangeset(version, _title, content) {
 
   try {
     const resJson = await res.json();
-
-    if (resJson.success) {
-      console.log('success');
+    if (resJson.success && resJson.results.slug) {
+      return `https://feedback.tokens.studio/changelog/${resJson.results.slug}`;
     }
   } catch (err) {
-    // console.log({ res });
     console.log(err);
   }
 }

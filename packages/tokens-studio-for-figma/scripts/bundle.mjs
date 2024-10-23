@@ -1,12 +1,9 @@
 import JSZip from 'jszip';
-import { glob } from 'glob';
 import path from 'path';
 import { readFile, writeFile } from 'fs/promises';
-// import * as fs from 'fs-extra';
 import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const __filename = url.fileURLToPath(import.meta.url);
 
 async function readJSONFile(filePath) {
   const absoluteFilePath = path.join(__dirname, filePath);
@@ -16,11 +13,6 @@ async function readJSONFile(filePath) {
 
 async function createZipBundle(isRelease) {
   const zip = new JSZip();
-  // fs.ensureDirSync('dist');
-  // const files = await glob(['packages/tokens-studio-for-figma/dist/*.js', 'packages/tokens-studio-for-figma/dist/*.html'], { nodir: true });
-  // await Promise.all(files.map(async (file) => {
-  //   await zip.file(file, fs.readFileSync(file, 'utf8'));
-  // }));
 
   const packageJson = await readJSONFile('../package.json');
   const manifest = await readJSONFile('../manifest.json');
