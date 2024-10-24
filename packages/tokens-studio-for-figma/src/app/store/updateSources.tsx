@@ -178,7 +178,9 @@ export default async function updateTokensOnSources({
     collapsedTokenSets,
     tokenFormat,
   }).then((result) => {
-    transaction.setMeasurement('nodes', result.nodes, '');
-    transaction.finish();
+    if (transaction) {
+      transaction.setMeasurement('nodes', result.nodes, '');
+      transaction.finish();
+    }
   });
 }
