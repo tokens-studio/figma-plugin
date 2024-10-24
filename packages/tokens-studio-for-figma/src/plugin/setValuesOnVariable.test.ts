@@ -15,19 +15,89 @@ describe('SetValuesOnVariable', () => {
       key: '123',
       name: 'button/primary/borderRadius',
       setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: 16,
+      },
     } as unknown as Variable,
     {
       id: 'VariableID:309:16432',
       key: '124',
       name: 'button/primary/height',
       setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: 32,
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16435',
+      key: '125',
+      name: 'colors/black',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16436',
+      key: '126',
+      name: 'colors/accent',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: {
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
+        },
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16437',
+      key: '127',
+      name: 'text/string',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: 'foobar',
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16438',
+      key: '128',
+      name: 'text/stringChanged',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: 'foobar',
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16439',
+      key: '129',
+      name: 'boolean/true',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: true,
+      },
+    } as unknown as Variable,
+    {
+      id: 'VariableID:309:16440',
+      key: '130',
+      name: 'boolean/false',
+      setValueForMode: mockSetValueForMode,
+      valuesByMode: {
+        309: false,
+      },
     } as unknown as Variable,
   ] as Variable[];
   const mode = '309';
   const collection = {
     id: 'VariableCollectionId:309:16430',
   } as VariableCollection;
-  it('when there is a variable which is connected to the token, we just update the value', () => {
+  it('when there is a variable which is connected to the token, we only update the value if it has changed, but not for others', () => {
     const tokens = [
       {
         name: 'button.primary.borderRadius',
@@ -37,9 +107,73 @@ describe('SetValuesOnVariable', () => {
         type: TokenTypes.BORDER_RADIUS,
         variableId: '123',
       },
+      {
+        name: 'button.primary.height',
+        path: 'button/primary/height',
+        rawValue: '32',
+        value: '32',
+        type: TokenTypes.SIZING,
+        variableId: '124',
+      },
+      {
+        name: 'colors.black',
+        path: 'colors/black',
+        rawValue: '#000000',
+        value: '#000000',
+        type: TokenTypes.COLOR,
+        variableId: '125',
+      },
+      {
+        name: 'colors.accent',
+        path: 'colors/accent',
+        rawValue: '#ff0000',
+        value: '#ff0000',
+        type: TokenTypes.COLOR,
+        variableId: '126',
+      },
+      {
+        name: 'text.string',
+        path: 'text/string',
+        rawValue: 'foobar',
+        value: 'foobar',
+        type: TokenTypes.TEXT,
+        variableId: '127',
+      },
+      {
+        name: 'text.stringChanged',
+        path: 'text/stringChanged',
+        rawValue: 'foobarX',
+        value: 'foobarX',
+        type: TokenTypes.TEXT,
+        variableId: '128',
+      },
+      {
+        name: 'boolean.true',
+        path: 'boolean/true',
+        rawValue: 'true',
+        value: 'true',
+        type: TokenTypes.BOOLEAN,
+        variableId: '129',
+      },
+      {
+        name: 'boolean.false',
+        path: 'boolean/false',
+        rawValue: 'true',
+        value: 'true',
+        type: TokenTypes.BOOLEAN,
+        variableId: '130',
+      },
     ] as SingleToken<true, { path: string, variableId: string }>[];
     setValuesOnVariable(variablesInFigma, tokens, collection, mode, baseFontSize);
+    // Check that the right values are called (only those that were changed)
     expect(mockSetValueForMode).toBeCalledWith(mode, 8);
+    expect(mockSetValueForMode).toBeCalledWith(mode, {
+      r: 1, g: 0, b: 0, a: 1,
+    });
+    expect(mockSetValueForMode).toBeCalledWith(mode, 'foobarX');
+    expect(mockSetValueForMode).toBeCalledWith(mode, true);
+    // Check that its only called for the right items (4 changed, 4 kept the same values)
+    expect(mockSetValueForMode).toHaveBeenCalledTimes(4);
   });
 
   it('should create a new variable when there is no variable which is connected to the token', () => {
