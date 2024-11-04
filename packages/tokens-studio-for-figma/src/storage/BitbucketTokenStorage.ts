@@ -145,7 +145,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    */
 
   private async fetchJsonFilesFromDirectory(url: string): Promise<FetchJsonResult> {
-
     const paginatedUrl = `${url}?pagelen=100`;
 
     const response = await fetch(paginatedUrl, {
