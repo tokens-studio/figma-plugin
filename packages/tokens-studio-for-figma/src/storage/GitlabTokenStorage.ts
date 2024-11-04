@@ -115,94 +115,120 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
-      if (!this.path.endsWith('.json')) {
-        const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
-          path: this.path,
-          ref: this.branch,
-          recursive: true,
-        });
+        if (!this.path.endsWith('.json')) {
+            const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+                path: this.path,
+                ref: this.branch,
+                recursive: true,
+            });
 
-        const jsonFiles = trees.filter((file) => (
-          file.path.endsWith('.json')
-        )).sort((a, b) => (
-          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-        ));
+            const gitkeepDeletions: CommitAction[] = [];
+            const jsonFiles = trees.filter((file) => (
+                file.path.endsWith('.json')
+            )).sort((a, b) => (
+                (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+            ));
 
-        const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-          this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
-        )));
+            // Check each directory for `.gitkeep` in non-empty directories
+            const directories = trees.reduce((acc: Record<string, string[]>, file) => {
+                const dir = file.path.substring(0, file.path.lastIndexOf('/'));
+                if (!acc[dir]) acc[dir] = [];
+                acc[dir].push(file.path);
+                return acc;
+            }, {});
 
-        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
-          const { path } = jsonFiles[index];
-          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
-            const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
-            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+            for (const [dir, files] of Object.entries(directories)) {
+                const hasGitkeep = files.some(file => file.endsWith('.gitkeep'));
+                const hasOtherFiles = files.some(file => !file.endsWith('.gitkeep'));
 
-            if (name === SystemFilenames.THEMES) {
-              return {
-                path,
-                type: 'themes',
-                data: parsed as ThemeObjectsList,
-              };
+                if (hasGitkeep && hasOtherFiles) {
+                    const gitkeepPath = `${dir}/.gitkeep`;
+                    gitkeepDeletions.push({ action: 'delete', filePath: gitkeepPath });
+                }
             }
 
-            if (name === SystemFilenames.METADATA) {
-              return {
-                path,
-                type: 'metadata',
-                data: parsed as RemoteTokenStorageMetadata,
-              };
+            if (gitkeepDeletions.length > 0) {
+                try {
+                    await this.gitlabClient.Commits.create(this.projectId, this.branch, 'Deleting unnecessary .gitkeep files', gitkeepDeletions);
+                } catch (e) {
+                    console.error('Failed to delete .gitkeep files:', e);
+                }
             }
 
-            return {
-              path,
-              name,
-              type: 'tokenSet',
-              data: parsed as AnyTokenSet<false>,
-            };
-          }
+            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
+                this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
+            )));
 
-          return null;
-        }));
-      }
+            return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+                const { path } = jsonFiles[index];
+                if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
+                    const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+                    const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
-      const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
-      const stringData = typeof data === 'string' ? data : await data.text();
+                    if (name === SystemFilenames.THEMES) {
+                        return {
+                            path,
+                            type: 'themes',
+                            data: parsed as ThemeObjectsList,
+                        };
+                    }
 
-      if (IsJSONString(stringData)) {
-        const parsed = JSON.parse(stringData) as GitSingleFileObject;
-        return [
-          {
-            type: 'themes',
-            path: `${this.path}/${SystemFilenames.THEMES}.json`,
-            data: parsed.$themes ?? [],
-          },
-          ...(parsed.$metadata ? [
-            {
-              type: 'metadata' as const,
-              path: this.path,
-              data: parsed.$metadata,
-            },
-          ] : []),
-          ...(Object.entries(parsed).filter(([key]) => (
-            !Object.values<string>(SystemFilenames).includes(key)
-          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-            name,
-            type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
-            data: tokenSet,
-          })),
-        ];
-      }
-      return {
-        errorMessage: ErrorMessages.VALIDATION_ERROR,
-      };
+                    if (name === SystemFilenames.METADATA) {
+                        return {
+                            path,
+                            type: 'metadata',
+                            data: parsed as RemoteTokenStorageMetadata,
+                        };
+                    }
+
+                    return {
+                        path,
+                        name,
+                        type: 'tokenSet',
+                        data: parsed as AnyTokenSet<false>,
+                    };
+                }
+
+                return null;
+            }));
+        }
+
+        const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
+        const stringData = typeof data === 'string' ? data : await data.text();
+
+        if (IsJSONString(stringData)) {
+            const parsed = JSON.parse(stringData) as GitSingleFileObject;
+            return [
+                {
+                    type: 'themes',
+                    path: `${this.path}/${SystemFilenames.THEMES}.json`,
+                    data: parsed.$themes ?? [],
+                },
+                ...(parsed.$metadata ? [
+                    {
+                        type: 'metadata' as const,
+                        path: this.path,
+                        data: parsed.$metadata,
+                    },
+                ] : []),
+                ...(Object.entries(parsed).filter(([key]) => (
+                    !Object.values<string>(SystemFilenames).includes(key)
+                )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+                    name,
+                    type: 'tokenSet',
+                    path: `${this.path}/${name}.json`,
+                    data: tokenSet,
+                })),
+            ];
+        }
+        return {
+            errorMessage: ErrorMessages.VALIDATION_ERROR,
+        };
     } catch (err) {
-      // Raise error (usually this is an auth error)
-      console.error(err);
+        console.error(err);
+        return [];
     }
-    return [];
-  }
+}
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     if (!this.projectId) throw new Error('Missing Project ID');
