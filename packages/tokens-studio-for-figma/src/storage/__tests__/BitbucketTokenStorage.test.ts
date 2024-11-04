@@ -162,7 +162,7 @@ describe('BitbucketTokenStorage', () => {
     ]);
 
     expect(mockFetch).toBeCalledWith(
-      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/?pagelen=100`,
       {
         headers: {
           Authorization: `Basic ${btoa('myusername:mock-secret')}`,
