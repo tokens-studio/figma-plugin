@@ -250,17 +250,21 @@ export class GitlabTokenStorage extends GitTokenStorage {
             this.projectId,
             gitkeepPath,
             branch,
-            '{}', // Empty .gitkeep content
+            '{}',
             'Initial commit',
         );
     }
 
-    // Actions to create/update JSON files based on the changeset
-    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
-        action: 'create',
-        filePath,
-        content,
-    }));
+    const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+      path: rootPath,
+      ref: branch,
+      recursive: true,
+  });
+
+  const gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+      const action = tree.some(file => file.path === filePath) ? 'update' : 'create';
+      return { action, filePath, content };
+  });
 
     // Commit the actions (including any new or updated files)
     try {
@@ -277,14 +281,12 @@ export class GitlabTokenStorage extends GitTokenStorage {
         throw new Error(e);
     }
 
-    // Re-fetch the directory contents after creating/updating files
     const updatedTree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
         path: rootPath,
         ref: branch,
         recursive: true,
     });
 
-    // If other files are now present, schedule .gitkeep for deletion
     const otherFilesPresent = updatedTree.some(file => file.path !== gitkeepPath);
     if (otherFilesPresent) {
         try {
@@ -295,7 +297,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
             console.error(`Failed to delete .gitkeep: ${e}`);
         }
     }
-
     return true;
 }
 
