@@ -115,120 +115,120 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     try {
-        if (!this.path.endsWith('.json')) {
-            const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
-                path: this.path,
-                ref: this.branch,
-                recursive: true,
-            });
+      if (!this.path.endsWith('.json')) {
+        const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+          path: this.path,
+          ref: this.branch,
+          recursive: true,
+        });
 
-            const gitkeepDeletions: CommitAction[] = [];
-            const jsonFiles = trees.filter((file) => (
-                file.path.endsWith('.json')
-            )).sort((a, b) => (
-                (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-            ));
+        const gitkeepDeletions: CommitAction[] = [];
+        const jsonFiles = trees.filter((file) => (
+          file.path.endsWith('.json')
+        )).sort((a, b) => (
+          (a.path && b.path) ? a.path.localeCompare(b.path) : 0
+        ));
 
-            // Check each directory for `.gitkeep` in non-empty directories
-            const directories = trees.reduce((acc: Record<string, string[]>, file) => {
-                const dir = file.path.substring(0, file.path.lastIndexOf('/'));
-                if (!acc[dir]) acc[dir] = [];
-                acc[dir].push(file.path);
-                return acc;
-            }, {});
+        // Check each directory for `.gitkeep` in non-empty directories
+        const directories = trees.reduce((acc: Record<string, string[]>, file) => {
+          const dir = file.path.substring(0, file.path.lastIndexOf('/'));
+          if (!acc[dir]) acc[dir] = [];
+          acc[dir].push(file.path);
+          return acc;
+        }, {});
 
-            for (const [dir, files] of Object.entries(directories)) {
-                const hasGitkeep = files.some(file => file.endsWith('.gitkeep'));
-                const hasOtherFiles = files.some(file => !file.endsWith('.gitkeep'));
+        for (const [dir, files] of Object.entries(directories)) {
+          const hasGitkeep = files.some((file) => file.endsWith('.gitkeep'));
+          const hasOtherFiles = files.some((file) => !file.endsWith('.gitkeep'));
 
-                if (hasGitkeep && hasOtherFiles) {
-                    const gitkeepPath = `${dir}/.gitkeep`;
-                    gitkeepDeletions.push({ action: 'delete', filePath: gitkeepPath });
-                }
-            }
-
-            if (gitkeepDeletions.length > 0) {
-                try {
-                    await this.gitlabClient.Commits.create(this.projectId, this.branch, 'Deleting unnecessary .gitkeep files', gitkeepDeletions);
-                } catch (e) {
-                    console.error('Failed to delete .gitkeep files:', e);
-                }
-            }
-
-            const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
-                this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
-            )));
-
-            return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
-                const { path } = jsonFiles[index];
-                if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
-                    const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
-                    const parsed = JSON.parse(fileContent) as GitMultiFileObject;
-
-                    if (name === SystemFilenames.THEMES) {
-                        return {
-                            path,
-                            type: 'themes',
-                            data: parsed as ThemeObjectsList,
-                        };
-                    }
-
-                    if (name === SystemFilenames.METADATA) {
-                        return {
-                            path,
-                            type: 'metadata',
-                            data: parsed as RemoteTokenStorageMetadata,
-                        };
-                    }
-
-                    return {
-                        path,
-                        name,
-                        type: 'tokenSet',
-                        data: parsed as AnyTokenSet<false>,
-                    };
-                }
-
-                return null;
-            }));
+          if (hasGitkeep && hasOtherFiles) {
+            const gitkeepPath = `${dir}/.gitkeep`;
+            gitkeepDeletions.push({ action: 'delete', filePath: gitkeepPath });
+          }
         }
 
-        const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
-        const stringData = typeof data === 'string' ? data : await data.text();
-
-        if (IsJSONString(stringData)) {
-            const parsed = JSON.parse(stringData) as GitSingleFileObject;
-            return [
-                {
-                    type: 'themes',
-                    path: `${this.path}/${SystemFilenames.THEMES}.json`,
-                    data: parsed.$themes ?? [],
-                },
-                ...(parsed.$metadata ? [
-                    {
-                        type: 'metadata' as const,
-                        path: this.path,
-                        data: parsed.$metadata,
-                    },
-                ] : []),
-                ...(Object.entries(parsed).filter(([key]) => (
-                    !Object.values<string>(SystemFilenames).includes(key)
-                )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-                    name,
-                    type: 'tokenSet',
-                    path: `${this.path}/${name}.json`,
-                    data: tokenSet,
-                })),
-            ];
+        if (gitkeepDeletions.length > 0) {
+          try {
+            await this.gitlabClient.Commits.create(this.projectId, this.branch, 'Deleting unnecessary .gitkeep files', gitkeepDeletions);
+          } catch (e) {
+            console.error('Failed to delete .gitkeep files:', e);
+          }
         }
-        return {
-            errorMessage: ErrorMessages.VALIDATION_ERROR,
-        };
+
+        const jsonFileContents = await Promise.all(jsonFiles.map((treeItem) => (
+          this.gitlabClient.RepositoryFiles.showRaw(this.projectId!, treeItem.path, this.branch)
+        )));
+
+        return compact(jsonFileContents.map<RemoteTokenStorageFile | null>((fileContent, index) => {
+          const { path } = jsonFiles[index];
+          if (typeof fileContent === 'string' && IsJSONString(fileContent)) {
+            const name = path.replace('.json', '').replace(this.path, '').replace(/^\//, '').replace(/\/$/, '');
+            const parsed = JSON.parse(fileContent) as GitMultiFileObject;
+
+            if (name === SystemFilenames.THEMES) {
+              return {
+                path,
+                type: 'themes',
+                data: parsed as ThemeObjectsList,
+              };
+            }
+
+            if (name === SystemFilenames.METADATA) {
+              return {
+                path,
+                type: 'metadata',
+                data: parsed as RemoteTokenStorageMetadata,
+              };
+            }
+
+            return {
+              path,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
+            };
+          }
+
+          return null;
+        }));
+      }
+
+      const data = await this.gitlabClient.RepositoryFiles.showRaw(this.projectId, this.path, this.branch);
+      const stringData = typeof data === 'string' ? data : await data.text();
+
+      if (IsJSONString(stringData)) {
+        const parsed = JSON.parse(stringData) as GitSingleFileObject;
+        return [
+          {
+            type: 'themes',
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
+            data: parsed.$themes ?? [],
+          },
+          ...(parsed.$metadata ? [
+            {
+              type: 'metadata' as const,
+              path: this.path,
+              data: parsed.$metadata,
+            },
+          ] : []),
+          ...(Object.entries(parsed).filter(([key]) => (
+            !Object.values<string>(SystemFilenames).includes(key)
+          )) as [string, AnyTokenSet<false>][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+            name,
+            type: 'tokenSet',
+            path: `${this.path}/${name}.json`,
+            data: tokenSet,
+          })),
+        ];
+      }
+      return {
+        errorMessage: ErrorMessages.VALIDATION_ERROR,
+      };
     } catch (err) {
-        console.error(err);
-        return [];
+      console.error(err);
+      return [];
     }
-}
+  }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
     if (!this.projectId) throw new Error('Missing Project ID');
@@ -238,68 +238,67 @@ export class GitlabTokenStorage extends GitTokenStorage {
     const gitkeepPath = `${this.path}/.gitkeep`;
 
     if (shouldCreateBranch && !branches.includes(branch)) {
-        const sourceBranch = this.previousSourceBranch || this.source;
-        await this.createBranch(branch, sourceBranch);
+      const sourceBranch = this.previousSourceBranch || this.source;
+      await this.createBranch(branch, sourceBranch);
     }
 
     // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
     try {
-        await this.gitlabClient.RepositoryFiles.show(this.projectId, gitkeepPath, branch);
+      await this.gitlabClient.RepositoryFiles.show(this.projectId, gitkeepPath, branch);
     } catch {
-        await this.gitlabClient.RepositoryFiles.create(
-            this.projectId,
-            gitkeepPath,
-            branch,
-            '{}',
-            'Initial commit',
-        );
+      await this.gitlabClient.RepositoryFiles.create(
+        this.projectId,
+        gitkeepPath,
+        branch,
+        '{}',
+        'Initial commit',
+      );
     }
 
     const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
       path: rootPath,
       ref: branch,
       recursive: true,
-  });
+    });
 
-  const gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
-      const action = tree.some(file => file.path === filePath) ? 'update' : 'create';
+    const gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+      const action = tree.some((file) => file.path === filePath) ? 'update' : 'create';
       return { action, filePath, content };
-  });
+    });
 
     // Commit the actions (including any new or updated files)
     try {
-        await this.gitlabClient.Commits.create(
-            this.projectId,
-            branch,
-            message,
-            gitlabActions,
-        );
+      await this.gitlabClient.Commits.create(
+        this.projectId,
+        branch,
+        message,
+        gitlabActions,
+      );
     } catch (e: any) {
-        if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
-            throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
-        }
-        throw new Error(e);
+      if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
+        throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
+      }
+      throw new Error(e);
     }
 
     const updatedTree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
-        path: rootPath,
-        ref: branch,
-        recursive: true,
+      path: rootPath,
+      ref: branch,
+      recursive: true,
     });
 
-    const otherFilesPresent = updatedTree.some(file => file.path !== gitkeepPath);
+    const otherFilesPresent = updatedTree.some((file) => file.path !== gitkeepPath);
     if (otherFilesPresent) {
-        try {
-            await this.gitlabClient.Commits.create(this.projectId, branch, message, [
-                { action: 'delete', filePath: gitkeepPath },
-            ]);
-        } catch (e: any) {
-            console.error(`Failed to delete .gitkeep: ${e}`);
-        }
+      try {
+        await this.gitlabClient.Commits.create(this.projectId, branch, message, [
+          { action: 'delete', filePath: gitkeepPath },
+        ]);
+      } catch (e: any) {
+        console.error(`Failed to delete .gitkeep: ${e}`);
+      }
     }
     return true;
-}
-
+  }
 
   public async getLatestCommitDate(): Promise<Date | null> {
     if (!this.projectId) throw new Error('Missing Project ID');
