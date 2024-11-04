@@ -208,68 +208,71 @@ export class GitlabTokenStorage extends GitTokenStorage {
     if (!this.projectId) throw new Error('Missing Project ID');
 
     const branches = await this.fetchBranches();
+    const rootPath = this.path.endsWith('.json') ? this.path.split('/').slice(0, -1).join('/') : this.path;
+    const gitkeepPath = `${this.path}/.gitkeep`;
 
-    const rootPath = this.path.endsWith('.json')
-      ? this.path.split('/').slice(0, -1).join('/')
-      : this.path;
     if (shouldCreateBranch && !branches.includes(branch)) {
-      const sourceBranch = this.previousSourceBranch || this.source;
-      await this.createBranch(branch, sourceBranch);
+        const sourceBranch = this.previousSourceBranch || this.source;
+        await this.createBranch(branch, sourceBranch);
     }
+
     // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
-    const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
     try {
-      await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
-    } catch (e) {
-      await this.gitlabClient.RepositoryFiles.create(
-        this.projectId,
-        pathToCreate,
-        branch,
-        '{}',
-        'Initial commit',
-      );
+        await this.gitlabClient.RepositoryFiles.show(this.projectId, gitkeepPath, branch);
+    } catch {
+        await this.gitlabClient.RepositoryFiles.create(
+            this.projectId,
+            gitkeepPath,
+            branch,
+            '{}', // Empty .gitkeep content
+            'Initial commit',
+        );
     }
 
-    const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
-      path: rootPath,
-      ref: branch,
-      recursive: true,
-    });
-    const jsonFiles = tree.filter((file) => (
-      file.path.endsWith('.json')
-    )).sort((a, b) => (
-      (a.path && b.path) ? a.path.localeCompare(b.path) : 0
-    )).map((jsonFile) => jsonFile.path);
-
+    // Actions to create/update JSON files based on the changeset
     let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
-      action: jsonFiles.includes(filePath) ? 'update' : 'create',
-      filePath,
-      content,
+        action: 'create',
+        filePath,
+        content,
     }));
 
-    if (!this.path.endsWith('.json')) {
-      const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
-      gitlabActions = gitlabActions.concat(filesToDelete.map((filePath) => ({
-        action: 'delete',
-        filePath,
-      })));
+    // Commit the actions (including any new or updated files)
+    try {
+        await this.gitlabClient.Commits.create(
+            this.projectId,
+            branch,
+            message,
+            gitlabActions,
+        );
+    } catch (e: any) {
+        if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
+            throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
+        }
+        throw new Error(e);
     }
 
-    try {
-      const response = await this.gitlabClient.Commits.create(
-        this.projectId,
-        branch,
-        message,
-        gitlabActions,
-      );
-      return !!response;
-    } catch (e: any) {
-      if (e.cause.description && String(e.cause.description).includes(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR)) {
-        throw new Error(ErrorMessages.GITLAB_PUSH_TO_PROTECTED_BRANCH_ERROR);
-      }
-      throw new Error(e);
+    // Re-fetch the directory contents after creating/updating files
+    const updatedTree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
+        path: rootPath,
+        ref: branch,
+        recursive: true,
+    });
+
+    // If other files are now present, schedule .gitkeep for deletion
+    const otherFilesPresent = updatedTree.some(file => file.path !== gitkeepPath);
+    if (otherFilesPresent) {
+        try {
+            await this.gitlabClient.Commits.create(this.projectId, branch, message, [
+                { action: 'delete', filePath: gitkeepPath },
+            ]);
+        } catch (e: any) {
+            console.error(`Failed to delete .gitkeep: ${e}`);
+        }
     }
-  }
+
+    return true;
+}
+
 
   public async getLatestCommitDate(): Promise<Date | null> {
     if (!this.projectId) throw new Error('Missing Project ID');
