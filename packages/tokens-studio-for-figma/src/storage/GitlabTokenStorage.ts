@@ -221,6 +221,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     try {
       await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
     } catch (e) {
+      if (!this.path.endsWith('.json')) {
       await this.gitlabClient.RepositoryFiles.create(
         this.projectId,
         pathToCreate,
@@ -228,6 +229,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         '{}',
         'Initial commit',
       );
+    }
     }
 
     const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
@@ -241,11 +243,13 @@ export class GitlabTokenStorage extends GitTokenStorage {
       (a.path && b.path) ? a.path.localeCompare(b.path) : 0
     )).map((jsonFile) => jsonFile.path);
 
-    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => ({
-      action: jsonFiles.includes(filePath) ? 'update' : 'create',
+    let gitlabActions: CommitAction[] = Object.entries(changeset)
+    .map(([filePath, content]) => ({
+      action: jsonFiles.includes(filePath) ? 'update' as CommitAction['action'] : 'create' as CommitAction['action'],
       filePath,
       content,
-    }));
+    }))
+    .filter(action => !action.filePath.endsWith('.gitkeep'));
 
     if (!this.path.endsWith('.json')) {
       const filesToDelete = jsonFiles.filter((jsonFile) => !Object.keys(changeset).some((item) => item.endsWith(jsonFile)));
