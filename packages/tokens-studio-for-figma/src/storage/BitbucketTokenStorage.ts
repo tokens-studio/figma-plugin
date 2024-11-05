@@ -1,6 +1,3 @@
-/* eslint-disable no-else-return */
-/* eslint-disable @typescript-eslint/indent */
-/* eslint "@typescript-eslint/no-unused-vars": off */
 import { Bitbucket, Schema } from 'bitbucket';
 import compact from 'just-compact';
 import {
@@ -149,36 +146,36 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let nextPageUrl: string | null = `${url}?pagelen=100`;
 
     while (nextPageUrl) {
-        const response = await fetch(nextPageUrl, {
-            headers: {
-                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-            },
-        });
+      const response = await fetch(nextPageUrl, {
+        headers: {
+          Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+        },
+      });
 
-        if (!response.ok) {
-            throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+      }
 
-        const data = await response.json();
-        if (data.values && Array.isArray(data.values)) {
-          const jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
-            allJsonFiles = allJsonFiles.concat(jsonFiles);
+      const data = await response.json();
+      if (data.values && Array.isArray(data.values)) {
+        const jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
+        allJsonFiles = allJsonFiles.concat(jsonFiles);
 
-            // Fetch files from subdirectories recursively
-            const subDirectoryFiles = await Promise.all(
-                data.values
-                    .filter((file: any) => file.type === 'commit_directory')
-                    .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
-            );
+        // Fetch files from subdirectories recursively
+        const subDirectoryFiles = await Promise.all(
+          data.values
+            .filter((file: any) => file.type === 'commit_directory')
+            .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
+        );
 
-            allJsonFiles = allJsonFiles.concat(...subDirectoryFiles);
-        }
+        allJsonFiles = allJsonFiles.concat(...subDirectoryFiles);
+      }
 
-        nextPageUrl = data.next || null;
+      nextPageUrl = data.next || null;
     }
 
     return allJsonFiles;
-}
+  }
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
@@ -188,13 +185,13 @@ export class BitbucketTokenStorage extends GitTokenStorage {
       const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
       if (Array.isArray(jsonFiles)) {
-      const jsonFileContents = await Promise.all(
-        jsonFiles.map((file: any) => fetch(file.links.self.href, {
+        const jsonFileContents = await Promise.all(
+          jsonFiles.map((file: any) => fetch(file.links.self.href, {
             headers: {
               Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
             },
           }).then((rsp) => rsp.text())),
-      );
+        );
         // Process the content of each JSON file
         return jsonFileContents.map((fileContent, index) => {
           const { path } = jsonFiles[index];
@@ -226,7 +223,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } else if (jsonFiles) {
+      } if (jsonFiles) {
         const parsed = jsonFiles as GitSingleFileObject;
         return [
           {
@@ -236,12 +233,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           },
           ...(parsed.$metadata
             ? [
-                {
-                  type: 'metadata' as const,
-                  path: this.path,
-                  data: parsed.$metadata,
-                },
-              ]
+              {
+                type: 'metadata' as const,
+                path: this.path,
+                data: parsed.$metadata,
+              },
+            ]
             : []),
           ...(
             Object.entries(parsed).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
@@ -297,8 +294,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    * const response = await createOrUpdateFiles(params);
    */
   public async createOrUpdateFiles({
- owner, repo, branch, changes,
-}: CreatedOrUpdatedFileType) {
+    owner, repo, branch, changes,
+  }: CreatedOrUpdatedFileType) {
     const { message, files } = changes[0];
 
     const data = new FormData();
