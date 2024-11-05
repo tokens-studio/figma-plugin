@@ -145,33 +145,41 @@ export class BitbucketTokenStorage extends GitTokenStorage {
    */
 
   private async fetchJsonFilesFromDirectory(url: string): Promise<FetchJsonResult> {
-    const paginatedUrl = `${url}?pagelen=100`;
+    let allJsonFiles: any[] = [];
+    let nextPageUrl: string | null = `${url}?pagelen=100`;
 
-    const response = await fetch(paginatedUrl, {
-      headers: {
-        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
-      },
-    });
+    while (nextPageUrl) {
+        const response = await fetch(nextPageUrl, {
+            headers: {
+                Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+            },
+        });
 
-    if (!response.ok) {
-      throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+        if (!response.ok) {
+            throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.values && Array.isArray(data.values)) {
+
+          const jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
+            allJsonFiles = allJsonFiles.concat(jsonFiles);
+
+            // Fetch files from subdirectories recursively
+            const subDirectoryFiles = await Promise.all(
+                data.values
+                    .filter((file: any) => file.type === 'commit_directory')
+                    .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
+            );
+
+            allJsonFiles = allJsonFiles.concat(...subDirectoryFiles);
+        }
+
+        nextPageUrl = data.next || null;
     }
 
-    const data = await response.json();
-    if (data.values && Array.isArray(data.values)) {
-      let jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
-
-      const subDirectoryFiles = await Promise.all(
-        data.values
-          .filter((file: any) => file.type === 'commit_directory')
-          .map(async (directory: any) => await this.fetchJsonFilesFromDirectory(directory.links.self.href)),
-      );
-
-      jsonFiles = jsonFiles.concat(...subDirectoryFiles);
-      return jsonFiles;
-        }
-      return data;
-  }
+    return allJsonFiles;
+}
 
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
