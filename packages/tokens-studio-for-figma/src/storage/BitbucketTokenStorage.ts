@@ -161,7 +161,6 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
         const data = await response.json();
         if (data.values && Array.isArray(data.values)) {
-
           const jsonFiles = data.values.filter((file: any) => file.path.endsWith('.json'));
             allJsonFiles = allJsonFiles.concat(jsonFiles);
 
