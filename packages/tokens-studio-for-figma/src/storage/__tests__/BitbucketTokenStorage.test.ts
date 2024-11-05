@@ -167,6 +167,7 @@ describe('BitbucketTokenStorage', () => {
         headers: {
           Authorization: `Basic ${btoa('myusername:mock-secret')}`,
         },
+        cache: 'no-cache',
       },
     );
   });
