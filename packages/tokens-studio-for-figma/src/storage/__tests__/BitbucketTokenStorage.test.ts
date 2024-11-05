@@ -163,7 +163,7 @@ describe('BitbucketTokenStorage', () => {
         },
       },
     );
-});
+  });
 
   it('listBranches should fetch branches as a simple list', async () => {
     mockListBranches.mockImplementationOnce(() =>
