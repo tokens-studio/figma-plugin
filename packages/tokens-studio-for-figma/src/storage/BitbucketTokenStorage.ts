@@ -150,7 +150,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         headers: {
           Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
         },
-      });
+        cache: 'no-cache',
+    });
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -190,6 +191,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             headers: {
               Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
             },
+            cache: 'no-cache',
           }).then((rsp) => rsp.text())),
         );
         // Process the content of each JSON file
