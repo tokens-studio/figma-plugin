@@ -61,7 +61,7 @@ export default function TokenListingHeading({
           <Box css={{ padding: '$2', margin: '-$2' }}>{isCollapsed ? <IconCollapseArrow /> : <IconExpandArrow />}</Box>
         </Tooltip>
         <Heading size="small">{label}</Heading>
-        {isPro ? <ProBadge /> : null}
+        {isPro ? <ProBadge link={`https://tokens.studio/plugin?ref=${tokenKey}-listing`} /> : null}
       </StyledTokenGroupHeadingButton>
       <Box
         css={{
