@@ -27,13 +27,13 @@ describe('SettingsDropdown', () => {
     const trigger = await result.getByTestId('bottom-bar-settings');
     waitFor(async () => {
       await userEvent.click(trigger);
-      const updateChanges = result.getByTestId('update-on-change');
-      const updateRemote = result.queryByTestId('update-remote');
-      const updateStyles = result.getByTestId('update-styles');
+      const updateChangesOption = result.getByTestId('update-on-change');
+      const updateRemoteOption = result.queryByTestId('update-remote');
+      const shouldUpdateStylesOption = result.getByTestId('should-update-styles');
 
-      expect(updateChanges).toBeInTheDocument();
-      expect(updateStyles).toBeInTheDocument();
-      expect(updateRemote).toBeNull();
+      expect(updateChangesOption).toBeInTheDocument();
+      expect(shouldUpdateStylesOption).toBeInTheDocument();
+      expect(updateRemoteOption).toBeNull();
     });
   });
   it('should show Update remote when jsonbin', async () => {

@@ -25,15 +25,16 @@ export const StyledProBadge = styled('a', {
 });
 
 type Props = {
-  compact?: boolean;
+  readonly compact?: boolean;
+  readonly link?: string;
 };
 
-export default function ProBadge({ compact }: Props) {
+export default function ProBadge({ compact, link }: Props) {
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const { t } = useTranslation(['licence']);
 
   return (
-    <StyledProBadge href="https://tokens.studio/plugin" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
+    <StyledProBadge href={link} target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
   );
 }
