@@ -338,6 +338,7 @@ export const tokenState = createModel<RootModel>()({
       const newTokens: StyleToCreateToken[] = [];
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
+
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
@@ -345,10 +346,9 @@ export const tokenState = createModel<RootModel>()({
 
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
-              if (
-                oldValue.description === token.description
-                || (typeof token.description === 'undefined' && oldValue.description === '')
-              ) {
+              const normalizedOldValueDescription = oldValue.description ?? '';
+              const normalizedTokenDescription = token.description ?? '';
+              if (isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
                 existingTokens.push(token);
               } else {
                 updatedTokens.push({
@@ -389,7 +389,9 @@ export const tokenState = createModel<RootModel>()({
             const oldValue = state.tokens[token.parent].find((t) => t.name === token.name);
             // If the token already exists
             if (oldValue) {
-              if (isEqual(oldValue.value, token.value) && isEqual(oldValue.description, token.description)) {
+              const normalizedOldValueDescription = oldValue.description ?? '';
+              const normalizedTokenDescription = token.description ?? '';
+              if (isEqual(oldValue.value, token.value) && isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
                 existingTokens.push(token);
               } else {
                 const updatedToken = { ...token };

@@ -5,14 +5,16 @@ function isSameCredentials(
   credential: StorageTypeCredentials,
   stored: StorageType | StorageTypeFormValues<false>,
 ): boolean {
+  // If the internalId is present, we use it to check for equality
+  if (stored.provider !== StorageProviderType.LOCAL && credential.internalId && stored.internalId) {
+    return credential.internalId === stored.internalId;
+  }
+
   switch (stored.provider) {
     case StorageProviderType.GITHUB:
     case StorageProviderType.GITLAB:
     case StorageProviderType.ADO:
     case StorageProviderType.BITBUCKET: {
-      if (credential.internalId && stored.internalId && credential.internalId === stored.internalId) {
-        return true;
-      }
       return (
         credential.id === stored.id
         && credential.provider === stored.provider
@@ -30,6 +32,7 @@ function isSameCredentials(
         credential.id === stored.id
         && credential.provider === stored.provider
         && credential.designSystemUrl === stored.designSystemUrl
+        && JSON.stringify(credential.mapping) === JSON.stringify(stored.mapping)
       );
     case StorageProviderType.TOKENS_STUDIO:
       return (
