@@ -227,7 +227,7 @@ export default function ColorTokenForm({
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
           <Heading size="small">{t('modify')}</Heading>
-          <ProBadge compact />
+          <ProBadge link="https://tokens.studio/plugin?ref=modifiers" compact />
         </Box>
         {
           !modifyVisible ? (

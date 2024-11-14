@@ -113,20 +113,36 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ global: { red: { name: 'red', type: 'color', value: '#ff0000' } } }),
-    }));
+    mockFetch
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          values: [
+            { path: '$themes.json', type: 'commit_file', links: { self: { href: 'https://api.bitbucket.org/file/$themes.json' } } },
+            { path: 'global.json', type: 'commit_file', links: { self: { href: 'https://api.bitbucket.org/file/global.json' } } },
+          ],
+          next: null, // No further pagination needed for this test
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+      }));
 
     const result = await storageProvider.read();
+
     expect(result).toEqual([
       {
-        path: '/$themes.json',
+        path: '$themes.json',
         type: 'themes',
-        data: [],
+        data: { $themes: [] },
       },
       {
-        path: '/global.json',
+        path: 'global.json',
         name: 'global',
         type: 'tokenSet',
         data: {
@@ -139,34 +155,13 @@ describe('BitbucketTokenStorage', () => {
       },
     ]);
 
-    storageProvider.changePath('data/core.json');
-
-    expect(result).toEqual([
-      {
-        path: '/$themes.json',
-        type: 'themes',
-        data: [],
-      },
-      {
-        path: '/global.json',
-        name: 'global',
-        type: 'tokenSet',
-        data: {
-          red: {
-            type: 'color',
-            name: 'red',
-            value: '#ff0000',
-          },
-        },
-      },
-    ]);
-
-    expect(mockFetch).toBeCalledWith(
-      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/?pagelen=100`,
       {
         headers: {
           Authorization: `Basic ${btoa('myusername:mock-secret')}`,
         },
+        cache: 'no-cache',
       },
     );
   });
