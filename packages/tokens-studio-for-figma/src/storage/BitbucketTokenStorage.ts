@@ -151,7 +151,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
         },
         cache: 'no-cache',
-    });
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
@@ -178,14 +178,66 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     return allJsonFiles;
   }
 
+  private async fetchJsonFile(url: string): Promise<GitSingleFileObject> {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Basic ${btoa(`${this.username}:${this.secret}`)}`,
+      },
+      cache: 'no-cache',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to read from Bitbucket: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    return data;
+  }
+
   public async read(): Promise<RemoteTokenStorageFile[] | RemoteTokenstorageErrorMessage> {
     const normalizedPath = compact(this.path.split('/')).join('/');
 
     try {
       const url = `https://api.bitbucket.org/2.0/repositories/${this.owner}/${this.repository}/src/${this.branch}/${normalizedPath}`;
-      const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
 
-      if (Array.isArray(jsonFiles)) {
+      // Single file
+      if (this.path.endsWith('.json')) {
+        const jsonFile = await this.fetchJsonFile(url);
+
+        return [
+          {
+            type: 'themes',
+            path: `${this.path}/${SystemFilenames.THEMES}.json`,
+            data: jsonFile.$themes ?? [],
+          },
+          ...(jsonFile.$metadata
+            ? [
+              {
+                type: 'metadata' as const,
+                path: this.path,
+                data: jsonFile.$metadata,
+              },
+            ]
+            : []),
+          ...(
+            Object.entries(jsonFile).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
+              string,
+              AnyTokenSet<false>,
+            ][]
+          ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+            name,
+            type: 'tokenSet',
+            path: `${this.path}/${name}.json`,
+            data: tokenSet,
+          })),
+        ];
+      }
+
+      // Multi file when it is enabled
+      if (this.flags.multiFileEnabled) {
+        const jsonFiles = await this.fetchJsonFilesFromDirectory(url);
+
         const jsonFileContents = await Promise.all(
           jsonFiles.map((file: any) => fetch(file.links.self.href, {
             headers: {
@@ -225,36 +277,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             data: parsed as AnyTokenSet<false>,
           };
         });
-      } if (jsonFiles) {
-        const parsed = jsonFiles as GitSingleFileObject;
-        return [
-          {
-            type: 'themes',
-            path: `${this.path}/${SystemFilenames.THEMES}.json`,
-            data: parsed.$themes ?? [],
-          },
-          ...(parsed.$metadata
-            ? [
-              {
-                type: 'metadata' as const,
-                path: this.path,
-                data: parsed.$metadata,
-              },
-            ]
-            : []),
-          ...(
-            Object.entries(parsed).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
-              string,
-              AnyTokenSet<false>,
-            ][]
-          ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
-            name,
-            type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
-            data: tokenSet,
-          })),
-        ];
       }
+
       return {
         errorMessage: ErrorMessages.VALIDATION_ERROR,
       };
@@ -302,24 +326,29 @@ export class BitbucketTokenStorage extends GitTokenStorage {
 
     const data = new FormData();
 
-    const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/`;
-    const existingFiles = await this.fetchJsonFilesFromDirectory(url);
+    const normalizedPath = compact(this.path.split('/')).join('/');
+    let deletedTokenSets: string[] = [];
 
-    const existingTokenSets: Record<string, boolean> = {};
-    if (Array.isArray(existingFiles)) {
-      existingFiles.forEach((file) => {
-        if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
-          const tokenSetName = file.path.replace('.json', '');
-          existingTokenSets[tokenSetName] = true;
-        }
-      });
+    if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
+      const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/${normalizedPath}`;
+      const existingFiles = await this.fetchJsonFilesFromDirectory(url);
+
+      const existingTokenSets: Record<string, boolean> = {};
+      if (Array.isArray(existingFiles)) {
+        existingFiles.forEach((file) => {
+          if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
+            const tokenSetName = file.path.replace('.json', '');
+            existingTokenSets[tokenSetName] = true;
+          }
+        });
+      }
+
+      const localTokenSets = Object.keys(files);
+
+      deletedTokenSets = Object.keys(existingTokenSets).filter(
+        (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
+      );
     }
-
-    const localTokenSets = Object.keys(files);
-
-    const deletedTokenSets = Object.keys(existingTokenSets).filter(
-      (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
-    );
 
     // @README the files object is Record<string, string> here
     // with the key equal to the filename and the value equal to the new content
