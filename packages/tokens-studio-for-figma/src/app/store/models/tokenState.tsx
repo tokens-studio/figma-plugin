@@ -10,9 +10,7 @@ import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
-import {
-  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
-} from '@/types/tokens';
+import { AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename } from '@/types/tokens';
 import {
   DeleteTokenPayload,
   SetTokenDataPayload,
@@ -74,7 +72,7 @@ export interface TokenState {
   changedState: CompareStateType;
   remoteData: CompareStateType;
   tokenFormat: TokenFormatOptions;
-  tokenSetMetadata: Record<string, { id: string, isDynamic?: boolean }>;
+  tokenSetMetadata: Record<string, { isDynamic?: boolean }>;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -127,9 +125,8 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: {
         ...state.usedTokenSet,
-        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
-          ? TokenSetStatus.DISABLED
-          : TokenSetStatus.SOURCE,
+        [tokenSet]:
+          state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE ? TokenSetStatus.DISABLED : TokenSetStatus.SOURCE,
       },
     }),
     setActiveTokenSet: (state, data: string) => ({
@@ -165,20 +162,14 @@ export const tokenState = createModel<RootModel>()({
         return state;
       }
       const indexOf = Object.keys(state.tokens).indexOf(oldName);
-      return updateTokenSetsInState(
-        state,
-        null,
-        [newName, state.tokens[oldName].map((token) => (
-          extend(true, {}, token) as typeof token
-        )), indexOf + 1],
-      );
+      return updateTokenSetsInState(state, null, [
+        newName,
+        state.tokens[oldName].map((token) => extend(true, {}, token) as typeof token),
+        indexOf + 1,
+      ]);
     },
-    deleteTokenSet: (state, name: string) => updateTokenSetsInState(
-      state,
-      (setName, tokenSet) => (
-        setName === name ? null : [setName, tokenSet]
-      ),
-    ),
+    deleteTokenSet: (state, name: string) =>
+      updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -232,10 +223,7 @@ export const tokenState = createModel<RootModel>()({
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
-          [data.parent]: [
-            ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data, uuidv4()),
-          ],
+          [data.parent]: [...state.tokens[data.parent], updateTokenPayloadToSingleToken(data, uuidv4())],
         };
       }
 
@@ -256,9 +244,7 @@ export const tokenState = createModel<RootModel>()({
         }
         const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex === -1) {
-          newTokens[token.parent].push(
-            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
-          );
+          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()));
         }
       });
 
@@ -295,31 +281,35 @@ export const tokenState = createModel<RootModel>()({
             const existingTokens = [...state.tokens[tokenSet]];
             existingTokens.splice(existingTokenIndex + 1, 0, {
               ...omit(state.tokens[tokenSet][existingTokenIndex], 'description', '$extensions'),
-              ...updateTokenPayloadToSingleToken({
-                parent: data.parent,
-                name: data.newName,
-                type: data.type,
-                value: data.value,
-                description: data.description,
-                oldName: data.oldName,
-                $extensions: data.$extensions,
-              } as UpdateTokenPayload, uuidv4()),
+              ...updateTokenPayloadToSingleToken(
+                {
+                  parent: data.parent,
+                  name: data.newName,
+                  type: data.type,
+                  value: data.value,
+                  description: data.description,
+                  oldName: data.oldName,
+                  $extensions: data.$extensions,
+                } as UpdateTokenPayload,
+                uuidv4(),
+              ),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
         } else if (data.tokenSets.includes(tokenSet)) {
           const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
           if (existingTokenIndex < 0) {
-            const newToken = updateTokenPayloadToSingleToken({
-              name: data.newName,
-              type: data.type,
-              value: data.value,
-              description: data.description,
-              $extensions: data.$extensions,
-            } as UpdateTokenPayload, uuidv4());
-            newTokens[tokenSet] = [
-              ...state.tokens[tokenSet], newToken as SingleToken,
-            ];
+            const newToken = updateTokenPayloadToSingleToken(
+              {
+                name: data.newName,
+                type: data.type,
+                value: data.value,
+                description: data.description,
+                $extensions: data.$extensions,
+              } as UpdateTokenPayload,
+              uuidv4(),
+            );
+            newTokens[tokenSet] = [...state.tokens[tokenSet], newToken as SingleToken];
           }
         }
       });
@@ -391,7 +381,10 @@ export const tokenState = createModel<RootModel>()({
             if (oldValue) {
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
-              if (isEqual(oldValue.value, token.value) && isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
+              if (
+                isEqual(oldValue.value, token.value) &&
+                isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+              ) {
                 existingTokens.push(token);
               } else {
                 const updatedToken = { ...token };
@@ -447,19 +440,20 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: typeof data.index === 'number'
-            ? state.tokens[data.parent].filter((token) => {
-              if (token.name === data.path) {
-                if (i === data.index) {
-                  i += 1;
-                  return true;
-                }
-                i += 1;
-                return false;
-              }
-              return (token.name !== data.path);
-            })
-            : state.tokens[data.parent].filter((token) => token.name !== data.path),
+          [data.parent]:
+            typeof data.index === 'number'
+              ? state.tokens[data.parent].filter((token) => {
+                  if (token.name === data.path) {
+                    if (i === data.index) {
+                      i += 1;
+                      return true;
+                    }
+                    i += 1;
+                    return false;
+                  }
+                  return token.name !== data.path;
+                })
+              : state.tokens[data.parent].filter((token) => token.name !== data.path),
         },
       };
 
@@ -470,7 +464,9 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
+          [data.parent]: state.tokens[data.parent].filter(
+            (token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type),
+          ),
         },
       };
 
@@ -478,9 +474,7 @@ export const tokenState = createModel<RootModel>()({
     },
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
-      const {
-        oldName, newName, type, parent,
-      } = data;
+      const { oldName, newName, type, parent } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${oldName}.`) && token.type === type) {
@@ -505,10 +499,10 @@ export const tokenState = createModel<RootModel>()({
     },
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
-      const {
-        parent, oldName, newName, tokenSets, type,
-      } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
+      const { parent, oldName, newName, tokenSets, type } = data;
+      const selectedTokenGroup = state.tokens[parent].filter(
+        (token) => token.name.startsWith(`${oldName}.`) && token.type === type,
+      );
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(oldName, newName);
@@ -556,7 +550,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
-    setChangedState: (state, receivedState: { tokens: Record<string, AnyTokenList>, themes: ThemeObjectsList }): TokenState => {
+    setChangedState: (
+      state,
+      receivedState: { tokens: Record<string, AnyTokenList>; themes: ThemeObjectsList },
+    ): TokenState => {
       const localState = {
         tokens: state.tokens,
         themes: state.themes,
@@ -582,9 +579,7 @@ export const tokenState = createModel<RootModel>()({
       tokenFormat: data,
     }),
     renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
-      const {
-        oldName, newName, type, tokenSets,
-      } = data;
+      const { oldName, newName, type, tokenSets } = data;
       const newTokens: TokenStore['values'] = {};
       Object.keys(state.tokens).forEach((tokenSet) => {
         if (tokenSets.includes(tokenSet)) {
@@ -662,7 +657,7 @@ export const tokenState = createModel<RootModel>()({
     duplicateTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    renameTokenSet(data: { oldName: string, newName: string }, rootState) {
+    renameTokenSet(data: { oldName: string; newName: string }, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
@@ -691,7 +686,10 @@ export const tokenState = createModel<RootModel>()({
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'UPDATE_TOKEN_SET_ORDER',
-          data: data.map((name, index) => ({ orderIndex: `${index}`, urn: rootState.tokenState.tokenSetMetadata[name].id })),
+          data: data.map((name, index) => ({
+            orderIndex: `${index}`,
+            name,
+          })),
         });
       }
     },
@@ -738,70 +736,75 @@ export const tokenState = createModel<RootModel>()({
       setFormat(payload);
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
-      const {
-        oldName, newName, type, parent,
-      } = data;
+      const { oldName, newName, type, parent } = data;
 
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
-      });
+      tokensInParent
+        .filter((token) => token.name.startsWith(`${newName}.`) && token.type === type)
+        .forEach((updatedToken) => {
+          dispatch.tokenState.updateAliases({
+            oldName: updatedToken.name.replace(`${newName}`, `${oldName}`),
+            newName: updatedToken.name,
+          });
+        });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     renameTokenAcrossSets(data: RenameTokensAcrossSetsPayload) {
-      const {
-        oldName, newName,
-      } = data;
+      const { oldName, newName } = data;
 
       dispatch.tokenState.updateAliases({ oldName, newName });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
+      if (!rootState) return;
       try {
-        wrapTransaction({
-          name: 'updateDocument',
-          statExtractor: (result, transaction) => {
-            transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
-              acc += tokens.length;
-              return acc;
-            }, 0), '');
-            transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
-            transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+        wrapTransaction(
+          {
+            name: 'updateDocument',
+            statExtractor: (result, transaction) => {
+              transaction.setMeasurement(
+                'tokens',
+                Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
+                  acc += tokens.length;
+                  return acc;
+                }, 0),
+                '',
+              );
+              transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
+              transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+            },
           },
-        }, () => {
-          updateTokensOnSources({
-            tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-            tokenValues: rootState.tokenState.tokens,
-            usedTokenSet: rootState.tokenState.usedTokenSet,
-            themes: rootState.tokenState.themes,
-            activeTheme: rootState.tokenState.activeTheme,
-            settings: rootState.settings,
-            updatedAt: new Date().toISOString(),
-            lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
-            isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-            editProhibited: rootState.tokenState.editProhibited,
-            api: rootState.uiState.api,
-            storageType: rootState.uiState.storageType,
-            shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-            checkForChanges: rootState.tokenState.checkForChanges,
-            shouldSwapStyles: rootState.settings.shouldSwapStyles,
-            collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
-            storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
-            dispatch,
-            tokenFormat: rootState.tokenState.tokenFormat,
-          });
-        });
+          () => {
+            updateTokensOnSources({
+              tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
+              tokenValues: rootState.tokenState.tokens,
+              usedTokenSet: rootState.tokenState.usedTokenSet,
+              themes: rootState.tokenState.themes,
+              activeTheme: rootState.tokenState.activeTheme,
+              settings: rootState.settings,
+              updatedAt: new Date().toISOString(),
+              lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
+              isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+              editProhibited: rootState.tokenState.editProhibited,
+              api: rootState.uiState.api,
+              storageType: rootState.uiState.storageType,
+              shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+              checkForChanges: rootState.tokenState.checkForChanges,
+              shouldSwapStyles: rootState.settings.shouldSwapStyles,
+              collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+              storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
+              dispatch,
+              tokenFormat: rootState.tokenState.tokenFormat,
+            });
+          },
+        );
       } catch (e) {
         console.error('Error updating document', e);
       }
     },
-    ...Object.fromEntries(
-      (Object.entries(tokenStateEffects).map(([key, factory]) => (
-        [key, factory(dispatch)]
-      ))),
-    ),
+    ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
 });

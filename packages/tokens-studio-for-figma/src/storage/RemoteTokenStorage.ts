@@ -7,47 +7,50 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 
 export type RemoteTokenStorageMetadata = {
   tokenSetOrder?: string[];
-  tokenSetsData?: Record<string, { id: string, isDynamic?: boolean }>;
+  tokenSetsData?: Record<string, { isDynamic?: boolean }>;
 };
 
 export type RemoteTokenStorageData<Metadata> = {
-  tokens: Record<string, AnyTokenList>
-  themes: ThemeObjectsList
-  metadata?: RemoteTokenStorageMetadata & Metadata | null
+  tokens: Record<string, AnyTokenList>;
+  themes: ThemeObjectsList;
+  metadata?: (RemoteTokenStorageMetadata & Metadata) | null;
 };
 
 export interface RemoteTokenStorageSingleTokenSetFile {
-  type: 'tokenSet'
-  path: string
-  name: string
-  data: Record<string, SingleToken<false> | DeepTokensMap<false>>;// @README we save tokens without their name, but rather key them by their name
+  type: 'tokenSet';
+  path: string;
+  name: string;
+  data: Record<string, SingleToken<false> | DeepTokensMap<false>>; // @README we save tokens without their name, but rather key them by their name
 }
 
 export interface RemoteTokenStorageThemesFile {
-  type: 'themes'
-  path: string
-  data: ThemeObjectsList
+  type: 'themes';
+  path: string;
+  data: ThemeObjectsList;
 }
 
 export interface RemoteTokenStorageMetadataFile<Metadata = unknown> {
-  type: 'metadata'
-  path: string
-  data: RemoteTokenStorageMetadata & Metadata
+  type: 'metadata';
+  path: string;
+  data: RemoteTokenStorageMetadata & Metadata;
 }
 
 export interface RemoteTokenstorageErrorMessage {
-  errorMessage: string
+  errorMessage: string;
 }
 
 export type RemoteTokenStorageFile<Metadata = unknown> =
-  RemoteTokenStorageSingleTokenSetFile
+  | RemoteTokenStorageSingleTokenSetFile
   | RemoteTokenStorageThemesFile
   | RemoteTokenStorageMetadataFile<Metadata>;
 
 type RemoteStorageSaveOptions = {
   storeTokenIdInJsonEditor: boolean;
 };
-export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends RemoteStorageSaveOptions = { storeTokenIdInJsonEditor: boolean }> {
+export abstract class RemoteTokenStorage<
+  Metadata = unknown,
+  SaveOptions extends RemoteStorageSaveOptions = { storeTokenIdInJsonEditor: boolean },
+> {
   public abstract write(files: RemoteTokenStorageFile<Metadata>[], saveOptions?: SaveOptions): Promise<boolean>;
   public abstract read(): Promise<RemoteTokenStorageFile<Metadata>[] | RemoteTokenstorageErrorMessage>;
 
@@ -93,7 +96,7 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends
     // start by reading the files from the remote source
     // it is up to the remote storage implementation to split it up into "File" objects
     const files = await this.read();
-
+    console.log('files', files);
     // successfully fetch data
     if (Array.isArray(files)) {
       if (files.length === 0) {
@@ -103,10 +106,14 @@ export abstract class RemoteTokenStorage<Metadata = unknown, SaveOptions extends
         if (file.type === 'themes') {
           data.themes = [...data.themes, ...file.data];
         } else if (file.type === 'tokenSet') {
+          console.log('filename', file.name);
+          console.log('file data', file.data);
           data.tokens = {
             ...data.tokens,
             ...parseTokenValues({ [file.name]: file.data }),
           };
+
+          console.log('data tokens', data.tokens);
         } else if (file.type === 'metadata') {
           data.metadata = {
             ...data.metadata,

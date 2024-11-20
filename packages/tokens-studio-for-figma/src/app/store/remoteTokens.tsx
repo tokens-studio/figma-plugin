@@ -14,9 +14,7 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import {
-  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
-} from '@/selectors';
+import { activeTabSelector, apiSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -33,7 +31,7 @@ import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
 
-export type PushOverrides = { branch: string, commitMessage: string };
+export type PushOverrides = { branch: string; commitMessage: string };
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials;
@@ -56,7 +54,8 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
-  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
+  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } =
+    useGenericVersionedStorage();
   const {
     addNewGitHubCredentials,
     syncTokensWithGitHub,
@@ -83,9 +82,8 @@ export default function useRemoteTokens() {
     fetchBitbucketBranches,
     createBitbucketBranch,
   } = useBitbucket();
-  const {
-    addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova,
-  } = useSupernova();
+  const { addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova } =
+    useSupernova();
   const {
     addNewTokensStudioCredentials,
     syncTokensWithTokensStudio,
@@ -105,7 +103,12 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(
     async ({
-      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
+      context = api,
+      featureFlags,
+      usedTokenSet,
+      activeTheme,
+      collapsedTokenSets,
+      updateLocalTokens = false,
     }: PullTokensOptions) => {
       showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
@@ -156,7 +159,11 @@ export default function useRemoteTokens() {
           metadata: remoteData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
-        const stringifiedRemoteTokens = JSON.stringify(compact([remoteData.tokens, remoteData.themes, TokenFormat.format]), null, 2);
+        const stringifiedRemoteTokens = JSON.stringify(
+          compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
+          null,
+          2,
+        );
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
@@ -215,11 +222,11 @@ export default function useRemoteTokens() {
             // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                  acc[key] = activeTheme[key];
-                }
-                return acc;
-              }, {} as Record<string, string>)
+                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                    acc[key] = activeTheme[key];
+                  }
+                  return acc;
+                }, {} as Record<string, string>)
               : {};
 
             if (updateLocalTokens || shouldOverride) {
@@ -247,7 +254,11 @@ export default function useRemoteTokens() {
           const themeCount = Object.keys(remoteData.themes).length;
           const tokenFormat = getFormat();
           track('pullTokens', {
-            provider: context.provider, setCount, tokensCount, themeCount, tokenFormat,
+            provider: context.provider,
+            setCount,
+            tokensCount,
+            themeCount,
+            tokenFormat,
           });
         } else {
           track('pullTokens failure', { provider: context.provider });
@@ -346,7 +357,7 @@ export default function useRemoteTokens() {
   );
 
   const pushTokens = useCallback(
-    async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
+    async ({ context = api, overrides }: { context?: StorageTypeCredentials; overrides?: PushOverrides } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       let pushResult;
       switch (context.provider) {
@@ -384,7 +395,12 @@ export default function useRemoteTokens() {
           const themeCount = Object.keys(themes).length;
           const tokenFormat = getFormat();
           track('pushTokens', {
-            provider: context.provider, isFolder, setCount, tokensCount, themeCount, tokenFormat,
+            provider: context.provider,
+            isFolder,
+            setCount,
+            tokensCount,
+            themeCount,
+            tokenFormat,
           });
         } else {
           track('pushTokens failure', { provider: context.provider, isFolder });
@@ -396,7 +412,17 @@ export default function useRemoteTokens() {
         notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
-    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO, pushTokensToSupernova, pushTokensToTokensStudio, tokens, themes],
+    [
+      api,
+      pushTokensToGitHub,
+      pushTokensToGitLab,
+      pushTokensToBitbucket,
+      pushTokensToADO,
+      pushTokensToSupernova,
+      pushTokensToTokensStudio,
+      tokens,
+      themes,
+    ],
   );
 
   const addNewProviderItem = useCallback(
@@ -460,6 +486,7 @@ export default function useRemoteTokens() {
           break;
         }
         case StorageProviderType.TOKENS_STUDIO: {
+          console.log('addNewTokensStudioCredentials', credentials);
           content = await addNewTokensStudioCredentials(credentials);
           break;
         }

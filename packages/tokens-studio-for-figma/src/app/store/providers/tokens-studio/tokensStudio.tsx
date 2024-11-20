@@ -46,10 +46,8 @@ interface PushToTokensStudio {
   metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
 }
 
-export const pushToTokensStudio = async ({
-  context, action, data, metadata,
-}: PushToTokensStudio) => {
-  const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
+export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
+  const storageClient = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
 
   return storageClient.push({
     action,
@@ -69,7 +67,7 @@ export function useTokensStudio() {
   const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: TokensStudioCredentials) => {
-    const storageClient = new TokensStudioTokenStorage(context.id, context.secret);
+    const storageClient = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
     return storageClient;
   }, []);
 
@@ -160,7 +158,10 @@ export function useTokensStudio() {
           };
         }
         if (content) {
-          const sortedTokens = applyTokenSetOrder(content.tokens, content.metadata?.tokenSetOrder ?? Object.keys(content.tokens));
+          const sortedTokens = applyTokenSetOrder(
+            content.tokens,
+            content.metadata?.tokenSetOrder ?? Object.keys(content.tokens),
+          );
           return {
             ...content,
             tokens: sortedTokens,
@@ -181,7 +182,11 @@ export function useTokensStudio() {
     async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       try {
         const storage = storageClientFactory(context);
+        console.log('storage', storage);
         const data = await storage.retrieve();
+
+        console.log('data retrieved bro', data);
+
         if (!data || data.status === 'failure') {
           throw new Error(data?.errorMessage);
         }
@@ -199,6 +204,7 @@ export function useTokensStudio() {
           metadata: data.metadata ?? {},
         };
       } catch (e) {
+        console.log('error syncing with Tokens Studio', e);
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',
@@ -211,6 +217,7 @@ export function useTokensStudio() {
 
   const addNewTokensStudioCredentials = useCallback(
     async (context: TokensStudioFormValues): Promise<RemoteResponseData> => {
+      console.log('addNewTokensStudioCredentials', context);
       const data = await syncTokensWithTokensStudio(context);
       if (!data || data.status === 'failure') {
         return {

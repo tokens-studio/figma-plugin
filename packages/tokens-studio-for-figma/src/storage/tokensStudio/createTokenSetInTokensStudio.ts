@@ -21,12 +21,12 @@ export async function createTokenSetInTokensStudio({
     data: { name },
   });
 
-  if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
-    onTokenSetCreated({
-      ...rootState.tokenState.tokenSetMetadata,
-      [name]: {
-        id: tokenSet.urn,
-      },
-    });
-  }
+  // if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
+  //   onTokenSetCreated({
+  //     ...rootState.tokenState.tokenSetMetadata,
+  //     [name]: {
+  //       id: tokenSet.urn,
+  //     },
+  //   });
+  // }
 }

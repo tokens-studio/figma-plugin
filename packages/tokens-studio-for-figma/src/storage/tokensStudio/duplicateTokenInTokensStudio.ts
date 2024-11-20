@@ -28,25 +28,27 @@ export async function duplicateTokenInTokensStudio({
   } as UpdateTokenPayload);
 
   const tokens = await Promise.all(
-    payload.tokenSets.map((tokenSet) => pushToTokensStudio({
-      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-      action: 'CREATE_TOKEN',
-      data: {
-        ...tokenData,
-        parent: tokenSet,
-      },
-      metadata: rootState.tokenState.tokenSetMetadata,
-    })),
+    payload.tokenSets.map((tokenSet) =>
+      pushToTokensStudio({
+        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+        action: 'CREATE_TOKEN',
+        data: {
+          ...tokenData,
+          parent: tokenSet,
+        },
+        metadata: rootState.tokenState.tokenSetMetadata,
+      }),
+    ),
   );
 
-  tokens.forEach((token, index) => {
-    if (typeof token !== 'boolean' && token?.urn) {
-      onTokenDuplicated({
-        ...tokenData,
-        parent: payload.tokenSets[index],
-        $extensions: deepmerge(tokenData.$extensions, { 'studio.tokens': { urn: token.urn } }),
-        shouldUpdate: false,
-      });
-    }
-  });
+  // tokens.forEach((token, index) => {
+  //   if (typeof token !== 'boolean' && token?.urn) {
+  //     onTokenDuplicated({
+  //       ...tokenData,
+  //       parent: payload.tokenSets[index],
+  //       $extensions: deepmerge(tokenData.$extensions, { 'studio.tokens': { urn: token.urn } }),
+  //       shouldUpdate: false,
+  //     });
+  //   }
+  // });
 }

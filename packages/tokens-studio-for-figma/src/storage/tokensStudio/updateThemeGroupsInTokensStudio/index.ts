@@ -29,8 +29,8 @@ export async function updateThemeGroupsInTokensStudio({
     tokenState: { themes: prevThemes },
   } = prevState;
   const groupIdsMap = prevThemes.reduce((acc, theme) => {
-    if (theme.groupId && theme.group) {
-      acc[theme.group] = theme.groupId;
+    if (theme.group) {
+      acc[theme.group] = theme.group;
     }
     return acc;
   }, {} as Record<string, string>);
@@ -58,7 +58,10 @@ export async function updateThemeGroupsInTokensStudio({
     }
     case 'tokenState/deleteTheme': {
       const themeGroupsToAlter = deleteTheme({
-        action, themes, prevThemes, groupIdsMap,
+        action,
+        themes,
+        prevThemes,
+        groupIdsMap,
       });
       themeGroupsToDelete = themeGroupsToAlter.themeGroupsToDelete;
       themeGroupsToUpdate = themeGroupsToAlter.themeGroupsToUpdate;
@@ -76,100 +79,102 @@ export async function updateThemeGroupsInTokensStudio({
   }
 
   const updatedThemeGroups = await Promise.all(
-    Object.entries(themeGroupsToUpdate).filter(([groupId]) => !!groupId).map(([groupId, themesToUpdate]) => pushToTokensStudio({
-      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-      action: 'UPDATE_THEME_GROUP',
-      data: {
-        groupId,
-        name: themesToUpdate[0].group,
-        options: themesToUpdate.map((theme) => ({
-          name: theme.name,
-          urn: theme.id,
-          selectedTokenSets: JSON.stringify(theme.selectedTokenSets),
-          figmaStyleReferences: JSON.stringify(theme.$figmaStyleReferences),
-          figmaVariableReferences: JSON.stringify(theme.$figmaVariableReferences),
-        })),
-      },
-    })),
+    Object.entries(themeGroupsToUpdate)
+      .filter(([groupId]) => !!groupId)
+      .map(([groupId, themesToUpdate]) =>
+        pushToTokensStudio({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+          action: 'UPDATE_THEME_GROUP',
+          data: {
+            name: themesToUpdate[0].group,
+            options: themesToUpdate.map((theme) => ({
+              name: theme.name,
+              selectedTokenSets: theme.selectedTokenSets,
+              figmaStyleReferences: theme.$figmaStyleReferences,
+              figmaVariableReferences: theme.$figmaVariableReferences,
+            })),
+          },
+        }),
+      ),
   );
 
-  let updatedFigmaThemes = [...themes];
-  let shouldUpdateThemes = false;
+  const updatedFigmaThemes = [...themes];
+  const shouldUpdateThemes = false;
 
-  if (updatedThemeGroups.length && action.type === 'tokenState/saveTheme') {
-    const updatedThemeGroupsMapping = (updatedThemeGroups as ThemeGroup[]).reduce((acc, group) => {
-      if (group && typeof group !== 'boolean' && group.name && group.options) {
-        acc[group.name] = {
-          urn: group.urn,
-          themes: group.options.reduce((themesAcc, theme) => {
-            if (theme?.name && theme?.urn) {
-              themesAcc[theme.name] = theme.urn;
-            }
-            return themesAcc;
-          }, {} as Record<string, string>),
-        };
-      }
-      return acc;
-    }, {} as Record<string, { urn: string; themes: Record<string, string> }>);
+  // if (updatedThemeGroups.length && action.type === 'tokenState/saveTheme') {
+  //   const updatedThemeGroupsMapping = (updatedThemeGroups as ThemeGroup[]).reduce((acc, group) => {
+  //     if (group && typeof group !== 'boolean' && group.name && group.options) {
+  //       acc[group.name] = {
+  //         urn: group.urn,
+  //         themes: group.options.reduce((themesAcc, theme) => {
+  //           if (theme?.name && theme?.urn) {
+  //             themesAcc[theme.name] = theme.urn;
+  //           }
+  //           return themesAcc;
+  //         }, {} as Record<string, string>),
+  //       };
+  //     }
+  //     return acc;
+  //   }, {} as Record<string, { urn: string; themes: Record<string, string> }>);
 
-    updatedFigmaThemes = updatedFigmaThemes.map((theme) => {
-      if (theme.group && updatedThemeGroupsMapping[theme.group]) {
-        const { urn: groupUrn, themes: groupThemes } = updatedThemeGroupsMapping[theme.group];
-        return {
-          ...theme,
-          groupId: groupUrn,
-          id: groupThemes[theme.name],
-        };
-      }
+  //   updatedFigmaThemes = updatedFigmaThemes.map((theme) => {
+  //     if (theme.group && updatedThemeGroupsMapping[theme.group]) {
+  //       const { urn: groupUrn, themes: groupThemes } = updatedThemeGroupsMapping[theme.group];
+  //       return {
+  //         ...theme,
+  //         groupId: groupUrn,
+  //         id: groupThemes[theme.name],
+  //       };
+  //     }
 
-      return theme;
-    });
+  //     return theme;
+  //   });
 
-    shouldUpdateThemes = true;
-  }
+  //   shouldUpdateThemes = true;
+  // }
 
-  if (themeToCreate) {
-    const createdThemeGroup = await pushToTokensStudio({
-      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-      action: 'CREATE_THEME_GROUP',
-      data: {
-        name: themeToCreate.group,
-        options: {
-          name: themeToCreate.name,
-          selectedTokenSets: JSON.stringify(themeToCreate.selectedTokenSets),
-          figmaStyleReferences: JSON.stringify(themeToCreate.$figmaStyleReferences),
-          figmaVariableReferences: JSON.stringify(themeToCreate.$figmaVariableReferences),
-        },
-      },
-    });
+  // if (themeToCreate) {
+  //   const createdThemeGroup = await pushToTokensStudio({
+  //     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+  //     action: 'CREATE_THEME_GROUP',
+  //     data: {
+  //       name: themeToCreate.group,
+  //       options: {
+  //         name: themeToCreate.name,
+  //         selectedTokenSets: JSON.stringify(themeToCreate.selectedTokenSets),
+  //         figmaStyleReferences: JSON.stringify(themeToCreate.$figmaStyleReferences),
+  //         figmaVariableReferences: JSON.stringify(themeToCreate.$figmaVariableReferences),
+  //       },
+  //     },
+  //   });
 
-    if (createdThemeGroup && typeof createdThemeGroup !== 'boolean') {
-      try {
-        const { name: groupName, urn: groupUrn, options } = createdThemeGroup as ThemeGroup;
+  //   if (createdThemeGroup && typeof createdThemeGroup !== 'boolean') {
+  //     try {
+  //       const { name: groupName, urn: groupUrn, options } = createdThemeGroup as ThemeGroup;
 
-        if (!options || !options.length) {
-          return;
-        }
+  //       if (!options || !options.length) {
+  //         return;
+  //       }
 
-        const remoteTheme = options[0];
+  //       const remoteTheme = options[0];
 
-        updatedFigmaThemes = updatedFigmaThemes.map((theme) => {
-          if (theme.group === groupName && theme.name === remoteTheme?.name) {
-            return {
-              ...theme,
-              groupId: groupUrn,
-              id: remoteTheme?.urn,
-            };
-          }
-          return theme;
-        });
+  //       updatedFigmaThemes = updatedFigmaThemes.map((theme) => {
+  //         if (theme.group === groupName && theme.name === remoteTheme?.name) {
+  //           return {
+  //             ...theme,
+  //             groupId: groupUrn,
+  //             id: remoteTheme?.urn,
+  //           };
+  //         }
+  //         return theme;
+  //       });
 
-        shouldUpdateThemes = true;
-      } catch (error) {
-        console.error('An error occurred:', error);
-      }
-    }
-  }
+  //       shouldUpdateThemes = true;
+  //     } catch (error) {
+  //       console.error('An error occurred:', error);
+  //     }
+  //   }
+  // }
 
   if (shouldUpdateThemes) {
     dispatch({ type: 'tokenState/setThemes', payload: updatedFigmaThemes });
@@ -177,13 +182,15 @@ export async function updateThemeGroupsInTokensStudio({
 
   if (themeGroupsToDelete.length) {
     await Promise.all(
-      themeGroupsToDelete.map((groupId) => pushToTokensStudio({
-        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-        action: 'DELETE_THEME_GROUP',
-        data: {
-          groupId,
-        },
-      })),
+      themeGroupsToDelete.map((groupId) =>
+        pushToTokensStudio({
+          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+          action: 'DELETE_THEME_GROUP',
+          data: {
+            groupId,
+          },
+        }),
+      ),
     );
   }
 }

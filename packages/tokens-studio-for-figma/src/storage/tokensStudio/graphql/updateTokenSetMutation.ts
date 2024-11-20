@@ -1,9 +1,16 @@
-export const UPDATE_TOKEN_SET_MUTATION = `mutation UpdateTokenSet($urn: String!, $input: TokenSetUpdateInput!) {
-  updateTokenSet(urn: $urn, input: $input) {
-    urn
+
+import { gql } from '@tokens-studio/sdk';
+
+export const UPDATE_TOKEN_SET_MUTATION = gql`
+mutation UpdateTokenSet($input: TokenSetUpdateInput!, $project: String!, $organization: String!) {
+  updateTokenSet(input: $input, project: $project, organization: $organization) {
     name
-    projectUrn
-    type
+    tokens {
+      extensions
+      name
+      description
+      value
+    }
   }
 }
 `;

@@ -8,18 +8,16 @@ type Props = {
   groupIdsMap: Record<string, string>;
 };
 
-export const deleteTheme = ({
-  action, themes, prevThemes, groupIdsMap,
-}: Props) => {
+export const deleteTheme = ({ action, themes, prevThemes, groupIdsMap }: Props) => {
   const { payload: themeUrn } = action;
 
   let themeGroupsToUpdate: Record<string, ThemeObjectsList> = {};
   let themeGroupsToDelete: string[] = [];
 
-  const themeGroupId = prevThemes.find((theme) => theme.id === themeUrn)?.groupId;
+  const themeGroupId = prevThemes.find((theme) => theme.id === themeUrn)?.group;
 
   if (themeGroupId) {
-    const themesToUpdate = themes.filter(({ groupId }) => groupId === themeGroupId);
+    const themesToUpdate = themes.filter(({ group }) => group === themeGroupId);
 
     if (themesToUpdate.length) {
       themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate, groupIdsMap);

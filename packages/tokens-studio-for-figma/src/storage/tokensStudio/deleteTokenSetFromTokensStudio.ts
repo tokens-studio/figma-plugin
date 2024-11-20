@@ -22,9 +22,9 @@ export async function deleteTokenSetFromTokensStudio({
     metadata: rootState.tokenState.tokenSetMetadata,
   });
 
-  if (tokenSet) {
-    const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
-    delete tokenSetMetadata[name];
-    onTokenSetDeleted(tokenSetMetadata);
-  }
+  // if (tokenSet) {
+  //   const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
+  //   delete tokenSetMetadata[name];
+  //   onTokenSetDeleted(tokenSetMetadata);
+  // }
 }
