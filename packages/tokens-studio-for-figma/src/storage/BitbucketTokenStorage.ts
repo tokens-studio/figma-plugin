@@ -208,14 +208,14 @@ export class BitbucketTokenStorage extends GitTokenStorage {
         return [
           {
             type: 'themes',
-            path: `${this.path}/${SystemFilenames.THEMES}.json`,
+            path: `${SystemFilenames.THEMES}.json`,
             data: jsonFile.$themes ?? [],
           },
           ...(jsonFile.$metadata
             ? [
               {
                 type: 'metadata' as const,
-                path: this.path,
+                path: `${SystemFilenames.METADATA}.json`,
                 data: jsonFile.$metadata,
               },
             ]
@@ -228,7 +228,7 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
             name,
             type: 'tokenSet',
-            path: `${this.path}/${name}.json`,
+            path: `${name}.json`,
             data: tokenSet,
           })),
         ];
