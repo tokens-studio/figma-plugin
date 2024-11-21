@@ -330,24 +330,28 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     let deletedTokenSets: string[] = [];
 
     if (!normalizedPath.endsWith('.json') && this.flags.multiFileEnabled) {
-      const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/${normalizedPath}`;
-      const existingFiles = await this.fetchJsonFilesFromDirectory(url);
+      try {
+        const url = `https://api.bitbucket.org/2.0/repositories/${owner}/${repo}/src/${branch}/${normalizedPath}`;
+        const existingFiles = await this.fetchJsonFilesFromDirectory(url);
 
-      const existingTokenSets: Record<string, boolean> = {};
-      if (Array.isArray(existingFiles)) {
-        existingFiles.forEach((file) => {
-          if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
-            const tokenSetName = file.path.replace('.json', '');
-            existingTokenSets[tokenSetName] = true;
-          }
-        });
+        const existingTokenSets: Record<string, boolean> = {};
+        if (Array.isArray(existingFiles)) {
+          existingFiles.forEach((file) => {
+            if (file.path.endsWith('.json') && !file.path.startsWith('$')) {
+              const tokenSetName = file.path.replace('.json', '');
+              existingTokenSets[tokenSetName] = true;
+            }
+          });
+        }
+
+        const localTokenSets = Object.keys(files);
+
+        deletedTokenSets = Object.keys(existingTokenSets).filter(
+          (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
+        );
+      } catch (e) {
+        // Do nothing as the folder is not yet created
       }
-
-      const localTokenSets = Object.keys(files);
-
-      deletedTokenSets = Object.keys(existingTokenSets).filter(
-        (tokenSet) => !localTokenSets.includes(tokenSet) && !tokenSet.startsWith('$'),
-      );
     }
 
     // @README the files object is Record<string, string> here
