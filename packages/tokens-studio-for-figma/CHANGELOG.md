@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 2.2.1
+
+### Patch Changes
+
+- 1af628f1: fixed an issue with pulling token sets from Bitbucket when multi-file sync is enabled, wherein all the token sets were not being pulled.
+- fdfc7be2: Disable cache for Bitbucket
+- 04f3fa67: When updating variables we now properly check if the variable needs to be updated, which fixes an issue where Figma was showing library updates even though the values were the same
+
 ## 2.2.0
 
 ### Minor Changes
