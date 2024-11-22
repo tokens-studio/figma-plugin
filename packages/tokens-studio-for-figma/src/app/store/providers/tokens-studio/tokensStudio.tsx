@@ -182,10 +182,7 @@ export function useTokensStudio() {
     async (context: TokensStudioCredentials): Promise<RemoteResponseData> => {
       try {
         const storage = storageClientFactory(context);
-        console.log('storage', storage);
         const data = await storage.retrieve();
-
-        console.log('data retrieved bro', data);
 
         if (!data || data.status === 'failure') {
           throw new Error(data?.errorMessage);
