@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import zod from 'zod';
 import {
   Box,
@@ -70,7 +70,6 @@ export default function TokensStudioForm({ onChange, onSubmit, onCancel, values,
           ...validationResult.data,
           internalId: validationResult.data.internalId || generateId(24),
         } as ValidatedFormValues;
-        console.log('formFields', formFields);
         onSubmit(formFields);
       }
     },
@@ -86,6 +85,12 @@ export default function TokensStudioForm({ onChange, onSubmit, onCancel, values,
   const handleDismissTeaser = React.useCallback(() => {
     setShowTeaser(false);
   }, []);
+
+  useEffect(() => {
+    if (values.secret) {
+      fetchOrgData();
+    }
+  }, [values.secret]);
 
   const fetchOrgData = React.useCallback(async () => {
     try {
