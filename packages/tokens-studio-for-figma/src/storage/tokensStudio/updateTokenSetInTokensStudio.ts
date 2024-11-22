@@ -22,15 +22,15 @@ export async function updateTokenSetInTokensStudio({
     metadata: rootState.tokenState.tokenSetMetadata,
   });
 
-  // if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
-  //   const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
-  //   delete tokenSetMetadata[data.oldName];
+  if (typeof tokenSet !== 'boolean' && data.newName) {
+    const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
+    delete tokenSetMetadata[data.oldName];
 
-  //   onTokenSetUpdated({
-  //     ...tokenSetMetadata,
-  //     [data.newName]: {
-  //       id: tokenSet.urn,
-  //     },
-  //   });
-  // }
+    onTokenSetUpdated({
+      ...tokenSetMetadata,
+      [data.newName]: {
+        isDynamic: false,
+      },
+    });
+  }
 }

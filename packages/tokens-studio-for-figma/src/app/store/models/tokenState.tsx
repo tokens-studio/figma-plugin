@@ -50,6 +50,7 @@ import {
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
+import { singleTokensToRawTokenSet } from '@/utils/convert';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -526,9 +527,9 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
-    updateAliases: (state, data: TokenToRename) => {
-      const newTokens = updateAliasesInState(state.tokens, data);
-
+    setUpdatedAliases: (state, newTokens: TokenStore['values']) => {
+      // const { newTokens } = updateAliasesInState(state.tokens, data);
+      // console.log('update alias reducer', newTokens);
       return {
         ...state,
         tokens: newTokens,
@@ -616,22 +617,52 @@ export const tokenState = createModel<RootModel>()({
       }
 
       if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'EDIT_TOKEN',
-          data: payload,
-        });
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        if (tokenSet) {
+          const updatedSet = tokenSet.map((token) => {
+            if (token.name === payload.oldName) {
+              return {
+                name: payload.name,
+                description: payload.description,
+                value: payload.value,
+                type: payload.type,
+                $extensions: payload.$extensions,
+              } as SingleToken;
+            }
+            return token;
+          });
+
+          const rawSet = singleTokensToRawTokenSet(updatedSet, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: {
+              raw: rawSet,
+              name: payload.parent,
+            },
+          });
+        }
       }
     },
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'DELETE_TOKEN',
-          data: payload,
-        });
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        if (tokenSet) {
+          const newSet = tokenSet.filter((token) => token.name !== payload.path);
+          const rawSet = singleTokensToRawTokenSet(newSet, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: {
+              raw: rawSet,
+              name: payload.parent,
+            },
+          });
+        }
       }
     },
     deleteDuplicateTokens() {
@@ -687,8 +718,8 @@ export const tokenState = createModel<RootModel>()({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'UPDATE_TOKEN_SET_ORDER',
           data: data.map((name, index) => ({
-            orderIndex: `${index}`,
-            name,
+            orderIndex: index,
+            path: name,
           })),
         });
       }
@@ -803,6 +834,24 @@ export const tokenState = createModel<RootModel>()({
         );
       } catch (e) {
         console.error('Error updating document', e);
+      }
+    },
+    async updateAliases(data: TokenToRename, rootState) {
+      const { newTokens, updatedSets } = updateAliasesInState(rootState.tokenState.tokens, data);
+
+      dispatch.tokenState.setUpdatedAliases(newTokens);
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        for (const set of updatedSets) {
+          const content = newTokens[set];
+          const rawSet = singleTokensToRawTokenSet(content, true);
+
+          await pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: { raw: rawSet, name: set },
+          });
+        }
       }
     },
     ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),

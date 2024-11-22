@@ -5,6 +5,8 @@ import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageT
 import { DuplicateTokenPayload, UpdateTokenPayload } from '@/types/payloads';
 import { RootModel } from '@/types/RootModel';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
+import { singleTokensToRawTokenSet } from '@/utils/convert';
+import { SingleToken } from '@/types/tokens';
 
 interface CreateTokenInTokensStudioPayload {
   rootState: RematchRootState<RootModel, Record<string, never>>;
@@ -27,28 +29,18 @@ export async function duplicateTokenInTokensStudio({
     $extensions: payload.$extensions,
   } as UpdateTokenPayload);
 
-  const tokens = await Promise.all(
-    payload.tokenSets.map((tokenSet) =>
-      pushToTokensStudio({
-        context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-        action: 'CREATE_TOKEN',
-        data: {
-          ...tokenData,
-          parent: tokenSet,
-        },
-        metadata: rootState.tokenState.tokenSetMetadata,
-      }),
-    ),
-  );
+  const tokenSets = rootState.tokenState.tokens;
+  let createdTokens: SingleToken[] = [];
 
-  // tokens.forEach((token, index) => {
-  //   if (typeof token !== 'boolean' && token?.urn) {
-  //     onTokenDuplicated({
-  //       ...tokenData,
-  //       parent: payload.tokenSets[index],
-  //       $extensions: deepmerge(tokenData.$extensions, { 'studio.tokens': { urn: token.urn } }),
-  //       shouldUpdate: false,
-  //     });
-  //   }
-  // });
+  for (const tokenSet of payload.tokenSets) {
+    const tokenSetContent = tokenSets[tokenSet];
+    const newTokenSetContent = [...tokenSetContent, tokenData];
+    createdTokens.push(tokenData);
+    const newRawTokenSet = singleTokensToRawTokenSet(newTokenSetContent, true);
+    await pushToTokensStudio({
+      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+      action: 'UPDATE_TOKEN_SET',
+      data: { raw: newRawTokenSet, name: tokenSet },
+    });
+  }
 }

@@ -43,6 +43,7 @@ import {
   // CREATE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
+  UPDATE_TOKEN_SET_ORDER_MUTATION,
   // DELETE_TOKEN_SET_MUTATION,
   // UPDATE_TOKEN_SET_ORDER_MUTATION,
   // UPDATE_THEME_GROUP_MUTATION,
@@ -95,7 +96,13 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
-        acc.tokens[tokenSet.name] = tokenSet.tokens;
+        acc.tokens[tokenSet.name] = tokenSet.tokens.map((tkn) => ({
+          name: tkn.name,
+          type: tkn.type,
+          description: tkn.description,
+          $extensions: tkn.extensions,
+          value: tkn.value,
+        }));
 
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
 
@@ -170,8 +177,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     try {
       const projectData = await getProjectData(this.id, this.orgId, this.client);
 
-      console.log('projectData', projectData);
-
       tokens = projectData?.tokens;
       themes = projectData?.themes || [];
 
@@ -183,7 +188,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         metadata.tokenSetOrder = projectData.tokenSetOrder;
       }
     } catch (error) {
-      console.log('crapa aciii');
       // We get errors in a slightly changed format from the backend
       if (tokens?.errors) console.log('Error is', tokens.errors[0].message);
       return {
@@ -215,8 +219,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         });
       }
 
-      console.log('returnPayload', returnPayload);
-
       return returnPayload;
     }
     return {
@@ -244,138 +246,12 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     data: any;
     metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
   }) {
-    console.log('push', action, data, metadata);
     switch (action) {
-      case 'CREATE_TOKEN': {
-        try {
-          // const setId = metadata?.[data.parent]?.id;
-
-          if (!data.name) {
-            throw new Error('Invalid data');
-          }
-
-          // const input: TokenInput = {
-          //   name: data.name,
-          //   type: data.type,
-          //   description: data.description,
-          //   extensions: JSON.stringify(data.$extensions),
-          // };
-
-          // if (data.type === TokenTypes.BOX_SHADOW) {
-          //   input.boxShadow = data.value;
-          // } else if (data.type === TokenTypes.BORDER) {
-          //   input.border = data.value;
-          // } else if (data.type === TokenTypes.TYPOGRAPHY) {
-          //   input.typography = data.value;
-          // } else if (data.type === TokenTypes.COMPOSITION) {
-          //   input.composition = data.value;
-          // } else {
-          //   input.value = data.value;
-          // }
-
-          // const responseData = await Graphql.exec<CreateTokenMutation>(
-          //   Graphql.op(CREATE_TOKEN_MUTATION, {
-          //     set: setId,
-          //     input,
-          //   }),
-          // );
-
-          // if (!responseData.data) {
-          //   return null;
-          // }
-
-          track('Create token in Tokens Studio');
-          notifyToUI('Token pushed to Tokens Studio', { error: false });
-
-          // return responseData.data.createToken;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error creating token in Tokens Studio', e);
-          return null;
-        }
-      }
-      //     case 'EDIT_TOKEN': {
-      //       const tokenId = data.$extensions?.['studio.tokens']?.urn;
-
-      //       if (!tokenId) {
-      //         throw new Error('Invalid data');
-      //       }
-
-      //       try {
-      //         const valueIsString = typeof data.value === 'string';
-      //         const isComplexTokenType = [
-      //           TokenTypes.BOX_SHADOW,
-      //           TokenTypes.BORDER,
-      //           TokenTypes.TYPOGRAPHY,
-      //           TokenTypes.COMPOSITION,
-      //         ].includes(data.type);
-
-      //         const input = {
-      //           name: data.name,
-      //           description: data.description,
-      //           extensions: JSON.stringify(data.$extensions),
-      //           value: undefined,
-      //         };
-
-      //         if (isComplexTokenType && !valueIsString) {
-      //           input[data.type.toLowerCase()] = data.value;
-      //         } else {
-      //           input.value = data.value;
-      //         }
-
-      //         const responseData = await Graphql.exec<UpdateTokenMutation>(
-      //           Graphql.op(UPDATE_TOKEN_MUTATION, {
-      //             urn: tokenId,
-      //             input,
-      //           }),
-      //         );
-
-      //         if (!responseData.data) {
-      //           return null;
-      //         }
-
-      //         track('Edit token in Tokens Studio');
-      //         notifyToUI('Token updated in Tokens Studio', { error: false });
-
-      //         return responseData.data.updateToken;
-      //       } catch (e) {
-      //         Sentry.captureException(e);
-      //         console.error('Error updating token in Tokens Studio', e);
-      //         return null;
-      //       }
-      //     }
-      //     case 'DELETE_TOKEN': {
-      //       if (!data.sourceId) {
-      //         throw new Error('Invalid data');
-      //       }
-
-      //       try {
-      //         const responseData = await Graphql.exec<DeleteTokenMutation>(
-      //           Graphql.op(DELETE_TOKEN_MUTATION, {
-      //             urn: data.sourceId,
-      //           }),
-      //         );
-
-      //         if (!responseData.data) {
-      //           return null;
-      //         }
-
-      //         track('Delete token from Tokens Studio');
-      //         notifyToUI('Token removed from Tokens Studio', { error: false });
-
-      //         return responseData.data.deleteToken;
-      //       } catch (e) {
-      //         Sentry.captureException(e);
-      //         console.error('Error removing token from Tokens Studio', e);
-      //         return null;
-      //       }
-      //     }
       case 'CREATE_TOKEN_SET': {
         try {
           if (!data.name) {
             throw new Error('Invalid data');
           }
-
           // TODO: export the type for the mutation from sdk
           const responseData = await this.client.mutate({
             mutation: CREATE_TOKEN_SET_MUTATION,
@@ -384,6 +260,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
               organization: this.orgId,
               input: {
                 path: data.name,
+                orderIndex: data.orderIndex,
               },
             },
           });
@@ -404,16 +281,15 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       }
       case 'UPDATE_TOKEN_SET': {
         try {
-          console.log('update token set', data);
           const responseData = await this.client.mutate({
             mutation: UPDATE_TOKEN_SET_MUTATION,
             variables: {
               project: this.id,
               organization: this.orgId,
               input: {
-                path: data.oldName,
+                path: data.oldName || data.name,
                 newPath: data.newName,
-                // raw: data
+                raw: data.raw,
               },
             },
           });
@@ -428,6 +304,9 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           return responseData.data.updateTokenSet;
         } catch (e) {
           Sentry.captureException(e);
+          notifyToUI(`Error updating following token set in Tokens Studio: ${data.oldName || data.name}`, {
+            error: true,
+          });
           console.error('Error updating token set in Tokens Studio', e);
           return null;
         }
@@ -462,28 +341,34 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           return null;
         }
       }
-      //     case 'UPDATE_TOKEN_SET_ORDER': {
-      //       try {
-      //         const responseData = await Graphql.exec<UpdateTokenSetOrderMutation>(
-      //           Graphql.op(UPDATE_TOKEN_SET_ORDER_MUTATION, {
-      //             input: data,
-      //           }),
-      //         );
+      case 'UPDATE_TOKEN_SET_ORDER': {
+        try {
+          console.log('data', data);
+          const responseData = await this.client.mutate({
+            mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
+            variables: {
+              updates: data,
+              project: this.id,
+              organization: this.orgId,
+            },
+          });
 
-      //         if (!responseData.data) {
-      //           return null;
-      //         }
+          if (!responseData.data) {
+            return null;
+          }
 
-      //         track('Update token set order in Tokens Studio');
-      //         notifyToUI('Token set order updated in Tokens Studio', { error: false });
+          console.log('responseData', responseData.data);
 
-      //         return responseData.data.updateTokenSetOrder;
-      //       } catch (e) {
-      //         Sentry.captureException(e);
-      //         console.error('Error updating token set order in Tokens Studio', e);
-      //         return null;
-      //       }
-      //     }
+          track('Update token set order in Tokens Studio');
+          notifyToUI('Token set order updated in Tokens Studio', { error: false });
+
+          return responseData.data.updateTokenSetsOrder;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error updating token set order in Tokens Studio', e);
+          return null;
+        }
+      }
       //     case 'CREATE_THEME_GROUP': {
       //       try {
       //         const responseData = await Graphql.exec<CreateThemeGroupMutation>(

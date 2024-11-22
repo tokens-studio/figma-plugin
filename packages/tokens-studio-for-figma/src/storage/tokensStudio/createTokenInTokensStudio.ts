@@ -5,8 +5,8 @@ import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageT
 import { UpdateTokenPayload } from '@/types/payloads';
 import { RootModel } from '@/types/RootModel';
 import convertTokensToObject from '@/utils/convertTokensToObject';
-import { AnyTokenList, SingleToken } from '@/types/tokens';
-import { convertTokenToFormat } from '@/utils/convertTokenToFormat';
+import { SingleToken } from '@/types/tokens';
+import { singleTokenToDTCGToken, singleTokensToRawTokenSet } from '@/utils/convert';
 
 interface CreateTokenInTokensStudioPayload {
   rootState: RematchRootState<RootModel, Record<string, never>>;
@@ -19,11 +19,6 @@ export async function createTokenInTokensStudio({
   onTokenCreated,
   rootState,
 }: CreateTokenInTokensStudioPayload) {
-  console.log({ payload });
-  console.log({ rootState });
-
-  // I need to add the token to the token set, and then convert the token set to a token set object, then push the token set object to tokens studio
-
   const tokenSet = rootState.tokenState.tokens[payload.parent];
 
   if (!tokenSet) {
@@ -39,27 +34,15 @@ export async function createTokenInTokensStudio({
   } as SingleToken;
 
   const newSet = [...tokenSet, newToken];
+  const dtcgSet = singleTokensToRawTokenSet(newSet, true);
 
-  const dtcgSet = newSet.map((token) => convertTokenToFormat(token));
-
-  console.log({ dtcgSet });
-
-  const tokenSetObject = convertTokensToObject({ [payload.parent]: dtcgSet }, false);
-
-  const token = await pushToTokensStudio({
+  await pushToTokensStudio({
     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
     action: 'UPDATE_TOKEN_SET',
     data: {
-      raw: tokenSetObject[payload.parent],
+      raw: dtcgSet,
+      name: payload.parent,
     },
     metadata: rootState.tokenState.tokenSetMetadata,
   });
-
-  // if (typeof token !== 'boolean' && token?.urn) {
-  //   onTokenCreated({
-  //     ...payload,
-  //     $extensions: deepmerge(payload.$extensions, { 'studio.tokens': { urn: token.urn } }),
-  //     shouldUpdate: false,
-  //   });
-  // }
 }
