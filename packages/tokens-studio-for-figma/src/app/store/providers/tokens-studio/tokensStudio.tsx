@@ -217,7 +217,6 @@ export function useTokensStudio() {
 
   const addNewTokensStudioCredentials = useCallback(
     async (context: TokensStudioFormValues): Promise<RemoteResponseData> => {
-      console.log('addNewTokensStudioCredentials', context);
       const data = await syncTokensWithTokensStudio(context);
       if (!data || data.status === 'failure') {
         return {

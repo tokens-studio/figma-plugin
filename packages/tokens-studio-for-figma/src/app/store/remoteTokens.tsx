@@ -486,7 +486,6 @@ export default function useRemoteTokens() {
           break;
         }
         case StorageProviderType.TOKENS_STUDIO: {
-          console.log('addNewTokensStudioCredentials', credentials);
           content = await addNewTokensStudioCredentials(credentials);
           break;
         }
