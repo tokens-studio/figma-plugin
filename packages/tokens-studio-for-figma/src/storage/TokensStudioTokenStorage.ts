@@ -41,13 +41,13 @@ import {
   // UPDATE_TOKEN_MUTATION,
   // DELETE_TOKEN_MUTATION,
   // CREATE_TOKEN_SET_MUTATION,
+  CREATE_THEME_GROUP_MUTATION,
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_ORDER_MUTATION,
   // DELETE_TOKEN_SET_MUTATION,
   // UPDATE_TOKEN_SET_ORDER_MUTATION,
   // UPDATE_THEME_GROUP_MUTATION,
-  // CREATE_THEME_GROUP_MUTATION,
   // DELETE_THEME_GROUP_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
@@ -369,40 +369,43 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           return null;
         }
       }
-      //     case 'CREATE_THEME_GROUP': {
-      //       try {
-      //         const responseData = await Graphql.exec<CreateThemeGroupMutation>(
-      //           Graphql.op(CREATE_THEME_GROUP_MUTATION, {
-      //             project: this.id,
-      //             input: {
-      //               name: data.name,
-      //               options: data.options,
-      //             },
-      //           }),
-      //         );
+      case 'CREATE_THEME_GROUP': {
+        try {
+          const responseData = await this.client.mutate({
+            mutation: CREATE_THEME_GROUP_MUTATION,
+            variables: {
+              input: {
+                name: data.name,
+                options: data.options,
+              },
+              project: this.id,
+              organization: this.orgId,
+              branch: 'master',
+            },
+          });
 
-      //         if (!responseData.data) {
-      //           return null;
-      //         }
+          if (!responseData.data) {
+            return null;
+          }
 
-      //         track('Create theme group in Tokens Studio');
-      //         notifyToUI('Theme group created in Tokens Studio', { error: false });
+          track('Create theme group in Tokens Studio');
+          notifyToUI('Theme group created in Tokens Studio', { error: false });
 
-      //         return responseData.data.createThemeGroup;
-      //       } catch (e) {
-      //         Sentry.captureException(e);
-      //         console.error('Error creating theme group in Tokens Studio', e);
-      //         return null;
-      //       }
-      //     }
+          return responseData.data.createThemeGroup;
+        } catch (e) {
+          Sentry.captureException(e);
+          console.error('Error creating theme group in Tokens Studio', e);
+          return null;
+        }
+      }
       case 'UPDATE_THEME_GROUP': {
         try {
-          console.log('update theme group', data);
           const responseData = await this.client.mutate({
             mutation: UPDATE_THEME_GROUP_MUTATION,
             variables: {
               input: {
                 name: data.name,
+                ...(data.newName && { newName: data.newName }),
                 options: data.options,
               },
               project: this.id,

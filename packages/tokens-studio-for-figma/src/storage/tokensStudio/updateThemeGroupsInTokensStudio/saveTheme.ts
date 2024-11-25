@@ -10,7 +10,7 @@ type Props = {
 
 export const saveTheme = ({ action, themes: newThemes, prevThemes, groupIdsMap }: Props) => {
   const {
-    payload: { id, name, group },
+    payload: { name, group },
   } = action;
 
   const themes = newThemes.map((theme) => (!id && theme.name === name ? { ...theme, id: '' } : theme));
@@ -22,7 +22,7 @@ export const saveTheme = ({ action, themes: newThemes, prevThemes, groupIdsMap }
   if (id) {
     if (groupIdsMap[group]) {
       // theme value updated and/or moved to an existing group
-      themeGroupsToUpdate = getThemeGroupsToUpdate(themes, groupIdsMap);
+      themeGroupsToUpdate = getThemeGroupsToUpdate(themes);
       themeGroupsToDelete = Object.values(groupIdsMap).filter((groupId) => !themeGroupsToUpdate[groupId]);
     } else {
       // theme moved to a new group
@@ -44,7 +44,7 @@ export const saveTheme = ({ action, themes: newThemes, prevThemes, groupIdsMap }
         );
 
         if (themesToUpdate.length) {
-          themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate, groupIdsMap);
+          themeGroupsToUpdate = getThemeGroupsToUpdate(themesToUpdate);
         } else {
           themeGroupsToDelete.push(movedThemePrevGroupId);
         }
@@ -52,7 +52,7 @@ export const saveTheme = ({ action, themes: newThemes, prevThemes, groupIdsMap }
     }
   } else if (groupIdsMap[group]) {
     // theme created in an existing group
-    themeGroupsToUpdate = getThemeGroupsToUpdate(themes, groupIdsMap);
+    themeGroupsToUpdate = getThemeGroupsToUpdate(themes);
   } else {
     // theme created in a new group
     const newTheme = themes.find((theme) => theme.name === name);

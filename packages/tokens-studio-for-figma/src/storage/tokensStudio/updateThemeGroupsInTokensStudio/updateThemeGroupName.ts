@@ -13,8 +13,10 @@ export const updateThemeGroupName = ({ action, themes, themeGroupsToUpdate }: Pr
     .filter((theme) => theme.group === newName)
     .forEach((theme) => {
       if (theme.group) {
-        themeGroupsToUpdate[theme.group] = themeGroupsToUpdate[theme.group] || [];
-        themeGroupsToUpdate[theme.group].push(theme);
+        themeGroupsToUpdate[action.payload] = themeGroupsToUpdate[action.payload] || [];
+        themeGroupsToUpdate[action.payload].push({
+          ...theme,
+        });
       }
     });
 };
