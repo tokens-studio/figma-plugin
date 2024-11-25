@@ -113,15 +113,14 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
+    storageProvider.changePath('global.json');
+
     mockFetch
       .mockImplementationOnce(() => Promise.resolve({
         ok: true,
         json: () => Promise.resolve({
-          values: [
-            { path: '$themes.json', type: 'commit_file', links: { self: { href: 'https://api.bitbucket.org/file/$themes.json' } } },
-            { path: 'global.json', type: 'commit_file', links: { self: { href: 'https://api.bitbucket.org/file/global.json' } } },
-          ],
-          next: null, // No further pagination needed for this test
+          $themes: [],
+          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
         }),
       }))
       .mockImplementationOnce(() => Promise.resolve({
@@ -139,7 +138,7 @@ describe('BitbucketTokenStorage', () => {
       {
         path: '$themes.json',
         type: 'themes',
-        data: { $themes: [] },
+        data: [],
       },
       {
         path: 'global.json',
@@ -156,7 +155,7 @@ describe('BitbucketTokenStorage', () => {
     ]);
 
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/?pagelen=100`,
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/global.json`,
       {
         headers: {
           Authorization: `Basic ${btoa('myusername:mock-secret')}`,
