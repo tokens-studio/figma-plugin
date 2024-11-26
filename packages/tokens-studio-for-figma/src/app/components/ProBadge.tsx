@@ -34,7 +34,7 @@ export default function ProBadge({ compact, campaign }: Props) {
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const { t } = useTranslation(['licence']);
 
-  const link = `https://tokens.studio/pro/?ref=figma-plugin&utm_source=figma-plugin&utm_medium=pro-badge&utm_campaign=${campaign}`;
+  const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=pro-badge&utm_campaign=${campaign}`;
 
   return (
     <StyledProBadge href={link} target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
