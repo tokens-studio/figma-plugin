@@ -109,7 +109,7 @@ export default function AddLicenseKey() {
       <Stack direction="row" gap={2} align="center" justify="between">
         <Heading size="medium">{t('licenseKey')}</Heading>
         <Stack direction="row" gap={2} align="center">
-          <ProBadge link="https://tokens.studio/plugin?ref=add-license-key" />
+          <ProBadge campaign="add-license-key" />
           {existingKey && !licenseKeyError && (
             <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
               {t('manageSubscription')}
