@@ -3,7 +3,11 @@ export default function setNumberValuesOnVariable(variable: Variable, mode: stri
     if (isNaN(value)) {
       throw new Error(`Skipping due to invalid value: ${value}`);
     }
-    variable.setValueForMode(mode, value);
+    const existingValue = variable.valuesByMode[mode];
+    if (typeof existingValue !== 'number') return;
+    if (existingValue !== value) {
+      variable.setValueForMode(mode, value);
+    }
   } catch (e) {
     console.error('Error setting numberVariable on variable', variable.name, e);
   }

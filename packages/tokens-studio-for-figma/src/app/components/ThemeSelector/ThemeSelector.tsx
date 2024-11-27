@@ -132,7 +132,7 @@ export const ThemeSelector: React.FC<React.PropsWithChildren<React.PropsWithChil
             onSelect={handleManageThemes}
           >
             <span>{t('manageThemes')}</span>
-            {!isProUser && <ProBadge compact />}
+            {!isProUser && <ProBadge campaign="manage-themes" compact />}
             <DropdownMenu.TrailingVisual>
               <NavArrowRight />
             </DropdownMenu.TrailingVisual>

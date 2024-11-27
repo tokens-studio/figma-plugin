@@ -25,15 +25,18 @@ export const StyledProBadge = styled('a', {
 });
 
 type Props = {
-  compact?: boolean;
+  readonly compact?: boolean;
+  readonly campaign: string;
 };
 
-export default function ProBadge({ compact }: Props) {
+export default function ProBadge({ compact, campaign }: Props) {
   const existingKey = useSelector(licenseKeySelector);
   const licenseKeyError = useSelector(licenseKeyErrorSelector);
   const { t } = useTranslation(['licence']);
 
+  const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=pro-badge&utm_campaign=${campaign}`;
+
   return (
-    <StyledProBadge href="https://tokens.studio/plugin" target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
+    <StyledProBadge href={link} target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
   );
 }

@@ -113,20 +113,35 @@ describe('BitbucketTokenStorage', () => {
   });
 
   it('can read from Git in single file format', async () => {
-    mockFetch.mockImplementationOnce(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ global: { red: { name: 'red', type: 'color', value: '#ff0000' } } }),
-    }));
+    storageProvider.changePath('global.json');
+
+    mockFetch
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({
+          $themes: [],
+          global: { red: { name: 'red', type: 'color', value: '#ff0000' } },
+        }),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ $themes: [] })),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ red: { name: 'red', type: 'color', value: '#ff0000' } })),
+      }));
 
     const result = await storageProvider.read();
+
     expect(result).toEqual([
       {
-        path: '/$themes.json',
+        path: '$themes.json',
         type: 'themes',
         data: [],
       },
       {
-        path: '/global.json',
+        path: 'global.json',
         name: 'global',
         type: 'tokenSet',
         data: {
@@ -139,34 +154,13 @@ describe('BitbucketTokenStorage', () => {
       },
     ]);
 
-    storageProvider.changePath('data/core.json');
-
-    expect(result).toEqual([
-      {
-        path: '/$themes.json',
-        type: 'themes',
-        data: [],
-      },
-      {
-        path: '/global.json',
-        name: 'global',
-        type: 'tokenSet',
-        data: {
-          red: {
-            type: 'color',
-            name: 'red',
-            value: '#ff0000',
-          },
-        },
-      },
-    ]);
-
-    expect(mockFetch).toBeCalledWith(
-      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/`,
+    expect(mockFetch).toHaveBeenCalledWith(
+      `https://api.bitbucket.org/2.0/repositories/${storageProvider.owner}/${storageProvider.repository}/src/${storageProvider.branch}/global.json`,
       {
         headers: {
           Authorization: `Basic ${btoa('myusername:mock-secret')}`,
         },
+        cache: 'no-cache',
       },
     );
   });

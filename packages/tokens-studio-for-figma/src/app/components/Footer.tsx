@@ -141,7 +141,7 @@ export default function Footer() {
           <a href="https://tokens.studio/changelog" target="_blank" rel="noreferrer">{`V ${pjs.version}`}</a>
         </Box>
         <Stack direction="row" gap={1}>
-          <ProBadge />
+          <ProBadge campaign="footer" />
           <IconButton
             as="a"
             href={docUrls.root}
