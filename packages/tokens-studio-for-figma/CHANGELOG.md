@@ -1,5 +1,14 @@
 # @tokens-studio/figma-plugin
 
+## 2.2.2
+
+### Patch Changes
+
+- 23caccde: Fixes sync with Bitbucket provider:
+
+  - Pull when the option is to sync with a single file was not working
+  - Push was removing all other .json files in the selected folder (either root of the chosen folder)
+
 ## 2.2.1
 
 ### Patch Changes
