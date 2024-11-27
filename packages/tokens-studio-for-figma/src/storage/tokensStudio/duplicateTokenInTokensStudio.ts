@@ -1,4 +1,3 @@
-import { deepmerge } from 'deepmerge-ts';
 import { RematchRootState } from '@rematch/core';
 import { pushToTokensStudio } from '@/app/store/providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
@@ -6,17 +5,14 @@ import { DuplicateTokenPayload, UpdateTokenPayload } from '@/types/payloads';
 import { RootModel } from '@/types/RootModel';
 import { updateTokenPayloadToSingleToken } from '@/utils/updateTokenPayloadToSingleToken';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
-import { SingleToken } from '@/types/tokens';
 
 interface CreateTokenInTokensStudioPayload {
   rootState: RematchRootState<RootModel, Record<string, never>>;
   payload: DuplicateTokenPayload;
-  onTokenDuplicated: (payload: UpdateTokenPayload) => void;
 }
 
 export async function duplicateTokenInTokensStudio({
   payload,
-  onTokenDuplicated,
   rootState,
 }: CreateTokenInTokensStudioPayload) {
   const tokenData = updateTokenPayloadToSingleToken({
@@ -30,14 +26,13 @@ export async function duplicateTokenInTokensStudio({
   } as UpdateTokenPayload);
 
   const tokenSets = rootState.tokenState.tokens;
-  let createdTokens: SingleToken[] = [];
 
   for (const tokenSet of payload.tokenSets) {
     const tokenSetContent = tokenSets[tokenSet];
     const newTokenSetContent = [...tokenSetContent, tokenData];
-    createdTokens.push(tokenData);
     const newRawTokenSet = singleTokensToRawTokenSet(newTokenSetContent, true);
-    await pushToTokensStudio({
+
+    pushToTokensStudio({
       context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
       action: 'UPDATE_TOKEN_SET',
       data: { raw: newRawTokenSet, name: tokenSet },

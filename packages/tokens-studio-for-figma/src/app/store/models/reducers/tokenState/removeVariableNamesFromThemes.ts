@@ -3,7 +3,7 @@ import type { TokenState } from '../../tokenState';
 
 export function removeVariableNamesFromThemes(state: TokenState, name: string, parent: string): TokenState {
   const newThemes = state.themes.map((theme) => {
-    const updatedTokens = theme.$figmaVariableReferences;
+    const updatedTokens = { ...theme.$figmaVariableReferences };
     if (theme.selectedTokenSets[parent] === TokenSetStatus.ENABLED && updatedTokens) {
       Object.entries(updatedTokens).forEach(([key]) => {
         if (name === key) delete updatedTokens[key];

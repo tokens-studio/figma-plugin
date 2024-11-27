@@ -31,37 +31,25 @@ import {
 } from './RemoteTokenStorage';
 import { ErrorMessages } from '../constants/ErrorMessages';
 import { SaveOption } from './FileTokenStorage';
-// import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 import {
   GET_PROJECT_DATA_QUERY,
   CREATE_TOKEN_SET_MUTATION,
   DELETE_THEME_GROUP_MUTATION,
   UPDATE_THEME_GROUP_MUTATION,
-  // CREATE_TOKEN_MUTATION,
-  // UPDATE_TOKEN_MUTATION,
-  // DELETE_TOKEN_MUTATION,
-  // CREATE_TOKEN_SET_MUTATION,
   CREATE_THEME_GROUP_MUTATION,
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_ORDER_MUTATION,
-  // DELETE_TOKEN_SET_MUTATION,
-  // UPDATE_TOKEN_SET_ORDER_MUTATION,
-  // UPDATE_THEME_GROUP_MUTATION,
-  // DELETE_THEME_GROUP_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
-// import { TokenTypes } from '@/constants/TokenTypes';
-// import { tokensStudioToToken } from './tokensStudio/utils';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
-const makeClient = (secret: string) =>
-  create({
-    host: process.env.API_HOST || 'localhost:4200',
-    secure: process.env.NODE_ENV !== 'development',
-    auth: `Bearer ${secret}`,
-  });
+const makeClient = (secret: string) => create({
+  host: process.env.API_HOST || 'localhost:4200',
+  secure: process.env.NODE_ENV !== 'development',
+  auth: `Bearer ${secret}`,
+});
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -161,8 +149,21 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private client: ApolloClient<any>;
 
+  public actionsQueue: any[];
+
+  public processQueueTimeout: NodeJS.Timeout | null;
+
   constructor(id: string, orgId: string, secret: string) {
     super();
+    this.id = id;
+    this.orgId = orgId;
+    this.secret = secret;
+    this.client = makeClient(secret);
+    this.actionsQueue = [];
+    this.processQueueTimeout = null;
+  }
+
+  public setContext(id: string, orgId: string, secret: string) {
     this.id = id;
     this.orgId = orgId;
     this.secret = secret;
@@ -241,219 +242,264 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     action,
     data,
     metadata,
+    successCallback,
   }: {
     action: TokensStudioAction;
     data: any;
     metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+    successCallback?: () => void;
   }) {
-    switch (action) {
-      case 'CREATE_TOKEN_SET': {
-        try {
-          if (!data.name) {
-            throw new Error('Invalid data');
-          }
-          // TODO: export the type for the mutation from sdk
-          const responseData = await this.client.mutate({
-            mutation: CREATE_TOKEN_SET_MUTATION,
-            variables: {
-              project: this.id,
-              organization: this.orgId,
-              input: {
-                path: data.name,
-                orderIndex: data.orderIndex,
-              },
-            },
-          });
+    this.actionsQueue.push({
+      action, data, metadata, successCallback,
+    });
 
-          if (!responseData.data) {
-            return null;
-          }
+    if (this.processQueueTimeout) {
+      clearTimeout(this.processQueueTimeout);
+    }
 
-          track('Create token set in Tokens Studio');
-          notifyToUI('Token set added in Tokens Studio', { error: false });
+    this.processQueueTimeout = setTimeout(this.processQueue.bind(this), 100);
+  }
 
-          return responseData.data.createTokenSet;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error creating token set in Tokens Studio', e);
-          return null;
-        }
+  private async handleCreateTokenSet(data: any, successCallback: () => void) {
+    try {
+      if (!data.name) {
+        throw new Error('Invalid data');
       }
-      case 'UPDATE_TOKEN_SET': {
-        try {
-          const responseData = await this.client.mutate({
-            mutation: UPDATE_TOKEN_SET_MUTATION,
-            variables: {
-              project: this.id,
-              organization: this.orgId,
-              input: {
-                path: data.oldName || data.name,
-                newPath: data.newName,
-                raw: data.raw,
-              },
-            },
-          });
+      // TODO: export the type for the mutation from sdk
+      const responseData = await this.client.mutate({
+        mutation: CREATE_TOKEN_SET_MUTATION,
+        variables: {
+          project: this.id,
+          organization: this.orgId,
+          input: {
+            path: data.name,
+            orderIndex: data.orderIndex,
+          },
+        },
+      });
 
-          if (!responseData.data) {
-            return null;
-          }
-
-          track('Update token set in Tokens Studio');
-          notifyToUI('Token set updated in Tokens Studio', { error: false });
-
-          return responseData.data.updateTokenSet;
-        } catch (e) {
-          Sentry.captureException(e);
-          notifyToUI(`Error updating following token set in Tokens Studio: ${data.oldName || data.name}`, {
-            error: true,
-          });
-          console.error('Error updating token set in Tokens Studio', e);
-          return null;
-        }
+      if (!responseData?.data) {
+        throw new Error('No response data');
       }
-      case 'DELETE_TOKEN_SET': {
-        try {
-          if (!data.name) {
-            throw new Error('Invalid data');
-          }
 
-          const responseData = await this.client.mutate({
-            mutation: DELETE_TOKEN_SET_MUTATION,
-            variables: {
-              branch: 'master',
-              path: data.name,
-              project: this.id,
-              organization: this.orgId,
-            },
-          });
+      track('Create token set in Tokens Studio');
+      notifyToUI('Token set added in Tokens Studio', { error: false });
 
-          if (!responseData.data) {
-            return null;
-          }
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error creating token set in Tokens Studio', e);
+    }
+  }
 
-          track('Delete token set in Tokens Studio');
-          notifyToUI('Token set deleted from Tokens Studio', { error: false });
+  private async handleUpdateTokenSet(data: any, successCallback: () => void) {
+    try {
+      const responseData = await this.client.mutate({
+        mutation: UPDATE_TOKEN_SET_MUTATION,
+        variables: {
+          project: this.id,
+          organization: this.orgId,
+          input: {
+            path: data.oldName || data.name,
+            newPath: data.newName,
+            raw: data.raw,
+          },
+        },
+      });
 
-          return responseData.data.deleteTokenSet;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error deleting token set in Tokens Studio', e);
-          return null;
-        }
+      if (!responseData.data) {
+        throw new Error('No response data');
       }
-      case 'UPDATE_TOKEN_SET_ORDER': {
-        try {
-          console.log('data', data);
-          const responseData = await this.client.mutate({
-            mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
-            variables: {
-              updates: data,
-              project: this.id,
-              organization: this.orgId,
-            },
-          });
 
-          if (!responseData.data) {
-            return null;
-          }
+      track('Update token set in Tokens Studio');
+      notifyToUI('Token set updated in Tokens Studio', { error: false });
 
-          console.log('responseData', responseData.data);
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      notifyToUI(`Error updating following token set in Tokens Studio: ${data.oldName || data.name}`, {
+        error: true,
+      });
+      console.error('Error updating token set in Tokens Studio', e);
+    }
+  }
 
-          track('Update token set order in Tokens Studio');
-          notifyToUI('Token set order updated in Tokens Studio', { error: false });
-
-          return responseData.data.updateTokenSetsOrder;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error updating token set order in Tokens Studio', e);
-          return null;
-        }
+  private async handleDeleteTokenSet(data: any, successCallback: () => void) {
+    try {
+      if (!data.name) {
+        throw new Error('Invalid data');
       }
-      case 'CREATE_THEME_GROUP': {
-        try {
-          const responseData = await this.client.mutate({
-            mutation: CREATE_THEME_GROUP_MUTATION,
-            variables: {
-              input: {
-                name: data.name,
-                options: data.options,
-              },
-              project: this.id,
-              organization: this.orgId,
-              branch: 'master',
-            },
-          });
 
-          if (!responseData.data) {
-            return null;
-          }
+      const responseData = await this.client.mutate({
+        mutation: DELETE_TOKEN_SET_MUTATION,
+        variables: {
+          branch: 'master',
+          path: data.name,
+          project: this.id,
+          organization: this.orgId,
+        },
+      });
 
-          track('Create theme group in Tokens Studio');
-          notifyToUI('Theme group created in Tokens Studio', { error: false });
-
-          return responseData.data.createThemeGroup;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error creating theme group in Tokens Studio', e);
-          return null;
-        }
+      if (!responseData.data) {
+        throw new Error('No response data');
       }
-      case 'UPDATE_THEME_GROUP': {
-        try {
-          const responseData = await this.client.mutate({
-            mutation: UPDATE_THEME_GROUP_MUTATION,
-            variables: {
-              input: {
-                name: data.name,
-                ...(data.newName && { newName: data.newName }),
-                options: data.options,
-              },
-              project: this.id,
-              organization: this.orgId,
-            },
-          });
 
-          if (!responseData.data) {
-            return null;
-          }
+      track('Delete token set in Tokens Studio');
+      notifyToUI('Token set deleted from Tokens Studio', { error: false });
 
-          track('Update theme group in Tokens Studio');
-          notifyToUI('Theme group updated in Tokens Studio', { error: false });
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error deleting token set in Tokens Studio', e);
+    }
+  }
 
-          return responseData.data.updateThemeGroup;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error updating theme group in Tokens Studio', e);
-          return null;
-        }
+  private async handleUpdateTokenSetOrder(data: any, successCallback: () => void) {
+    try {
+      const responseData = await this.client.mutate({
+        mutation: UPDATE_TOKEN_SET_ORDER_MUTATION,
+        variables: {
+          updates: data,
+          project: this.id,
+          organization: this.orgId,
+        },
+      });
+
+      if (!responseData.data) {
+        throw new Error('No response data');
       }
-      case 'DELETE_THEME_GROUP': {
-        try {
-          const responseData = await this.client.mutate({
-            mutation: DELETE_THEME_GROUP_MUTATION,
-            variables: {
-              branch: 'master',
-              themeGroupName: data.name,
-              project: this.id,
-              organization: this.orgId,
-            },
-          });
 
-          if (!responseData.data) {
-            return null;
-          }
+      console.log('responseData', responseData.data);
 
-          track('Delete theme group in Tokens Studio');
-          notifyToUI('Theme group deleted from Tokens Studio', { error: false });
-          return responseData.data.deleteThemeGroup;
-        } catch (e) {
-          Sentry.captureException(e);
-          console.error('Error deleting theme group in Tokens Studio', e);
-          return null;
-        }
+      track('Update token set order in Tokens Studio');
+      notifyToUI('Token set order updated in Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error updating token set order in Tokens Studio', e);
+    }
+  }
+
+  private async handleCreateThemeGroup(data: any, successCallback: () => void) {
+    try {
+      const responseData = await this.client.mutate({
+        mutation: CREATE_THEME_GROUP_MUTATION,
+        variables: {
+          input: {
+            name: data.name,
+            options: data.options,
+          },
+          project: this.id,
+          organization: this.orgId,
+          branch: 'master',
+        },
+      });
+
+      if (!responseData.data) {
+        throw new Error('No response data');
       }
-      default:
-        throw new Error(`Unimplemented storage provider for ${action}`);
+
+      track('Create theme group in Tokens Studio');
+      notifyToUI('Theme group created in Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error creating theme group in Tokens Studio', e);
+    }
+  }
+
+  private async handleUpdateThemeGroup(data: any, successCallback: () => void) {
+    try {
+      const responseData = await this.client.mutate({
+        mutation: UPDATE_THEME_GROUP_MUTATION,
+        variables: {
+          input: {
+            name: data.name,
+            ...(data.newName && { newName: data.newName }),
+            options: data.options,
+          },
+          project: this.id,
+          organization: this.orgId,
+        },
+      });
+
+      if (!responseData.data) {
+        throw new Error('No response data');
+      }
+
+      track('Update theme group in Tokens Studio');
+      notifyToUI('Theme group updated in Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error updating theme group in Tokens Studio', e);
+    }
+  }
+
+  private async handleDeleteThemeGroup(data: any, successCallback: () => void) {
+    try {
+      const responseData = await this.client.mutate({
+        mutation: DELETE_THEME_GROUP_MUTATION,
+        variables: {
+          branch: 'master',
+          themeGroupName: data.name,
+          project: this.id,
+          organization: this.orgId,
+        },
+      });
+
+      if (!responseData.data) {
+        throw new Error('No response data');
+      }
+
+      track('Delete theme group in Tokens Studio');
+      notifyToUI('Theme group deleted from Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error deleting theme group in Tokens Studio', e);
+    }
+  }
+
+  private async processQueue() {
+    const actionsToProcess = [...this.actionsQueue];
+    this.actionsQueue = [];
+    this.processQueueTimeout = null;
+
+    for (const actionToProcess of actionsToProcess) {
+      const {
+        action, data, successCallback,
+      } = actionToProcess;
+
+      switch (action) {
+        case 'CREATE_TOKEN_SET':
+          await this.handleCreateTokenSet(data, successCallback);
+          break;
+        case 'UPDATE_TOKEN_SET':
+          await this.handleUpdateTokenSet(data, successCallback);
+          break;
+        case 'DELETE_TOKEN_SET':
+          await this.handleDeleteTokenSet(data, successCallback);
+          break;
+        case 'UPDATE_TOKEN_SET_ORDER':
+          await this.handleUpdateTokenSetOrder(data, successCallback);
+          break;
+        case 'CREATE_THEME_GROUP':
+          await this.handleCreateThemeGroup(data, successCallback);
+          break;
+        case 'UPDATE_THEME_GROUP':
+          await this.handleUpdateThemeGroup(data, successCallback);
+          break;
+        case 'DELETE_THEME_GROUP':
+          await this.handleDeleteThemeGroup(data, successCallback);
+          break;
+        default:
+          throw new Error(`Unimplemented storage provider for ${action}`);
+      }
     }
   }
 }

@@ -8,7 +8,11 @@ import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 type Payload = Omit<ThemeObject, 'id' | '$figmaStyleReferences'> & {
   id?: string,
-  group?: string
+  group?: string,
+  meta?: {
+    oldName?: string,
+    oldGroup?: string,
+  }
 };
 
 export function saveTheme(state: TokenState, data: Payload): TokenState {

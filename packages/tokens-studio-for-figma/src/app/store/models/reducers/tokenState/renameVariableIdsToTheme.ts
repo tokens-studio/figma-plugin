@@ -10,7 +10,7 @@ export function renameVariableIdsToTheme(state: TokenState, variableTokens: Rena
   const variableTokenMap = new Map<string, RenameVariableToken>();
   variableTokens.forEach((token) => variableTokenMap.set(token.oldName, token));
   updatedThemes.forEach((theme) => {
-    const updatedTokens = theme.$figmaVariableReferences;
+    const updatedTokens = { ...theme.$figmaVariableReferences };
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([key, variableId]) => {
         const renameInfo = variableTokenMap.get(key);

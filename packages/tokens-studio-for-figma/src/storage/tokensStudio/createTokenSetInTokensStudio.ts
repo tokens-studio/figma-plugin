@@ -16,18 +16,18 @@ export async function createTokenSetInTokensStudio({
   onTokenSetCreated,
 }: CreateTokenSetInTokensStudioPayload) {
   const orderIndex = Object.keys(rootState.tokenState.tokens).length;
-  const tokenSet = await pushToTokensStudio({
+
+  pushToTokensStudio({
     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
     action: 'CREATE_TOKEN_SET',
     data: { name, orderIndex },
+    successCallback: () => {
+      onTokenSetCreated({
+        ...rootState.tokenState.tokenSetMetadata,
+        [name]: {
+          isDynamic: false,
+        },
+      });
+    },
   });
-
-  if (typeof tokenSet !== 'boolean') {
-    onTokenSetCreated({
-      ...rootState.tokenState.tokenSetMetadata,
-      [name]: {
-        isDynamic: false,
-      },
-    });
-  }
 }

@@ -748,7 +748,6 @@ export const tokenState = createModel<RootModel>()({
         duplicateTokenInTokensStudio({
           rootState,
           payload,
-          onTokenDuplicated: dispatch.tokenState.editToken,
         });
       }
     },
@@ -759,7 +758,6 @@ export const tokenState = createModel<RootModel>()({
         createTokenInTokensStudio({
           rootState,
           payload,
-          onTokenCreated: dispatch.tokenState.editToken,
         });
       }
     },
@@ -846,7 +844,7 @@ export const tokenState = createModel<RootModel>()({
           const content = newTokens[set];
           const rawSet = singleTokensToRawTokenSet(content, true);
 
-          await pushToTokensStudio({
+          pushToTokensStudio({
             context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
             action: 'UPDATE_TOKEN_SET',
             data: { raw: rawSet, name: set },

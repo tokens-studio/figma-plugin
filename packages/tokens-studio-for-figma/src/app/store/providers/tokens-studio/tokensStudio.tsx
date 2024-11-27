@@ -44,15 +44,31 @@ interface PushToTokensStudio {
   action: TokensStudioAction;
   data: any;
   metadata?: RemoteTokenStorageMetadata['tokenSetsData'];
+  successCallback?: () => void;
 }
 
-export const pushToTokensStudio = async ({ context, action, data, metadata }: PushToTokensStudio) => {
-  const storageClient = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+let storageClientObject;
 
-  return storageClient.push({
+const getStorageClient = (context: TokensStudioCredentials) => {
+  if (!storageClientObject) {
+    storageClientObject = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+    return storageClientObject;
+  }
+
+  storageClientObject.setContext(context.id, context.orgId, context.secret);
+  return storageClientObject;
+};
+
+export const pushToTokensStudio = async ({
+  context, action, data, metadata, successCallback,
+}: PushToTokensStudio) => {
+  const storageClient = getStorageClient(context);
+
+  storageClient.push({
     action,
     data,
     metadata,
+    successCallback,
   });
 };
 
@@ -67,7 +83,7 @@ export function useTokensStudio() {
   const { pushDialog, closePushDialog } = usePushDialog();
 
   const storageClientFactory = useCallback((context: TokensStudioCredentials) => {
-    const storageClient = new TokensStudioTokenStorage(context.id, context.orgId, context.secret);
+    const storageClient = getStorageClient(context);
     return storageClient;
   }, []);
 
@@ -201,7 +217,7 @@ export function useTokensStudio() {
           metadata: data.metadata ?? {},
         };
       } catch (e) {
-        console.log('error syncing with Tokens Studio', e);
+        console.error('error syncing with Tokens Studio', e);
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',

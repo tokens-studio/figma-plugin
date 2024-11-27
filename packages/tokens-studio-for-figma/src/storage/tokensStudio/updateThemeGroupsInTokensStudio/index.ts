@@ -27,20 +27,7 @@ export async function updateThemeGroupsInTokensStudio({
   const {
     tokenState: { themes: prevThemes },
   } = prevState;
-  // TODO: remove this
-  const groupIdsMap = prevThemes.reduce((acc, theme) => {
-    if (theme.group) {
-      acc[theme.group] = theme.group;
-    }
-    return acc;
-  }, {} as Record<string, string>);
 
-  console.log('initial data', {
-    prevThemes,
-    themes,
-    groupIdsMap,
-    action,
-  });
   let themeToCreate: ThemeObject | null = null;
   let themeGroupsToUpdate: Record<string, ThemeObjectsList> = {};
   let themeGroupsToDelete: string[] = [];
@@ -55,7 +42,6 @@ export async function updateThemeGroupsInTokensStudio({
         action,
         themes,
         prevThemes,
-        groupIdsMap,
       });
       themeToCreate = themeGroupsToAlter.themeToCreate;
       themeGroupsToDelete = themeGroupsToAlter.themeGroupsToDelete;
@@ -83,38 +69,28 @@ export async function updateThemeGroupsInTokensStudio({
     default:
   }
 
-  console.log('themeGroupsToAlter', {
-    themeGroupsToUpdate,
-    themeGroupsToDelete,
-    themeToCreate,
-  });
+  for (const [groupName, themesToUpdate] of Object.entries(themeGroupsToUpdate)) {
+    const data: any = {
+      name: groupName,
+      options: themesToUpdate.map((theme) => ({
+        name: theme.name,
+        selectedTokenSets: theme.selectedTokenSets,
+        figmaStyleReferences: theme.$figmaStyleReferences,
+        figmaVariableReferences: theme.$figmaVariableReferences,
+      })),
+    };
 
-  Promise.all(
-    Object.entries(themeGroupsToUpdate)
-      .filter(([groupName]) => !!groupName)
-      .map(([groupName, themesToUpdate]) => {
-        const data: any = {
-          name: groupName,
-          options: themesToUpdate.map((theme) => ({
-            name: theme.name,
-            selectedTokenSets: theme.selectedTokenSets,
-            figmaStyleReferences: theme.$figmaStyleReferences,
-            figmaVariableReferences: theme.$figmaVariableReferences,
-          })),
-        };
+    // If the group name has changed, we need to send the old name in the newName field
+    if (groupName !== themesToUpdate[0].group) {
+      data.newName = themesToUpdate[0].group;
+    }
 
-        // If the group name has changed, we need to send the old name in the newName field
-        if (groupName !== themesToUpdate[0].group) {
-          data.newName = themesToUpdate[0].group;
-        }
-
-        return pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'UPDATE_THEME_GROUP',
-          data,
-        });
-      }),
-  );
+    pushToTokensStudio({
+      context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+      action: 'UPDATE_THEME_GROUP',
+      data,
+    });
+  }
 
   if (themeToCreate) {
     pushToTokensStudio({
@@ -133,14 +109,14 @@ export async function updateThemeGroupsInTokensStudio({
   }
 
   if (themeGroupsToDelete.length) {
-    Promise.all(
-      themeGroupsToDelete.map((groupName) => pushToTokensStudio({
+    for (const groupName of themeGroupsToDelete) {
+      pushToTokensStudio({
         context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
         action: 'DELETE_THEME_GROUP',
         data: {
           name: groupName,
         },
-      })),
-    );
+      });
+    }
   }
 }

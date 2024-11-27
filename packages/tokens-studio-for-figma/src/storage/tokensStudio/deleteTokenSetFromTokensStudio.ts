@@ -15,16 +15,15 @@ export async function deleteTokenSetFromTokensStudio({
   name,
   onTokenSetDeleted,
 }: DeleteTokenSetFromTokensStudioPayload) {
-  const tokenSet = await pushToTokensStudio({
+  pushToTokensStudio({
     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
     action: 'DELETE_TOKEN_SET',
     data: { name },
     metadata: rootState.tokenState.tokenSetMetadata,
+    successCallback: () => {
+      const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
+      delete tokenSetMetadata[name];
+      onTokenSetDeleted(tokenSetMetadata);
+    },
   });
-
-  if (tokenSet) {
-    const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
-    delete tokenSetMetadata[name];
-    onTokenSetDeleted(tokenSetMetadata);
-  }
 }
