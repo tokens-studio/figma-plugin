@@ -10,7 +10,9 @@ import { notifyToUI } from '@/plugin/notifiers';
 import parseJson from '@/utils/parseJson';
 import { TokenData } from '@/types/SecondScreen';
 import updateTokensOnSources from '../updateSources';
-import { AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename } from '@/types/tokens';
+import {
+  AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
+} from '@/types/tokens';
 import {
   DeleteTokenPayload,
   SetTokenDataPayload,
@@ -169,8 +171,7 @@ export const tokenState = createModel<RootModel>()({
         indexOf + 1,
       ]);
     },
-    deleteTokenSet: (state, name: string) =>
-      updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -383,8 +384,8 @@ export const tokenState = createModel<RootModel>()({
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
               if (
-                isEqual(oldValue.value, token.value) &&
-                isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+                isEqual(oldValue.value, token.value)
+                && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
               ) {
                 existingTokens.push(token);
               } else {
@@ -444,16 +445,16 @@ export const tokenState = createModel<RootModel>()({
           [data.parent]:
             typeof data.index === 'number'
               ? state.tokens[data.parent].filter((token) => {
-                  if (token.name === data.path) {
-                    if (i === data.index) {
-                      i += 1;
-                      return true;
-                    }
+                if (token.name === data.path) {
+                  if (i === data.index) {
                     i += 1;
-                    return false;
+                    return true;
                   }
-                  return token.name !== data.path;
-                })
+                  i += 1;
+                  return false;
+                }
+                return token.name !== data.path;
+              })
               : state.tokens[data.parent].filter((token) => token.name !== data.path),
         },
       };
@@ -475,7 +476,9 @@ export const tokenState = createModel<RootModel>()({
     },
 
     renameTokenGroup: (state, data: RenameTokenGroupPayload) => {
-      const { oldName, newName, type, parent } = data;
+      const {
+        oldName, newName, type, parent,
+      } = data;
       const tokensInParent = state.tokens[parent] ?? [];
       const renamedTokensInParent = tokensInParent.map((token) => {
         if (token.name.startsWith(`${oldName}.`) && token.type === type) {
@@ -500,7 +503,9 @@ export const tokenState = createModel<RootModel>()({
     },
 
     duplicateTokenGroup: (state, data: DuplicateTokenGroupPayload) => {
-      const { parent, oldName, newName, tokenSets, type } = data;
+      const {
+        parent, oldName, newName, tokenSets, type,
+      } = data;
       const selectedTokenGroup = state.tokens[parent].filter(
         (token) => token.name.startsWith(`${oldName}.`) && token.type === type,
       );
@@ -527,14 +532,13 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
-    setUpdatedAliases: (state, newTokens: TokenStore['values']) => {
+    setUpdatedAliases: (state, newTokens: TokenStore['values']) =>
       // const { newTokens } = updateAliasesInState(state.tokens, data);
       // console.log('update alias reducer', newTokens);
-      return {
+      ({
         ...state,
         tokens: newTokens,
-      };
-    },
+      }),
     setCollapsedTokenSets: (state, data: string[]) => ({
       ...state,
       collapsedTokenSets: data,
@@ -580,7 +584,9 @@ export const tokenState = createModel<RootModel>()({
       tokenFormat: data,
     }),
     renameTokenAcrossSets: (state, data: RenameTokensAcrossSetsPayload) => {
-      const { oldName, newName, type, tokenSets } = data;
+      const {
+        oldName, newName, type, tokenSets,
+      } = data;
       const newTokens: TokenStore['values'] = {};
       Object.keys(state.tokens).forEach((tokenSet) => {
         if (tokenSets.includes(tokenSet)) {
@@ -765,7 +771,9 @@ export const tokenState = createModel<RootModel>()({
       setFormat(payload);
     },
     renameTokenGroup(data: RenameTokenGroupPayload, rootState) {
-      const { oldName, newName, type, parent } = data;
+      const {
+        oldName, newName, type, parent,
+      } = data;
 
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
       tokensInParent

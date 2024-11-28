@@ -1,6 +1,8 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Heading, Stack, Text } from '@tokens-studio/ui';
+import {
+  Button, Heading, Stack, Text,
+} from '@tokens-studio/ui';
 import { Dispatch } from '@/app/store';
 import { track } from '@/utils/analytics';
 

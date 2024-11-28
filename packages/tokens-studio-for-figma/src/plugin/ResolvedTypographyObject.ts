@@ -1,4 +1,3 @@
-
 export type ResolvedTypographyObject = {
   fontFamily?: string;
   fontWeight?: string;

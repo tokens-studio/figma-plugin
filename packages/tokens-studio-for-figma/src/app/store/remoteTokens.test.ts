@@ -792,11 +792,11 @@ describe('remoteTokens', () => {
           Promise.resolve(true)
         ));
         await waitFor(() => { result.current.addNewProviderItem(context as StorageTypeCredentials); });
-          expect(notifyToUI).toBeCalledTimes(2);
-          expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
-          expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
-            status: 'success',
-          });
+        expect(notifyToUI).toBeCalledTimes(2);
+        expect(notifyToUI).toBeCalledWith('No tokens stored on remote');
+        expect(await result.current.addNewProviderItem(context as StorageTypeCredentials)).toEqual({
+          status: 'success',
+        });
       });
     } else {
       it(`Add newProviderItem to ${context.provider}, should pull tokens and return error message if there is no tokens on remote`, async () => {

@@ -132,11 +132,11 @@ export default function BorderTokenForm({
             onSubmit={onSubmit}
           />
 
-          {isAliasMode &&
-            typeof internalEditToken.value === 'string' &&
-            checkIfContainsAlias(internalEditToken.value) && (
+          {isAliasMode
+            && typeof internalEditToken.value === 'string'
+            && checkIfContainsAlias(internalEditToken.value) && (
               <ResolvedTokenDisplay alias={alias} selectedToken={selectedToken} />
-            )}
+          )}
         </Stack>
       )}
     </Stack>

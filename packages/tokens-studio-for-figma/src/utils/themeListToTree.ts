@@ -16,10 +16,9 @@ export type TreeItem = {
 export function themeListToTree(items: ThemeObjectsList) {
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
     const parentIndex = acc.findIndex(
-      (item) =>
-        !item.isLeaf &&
-        ((typeof curr?.group !== 'undefined' && item.key === curr.group) ||
-          (typeof curr?.group === 'undefined' && item.key === INTERNAL_THEMES_NO_GROUP)),
+      (item) => !item.isLeaf
+        && ((typeof curr?.group !== 'undefined' && item.key === curr.group)
+          || (typeof curr?.group === 'undefined' && item.key === INTERNAL_THEMES_NO_GROUP)),
     );
 
     if (parentIndex < 0) {
@@ -45,10 +44,9 @@ export function themeListToTree(items: ThemeObjectsList) {
       });
     } else {
       const childrenLength = acc.filter(
-        (item) =>
-          item.isLeaf === true &&
-          ((typeof curr?.group !== 'undefined' && item.parent === curr.group) ||
-            (typeof curr?.group === 'undefined' && item.parent === INTERNAL_THEMES_NO_GROUP)),
+        (item) => item.isLeaf === true
+          && ((typeof curr?.group !== 'undefined' && item.parent === curr.group)
+            || (typeof curr?.group === 'undefined' && item.parent === INTERNAL_THEMES_NO_GROUP)),
       ).length;
       acc.splice(parentIndex + childrenLength + 1, 0, {
         isLeaf: true,

@@ -3,10 +3,10 @@ import {
   Box, Stack, ToggleGroup,
 } from '@tokens-studio/ui';
 import { Check, Xmark, CodeBrackets } from 'iconoir-react';
+import { useTranslation } from 'react-i18next';
 import { TreeItem } from '@/utils/tokenset';
 import { StyledThemeLabel } from './StyledThemeLabel';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { useTranslation } from 'react-i18next';
 
 type Props = {
   item: TreeItem

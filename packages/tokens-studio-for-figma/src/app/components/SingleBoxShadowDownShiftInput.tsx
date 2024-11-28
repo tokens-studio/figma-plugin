@@ -52,8 +52,8 @@ export default function SingleBoxShadowDownShiftInput({
       setInputValue={handleBoxshadowDownShiftInputChange}
       placeholder={name === 'color' ? t('colorOrAlias') : t('valueOrAlias')}
       prefix={
-        name === 'color' &&
-        resolvedColor && (
+        name === 'color'
+        && resolvedColor && (
           <ColorPickerTrigger background={resolvedColor} onClick={handleToggleInputHelper}>
             {value}
           </ColorPickerTrigger>

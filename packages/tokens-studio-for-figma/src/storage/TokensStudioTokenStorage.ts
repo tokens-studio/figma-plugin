@@ -1,4 +1,6 @@
-import { ThemeGroup, TokenSetType, TokensSet, create } from '@tokens-studio/sdk';
+import {
+  ThemeGroup, TokenSetType, TokensSet, create,
+} from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { ApolloClient } from '@apollo/client';
 import { AnyTokenSet } from '@/types/tokens';
@@ -25,12 +27,11 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
-const makeClient = (secret: string) =>
-  create({
-    host: process.env.API_HOST || 'localhost:4200',
-    secure: process.env.NODE_ENV !== 'development',
-    auth: `Bearer ${secret}`,
-  });
+const makeClient = (secret: string) => create({
+  host: process.env.API_HOST || 'localhost:4200',
+  secure: process.env.NODE_ENV !== 'development',
+  auth: `Bearer ${secret}`,
+});
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;

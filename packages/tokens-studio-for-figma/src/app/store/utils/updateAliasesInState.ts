@@ -4,7 +4,7 @@ import { TokenState } from '../models/tokenState';
 import { updateModify } from './updateModify';
 
 export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data: TokenToRename) {
-  let updatedSets: string[] = []
+  const updatedSets: string[] = [];
   const newTokens = Object.entries(tokens).reduce<TokenState['tokens']>(
     (acc, [key, values]) => {
       const newValues = values.map<SingleToken>((token) => {
@@ -15,13 +15,13 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
           if (JSON.stringify(newToken.$extensions) !== JSON.stringify(token.$extensions)) {
             if (!updatedSets.includes(key)) updatedSets.push(key);
           }
-          
+
           // Update if token is of type array, e.g. box shadows
           if (Array.isArray(newToken.value)) {
             const newTokenValue = newToken.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
               a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
               return a;
-            }, {}))
+            }, {}));
 
             if (JSON.stringify(newTokenValue) !== JSON.stringify(newToken.value)) {
               if (!updatedSets.includes(key)) updatedSets.push(key);
@@ -49,7 +49,6 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
               value: newTokenValue,
             } as SingleToken;
           }
-
 
           const newValue = replaceReferences(newToken.value.toString(), data.oldName, data.newName);
           if (newValue !== newToken.value) {
