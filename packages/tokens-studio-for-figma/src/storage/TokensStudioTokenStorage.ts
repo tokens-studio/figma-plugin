@@ -1,24 +1,4 @@
-import {
-  ThemeGroup,
-  TokenSetType,
-  // Graphql,
-  // Configuration,
-  // CreateTokenMutation,
-  // UpdateTokenMutation,
-  // DeleteTokenMutation,
-  // CreateTokenSetMutation,
-  // UpdateTokenSetMutation,
-  // DeleteTokenSetMutation,
-  // ProjectQuery,
-  // UpdateTokenSetOrderMutation,
-  // ThemeGroup,
-  TokensSet,
-  // UpdateThemeGroupMutation,
-  // CreateThemeGroupMutation,
-  // DeleteThemeGroupMutation,
-  // TokenInput,
-  create,
-} from '@tokens-studio/sdk';
+import { ThemeGroup, TokenSetType, TokensSet, create } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { ApolloClient } from '@apollo/client';
 import { AnyTokenSet } from '@/types/tokens';
@@ -45,11 +25,12 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
-const makeClient = (secret: string) => create({
-  host: process.env.API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
-  auth: `Bearer ${secret}`,
-});
+const makeClient = (secret: string) =>
+  create({
+    host: process.env.API_HOST || 'localhost:4200',
+    secure: process.env.NODE_ENV !== 'development',
+    auth: `Bearer ${secret}`,
+  });
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -250,7 +231,10 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     successCallback?: () => void;
   }) {
     this.actionsQueue.push({
-      action, data, metadata, successCallback,
+      action,
+      data,
+      metadata,
+      successCallback,
     });
 
     if (this.processQueueTimeout) {
@@ -369,8 +353,6 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
         throw new Error('No response data');
       }
 
-      console.log('responseData', responseData.data);
-
       track('Update token set order in Tokens Studio');
       notifyToUI('Token set order updated in Tokens Studio', { error: false });
 
@@ -471,9 +453,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     this.processQueueTimeout = null;
 
     for (const actionToProcess of actionsToProcess) {
-      const {
-        action, data, successCallback,
-      } = actionToProcess;
+      const { action, data, successCallback } = actionToProcess;
 
       switch (action) {
         case 'CREATE_TOKEN_SET':
