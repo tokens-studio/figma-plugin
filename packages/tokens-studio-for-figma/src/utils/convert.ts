@@ -6,7 +6,7 @@ export interface DTCGToken {
   $type: NonNullable<SingleToken['type']>;
   $description: string | undefined;
   $value: NonNullable<SingleToken['value']>;
-  $extensions: object | undefined;
+  $extensions: Record<string, unknown> | undefined;
 }
 
 export const singleTokenToDTCGToken = (token: SingleToken): DTCGToken => ({

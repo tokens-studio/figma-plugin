@@ -88,12 +88,6 @@ export default function TokensStudioForm({
     setShowTeaser(false);
   }, []);
 
-  useEffect(() => {
-    if (values.secret) {
-      fetchOrgData();
-    }
-  }, [values.secret]);
-
   const fetchOrgData = React.useCallback(async () => {
     try {
       const client = create({
@@ -112,6 +106,12 @@ export default function TokensStudioForm({
     }
   }, [values.secret]);
 
+  useEffect(() => {
+    if (values.secret) {
+      fetchOrgData();
+    }
+  }, [values.secret,]);
+
   const orgOptions = React.useMemo(
     () => orgData?.map((org) => ({
       label: org.name,
@@ -129,9 +129,9 @@ export default function TokensStudioForm({
 
   const projectOptions = React.useMemo(() => {
     if (!orgData) return [];
-    const org = orgData.find((org) => org.id === values.orgId);
-    if (!org) return [];
-    return org.projects.data.map((project) => ({
+    const selectedOrgData = orgData.find((org) => org.id === values.orgId);
+    if (!selectedOrgData) return [];
+    return selectedOrgData.projects.data.map((project) => ({
       label: project.name,
       value: project.id,
     }));
