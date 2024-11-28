@@ -110,7 +110,7 @@ export default function TokensStudioForm({
     if (values.secret) {
       fetchOrgData();
     }
-  }, [values.secret,]);
+  }, [values.secret, fetchOrgData]);
 
   const orgOptions = React.useMemo(
     () => orgData?.map((org) => ({
