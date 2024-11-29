@@ -77,8 +77,8 @@ export type TokensStudioStorageType = GenericStorageType<
 StorageProviderType.TOKENS_STUDIO,
 {
   name: string; // this is only for reference
-  orgId: string; // this is the organization urn
-  id: string; // this is the project urn
+  orgId: string; // this is the organization id
+  id: string; // this is the project id
 }
 >;
 
