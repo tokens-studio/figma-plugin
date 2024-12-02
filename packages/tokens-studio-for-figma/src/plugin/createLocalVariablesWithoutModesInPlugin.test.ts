@@ -55,7 +55,7 @@ describe('createLocalVariablesWithoutModesInPlugin', () => {
     const selectedSets = [{
       set: 'global',
       status: TokenSetStatus.ENABLED,
-    }]
+    }];
     expect(await createLocalVariablesWithoutModesInPlugin(tokens, settings, selectedSets)).toEqual({
       allVariableCollectionIds: {},
       totalVariables: 0,

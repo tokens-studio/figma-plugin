@@ -284,40 +284,40 @@ describe('destructureTokenForAlias', () => {
       borderBottom: 'delete',
       borderLeft: 'delete',
       borderRight: 'delete',
-      borderTop: 'delete'
+      borderTop: 'delete',
     };
     const tokens = new Map([
       ['red', {
         name: 'red',
         rawValue: '#f00',
         type: TokenTypes.COLOR,
-        value: '#f00'
+        value: '#f00',
       }],
       ['borderWidth.10px', {
         name: 'borderWidth.10px',
         rawValue: '10',
         type: TokenTypes.BORDER_WIDTH,
-        value: 10
+        value: 10,
       }],
       ['test', {
         name: 'test',
         rawValue: {
           color: '{red}',
           style: 'solid',
-          width: '{borderWidth.10px}'
+          width: '{borderWidth.10px}',
         },
         resolvedValueWithReferences: {
           color: '{red}',
           style: 'solid',
-          width: '{borderWidth.10px}'
+          width: '{borderWidth.10px}',
         },
         type: TokenTypes.BORDER,
         value: {
           color: '#f00',
           width: 10,
-          style: 'solid'
-        }
-      }]
+          style: 'solid',
+        },
+      }],
     ]);
     expect(destructureTokenForAlias(tokens, values)).toEqual({
       border: 'test',
@@ -326,9 +326,9 @@ describe('destructureTokenForAlias', () => {
       borderRight: 'delete',
       borderTop: 'delete',
       borderColor: 'red',
-      borderWidth: 'borderWidth.10px'
+      borderWidth: 'borderWidth.10px',
     });
-  })
+  });
 });
 
 describe('returnValueToLookFor', () => {

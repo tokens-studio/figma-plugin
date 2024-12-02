@@ -337,7 +337,7 @@ const nestedTokens = [
     internal_Parent: 'b',
     name: 'tertiary',
     type: 'typography',
-    value: '{secondary}'
+    value: '{secondary}',
   },
   {
     internal_Parent: 'a',
@@ -345,15 +345,15 @@ const nestedTokens = [
     type: 'typography',
     value: {
       fontFamily: 'ABeeZee',
-      fontSize: '50'
-    }
+      fontSize: '50',
+    },
   },
   {
     internal_Parent: 'a',
     name: 'secondary',
     type: 'typography',
-    value: '{original}'
-  }
+    value: '{original}',
+  },
 ];
 
 const output = [
@@ -830,30 +830,30 @@ describe('resolve tokens with multiple nested references', () => {
         rawValue: '{secondary}',
         resolvedValueWithReferences: {
           fontFamily: 'ABeeZee',
-          fontSize: '50'
+          fontSize: '50',
         },
         type: 'typography',
         value: {
           fontFamily: 'ABeeZee',
-          fontSize: 50
-        }
+          fontSize: 50,
+        },
       },
       {
         internal_Parent: 'a',
         name: 'original',
         rawValue: {
           fontFamily: 'ABeeZee',
-          fontSize: '50'
+          fontSize: '50',
         },
         resolvedValueWithReferences: {
           fontFamily: 'ABeeZee',
-          fontSize: '50'
+          fontSize: '50',
         },
         type: 'typography',
         value: {
           fontFamily: 'ABeeZee',
-          fontSize: 50
-        }
+          fontSize: 50,
+        },
       },
       {
         internal_Parent: 'a',
@@ -861,17 +861,17 @@ describe('resolve tokens with multiple nested references', () => {
         rawValue: '{original}',
         resolvedValueWithReferences: {
           fontFamily: 'ABeeZee',
-          fontSize: '50'
+          fontSize: '50',
         },
         type: 'typography',
         value: {
           fontFamily: 'ABeeZee',
-          fontSize: 50
-        }
-      }
+          fontSize: 50,
+        },
+      },
     ];
 
     const resolvedTokens = defaultTokenResolver.setTokens(nestedTokens);
-    expect(resolvedTokens).toEqual(resolvedTokensOutput); 
+    expect(resolvedTokens).toEqual(resolvedTokensOutput);
   });
 });

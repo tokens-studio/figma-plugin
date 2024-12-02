@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import Modal from '../Modal';
 import StorageItemForm from '../StorageItemForm';
 import useRemoteTokens from '../../store/remoteTokens';
@@ -19,7 +18,6 @@ export default function CreateStorageItemModal({
   isOpen, onClose, onSuccess, storageProvider,
 }: Props) {
   const { addNewProviderItem } = useRemoteTokens();
-  const { t } = useTranslation(['storage']);
   const [hasErrored, setHasErrored] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string>();
 

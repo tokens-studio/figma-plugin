@@ -10,7 +10,7 @@ interface Token {
   $extensions?: SingleToken['$extensions'];
 }
 
-const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([key, v]) => v !== null));
+const removeNulls = (obj: any) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== null));
 
 const parseValue = (value: string | undefined | null) => {
   if (!value) {

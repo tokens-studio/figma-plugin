@@ -140,9 +140,9 @@ const StyledPrefix = styled('div', {
     },
     isComposition: {
       true: {
-        padding: '0'
-      }
-    }
+        padding: '0',
+      },
+    },
   },
 });
 

@@ -25,7 +25,7 @@ import {
 import fuzzySearch from '@/utils/fuzzySearch';
 import MentionsInput from './MentionInput';
 import getResolvedText from '@/utils/getResolvedTextValue';
-import getColorSwatchStyle from '@/utils/color/getColorSwatchStyle';
+import { getColorSwatchStyle } from '@/utils/color/getColorSwatchStyle';
 
 type SearchField = 'Tokens' | 'Fonts' | 'Weights';
 

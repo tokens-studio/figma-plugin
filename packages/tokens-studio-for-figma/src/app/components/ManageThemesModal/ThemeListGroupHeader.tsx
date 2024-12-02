@@ -3,6 +3,7 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton } from '@tokens-studio/ui';
+import { Xmark, Check } from 'iconoir-react';
 import { editProhibitedSelector } from '@/selectors';
 import { DragControlsContext } from '@/context';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
@@ -13,7 +14,6 @@ import Input from '../Input';
 import IconPencil from '@/icons/pencil.svg';
 import { Dispatch } from '@/app/store';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
-import { Xmark, Check } from 'iconoir-react';
 
 type Props = React.PropsWithChildren<{
   groupName: string

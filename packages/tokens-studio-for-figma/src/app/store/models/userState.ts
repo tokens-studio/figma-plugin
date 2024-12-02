@@ -1,6 +1,5 @@
 import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
-import validateLicense from '@/utils/validateLicense';
 import { notifyToUI } from '@/plugin/notifiers';
 import removeLicense from '@/utils/removeLicense';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -50,7 +49,6 @@ export const userState = createModel<RootModel>()({
     },
   } as UserState,
   reducers: {
-
     setUserId(state, payload: string | null) {
       return {
         ...state,
