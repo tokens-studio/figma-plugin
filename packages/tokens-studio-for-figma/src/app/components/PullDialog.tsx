@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Box, Button, Heading, Spinner, Stack,
+  Button, Heading, Spinner, Stack,
 } from '@tokens-studio/ui';
 import { storageTypeSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';

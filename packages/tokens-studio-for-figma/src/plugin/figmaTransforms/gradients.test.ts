@@ -118,25 +118,25 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0,
             g: 0,
             b: 0,
-            a: 1
+            a: 1,
           },
-          position: 0
+          position: 0,
         },
         {
           color: {
             r: 1,
             g: 1,
             b: 1,
-            a: 1
+            a: 1,
           },
-          position: 1
-        }
+          position: 1,
+        },
       ],
       gradientTransform: [
         [6.123233995736766e-17, 1, -6.123233995736766e-17],
-        [-1, 6.123233995736766e-17, 1]
-      ]
-    }
+        [-1, 6.123233995736766e-17, 1],
+      ],
+    },
   };
 
   const test5 = {
@@ -148,22 +148,22 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0.9019607843137255,
             g: 0.39215686274509803,
             b: 0.396078431372549,
-            a: 1
+            a: 1,
           },
-          position: 0
+          position: 0,
         },
         {
           color: {
             r: 0.5686274509803921,
             g: 0.596078431372549,
             b: 0.8980392156862745,
-            a: 1
+            a: 1,
           },
-          position: 1
-        }
+          position: 1,
+        },
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]]
-    }
+      gradientTransform: [[1, 0, 0], [0, 1, 0]],
+    },
   };
 
   const test6 = {
@@ -175,26 +175,26 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0.9019607843137255,
             g: 0.39215686274509803,
             b: 0.396078431372549,
-            a: 1
+            a: 1,
           },
-          position: 0
+          position: 0,
         },
         {
           color: {
             r: 0.5686274509803921,
             g: 0.596078431372549,
             b: 0.8980392156862745,
-            a: 1
+            a: 1,
           },
-          position: 1
-        }
+          position: 1,
+        },
       ],
       gradientTransform: [
         [6.123233995736766e-17, 1, -6.123233995736766e-17],
-        [-1, 6.123233995736766e-17, 1]
-      ]
-    }
-  }
+        [-1, 6.123233995736766e-17, 1],
+      ],
+    },
+  };
 
   expect(convertStringToFigmaGradient(test1.input)).toEqual(test1.output);
   expect(convertStringToFigmaGradient(test2.input)).toEqual(test2.output);

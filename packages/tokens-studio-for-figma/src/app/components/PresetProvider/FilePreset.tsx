@@ -1,6 +1,8 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Heading, Stack, Text } from '@tokens-studio/ui';
+import {
+  Button, Heading, Stack, Text,
+} from '@tokens-studio/ui';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import {
@@ -84,7 +86,6 @@ export default function FilePreset({ onCancel }: Props) {
           ref={hiddenDirectoryInput}
           style={{ display: 'none' }}
           onChange={handleFileOrDirectoryChange}
-          directory=""
           webkitdirectory=""
         />
       </Stack>

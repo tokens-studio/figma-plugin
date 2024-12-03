@@ -18,8 +18,8 @@ type Props = {
   type: string;
   newName: string;
   oldName: string;
-  onClose: () => void;
-  handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClose?: () => void;
+  handleNewTokenGroupNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export default function DuplicateTokenGroupModal({
@@ -40,7 +40,9 @@ export default function DuplicateTokenGroupModal({
     duplicateGroup({
       oldName, newName, tokenSets: selectedTokenSets, type,
     });
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   }, [duplicateGroup, oldName, newName, selectedTokenSets, type, onClose]);
 
   const error = useMemo(() => {

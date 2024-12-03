@@ -17,12 +17,10 @@ type Props = {
 
 export const ColorPickerTrigger: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
   onClick, background,
-}) => {
-  return (
-    <TriggerButton
-      type="button"
-      css={{ background }}
-      onClick={onClick}
-    />
-  )
-};
+}) => (
+  <TriggerButton
+    type="button"
+    css={{ background }}
+    onClick={onClick}
+  />
+);

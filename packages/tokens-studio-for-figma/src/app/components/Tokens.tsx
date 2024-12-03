@@ -2,8 +2,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
-import { ToggleGroup, IconButton, Label } from '@tokens-studio/ui';
+import { ToggleGroup, IconButton } from '@tokens-studio/ui';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import TokenListing from './TokenListing';
 import TokensBottomBar from './TokensBottomBar';
@@ -24,7 +23,6 @@ import {
 } from '@/selectors';
 import { ThemeSelector } from './ThemeSelector';
 import { ManageThemesModal } from './ManageThemesModal';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { activeTokensTabSelector } from '@/selectors/activeTokensTabSelector';
 import { stringTokensSelector } from '@/selectors/stringTokensSelector';
 import { getAliasValue } from '@/utils/alias';
@@ -99,7 +97,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
   const [tokenSetsVisible, setTokenSetsVisible] = React.useState(true);
   const { getStringTokens } = useTokens();
   const tokenDiv = React.useRef<HTMLDivElement>(null);
-  const { t } = useTranslation(['tokens']);
 
   React.useEffect(() => {
     if (tokenDiv.current) {

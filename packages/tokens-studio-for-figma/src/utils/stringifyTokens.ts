@@ -1,6 +1,6 @@
 import set from 'set-value';
 import { appendTypeToToken } from '@/app/components/createTokenObj';
-import { AnyTokenList, SingleToken } from '@/types/tokens';
+import { AnyTokenList } from '@/types/tokens';
 import removeTokenId from './removeTokenId';
 import { TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { TokenInJSON } from './convertTokens';
@@ -23,9 +23,7 @@ export default function stringifyTokens(
     const tokenWithType = appendTypeToToken(token);
     const { name, ...tokenWithoutName } = removeTokenId(tokenWithType, !storeTokenIdInJsonEditor);
     if (tokenWithoutName.inheritTypeLevel) {
-      const {
-        inheritTypeLevel, ...tokenWithoutInheritTypeLevel
-      } = tokenWithoutName;
+      const { inheritTypeLevel, ...tokenWithoutInheritTypeLevel } = tokenWithoutName;
       const tokenInJSON: TokenInJSON = tokenWithoutInheritTypeLevel;
       // set type of group level
       set(tokenObj, getGroupTypeName(token.name, inheritTypeLevel), tokenInJSON.type);

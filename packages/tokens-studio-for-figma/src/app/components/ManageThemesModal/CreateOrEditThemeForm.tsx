@@ -101,7 +101,10 @@ export const CreateOrEditThemeForm: React.FC<React.PropsWithChildren<React.Props
 
   return (
     <StyledForm id="form-create-or-edit-theme" onSubmit={handleSubmit(onSubmit)}>
-      <StyledNameInputBox css={{ width: '100%', position: 'sticky', top: 0, zIndex: 2 }}>
+      <StyledNameInputBox css={{
+        width: '100%', position: 'sticky', top: 0, zIndex: 2,
+      }}
+      >
         <StyledCreateOrEditThemeFormHeaderFlex>
           <IconButton
             tooltip={t('returnToOverview')}

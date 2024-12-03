@@ -18,7 +18,7 @@ export function convertFigmaGradientToString(paint: GradientPaint) {
 }
 
 export function convertStringToFigmaGradient(value: string) {
-  const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map(s => s.trim());
+  const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map((s) => s.trim());
 
   // Default angle is to top (180 degrees)
   let angle = 180;

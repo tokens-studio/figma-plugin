@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Stack, Label, Box, Link, Button, Switch, Text,
+  Stack, Label, Box, Button, Switch, Text,
 } from '@tokens-studio/ui';
 import { styled } from '@stitches/react';
 import {

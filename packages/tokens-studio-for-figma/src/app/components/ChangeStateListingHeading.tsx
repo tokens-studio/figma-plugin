@@ -1,10 +1,8 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Heading } from '@tokens-studio/ui';
 import {
   IconCollapseArrow, IconExpandArrow,
 } from '@/icons';
-import Tooltip from './Tooltip';
 import Box from './Box';
 import Stack from './Stack';
 import { Count } from './Count';
@@ -48,8 +46,6 @@ export default function ChangeStateListingHeading({
   const handleCollapse = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     onCollapse(e, label);
   }, [onCollapse, label]);
-
-  const { t } = useTranslation(['tokens']);
 
   return (
     <Stack direction="row" align="center" justify="between" gap={4} css={{ position: 'relative' }}>

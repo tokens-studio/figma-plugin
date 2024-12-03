@@ -27,7 +27,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     const parsedURL = new URL(url);
     const fragments = parsedURL.pathname.split('/');
     const isCloud = url.match(/\/\/(cloud|app).(dev\.|demo\.|staging\.|)supernova.io/)?.[1] === 'cloud';
-    if (fragments.length < 5 || isCloud && (fragments[1] !== 'ws' || fragments[3] !== 'ds')) {
+    if (fragments.length < 5 || (isCloud && (fragments[1] !== 'ws' || fragments[3] !== 'ds'))) {
       throw new Error(
         'Design system URL is not properly formatted. Please copy URL from the cloud without modifying it and try again.',
       );
@@ -70,10 +70,12 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
             },
           ]
           : []),
-        ...(Object.entries(payload).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
-          string,
-          AnyTokenSet<false>,
-        ][]).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
+        ...(
+          Object.entries(payload).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [
+            string,
+            AnyTokenSet<false>,
+          ][]
+        ).map<RemoteTokenStorageFile>(([name, tokenSet]) => ({
           name,
           type: 'tokenSet',
           path: `${name}.json`,
@@ -88,9 +90,7 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
     }
   }
 
-  public async write(
-    files: Array<RemoteTokenStorageFile<any>>,
-  ): Promise<boolean> {
+  public async write(files: Array<RemoteTokenStorageFile<any>>): Promise<boolean> {
     // Create Supernova instance, fetch design system and version
     // Create writable Supernova instance
     const accessor = await this.readWriteInstance();

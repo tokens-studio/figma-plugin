@@ -53,7 +53,7 @@ const StartupApp = () => {
   ) : appContainer;
 };
 
-export default async () => {
+export const startup = async () => {
   const container = document.getElementById('app');
 
   // Side effect from first load

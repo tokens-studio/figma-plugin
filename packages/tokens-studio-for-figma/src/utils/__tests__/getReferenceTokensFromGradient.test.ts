@@ -1,4 +1,4 @@
-import { getReferenceTokensFromGradient } from "../color";
+import { getReferenceTokensFromGradient } from '../color';
 
 describe('getReferenceTokensFromGradient', () => {
   const inputs = [
@@ -10,7 +10,7 @@ describe('getReferenceTokensFromGradient', () => {
     'linear-gradient(150deg, #555555 0%, #eeeeee 100%)',
     'linear-gradient(90deg, {root} 0%, {dark} 50%, #ff0000 100%)',
     'linear-gradient(90deg, {root} 0%, #ff0000 50%, {dark} 100%)',
-    'linear-gradient(150deg, #555555, #eeeeee)'
+    'linear-gradient(150deg, #555555, #eeeeee)',
   ];
   const outputs = [
     ['root', 'dark'],

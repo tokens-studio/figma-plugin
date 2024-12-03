@@ -19,7 +19,6 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
-import Input from './Input';
 import InspectSearchOptionDropdown from './InspectSearchOptionDropdown';
 import Stack from './Stack';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
