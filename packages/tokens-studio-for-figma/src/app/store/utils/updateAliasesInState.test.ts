@@ -55,9 +55,9 @@ describe('updateAliasesInState', () => {
       ],
     };
 
-    const updatedTokens = updateAliasesInState(tokens, data);
+    const { newTokens } = updateAliasesInState(tokens, data);
 
-    expect(updatedTokens).toEqual(expectedTokens);
+    expect(newTokens).toEqual(expectedTokens);
   });
 
   it('should not update aliases in state if oldName is not found', () => {
@@ -84,8 +84,8 @@ describe('updateAliasesInState', () => {
       ],
     };
 
-    const updatedTokens = updateAliasesInState(tokens, data);
+    const { newTokens } = updateAliasesInState(tokens, data);
 
-    expect(updatedTokens).toEqual(expectedTokens);
+    expect(newTokens).toEqual(expectedTokens);
   });
 });
