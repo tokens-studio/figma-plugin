@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, {
-  useCallback, useEffect, useState, useRef,
+  useCallback, useEffect, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
@@ -23,7 +23,6 @@ import { ErrorMessage } from '../ErrorMessage';
 import { addLicenseKey } from '@/utils/addLicenseKey';
 
 export default function AddLicenseKey() {
-  const inputEl = useRef<HTMLInputElement | null>(null);
   const dispatch = useDispatch<Dispatch>();
   const existingKey = useSelector(licenseKeySelector);
   const licenseDetails = useSelector(licenseDetailsSelector);
@@ -109,7 +108,7 @@ export default function AddLicenseKey() {
       <Stack direction="row" gap={2} align="center" justify="between">
         <Heading size="medium">{t('licenseKey')}</Heading>
         <Stack direction="row" gap={2} align="center">
-          <ProBadge link="https://tokens.studio/plugin?ref=add-license-key" />
+          <ProBadge campaign="add-license-key" />
           {existingKey && !licenseKeyError && (
             <ManageSubscriptionLink href="https://account.tokens.studio" target="_blank">
               {t('manageSubscription')}

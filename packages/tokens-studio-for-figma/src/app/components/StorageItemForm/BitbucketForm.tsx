@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import zod from 'zod';
 import {
-  Button, Box, TextInput, Stack, FormField, Label, Link, IconButton, Text,
+  Button, TextInput, Stack, FormField, Label, Link, IconButton, Text,
 } from '@tokens-studio/ui';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';

@@ -21,30 +21,18 @@
     "sourceMap": true,
     "inlineSources": true,
     "sourceRoot": "/",
-    "types": [
-      "jest"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/@figma"
-    ],
+    "types": ["jest"],
+    "typeRoots": ["node_modules/@types", "node_modules/@figma"],
     "paths": {
-      "@emotion/core": [
-        "./emotion.d.ts"
-      ],
-      "@/*": [
-        "src/*"
-      ]
-    },
+      "@emotion/core": ["./emotion.d.ts"],
+      "@/*": ["src/*"]
+    }
   },
-  "exclude": [
-    "**/node_modules",
-    "./storybook",
-    "storybook-static",
-  ],
+  "exclude": ["**/node_modules", "./storybook", "storybook-static"],
   "include": [
     "flags.d.ts",
     "jest.config.ts",
+    "cypress.config.ts",
     "src/app/components/custom.d.ts",
     "css.d.ts",
     "src/**/*.ts",

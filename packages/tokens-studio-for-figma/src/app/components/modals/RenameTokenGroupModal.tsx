@@ -15,9 +15,9 @@ type Props = {
   isOpen: boolean
   newName: string
   oldName: string
-  onClose: () => void;
-  handleRenameTokenGroupSubmit: (e: React.FormEvent<HTMLFormElement>) => void
-  handleNewTokenGroupNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onClose?: () => void;
+  handleRenameTokenGroupSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
+  handleNewTokenGroupNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   type: string
 };
 

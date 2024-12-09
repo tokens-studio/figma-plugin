@@ -7,7 +7,11 @@ import * as pjs from '../../../../../package.json';
 import useStorage from '../../useStorage';
 import { compareUpdatedAt } from '@/utils/date';
 import {
-  activeThemeSelector, storeTokenIdInJsonEditorSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  activeThemeSelector,
+  storeTokenIdInJsonEditorSelector,
+  themesListSelector,
+  tokensSelector,
+  usedTokenSetSelector,
 } from '@/selectors';
 import { UpdateRemoteFunctionPayload } from '@/types/UpdateRemoteFunction';
 import { GenericVersionedMeta, GenericVersionedStorage } from '@/storage';
@@ -31,7 +35,6 @@ export async function updateGenericVersionedTokens({
   updatedAt,
   oldUpdatedAt = null,
   storeTokenIdInJsonEditor,
-  dispatch,
 }: UpdateRemoteFunctionPayload): Promise<RemoteResponseData<GenericVersionedMeta> | null> {
   const { id, additionalHeaders, flow } = context as GenericVersionedStorageType;
 
@@ -276,7 +279,11 @@ export function useGenericVersionedStorage() {
             tokenSetOrder: Object.keys(content.tokens),
           },
         });
-        const stringifiedRemoteTokens = JSON.stringify(compact([content.tokens, content.themes, TokenFormat.format]), null, 2);
+        const stringifiedRemoteTokens = JSON.stringify(
+          compact([content.tokens, content.themes, TokenFormat.format]),
+          null,
+          2,
+        );
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         return content;
       }

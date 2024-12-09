@@ -67,8 +67,8 @@ async function tryApplyCompositeVariable({
           const updatedEffect = figma.variables.setBoundVariableForEffect(effect, transformShadowKeyToFigmaVariable(key), variableToApply);
           effect = {
             ...effect,
-            boundVariables: updatedEffect.boundVariables
-          }
+            boundVariables: updatedEffect.boundVariables,
+          };
         }
       }
     }

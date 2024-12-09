@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  Box, Button, Label, Stack, TextInput, Link, Text, Heading,
+  Box, Button, Label, Stack, TextInput, Link, Text,
 } from '@tokens-studio/ui';
 import { ChevronLeftIcon } from '@radix-ui/react-icons';
 import { useAuth } from '@/context/AuthContext';
