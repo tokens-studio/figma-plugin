@@ -1,9 +1,11 @@
+import { isVariableWithAliasReference } from '@/utils/isAliasReference';
+
 export default function setStringValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
-    const existingValue = variable.valuesByMode[mode];
-    if (typeof existingValue !== 'string') return;
+    const existingVariableValue = variable.valuesByMode[mode];
+    if (!existingVariableValue || !(typeof existingVariableValue === 'string' || isVariableWithAliasReference(existingVariableValue))) return;
 
-    if (existingValue !== value) {
+    if (existingVariableValue !== value) {
       variable.setValueForMode(mode, value);
     }
   } catch (e) {
