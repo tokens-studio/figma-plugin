@@ -532,13 +532,10 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
-    setUpdatedAliases: (state, newTokens: TokenStore['values']) =>
-      // const { newTokens } = updateAliasesInState(state.tokens, data);
-      // console.log('update alias reducer', newTokens);
-      ({
-        ...state,
-        tokens: newTokens,
-      }),
+    setUpdatedAliases: (state, newTokens: TokenStore['values']) => ({
+      ...state,
+      tokens: newTokens,
+    }),
     setCollapsedTokenSets: (state, data: string[]) => ({
       ...state,
       collapsedTokenSets: data,

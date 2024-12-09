@@ -1,5 +1,4 @@
 import { RematchDispatch, RematchRootState } from '@rematch/core';
-import { ThemeGroup } from '@tokens-studio/sdk';
 import { pushToTokensStudio } from '@/app/store/providers/tokens-studio';
 import { StorageTypeCredential, TokensStudioStorageType } from '@/types/StorageType';
 import { RootModel } from '@/types/RootModel';
