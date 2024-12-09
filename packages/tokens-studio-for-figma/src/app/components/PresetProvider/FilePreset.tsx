@@ -86,7 +86,6 @@ export default function FilePreset({ onCancel }: Props) {
           ref={hiddenDirectoryInput}
           style={{ display: 'none' }}
           onChange={handleFileOrDirectoryChange}
-          directory=""
           webkitdirectory=""
         />
       </Stack>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
@@ -17,9 +17,9 @@ export default function StylesDropdown() {
 
   const [showModal, setShowModal] = React.useState(false);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     setShowModal(true);
-  };
+  }, [setShowModal]);
 
   return (
     <>

@@ -40,8 +40,8 @@ const LocalStorageItem = () => {
       if (confirmResult) {
         handleSubmitLocalStorage();
       }
-      return null;
     }
+    return null;
   }, [confirm, handleSubmitLocalStorage, storageType?.provider, t]);
 
   const isActive = storageType.provider === StorageProviderType.LOCAL;

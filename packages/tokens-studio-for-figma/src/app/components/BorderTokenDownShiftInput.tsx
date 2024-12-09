@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import DownshiftInput from './DownshiftInput';
 import { getLabelForProperty } from '@/utils/getLabelForProperty';
-import { styled } from '@/stitches.config';
 import { getAliasValue } from '@/utils/alias';
 import { ColorPickerTrigger } from './ColorPickerTrigger';
 

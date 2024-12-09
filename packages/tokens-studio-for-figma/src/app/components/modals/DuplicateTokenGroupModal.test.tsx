@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import DuplicateTokenGroupModal from './DuplicateTokenGroupModal';
 
 const tokens: Record<string, AnyTokenList> = {
@@ -31,8 +33,6 @@ describe('DuplicateTokenGroupModal', () => {
           type={TokenTypes.COLOR}
           newName="newName"
           oldName="oldName"
-          onClose={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
         />
       </Provider>,
     );
@@ -49,8 +49,6 @@ describe('DuplicateTokenGroupModal', () => {
           type={TokenTypes.COLOR}
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
         />
       </Provider>,
     );
@@ -71,8 +69,6 @@ describe('DuplicateTokenGroupModal', () => {
           type={TokenTypes.COLOR}
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
         />
       </Provider>,
     );

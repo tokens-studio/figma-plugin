@@ -55,7 +55,7 @@ export function themeListToTree(items: ThemeObjectsList) {
         parent: curr?.group ?? INTERNAL_THEMES_NO_GROUP,
         path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.name}`,
         level: 1,
-        label: curr.name,
+        label: curr.id,
         id: uuidv4(),
       });
     }

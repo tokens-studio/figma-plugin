@@ -1,15 +1,14 @@
+import { isVariableWithAliasReference } from '@/utils/isAliasReference';
+
 export default function setBooleanValuesOnVariable(variable: Variable, mode: string, value: string) {
   try {
     const existingVariableValue = variable.valuesByMode[mode];
-    if (typeof existingVariableValue !== 'boolean') return;
+    if (existingVariableValue === undefined || !(typeof existingVariableValue === 'boolean' || isVariableWithAliasReference(existingVariableValue))) return;
 
-    const existingValueString = existingVariableValue.toString();
-    if (existingValueString !== value) {
-      if (value === 'true') {
-        variable.setValueForMode(mode, value === 'true');
-      } else {
-        variable.setValueForMode(mode, false);
-      }
+    const newValue = value === 'true';
+
+    if (existingVariableValue !== newValue) {
+      variable.setValueForMode(mode, newValue);
     }
   } catch (e) {
     console.error('Error setting booleanVariable', e);

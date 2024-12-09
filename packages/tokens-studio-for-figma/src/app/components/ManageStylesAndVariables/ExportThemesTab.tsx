@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
-  Button, Heading, Tabs, Link, Box, Stack, Checkbox, Label,
+  Button, Heading, Tabs, Box, Stack, Checkbox, Label,
 } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { StyledCard } from './StyledCard';
@@ -10,7 +10,6 @@ import {
 } from '@/selectors';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
-import { docsLinks } from './docsLinks';
 import { LabelledCheckbox } from './LabelledCheckbox';
 
 export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { useUIDSeed } from 'react-uid';
 import { DropdownMenu, Button } from '@tokens-studio/ui';
 
@@ -17,8 +16,6 @@ export const MultiSelectDropdown: React.FunctionComponent<React.PropsWithChildre
   handleSelectedItemChange,
 }) => {
   const seed = useUIDSeed();
-
-  const { t } = useTranslation(['tokens']);
   const selectedItemsString = React.useMemo(() => selectedItems.join(','), [selectedItems]);
 
   const handleSelectedItem = React.useCallback((selectedItem: string) => {

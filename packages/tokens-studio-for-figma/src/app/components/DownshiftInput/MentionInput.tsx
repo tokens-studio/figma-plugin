@@ -17,7 +17,7 @@ import './mentions.css';
 import { ResolveTokenValuesResult } from '@/utils/tokenHelpers';
 import { isDocumentationType } from '@/utils/is/isDocumentationType';
 import getResolvedTextValue from '@/utils/getResolvedTextValue';
-import getColorSwatchStyle from '@/utils/color/getColorSwatchStyle';
+import { getColorSwatchStyle } from '@/utils/color/getColorSwatchStyle';
 
 // Constants
 import { Properties } from '@/constants/Properties';

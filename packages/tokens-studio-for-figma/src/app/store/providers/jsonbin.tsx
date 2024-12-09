@@ -21,7 +21,7 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 export async function updateJSONBinTokens({
-  tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor, dispatch,
+  tokens, themes, context, updatedAt, oldUpdatedAt = null, storeTokenIdInJsonEditor,
 }: UpdateRemoteFunctionPayload) {
   const { id, secret } = context;
   try {

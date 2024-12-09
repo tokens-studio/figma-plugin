@@ -1,7 +1,7 @@
-import React from 'react';
-import { Text as InternalText } from '@tokens-studio/ui';
+import React, { type HTMLAttributes } from 'react';
+import { Text as InternalText, type TextProps } from '@tokens-studio/ui';
 
-function WrappedText(props) {
+function WrappedText(props: TextProps & HTMLAttributes<Element>) {
   const { size = 'xsmall' } = props;
   return <InternalText {...props} size={size} />;
 }

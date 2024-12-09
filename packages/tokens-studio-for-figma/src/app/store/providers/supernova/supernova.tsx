@@ -11,7 +11,6 @@ import {
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
-import { isEqual } from '@/utils/isEqual';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';

@@ -771,7 +771,7 @@ describe('remoteTokens', () => {
     }
   });
 
-  Object.entries(contextMap).forEach(([contextName, context]) => {
+  Object.entries(contextMap).forEach(([_contextName, context]) => {
     if (context === gitHubContext || context === gitLabContext || context === adoContext || context === bitbucketContext) {
       it(`Add newProviderItem to ${context.provider}, should notify that no tokens stored on remote if there is no tokens on remote`, async () => {
         mockFetchBranches.mockImplementation(() => (

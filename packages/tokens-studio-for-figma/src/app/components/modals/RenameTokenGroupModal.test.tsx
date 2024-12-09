@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { createMockStore, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import RenameTokenGroupModal from './RenameTokenGroupModal';
 
 const tokens: Record<string, AnyTokenList> = {
@@ -30,9 +32,7 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName="newName"
           oldName="oldName"
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
       </Provider>,
     );
@@ -48,9 +48,7 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
       </Provider>,
     );
@@ -70,9 +68,7 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
       </Provider>,
     );

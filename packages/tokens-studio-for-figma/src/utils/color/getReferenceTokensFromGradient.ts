@@ -5,7 +5,7 @@ export const getReferenceTokensFromGradient = (rawValue: string): string[] => {
     if (curr.includes('#') || curr.includes('{')) {
       const matches = curr.match(/{(.*?)}/g);
       // Return empty string in case of not reference token
-      acc.push(matches ? matches[0].replace(/[\{\}]/g, '') : '');
+      acc.push(matches ? matches[0].replace(/[{}]/g, '') : '');
     }
     return acc;
   }, []);

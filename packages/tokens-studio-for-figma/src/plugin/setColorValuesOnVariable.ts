@@ -1,3 +1,4 @@
+import { isVariableWithAliasReference } from '@/utils/isAliasReference';
 import { convertToFigmaColor } from './figmaTransforms/colors';
 
 export function normalizeFigmaColor({
@@ -22,16 +23,22 @@ export default function setColorValuesOnVariable(variable: Variable, mode: strin
   try {
     const { color, opacity } = convertToFigmaColor(value);
     const existingVariableValue = variable.valuesByMode[mode];
-    if (!existingVariableValue || !isFigmaColorObject(existingVariableValue)) return;
-    const existingValue = normalizeFigmaColor(existingVariableValue as RGBA);
-    const newValue = normalizeFigmaColor({ ...color, a: opacity });
+    if (!existingVariableValue || !(isFigmaColorObject(existingVariableValue) || isVariableWithAliasReference(existingVariableValue))) return;
 
-    if ((existingValue.r !== newValue.r)
-      || (existingValue.g !== newValue.g)
-      || (existingValue.b !== newValue.b)
-      || (existingValue.a !== newValue.a)) {
-      variable.setValueForMode(mode, newValue);
+    const existingValue = isFigmaColorObject(existingVariableValue) ? normalizeFigmaColor(existingVariableValue) : existingVariableValue;
+    const newValue = isFigmaColorObject(color) ? normalizeFigmaColor({ ...color, a: opacity }) : { ...color, a: opacity };
+
+    if (isFigmaColorObject(existingValue) && isFigmaColorObject(newValue)) {
+      if ((existingValue.r === newValue.r)
+        && (existingValue.g === newValue.g)
+        && (existingValue.b === newValue.b)
+        && (existingValue.a === newValue.a)) {
+      // return if values match
+        return;
+      }
     }
+
+    variable.setValueForMode(mode, newValue);
   } catch (e) {
     console.error('Error setting colorVariable', e);
   }
