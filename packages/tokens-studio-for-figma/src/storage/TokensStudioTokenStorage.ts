@@ -2,7 +2,6 @@ import {
   ThemeGroup, TokenSetType, TokensSet, create,
 } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
 import {
@@ -129,7 +128,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
 
   private orgId: string;
 
-  private client: ApolloClient<NormalizedCacheObject>;
+  private client: any;
 
   public actionsQueue: any[];
 
