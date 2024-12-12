@@ -7,18 +7,18 @@ export function renameVariableNamesToThemes(state: TokenState, tokensToRename: T
     return acc;
   }, {});
   const newThemes = state.themes.map((theme) => {
-    const updatedTokens = { ...theme.$figmaVariableReferences };
-    if (updatedTokens) {
-      Object.entries(updatedTokens).forEach(([key]) => {
+    const updatedVariablesReferences = theme.$figmaVariableReferences;
+    if (updatedVariablesReferences) {
+      Object.entries(updatedVariablesReferences).forEach(([key]) => {
         if (oldToNewNameMap[key]) {
-          updatedTokens[oldToNewNameMap[key]] = updatedTokens[key];
-          delete updatedTokens[key];
+          updatedVariablesReferences[oldToNewNameMap[key]] = updatedVariablesReferences[key];
+          delete updatedVariablesReferences[key];
         }
       });
     }
     return {
       ...theme,
-      $figmaVariableReferences: updatedTokens,
+      $figmaVariableReferences: updatedVariablesReferences,
     };
   });
   return {

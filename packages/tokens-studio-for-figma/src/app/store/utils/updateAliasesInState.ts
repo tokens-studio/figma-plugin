@@ -5,7 +5,7 @@ import { updateModify } from './updateModify';
 
 export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data: TokenToRename) {
   const updatedSets: string[] = [];
-  const newTokens = Object.entries(tokens).reduce<TokenState['tokens']>(
+  const updatedTokens = Object.entries(tokens).reduce<TokenState['tokens']>(
     (acc, [key, values]) => {
       const newValues = values.map<SingleToken>((token) => {
         try {
@@ -71,5 +71,5 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
     },
     {},
   );
-  return { newTokens, updatedSets };
+  return { updatedTokens, updatedSets };
 }

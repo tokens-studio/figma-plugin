@@ -840,13 +840,13 @@ export const tokenState = createModel<RootModel>()({
       }
     },
     async updateAliases(data: TokenToRename, rootState) {
-      const { newTokens, updatedSets } = updateAliasesInState(rootState.tokenState.tokens, data);
+      const { updatedTokens, updatedSets } = updateAliasesInState(rootState.tokenState.tokens, data);
 
-      dispatch.tokenState.setUpdatedAliases(newTokens);
+      dispatch.tokenState.setUpdatedAliases(updatedTokens);
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
         for (const set of updatedSets) {
-          const content = newTokens[set];
+          const content = updatedTokens[set];
           const rawSet = singleTokensToRawTokenSet(content, true);
 
           pushToTokensStudio({
