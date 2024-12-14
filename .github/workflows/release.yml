@@ -85,14 +85,47 @@ jobs:
       # Generate the release automatically in Github. This should not result in a publish to npm
       # We should disable this if doing beta releases   
       - name: Create Release
-        if: ${{ inputs.createRelease }}
         id: changesets
         uses: changesets/action@v1
+        with:
+          version: npm run version
+          publish: npx @changesets/cli tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Figma plugin
+        if: steps.changesets.outputs.published == 'true'
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIGMA_WEB_AUTHN_TOKEN: ${{ secrets.FIGMA_WEB_AUTHN_TOKEN }}
+      - name: Prepare Figma release
+        if: steps.changesets.outputs.pullRequestNumber != ''
+        run: npm run bundle
       # Store artifact for later use
       - name: Store Artifact
+        id: "store_artifact"
+        if: steps.changesets.outputs.pullRequestNumber != ''
         uses: actions/upload-artifact@v4
         with:
           name: package
-          path: dist/bundle.zip
+          path: |
+            packages/plugin/dist/bundle.zip
+            packages/plugin/dist/release.zip
+      # Post link to artifact
+      - name: Find artifact comment
+        uses: peter-evans/find-comment@v3
+        if: steps.changesets.outputs.pullRequestNumber != ''
+        id: find_artifact_comment
+        with:
+          issue-number: ${{ steps.changesets.outputs.pullRequestNumber }}
+          comment-author: 'github-actions[bot]'
+          body-includes: The artifact was successfully created
+      - name: Create or update artifact comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: steps.changesets.outputs.pullRequestNumber != ''
+        with:
+          comment-id: ${{ steps.find_artifact_comment.outputs.comment-id }}
+          issue-number: ${{ steps.changesets.outputs.pullRequestNumber }}
+          body: |
+            ⤵️ 📦 ✨ The artifact was successfully created! Want to test it? [Download it here](${{steps.store_artifact.outputs.artifact-url}}) 👀 🎁
+          edit-mode: replace

@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "bundle": "ts-node ./scripts/bundle.ts",
+    "bundle": "node scripts/bundle.mjs",
     "watch-transform": "webpack --mode=development --watch --config webpack-transform.config.js",
     "build": "cross-env NODE_ENV=production webpack --mode=production",
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
@@ -31,6 +31,9 @@
     "serve": "serve dist -p 58630",
     "serve:preview": "serve preview -p 58630",
     "changeset": "changeset",
+    "release": "node scripts/release.mjs",
+    "version": "node scripts/version.mjs",
+    "publish": "changeset tag && npm run release",
     "translate": "node  ./scripts/translate.mjs",
     "lint": "eslint . --quiet --fix",
     "lint:nofix": "eslint .",
@@ -208,6 +211,7 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "eslint-plugin-validate-jsx-nesting": "^0.1.1",
     "express": "^4.19.2",
+    "figcd": "^0.0.16",
     "figma-api-stub": "^0.0.56",
     "figma-plugin-ds": "^1.0.1",
     "file-loader": "^6.2.0",
@@ -263,5 +267,8 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "figma": {
+    "version": "177"
   }
 }
