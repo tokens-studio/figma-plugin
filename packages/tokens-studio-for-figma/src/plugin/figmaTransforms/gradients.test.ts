@@ -25,8 +25,8 @@ describe('convertStringtoFigmaGradient', () => {
         },
       ],
       gradientTransform: [
-        [0.5000000000000001, -0.5, 0.49999999999999994],
-        [0.5, 0.5000000000000001, -5.551115123125784e-17],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, 0],
       ],
     },
   };
@@ -64,8 +64,8 @@ describe('convertStringtoFigmaGradient', () => {
         },
       ],
       gradientTransform: [
-        [0.5000000000000001, -0.5, 0.49999999999999994],
-        [0.5, 0.5000000000000001, -5.551115123125784e-17],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, 0],
       ],
     },
   };
@@ -103,8 +103,8 @@ describe('convertStringtoFigmaGradient', () => {
         },
       ],
       gradientTransform: [
-        [0.5000000000000001, -0.5, 0.49999999999999994],
-        [0.5, 0.5000000000000001, -5.551115123125784e-17],
+        [0.5, -0.5, 0.5],
+        [0.5, 0.5, 0],
       ],
     },
   };
@@ -118,25 +118,25 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0,
             g: 0,
             b: 0,
-            a: 1,
+            a: 1
           },
-          position: 0,
+          position: 0
         },
         {
           color: {
             r: 1,
             g: 1,
             b: 1,
-            a: 1,
+            a: 1
           },
-          position: 1,
-        },
+          position: 1
+        }
       ],
       gradientTransform: [
-        [6.123233995736766e-17, 1, -6.123233995736766e-17],
-        [-1, 6.123233995736766e-17, 1],
+        [0, 1, 0],
+        [-1, 0, 1],
       ],
-    },
+    }
   };
 
   const test5 = {
@@ -148,22 +148,22 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0.9019607843137255,
             g: 0.39215686274509803,
             b: 0.396078431372549,
-            a: 1,
+            a: 1
           },
-          position: 0,
+          position: 0
         },
         {
           color: {
             r: 0.5686274509803921,
             g: 0.596078431372549,
             b: 0.8980392156862745,
-            a: 1,
+            a: 1
           },
-          position: 1,
-        },
+          position: 1
+        }
       ],
-      gradientTransform: [[1, 0, 0], [0, 1, 0]],
-    },
+      gradientTransform: [[1, 0, 0], [0, 1, 0]]
+    }
   };
 
   const test6 = {
@@ -175,26 +175,56 @@ describe('convertStringtoFigmaGradient', () => {
             r: 0.9019607843137255,
             g: 0.39215686274509803,
             b: 0.396078431372549,
-            a: 1,
+            a: 1
           },
-          position: 0,
+          position: 0
         },
         {
           color: {
             r: 0.5686274509803921,
             g: 0.596078431372549,
             b: 0.8980392156862745,
-            a: 1,
+            a: 1
           },
-          position: 1,
-        },
+          position: 1
+        }
       ],
       gradientTransform: [
-        [6.123233995736766e-17, 1, -6.123233995736766e-17],
-        [-1, 6.123233995736766e-17, 1],
+        [0, 1, 0],
+        [-1, 0, 1],
       ],
     },
   };
+
+  const test7 = {
+    input: 'linear-gradient(106.84deg, #FF0000 5.61%, #cc00ff00 89.41%)',
+    output: {
+      gradientStops: [
+        {
+          color: {
+            r: 1,
+            g: 0,
+            b: 0,
+            a: 1,
+          },
+          position: 0.056100000000000004,
+        },
+        {
+          color: {
+            r: 0.8,
+            g: 0,
+            b: 1,
+            a: 0,
+          },
+          position: 0.8941,
+        },
+      ],
+      gradientTransform: [
+        [0.9160738743, 0.2772769934, -0.0966754339],
+        [-0.2772769934, 0.9160738743, 0.1806015595],
+      ],
+    }
+  }
 
   expect(convertStringToFigmaGradient(test1.input)).toEqual(test1.output);
   expect(convertStringToFigmaGradient(test2.input)).toEqual(test2.output);
@@ -202,6 +232,7 @@ describe('convertStringtoFigmaGradient', () => {
   expect(convertStringToFigmaGradient(test4.input)).toEqual(test4.output);
   expect(convertStringToFigmaGradient(test5.input)).toEqual(test5.output);
   expect(convertStringToFigmaGradient(test6.input)).toEqual(test6.output);
+  expect(convertStringToFigmaGradient(test7.input)).toEqual(test7.output);
 });
 
 describe('convertFigmaGradientToString', () => {
