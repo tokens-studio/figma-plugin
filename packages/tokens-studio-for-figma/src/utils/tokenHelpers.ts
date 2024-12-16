@@ -13,7 +13,7 @@ true,
 
 export function getOverallConfig(themes: ThemeObject[], selectedThemes: string[]) {
   return selectedThemes.reduce((acc, themeId) => {
-    const currentTheme = themes.find((theme) => theme.name === themeId);
+    const currentTheme = themes.find((theme) => theme.id === themeId);
     if (!currentTheme) return acc;
 
     Object.entries(currentTheme.selectedTokenSets).forEach(([tokenSet, status]) => {

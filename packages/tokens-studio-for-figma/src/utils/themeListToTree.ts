@@ -51,7 +51,7 @@ export function themeListToTree(items: ThemeObjectsList) {
       acc.splice(parentIndex + childrenLength + 1, 0, {
         isLeaf: true,
         value: curr,
-        key: curr.name,
+        key: curr.id,
         parent: curr?.group ?? INTERNAL_THEMES_NO_GROUP,
         path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.name}`,
         level: 1,

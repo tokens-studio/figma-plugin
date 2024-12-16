@@ -100,7 +100,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
             const selectedTokenSets = theme?.selectedTokenSets;
 
             return {
-              id: theme?.name as string,
+              id: `${group}-${theme?.name}` as string,
               name: theme?.name as string,
               group,
               selectedTokenSets,
