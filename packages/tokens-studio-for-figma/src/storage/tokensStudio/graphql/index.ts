@@ -11,3 +11,4 @@ export { UPDATE_THEME_GROUP_MUTATION } from './updateThemeGroupMutation';
 export { DELETE_THEME_GROUP_MUTATION } from './deleteThemeGroupMutation';
 export { GET_GENERATOR_QUERY } from './getGeneratorQuery';
 export { GET_TOKEN_SET_QUERY } from './getTokenSetQuery';
+export { GET_ORGS_QUERY } from './getOrgsQuery';

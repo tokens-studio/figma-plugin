@@ -5,19 +5,21 @@ import { ThemeObject, ThemeObjectsList } from '@/types';
 export type TreeItem = {
   key: string;
   path: string;
-  parent: string | null
+  parent: string | null;
   level: number;
   label: string;
   isLeaf: boolean;
   value: string | ThemeObject;
-  id: string
+  id: string;
 };
 
 export function themeListToTree(items: ThemeObjectsList) {
   const tree = items.reduce<TreeItem[]>((acc, curr) => {
-    const parentIndex = acc.findIndex((item) => !item.isLeaf
-      && ((typeof curr?.group !== 'undefined' && item.key === curr.group)
-        || (typeof curr?.group === 'undefined' && item.key === INTERNAL_THEMES_NO_GROUP)));
+    const parentIndex = acc.findIndex(
+      (item) => !item.isLeaf
+        && ((typeof curr?.group !== 'undefined' && item.key === curr.group)
+          || (typeof curr?.group === 'undefined' && item.key === INTERNAL_THEMES_NO_GROUP)),
+    );
 
     if (parentIndex < 0) {
       acc.push({
@@ -41,15 +43,17 @@ export function themeListToTree(items: ThemeObjectsList) {
         id: uuidv4(),
       });
     } else {
-      const childrenLength = acc.filter((item) => item.isLeaf === true
-      && ((typeof curr?.group !== 'undefined' && item.parent === curr.group)
-          || (typeof curr?.group === 'undefined' && item.parent === INTERNAL_THEMES_NO_GROUP))).length;
+      const childrenLength = acc.filter(
+        (item) => item.isLeaf === true
+          && ((typeof curr?.group !== 'undefined' && item.parent === curr.group)
+            || (typeof curr?.group === 'undefined' && item.parent === INTERNAL_THEMES_NO_GROUP)),
+      ).length;
       acc.splice(parentIndex + childrenLength + 1, 0, {
         isLeaf: true,
         value: curr,
         key: curr.id,
         parent: curr?.group ?? INTERNAL_THEMES_NO_GROUP,
-        path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.id}`,
+        path: `${curr?.group ?? INTERNAL_THEMES_NO_GROUP}/${curr.name}`,
         level: 1,
         label: curr.id,
         id: uuidv4(),
