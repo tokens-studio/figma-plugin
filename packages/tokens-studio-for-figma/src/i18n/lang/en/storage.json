@@ -85,7 +85,9 @@
       "descriptionSecondPart": "If you are already using the Studio platform and need help setting up the sync, read the ",
       "tokensStudioSyncGuide": "Tokens Studio Sync guide here.",
       "pat": "Personal Access Token",
-      "id": "Connection ID"
+      "id": "Connection ID",
+      "selectOrgLabel": "Choose organization",
+      "selectProjectLabel": "Choose project"
     }
   },
   "selectALayerToSeeAppliedTokens": "Select a layer to see applied tokens",

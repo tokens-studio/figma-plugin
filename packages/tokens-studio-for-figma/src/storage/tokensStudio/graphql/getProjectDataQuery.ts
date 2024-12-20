@@ -1,30 +1,35 @@
-import { TOKEN_FRAGMENT } from './tokenFragment';
+import { gql } from '@tokens-studio/sdk';
 
-export const GET_PROJECT_DATA_QUERY = `
-query Project($urn: String!) {
-  project(urn: $urn) {
-    sets {
-      urn
-      name
-      type
-      projectUrn
-      generatorUrn
-      orderIndex
-      tokens(limit: 3000) {
-        ${TOKEN_FRAGMENT}
-      }
-    }
-    themeGroups {
-      urn
-      name
-      options {
-        urn
-        name
-        selectedTokenSets
-        figmaStyleReferences
-        figmaVariableReferences
+export const GET_PROJECT_DATA_QUERY = gql`
+  query Branch($projectId: String!, $organization: String!, $name: String) {
+    project(id: $projectId, organization: $organization) {
+      branch(name: $name) {
+        tokenSets {
+          data {
+            name
+            orderIndex
+            type
+            tokens {
+              name
+              type
+              description
+              extensions
+              value
+            }
+          }
+        }
+        themeGroups {
+          data {
+            name
+            options {
+              name
+              figmaStyleReferences
+              figmaVariableReferences
+              selectedTokenSets
+            }
+          }
+        }
       }
     }
   }
-}
 `;

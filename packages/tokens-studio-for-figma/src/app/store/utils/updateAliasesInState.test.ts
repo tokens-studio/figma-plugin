@@ -55,7 +55,7 @@ describe('updateAliasesInState', () => {
       ],
     };
 
-    const updatedTokens = updateAliasesInState(tokens, data);
+    const { updatedTokens } = updateAliasesInState(tokens, data);
 
     expect(updatedTokens).toEqual(expectedTokens);
   });
@@ -84,7 +84,7 @@ describe('updateAliasesInState', () => {
       ],
     };
 
-    const updatedTokens = updateAliasesInState(tokens, data);
+    const { updatedTokens } = updateAliasesInState(tokens, data);
 
     expect(updatedTokens).toEqual(expectedTokens);
   });
