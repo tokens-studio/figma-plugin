@@ -69,7 +69,6 @@ export async function applyTypographyTokenOnNode(
 
   // Apply matching style or fallback to applying values
   if (matchingStyleId && (await trySetStyleId(node, 'text', matchingStyleId))) return;
-
   // Apply typography token directly if no other properties exist
   if (data.typography && resolvedToken && isSingleTypographyValue(resolvedToken.value) && !Object.keys(values).length) {
     setTextValuesOnTarget(node, data.typography, baseFontSize);
@@ -80,14 +79,23 @@ export async function applyTypographyTokenOnNode(
   const resolvedValueObject = buildResolvedValueObject(resolvedToken ? resolvedToken.rawValue : data);
   const valueObject = buildValueObject(values, resolvedToken);
 
-  console.log("resolved value object,", resolvedValueObject)
-  console.log("valueObject, ", valueObject);
+  const updatedResolvedValueObject = {
+    ...resolvedValueObject,
+    fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
+    fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
+    lineHeight: isPrimitiveValue(data.lineHeights) ? String(data.lineHeights.startsWith('{') ? data.lineHeights : `{${data.lineHeights}}`) : undefined,
+    fontSize: isPrimitiveValue(data.fontSizes) ? String(data.fontSizes.startsWith('{') ? data.fontSizes : `{${data.fontSizes}}`) : undefined,
+    letterSpacing: isPrimitiveValue(data.letterSpacing) ? String(data.letterSpacing.startsWith('{') ? data.letterSpacing : `{${data.letterSpacing}}`) : undefined,
+    paragraphSpacing: isPrimitiveValue(data.paragraphSpacing) ? String(data.paragraphSpacing.startsWith('{') ? data.paragraphSpacing : `{${data.paragraphSpacing}}`) : undefined,
+    textCase: isPrimitiveValue(data.textCase) ? String(data.textCase.startsWith('{') ? data.textCase : `{${data.textCase}}`) : undefined,
+    textDecoration: isPrimitiveValue(data.textDecoration) ? String(data.textDecoration.startsWith('{') ? data.textDecoration : `{${data.textDecoration}}`) : undefined,
+  };
 
   // Apply the typography token and other values together
   await tryApplyTypographyCompositeVariable({
     target: node,
     value: valueObject,
-    resolvedValue: resolvedValueObject,
+    resolvedValue: updatedResolvedValueObject,
     baseFontSize,
   });
 }
