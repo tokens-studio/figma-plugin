@@ -15,17 +15,16 @@ function formatValue(value: any): string | undefined {
   return undefined;
 }
 
-function buildResolvedValueObject(data: any) {
-  console.log("data is,", data);
+function buildResolvedValueObject(resolvedToken: any, data: any) {
   return {
-    fontFamily: formatValue(data.fontFamilies || data.fontFamily),
-    fontWeight: formatValue(data.fontWeights || data.fontWeight),
-    lineHeight: formatValue(data.lineHeights || data.lineHeight),
-    fontSize: formatValue(data.fontSizes || data.fontSize),
-    letterSpacing: formatValue(data.letterSpacing),
-    paragraphSpacing: formatValue(data.paragraphSpacing),
-    textCase: formatValue(data.textCase),
-    textDecoration: formatValue(data.textDecoration),
+    fontFamily: formatValue(data.fontFamilies || data.fontFamily || resolvedToken?.rawValue?.fontFamilies || resolvedToken?.rawValue?.fontFamily),
+    fontWeight: formatValue(data.fontWeights || data.fontWeight || resolvedToken?.rawValue?.fontWeights || resolvedToken?.rawValue?.fontWeight),
+    lineHeight: formatValue(data.lineHeights || data.lineHeight || resolvedToken?.rawValue?.lineHeights || resolvedToken?.rawValue?.lineHeight),
+    fontSize: formatValue(data.fontSizes || data.fontSize || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize),
+    letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
+    paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
+    textCase: formatValue(data.textCase || resolvedToken?.rawValue?.textCase),
+    textDecoration: formatValue(data.textDecoration || resolvedToken?.rawValue?.textDecoration),
   };
 }
 
@@ -76,26 +75,14 @@ export async function applyTypographyTokenOnNode(
   }
 
   // Build the resolved value and value objects
-  const resolvedValueObject = buildResolvedValueObject(resolvedToken ? resolvedToken.rawValue : data);
+  const resolvedValueObject = buildResolvedValueObject(resolvedToken, data);
   const valueObject = buildValueObject(values, resolvedToken);
-
-  const updatedResolvedValueObject = {
-    ...resolvedValueObject,
-    fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
-    fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
-    lineHeight: isPrimitiveValue(data.lineHeights) ? String(data.lineHeights.startsWith('{') ? data.lineHeights : `{${data.lineHeights}}`) : undefined,
-    fontSize: isPrimitiveValue(data.fontSizes) ? String(data.fontSizes.startsWith('{') ? data.fontSizes : `{${data.fontSizes}}`) : undefined,
-    letterSpacing: isPrimitiveValue(data.letterSpacing) ? String(data.letterSpacing.startsWith('{') ? data.letterSpacing : `{${data.letterSpacing}}`) : undefined,
-    paragraphSpacing: isPrimitiveValue(data.paragraphSpacing) ? String(data.paragraphSpacing.startsWith('{') ? data.paragraphSpacing : `{${data.paragraphSpacing}}`) : undefined,
-    textCase: isPrimitiveValue(data.textCase) ? String(data.textCase.startsWith('{') ? data.textCase : `{${data.textCase}}`) : undefined,
-    textDecoration: isPrimitiveValue(data.textDecoration) ? String(data.textDecoration.startsWith('{') ? data.textDecoration : `{${data.textDecoration}}`) : undefined,
-  };
 
   // Apply the typography token and other values together
   await tryApplyTypographyCompositeVariable({
     target: node,
     value: valueObject,
-    resolvedValue: updatedResolvedValueObject,
+    resolvedValue: resolvedValueObject,
     baseFontSize,
   });
 }
