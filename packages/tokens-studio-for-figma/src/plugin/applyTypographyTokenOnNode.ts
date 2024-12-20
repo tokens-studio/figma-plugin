@@ -17,10 +17,27 @@ function formatValue(value: any): string | undefined {
 
 function buildResolvedValueObject(resolvedToken: any, data: any) {
   return {
-    fontFamily: formatValue(data.fontFamilies || data.fontFamily || resolvedToken?.rawValue?.fontFamilies || resolvedToken?.rawValue?.fontFamily),
-    fontWeight: formatValue(data.fontWeights || data.fontWeight || resolvedToken?.rawValue?.fontWeights || resolvedToken?.rawValue?.fontWeight),
-    lineHeight: formatValue(data.lineHeights || data.lineHeight || resolvedToken?.rawValue?.lineHeights || resolvedToken?.rawValue?.lineHeight),
-    fontSize: formatValue(data.fontSizes || data.fontSize || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize),
+    fontFamily: formatValue(
+      data.fontFamilies ||
+        data.fontFamily ||
+        resolvedToken?.rawValue?.fontFamilies ||
+        resolvedToken?.rawValue?.fontFamily,
+    ),
+    fontWeight: formatValue(
+      data.fontWeights ||
+        data.fontWeight ||
+        resolvedToken?.rawValue?.fontWeights ||
+        resolvedToken?.rawValue?.fontWeight,
+    ),
+    lineHeight: formatValue(
+      data.lineHeights ||
+        data.lineHeight ||
+        resolvedToken?.rawValue?.lineHeights ||
+        resolvedToken?.rawValue?.lineHeight,
+    ),
+    fontSize: formatValue(
+      data.fontSizes || data.fontSize || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize,
+    ),
     letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
     paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
     textCase: formatValue(data.textCase || resolvedToken?.rawValue?.textCase),
@@ -37,7 +54,9 @@ function buildValueObject(values: any, resolvedToken: any) {
     lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : tokenValue.lineHeight,
     fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : tokenValue.fontSize,
     letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : tokenValue.letterSpacing,
-    paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : tokenValue.paragraphSpacing,
+    paragraphSpacing: isPrimitiveValue(values.paragraphSpacing)
+      ? String(values.paragraphSpacing)
+      : tokenValue.paragraphSpacing,
     textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : tokenValue.textCase,
     textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : tokenValue.textDecoration,
   };
