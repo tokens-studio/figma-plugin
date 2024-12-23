@@ -18,25 +18,22 @@ function formatValue(value: any): string | undefined {
 function buildResolvedValueObject(resolvedToken: any, data: any) {
   return {
     fontFamily: formatValue(
-      data.fontFamilies ||
-        data.fontFamily ||
-        resolvedToken?.rawValue?.fontFamilies ||
-        resolvedToken?.rawValue?.fontFamily,
+      data.fontFamilies
+        || resolvedToken?.rawValue?.fontFamilies
+        || resolvedToken?.rawValue?.fontFamily,
     ),
     fontWeight: formatValue(
-      data.fontWeights ||
-        data.fontWeight ||
-        resolvedToken?.rawValue?.fontWeights ||
-        resolvedToken?.rawValue?.fontWeight,
+      data.fontWeights
+        || resolvedToken?.rawValue?.fontWeights
+        || resolvedToken?.rawValue?.fontWeight,
     ),
     lineHeight: formatValue(
-      data.lineHeights ||
-        data.lineHeight ||
-        resolvedToken?.rawValue?.lineHeights ||
-        resolvedToken?.rawValue?.lineHeight,
+      data.lineHeights
+        || resolvedToken?.rawValue?.lineHeights
+        || resolvedToken?.rawValue?.lineHeight,
     ),
     fontSize: formatValue(
-      data.fontSizes || data.fontSize || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize,
+      data.fontSizes || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize,
     ),
     letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
     paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
