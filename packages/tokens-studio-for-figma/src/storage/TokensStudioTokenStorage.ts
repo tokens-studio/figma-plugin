@@ -27,7 +27,7 @@ import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
 const makeClient = (secret: string) => create({
-  host: process.env.API_HOST || 'localhost:4200',
+  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
   secure: process.env.NODE_ENV !== 'development',
   auth: `Bearer ${secret}`,
 });
