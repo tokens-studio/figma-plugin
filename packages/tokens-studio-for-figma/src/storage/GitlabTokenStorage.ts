@@ -216,6 +216,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
       const sourceBranch = this.previousSourceBranch || this.source;
       await this.createBranch(branch, sourceBranch);
     }
+
+    const pushRules = await this.gitlabClient.ProjectPushRules.show(this.projectId);
+    const initialCommitMessage = pushRules?.commit_message_regex ? 'chore: Initial Commit' : 'Initial Commit';
     // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
     const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
     try {
@@ -226,7 +229,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         pathToCreate,
         branch,
         '{}',
-        'Initial commit',
+        initialCommitMessage,
       );
     }
 
