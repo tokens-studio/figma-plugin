@@ -422,6 +422,8 @@ describe('GitlabTokenStorage', () => {
       })
     ));
 
+    const userCommitMessage = 'Initial Commit';
+
     await storageProvider.write([
       {
         type: 'metadata',
@@ -453,14 +455,14 @@ describe('GitlabTokenStorage', () => {
         },
       },
     ], {
-      commitMessage: 'Initial commit',
+      commitMessage: userCommitMessage,
       storeTokenIdInJsonEditor: true,
     });
 
     expect(mockCreateCommits).toHaveBeenCalledWith(
       35102363,
       'main',
-      'Initial commit',
+      userCommitMessage,
       [
         {
           action: 'create',
