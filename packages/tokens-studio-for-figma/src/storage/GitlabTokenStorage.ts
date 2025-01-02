@@ -251,7 +251,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         gitkeepPath,
         branch,
         '{}',
-        'Initial commit',
+        message,
       );
     }
 

@@ -2,7 +2,9 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { AnyTokenList } from '@/types/tokens';
-import { createMockStore, fireEvent, render, waitFor } from '../../../../tests/config/setupTest';
+import {
+  createMockStore, render, waitFor,
+} from '../../../../tests/config/setupTest';
 import RenameTokenGroupModal from './RenameTokenGroupModal';
 
 const tokens: Record<string, AnyTokenList> = {
@@ -10,14 +12,14 @@ const tokens: Record<string, AnyTokenList> = {
     {
       value: '#f0',
       type: TokenTypes.COLOR,
-      name: 'foo.bar.something.bar'
+      name: 'foo.bar.something.bar',
     },
     {
       value: '#fff',
       type: TokenTypes.COLOR,
-      name: 'otherfoo.something'
-    }
-  ]
+      name: 'otherfoo.something',
+    },
+  ],
 };
 
 const store = createMockStore({ tokenState: { tokens, activeTokenSet: 'global' } });
@@ -30,11 +32,9 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName="newName"
           oldName="oldName"
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
-      </Provider>
+      </Provider>,
     );
   });
 
@@ -48,11 +48,9 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
-      </Provider>
+      </Provider>,
     );
 
     waitFor(async () => {
@@ -70,11 +68,9 @@ describe('RenameTokenGroupModal', () => {
           isOpen
           newName={newName}
           oldName={oldName}
-          onClose={() => {}}
-          handleRenameTokenGroupSubmit={() => {}}
-          handleNewTokenGroupNameChange={() => {}}
+          type={TokenTypes.COLOR}
         />
-      </Provider>
+      </Provider>,
     );
 
     waitFor(async () => {

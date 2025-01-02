@@ -8,16 +8,37 @@ import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { MapValuesToTokensResult } from '@/types';
 import { tryApplyTypographyCompositeVariable } from './tryApplyTypographyCompositeVariable';
 
-function buildResolvedValueObject(data: any) {
+function formatValue(value: any): string | undefined {
+  if (isPrimitiveValue(value)) {
+    return String(value.startsWith('{') ? value : `{${value}}`);
+  }
+  return undefined;
+}
+
+function buildResolvedValueObject(resolvedToken: any, data: any) {
   return {
-    fontFamily: isPrimitiveValue(data.fontFamilies) ? String(data.fontFamilies.startsWith('{') ? data.fontFamilies : `{${data.fontFamilies}}`) : undefined,
-    fontWeight: isPrimitiveValue(data.fontWeights) ? String(data.fontWeights.startsWith('{') ? data.fontWeights : `{${data.fontWeights}}`) : undefined,
-    lineHeight: isPrimitiveValue(data.lineHeights) ? String(data.lineHeights.startsWith('{') ? data.lineHeights : `{${data.lineHeights}}`) : undefined,
-    fontSize: isPrimitiveValue(data.fontSizes) ? String(data.fontSizes.startsWith('{') ? data.fontSizes : `{${data.fontSizes}}`) : undefined,
-    letterSpacing: isPrimitiveValue(data.letterSpacing) ? String(data.letterSpacing.startsWith('{') ? data.letterSpacing : `{${data.letterSpacing}}`) : undefined,
-    paragraphSpacing: isPrimitiveValue(data.paragraphSpacing) ? String(data.paragraphSpacing.startsWith('{') ? data.paragraphSpacing : `{${data.paragraphSpacing}}`) : undefined,
-    textCase: isPrimitiveValue(data.textCase) ? String(data.textCase.startsWith('{') ? data.textCase : `{${data.textCase}}`) : undefined,
-    textDecoration: isPrimitiveValue(data.textDecoration) ? String(data.textDecoration.startsWith('{') ? data.textDecoration : `{${data.textDecoration}}`) : undefined,
+    fontFamily: formatValue(
+      data.fontFamilies
+        || resolvedToken?.rawValue?.fontFamilies
+        || resolvedToken?.rawValue?.fontFamily,
+    ),
+    fontWeight: formatValue(
+      data.fontWeights
+        || resolvedToken?.rawValue?.fontWeights
+        || resolvedToken?.rawValue?.fontWeight,
+    ),
+    lineHeight: formatValue(
+      data.lineHeights
+        || resolvedToken?.rawValue?.lineHeights
+        || resolvedToken?.rawValue?.lineHeight,
+    ),
+    fontSize: formatValue(
+      data.fontSizes || resolvedToken?.rawValue?.fontSizes || resolvedToken?.rawValue?.fontSize,
+    ),
+    letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
+    paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
+    textCase: formatValue(data.textCase || resolvedToken?.rawValue?.textCase),
+    textDecoration: formatValue(data.textDecoration || resolvedToken?.rawValue?.textDecoration),
   };
 }
 
@@ -30,7 +51,9 @@ function buildValueObject(values: any, resolvedToken: any) {
     lineHeight: isPrimitiveValue(values.lineHeights) ? String(values.lineHeights) : tokenValue.lineHeight,
     fontSize: isPrimitiveValue(values.fontSizes) ? String(values.fontSizes) : tokenValue.fontSize,
     letterSpacing: isPrimitiveValue(values.letterSpacing) ? String(values.letterSpacing) : tokenValue.letterSpacing,
-    paragraphSpacing: isPrimitiveValue(values.paragraphSpacing) ? String(values.paragraphSpacing) : tokenValue.paragraphSpacing,
+    paragraphSpacing: isPrimitiveValue(values.paragraphSpacing)
+      ? String(values.paragraphSpacing)
+      : tokenValue.paragraphSpacing,
     textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : tokenValue.textCase,
     textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : tokenValue.textDecoration,
   };
@@ -61,7 +84,6 @@ export async function applyTypographyTokenOnNode(
 
   // Apply matching style or fallback to applying values
   if (matchingStyleId && (await trySetStyleId(node, 'text', matchingStyleId))) return;
-
   // Apply typography token directly if no other properties exist
   if (data.typography && resolvedToken && isSingleTypographyValue(resolvedToken.value) && !Object.keys(values).length) {
     setTextValuesOnTarget(node, data.typography, baseFontSize);
@@ -69,7 +91,7 @@ export async function applyTypographyTokenOnNode(
   }
 
   // Build the resolved value and value objects
-  const resolvedValueObject = buildResolvedValueObject(data);
+  const resolvedValueObject = buildResolvedValueObject(resolvedToken, data);
   const valueObject = buildValueObject(values, resolvedToken);
 
   // Apply the typography token and other values together

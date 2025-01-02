@@ -274,7 +274,6 @@ export function useGitLab() {
     }
     const data = await syncTokensWithGitLab(context);
 
-
     if (data.status === 'success') {
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.CREDENTIALS,

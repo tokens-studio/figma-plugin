@@ -1,5 +1,22 @@
 # @tokens-studio/figma-plugin
 
+## 2.3.0
+
+### Minor Changes
+
+- 8cbef622: Improved Tokens Studio Sync provider creation and updated Tokens Studio SDK to the latest version
+
+### Patch Changes
+
+- 41f7e340: Fix for linear gradient start/end points being outside the node bounding box when using angles that aren't divisible by 45.
+- a60aa4d5: Fixes an issue where a typography token applied with exported variable is not displayed in Figma.
+
+## 2.2.3
+
+### Patch Changes
+
+- 01ccff2a: Fixes an issue when updating a token's value from a reference to a hard value, the check we introduced in the last release caused those to not be updated (and only worked when changing to another reference).
+
 ## 2.2.2
 
 ### Patch Changes

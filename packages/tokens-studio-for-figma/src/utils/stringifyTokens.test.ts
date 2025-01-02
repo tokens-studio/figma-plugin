@@ -142,20 +142,20 @@ describe('stringfyTokens', () => {
           name: 'scale.small',
           type: 'spacing',
           value: '4px',
-          inheritTypeLevel: 2
+          inheritTypeLevel: 2,
         },
         {
           name: 'scale.medium',
           type: 'spacing',
           value: '8px',
-          inheritTypeLevel: 2
+          inheritTypeLevel: 2,
         },
         {
           name: 'scale.large',
           value: '12px',
-          type: 'sizing'
+          type: 'sizing',
         },
-      ]
+      ],
     };
     setFormat(TokenFormatOptions.Legacy);
     expect(stringifyTokens(input, activeTokenSet)).toEqual(
@@ -164,20 +164,20 @@ describe('stringfyTokens', () => {
           scale: {
             type: 'spacing',
             small: {
-              value: '4px'
+              value: '4px',
             },
             medium: {
-              value: '8px'
+              value: '8px',
             },
             large: {
               value: '12px',
-              type: 'sizing'
-            }
-          }
+              type: 'sizing',
+            },
+          },
         },
         null,
-        2
-      )
+        2,
+      ),
     );
   });
 });

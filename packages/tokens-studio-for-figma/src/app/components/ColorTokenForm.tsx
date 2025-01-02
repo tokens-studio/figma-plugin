@@ -48,8 +48,6 @@ export default function ColorTokenForm({
   const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
-  const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
-  const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
   const isProUser = useIsProUser();
 
@@ -139,14 +137,6 @@ export default function ColorTokenForm({
     setModifyVisible(false);
     handleRemoveColorModify();
   }, [handleRemoveColorModify]);
-
-  const handleOperationToggleMenu = useCallback(() => {
-    setOperationMenuOpened(!operationMenuOpened);
-  }, [operationMenuOpened]);
-
-  const handleColorSpaceToggleMenu = useCallback(() => {
-    setColorSpaceMenuOpened(!colorSpaceMenuOpened);
-  }, [colorSpaceMenuOpened]);
 
   const onOperationSelected = useCallback((operation: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {

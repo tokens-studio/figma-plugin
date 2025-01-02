@@ -8,7 +8,7 @@ export function renameStyleNamesToCurrentTheme(state: TokenState, tokensToRename
     return acc;
   }, {});
   updatedThemes.forEach((theme) => {
-    const updatedTokens = theme.$figmaStyleReferences;
+    const updatedTokens = { ...theme.$figmaStyleReferences };
     if (updatedTokens) {
       Object.entries(updatedTokens).forEach(([key]) => {
         if (oldToNewNameMap[key]) {

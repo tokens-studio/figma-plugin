@@ -9,6 +9,6 @@ export function tokenSetListToList(items: string[]): TreeItem[] {
     parent: null,
     level: 0,
     label: item,
-    id: uuidv4()
+    id: uuidv4(),
   }));
 }

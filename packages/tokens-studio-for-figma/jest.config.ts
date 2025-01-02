@@ -37,12 +37,7 @@ export default {
   // coverageProvider: "babel",
 
   // A list of reporter names that Jest uses when writing coverage reports
-  coverageReporters: [
-    'json',
-    'text',
-    'lcov',
-    'clover',
-  ],
+  coverageReporters: ['json', 'text', 'lcov', 'clover'],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -81,7 +76,7 @@ export default {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-            '<rootDir>/tests/__mocks__/fileMock.js',
+      '<rootDir>/tests/__mocks__/fileMock.js',
     '\\.(css)$': '<rootDir>/tests/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
@@ -185,7 +180,10 @@ export default {
   //     "^.+\\.js$": "babel-jest",
   // },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: ['/node_modules/(?!(@figma-plugin|react-dnd|@react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|culori|dot-prop)/)', '\\.pnp\\.[^\\/]+$'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@figma-plugin|react-dnd|@react-dnd|react-colorful|dnd-core|react-dnd-html5-backend|culori|dot-prop|@tokens-studio/sdk|@apollo/client)/)',
+    '\\.pnp\\.[^\\/]+$',
+  ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
