@@ -100,9 +100,12 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
             } else if (typeof value === 'number') {
               if (options.useRem) {
-                tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
+                tokenValue = `${(Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3)}rem`;
               } else if (options.useDimensions) {
-                tokenValue = `${tokenValue}px`;
+                tokenValue = `${tokenValue.toFixed(3)}px`;
+              }
+              else {
+                tokenValue = Number(tokenValue.toFixed(3));
               }
             }
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;
@@ -110,7 +113,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             if (options.useDimensions || options.useRem) {
               dimensions.push({
                 name: variableName,
-                value: tokenValue as string,
+                value: typeof tokenValue === 'number' ? tokenValue.toString() : tokenValue,
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
@@ -118,7 +121,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             } else {
               numbers.push({
                 name: variableName,
-                value: tokenValue as string,
+                value: typeof tokenValue === 'number' ? tokenValue.toString() : tokenValue,
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
