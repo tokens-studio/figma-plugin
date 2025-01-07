@@ -97,7 +97,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .sort((a, b) => a - b)
       .map((size, idx) => ({
         name: `fontSize.${idx}`,
-        value: size.toString(),
+        value: Number(size.toFixed(3)).toString(),
         type: TokenTypes.FONT_SIZES,
       }));
 
@@ -162,6 +162,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     }));
 
     typography = figmaTextStyles.map((style) => {
+      console.log("figmatextstyle", style);
       const foundFamily = fontFamilies.find((el: StyleToCreateToken) => el.value === style.fontName.family);
       const foundFontWeight = fontWeights.find(
         (el: StyleToCreateToken) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
