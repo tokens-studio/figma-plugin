@@ -103,8 +103,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
                 tokenValue = `${(Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3)}rem`;
               } else if (options.useDimensions) {
                 tokenValue = `${tokenValue.toFixed(3)}px`;
-              }
-              else {
+              } else {
                 tokenValue = Number(tokenValue.toFixed(3));
               }
             }
