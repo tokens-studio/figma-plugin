@@ -1,6 +1,4 @@
-import {
-  ThemeGroup, TokenSetType, TokensSet, create,
-} from '@tokens-studio/sdk';
+import { ThemeGroup, TokenSetType, TokensSet, create } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -26,11 +24,12 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
-const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
-  auth: `Bearer ${secret}`,
-});
+const makeClient = (secret: string) =>
+  create({
+    host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+    secure: process.env.NODE_ENV !== 'development',
+    auth: `Bearer ${secret}`,
+  });
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -106,6 +105,8 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
               selectedTokenSets,
               $figmaStyleReferences: theme?.figmaStyleReferences,
               $figmaVariableReferences: theme?.figmaVariableReferences,
+              $figmaCollectionId: theme?.figmaCollectionId ?? undefined,
+              $figmaModeId: theme?.figmaModeId ?? undefined,
             };
           });
 
