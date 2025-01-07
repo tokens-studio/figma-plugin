@@ -100,9 +100,9 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
             } else if (typeof value === 'number') {
               if (options.useRem) {
-                tokenValue = `${(Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3)}rem`;
+                tokenValue = `${Number((Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3))}rem`;
               } else if (options.useDimensions) {
-                tokenValue = `${tokenValue.toFixed(3)}px`;
+                tokenValue = `${Number(tokenValue.toFixed(3))}px`;
               } else {
                 tokenValue = Number(tokenValue.toFixed(3));
               }
@@ -112,7 +112,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             if (options.useDimensions || options.useRem) {
               dimensions.push({
                 name: variableName,
-                value: typeof tokenValue === 'number' ? tokenValue.toString() : tokenValue,
+                value: tokenValue as string,
                 type: TokenTypes.DIMENSION,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
@@ -120,7 +120,7 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             } else {
               numbers.push({
                 name: variableName,
-                value: typeof tokenValue === 'number' ? tokenValue.toString() : tokenValue,
+                value: tokenValue as string,
                 type: TokenTypes.NUMBER,
                 parent: `${collection?.name}/${modeName}`,
                 ...(variable.description ? { description: variable.description } : {}),
