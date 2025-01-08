@@ -129,7 +129,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
           (a.path && b.path) ? a.path.localeCompare(b.path) : 0
         ));
 
-        // Check each directory for `.gitkeep` in non-empty directories
         const directories = trees.reduce((acc: Record<string, string[]>, file) => {
           const dir = file.path.substring(0, file.path.lastIndexOf('/'));
           if (!acc[dir]) acc[dir] = [];
@@ -287,14 +286,35 @@ export class GitlabTokenStorage extends GitTokenStorage {
       recursive: true,
     });
 
-    const otherFilesPresent = updatedTree.some((file) => file.path !== gitkeepPath);
-    if (otherFilesPresent) {
+    const gitkeepDeletions: CommitAction[] = [];
+    const directories = updatedTree.reduce((acc: Record<string, string[]>, file) => {
+      const dir = file.path.substring(0, file.path.lastIndexOf('/'));
+      if (!acc[dir]) acc[dir] = [];
+      acc[dir].push(file.path);
+      return acc;
+    }, {});
+
+    // Check each directory for .gitkeep files that can be deleted
+    for (const [dir, files] of Object.entries(directories)) {
+      const hasGitkeep = files.some((file) => file.endsWith('.gitkeep'));
+      const hasOtherFiles = files.some((file) => !file.endsWith('.gitkeep'));
+
+      if (hasGitkeep && hasOtherFiles) {
+        const gitkeepPath = `${dir}/.gitkeep`;
+        gitkeepDeletions.push({ action: 'delete', filePath: gitkeepPath });
+      }
+    }
+
+    if (gitkeepDeletions.length > 0) {
       try {
-        await this.gitlabClient.Commits.create(this.projectId, branch, message, [
-          { action: 'delete', filePath: gitkeepPath },
-        ]);
-      } catch (e: any) {
-        console.error(`Failed to delete .gitkeep: ${e}`);
+        await this.gitlabClient.Commits.create(
+          this.projectId,
+          branch,
+          'Deleting unnecessary .gitkeep files',
+          gitkeepDeletions,
+        );
+      } catch (e) {
+        console.error('Failed to delete .gitkeep files:', e);
       }
     }
     return true;
