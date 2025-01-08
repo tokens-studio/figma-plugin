@@ -76,6 +76,8 @@ export async function updateThemeGroupsInTokensStudio({
         selectedTokenSets: theme.selectedTokenSets,
         figmaStyleReferences: theme.$figmaStyleReferences,
         figmaVariableReferences: theme.$figmaVariableReferences,
+        figmaCollectionId: theme.$figmaCollectionId,
+        figmaModeId: theme.$figmaModeId,
       })),
     };
 
@@ -102,6 +104,8 @@ export async function updateThemeGroupsInTokensStudio({
           selectedTokenSets: themeToCreate.selectedTokenSets,
           figmaStyleReferences: themeToCreate.$figmaStyleReferences,
           figmaVariableReferences: themeToCreate.$figmaVariableReferences,
+          figmaCollectionId: themeToCreate.$figmaCollectionId,
+          figmaModeId: themeToCreate.$figmaModeId,
         }],
       },
     });
