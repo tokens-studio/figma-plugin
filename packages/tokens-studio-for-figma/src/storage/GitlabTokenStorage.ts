@@ -148,7 +148,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
         if (gitkeepDeletions.length > 0) {
           try {
-            await this.gitlabClient.Commits.create(this.projectId, this.branch, 'Deleting unnecessary .gitkeep files', gitkeepDeletions);
+            await this.gitlabClient.Commits.create(this.projectId, this.branch, 'chore: delete unnecessary .gitkeep files', gitkeepDeletions);
           } catch (e) {
             console.error('Failed to delete .gitkeep files:', e);
           }
@@ -310,7 +310,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         await this.gitlabClient.Commits.create(
           this.projectId,
           branch,
-          'Deleting unnecessary .gitkeep files',
+          'chore: delete unnecessary .gitkeep files',
           gitkeepDeletions,
         );
       } catch (e) {
