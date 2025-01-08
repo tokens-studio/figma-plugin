@@ -111,7 +111,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
     return false;
   }
 
-  private async cleanupGitkeepFiles(path: string, branch: string) {
+  private async cleanupGitkeepFiles(path: string, branch: string, message: string) {
     const trees = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId!, {
       path,
       ref: branch,
@@ -141,7 +141,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
         await this.gitlabClient.Commits.create(
           this.projectId!,
           branch,
-          'chore: delete unnecessary .gitkeep files',
+          message,
           gitkeepDeletions,
         );
       } catch (e) {
@@ -160,8 +160,6 @@ export class GitlabTokenStorage extends GitTokenStorage {
           ref: this.branch,
           recursive: true,
         });
-
-        await this.cleanupGitkeepFiles(this.path, this.branch);
 
         const jsonFiles = trees.filter((file) => (
           file.path.endsWith('.json')
@@ -294,7 +292,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       throw new Error(e);
     }
 
-    await this.cleanupGitkeepFiles(rootPath, branch);
+    await this.cleanupGitkeepFiles(rootPath, branch, message);
     return true;
   }
 
