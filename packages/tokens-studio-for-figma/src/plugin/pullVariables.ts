@@ -19,10 +19,10 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     const uiSettings = await figma.clientStorage.getAsync('uiSettings');
     const settings = JSON.parse(await uiSettings);
     if (settings?.baseFontSize) {
-      const baseFontSizeValue = typeof settings.baseFontSize === 'number' 
-        ? settings.baseFontSize 
+      const baseFontSizeValue = typeof settings.baseFontSize === 'number'
+        ? settings.baseFontSize
         : parseFloat(settings.baseFontSize);
-      
+
       baseRem = !isNaN(baseFontSizeValue) ? Number(baseFontSizeValue) : 16;
     }
   }
