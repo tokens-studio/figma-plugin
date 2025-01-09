@@ -83,6 +83,18 @@ describe('pullStyles', () => {
           },
         },
         {
+          name: 'Number3',
+          remote: false,
+          variableCollectionId: 'coll1',
+          resolvedType: 'FLOAT',
+          valuesByMode: {
+            '1:0': 24.8,
+            '1:1': 24.8,
+            '1:2': 24.8,
+            '1:3': 24.8,
+          },
+        },
+        {
           name: 'String',
           remote: false,
           variableCollectionId: 'coll1',
@@ -191,6 +203,30 @@ describe('pullStyles', () => {
           type: 'number',
           value: 16,
         },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Default',
+          type: 'number',
+          value: 24.8,
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Dark',
+          type: 'number',
+          value: 24.8,
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Light',
+          type: 'number',
+          value: 24.8,
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Custom',
+          type: 'number',
+          value: 24.8,
+        },
       ],
       booleans: [{
         name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
@@ -291,6 +327,30 @@ describe('pullStyles', () => {
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '16px',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Default',
+          type: 'dimension',
+          value: '24.8px',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Dark',
+          type: 'dimension',
+          value: '24.8px',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Light',
+          type: 'dimension',
+          value: '24.8px',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Custom',
+          type: 'dimension',
+          value: '24.8px',
         },
       ],
       booleans: [{
@@ -393,6 +453,30 @@ describe('pullStyles', () => {
           type: 'dimension',
           value: '1rem',
         },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Default',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Dark',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Light',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Custom',
+          type: 'dimension',
+          value: '1.55rem',
+        },
       ],
       booleans: [{
         name: 'Boolean', parent: 'Collection 1/Default', type: 'boolean', value: 'true',
@@ -493,6 +577,30 @@ describe('pullStyles', () => {
           parent: 'Collection 1/Custom',
           type: 'dimension',
           value: '1rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Default',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Dark',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Light',
+          type: 'dimension',
+          value: '1.55rem',
+        },
+        {
+          name: 'Number3',
+          parent: 'Collection 1/Custom',
+          type: 'dimension',
+          value: '1.55rem',
         },
       ],
       booleans: [{
