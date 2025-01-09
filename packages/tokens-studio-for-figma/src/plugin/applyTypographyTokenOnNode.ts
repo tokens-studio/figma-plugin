@@ -37,6 +37,7 @@ function buildResolvedValueObject(resolvedToken: any, data: any) {
     ),
     letterSpacing: formatValue(data.letterSpacing || resolvedToken?.rawValue?.letterSpacing),
     paragraphSpacing: formatValue(data.paragraphSpacing || resolvedToken?.rawValue?.paragraphSpacing),
+    paragraphIndent: formatValue(data.paragraphIndent || resolvedToken?.rawValue?.paragraphIndent),
     textCase: formatValue(data.textCase || resolvedToken?.rawValue?.textCase),
     textDecoration: formatValue(data.textDecoration || resolvedToken?.rawValue?.textDecoration),
   };
@@ -54,6 +55,9 @@ function buildValueObject(values: any, resolvedToken: any) {
     paragraphSpacing: isPrimitiveValue(values.paragraphSpacing)
       ? String(values.paragraphSpacing)
       : tokenValue.paragraphSpacing,
+    paragraphIndent: isPrimitiveValue(values.paragraphIndent)
+      ? String(values.paragraphIndent)
+      : tokenValue.paragraphIndent,
     textCase: isPrimitiveValue(values.textCase) ? String(values.textCase) : tokenValue.textCase,
     textDecoration: isPrimitiveValue(values.textDecoration) ? String(values.textDecoration) : tokenValue.textDecoration,
   };
