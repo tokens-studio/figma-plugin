@@ -16,10 +16,15 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
 
   let baseRem = 16;
   if (options.useRem) {
-    baseRem = await figma.clientStorage.getAsync('uiSettings').then(async (uiSettings) => {
-      const settings = JSON.parse(await uiSettings);
-      return settings.baseFontSize;
-    });
+    const uiSettings = await figma.clientStorage.getAsync('uiSettings');
+    const settings = JSON.parse(await uiSettings);
+    if (settings?.baseFontSize) {
+      const baseFontSizeValue = typeof settings.baseFontSize === 'number'
+        ? settings.baseFontSize
+        : parseFloat(settings.baseFontSize);
+
+      baseRem = !isNaN(baseFontSizeValue) ? Number(baseFontSizeValue) : 16;
+    }
   }
 
   const localVariables = await getVariablesWithoutZombies();
@@ -100,9 +105,11 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
               tokenValue = `{${alias?.name.replace(/\//g, '.')}}`;
             } else if (typeof value === 'number') {
               if (options.useRem) {
-                tokenValue = `${Number(tokenValue) / parseFloat(String(baseRem))}rem`;
+                tokenValue = `${Number((Number(tokenValue) / parseFloat(String(baseRem))).toFixed(3))}rem`;
               } else if (options.useDimensions) {
-                tokenValue = `${tokenValue}px`;
+                tokenValue = `${Number(tokenValue.toFixed(3))}px`;
+              } else {
+                tokenValue = Number(tokenValue.toFixed(3));
               }
             }
             const modeName = collection?.modes.find((m) => m.modeId === mode)?.name;

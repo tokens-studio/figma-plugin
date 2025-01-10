@@ -97,7 +97,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       .sort((a, b) => a - b)
       .map((size, idx) => ({
         name: `fontSize.${idx}`,
-        value: size.toString(),
+        value: Number(size.toFixed(3)).toString(),
         type: TokenTypes.FONT_SIZES,
       }));
 
