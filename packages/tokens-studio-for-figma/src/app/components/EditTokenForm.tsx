@@ -156,6 +156,15 @@ function EditTokenForm({ resolvedTokens }: Props) {
     [internalEditToken],
   );
 
+  const hasEmptyGroups = React.useMemo(() => {
+    if (internalEditToken?.name) {
+      return internalEditToken.name.includes('..')
+        || internalEditToken.name.startsWith('.')
+        || internalEditToken.name.endsWith('.');
+    }
+    return false;
+  }, [internalEditToken]);
+
   React.useEffect(() => {
     if ((internalEditToken?.status !== EditTokenFormStatus.EDIT || nameWasChanged) && hasNameThatExistsAlready) {
       setError(t('tokenNamesMustBeUnique', { ns: 'errors' }));
@@ -175,7 +184,10 @@ function EditTokenForm({ resolvedTokens }: Props) {
     if ((internalEditToken?.status || nameWasChanged) && hasCurlyBraces) {
       setError(t('tokenNamesCantContainCurlyBraces', { ns: 'errors' }));
     }
-  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasAnotherTokenThatStartsWithName]);
+    if ((internalEditToken?.status || nameWasChanged) && hasEmptyGroups) {
+      setError(t('tokenNamesCantContainEmptyGroups', { ns: 'errors' }));
+    }
+  }, [internalEditToken, hasNameThatExistsAlready, nameWasChanged, hasAnotherTokenThatStartsWithName, hasEmptyGroups]);
 
   const handleChange = React.useCallback(
     (property: string, value: string) => {

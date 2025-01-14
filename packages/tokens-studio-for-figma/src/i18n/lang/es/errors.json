@@ -8,5 +8,6 @@
   "cantCreateGroupThatSharesNameWithExistingToken": "No se puede crear un grupo que comparta un nombre con un token existente",
   "valueMustIncludePxOrRem": "El valor debe incluir px o rem",
   "tokenNamesCantStartWithDollar": "No puedo comenzar con un signo de dólar ($)",
-  "tokenNamesCantContainCurlyBraces": "No puede contener llaves '{}'"
+  "tokenNamesCantContainCurlyBraces": "No puede contener llaves '{}'",
+  "tokenNamesCantContainEmptyGroups": "Los nombres de los tokens no pueden contener grupos vacíos"
 }
