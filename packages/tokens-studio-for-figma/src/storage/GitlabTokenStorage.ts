@@ -238,8 +238,8 @@ export class GitlabTokenStorage extends GitTokenStorage {
       };
     } catch (err) {
       console.error(err);
-      return [];
     }
+    return [];
   }
 
   public async writeChangeset(changeset: Record<string, string>, message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
@@ -247,7 +247,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
     const branches = await this.fetchBranches();
     const rootPath = this.path.endsWith('.json') ? this.path.split('/').slice(0, -1).join('/') : this.path;
-    const gitkeepPath = `${this.path}/.gitkeep`;
+    const pathToCreate = this.path.endsWith('.json') ? this.path : `${this.path}/.gitkeep`;
 
     if (shouldCreateBranch && !branches.includes(branch)) {
       const sourceBranch = this.previousSourceBranch || this.source;
@@ -256,11 +256,11 @@ export class GitlabTokenStorage extends GitTokenStorage {
 
     // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
     try {
-      await this.gitlabClient.RepositoryFiles.show(this.projectId, gitkeepPath, branch);
+      await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
     } catch {
       await this.gitlabClient.RepositoryFiles.create(
         this.projectId,
-        gitkeepPath,
+        pathToCreate,
         branch,
         '{}',
         message,
@@ -292,7 +292,9 @@ export class GitlabTokenStorage extends GitTokenStorage {
       throw new Error(e);
     }
 
-    await this.cleanupGitkeepFiles(rootPath, branch, message);
+    if (!this.path.endsWith('.json')) {
+      await this.cleanupGitkeepFiles(rootPath, branch, message);
+    }
     return true;
   }
 
