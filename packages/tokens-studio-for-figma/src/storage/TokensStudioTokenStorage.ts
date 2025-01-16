@@ -24,6 +24,8 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
+const DEFAULT_BRANCH = 'main';
+
 const makeClient = (secret: string) =>
   create({
     host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
@@ -51,7 +53,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
       variables: {
         projectId: id,
         organization: orgId,
-        name: 'master',
+        name: DEFAULT_BRANCH,
       },
     });
 
@@ -318,7 +320,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       const responseData = await this.client.mutate({
         mutation: DELETE_TOKEN_SET_MUTATION,
         variables: {
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           path: data.name,
           project: this.id,
           organization: this.orgId,
@@ -375,7 +377,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           },
           project: this.id,
           organization: this.orgId,
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
         },
       });
 
@@ -427,7 +429,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
         variables: {
-          branch: 'master',
+          branch: 'main',
           themeGroupName: data.name,
           project: this.id,
           organization: this.orgId,
