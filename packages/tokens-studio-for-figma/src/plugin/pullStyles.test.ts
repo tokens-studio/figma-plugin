@@ -40,7 +40,7 @@ describe('pullStyles', () => {
         name: 'heading/h1/bold',
         id: '456',
         description: 'the big one',
-        fontSize: 24,
+        fontSize: 24.8,
         fontName: {
           family: 'Inter',
           style: 'Bold',
@@ -164,7 +164,7 @@ describe('pullStyles', () => {
       ],
       fontSizes: [
         { name: 'fontSize.0', type: 'fontSizes', value: '16' },
-        { name: 'fontSize.1', type: 'fontSizes', value: '24' },
+        { name: 'fontSize.1', type: 'fontSizes', value: '24.8' },
       ],
       letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' }],
       paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },

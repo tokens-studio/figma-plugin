@@ -8,5 +8,6 @@
   "cantCreateGroupThatSharesNameWithExistingToken": "Impossible de créer un groupe partageant un nom avec un jeton existant",
   "valueMustIncludePxOrRem": "La valeur doit inclure px ou rem",
   "tokenNamesCantStartWithDollar": "Je ne peux pas commencer par un signe dollar ($)",
-  "tokenNamesCantContainCurlyBraces": "Ne peut pas contenir d'accolades '{}'"
+  "tokenNamesCantContainCurlyBraces": "Ne peut pas contenir d'accolades '{}'",
+  "tokenNamesCantContainEmptyGroups": "Les noms de jetons ne peuvent pas contenir de groupes vides"
 }
