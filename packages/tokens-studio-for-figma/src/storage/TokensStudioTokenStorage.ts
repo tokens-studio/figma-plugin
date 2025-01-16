@@ -429,7 +429,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
         variables: {
-          branch: 'main',
+          branch: DEFAULT_BRANCH,
           themeGroupName: data.name,
           project: this.id,
           organization: this.orgId,
