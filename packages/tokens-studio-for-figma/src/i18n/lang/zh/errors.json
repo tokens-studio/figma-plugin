@@ -8,5 +8,6 @@
   "cantCreateGroupThatSharesNameWithExistingToken": "无法创建与现有令Token享名称的组",
   "valueMustIncludePxOrRem": "值必须包含 px 或 rem",
   "tokenNamesCantStartWithDollar": "不能以美元 ($) 符号开头",
-  "tokenNamesCantContainCurlyBraces": "不能包含大括号“{}”"
+  "tokenNamesCantContainCurlyBraces": "不能包含大括号“{}”",
+  "tokenNamesCantContainEmptyGroups": "令牌名称不能包含空组"
 }

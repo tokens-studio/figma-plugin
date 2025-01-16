@@ -8,5 +8,6 @@
   "cantCreateGroupThatSharesNameWithExistingToken": "Kan geen groep maken die een naam deelt met een bestaand token",
   "valueMustIncludePxOrRem": "De waarde moet px of rem bevatten",
   "tokenNamesCantStartWithDollar": "Kan niet beginnen met een dollarteken ($).",
-  "tokenNamesCantContainCurlyBraces": "Mag geen accolades '{}' bevatten"
+  "tokenNamesCantContainCurlyBraces": "Mag geen accolades '{}' bevatten",
+  "tokenNamesCantContainEmptyGroups": "Tokennamen mogen geen lege groepen bevatten"
 }
