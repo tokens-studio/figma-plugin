@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 2.3.1
+
+### Patch Changes
+
+- daba40ff: Fix issue of lingering gitkeep files in non-empty gitlab directories
+- 7ba9f467: Fix Tokens Studio sync missing theme metadata
+- b08d2fde: Fix application of paragraph Indent property via typography tokens
+- 35a0281d: Fix import of decimal values when importing styles and variables
+- 62dced00: Fixes an issue in Gitlab sync where the Initial commit message caused an error due to non-conformance with the user's comapany's commit message rules.
+- c83b514e: Fix ability to add a token with empty or nested empty token groups
+
 ## 2.3.0
 
 ### Minor Changes
