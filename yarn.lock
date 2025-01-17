@@ -3415,19 +3415,7 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
-"@radix-ui/react-dismissable-layer@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.4.tgz#883a48f5f938fa679427aa17fcba70c5494c6978"
-  integrity sha512-7UpBa/RKMoHJYjie1gkF1DlK8l1fdU/VKDpoS3rCCo8YBJR294GwcEHyxHw72yvphJ7ld0AXEcSLAzY2F/WyCg==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    "@radix-ui/primitive" "1.0.1"
-    "@radix-ui/react-compose-refs" "1.0.1"
-    "@radix-ui/react-primitive" "1.0.3"
-    "@radix-ui/react-use-callback-ref" "1.0.1"
-    "@radix-ui/react-use-escape-keydown" "1.0.3"
-
-"@radix-ui/react-dismissable-layer@1.0.5":
+"@radix-ui/react-dismissable-layer@1.0.4", "@radix-ui/react-dismissable-layer@1.0.5":
   version "1.0.5"
   resolved "https://registry.npmjs.org/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.5.tgz"
   integrity sha512-aJeDjQhywg9LBu2t/At58hCvr7pEm0o2Ke1x33B+MhjNmmZ17sy4KImo0KPLgsnc/zN7GPdce8Cnn0SWvwZO7g==
@@ -5564,13 +5552,13 @@
     semver-compare "^1.0.0"
     token-transformer "^0.0.33"
 
-"@tokens-studio/sdk@^2.0.0-alpha.0":
-  version "2.0.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-2.0.0-alpha.0.tgz#89c1be0f7b202a1300b13be32560a7bba4dabbb2"
-  integrity sha512-yFehaanRscRNxY1JuoXHBVLKgIAJIJd/J2b0S/6goLzOaflu4R2HwgM2OEeI1k+ouBjOVDO6pdF5laqJyFluzA==
+"@tokens-studio/sdk@^1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/sdk/-/sdk-1.4.2.tgz#f246ba9d09e07468d6591b81d21b82e6163f65ce"
+  integrity sha512-wyWtpaXAxofGWExujZKOgZThUGV8oz1WSbonToNqdWKIKc5mYkDmFUIyT0mqWPx09JSwCOMNK3d87Y33hqq2Cw==
   dependencies:
     "@apollo/client" "^3.11.4"
-    "@tokens-studio/types" "^0.3.0"
+    "@tokens-studio/types" "^0.5.2"
     commander "^12.1.0"
     graphql-tag "^2.12.6"
     graphql-ws "^5.16.0"
@@ -5593,10 +5581,10 @@
   resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.2.5.tgz#fbddad1d0040f1316ee74dbd42a389f2f3d2fcbc"
   integrity sha512-pJ0zWxGnEjca4dznFIHC9/oXuovu3DKHUhLDNJVzTRZEVXhWkIRIUbjDwIRihxBr39c776W+3thYvWMgChT0Rw==
 
-"@tokens-studio/types@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.3.0.tgz#ac0579df362b6b9e47c8893e3ca110d3831f7f26"
-  integrity sha512-MgGe1HFH2R/advBxpETgB1VGnCmh3j08igsPmc/1xvm/m2A5fYPmnzqjX6SFlHiajIJ5DEwYbHDzUAO4POn0tw==
+"@tokens-studio/types@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@tokens-studio/types/-/types-0.5.2.tgz#cac9bce7a27dda7254664d7acab7b088e2aefe33"
+  integrity sha512-rzMcZP0bj2E5jaa7Fj0LGgYHysoCrbrxILVbT0ohsCUH5uCHY/u6J7Qw/TE0n6gR9Js/c9ZO9T8mOoz0HdLMbA==
 
 "@tokens-studio/ui@0.9.0":
   version "0.9.0"
@@ -18573,7 +18561,7 @@ react-window@^1.8.8:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
 
-react@^18.2.0:
+react@^18, react@^18.2.0:
   version "18.3.1"
   resolved "https://registry.yarnpkg.com/react/-/react-18.3.1.tgz#49ab892009c53933625bd16b2533fc754cab2891"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==

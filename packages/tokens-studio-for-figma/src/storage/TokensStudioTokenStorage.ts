@@ -1,6 +1,4 @@
-import {
-  ThemeGroup, TokenSetType, TokensSet, create,
-} from '@tokens-studio/sdk';
+import { ThemeGroup, TokenSetType, TokensSet, create } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -26,11 +24,14 @@ import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
-const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
-  auth: `Bearer ${secret}`,
-});
+const DEFAULT_BRANCH = 'main';
+
+const makeClient = (secret: string) =>
+  create({
+    host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+    secure: process.env.NODE_ENV !== 'development',
+    auth: `Bearer ${secret}`,
+  });
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -52,7 +53,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
       variables: {
         projectId: id,
         organization: orgId,
-        name: 'master',
+        name: DEFAULT_BRANCH,
       },
     });
 
@@ -106,6 +107,8 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
               selectedTokenSets,
               $figmaStyleReferences: theme?.figmaStyleReferences,
               $figmaVariableReferences: theme?.figmaVariableReferences,
+              $figmaCollectionId: theme?.figmaCollectionId ?? undefined,
+              $figmaModeId: theme?.figmaModeId ?? undefined,
             };
           });
 
@@ -317,7 +320,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       const responseData = await this.client.mutate({
         mutation: DELETE_TOKEN_SET_MUTATION,
         variables: {
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           path: data.name,
           project: this.id,
           organization: this.orgId,
@@ -374,7 +377,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           },
           project: this.id,
           organization: this.orgId,
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
         },
       });
 
@@ -426,7 +429,7 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
       const responseData = await this.client.mutate({
         mutation: DELETE_THEME_GROUP_MUTATION,
         variables: {
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           themeGroupName: data.name,
           project: this.id,
           organization: this.orgId,

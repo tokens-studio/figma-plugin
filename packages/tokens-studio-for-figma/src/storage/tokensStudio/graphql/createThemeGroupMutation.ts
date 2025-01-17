@@ -9,6 +9,8 @@ export const CREATE_THEME_GROUP_MUTATION = gql`
         figmaStyleReferences
         figmaVariableReferences
         selectedTokenSets
+        figmaCollectionId
+        figmaModeId
       }
     }
   }

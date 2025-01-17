@@ -6,11 +6,19 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { models } from '../../index';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
-  CREATE_THEME_GROUP_MUTATION, CREATE_TOKEN_SET_MUTATION, DELETE_THEME_GROUP_MUTATION, DELETE_TOKEN_SET_MUTATION, UPDATE_THEME_GROUP_MUTATION, UPDATE_TOKEN_SET_MUTATION, UPDATE_TOKEN_SET_ORDER_MUTATION,
+  CREATE_THEME_GROUP_MUTATION,
+  CREATE_TOKEN_SET_MUTATION,
+  DELETE_THEME_GROUP_MUTATION,
+  DELETE_TOKEN_SET_MUTATION,
+  UPDATE_THEME_GROUP_MUTATION,
+  UPDATE_TOKEN_SET_MUTATION,
+  UPDATE_TOKEN_SET_ORDER_MUTATION,
 } from '@/storage/tokensStudio/graphql';
 import { DeleteTokenPayload, UpdateTokenPayload } from '@/types/payloads';
 import * as notifiers from '@/plugin/notifiers';
 import { middlewares } from '@/app/store/middlewares';
+
+const DEFAULT_BRANCH = 'main';
 
 type Store = RematchStore<RootModel, Record<string, never>>;
 
@@ -149,7 +157,9 @@ const initialRawTokensDTCG = {
 };
 
 function delay(ms = 0) {
-  return new Promise((resolve) => { setTimeout(resolve, ms); });
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 const mockQuery = jest.fn();
@@ -247,12 +257,14 @@ describe('Tokens Studio sync', () => {
       parent: 'global',
       name: 'newBoxShadow',
       description: 'newBoxShadow description',
-      value: [{
-        color: '#e63d3d',
-        type: 'innerShadow',
-        x: '2px',
-        y: '2px',
-      }],
+      value: [
+        {
+          color: '#e63d3d',
+          type: 'innerShadow',
+          x: '2px',
+          y: '2px',
+        },
+      ],
       type: TokenTypes.BOX_SHADOW,
     },
     {
@@ -447,7 +459,7 @@ describe('Tokens Studio sync', () => {
         project: 'projectId',
         organization: 'orgId',
         path: 'global',
-        branch: 'master',
+        branch: DEFAULT_BRANCH,
       },
     });
 
@@ -521,15 +533,17 @@ describe('Tokens Studio sync', () => {
         variables: {
           project: 'projectId',
           organization: 'orgId',
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           input: {
             name: themeData.group,
-            options: [{
-              name: themeData.name,
-              selectedTokenSets: themeData.selectedTokenSets,
-              figmaStyleReferences: {},
-              figmaVariableReferences: undefined,
-            }],
+            options: [
+              {
+                name: themeData.name,
+                selectedTokenSets: themeData.selectedTokenSets,
+                figmaStyleReferences: {},
+                figmaVariableReferences: undefined,
+              },
+            ],
           },
         },
       });
@@ -619,12 +633,14 @@ describe('Tokens Studio sync', () => {
           organization: 'orgId',
           input: {
             name: updatedThemeData.group,
-            options: [{
-              name: updatedThemeData.name,
-              selectedTokenSets: updatedThemeData.selectedTokenSets,
-              figmaStyleReferences: {},
-              figmaVariableReferences: undefined,
-            }],
+            options: [
+              {
+                name: updatedThemeData.name,
+                selectedTokenSets: updatedThemeData.selectedTokenSets,
+                figmaStyleReferences: {},
+                figmaVariableReferences: undefined,
+              },
+            ],
           },
         },
       });
@@ -657,14 +673,16 @@ describe('Tokens Studio sync', () => {
         variables: {
           project: 'projectId',
           organization: 'orgId',
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           input: {
             name: updatedThemeData.group,
-            options: [{
-              name: updatedThemeData.name,
-              selectedTokenSets: updatedThemeData.selectedTokenSets,
-              figmaStyleReferences: {},
-            }],
+            options: [
+              {
+                name: updatedThemeData.name,
+                selectedTokenSets: updatedThemeData.selectedTokenSets,
+                figmaStyleReferences: {},
+              },
+            ],
           },
         },
       });
@@ -676,7 +694,7 @@ describe('Tokens Studio sync', () => {
         variables: {
           project: 'projectId',
           organization: 'orgId',
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           themeGroupName: existingTheme.group,
         },
       });
@@ -698,7 +716,7 @@ describe('Tokens Studio sync', () => {
         variables: {
           project: 'projectId',
           organization: 'orgId',
-          branch: 'master',
+          branch: DEFAULT_BRANCH,
           themeGroupName: existingTheme.group,
         },
       });
@@ -722,14 +740,17 @@ describe('Tokens Studio sync', () => {
             ...storeInitialState.redux.initialState,
             tokenState: {
               ...storeInitialState.redux.initialState.tokenState,
-              themes: [existingTheme, {
-                id: 'themeId2',
-                name: 'themeName2',
-                group: 'themeGroup',
-                selectedTokenSets: { options: TokenSetStatus.ENABLED },
-                figmaVariableReferences: undefined,
-                figmaStyleReferences: undefined,
-              }],
+              themes: [
+                existingTheme,
+                {
+                  id: 'themeId2',
+                  name: 'themeName2',
+                  group: 'themeGroup',
+                  selectedTokenSets: { options: TokenSetStatus.ENABLED },
+                  figmaVariableReferences: undefined,
+                  figmaStyleReferences: undefined,
+                },
+              ],
             },
           },
         },

@@ -26,6 +26,8 @@ export const GET_PROJECT_DATA_QUERY = gql`
               figmaStyleReferences
               figmaVariableReferences
               selectedTokenSets
+              figmaCollectionId
+              figmaModeId
             }
           }
         }
