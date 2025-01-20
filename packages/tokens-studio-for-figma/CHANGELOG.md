@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.3.2
+
+### Patch Changes
+
+- e15ba659: Raise limit for token sets to 100 when syncing with Tokens Studio provider
+
 ## 2.3.1
 
 ### Patch Changes
