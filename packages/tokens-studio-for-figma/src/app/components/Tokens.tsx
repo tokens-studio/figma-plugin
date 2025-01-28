@@ -30,6 +30,8 @@ import SidebarIcon from '@/icons/sidebar.svg';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { tokenFormatSelector } from '@/selectors/tokenFormatSelector';
 import { IconJson } from '@/icons';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const StatusToast = ({ open, error }: { open: boolean; error: string | null }) => {
   const [isOpen, setOpen] = React.useState(open);
@@ -109,6 +111,29 @@ function Tokens({ isActive }: { isActive: boolean }) {
       tokenDiv.current.scrollTo(0, scrollPositionSet[activeTokenSet]);
     }
   }, [activeTokenSet]);
+
+  React.useEffect(() => {
+    async function syncTokens() {
+      try {
+        const response = await AsyncMessageChannel.ReactInstance.message({
+          type: AsyncMessageTypes.SYNC_SHARED_TOKENS,
+        });
+        console.log('response', response);
+        if (response.sharedTokens) {
+          console.log('response.sharedTokens', response.sharedTokens);
+          // dispatch.tokenState.setTokenData({ values: response.sharedTokens });
+        }
+      } catch (error) {
+        console.error('Error syncing shared tokens:', error);
+      }
+    }
+
+    // Trigger an initial sync when the component mounts
+    syncTokens();
+
+    const interval = setInterval(syncTokens, 10000); // Sync every 10 seconds
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   const resolvedTokens = React.useMemo(
     () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
