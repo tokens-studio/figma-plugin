@@ -4,6 +4,7 @@ import { notifyVariableValues } from './notifiers';
 import { PullVariablesOptions } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 export default async function pullVariables(options: PullVariablesOptions): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -21,8 +22,9 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
     });
   }
 
-  // eslint-disable-next-line consistent-return
-  figma.variables.getLocalVariables().forEach((variable) => {
+  const localVariables = await getVariablesWithoutZombies();
+
+  localVariables.forEach((variable) => {
     const variableName = variable.name.replace(/\//g, '.');
     try {
       const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
@@ -124,9 +126,9 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
             }
           });
           break;
-        default: return null;
+        default:
+          break;
       }
-      return null;
     } catch (error) {
       console.error('Error while processing variable:', variableName, error);
     }
