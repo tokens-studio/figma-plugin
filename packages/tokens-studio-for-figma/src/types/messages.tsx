@@ -7,6 +7,7 @@ import type { StorageTypeCredentials } from './StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from './payloads';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { AnyTokenList } from './tokens';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -24,6 +25,7 @@ export enum MessageFromPluginTypes {
   SET_TOKENS = 'set_tokens',
   NOTIFY_EXCEPTION = 'notify_exception',
   TRACK_FROM_PLUGIN = 'track_from_plugin',
+  SYNC_TOKENS = 'sync_tokens',
 }
 
 export type NoSelectionFromPluginMessage = { type: MessageFromPluginTypes.NO_SELECTION };
@@ -128,6 +130,11 @@ export type TrackFromPluginMessage = {
   opts?: Record<string, unknown>;
 };
 
+export type SyncTokensFromPluginMessage = {
+  type: MessageFromPluginTypes.SYNC_TOKENS;
+  tokens?: AnyTokenList;
+};
+
 export type PostToUIMessage =
   | NoSelectionFromPluginMessage
   | SelectionFromPluginMessage
@@ -143,4 +150,5 @@ export type PostToUIMessage =
   | CompleteJobTasksFromPluginMessage
   | SetTokensFromPluginMessage
   | NotifyExceptionFromPluginMessage
-  | TrackFromPluginMessage;
+  | TrackFromPluginMessage
+  | SyncTokensFromPluginMessage;
