@@ -119,9 +119,11 @@ function Tokens({ isActive }: { isActive: boolean }) {
           type: AsyncMessageTypes.SYNC_SHARED_TOKENS,
         });
         console.log('response', response);
-        if (response.sharedTokens) {
+        if (response.sharedTokens && JSON.stringify(response.sharedTokens) !== JSON.stringify(tokens)) {
           console.log('response.sharedTokens', response.sharedTokens);
-          // dispatch.tokenState.setTokenData({ values: response.sharedTokens });
+          dispatch.tokenState.setTokenData({
+            values: response.sharedTokens,
+          });
         }
       } catch (error) {
         console.error('Error syncing shared tokens:', error);
