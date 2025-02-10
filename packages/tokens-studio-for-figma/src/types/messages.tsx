@@ -132,7 +132,7 @@ export type TrackFromPluginMessage = {
 
 export type SyncTokensFromPluginMessage = {
   type: MessageFromPluginTypes.SYNC_TOKENS;
-  tokens?: AnyTokenList;
+  tokens?: Record<string, AnyTokenList>;
 };
 
 export type PostToUIMessage =
