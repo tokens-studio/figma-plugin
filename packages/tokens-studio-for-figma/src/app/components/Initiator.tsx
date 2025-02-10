@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
-import { Dispatch } from '../store';
+import { Dispatch, store } from '../store';
 import useStorage from '../store/useStorage';
 import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
 import { convertToOrderObj } from '@/utils/convertToOrderObj';
@@ -157,6 +157,15 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.SYNC_TOKENS: {
+            const currentTokens = store.getState().tokenState.tokens;
+            if (JSON.stringify(currentTokens) !== JSON.stringify(pluginMessage.tokens)) {
+              if (pluginMessage.tokens) {
+                dispatch.tokenState.setTokenData({ values: pluginMessage.tokens });
+              }
+            }
             break;
           }
           default:

@@ -110,21 +110,6 @@ function Tokens({ isActive }: { isActive: boolean }) {
     }
   }, [activeTokenSet]);
 
-  React.useEffect(() => {
-    function handleTokenSync(event: MessageEvent) {
-      if (event.data.pluginMessage?.type === 'sync_tokens') {
-        console.log('Received token update:', event.data.pluginMessage.tokens);
-        dispatch.tokenState.setTokenData({ values: event.data.pluginMessage.tokens });
-      }
-    }
-
-    window.addEventListener('message', handleTokenSync);
-
-    return () => {
-      window.removeEventListener('message', handleTokenSync);
-    };
-  });
-
   const resolvedTokens = React.useMemo(
     () => defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet, {}, activeTokenSet)),
     [tokens, usedTokenSet, activeTokenSet],
