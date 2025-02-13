@@ -133,7 +133,9 @@ const StorageItem = ({ item, onEdit }: Props) => {
       <Box css={{ marginRight: '$1' }}>
         {isActive() ? (
           <Stack gap={2} align="center">
-            <TokenFormatBadge extended />
+            {storageType.provider !== StorageProviderType.TOKENS_STUDIO && (
+              <TokenFormatBadge extended />
+            )}
             <Badge>{t('active')}</Badge>
           </Stack>
         ) : (
