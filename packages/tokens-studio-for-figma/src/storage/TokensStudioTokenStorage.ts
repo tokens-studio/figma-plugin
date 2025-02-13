@@ -66,7 +66,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
 
     // TODO: This is a temporary solution until we implement pagination
     if (totalPages > 1) {
-      notifyToUI('We are currently supporting up to 100 sets, if you encounter this issue and need even more sets please reach out to us on slack or featurebase.', { error: true });
+      notifyToUI('We are currently supporting up to 1000 sets, if you encounter this issue and need even more sets please reach out to us on slack or featurebase.', { error: true });
     }
 
     const returnData = tokenSets.reduce(

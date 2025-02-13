@@ -4,7 +4,7 @@ export const GET_PROJECT_DATA_QUERY = gql`
   query Branch($projectId: String!, $organization: String!, $name: String) {
     project(id: $projectId, organization: $organization) {
       branch(name: $name) {
-        tokenSets(limit: 100) {
+        tokenSets(limit: 1000) {
           data {
             name
             orderIndex
