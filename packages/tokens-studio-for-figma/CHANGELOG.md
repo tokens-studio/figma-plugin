@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.3.3
+
+### Patch Changes
+
+- 10a77c18: Increase Tokens Studio tokens set sync limit to 1000
+- b87340e5: Fixes an issue where a user is unable to apply a linear gradient fill via a composition token.
+
 ## 2.3.2
 
 ### Patch Changes
