@@ -8,6 +8,7 @@ import { StyleToCreateToken, VariableToCreateToken } from './payloads';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
 import { AnyTokenList } from './tokens';
+import type { ThemeObjectsList } from './ThemeObjectsList';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -133,6 +134,10 @@ export type TrackFromPluginMessage = {
 export type SyncTokensFromPluginMessage = {
   type: MessageFromPluginTypes.SYNC_TOKENS;
   tokens?: Record<string, AnyTokenList>;
+  values?: Record<string, AnyTokenList>;
+  activeTheme?: string | Record<string, string>
+  themes?: ThemeObjectsList;
+  tokenFormat?: string;
 };
 
 export type PostToUIMessage =
