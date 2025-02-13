@@ -24,7 +24,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
-import { getFormat, TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -149,6 +149,7 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           remoteData = await pullTokensFromTokensStudio(context);
+          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
           break;
         }
         default:
@@ -324,6 +325,7 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           content = await syncTokensWithTokensStudio(context);
+          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
           break;
         }
         default:
