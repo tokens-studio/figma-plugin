@@ -22,6 +22,7 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
       checkForChanges: msg.checkForChanges ?? false,
       collapsedTokenSets: msg.collapsedTokenSets,
       tokenFormat: msg.tokenFormat || TokenFormatOptions.Legacy,
+      lastModifiedBy: figma.currentUser?.id ?? '',
     });
   }
   if (msg.tokens) {

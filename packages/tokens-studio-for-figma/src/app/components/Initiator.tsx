@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { MessageFromPluginTypes, PostToUIMessage } from '@/types/messages';
 import useRemoteTokens from '../store/remoteTokens';
-import { Dispatch } from '../store';
+import { Dispatch, store } from '../store';
 import useStorage from '../store/useStorage';
 import { sortSelectionValueByProperties } from '@/utils/sortSelectionValueByProperties';
 import { convertToOrderObj } from '@/utils/convertToOrderObj';
@@ -13,6 +13,8 @@ import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
+import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
@@ -157,6 +159,27 @@ export function Initiator() {
               count: pluginMessage.count,
               timePerTask: pluginMessage.timePerTask,
             });
+            break;
+          }
+          case MessageFromPluginTypes.SYNC_TOKENS: {
+            const currentState = store.getState();
+            console.log('currentState.tokenState', currentState.tokenState);
+            console.log('pluginMessage', pluginMessage);
+            const hasStateChanged = JSON.stringify(currentState.tokenState.tokens?.values) !== JSON.stringify(pluginMessage.values)
+              || String(currentState.tokenState.activeTheme) !== String(pluginMessage.activeTheme)
+              || JSON.stringify(currentState.tokenState.themes) !== JSON.stringify(pluginMessage.themes)
+              || currentState.tokenState.tokenFormat !== pluginMessage.tokenFormat;
+
+            if (hasStateChanged) {
+              dispatch.tokenState.setTokenData({ values: pluginMessage.values ?? { global: [] } });
+              dispatch.tokenState.setActiveTheme({
+                newActiveTheme: typeof pluginMessage.activeTheme === 'string'
+                  ? { [INTERNAL_THEMES_NO_GROUP]: pluginMessage.activeTheme }
+                  : pluginMessage.activeTheme ?? {},
+              });
+              dispatch.tokenState.setThemes(pluginMessage.themes ?? []);
+              dispatch.tokenState.setTokenFormat((pluginMessage.tokenFormat as TokenFormatOptions) ?? 'json');
+            }
             break;
           }
           default:

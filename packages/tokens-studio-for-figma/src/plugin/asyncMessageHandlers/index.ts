@@ -40,3 +40,4 @@ export * from './updateVariables';
 export * from './setInitialLoad';
 export * from './preview';
 export * from './removeStylesWithoutConnection';
+export * from './syncSharedTokens';

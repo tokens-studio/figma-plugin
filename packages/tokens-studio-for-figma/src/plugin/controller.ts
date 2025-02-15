@@ -65,6 +65,7 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, async
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, asyncHandlers.createLocalVariablesWithoutModes);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SYNC_SHARED_TOKENS, asyncHandlers.syncSharedTokens);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
   asyncHandlers.attachLocalVariablesToTheme,

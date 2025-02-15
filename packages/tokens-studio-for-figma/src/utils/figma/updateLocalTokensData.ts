@@ -8,6 +8,7 @@ import {
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { LastModifiedByProperty } from '@/figmaStorage/LastModifiedBy';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -18,6 +19,7 @@ type Payload = {
   checkForChanges: boolean
   collapsedTokenSets: string[]
   tokenFormat: TokenFormatOptions
+  lastModifiedBy: string
 };
 
 export async function updateLocalTokensData(payload: Payload) {
@@ -30,4 +32,6 @@ export async function updateLocalTokensData(payload: Payload) {
   await CheckForChangesProperty.write(payload.checkForChanges);
   await CollapsedTokenSetsProperty.write(payload.collapsedTokenSets);
   await TokenFormatProperty.write(payload.tokenFormat);
+  // console.log('payload.lastModifiedBy in updateLocalTokensData', payload.lastModifiedBy);
+  await LastModifiedByProperty.write(payload.lastModifiedBy);
 }
