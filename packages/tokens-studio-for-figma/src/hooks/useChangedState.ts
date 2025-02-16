@@ -43,12 +43,15 @@ export function useChangedState() {
   }, [remoteData, tokens, themes, storageType]);
 
   const hasChanges = useMemo(() => {
+    if (storageType.provider === StorageProviderType.LOCAL) {
+      return false;
+    }
     const hasChanged = !compareLastSyncedState(tokens, themes, lastSyncedState, tokenFormat);
 
     dispatch.tokenState.updateCheckForChanges(hasChanged);
 
     return hasChanged;
-  }, [tokens, themes, lastSyncedState, tokenFormat, dispatch.tokenState]);
+  }, [storageType.provider, tokens, themes, lastSyncedState, tokenFormat, dispatch.tokenState]);
 
   return { changedPushState, changedPullState, hasChanges };
 }

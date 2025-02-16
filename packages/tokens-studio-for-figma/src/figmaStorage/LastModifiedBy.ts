@@ -1,6 +1,6 @@
 import { FigmaStorageProperty, FigmaStorageType } from './FigmaStorageProperty';
 
 export const LastModifiedByProperty = new FigmaStorageProperty<string>(
-  FigmaStorageType.CLIENT_STORAGE,
+  FigmaStorageType.SHARED_PLUGIN_DATA,
   'lastModifiedBy',
 );

@@ -176,6 +176,7 @@ export function Initiator() {
                 newActiveTheme: typeof pluginMessage.activeTheme === 'string'
                   ? { [INTERNAL_THEMES_NO_GROUP]: pluginMessage.activeTheme }
                   : pluginMessage.activeTheme ?? {},
+                shouldUpdateDocument: !pluginMessage.isExternalChange, // if the change is external, we don't want to update the document as it would trigger a loop
               });
               dispatch.tokenState.setThemes(pluginMessage.themes ?? []);
               dispatch.tokenState.setTokenFormat((pluginMessage.tokenFormat as TokenFormatOptions) ?? 'json');
