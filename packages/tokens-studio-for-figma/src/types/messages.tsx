@@ -138,6 +138,7 @@ export type SyncTokensFromPluginMessage = {
   activeTheme?: string | Record<string, string>
   themes?: ThemeObjectsList;
   tokenFormat?: string;
+  isExternalChange?: boolean;
 };
 
 export type PostToUIMessage =
