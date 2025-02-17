@@ -275,10 +275,28 @@ export class GitlabTokenStorage extends GitTokenStorage {
       console.error('Error checking directory:', e);
     }
 
-    const gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
       const action = tree.some((file) => file.path === filePath) ? 'update' : 'create';
       return { action, filePath, content };
     });
+
+    // Add delete actions for files that no longer exist in changeset
+    const jsonFiles = tree
+      .filter((file) => file.path.endsWith('.json'))
+      .map((file) => file.path);
+
+    const filesToDelete = jsonFiles.filter(
+      (jsonFile) => !Object.keys(changeset).some((item) => item === jsonFile),
+    );
+
+    if (filesToDelete.length > 0) {
+      gitlabActions = gitlabActions.concat(
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+      );
+    }
 
     try {
       await this.gitlabClient.Commits.create(
