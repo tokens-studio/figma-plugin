@@ -540,27 +540,27 @@
     },
     "fontSizes": {
       "h1": {
-        "$value": "{fontSizes.h2} * 1.25",
+        "$value": "roundTo({fontSizes.body}*1.25^5)",
         "$type": "fontSizes"
       },
       "h2": {
-        "$value": "{fontSizes.h3} * 1.25",
+        "$value": "roundTo({fontSizes.body}*1.25^4)",
         "$type": "fontSizes"
       },
       "h3": {
-        "$value": "{fontSizes.h4} * 1.25",
+        "$value": "roundTo({fontSizes.body}*1.25^3)",
         "$type": "fontSizes"
       },
       "h4": {
-        "$value": "{fontSizes.h5} * 1.25",
+        "$value": "roundTo({fontSizes.body}*1.25^2)",
         "$type": "fontSizes"
       },
       "h5": {
-        "$value": "{fontSizes.h6} * 1.25",
+        "$value": "roundTo({fontSizes.body}*1.25^1)",
         "$type": "fontSizes"
       },
       "h6": {
-        "$value": "{fontSizes.body} * 1",
+        "$value": "{fontSizes.body}",
         "$type": "fontSizes"
       },
       "body": {
