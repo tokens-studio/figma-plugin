@@ -125,7 +125,7 @@ describe('pullStyles', () => {
   };
 
   it('pulls variables without no dimension options', async () => {
-    await pullVariables({ useDimensions: false, useRem: false });
+    await pullVariables({ useDimensions: false, useRem: false }, [], false);
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
@@ -246,11 +246,11 @@ describe('pullStyles', () => {
       }, {
         name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
-    });
+    }, []);
   });
 
   it('pulls variables with Convert numbers to dimensions option', async () => {
-    await pullVariables({ useDimensions: 'true', useRem: false });
+    await pullVariables({ useDimensions: 'true', useRem: false }, [], false);
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
@@ -371,11 +371,11 @@ describe('pullStyles', () => {
       }, {
         name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
-    });
+    }, []);
   });
 
   it('pulls variables with Use rem for dimension values option', async () => {
-    await pullVariables({ useDimensions: false, useRem: 'true' });
+    await pullVariables({ useDimensions: false, useRem: true }, [], false);
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
@@ -496,11 +496,11 @@ describe('pullStyles', () => {
       }, {
         name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
-    });
+    }, []);
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
-    await pullVariables({ useDimensions: true, useRem: true });
+    await pullVariables({ useDimensions: true, useRem: true }, [], false);
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
       colors: [
@@ -621,6 +621,27 @@ describe('pullStyles', () => {
       }, {
         name: 'String', parent: 'Collection 1/Custom', type: 'text', value: 'Hello',
       }],
-    });
+    }, []);
+  });
+
+  it('creates theme options for pro users', async () => {
+    await pullVariables({ useDimensions: false, useRem: false }, [], true);
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(String),
+          name: 'Default',
+          group: 'Collection 1',
+          selectedTokenSets: {
+            'Collection 1/Default': 'enabled',
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: '1:0',
+          $figmaCollectionId: 'VariableID:1:0',
+        }),
+      ]),
+    );
   });
 });
