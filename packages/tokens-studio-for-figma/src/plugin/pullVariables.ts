@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues } from './notifiers';
-import { PullVariablesOptions } from '@/types';
+import { PullVariablesOptions, ThemeObjectsList } from '@/types';
 import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { TokenSetStatus } from '@/constants/TokenSetStatus';
 
-export default async function pullVariables(options: PullVariablesOptions): Promise<void> {
+export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
   const colors: VariableToCreateToken[] = [];
   const booleans: VariableToCreateToken[] = [];
@@ -29,10 +30,23 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
 
   const localVariables = await getVariablesWithoutZombies();
 
-  localVariables.forEach((variable) => {
+  const collections = new Map<string, {
+    id: string,
+    name: string,
+    modes: { name: string, modeId: string }[]
+  }>();
+
+  localVariables.forEach(async (variable) => {
+    const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+    if (collection) {
+      collections.set(collection.name, {
+        id: collection.id,
+        name: collection.name,
+        modes: collection.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+      });
+    }
     const variableName = variable.name.replace(/\//g, '.');
     try {
-      const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
       switch (variable.resolvedType) {
         case 'COLOR':
           Object.entries(variable.valuesByMode).forEach(([mode, value]) => {
@@ -151,12 +165,35 @@ export default async function pullVariables(options: PullVariablesOptions): Prom
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
-  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
-    if (value.length > 0) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+  // Process themes if pro user
+  const updatedThemes = [...themes];
+  if (proUser) {
+    collections.forEach((collection) => {
+      collection.modes.forEach((mode) => {
+        updatedThemes.push({
+          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+          name: mode.name,
+          group: collection.name, // Collection name becomes the group
+          selectedTokenSets: {
+            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+          },
+          $figmaStyleReferences: {},
+          $figmaModeId: mode.modeId,
+          $figmaCollectionId: collection.id,
+        });
+      });
+    });
+  }
 
-  notifyVariableValues(returnedObject);
+  const returnedObject = {
+    tokens: Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+      if (value.length > 0) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {}),
+    themes: proUser ? updatedThemes : themes,
+  };
+
+  notifyVariableValues(returnedObject.tokens, returnedObject.themes);
 }
