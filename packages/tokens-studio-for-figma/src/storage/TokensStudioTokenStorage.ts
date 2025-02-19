@@ -76,7 +76,6 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
         const rawTokens = typeof tokenSet.raw === 'string'
           ? JSON.parse(tokenSet.raw)
           : tokenSet.raw;
-        // Creating new object to ensure it's extensible
         acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(rawTokens));
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
         return acc;
