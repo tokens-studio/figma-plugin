@@ -9,13 +9,7 @@ export const GET_PROJECT_DATA_QUERY = gql`
             name
             orderIndex
             type
-            tokens {
-              name
-              type
-              description
-              extensions
-              value
-            }
+            raw
           }
           totalPages
         }
