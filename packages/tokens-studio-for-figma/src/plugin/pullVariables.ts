@@ -36,7 +36,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     modes: { name: string, modeId: string }[]
   }>();
 
-  localVariables.forEach(async (variable) => {
+  for (const variable of localVariables) {
     const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
     if (collection) {
       collections.set(collection.name, {
@@ -153,7 +153,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     } catch (error) {
       console.error('Error while processing variable:', variableName, error);
     }
-  });
+  }
 
   const stylesObject = {
     colors,
