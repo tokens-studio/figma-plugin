@@ -169,18 +169,42 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   const updatedThemes = [...themes];
   if (proUser) {
     collections.forEach((collection) => {
+      const existingThemeGroup = collection.name && updatedThemes.find(
+        (theme) => theme.group === collection.name,
+      );
+
       collection.modes.forEach((mode) => {
-        updatedThemes.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-          name: mode.name,
-          group: collection.name, // Collection name becomes the group
-          selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {},
-          $figmaModeId: mode.modeId,
-          $figmaCollectionId: collection.id,
-        });
+        if (existingThemeGroup) {
+          const modeExists = updatedThemes.some(
+            (theme) => theme.group === collection.name
+            && theme.$figmaModeId === mode.modeId,
+          );
+          if (!modeExists) {
+            updatedThemes.push({
+              id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+              name: mode.name,
+              group: collection.name,
+              selectedTokenSets: {
+                [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+              },
+              $figmaStyleReferences: {},
+              $figmaModeId: mode.modeId,
+              $figmaCollectionId: collection.id,
+            });
+          }
+        } else {
+          updatedThemes.push({
+            id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+            name: mode.name,
+            group: collection.name,
+            selectedTokenSets: {
+              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            },
+            $figmaStyleReferences: {},
+            $figmaModeId: mode.modeId,
+            $figmaCollectionId: collection.id,
+          });
+        }
       });
     });
   }
