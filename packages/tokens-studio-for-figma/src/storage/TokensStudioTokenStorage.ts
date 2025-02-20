@@ -73,10 +73,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
-        const rawTokens = typeof tokenSet.raw === 'string'
-          ? JSON.parse(tokenSet.raw)
-          : tokenSet.raw;
-        acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(rawTokens));
+        acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(tokenSet.raw));
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
         return acc;
       },
