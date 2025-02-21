@@ -620,22 +620,22 @@ export const tokenState = createModel<RootModel>()({
       const updatedThemes: ThemeObjectsList = [];
 
       themes.forEach((theme) => {
-        const oldTheme = state.themes.find((t) => t.group === theme.group);
+        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
 
-        if (oldTheme) {
-          if (!isEqual(oldTheme.selectedTokenSets, theme.selectedTokenSets)) {
+        if (existingTheme) {
+          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
             updatedThemes.push({
               ...theme,
-              selectedTokenSets: oldTheme.selectedTokenSets,
+              selectedTokenSets: {
+                ...existingTheme.selectedTokenSets,
+                ...theme.selectedTokenSets,
+              },
             });
           }
         } else {
           newThemes.push(theme);
         }
       });
-
-      console.log('newThemes', newThemes);
-      console.log('updatedThemes', updatedThemes);
 
       return {
         ...state,
