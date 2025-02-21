@@ -72,6 +72,7 @@ export enum AsyncMessageTypes {
   UPDATE_VARIABLES = 'async/update-variables',
   SET_INITIAL_LOAD = 'async/set-initial-load',
   PREVIEW_REQUEST_STARTUP = 'async/preview-request-startup',
+  SYNC_SHARED_TOKENS = 'async/sync-shared-tokens',
 }
 
 export type AsyncMessage<T extends AsyncMessageTypes, P = unknown> = P & { type: T };
@@ -348,6 +349,12 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
+export type SyncSharedTokensAsyncMessage = AsyncMessage<AsyncMessageTypes.SYNC_SHARED_TOKENS>;
+
+export type SyncSharedTokensAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SYNC_SHARED_TOKENS, {
+  sharedTokens: AnyTokenList
+}>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -393,8 +400,8 @@ export type AsyncMessages =
   | UpdateVariablesAsyncMessage
   | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage
-  | RemoveStylesWithoutConnectionMessage;
-
+  | RemoveStylesWithoutConnectionMessage
+  | SyncSharedTokensAsyncMessage;
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
   | RenameStylesAsyncMessageResult
@@ -440,7 +447,8 @@ export type AsyncMessageResults =
   | UpdateVariablesAsyncMessageResult
   | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult
-  | RemoveStylesWithoutConnectionResult;
+  | RemoveStylesWithoutConnectionResult
+  | SyncSharedTokensAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
