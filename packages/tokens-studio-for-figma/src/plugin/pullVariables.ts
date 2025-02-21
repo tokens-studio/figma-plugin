@@ -37,7 +37,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   }>();
 
   for (const variable of localVariables) {
-    const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+    const collection = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
     if (collection) {
       collections.set(collection.name, {
         id: collection.id,
@@ -170,6 +170,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   if (proUser) {
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
       await Promise.all(collection.modes.map(async (mode) => {
+        const collectionVariables = localVariables.filter((v) => v.variableCollectionId === collection.id);
+
+        const variableReferences = collectionVariables.reduce((acc, variable) => ({
+          ...acc,
+          [variable.name]: variable.id,
+        }), {});
+
         themesToCreate.push({
           id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
           name: mode.name,
@@ -178,7 +185,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
           },
           $figmaStyleReferences: {},
-          $figmaVariableReferences: {},
+          $figmaVariableReferences: variableReferences,
           $figmaModeId: mode.modeId,
           $figmaCollectionId: collection.id,
         });
