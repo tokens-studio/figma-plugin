@@ -125,7 +125,7 @@ export function Initiator() {
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             if (themes) {
-              dispatch.tokenState.setThemes(themes);
+              dispatch.tokenState.setThemesFromVariables(themes);
             }
             break;
           }

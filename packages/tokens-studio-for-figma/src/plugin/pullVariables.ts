@@ -165,59 +165,37 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
+  const themesToCreate: ThemeObjectsList = [];
   // Process themes if pro user
-  const updatedThemes = [...themes];
   if (proUser) {
-    collections.forEach((collection) => {
-      const existingThemeGroup = collection.name && updatedThemes.find(
-        (theme) => theme.group === collection.name,
-      );
-
-      collection.modes.forEach((mode) => {
-        if (existingThemeGroup) {
-          const modeExists = updatedThemes.some(
-            (theme) => theme.group === collection.name
-            && theme.$figmaModeId === mode.modeId,
-          );
-          if (!modeExists) {
-            updatedThemes.push({
-              id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-              name: mode.name,
-              group: collection.name,
-              selectedTokenSets: {
-                [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-              },
-              $figmaStyleReferences: {},
-              $figmaModeId: mode.modeId,
-              $figmaCollectionId: collection.id,
-            });
-          }
-        } else {
-          updatedThemes.push({
-            id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-            name: mode.name,
-            group: collection.name,
-            selectedTokenSets: {
-              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-            },
-            $figmaStyleReferences: {},
-            $figmaModeId: mode.modeId,
-            $figmaCollectionId: collection.id,
-          });
-        }
-      });
-    });
+    await Promise.all(Array.from(collections.values()).map(async (collection) => {
+      await Promise.all(collection.modes.map(async (mode) => {
+        themesToCreate.push({
+          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+          name: mode.name,
+          group: collection.name,
+          selectedTokenSets: {
+            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+          },
+          $figmaStyleReferences: {},
+          $figmaVariableReferences: {},
+          $figmaModeId: mode.modeId,
+          $figmaCollectionId: collection.id,
+        });
+      }));
+    }));
   }
 
-  const returnedObject = {
-    tokens: Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+  try {
+    const processedTokens = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
       if (value.length > 0) {
         acc[key] = value;
       }
       return acc;
-    }, {}),
-    themes: proUser ? updatedThemes : themes,
-  };
-
-  notifyVariableValues(returnedObject.tokens, returnedObject.themes);
+    }, {});
+    notifyVariableValues(processedTokens, themesToCreate);
+  } catch (error) {
+    console.error('Error processing results:', error);
+    notifyVariableValues({});
+  }
 }

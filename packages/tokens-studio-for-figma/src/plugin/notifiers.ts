@@ -165,11 +165,14 @@ export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) 
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 
-export function notifyVariableValues(values: Record<string, VariableToCreateToken[]>, themes?: ThemeObjectsList) {
+export function notifyVariableValues(
+  values: Record<string, VariableToCreateToken[]>,
+  themes?: ThemeObjectsList,
+) {
   postToUI({
     type: MessageFromPluginTypes.VARIABLES,
     values,
-    ...(themes && { themes }),
+    themes,
   });
 }
 
