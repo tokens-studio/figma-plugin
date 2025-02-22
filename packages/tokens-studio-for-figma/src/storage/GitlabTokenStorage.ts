@@ -48,6 +48,10 @@ export class GitlabTokenStorage extends GitTokenStorage {
     this.gitlabClient = new Gitlab({
       token: this.secret,
       host: this.baseUrl || undefined,
+      rateLimits: {
+        // 4 requests per second = 250 requests per minute (GitLab API limit for raw endpoints: https://docs.gitlab.com/ee/administration/settings/rate_limits_on_raw_endpoints.html)
+        '/projects/*/repository/files/*/raw': 4,
+      },
     });
     this.source = branch;
     this.previousSourceBranch = previousSourceBranch;
