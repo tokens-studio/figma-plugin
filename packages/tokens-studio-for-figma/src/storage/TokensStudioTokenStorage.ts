@@ -1,4 +1,6 @@
-import { ThemeGroup, TokenSetType, TokensSet, create } from '@tokens-studio/sdk';
+import {
+  ThemeGroup, TokenSetType, TokensSet, create,
+} from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
 import { AnyTokenSet } from '@/types/tokens';
 import { notifyToUI } from '@/plugin/notifiers';
@@ -26,12 +28,11 @@ import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
 
 const DEFAULT_BRANCH = 'main';
 
-const makeClient = (secret: string) =>
-  create({
-    host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-    secure: process.env.NODE_ENV !== 'development',
-    auth: `Bearer ${secret}`,
-  });
+const makeClient = (secret: string) => create({
+  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
+  secure: process.env.NODE_ENV !== 'development',
+  auth: `Bearer ${secret}`,
+});
 
 export type TokensStudioSaveOptions = {
   commitMessage?: string;
@@ -72,16 +73,8 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     const returnData = tokenSets.reduce(
       (acc, tokenSet) => {
         if (!tokenSet.name) return acc;
-        acc.tokens[tokenSet.name] = tokenSet.tokens.map((tkn) => ({
-          name: tkn.name,
-          type: tkn.type,
-          description: tkn.description,
-          $extensions: tkn.extensions,
-          value: tkn.value,
-        }));
-
+        acc.tokens[tokenSet.name] = JSON.parse(JSON.stringify(tokenSet.raw));
         acc.tokenSets[tokenSet.name] = { isDynamic: tokenSet.type === TokenSetType.Dynamic };
-
         return acc;
       },
       { tokens: {}, tokenSets: {} },
