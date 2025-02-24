@@ -254,29 +254,49 @@ export class GitlabTokenStorage extends GitTokenStorage {
       await this.createBranch(branch, sourceBranch);
     }
 
-    // Directories cannot be created empty (Source: https://gitlab.com/gitlab-org/gitlab/-/issues/247503)
-    try {
-      await this.gitlabClient.RepositoryFiles.show(this.projectId, pathToCreate, branch);
-    } catch {
-      await this.gitlabClient.RepositoryFiles.create(
-        this.projectId,
-        pathToCreate,
-        branch,
-        '{}',
-        message,
-      );
-    }
-
     const tree = await this.gitlabClient.Repositories.allRepositoryTrees(this.projectId, {
       path: rootPath,
       ref: branch,
       recursive: true,
     });
 
-    const gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
+    try {
+      // Only create .gitkeep if the directory is completely empty/non-existent
+      if (tree.length === 0) {
+        await this.gitlabClient.RepositoryFiles.create(
+          this.projectId,
+          pathToCreate,
+          branch,
+          '{}',
+          message,
+        );
+      }
+    } catch (e) {
+      console.error('Error checking directory:', e);
+    }
+
+    let gitlabActions: CommitAction[] = Object.entries(changeset).map(([filePath, content]) => {
       const action = tree.some((file) => file.path === filePath) ? 'update' : 'create';
       return { action, filePath, content };
     });
+
+    // Add delete actions for files that no longer exist in changeset
+    const jsonFiles = tree
+      .filter((file) => file.path.endsWith('.json'))
+      .map((file) => file.path);
+
+    const filesToDelete = jsonFiles.filter(
+      (jsonFile) => !Object.keys(changeset).some((item) => item === jsonFile),
+    );
+
+    if (filesToDelete.length > 0) {
+      gitlabActions = gitlabActions.concat(
+        filesToDelete.map((filePath) => ({
+          action: 'delete',
+          filePath,
+        })),
+      );
+    }
 
     try {
       await this.gitlabClient.Commits.create(
