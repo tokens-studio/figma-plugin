@@ -12,6 +12,7 @@ import { StorageTypeCredentials } from '@/types/StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from '@/types/payloads';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { ThemeObjectsList } from '@/types/ThemeObjectsList';
 
 export function notifyUI(msg: string, opts?: NotificationOptions) {
   figma.notify(msg, opts);
@@ -164,8 +165,15 @@ export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) 
   postToUI({ type: MessageFromPluginTypes.STYLES, values });
 }
 
-export function notifyVariableValues(values: Record<string, VariableToCreateToken[]>) {
-  postToUI({ type: MessageFromPluginTypes.VARIABLES, values });
+export function notifyVariableValues(
+  values: Record<string, VariableToCreateToken[]>,
+  themes?: ThemeObjectsList,
+) {
+  postToUI({
+    type: MessageFromPluginTypes.VARIABLES,
+    values,
+    themes,
+  });
 }
 
 export function notifySetTokens(values: TokenStore) {

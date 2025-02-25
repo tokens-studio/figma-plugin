@@ -7,6 +7,7 @@ import type { StorageTypeCredentials } from './StorageType';
 import { StyleToCreateToken, VariableToCreateToken } from './payloads';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import type { ThemeObjectsList } from './ThemeObjectsList';
 
 export enum MessageFromPluginTypes {
   SELECTION = 'selection',
@@ -85,6 +86,7 @@ export type StylesFromPluginMessage = {
 export type VariablesFromPluginMessage = {
   type: MessageFromPluginTypes.VARIABLES;
   values?: Record<string, VariableToCreateToken[]>;
+  themes?: ThemeObjectsList;
 };
 
 export type StartJobFromPluginMessage = {

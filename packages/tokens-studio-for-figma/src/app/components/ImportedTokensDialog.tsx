@@ -5,7 +5,9 @@ import { IconButton, Button } from '@tokens-studio/ui';
 import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
-import { activeTokenSetSelector, importedTokensSelector } from '@/selectors';
+import {
+  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector,
+} from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
 import TrashIcon from '@/icons/trash.svg';
@@ -98,7 +100,11 @@ export default function ImportedTokensDialog() {
   const dispatch = useDispatch<Dispatch>();
   const { editSingleToken, createSingleToken, importMultipleTokens } = useManageTokens();
   const activeTokenSet = useSelector(activeTokenSetSelector);
+  const themes = useSelector(themesListSelector);
   const importedTokens = useSelector(importedTokensSelector);
+  const importedThemes = useSelector(importedThemesSelector);
+  const [newThemes, setNewThemes] = React.useState(importedThemes.newThemes);
+  const [updatedThemes, setUpdatedThemes] = React.useState(importedThemes.updatedThemes);
   const [newTokens, setNewTokens] = React.useState(importedTokens.newTokens);
   const [updatedTokens, setUpdatedTokens] = React.useState(importedTokens.updatedTokens);
 
@@ -162,6 +168,14 @@ export default function ImportedTokensDialog() {
       shouldUpdateDocument: false,
     }));
 
+    if (newThemes.length > 0 || updatedThemes.length > 0) {
+      dispatch.tokenState.setThemes([
+        ...themes.filter((theme) => !updatedThemes.some((updatedTheme) => updatedTheme.group === theme.group)),
+        ...newThemes,
+        ...updatedThemes,
+      ]);
+    }
+
     // Update all existing tokens, and create new ones
     importMultipleTokens({ multipleUpdatedTokens, multipleNewTokens });
 
@@ -188,7 +202,9 @@ export default function ImportedTokensDialog() {
 
     setUpdatedTokens([]);
     setNewTokens([]);
-  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens]);
+    setNewThemes([]);
+    setUpdatedThemes([]);
+  }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, dispatch]);
 
   const handleCreateSingleClick = React.useCallback((token: any) => {
     // Create new tokens according to styles
@@ -228,6 +244,11 @@ export default function ImportedTokensDialog() {
     setNewTokens(importedTokens.newTokens);
     setUpdatedTokens(importedTokens.updatedTokens);
   }, [importedTokens.newTokens, importedTokens.updatedTokens]);
+
+  React.useEffect(() => {
+    setNewThemes(importedThemes.newThemes);
+    setUpdatedThemes(importedThemes.updatedThemes);
+  }, [importedThemes.newThemes, importedThemes.updatedThemes]);
 
   const ListLength = 50;
 
