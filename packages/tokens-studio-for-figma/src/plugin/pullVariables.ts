@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import { figmaRGBToHex } from '@figma-plugin/helpers';
 import { notifyVariableValues } from './notifiers';
 import { PullVariablesOptions, ThemeObjectsList } from '@/types';
@@ -37,15 +36,30 @@ export default async function pullVariables(options: PullVariablesOptions, theme
     modes: { name: string, modeId: string }[]
   }>();
 
+  // Cache for collection lookups
+  const collectionsCache = new Map<string, {
+    id: string,
+    name: string,
+    modes: { name: string, modeId: string }[]
+  }>();
+
   for (const variable of localVariables) {
-    const collection = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
-    if (collection) {
-      collections.set(collection.name, {
-        id: collection.id,
-        name: collection.name,
-        modes: collection.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
-      });
+    let collection = collectionsCache.get(variable.variableCollectionId);
+    if (!collection) {
+      const collectionData = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
+      if (collectionData) {
+        collection = {
+          id: collectionData.id,
+          name: collectionData.name,
+          modes: collectionData.modes.map((mode) => ({ name: mode.name, modeId: mode.modeId })),
+        };
+        collectionsCache.set(variable.variableCollectionId, collection);
+      }
     }
+    if (collection) {
+      collections.set(collection.name, collection);
+    }
+
     const variableName = normalizeTokenName(variable.name);
     try {
       switch (variable.resolvedType) {
