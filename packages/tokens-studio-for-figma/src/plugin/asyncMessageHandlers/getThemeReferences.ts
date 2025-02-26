@@ -4,6 +4,7 @@ import { RawVariableReferenceMap } from '@/types/RawVariableReferenceMap';
 import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { getVariablesWithoutZombies } from '../getVariablesWithoutZombies';
+import { normalizeVariableName } from '@/utils/normalizeVariableName';
 
 export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   defaultTokenValueRetriever.clearCache();
@@ -53,7 +54,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   const localVariables = await getVariablesWithoutZombies();
 
   localVariables.forEach((variable) => {
-    const normalizedVariableName = variable.name.split('/').join('.'); // adjusting variable name to match the token name
+    const normalizedVariableName = normalizeVariableName(variable.name); // adjusting variable name to match the token name
     if (!figmaVariableReferences.has(normalizedVariableName)) {
       figmaVariableReferences.set(normalizedVariableName, variable.key);
     }
@@ -67,7 +68,7 @@ export async function getThemeReferences(prefixStylesWithThemeName?: boolean) {
   // We'll also add local styles to the references in case of where we work with local sets
   localStyles.forEach((style) => {
     if (!figmaStyleReferences.has(style.name)) {
-      const normalizedStyleName = style.name.split('/').join('.'); // adjusting variable name to match the token name
+      const normalizedStyleName = normalizeVariableName(style.name); // adjusting variable name to match the token name
       figmaStyleReferences.set(normalizedStyleName, style.id);
     }
   });
