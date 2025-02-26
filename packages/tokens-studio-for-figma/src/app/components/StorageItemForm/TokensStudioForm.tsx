@@ -107,7 +107,6 @@ export default function TokensStudioForm({
       }
     } catch (error) {
       setFetchOrgsError('Error fetching organization data. Please check your Studio API key.');
-      dispatch.userState.setTokensStudioPAT(null);
     }
   }, [values.secret, dispatch]);
 
