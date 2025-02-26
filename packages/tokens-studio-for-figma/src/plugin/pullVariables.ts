@@ -5,7 +5,7 @@ import { VariableToCreateToken } from '@/types/payloads';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { normalizeTokenName } from '@/utils/normalizeTokenName';
+import { normalizeVariableName } from '@/utils/normalizeVariableName';
 
 export default async function pullVariables(options: PullVariablesOptions, themes: ThemeObjectsList, proUser: boolean): Promise<void> {
   // @TODO should be specifically typed according to their type
@@ -60,7 +60,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       collections.set(collection.name, collection);
     }
 
-    const variableName = normalizeTokenName(variable.name);
+    const variableName = normalizeVariableName(variable.name);
     try {
       switch (variable.resolvedType) {
         case 'COLOR':
@@ -189,7 +189,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({
           ...acc,
-          [normalizeTokenName(variable.name)]: variable.id,
+          [normalizeVariableName(variable.name)]: variable.id,
         }), {});
 
         themesToCreate.push({
