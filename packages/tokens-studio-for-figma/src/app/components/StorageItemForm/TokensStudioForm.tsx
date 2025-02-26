@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import zod from 'zod';
 import {
   Box,
@@ -24,6 +25,7 @@ import { ErrorMessage } from '../ErrorMessage';
 import TokensStudioWord from '@/icons/tokensstudio-word.svg';
 import { styled } from '@/stitches.config';
 import { GET_ORGS_QUERY } from '@/storage/tokensStudio/graphql';
+import { Dispatch } from '@/app/store';
 
 const StyledTokensStudioWord = styled(TokensStudioWord, {
   width: '200px',
@@ -49,6 +51,7 @@ export default function TokensStudioForm({
   const syncGuideUrl = 'tokens-studio';
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
+  const dispatch = useDispatch<Dispatch>();
 
   const toggleMask = React.useCallback(() => {
     setIsMasked((prev) => !prev);
@@ -98,13 +101,15 @@ export default function TokensStudioForm({
       const result = await client.query({
         query: GET_ORGS_QUERY,
       });
-      if (result.data?.organizations) {
+      if (result.data?.organizations && values.secret) {
         setOrgData(result.data.organizations.data as Organization[]);
+        dispatch.userState.setTokensStudioPAT(values.secret);
       }
     } catch (error) {
       setFetchOrgsError('Error fetching organization data. Please check your Studio API key.');
+      dispatch.userState.setTokensStudioPAT(null);
     }
-  }, [values.secret]);
+  }, [values.secret, dispatch]);
 
   useEffect(() => {
     if (values.secret) {
