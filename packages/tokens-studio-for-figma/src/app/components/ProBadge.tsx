@@ -1,9 +1,7 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { styled } from '@/stitches.config';
-import { licenseKeySelector } from '@/selectors/licenseKeySelector';
-import { licenseKeyErrorSelector } from '@/selectors/licenseKeyErrorSelector';
+import { useIsProUser } from '@/app/hooks/useIsProUser';
 
 export const StyledProBadge = styled('a', {
   display: 'inline-flex',
@@ -30,13 +28,14 @@ type Props = {
 };
 
 export default function ProBadge({ compact, campaign }: Props) {
-  const existingKey = useSelector(licenseKeySelector);
-  const licenseKeyError = useSelector(licenseKeyErrorSelector);
+  const isProUser = useIsProUser();
   const { t } = useTranslation(['licence']);
 
   const link = `https://tokens.studio/pro?ref=figma-plugin&utm_source=figma-plugin&utm_medium=pro-badge&utm_campaign=${campaign}`;
 
   return (
-    <StyledProBadge href={link} target="_blank">{(existingKey && !licenseKeyError) || compact ? t('pro') : t('getPro')}</StyledProBadge>
+    <StyledProBadge href={link} target="_blank">
+      {isProUser || compact ? t('pro') : t('getPro')}
+    </StyledProBadge>
   );
 }
