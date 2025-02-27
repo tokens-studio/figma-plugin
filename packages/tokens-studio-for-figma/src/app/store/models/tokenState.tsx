@@ -76,6 +76,10 @@ export interface TokenState {
   remoteData: CompareStateType;
   tokenFormat: TokenFormatOptions;
   tokenSetMetadata: Record<string, { isDynamic?: boolean }>;
+  importedThemes: {
+    newThemes: ThemeObjectsList;
+    updatedThemes: ThemeObjectsList;
+  };
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -112,6 +116,10 @@ export const tokenState = createModel<RootModel>()({
     },
     tokenFormat: TokenFormatOptions.Legacy,
     tokenSetMetadata: {},
+    importedThemes: {
+      newThemes: [],
+      updatedThemes: [],
+    },
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -604,6 +612,36 @@ export const tokenState = createModel<RootModel>()({
         tokens: {
           ...state.tokens,
           ...newTokens,
+        },
+      };
+    },
+    setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
+      const newThemes: ThemeObjectsList = [];
+      const updatedThemes: ThemeObjectsList = [];
+
+      themes.forEach((theme) => {
+        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
+
+        if (existingTheme) {
+          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
+            updatedThemes.push({
+              ...theme,
+              selectedTokenSets: {
+                ...existingTheme.selectedTokenSets,
+                ...theme.selectedTokenSets,
+              },
+            });
+          }
+        } else {
+          newThemes.push(theme);
+        }
+      });
+
+      return {
+        ...state,
+        importedThemes: {
+          newThemes,
+          updatedThemes,
         },
       };
     },

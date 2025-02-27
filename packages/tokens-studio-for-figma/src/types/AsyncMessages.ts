@@ -144,7 +144,11 @@ export type SelectNodesMessageAsyncResult = AsyncMessage<AsyncMessageTypes.SELEC
 export type PullStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_STYLES, { styleTypes: PullStyleOptions; }>;
 export type PullStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PULL_STYLES>;
 
-export type PullVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES, { options: PullVariablesOptions; }>;
+export type PullVariablesAsyncMessage = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES, {
+  options: PullVariablesOptions;
+  themes: ThemeObjectsList;
+  proUser: boolean;
+}>;
 export type PullVariablesMessageResult = AsyncMessage<AsyncMessageTypes.PULL_VARIABLES>;
 
 export type NotifyAsyncMessage = AsyncMessage<AsyncMessageTypes.NOTIFY, {
