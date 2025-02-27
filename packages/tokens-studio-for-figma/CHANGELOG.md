@@ -1,5 +1,17 @@
 # @tokens-studio/figma-plugin
 
+## 2.4.0
+
+### Minor Changes
+
+- 7ef0d006: Add ability to create themes when importing when importing variables from the figma file into the plugin
+
+### Patch Changes
+
+- 15338342: fix a bug where gitkeep file was being created in every commit in Gitlab repo.
+- 4bcd1efb: Fixes the default format of tokens to DTCG when tokens are synced froM Tokens Studio Platform.
+- 259afac3: Fix issue where pro features are not activated for users using Tokens Studio sync with a valid API Key from the platform.
+
 ## 2.3.3
 
 ### Patch Changes
