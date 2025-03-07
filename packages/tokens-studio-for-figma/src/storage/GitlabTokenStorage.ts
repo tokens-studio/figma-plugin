@@ -289,7 +289,7 @@ export class GitlabTokenStorage extends GitTokenStorage {
       (jsonFile) => !Object.keys(changeset).some((item) => item === jsonFile),
     );
 
-    if (filesToDelete.length > 0) {
+    if (filesToDelete.length > 0 && !this.path.endsWith('.json')) {
       gitlabActions = gitlabActions.concat(
         filesToDelete.map((filePath) => ({
           action: 'delete',
