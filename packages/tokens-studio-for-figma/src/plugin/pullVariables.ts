@@ -189,7 +189,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
 
         const variableReferences = collectionVariables.reduce((acc, variable) => ({
           ...acc,
-          [normalizeVariableName(variable.name)]: variable.id,
+          [normalizeVariableName(variable.name)]: variable.key,
         }), {});
 
         themesToCreate.push({
