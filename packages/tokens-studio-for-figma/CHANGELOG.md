@@ -1,5 +1,12 @@
 # @tokens-studio/figma-plugin
 
+## 2.4.1
+
+### Patch Changes
+
+- 476cf137: Fix unintended JSON file deletion during gitlab single file tokens sync
+- d2174fa0: Fix mapping of variables to theme when themes are created via import of variables.
+
 ## 2.4.0
 
 ### Minor Changes
