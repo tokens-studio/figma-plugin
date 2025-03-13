@@ -116,7 +116,6 @@ jobs:
           working-directory: ./packages/tokens-studio-for-figma
           build: npm run build:cy
           start: npm run serve
-
   performance:
     name: Performance
     runs-on: ubuntu-22.04
@@ -134,3 +133,14 @@ jobs:
       - name: Run benchmark
         working-directory: packages/tokens-studio-for-figma
         run: npm run benchmark:build && npm run benchmark:run
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

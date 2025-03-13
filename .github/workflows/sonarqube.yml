@@ -1,0 +1,22 @@
+
+# This workflow is used to manually trigger a SonarQube scan. It is used to perform an initial scan on the dominant branch. After the initial scan, we protect against new code being added without a scan by using the SonarQube jobs to scan PRs. 
+name: Sonarqube manual
+
+on:
+    # Allows you to run this workflow manually from the Actions tab.
+    # As there are a number of changes that need to happen during release we don't automatically release on push
+    workflow_dispatch:
+        inputs: {}
+
+jobs:
+    sonarqube:
+        name: SonarQube
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+        - name: SonarQube Scan
+          uses: SonarSource/sonarqube-scan-action@v5
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
