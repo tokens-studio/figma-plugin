@@ -26,6 +26,21 @@ export function setUserData(data: { [key: string]: string }) {
   }
 }
 
+export function trackSharedPluginData(data: {
+  action: 'read',
+  type: 'values',
+  success: boolean,
+  error?: string
+}) {
+  track('sharedPluginData', {
+    action: data.action,
+    type: data.type,
+    success: data.success,
+    error: data.error,
+    version: pjs.version,
+  });
+}
+
 export function initializeAnalytics() {
   if (process.env.MIXPANEL_ACCESS_TOKEN) {
     mixpanel.init(process.env.MIXPANEL_ACCESS_TOKEN, {
