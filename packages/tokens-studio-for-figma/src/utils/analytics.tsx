@@ -30,13 +30,15 @@ export function trackSharedPluginData(data: {
   action: 'read',
   type: 'values',
   success: boolean,
-  error?: string
+  error?: string,
+  size?: number,
 }) {
   track('sharedPluginData', {
     action: data.action,
     type: data.type,
     success: data.success,
     error: data.error,
+    size: data.size,
     version: pjs.version,
   });
 }

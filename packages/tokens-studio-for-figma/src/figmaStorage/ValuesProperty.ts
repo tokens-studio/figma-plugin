@@ -18,6 +18,7 @@ export const ValuesProperty = new FigmaStorageProperty<Record<string, AnyTokenLi
         action: 'read',
         type: 'values',
         success: true,
+        size: value ? new TextEncoder().encode(value).length : 0,
       });
       return result;
     } catch (error) {
@@ -26,6 +27,7 @@ export const ValuesProperty = new FigmaStorageProperty<Record<string, AnyTokenLi
         type: 'values',
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
+        size: 0,
       });
       return {};
     }
