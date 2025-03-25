@@ -149,14 +149,14 @@ export const tokenState = createModel<RootModel>()({
       usedTokenSet: data,
     }),
     setThemes: (state, data: ThemeObjectsList) => {
-      const { newThemes } = state.importedThemes;
+      const { newThemes, updatedThemes } = state.importedThemes;
 
       return {
         ...state,
         themes: [
-          ...data,
+          ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
           ...state.themes.map((existingTheme) => {
-            const updateTheme = state.importedThemes.updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId);
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
             return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
           }),
           ...newThemes,
