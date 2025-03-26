@@ -10,7 +10,7 @@ import { convertToOrderObj } from '@/utils/convertToOrderObj';
 import { Properties } from '@/constants/Properties';
 import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
-import { track } from '@/utils/analytics';
+import { track, trackSharedPluginData } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 
@@ -96,7 +96,15 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.TRACK_FROM_PLUGIN: {
-            track(pluginMessage.title, pluginMessage.opts);
+            if (pluginMessage.title === 'sharedPluginData') {
+              trackSharedPluginData(pluginMessage.opts as {
+                action: 'read';
+                type: 'values';
+                success: boolean;
+                error?: string;
+                size?: number;
+              });
+            }
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
