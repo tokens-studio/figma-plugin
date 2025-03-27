@@ -10,7 +10,7 @@ import { convertToOrderObj } from '@/utils/convertToOrderObj';
 import { Properties } from '@/constants/Properties';
 import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
-import { track, trackSharedPluginData } from '@/utils/analytics';
+import { track } from '@/utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 
@@ -97,13 +97,7 @@ export function Initiator() {
           }
           case MessageFromPluginTypes.TRACK_FROM_PLUGIN: {
             if (pluginMessage.title === 'sharedPluginData') {
-              trackSharedPluginData(pluginMessage.opts as {
-                action: 'read';
-                type: 'values';
-                success: boolean;
-                error?: string;
-                size?: number;
-              });
+              track('sharedPluginData', pluginMessage.opts);
             }
             break;
           }
