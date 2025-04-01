@@ -912,6 +912,18 @@ export const tokenState = createModel<RootModel>()({
         }
       }
     },
+    setThemesFromVariables(themes: ThemeObjectsList, rootState) {
+      themes.forEach((theme) => {
+        const existingTheme = rootState.tokenState.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
+        if (existingTheme) {
+          Object.keys(existingTheme.selectedTokenSets)
+            .filter((key) => key.startsWith(`${existingTheme.group}/`))
+            .forEach((setName) => {
+              dispatch.tokenState.deleteTokenSet(setName);
+            });
+        }
+      });
+    },
     ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
 });
