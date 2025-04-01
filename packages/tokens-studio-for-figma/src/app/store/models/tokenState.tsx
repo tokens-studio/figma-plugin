@@ -634,10 +634,17 @@ export const tokenState = createModel<RootModel>()({
 
         if (existingTheme) {
           if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
+            const filteredTokenSets = Object.entries(existingTheme.selectedTokenSets).reduce((acc, [key, value]) => {
+              if (!key.startsWith(`${existingTheme.group}/`)) {
+                acc[key] = value;
+              }
+              return acc;
+            }, {});
+
             updatedThemes.push({
               ...theme,
               selectedTokenSets: {
-                ...existingTheme.selectedTokenSets,
+                ...filteredTokenSets,
                 ...theme.selectedTokenSets,
               },
             });
