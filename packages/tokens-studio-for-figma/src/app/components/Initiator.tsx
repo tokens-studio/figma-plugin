@@ -96,9 +96,7 @@ export function Initiator() {
             break;
           }
           case MessageFromPluginTypes.TRACK_FROM_PLUGIN: {
-            if (pluginMessage.title === 'sharedPluginData') {
-              track('sharedPluginData', pluginMessage.opts);
-            }
+            track(pluginMessage.title, pluginMessage.opts);
             break;
           }
           case MessageFromPluginTypes.API_PROVIDERS: {
