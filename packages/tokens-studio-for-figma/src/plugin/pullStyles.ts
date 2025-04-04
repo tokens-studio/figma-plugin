@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import compact from 'just-compact';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { SingleColorToken } from '@/types/tokens';
+import { SingleColorToken, SingleToken } from '@/types/tokens';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
 import { convertFigmaGradientToString } from './figmaTransforms/gradients';
 import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
@@ -14,8 +14,11 @@ import { slugify } from '@/utils/string';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenBoxshadowValue } from '@/types/values';
 import { StyleToCreateToken } from '@/types/payloads';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { getTokenData } from './node';
 
-export default function pullStyles(styleTypes: PullStyleOptions): void {
+export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
+  const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
   let colors: StyleToCreateToken[] = [];
   let typography: StyleToCreateToken[] = [];
@@ -81,6 +84,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     const rawTextDecoration: TextDecoration[] = [];
 
     const figmaTextStyles = figma.getLocalTextStyles();
+    const localVariables = await getVariablesWithoutZombies();
 
     figmaTextStyles.forEach((style) => {
       if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
@@ -93,13 +97,37 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = rawFontSizes
-      .sort((a, b) => a - b)
-      .map((size, idx) => ({
+    fontSizes = figmaTextStyles.map((style, idx) => {
+      if (style.boundVariables?.fontSize?.id) {
+        const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
+        if (fontSizeVar && tokens) {
+          const normalizedName = fontSizeVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+                  && token !== null
+                  && 'name' in token
+                  && token.name === normalizedName) : null;
+
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: String(existingToken.value),
+              type: TokenTypes.FONT_SIZES,
+            };
+          }
+        }
+      }
+      return {
         name: `fontSize.${idx}`,
-        value: Number(size.toFixed(3)).toString(),
+        value: style.fontSize.toString(),
         type: TokenTypes.FONT_SIZES,
-      }));
+      };
+    }) as StyleToCreateToken[];
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
@@ -169,7 +197,16 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       const foundLineHeight = lineHeights.find(
         (el: StyleToCreateToken) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
       );
-      const foundFontSize = fontSizes.find((el: StyleToCreateToken) => el.value === style.fontSize.toString());
+      const foundFontSize = fontSizes.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.fontSize?.id) {
+          const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
+          if (fontSizeVar) {
+            const normalizedName = fontSizeVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.value === style.fontSize.toString();
+      });
       const foundLetterSpacing = letterSpacing.find(
         (el: StyleToCreateToken) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
       );
@@ -271,14 +308,14 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     paragraphIndent,
   };
 
-  type ResultObject = Record<string, StyleToCreateToken[]>;
+ type ResultObject = Record<string, StyleToCreateToken[]>;
 
-  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
-    if (value.length > 0) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+ const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+   if (value.length > 0) {
+     acc[key] = value;
+   }
+   return acc;
+ }, {});
 
-  notifyStyleValues(returnedObject);
+ notifyStyleValues(returnedObject);
 }
