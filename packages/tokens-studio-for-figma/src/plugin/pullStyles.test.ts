@@ -41,65 +41,30 @@ describe('pullStyles', () => {
         id: '456',
         description: 'the big one',
         fontSize: 24.8,
-        fontName: {
-          family: 'Inter',
-          style: 'Bold',
+        boundVariables: {
+          fontSize: {
+            id: 'fontSize-var-id-1',
+          },
         },
-        lineHeight: {
-          unit: 'AUTO',
-        },
+        fontName: { family: 'Inter', style: 'Bold' },
+        lineHeight: { unit: 'AUTO' },
         paragraphSpacing: 0,
         paragraphIndent: 0,
-        letterSpacing: {
-          unit: 'PERCENT',
-          value: 0,
-        },
-        textCase: 'ORIGINAL',
-        textDecoration: 'NONE',
-      },
-      {
-        name: 'heading/h2/regular',
-        id: '456',
-        description: 'the small regular one',
-        fontSize: 16,
-        fontName: {
-          family: 'Inter',
-          style: 'Regular',
-        },
-        lineHeight: {
-          unit: 'AUTO',
-        },
-        paragraphSpacing: 3,
-        paragraphIndent: 3,
-        letterSpacing: {
-          unit: 'PERCENT',
-          value: 0,
-        },
-        textCase: 'ORIGINAL',
-        textDecoration: 'NONE',
-      },
-      {
-        name: 'copy/regular',
-        id: '121',
-        description: '',
-        fontSize: 16,
-        fontName: {
-          family: 'Roboto',
-          style: 'Regular',
-        },
-        lineHeight: {
-          unit: 'AUTO',
-        },
-        paragraphSpacing: 7,
-        paragraphIndent: 7,
-        letterSpacing: {
-          unit: 'PERCENT',
-          value: 0,
-        },
+        letterSpacing: { unit: 'PERCENT', value: 0 },
         textCase: 'ORIGINAL',
         textDecoration: 'NONE',
       },
     ]);
+
+    // Mock local variables
+    figma.variables.getLocalVariables.mockReturnValue([
+      {
+        id: 'fontSize-var-id-1',
+        name: 'Typography/heading/fontSize/1',
+        value: '24.8',
+      },
+    ]);
+
     await pullStyles({ textStyles: true });
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
@@ -110,7 +75,7 @@ describe('pullStyles', () => {
           value: {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
-            fontSize: '{fontSize.1}',
+            fontSize: '{fontSize.0}',
             letterSpacing: '{letterSpacing.0}',
             lineHeight: '{lineHeights.0}',
             paragraphSpacing: '{paragraphSpacing.0}',
@@ -120,74 +85,33 @@ describe('pullStyles', () => {
           },
           description: 'the big one',
         },
-        {
-          name: 'heading.h2.regular',
-          type: 'typography',
-          value: {
-            fontFamily: '{fontFamilies.inter}',
-            fontWeight: '{fontWeights.inter-1}',
-            fontSize: '{fontSize.0}',
-            letterSpacing: '{letterSpacing.0}',
-            lineHeight: '{lineHeights.0}',
-            paragraphSpacing: '{paragraphSpacing.1}',
-            paragraphIndent: '{paragraphIndent.1}',
-            textCase: '{textCase.none}',
-            textDecoration: '{textDecoration.none}',
-          },
-          description: 'the small regular one',
-        },
-        {
-          name: 'copy.regular',
-          type: 'typography',
-          value: {
-            fontFamily: '{fontFamilies.roboto}',
-            fontWeight: '{fontWeights.roboto-2}',
-            fontSize: '{fontSize.0}',
-            letterSpacing: '{letterSpacing.0}',
-            lineHeight: '{lineHeights.0}',
-            paragraphSpacing: '{paragraphSpacing.2}',
-            paragraphIndent: '{paragraphIndent.2}',
-            textCase: '{textCase.none}',
-            textDecoration: '{textDecoration.none}',
-          },
-        },
       ],
       fontFamilies: [
         { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
-        { name: 'fontFamilies.roboto', type: 'fontFamilies', value: 'Roboto' },
-      ],
-      lineHeights: [{ name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' }],
-      fontWeights: [
-        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
-        { name: 'fontWeights.inter-1', type: 'fontWeights', value: 'Regular' },
-        { name: 'fontWeights.roboto-2', type: 'fontWeights', value: 'Regular' },
       ],
       fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: '16' },
-        { name: 'fontSize.1', type: 'fontSizes', value: '24.8' },
+        { name: 'fontSize.0', type: 'fontSizes', value: '24.8' },
       ],
-      letterSpacing: [{ name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' }],
-      paragraphSpacing: [{ name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },
-        { name: 'paragraphSpacing.1', type: 'paragraphSpacing', value: '3' },
-        { name: 'paragraphSpacing.2', type: 'paragraphSpacing', value: '7' }],
-      textCase: [{ name: 'textCase.none', type: 'textCase', value: 'none' }],
-      textDecoration: [{ name: 'textDecoration.none', type: 'textDecoration', value: 'none' }],
+      fontWeights: [
+        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: 'AUTO' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '0' },
+      ],
       paragraphIndent: [
-        {
-          name: 'paragraphIndent.0',
-          type: 'dimension',
-          value: '0px',
-        },
-        {
-          name: 'paragraphIndent.1',
-          type: 'dimension',
-          value: '3px',
-        },
-        {
-          name: 'paragraphIndent.2',
-          type: 'dimension',
-          value: '7px',
-        },
+        { name: 'paragraphIndent.0', type: 'dimension', value: '0px' },
+      ],
+      textCase: [
+        { name: 'textCase.none', type: 'textCase', value: 'none' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.none', type: 'textDecoration', value: 'none' },
       ],
     });
   });
