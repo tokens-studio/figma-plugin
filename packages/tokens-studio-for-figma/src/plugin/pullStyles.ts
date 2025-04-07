@@ -215,13 +215,36 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = rawLetterSpacing
-      .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
-      .map((lh, idx) => ({
+    letterSpacing = figmaTextStyles.map((style, idx) => {
+      if (style.boundVariables?.letterSpacing?.id) {
+        const letterSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.letterSpacing?.id);
+        if (letterSpacingVar && tokens) {
+          const normalizedName = letterSpacingVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+              && token !== null
+              && 'name' in token
+              && token.name === normalizedName) : null;
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: (existingToken as unknown as SingleToken).value,
+              type: TokenTypes.LETTER_SPACING,
+            };
+          }
+        }
+      }
+      return {
         name: `letterSpacing.${idx}`,
-        value: convertFigmaToLetterSpacing(lh).toString(),
+        value: convertFigmaToLetterSpacing(style.letterSpacing).toString(),
         type: TokenTypes.LETTER_SPACING,
-      }));
+      };
+    });
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
@@ -260,9 +283,16 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         }
         return el.value === style.fontSize.toString();
       });
-      const foundLetterSpacing = letterSpacing.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-      );
+      const foundLetterSpacing = letterSpacing.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.letterSpacing?.id) {
+          const letterSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.letterSpacing?.id);
+          if (letterSpacingVar) {
+            const normalizedName = letterSpacingVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString();
+      });
       const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
         if (style.boundVariables?.paragraphSpacing?.id) {
           const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
