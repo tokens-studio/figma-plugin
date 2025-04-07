@@ -42,9 +42,10 @@ describe('pullStyles', () => {
         description: 'the big one',
         fontSize: 24.8,
         boundVariables: {
-          fontSize: {
-            id: 'fontSize-var-id-1',
-          },
+          fontSize: { id: 'fontSize-var-id-1' },
+          lineHeight: { id: 'lineHeight-var-id-1' },
+          letterSpacing: { id: 'letterSpacing-var-id-1' },
+          paragraphSpacing: { id: 'paragraphSpacing-var-id-1' },
         },
         fontName: { family: 'Inter', style: 'Bold' },
         lineHeight: { unit: 'AUTO' },
@@ -56,12 +57,26 @@ describe('pullStyles', () => {
       },
     ]);
 
-    // Mock local variables
     figma.variables.getLocalVariables.mockReturnValue([
       {
         id: 'fontSize-var-id-1',
         name: 'Typography/heading/fontSize/1',
         value: '24.8',
+      },
+      {
+        id: 'lineHeight-var-id-1',
+        name: 'Typography/heading/lineHeight/1',
+        value: 'AUTO',
+      },
+      {
+        id: 'letterSpacing-var-id-1',
+        name: 'Typography/heading/letterSpacing/1',
+        value: '0%',
+      },
+      {
+        id: 'paragraphSpacing-var-id-1',
+        name: 'Typography/heading/paragraphSpacing/1',
+        value: '0',
       },
     ]);
 
@@ -76,8 +91,8 @@ describe('pullStyles', () => {
             fontFamily: '{fontFamilies.inter}',
             fontWeight: '{fontWeights.inter-0}',
             fontSize: '{fontSize.0}',
-            letterSpacing: '{letterSpacing.0}',
             lineHeight: '{lineHeights.0}',
+            letterSpacing: '{letterSpacing.0}',
             paragraphSpacing: '{paragraphSpacing.0}',
             paragraphIndent: '{paragraphIndent.0}',
             textCase: '{textCase.none}',
