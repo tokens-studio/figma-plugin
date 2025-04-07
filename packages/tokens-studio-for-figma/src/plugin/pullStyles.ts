@@ -84,7 +84,9 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     const rawTextDecoration: TextDecoration[] = [];
 
     const figmaTextStyles = figma.getLocalTextStyles();
+    console.log('figmaTextStyles', figmaTextStyles);
     const localVariables = await getVariablesWithoutZombies();
+    console.log('localVariables', localVariables);
 
     figmaTextStyles.forEach((style) => {
       if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
@@ -174,13 +176,36 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       value: font.style,
       type: TokenTypes.FONT_WEIGHTS,
     }));
-    paragraphSpacing = rawParagraphSpacing
-      .sort((a, b) => a - b)
-      .map((size, idx) => ({
+    paragraphSpacing = figmaTextStyles.map((style, idx) => {
+      if (style.boundVariables?.paragraphSpacing?.id) {
+        const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+        if (paragraphSpacingVar && tokens) {
+          const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+              && token !== null
+              && 'name' in token
+              && token.name === normalizedName) : null;
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: (existingToken as unknown as SingleToken).value,
+              type: TokenTypes.PARAGRAPH_SPACING,
+            };
+          }
+        }
+      }
+      return {
         name: `paragraphSpacing.${idx}`,
-        value: size.toString(),
+        value: style.paragraphSpacing.toString(),
         type: TokenTypes.PARAGRAPH_SPACING,
-      }));
+      };
+    });
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
@@ -238,9 +263,16 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       const foundLetterSpacing = letterSpacing.find(
         (el: StyleToCreateToken) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
       );
-      const foundParagraphSpacing = paragraphSpacing.find(
-        (el: StyleToCreateToken) => el.value === style.paragraphSpacing.toString(),
-      );
+      const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.paragraphSpacing?.id) {
+          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+          if (paragraphSpacingVar) {
+            const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.value === style.paragraphSpacing.toString();
+      });
       const foundParagraphIndent = paragraphIndent.find(
         (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
       );
