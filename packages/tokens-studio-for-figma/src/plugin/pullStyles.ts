@@ -99,6 +99,8 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
+    console.log('fontCombinations', fontCombinations);
+
     fontSizes = figmaTextStyles.map((style, idx) => {
       if (style.boundVariables?.fontSize?.id) {
         const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
@@ -134,6 +136,8 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
+
+    console.log('uniqueFontCombinations', uniqueFontCombinations);
     lineHeights = figmaTextStyles.map((style, idx) => {
       if (style.boundVariables?.lineHeight?.id) {
         const lineHeightVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
@@ -165,17 +169,109 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       };
     });
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => ({
-      name: `fontFamilies.${slugify(fontFamily)}`,
-      value: fontFamily,
-      type: TokenTypes.FONT_FAMILIES,
-    }));
+    fontWeights = uniqueFontCombinations.map((font, idx) => {
+      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
+        && style.fontName.style === font.style);
 
-    fontWeights = uniqueFontCombinations.map((font, idx) => ({
-      name: `fontWeights.${slugify(font.family)}-${idx}`,
-      value: font.style,
-      type: TokenTypes.FONT_WEIGHTS,
-    }));
+      if (matchingStyle?.boundVariables?.fontStyle?.id) {
+        const fontStyleVar = localVariables.find((v) => v.id === matchingStyle.boundVariables?.fontStyle?.id);
+        if (fontStyleVar && tokens) {
+          const normalizedName = fontStyleVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+              && token !== null
+              && 'name' in token
+              && token.name === normalizedName) : null;
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: (existingToken as unknown as SingleToken).value,
+              type: TokenTypes.FONT_WEIGHTS,
+            };
+          }
+        }
+      }
+
+      return {
+        name: `fontWeights.${slugify(font.family)}-${idx}`,
+        value: font.style,
+        type: TokenTypes.FONT_WEIGHTS,
+      };
+    });
+
+    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => {
+      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
+
+      if (matchingStyle?.boundVariables?.fontFamily?.id) {
+        const fontFamilyVar = localVariables.find((v) => v.id === matchingStyle.boundVariables?.fontFamily?.id);
+        if (fontFamilyVar && tokens) {
+          const normalizedName = fontFamilyVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+              && token !== null
+              && 'name' in token
+              && token.name === normalizedName) : null;
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: (existingToken as unknown as SingleToken).value,
+              type: TokenTypes.FONT_FAMILIES,
+            };
+          }
+        }
+      }
+
+      return {
+        name: `fontFamilies.${slugify(fontFamily)}`,
+        value: fontFamily,
+        type: TokenTypes.FONT_FAMILIES,
+      };
+    });
+
+    console.log('fontFamilies', fontFamilies);
+
+    fontSizes = figmaTextStyles.map((style, idx) => {
+      if (style.boundVariables?.fontSize?.id) {
+        const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
+        if (fontSizeVar && tokens) {
+          const normalizedName = fontSizeVar.name.replace(/\//g, '.');
+
+          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+            if (found) return found;
+            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+                  && token !== null
+                  && 'name' in token
+                  && token.name === normalizedName) : null;
+
+            return foundToken || null;
+          }, null);
+
+          if (existingToken) {
+            return {
+              name: existingToken.name,
+              value: String(existingToken.value),
+              type: TokenTypes.FONT_SIZES,
+            };
+          }
+        }
+      }
+      return {
+        name: `fontSize.${idx}`,
+        value: style.fontSize.toString(),
+        type: TokenTypes.FONT_SIZES,
+      };
+    }) as StyleToCreateToken[];
+
     paragraphSpacing = figmaTextStyles.map((style, idx) => {
       if (style.boundVariables?.paragraphSpacing?.id) {
         const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
@@ -259,10 +355,28 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find((el: StyleToCreateToken) => el.value === style.fontName.family);
-      const foundFontWeight = fontWeights.find(
-        (el: StyleToCreateToken) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
-      );
+      const foundFamily = fontFamilies.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.fontFamily?.id) {
+          const fontFamilyVar = localVariables.find((v) => v.id === style.boundVariables?.fontFamily?.id);
+          if (fontFamilyVar) {
+            const normalizedName = fontFamilyVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.value === style.fontName.family;
+      });
+
+      const foundFontWeight = fontWeights.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.fontStyle?.id) {
+          const fontStyleVar = localVariables.find((v) => v.id === style.boundVariables?.fontStyle?.id);
+          if (fontStyleVar) {
+            const normalizedName = fontStyleVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style;
+      });
+
       const foundLineHeight = lineHeights.find((el: StyleToCreateToken) => {
         if (style.boundVariables?.lineHeight?.id) {
           const lineHeightVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
