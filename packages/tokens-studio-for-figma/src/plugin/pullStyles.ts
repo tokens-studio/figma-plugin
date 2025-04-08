@@ -84,9 +84,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     const rawTextDecoration: TextDecoration[] = [];
 
     const figmaTextStyles = figma.getLocalTextStyles();
-    console.log('figmaTextStyles', figmaTextStyles);
     const localVariables = await getVariablesWithoutZombies();
-    console.log('localVariables', localVariables);
 
     figmaTextStyles.forEach((style) => {
       if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
@@ -98,8 +96,6 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextCase.includes(style.textCase)) rawTextCase.push(style.textCase);
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
-
-    console.log('fontCombinations', fontCombinations);
 
     fontSizes = figmaTextStyles.map((style, idx) => {
       if (style.boundVariables?.fontSize?.id) {
@@ -137,7 +133,6 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
 
-    console.log('uniqueFontCombinations', uniqueFontCombinations);
     lineHeights = figmaTextStyles.map((style, idx) => {
       if (style.boundVariables?.lineHeight?.id) {
         const lineHeightVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
