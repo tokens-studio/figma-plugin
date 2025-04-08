@@ -46,6 +46,8 @@ describe('pullStyles', () => {
           lineHeight: { id: 'lineHeight-var-id-1' },
           letterSpacing: { id: 'letterSpacing-var-id-1' },
           paragraphSpacing: { id: 'paragraphSpacing-var-id-1' },
+          fontFamily: { id: 'fontFamily-var-id-1' },
+          fontStyle: { id: 'fontStyle-var-id-1' },
         },
         fontName: { family: 'Inter', style: 'Bold' },
         lineHeight: { unit: 'AUTO' },
@@ -78,6 +80,16 @@ describe('pullStyles', () => {
         name: 'Typography/heading/paragraphSpacing/1',
         value: '0',
       },
+      {
+        id: 'fontFamily-var-id-1',
+        name: 'Typography/heading/fontFamily/1',
+        value: 'Inter',
+      },
+      {
+        id: 'fontStyle-var-id-1',
+        name: 'Typography/heading/fontStyle/1',
+        value: 'Bold',
+      },
     ]);
 
     await pullStyles({ textStyles: true });
@@ -104,11 +116,11 @@ describe('pullStyles', () => {
       fontFamilies: [
         { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
       ],
-      fontSizes: [
-        { name: 'fontSize.0', type: 'fontSizes', value: '24.8' },
-      ],
       fontWeights: [
         { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Bold' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: '24.8' },
       ],
       letterSpacing: [
         { name: 'letterSpacing.0', type: 'letterSpacing', value: '0%' },
