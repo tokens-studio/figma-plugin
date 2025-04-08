@@ -16,6 +16,7 @@ import { TokenBoxshadowValue } from '@/types/values';
 import { StyleToCreateToken } from '@/types/payloads';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
+import { processTextStyleProperty } from './processTextStyleProperty';
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
   const tokens = await getTokenData();
@@ -97,72 +98,31 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = figmaTextStyles.map((style, idx) => {
-      if (style.boundVariables?.fontSize?.id) {
-        const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
-        if (fontSizeVar && tokens) {
-          const normalizedName = fontSizeVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-                  && token !== null
-                  && 'name' in token
-                  && token.name === normalizedName) : null;
-
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: String(existingToken.value),
-              type: TokenTypes.FONT_SIZES,
-            };
-          }
-        }
-      }
-      return {
-        name: `fontSize.${idx}`,
-        value: style.fontSize.toString(),
-        type: TokenTypes.FONT_SIZES,
-      };
-    }) as StyleToCreateToken[];
+    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'fontSize',
+      localVariables,
+      tokens,
+      TokenTypes.FONT_SIZES,
+      'fontSize',
+      idx,
+      (value) => value.toString(),
+    ));
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
 
-    lineHeights = figmaTextStyles.map((style, idx) => {
-      if (style.boundVariables?.lineHeight?.id) {
-        const lineHeightVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
-        if (lineHeightVar && tokens) {
-          const normalizedName = lineHeightVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-              && token !== null
-              && 'name' in token
-              && token.name === normalizedName) : null;
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: (existingToken as unknown as SingleToken).value,
-              type: TokenTypes.LINE_HEIGHTS,
-            };
-          }
-        }
-      }
-      return {
-        name: `lineHeights.${idx}`,
-        value: convertFigmaToLineHeight(style.lineHeight).toString(),
-        type: TokenTypes.LINE_HEIGHTS,
-      };
-    });
+    lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'lineHeight',
+      localVariables,
+      tokens,
+      TokenTypes.LINE_HEIGHTS,
+      'lineHeights',
+      idx,
+      (value) => convertFigmaToLineHeight(value).toString(),
+    ));
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
       const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
@@ -233,70 +193,18 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       };
     });
 
-    console.log('fontFamilies', fontFamilies);
+    // Remove console.log and duplicate fontSizes assignment
 
-    fontSizes = figmaTextStyles.map((style, idx) => {
-      if (style.boundVariables?.fontSize?.id) {
-        const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
-        if (fontSizeVar && tokens) {
-          const normalizedName = fontSizeVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-                  && token !== null
-                  && 'name' in token
-                  && token.name === normalizedName) : null;
-
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: String(existingToken.value),
-              type: TokenTypes.FONT_SIZES,
-            };
-          }
-        }
-      }
-      return {
-        name: `fontSize.${idx}`,
-        value: style.fontSize.toString(),
-        type: TokenTypes.FONT_SIZES,
-      };
-    }) as StyleToCreateToken[];
-
-    paragraphSpacing = figmaTextStyles.map((style, idx) => {
-      if (style.boundVariables?.paragraphSpacing?.id) {
-        const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
-        if (paragraphSpacingVar && tokens) {
-          const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-              && token !== null
-              && 'name' in token
-              && token.name === normalizedName) : null;
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: (existingToken as unknown as SingleToken).value,
-              type: TokenTypes.PARAGRAPH_SPACING,
-            };
-          }
-        }
-      }
-      return {
-        name: `paragraphSpacing.${idx}`,
-        value: style.paragraphSpacing.toString(),
-        type: TokenTypes.PARAGRAPH_SPACING,
-      };
-    });
+    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'paragraphSpacing',
+      localVariables,
+      tokens,
+      TokenTypes.PARAGRAPH_SPACING,
+      'paragraphSpacing',
+      idx,
+      (value) => value.toString(),
+    ));
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
@@ -306,36 +214,16 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = figmaTextStyles.map((style, idx) => {
-      if (style.boundVariables?.letterSpacing?.id) {
-        const letterSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.letterSpacing?.id);
-        if (letterSpacingVar && tokens) {
-          const normalizedName = letterSpacingVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-              && token !== null
-              && 'name' in token
-              && token.name === normalizedName) : null;
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: (existingToken as unknown as SingleToken).value,
-              type: TokenTypes.LETTER_SPACING,
-            };
-          }
-        }
-      }
-      return {
-        name: `letterSpacing.${idx}`,
-        value: convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-        type: TokenTypes.LETTER_SPACING,
-      };
-    });
+    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'letterSpacing',
+      localVariables,
+      tokens,
+      TokenTypes.LETTER_SPACING,
+      'letterSpacing',
+      idx,
+      (value) => convertFigmaToLetterSpacing(value).toString(),
+    ));
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
