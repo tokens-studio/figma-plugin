@@ -8,10 +8,7 @@ export const ValuesProperty = new FigmaStorageProperty<Record<string, AnyTokenLi
   FigmaStorageType.SHARED_PLUGIN_DATA,
   `${SharedPluginDataNamespaces.TOKENS}/${SharedPluginDataKeys.tokens.values}`,
   (value) => JSON.stringify(value),
-  (value) => {
-    const result = attemptOrFallback<Record<string, AnyTokenList>>(() => (
-      value ? JSON.parse(value) : {}
-    ), {});
-    return result;
-  },
+  (value) => attemptOrFallback<Record<string, AnyTokenList>>(() => (
+    value ? JSON.parse(value) : {}
+  ), {}),
 );
