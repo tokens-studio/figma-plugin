@@ -31,6 +31,8 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import { useStorageSize } from '@/app/hooks/useStorageSize';
+import StorageSizeIndicator from './StorageSizeIndicator';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -40,10 +42,11 @@ export default function Footer() {
   const projectURL = useSelector(projectURLSelector);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
-  const { t } = useTranslation(['footer', 'licence']);
+  const { t } = useTranslation(['footer', 'licence', 'storage']);
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges: hasLocalChange } = useChangedState();
   const { hasRemoteChange } = uiState;
+  const { storageSize, isLocalStorage } = useStorageSize();
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -107,6 +110,9 @@ export default function Footer() {
               />
             </DirtyStateBadgeWrapper>
           </>
+        )}
+        {isLocalStorage && storageSize > 0 && (
+        <StorageSizeIndicator size={storageSize} />
         )}
         {storageType.provider !== StorageProviderType.LOCAL
           && storageType.provider !== StorageProviderType.GITHUB

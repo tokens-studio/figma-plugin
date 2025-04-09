@@ -160,6 +160,8 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
+  console.log('Merged tokens', tokenValues);
+
   const transaction = startTransaction({
     op: 'transaction',
     name: 'Update Tokens',

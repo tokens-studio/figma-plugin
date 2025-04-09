@@ -109,5 +109,10 @@
   "converttow3c": "Convert to W3C DTCG format",
   "converttolegacy": "Convert to legacy format",
   "pushfirsterror": "Push your unsaved changes before converting",
-  "readmoreformat": "Read more"
+  "readmoreformat": "Read more",
+  "storageSizeTooltip": "Current local storage size",
+  "sizeLimitTitle": "Upcoming size limit changes",
+  "sizeLimitDescription": "Figma has changed the maximum allowed size to be stored on shared plugin data - starting May 15 we will no longer be able to save larger amounts of token data. That limit is going to be 100kb, you are currently at {{currentkb}}kb.",
+  "sizeLimitRecommendation": "We recommend switching to a remote storage provider like GitHub or Studio. There will still be local document storage, but we will be using Figma's client storage instead - which is private to the current user (and not viewable by others in your team)",
+  "ok": "OK"
 }
