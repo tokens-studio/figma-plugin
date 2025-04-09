@@ -79,7 +79,9 @@
       "descriptionSecondPart": "如果您已经在使用 Studio 平台并需要设置同步方面的帮助，请阅读",
       "tokensStudioSyncGuide": "Tokens Studio 同步指南请参见此处。",
       "pat": "个人访问令牌",
-      "id": "连接ID"
+      "id": "连接ID",
+      "selectOrgLabel": "选择组织",
+      "selectProjectLabel": "选择项目"
     }
   },
   "selectALayerToSeeAppliedTokens": "选择一个图层以查看应用的令牌",
