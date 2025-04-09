@@ -9,8 +9,10 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
+  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
 } from '@/figmaStorage';
+import { getTokenValues } from '@/utils/figma/getTokenValues';
+import { getCheckForChanges } from '@/utils/figma/getCheckForChanges';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
@@ -107,12 +109,14 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
-    const values = await ValuesProperty.read(figma.root) ?? {};
+    // Get token values from the appropriate storage
+    const values = await getTokenValues() ?? {};
     const themes = await ThemesProperty.read(figma.root) ?? [];
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
-    const checkForChanges = await CheckForChangesProperty.read(figma.root);
+    // Get checkForChanges from the appropriate storage
+    const checkForChanges = await getCheckForChanges();
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
@@ -132,7 +136,7 @@ export async function getTokenData(): Promise<{
       };
     }
   } catch (e) {
-    console.log('Error reading tokens', e);
+    console.error('Error reading tokens', e);
   }
   return null;
 }

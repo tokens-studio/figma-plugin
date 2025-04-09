@@ -31,6 +31,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import StorageSizeIndicator from './StorageSizeIndicator';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -71,6 +72,7 @@ export default function Footer() {
     >
 
       <Stack direction="row" align="center" gap={2}>
+        <StorageSizeIndicator />
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />

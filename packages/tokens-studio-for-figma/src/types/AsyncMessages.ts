@@ -37,6 +37,8 @@ export enum AsyncMessageTypes {
   SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
+  SET_USE_CLIENT_STORAGE_FOR_LOCAL = 'async/set-use-client-storage-for-local',
+  CHECK_STORAGE_SIZE = 'async/check-storage-size',
   SET_NODE_DATA = 'async/set-node-data',
   REMOVE_TOKENS_BY_VALUE = 'async/remove-tokens-by-value',
   REMAP_TOKENS = 'async/remap-tokens',
@@ -101,6 +103,17 @@ export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessage
 
 export type SetStorageTypeAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE, { storageType: StorageType; }>;
 export type SetStorageTypeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_STORAGE_TYPE>;
+
+export type SetUseClientStorageForLocalAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_USE_CLIENT_STORAGE_FOR_LOCAL, { value: boolean; }>;
+
+export type CheckStorageSizeAsyncMessage = AsyncMessage<AsyncMessageTypes.CHECK_STORAGE_SIZE, {
+  tokenValues: Record<string, AnyTokenList>;
+}>;
+export type CheckStorageSizeAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CHECK_STORAGE_SIZE, {
+  isExceeded: boolean;
+}>;
+
+export type SetUseClientStorageForLocalAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_USE_CLIENT_STORAGE_FOR_LOCAL>;
 
 export type SetNodeDataAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_NODE_DATA, { values: NodeTokenRefMap; tokens: AnyTokenList; settings: SettingsState; }>;
 export type SetNodeDataAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_NODE_DATA>;
@@ -219,6 +232,7 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
   tokenFormat: TokenFormatOptions;
+  useClientStorage?: boolean;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   nodes: number
@@ -360,6 +374,8 @@ export type AsyncMessages =
   | ChangedTabsAsyncMessage
   | RemoveSingleCredentialAsyncMessage
   | SetStorageTypeAsyncMessage
+  | SetUseClientStorageForLocalAsyncMessage
+  | CheckStorageSizeAsyncMessage
   | SetOnboardingExplainerSetsAsyncMessage
   | SetOnboardingExplainerExportSetsAsyncMessage
   | SetOnboardingExplainerInspectAsyncMessage
@@ -407,6 +423,8 @@ export type AsyncMessageResults =
   | ChangedTabsAsyncMessageResult
   | RemoveSingleCredentialAsyncMessageResult
   | SetStorageTypeAsyncMessageResult
+  | SetUseClientStorageForLocalAsyncMessageResult
+  | CheckStorageSizeAsyncMessageResult
   | SetOnboardingExplainerSetsAsyncMessageResult
   | SetOnboardingExplainerExportSetsAsyncMessageResult
   | SetOnboardingExplainerSyncProvidersAsyncMessageResult

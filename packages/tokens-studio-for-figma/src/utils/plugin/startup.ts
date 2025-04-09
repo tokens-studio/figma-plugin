@@ -9,8 +9,12 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
+import { migrateStorageData } from './migrateStorageData';
 
 export async function startup() {
+  // Migrate storage data if needed
+  await migrateStorageData();
+
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
   const [
     settings,

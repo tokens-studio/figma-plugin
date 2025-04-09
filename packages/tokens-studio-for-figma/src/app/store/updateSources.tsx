@@ -14,6 +14,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType, StorageTypeCredentials } from '@/types/StorageType';
 import { defaultTokenResolver } from '@/utils/TokenResolver';
 import { getFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { exceedsStorageLimit } from '@/utils/sizeCheck';
 
 type UpdateRemoteTokensPayload = {
   provider: StorageProviderType;
@@ -160,6 +161,40 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
+  // Check if we should use client storage
+  let useClientStorage = false;
+
+  // For local storage, check size before sending to plugin
+  if (isLocal) {
+    try {
+      // Get the current state to check if user is already using client storage
+      const state = dispatch.getState();
+      const alreadyUsingClientStorage = state.uiState.useClientStorageForLocal;
+
+      // Check if token values exceed the storage limit
+      if (exceedsStorageLimit(tokenValues)) {
+        // Storage limit exceeded, use client storage
+        useClientStorage = true;
+
+        // Only show warning if not already using client storage
+        if (!alreadyUsingClientStorage) {
+          // Set the flag in UI state to trigger the warning dialog
+          dispatch.uiState.setStorageLimitExceeded(true);
+        }
+      } else {
+        // Not exceeding limit, but check if user has chosen to use client storage
+        useClientStorage = alreadyUsingClientStorage;
+        dispatch.uiState.setStorageLimitExceeded(false);
+      }
+    } catch (error) {
+      // If there's an error checking the size, use client storage to be safe
+      useClientStorage = true;
+    }
+  } else {
+    // For remote storage, always use client storage
+    useClientStorage = true;
+  }
+
   const transaction = startTransaction({
     op: 'transaction',
     name: 'Update Tokens',
@@ -177,6 +212,7 @@ export default async function updateTokensOnSources({
     shouldSwapStyles,
     collapsedTokenSets,
     tokenFormat,
+    useClientStorage,
   }).then((result) => {
     if (transaction) {
       transaction.setMeasurement('nodes', result.nodes, '');

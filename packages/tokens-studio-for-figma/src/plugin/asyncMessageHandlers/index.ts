@@ -2,6 +2,8 @@ export * from './credentials';
 export * from './changedTabs';
 export * from './removeSingleCredential';
 export * from './setStorageType';
+export * from './setUseClientStorageForLocal';
+export * from './checkStorageSize';
 export * from './setOnboardingExplainerSets';
 export * from './setOnboardingExplainerExportSets';
 export * from './setOnboardingExplainerSyncProviders';
