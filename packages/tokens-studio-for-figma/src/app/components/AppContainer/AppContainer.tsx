@@ -25,6 +25,7 @@ import PullDialog from '../PullDialog';
 import { useFigmaTheme } from '@/hooks/useFigmaTheme';
 import Box from '../Box';
 import { darkThemeMode, lightThemeMode } from '@/stitches.config';
+import StorageLimitWarningChecker from '../StorageLimitWarningChecker';
 
 type Props = StartupMessage & {
   // @README only for unit testing purposes
@@ -107,6 +108,7 @@ export const AppContainer = withLDProviderWrapper((params: Props) => {
       <Changelog />
       <SecondScreenSync />
       <AuthModal />
+      <StorageLimitWarningChecker />
     </Box>
   );
 

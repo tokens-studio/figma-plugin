@@ -91,6 +91,8 @@ export interface UIState {
   showConvertTokenFormatModal: boolean;
   sidebarWidth: number;
   hasRemoteChange: boolean;
+  useClientStorageForLocal: boolean;
+  storageLimitExceeded: boolean;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -151,6 +153,8 @@ export const uiState = createModel<RootModel>()({
     showConvertTokenFormatModal: false,
     sidebarWidth: 150,
     hasRemoteChange: false,
+    useClientStorageForLocal: false,
+    storageLimitExceeded: false,
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -168,6 +172,14 @@ export const uiState = createModel<RootModel>()({
     setHasRemoteChange: (state, data: boolean) => ({
       ...state,
       hasRemoteChange: data,
+    }),
+    setUseClientStorageForLocal: (state, data: boolean) => ({
+      ...state,
+      useClientStorageForLocal: data,
+    }),
+    setStorageLimitExceeded: (state, data: boolean) => ({
+      ...state,
+      storageLimitExceeded: data,
     }),
     setShowConfirm: (
       state,
@@ -464,6 +476,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+      });
+    },
+    setUseClientStorageForLocal(payload: boolean) {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_USE_CLIENT_STORAGE_FOR_LOCAL,
+        value: payload,
       });
     },
   }),

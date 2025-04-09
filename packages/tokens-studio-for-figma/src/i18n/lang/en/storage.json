@@ -109,5 +109,18 @@
   "converttow3c": "Convert to W3C DTCG format",
   "converttolegacy": "Convert to legacy format",
   "pushfirsterror": "Push your unsaved changes before converting",
-  "readmoreformat": "Read more"
+  "readmoreformat": "Read more",
+  "storageLimitWarning": {
+    "title": "Storage Limit Warning",
+    "description": "Your token set is approaching Figma's 100KB shared plugin data limit. To avoid data loss, we recommend switching to a remote storage provider or using client storage.",
+    "switchToRemote": "Switch to Remote Storage",
+    "useClientStorage": "Use Client Storage"
+  },
+  "storageSizeTooltip": "Local storage size: {{size}}KB (Figma limit: {{limit}}KB)",
+  "storageSizeTooltipShared": "Shared Plugin Data: {{size}}KB / {{limit}}KB\nThis storage is limited to 100KB and shared with other plugins",
+  "storageSizeTooltipClient": "Client Storage: {{size}}KB / {{limit}}KB\nThis storage is limited to 5MB but is only available to this plugin",
+  "storageLocation": {
+    "client": "Client Storage",
+    "shared": "Shared Plugin Data"
+  }
 }

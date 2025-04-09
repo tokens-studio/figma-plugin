@@ -16,6 +16,8 @@ AsyncMessageChannel.PluginInstance.handle(
   asyncHandlers.removeSingleCredential,
 );
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_STORAGE_TYPE, asyncHandlers.setStorageType);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USE_CLIENT_STORAGE_FOR_LOCAL, asyncHandlers.setUseClientStorageForLocal);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CHECK_STORAGE_SIZE, asyncHandlers.checkStorageSize);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.SET_ONBOARDINGEXPLAINERSETS,
   asyncHandlers.setOnboardingExplainerSets,
