@@ -79,7 +79,9 @@
       "descriptionSecondPart": "Als u het Studio-platform al gebruikt en hulp nodig heeft bij het instellen van de synchronisatie, lees dan de",
       "tokensStudioSyncGuide": "Tokens Studio Sync-handleiding hier.",
       "pat": "Persoonlijk toegangstoken",
-      "id": "Verbindings-ID"
+      "id": "Verbindings-ID",
+      "selectOrgLabel": "Kies organisatie",
+      "selectProjectLabel": "Kies Project"
     }
   },
   "selectALayerToSeeAppliedTokens": "Selecteer een laag om de toegepaste tokens te zien",
