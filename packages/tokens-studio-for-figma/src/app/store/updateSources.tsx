@@ -161,8 +161,12 @@ export default async function updateTokensOnSources({
     : null;
 
   if (mergedTokens) {
-    const jsonSize = (new TextEncoder().encode(JSON.stringify(tokenValues)).length) / 1024;
-    track('tokens_size', { jsonSize });
+    try {
+      const jsonSize = (new TextEncoder().encode(JSON.stringify(tokenValues)).length) / 1024;
+      track('tokens_size', { jsonSize });
+    } catch (error) {
+      console.error('Failed to track tokens size:', error);
+    }
   }
 
   const transaction = startTransaction({
