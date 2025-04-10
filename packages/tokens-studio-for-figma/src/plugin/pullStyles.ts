@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import compact from 'just-compact';
 import { figmaRGBToHex } from '@figma-plugin/helpers';
-import { SingleColorToken, SingleToken } from '@/types/tokens';
+import { SingleColorToken } from '@/types/tokens';
 import { convertBoxShadowTypeFromFigma } from './figmaTransforms/boxShadow';
 import { convertFigmaGradientToString } from './figmaTransforms/gradients';
 import { convertFigmaToLetterSpacing } from './figmaTransforms/letterSpacing';
@@ -126,71 +126,49 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
       const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
-        && style.fontName.style === font.style);
+ && style.fontName.style === font.style);
 
-      if (matchingStyle?.boundVariables?.fontStyle?.id) {
-        const fontStyleVar = localVariables.find((v) => v.id === matchingStyle.boundVariables?.fontStyle?.id);
-        if (fontStyleVar && tokens) {
-          const normalizedName = fontStyleVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-              && token !== null
-              && 'name' in token
-              && token.name === normalizedName) : null;
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: (existingToken as unknown as SingleToken).value,
-              type: TokenTypes.FONT_WEIGHTS,
-            };
-          }
-        }
+      if (!matchingStyle) {
+        return {
+          name: `fontWeights.${slugify(font.family)}-${idx}`,
+          value: font.style,
+          type: TokenTypes.FONT_WEIGHTS,
+        };
       }
 
-      return {
-        name: `fontWeights.${slugify(font.family)}-${idx}`,
-        value: font.style,
-        type: TokenTypes.FONT_WEIGHTS,
-      };
+      return processTextStyleProperty(
+        matchingStyle,
+        'fontStyle',
+        localVariables,
+        tokens,
+        TokenTypes.FONT_WEIGHTS,
+        `fontWeights.${slugify(font.family)}`,
+        idx,
+        () => font.style,
+      );
     });
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => {
+    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily, idx) => {
       const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
 
-      if (matchingStyle?.boundVariables?.fontFamily?.id) {
-        const fontFamilyVar = localVariables.find((v) => v.id === matchingStyle.boundVariables?.fontFamily?.id);
-        if (fontFamilyVar && tokens) {
-          const normalizedName = fontFamilyVar.name.replace(/\//g, '.');
-
-          const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-            if (found) return found;
-            const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-              && token !== null
-              && 'name' in token
-              && token.name === normalizedName) : null;
-            return foundToken || null;
-          }, null);
-
-          if (existingToken) {
-            return {
-              name: existingToken.name,
-              value: (existingToken as unknown as SingleToken).value,
-              type: TokenTypes.FONT_FAMILIES,
-            };
-          }
-        }
+      if (!matchingStyle) {
+        return {
+          name: `fontFamilies.${slugify(fontFamily)}`,
+          value: fontFamily,
+          type: TokenTypes.FONT_FAMILIES,
+        };
       }
 
-      return {
-        name: `fontFamilies.${slugify(fontFamily)}`,
-        value: fontFamily,
-        type: TokenTypes.FONT_FAMILIES,
-      };
+      return processTextStyleProperty(
+        matchingStyle,
+        'fontFamily',
+        localVariables,
+        tokens,
+        TokenTypes.FONT_FAMILIES,
+        `fontFamilies.${slugify(fontFamily)}`,
+        idx,
+        () => fontFamily,
+      );
     });
 
     // Remove console.log and duplicate fontSizes assignment
