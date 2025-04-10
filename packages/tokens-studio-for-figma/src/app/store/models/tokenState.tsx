@@ -339,10 +339,15 @@ export const tokenState = createModel<RootModel>()({
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
 
-      // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
-          const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
+          let oldValue;
+          Object.values(state.tokens).forEach((tokenSet) => {
+            const foundToken = tokenSet.find((t) => t.name === token.name);
+            if (foundToken && !oldValue) { // Take the first match we find
+              oldValue = foundToken;
+            }
+          });
 
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
@@ -362,6 +367,7 @@ export const tokenState = createModel<RootModel>()({
               updatedTokens.push(updatedToken);
             }
           } else {
+            // Token doesn't exist in any token set
             newTokens.push(token);
           }
         });
