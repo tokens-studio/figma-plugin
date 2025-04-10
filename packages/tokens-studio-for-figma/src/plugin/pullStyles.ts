@@ -171,8 +171,6 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    // Remove console.log and duplicate fontSizes assignment
-
     paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
       style,
       'paragraphSpacing',
