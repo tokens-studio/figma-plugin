@@ -14,7 +14,15 @@ describe('processTextStyleProperty', () => {
       global: [
         { name: 'fontSize.large', value: '24px', type: TokenTypes.FONT_SIZES },
         { name: 'lineHeight.relaxed', value: '1.5', type: TokenTypes.LINE_HEIGHTS },
+      ],
+      theme: [
         { name: 'letterSpacing.tight', value: '-0.5px', type: TokenTypes.LETTER_SPACING },
+      ],
+      components: [
+        { name: 'fontSize.small', value: '12px', type: TokenTypes.FONT_SIZES },
+      ],
+      core: [
+        { name: 'lineHeight.normal', value: '1.2', type: TokenTypes.LINE_HEIGHTS },
       ],
     },
   };
