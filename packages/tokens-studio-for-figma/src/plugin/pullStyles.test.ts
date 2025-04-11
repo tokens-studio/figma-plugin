@@ -143,6 +143,75 @@ describe('pullStyles', () => {
     });
   });
 
+  it('pulls text styles without bound variables', async () => {
+    figma.getLocalTextStyles.mockReturnValue([
+      {
+        name: 'heading/h1/regular',
+        id: '456',
+        description: 'the regular one',
+        fontSize: 24,
+        fontName: { family: 'Inter', style: 'Regular' },
+        lineHeight: { unit: 'PIXELS', value: 32 },
+        paragraphSpacing: 16,
+        paragraphIndent: 8,
+        letterSpacing: { unit: 'PIXELS', value: -0.5 },
+        textCase: 'UPPER',
+        textDecoration: 'UNDERLINE',
+        boundVariables: {},
+      },
+    ]);
+
+    await pullStyles({ textStyles: true });
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
+      typography: [
+        {
+          name: 'heading.h1.regular',
+          type: 'typography',
+          value: {
+            fontFamily: '{fontFamilies.inter}',
+            fontWeight: '{fontWeights.inter-0}',
+            fontSize: '{fontSize.0}',
+            lineHeight: '{lineHeights.0}',
+            letterSpacing: '{letterSpacing.0}',
+            paragraphSpacing: '{paragraphSpacing.0}',
+            paragraphIndent: '{paragraphIndent.0}',
+            textCase: '{textCase.uppercase}',
+            textDecoration: '{textDecoration.underline}',
+          },
+          description: 'the regular one',
+        },
+      ],
+      fontFamilies: [
+        { name: 'fontFamilies.inter', type: 'fontFamilies', value: 'Inter' },
+      ],
+      fontWeights: [
+        { name: 'fontWeights.inter-0', type: 'fontWeights', value: 'Regular' },
+      ],
+      fontSizes: [
+        { name: 'fontSize.0', type: 'fontSizes', value: '24' },
+      ],
+      letterSpacing: [
+        { name: 'letterSpacing.0', type: 'letterSpacing', value: '-0.5' },
+      ],
+      lineHeights: [
+        { name: 'lineHeights.0', type: 'lineHeights', value: '32' },
+      ],
+      paragraphSpacing: [
+        { name: 'paragraphSpacing.0', type: 'paragraphSpacing', value: '16' },
+      ],
+      paragraphIndent: [
+        { name: 'paragraphIndent.0', type: 'dimension', value: '8px' },
+      ],
+      textCase: [
+        { name: 'textCase.uppercase', type: 'textCase', value: 'uppercase' },
+      ],
+      textDecoration: [
+        { name: 'textDecoration.underline', type: 'textDecoration', value: 'underline' },
+      ],
+    });
+  });
+
   it('pulls shadow styles', async () => {
     figma.getLocalEffectStyles.mockReturnValue([
       {
