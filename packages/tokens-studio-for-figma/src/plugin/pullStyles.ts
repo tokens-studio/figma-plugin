@@ -156,7 +156,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
       return processTextStyleProperty(
         matchingStyle,
-        'fontWeights',
+        'fontStyle',
         localVariables,
         tokens,
         TokenTypes.FONT_WEIGHTS,
@@ -179,7 +179,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
       return processTextStyleProperty(
         matchingStyle,
-        'fontFamilies',
+        'fontFamily',
         localVariables,
         tokens,
         TokenTypes.FONT_FAMILIES,
