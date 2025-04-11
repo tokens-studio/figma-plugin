@@ -10,7 +10,8 @@ export function processTextStyleProperty(
   tokenType: TokenTypes,
   defaultNamePrefix: string,
   idx: number,
-  valueTransformer?: (value: any) => string): StyleToCreateToken {
+  valueTransformer?: (value: any) => string,
+): StyleToCreateToken {
   // Check if the style has a bound variable for this property
   const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
   if (boundVariables?.[propertyKey]?.id) {
@@ -43,8 +44,17 @@ export function processTextStyleProperty(
   const styleValue = style[propertyKey as keyof TextStyle];
   const transformedValue = valueTransformer ? valueTransformer(styleValue) : String(styleValue);
 
+  let tokenName = defaultNamePrefix;
+  if (idx !== undefined) {
+    if (tokenType === TokenTypes.FONT_WEIGHTS) {
+      tokenName = `${defaultNamePrefix}-${idx}`;
+    } else if (tokenType !== TokenTypes.FONT_FAMILIES) {
+      tokenName = `${defaultNamePrefix}.${idx}`;
+    }
+  }
+
   return {
-    name: `${defaultNamePrefix}.${idx}`,
+    name: tokenName,
     value: transformedValue,
     type: tokenType,
   };
