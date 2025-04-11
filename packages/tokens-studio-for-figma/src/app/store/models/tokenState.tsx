@@ -339,16 +339,20 @@ export const tokenState = createModel<RootModel>()({
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
 
+      // Create a map of token names to tokens once, outside the loop
+      const tokenMap = new Map();
+      Object.values(state.tokens).forEach((tokenSet) => {
+        tokenSet.forEach((token) => {
+          if (!tokenMap.has(token.name)) { // Only store first occurrence
+            tokenMap.set(token.name, token);
+          }
+        });
+      });
+
+      // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
-          let oldValue;
-          Object.values(state.tokens).forEach((tokenSet) => {
-            const foundToken = tokenSet.find((t) => t.name === token.name);
-            if (foundToken && !oldValue) { // Take the first match we find
-              oldValue = foundToken;
-            }
-          });
-
+          const oldValue = tokenMap.get(token.name);
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               const normalizedOldValueDescription = oldValue.description ?? '';
