@@ -18,6 +18,24 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
 
+function findBoundVariable(
+  style: TextStyle,
+  propertyKey: string,
+  localVariables: Variable[],
+  compareValue: (el: StyleToCreateToken) => boolean,
+): (el: StyleToCreateToken) => boolean {
+  return (el: StyleToCreateToken) => {
+    if (style.boundVariables?.[propertyKey]?.id) {
+      const boundVar = localVariables.find((v) => v.id === style.boundVariables?.[propertyKey]?.id);
+      if (boundVar) {
+        const normalizedName = boundVar.name.replace(/\//g, '.');
+        return el.name === normalizedName;
+      }
+    }
+    return compareValue(el);
+  };
+}
+
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
   const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
@@ -214,58 +232,48 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.fontFamily?.id) {
-          const fontFamilyVar = localVariables.find((v) => v.id === style.boundVariables?.fontFamily?.id);
-          if (fontFamilyVar) {
-            const normalizedName = fontFamilyVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
-        }
-        return el.value === style.fontName.family;
-      });
+      const foundFamily = fontFamilies.find(
+        findBoundVariable(
+          style,
+          'fontFamily',
+          localVariables,
+          (el) => el.value === style.fontName.family,
+        ),
+      );
 
-      const foundFontWeight = fontWeights.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.fontStyle?.id) {
-          const fontStyleVar = localVariables.find((v) => v.id === style.boundVariables?.fontStyle?.id);
-          if (fontStyleVar) {
-            const normalizedName = fontStyleVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
-        }
-        return el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style;
-      });
+      const foundFontWeight = fontWeights.find(
+        findBoundVariable(
+          style,
+          'fontStyle',
+          localVariables,
+          (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
+        ),
+      );
 
-      const foundLineHeight = lineHeights.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.lineHeight?.id) {
-          const lineHeightVar = localVariables.find((v) => v.id === style.boundVariables?.lineHeight?.id);
-          if (lineHeightVar) {
-            const normalizedName = lineHeightVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
-        }
-        return el.value === convertFigmaToLineHeight(style.lineHeight).toString();
-      });
-      const foundFontSize = fontSizes.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.fontSize?.id) {
-          const fontSizeVar = localVariables.find((v) => v.id === style.boundVariables?.fontSize?.id);
-          if (fontSizeVar) {
-            const normalizedName = fontSizeVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
-        }
-        return el.value === style.fontSize.toString();
-      });
-      const foundLetterSpacing = letterSpacing.find((el: StyleToCreateToken) => {
-        if (style.boundVariables?.letterSpacing?.id) {
-          const letterSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.letterSpacing?.id);
-          if (letterSpacingVar) {
-            const normalizedName = letterSpacingVar.name.replace(/\//g, '.');
-            return el.name === normalizedName;
-          }
-        }
-        return el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString();
-      });
+      const foundLineHeight = lineHeights.find(
+        findBoundVariable(
+          style,
+          'lineHeight',
+          localVariables,
+          (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
+        ),
+      );
+      const foundFontSize = fontSizes.find(
+        findBoundVariable(
+          style,
+          'fontSize',
+          localVariables,
+          (el) => el.value === style.fontSize.toString(),
+        ),
+      );
+      const foundLetterSpacing = letterSpacing.find(
+        findBoundVariable(
+          style,
+          'letterSpacing',
+          localVariables,
+          (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        ),
+      );
       const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
         if (style.boundVariables?.paragraphSpacing?.id) {
           const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
