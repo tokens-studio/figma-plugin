@@ -17,24 +17,7 @@ import { StyleToCreateToken } from '@/types/payloads';
 import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 import { getTokenData } from './node';
 import { processTextStyleProperty } from './processTextStyleProperty';
-
-function findBoundVariable(
-  style: TextStyle,
-  propertyKey: string,
-  localVariables: Variable[],
-  compareValue: (el: StyleToCreateToken) => boolean,
-): (el: StyleToCreateToken) => boolean {
-  return (el: StyleToCreateToken) => {
-    if (style.boundVariables?.[propertyKey]?.id) {
-      const boundVar = localVariables.find((v) => v.id === style.boundVariables?.[propertyKey]?.id);
-      if (boundVar) {
-        const normalizedName = boundVar.name.replace(/\//g, '.');
-        return el.name === normalizedName;
-      }
-    }
-    return compareValue(el);
-  };
-}
+import { findBoundVariable } from '@/utils/findBoundVariable';
 
 export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
   const tokens = await getTokenData();
