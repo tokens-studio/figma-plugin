@@ -79,7 +79,9 @@
       "descriptionSecondPart": "Si ya está utilizando la plataforma Studio y necesita ayuda para configurar la sincronización, lea el",
       "tokensStudioSyncGuide": "Guía de sincronización de Tokens Studio aquí.",
       "pat": "Token de acceso personal",
-      "id": "ID de conexión"
+      "id": "ID de conexión",
+      "selectOrgLabel": "Elija la organización",
+      "selectProjectLabel": "Elija Proyecto"
     }
   },
   "selectALayerToSeeAppliedTokens": "Seleccione una capa para ver los tokens aplicados",
