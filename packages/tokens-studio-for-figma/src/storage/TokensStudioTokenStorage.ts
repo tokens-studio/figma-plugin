@@ -1,4 +1,5 @@
 import {
+  PaginatedSets,
   ThemeGroup, TokenSetType, TokensSet, create,
 } from '@tokens-studio/sdk';
 import * as Sentry from '@sentry/react';
@@ -25,12 +26,13 @@ import {
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
 import { TokensStudioAction } from '@/app/store/providers/tokens-studio';
+import { GET_TOKEN_SET_PAGE } from './tokensStudio/graphql/getTokenSetsQuery';
 
 const DEFAULT_BRANCH = 'main';
 
 const makeClient = (secret: string) => create({
-  host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-  secure: process.env.NODE_ENV !== 'development',
+  host: process.env.TOKENS_STUDIO_API_HOST ?? 'localhost:4200',
+  secure: !!process.env.SECURE_API,
   auth: `Bearer ${secret}`,
 });
 
@@ -47,27 +49,72 @@ type ProjectData = {
   tokenSetOrder: string[];
 };
 
-async function getProjectData(id: string, orgId: string, client: any): Promise<ProjectData | null> {
+export async function getAllTokenSets(
+  id: string,
+  orgId: string,
+  client: ReturnType<typeof create>,
+  branch = DEFAULT_BRANCH,
+): Promise<TokensSet[]> {
+
+  console.trace(branch);
+  const data = await client.query({
+    query: GET_TOKEN_SET_PAGE,
+    variables: {
+      projectId: id,
+      organization: orgId,
+      branch,
+      page: 1,
+    },
+  });
+
+  if (!data.data?.project?.branch) {
+    return [];
+  }
+
+  const paginatedData = data.data.project.branch.tokenSets as PaginatedSets;
+
+  const page1Data = data.data.project.branch.tokenSets.data as TokensSet[];
+
+  // +1 to account from non zero index, another +1 to account for the first page
+  const pageIndices = Array.from(
+    { length: paginatedData.totalPages - 1 },
+    (_, i) => i + 2,
+  );
+
+  const remainingPages = await Promise.all(
+    pageIndices.map(async (page) => {
+      const data = await client.query({
+        query: GET_TOKEN_SET_PAGE,
+        variables: {
+          projectId: id,
+          organization: orgId,
+          name: "main",
+          page,
+        },
+      });
+      return data.data.project.branch.tokenSets.data as TokensSet[];
+    }),
+  );
+
+  return [...page1Data, ...remainingPages.flat()];
+}
+
+async function getProjectData(id: string, orgId: string, client: ReturnType<typeof create>, branch = DEFAULT_BRANCH): Promise<ProjectData | null> {
   try {
-    const data = await client.query({
-      query: GET_PROJECT_DATA_QUERY,
-      variables: {
-        projectId: id,
-        organization: orgId,
-        name: DEFAULT_BRANCH,
-      },
-    });
+    const [projectData, tokenSets] = await Promise.all([
+      client.query({
+        query: GET_PROJECT_DATA_QUERY,
+        variables: {
+          projectId: id,
+          organization: orgId,
+          branch,
+        },
+      }),
+      getAllTokenSets(id, orgId, client),
+    ]);
 
-    if (!data.data?.project?.branch) {
+    if (!projectData.data?.project?.branch) {
       return null;
-    }
-
-    const tokenSets = data.data.project.branch.tokenSets.data as TokensSet[];
-    const { totalPages } = data.data.project.branch.tokenSets;
-
-    // TODO: This is a temporary solution until we implement pagination
-    if (totalPages > 1) {
-      notifyToUI('We are currently supporting up to 1000 sets, if you encounter this issue and need even more sets please reach out to us on slack or featurebase.', { error: true });
     }
 
     const returnData = tokenSets.reduce(
@@ -86,7 +133,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
       .map((tokenSet) => tokenSet.name);
 
     let themes = [] as ThemeObjectsList;
-    const themeGroups = data.data.project.branch.themeGroups.data as ThemeGroup[];
+    const themeGroups = projectData.data.project.branch.themeGroups.data as ThemeGroup[];
 
     if (themeGroups) {
       themeGroups.forEach(({ name: group, options }) => {
@@ -100,8 +147,8 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
             const selectedTokenSets = theme?.selectedTokenSets;
 
             return {
-              id: `${group}-${theme?.name}` as string,
-              name: theme?.name as string,
+              id: theme.id,
+              name: theme?.name,
               group,
               selectedTokenSets,
               $figmaStyleReferences: theme?.figmaStyleReferences,
@@ -485,3 +532,4 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     }
   }
 }
+
