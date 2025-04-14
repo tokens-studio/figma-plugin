@@ -5028,7 +5028,7 @@
     "@supabase/supabase-js" "^2.0.5"
     "@supernovaio/supernova-sdk" "^1.9.3"
     "@tokens-studio/graph-engine" "^0.17.5"
-    "@tokens-studio/sdk" "^2.2.0"
+    "@tokens-studio/sdk" "^2.2.1"
     "@tokens-studio/tokens" "0.2.5"
     "@tokens-studio/types" "0.5.1"
     "@tokens-studio/ui" "0.9.0"

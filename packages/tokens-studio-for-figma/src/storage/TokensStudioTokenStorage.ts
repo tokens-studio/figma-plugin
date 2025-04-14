@@ -55,8 +55,6 @@ export async function getAllTokenSets(
   client: ReturnType<typeof create>,
   branch = DEFAULT_BRANCH,
 ): Promise<TokensSet[]> {
-
-  console.trace(branch);
   const data = await client.query({
     query: GET_TOKEN_SET_PAGE,
     variables: {
@@ -83,16 +81,16 @@ export async function getAllTokenSets(
 
   const remainingPages = await Promise.all(
     pageIndices.map(async (page) => {
-      const data = await client.query({
+      const pageData = await client.query({
         query: GET_TOKEN_SET_PAGE,
         variables: {
           projectId: id,
           organization: orgId,
-          name: "main",
+          branch,
           page,
         },
       });
-      return data.data.project.branch.tokenSets.data as TokensSet[];
+      return pageData.data.project.branch.tokenSets.data as TokensSet[];
     }),
   );
 
