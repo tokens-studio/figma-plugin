@@ -94,8 +94,8 @@ export default function TokensStudioForm({
   const fetchOrgData = React.useCallback(async () => {
     try {
       const client = create({
-        host: process.env.TOKENS_STUDIO_API_HOST || 'localhost:4200',
-        secure: process.env.NODE_ENV !== 'development',
+        host: process.env.TOKENS_STUDIO_API_HOST ?? 'localhost:4200',
+        secure: !!process.env.SECURE_API,
         auth: `Bearer ${values.secret}`,
       });
       const result = await client.query({
@@ -105,6 +105,7 @@ export default function TokensStudioForm({
         setOrgData(result.data.organizations.data as Organization[]);
         dispatch.userState.setTokensStudioPAT(values.secret);
       }
+      setFetchOrgsError(null);
     } catch (error) {
       setFetchOrgsError('Error fetching organization data. Please check your Studio API key.');
     }
