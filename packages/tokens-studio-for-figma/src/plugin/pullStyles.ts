@@ -14,8 +14,13 @@ import { slugify } from '@/utils/string';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { TokenBoxshadowValue } from '@/types/values';
 import { StyleToCreateToken } from '@/types/payloads';
+import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
+import { getTokenData } from './node';
+import { processTextStyleProperty } from './processTextStyleProperty';
+import { findBoundVariable } from '@/utils/findBoundVariable';
 
-export default function pullStyles(styleTypes: PullStyleOptions): void {
+export default async function pullStyles(styleTypes: PullStyleOptions): Promise<void> {
+  const tokens = await getTokenData();
   // @TODO should be specifically typed according to their type
   let colors: StyleToCreateToken[] = [];
   let typography: StyleToCreateToken[] = [];
@@ -81,6 +86,7 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     const rawTextDecoration: TextDecoration[] = [];
 
     const figmaTextStyles = figma.getLocalTextStyles();
+    const localVariables = await getVariablesWithoutZombies();
 
     figmaTextStyles.forEach((style) => {
       if (!rawFontSizes.includes(style.fontSize)) rawFontSizes.push(style.fontSize);
@@ -93,45 +99,89 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = rawFontSizes
-      .sort((a, b) => a - b)
-      .map((size, idx) => ({
-        name: `fontSize.${idx}`,
-        value: Number(size.toFixed(3)).toString(),
-        type: TokenTypes.FONT_SIZES,
-      }));
+    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'fontSize',
+      localVariables,
+      tokens,
+      TokenTypes.FONT_SIZES,
+      'fontSize',
+      idx,
+      (value) => value.toString(),
+    ));
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
-    lineHeights = rawLineHeights
-      .filter(
-        (v, i, a) => a.findIndex((t) => t.unit === v.unit && ('value' in t && 'value' in v ? t.value === v.value : true)) === i,
-      )
-      .map((lh, idx) => ({
-        name: `lineHeights.${idx}`,
-        value: convertFigmaToLineHeight(lh).toString(),
-        type: TokenTypes.LINE_HEIGHTS,
-      }));
 
-    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily) => ({
-      name: `fontFamilies.${slugify(fontFamily)}`,
-      value: fontFamily,
-      type: TokenTypes.FONT_FAMILIES,
-    }));
+    lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'lineHeight',
+      localVariables,
+      tokens,
+      TokenTypes.LINE_HEIGHTS,
+      'lineHeights',
+      idx,
+      (value) => convertFigmaToLineHeight(value).toString(),
+    ));
 
-    fontWeights = uniqueFontCombinations.map((font, idx) => ({
-      name: `fontWeights.${slugify(font.family)}-${idx}`,
-      value: font.style,
-      type: TokenTypes.FONT_WEIGHTS,
-    }));
-    paragraphSpacing = rawParagraphSpacing
-      .sort((a, b) => a - b)
-      .map((size, idx) => ({
-        name: `paragraphSpacing.${idx}`,
-        value: size.toString(),
-        type: TokenTypes.PARAGRAPH_SPACING,
-      }));
+    fontWeights = uniqueFontCombinations.map((font, idx) => {
+      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
+ && style.fontName.style === font.style);
+
+      if (!matchingStyle) {
+        return {
+          name: `fontWeights.${slugify(font.family)}-${idx}`,
+          value: font.style,
+          type: TokenTypes.FONT_WEIGHTS,
+        };
+      }
+
+      return processTextStyleProperty(
+        matchingStyle,
+        'fontStyle',
+        localVariables,
+        tokens,
+        TokenTypes.FONT_WEIGHTS,
+        `fontWeights.${slugify(font.family)}`,
+        idx,
+        () => font.style,
+      );
+    });
+
+    fontFamilies = [...new Set(uniqueFontCombinations.map((font) => font.family))].map((fontFamily, idx) => {
+      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === fontFamily);
+
+      if (!matchingStyle) {
+        return {
+          name: `fontFamilies.${slugify(fontFamily)}`,
+          value: fontFamily,
+          type: TokenTypes.FONT_FAMILIES,
+        };
+      }
+
+      return processTextStyleProperty(
+        matchingStyle,
+        'fontFamily',
+        localVariables,
+        tokens,
+        TokenTypes.FONT_FAMILIES,
+        `fontFamilies.${slugify(fontFamily)}`,
+        idx,
+        () => fontFamily,
+      );
+    });
+
+    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'paragraphSpacing',
+      localVariables,
+      tokens,
+      TokenTypes.PARAGRAPH_SPACING,
+      'paragraphSpacing',
+      idx,
+      (value) => value.toString(),
+    ));
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
@@ -141,13 +191,16 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = rawLetterSpacing
-      .filter((v, i, a) => a.findIndex((t) => t.unit === v.unit && t.value === v.value) === i)
-      .map((lh, idx) => ({
-        name: `letterSpacing.${idx}`,
-        value: convertFigmaToLetterSpacing(lh).toString(),
-        type: TokenTypes.LETTER_SPACING,
-      }));
+    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
+      style,
+      'letterSpacing',
+      localVariables,
+      tokens,
+      TokenTypes.LETTER_SPACING,
+      'letterSpacing',
+      idx,
+      (value) => convertFigmaToLetterSpacing(value).toString(),
+    ));
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
@@ -162,20 +215,58 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     }));
 
     typography = figmaTextStyles.map((style) => {
-      const foundFamily = fontFamilies.find((el: StyleToCreateToken) => el.value === style.fontName.family);
+      const foundFamily = fontFamilies.find(
+        findBoundVariable(
+          style,
+          'fontFamily',
+          localVariables,
+          (el) => el.value === style.fontName.family,
+        ),
+      );
+
       const foundFontWeight = fontWeights.find(
-        (el: StyleToCreateToken) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
+        findBoundVariable(
+          style,
+          'fontStyle',
+          localVariables,
+          (el) => el.name.includes(slugify(style.fontName.family)) && el.value === style.fontName?.style,
+        ),
       );
+
       const foundLineHeight = lineHeights.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
+        findBoundVariable(
+          style,
+          'lineHeight',
+          localVariables,
+          (el) => el.value === convertFigmaToLineHeight(style.lineHeight).toString(),
+        ),
       );
-      const foundFontSize = fontSizes.find((el: StyleToCreateToken) => el.value === style.fontSize.toString());
+      const foundFontSize = fontSizes.find(
+        findBoundVariable(
+          style,
+          'fontSize',
+          localVariables,
+          (el) => el.value === style.fontSize.toString(),
+        ),
+      );
       const foundLetterSpacing = letterSpacing.find(
-        (el: StyleToCreateToken) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        findBoundVariable(
+          style,
+          'letterSpacing',
+          localVariables,
+          (el) => el.value === convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        ),
       );
-      const foundParagraphSpacing = paragraphSpacing.find(
-        (el: StyleToCreateToken) => el.value === style.paragraphSpacing.toString(),
-      );
+      const foundParagraphSpacing = paragraphSpacing.find((el: StyleToCreateToken) => {
+        if (style.boundVariables?.paragraphSpacing?.id) {
+          const paragraphSpacingVar = localVariables.find((v) => v.id === style.boundVariables?.paragraphSpacing?.id);
+          if (paragraphSpacingVar) {
+            const normalizedName = paragraphSpacingVar.name.replace(/\//g, '.');
+            return el.name === normalizedName;
+          }
+        }
+        return el.value === style.paragraphSpacing.toString();
+      });
       const foundParagraphIndent = paragraphIndent.find(
         (el: StyleToCreateToken) => el.value === `${style.paragraphIndent.toString()}px`,
       );
@@ -271,14 +362,14 @@ export default function pullStyles(styleTypes: PullStyleOptions): void {
     paragraphIndent,
   };
 
-  type ResultObject = Record<string, StyleToCreateToken[]>;
+ type ResultObject = Record<string, StyleToCreateToken[]>;
 
-  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
-    if (value.length > 0) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+ const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+   if (value.length > 0) {
+     acc[key] = value;
+   }
+   return acc;
+ }, {});
 
-  notifyStyleValues(returnedObject);
+ notifyStyleValues(returnedObject);
 }
