@@ -14,5 +14,5 @@ export function useStorageSizeWarning(tokensSize: number) {
         cancelAction: t('storageLimitWarning.useClientStorage'),
       });
     }
-  }, [confirm, tokensSize]);
+  }, [confirm, tokensSize, t]);
 }
