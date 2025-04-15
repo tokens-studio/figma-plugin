@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton, Badge } from '@tokens-studio/ui';
+import { WarningTriangleSolid } from 'iconoir-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Stack from './Stack';
@@ -32,6 +33,7 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
 
 const getBadgeVariant = (sizeInKB: number) => {
   if (sizeInKB >= 100) return 'danger';
@@ -66,6 +68,8 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
+  const handleBadgeClick = useStorageSizeWarning(tokensSize);
+
   return (
     <Box
       css={{
@@ -81,8 +85,15 @@ export default function Footer() {
         <Badge
           variant={getBadgeVariant(tokensSize)}
           size="small"
+          onClick={handleBadgeClick}
+          style={{ cursor: tokensSize >= 90 ? 'pointer' : 'default' }}
         >
-          {`${tokensSize} kb${tokensSize >= 90 ? ' !' : ''}`}
+          {`${tokensSize} kb`}
+          {tokensSize >= 90 && (
+            <span style={{ marginLeft: '4px', display: 'inline-flex', alignItems: 'center' }}>
+              <WarningTriangleSolid width={12} height={12} />
+            </span>
+          )}
         </Badge>
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
