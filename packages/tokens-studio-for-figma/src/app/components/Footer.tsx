@@ -16,7 +16,7 @@ import {
   projectURLSelector,
   activeThemeSelector,
   uiStateSelector,
-  tokensSelector,
+  tokensSizeSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -32,14 +32,19 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
-import { checkStorageSize } from '@/utils/checkStorageSize';
+
+const getBadgeVariant = (sizeInKB: number) => {
+  if (sizeInKB >= 100) return 'danger';
+  if (sizeInKB >= 90) return 'danger';
+  return 'success';
+};
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
-  const tokens = useSelector(tokensSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const tokensSize = useSelector(tokensSizeSelector);
   const projectURL = useSelector(projectURLSelector);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
@@ -74,10 +79,10 @@ export default function Footer() {
     >
       <Stack direction="row" align="center" gap={2}>
         <Badge
-          variant="accent"
+          variant={getBadgeVariant(tokensSize)}
           size="small"
         >
-          {`${checkStorageSize(tokens).sizeInKB} kb`}
+          {`${tokensSize} kb${tokensSize >= 90 ? ' !' : ''}`}
         </Badge>
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
