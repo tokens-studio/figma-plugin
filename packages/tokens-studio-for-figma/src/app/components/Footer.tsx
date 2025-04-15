@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
-import { IconButton } from '@tokens-studio/ui';
+import { IconButton, Badge } from '@tokens-studio/ui';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Stack from './Stack';
@@ -16,6 +16,7 @@ import {
   projectURLSelector,
   activeThemeSelector,
   uiStateSelector,
+  tokensSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -31,11 +32,13 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import { checkStorageSize } from '@/utils/checkStorageSize';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
+  const tokens = useSelector(tokensSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const projectURL = useSelector(projectURLSelector);
   const uiState = useSelector(uiStateSelector, isEqual);
@@ -69,8 +72,13 @@ export default function Footer() {
         borderTop: '1px solid $borderMuted',
       }}
     >
-
       <Stack direction="row" align="center" gap={2}>
+        <Badge
+          variant="accent"
+          size="small"
+        >
+          {`${checkStorageSize(tokens).sizeInKB} kb`}
+        </Badge>
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />
