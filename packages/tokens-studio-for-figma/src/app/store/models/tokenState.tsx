@@ -53,6 +53,7 @@ import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTok
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
+import { checkStorageSize } from '@/utils/checkStorageSize';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -80,6 +81,7 @@ export interface TokenState {
     newThemes: ThemeObjectsList;
     updatedThemes: ThemeObjectsList;
   };
+  tokensSize: number;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -120,6 +122,7 @@ export const tokenState = createModel<RootModel>()({
       newThemes: [],
       updatedThemes: [],
     },
+    tokensSize: 0,
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -158,6 +161,7 @@ export const tokenState = createModel<RootModel>()({
       themes: data.themes || state.themes,
       activeTheme: data.activeTheme || state.activeTheme,
       tokens: addIdPropertyToTokens(data.sets ?? {}) || addIdPropertyToTokens(state.tokens),
+      tokensSize: checkStorageSize(data.sets ?? {}).sizeInKB,
     }),
     addTokenSet: (state, name: string): TokenState => {
       if (name in state.tokens) {
@@ -215,6 +219,7 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...addIdPropertyToTokens(values),
         },
+        tokensSize: checkStorageSize(values).sizeInKB,
       };
     },
     setHasUnsavedChanges(state, payload: boolean) {
@@ -226,6 +231,7 @@ export const tokenState = createModel<RootModel>()({
     setTokens: (state, newTokens: Record<string, AnyTokenList>) => ({
       ...state,
       tokens: addIdPropertyToTokens(newTokens),
+      tokensSize: checkStorageSize(newTokens).sizeInKB,
     }),
     createToken: (state, data: UpdateTokenPayload) => {
       let newTokens: TokenStore['values'] = {};
@@ -243,6 +249,7 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...newTokens,
         },
+        tokensSize: checkStorageSize(state.tokens).sizeInKB,
       };
     },
     createMultipleTokens: (state, data: CreateSingleTokenData[]) => {
@@ -261,6 +268,7 @@ export const tokenState = createModel<RootModel>()({
       return {
         ...state,
         tokens: newTokens,
+        tokensSize: checkStorageSize(newTokens).sizeInKB,
       };
     },
     editMultipleTokens: (state, data: EditSingleTokenData[]) => {
@@ -280,6 +288,7 @@ export const tokenState = createModel<RootModel>()({
       return {
         ...state,
         tokens: newTokens,
+        tokensSize: checkStorageSize(newTokens).sizeInKB,
       };
     },
     duplicateToken: (state, data: DuplicateTokenPayload) => {
@@ -330,6 +339,7 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...newTokens,
         },
+        tokensSize: checkStorageSize(newTokens).sizeInKB,
       };
     },
 
@@ -383,6 +393,7 @@ export const tokenState = createModel<RootModel>()({
           newTokens,
           updatedTokens,
         },
+        tokensSize: checkStorageSize(state.tokens).sizeInKB,
       } as TokenState;
     },
     // Imports received variables as tokens, if needed
@@ -425,6 +436,7 @@ export const tokenState = createModel<RootModel>()({
           newTokens,
           updatedTokens,
         },
+        tokensSize: checkStorageSize(state.tokens).sizeInKB,
       } as TokenState;
     },
     editToken: (state, data: UpdateTokenPayload) => {
@@ -623,6 +635,7 @@ export const tokenState = createModel<RootModel>()({
           ...state.tokens,
           ...newTokens,
         },
+        tokensSize: checkStorageSize(newTokens).sizeInKB,
       };
     },
     setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
