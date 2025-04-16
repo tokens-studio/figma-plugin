@@ -1,6 +1,6 @@
 import { AsyncMessageChannelHandlers } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
-import type { AnyTokenList } from '@/types/AsyncMessages';
+import type { AnyTokenList } from '@/types/tokens';
 
 /**
  * Plugin handler: generate a style guide page/frame in the Figma document for color tokens.
@@ -14,7 +14,8 @@ export const generateStyleGuide: AsyncMessageChannelHandlers[AsyncMessageTypes.G
   // Create a frame for color swatches
   const frame = figma.createFrame();
   frame.name = 'Colors';
-  frame.layoutMode = 'GRID';
+  // Use vertical auto-layout for listing color swatches
+  frame.layoutMode = 'VERTICAL';
   frame.primaryAxisSizingMode = 'AUTO';
   frame.counterAxisSizingMode = 'AUTO';
   frame.itemSpacing = 16;
@@ -29,8 +30,8 @@ export const generateStyleGuide: AsyncMessageChannelHandlers[AsyncMessageTypes.G
 
   // Iterate color tokens and place swatches + labels
   for (const token of msg.tokens) {
-    if ((token as any).type === 'color') {
-      const style = paintStyles.find(s => s.name === (token as any).name);
+    if (token.type === 'color') {
+      const style = paintStyles.find(s => s.name === token.name);
       if (!style) continue;
 
       // Swatch rectangle
@@ -38,12 +39,12 @@ export const generateStyleGuide: AsyncMessageChannelHandlers[AsyncMessageTypes.G
       rect.resize(100, 100);
       rect.fills = [];
       rect.fillStyleId = style.id;
-      rect.name = (token as any).name;
+      rect.name = token.name;
       frame.appendChild(rect);
 
       // Label text
       const text = figma.createText();
-      text.characters = (token as any).name;
+      text.characters = token.name;
       text.fontSize = 12;
       text.textAlignHorizontal = 'CENTER';
       text.textAlignVertical = 'CENTER';

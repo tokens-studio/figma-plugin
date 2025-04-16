@@ -364,6 +364,7 @@ export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageT
 
 export type AsyncMessages =
   CreateStylesAsyncMessage
+  | GenerateStyleGuideAsyncMessage  // UI -> plugin: generate a color style guide
   | RenameStylesAsyncMessage
   | RemoveStylesAsyncMessage
   | CredentialsAsyncMessage
@@ -411,6 +412,7 @@ export type AsyncMessages =
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
+  | GenerateStyleGuideAsyncMessageResult  // plugin -> UI: completed style guide generation
   | RenameStylesAsyncMessageResult
   | RemoveStylesAsyncMessageResult
   | CredentialsAsyncMessageResult

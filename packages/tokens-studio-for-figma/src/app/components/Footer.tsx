@@ -168,12 +168,13 @@ export default function Footer() {
           <IconButton
             data-testid="footer-generate-style-guide"
             icon={<IconLibrary />}
-            onClick={() =>
-              AsyncMessageChannel.ReactInstance.send({
+            onClick={() => {
+              // Fire and forget style guide generation
+              AsyncMessageChannel.ReactInstance.message({
                 type: AsyncMessageTypes.GENERATE_STYLE_GUIDE,
                 tokens,
-              })
-            }
+              }).catch(console.error);
+            }}
             variant="invisible"
             size="small"
             tooltip={t('generateStyleGuide', 'Generate style guide') as string}
