@@ -162,10 +162,14 @@ export default async function updateTokensOnSources({
 
   if (mergedTokens) {
     try {
-      const jsonSize = (new TextEncoder().encode(JSON.stringify(tokenValues)).length) / 1024;
-      track('tokens_size', { jsonSize });
+      const combinedData = { tokens: tokenValues, themes };
+      const jsonSize = (new TextEncoder().encode(JSON.stringify(combinedData)).length) / 1024;
+      track('tokens_size', {
+        jsonSize,
+        storageProvider: storageType.provider,
+      });
     } catch (error) {
-      console.error('Failed to track tokens size:', error);
+      console.error('Failed to track tokens and themes size:', error);
     }
   }
 
