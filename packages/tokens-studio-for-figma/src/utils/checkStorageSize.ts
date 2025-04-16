@@ -1,6 +1,3 @@
-import { AnyTokenList } from '@tokens-studio/types';
-import { ThemeObjectsList } from '@/types';
-
 export function checkStorageSize(tokens: any, themes: any): number {
   try {
     const stringifiedData = JSON.stringify({ tokens, themes });
