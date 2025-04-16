@@ -11,7 +11,6 @@ export function useStorageSizeWarning(tokensSize: number) {
         text: t('storageLimitWarning.title'),
         description: t('storageLimitWarning.description'),
         confirmAction: t('storageLimitWarning.switchToRemote'),
-        cancelAction: t('storageLimitWarning.useClientStorage'),
       });
     }
   }, [confirm, tokensSize, t]);
