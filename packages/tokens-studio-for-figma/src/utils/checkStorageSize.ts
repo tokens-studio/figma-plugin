@@ -1,6 +1,9 @@
-export function checkStorageSize(data: unknown): number {
+import { AnyTokenList } from '@tokens-studio/types';
+import { ThemeObjectsList } from '@/types';
+
+export function checkStorageSize(tokens: any, themes: any): number {
   try {
-    const stringifiedData = JSON.stringify(data);
+    const stringifiedData = JSON.stringify({ tokens, themes });
     const sizeInBytes = new TextEncoder().encode(stringifiedData).length;
     const sizeInKB = sizeInBytes / 1024;
 
