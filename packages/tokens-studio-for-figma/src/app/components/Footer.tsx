@@ -31,6 +31,9 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
+import { tokensSelector } from '@/selectors';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -43,6 +46,7 @@ export default function Footer() {
   const { t } = useTranslation(['footer', 'licence']);
   const activeTheme = useSelector(activeThemeSelector);
   const { hasChanges: hasLocalChange } = useChangedState();
+  const tokens = useSelector(tokensSelector);
   const { hasRemoteChange } = uiState;
 
   React.useEffect(() => {
@@ -159,6 +163,20 @@ export default function Footer() {
             size="small"
             tooltip={t('feedback') as string}
             target="_blank"
+          />
+          {/* Generate style guide for color tokens */}
+          <IconButton
+            data-testid="footer-generate-style-guide"
+            icon={<IconLibrary />}
+            onClick={() =>
+              AsyncMessageChannel.ReactInstance.send({
+                type: AsyncMessageTypes.GENERATE_STYLE_GUIDE,
+                tokens,
+              })
+            }
+            variant="invisible"
+            size="small"
+            tooltip={t('generateStyleGuide', 'Generate style guide') as string}
           />
         </Stack>
       </Stack>

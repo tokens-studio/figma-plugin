@@ -27,6 +27,8 @@ import { ExportTokenSet } from './ExportTokenSet';
 export enum AsyncMessageTypes {
   // the below messages are going from UI to plugin
   CREATE_STYLES = 'async/create-styles',
+  /** Generate a style guide page/frame in Figma for tokens (colors only, for now) */
+  GENERATE_STYLE_GUIDE = 'async/generate-style-guide',
   RENAME_STYLES = 'async/rename-styles',
   REMOVE_STYLES = 'async/remove-styles',
   CREDENTIALS = 'async/credentials',
@@ -189,6 +191,14 @@ export type CreateStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.CREATE_STY
 export type CreateStylesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.CREATE_STYLES, {
   styleIds: Record<string, string>;
 }>;
+// Message to instruct plugin to generate a style guide in the document (colors only)
+export type GenerateStyleGuideAsyncMessage = AsyncMessage<AsyncMessageTypes.GENERATE_STYLE_GUIDE, {
+  /** List of tokens from which to generate the guide */
+  tokens: AnyTokenList;
+  /** Optional page name for the style guide */
+  pageName?: string;
+}>;
+export type GenerateStyleGuideAsyncMessageResult = AsyncMessage<AsyncMessageTypes.GENERATE_STYLE_GUIDE>;
 
 export type RenameStylesAsyncMessage = AsyncMessage<AsyncMessageTypes.RENAME_STYLES, {
   tokensToRename: TokensToRenamePayload[];
