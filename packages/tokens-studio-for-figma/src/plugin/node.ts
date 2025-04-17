@@ -1,4 +1,5 @@
 import compact from 'just-compact';
+import { decompressFromUTF16 } from 'lz-string';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
@@ -107,7 +108,8 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
-    const values = await ValuesProperty.read(figma.root) ?? {};
+    const compressedValues = await ValuesProperty.read(figma.root) ?? '';
+    const values = JSON.parse(decompressFromUTF16(compressedValues)) ?? {};
     const themes = await ThemesProperty.read(figma.root) ?? [];
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
