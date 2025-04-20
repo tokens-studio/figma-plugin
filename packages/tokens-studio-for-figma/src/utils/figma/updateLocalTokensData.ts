@@ -8,6 +8,8 @@ import {
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { StorageProviderType } from '@/types/StorageType';
+import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -18,12 +20,22 @@ type Payload = {
   checkForChanges: boolean
   collapsedTokenSets: string[]
   tokenFormat: TokenFormatOptions
+  storageProvider: StorageProviderType
+  storageSize: number
 };
 
 export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
-  await ThemesProperty.write(payload.themes);
-  await ValuesProperty.write(payload.tokens);
+  // Check storage size and storage method
+  if (payload.storageSize && payload.storageSize < 100 && payload.storageProvider === StorageProviderType.LOCAL) {
+    await ThemesProperty.write(payload.themes);
+    await ValuesProperty.write(payload.tokens);
+  } else {
+    await ValuesProperty.write({});
+    await ThemesProperty.write([]);
+    await ClientStorageProperty.write('tokens/themes', payload.themes);
+    await ClientStorageProperty.write('tokens/values', payload.tokens);
+  }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);

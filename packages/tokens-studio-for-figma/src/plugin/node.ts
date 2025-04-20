@@ -14,6 +14,7 @@ import {
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
+import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
 
 // @TODO fix typings
 
@@ -107,8 +108,17 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
-    const values = await ValuesProperty.read(figma.root) ?? {};
-    const themes = await ThemesProperty.read(figma.root) ?? [];
+    let values = await ValuesProperty.read(figma.root) ?? {};
+    let themes = await ThemesProperty.read(figma.root) ?? [];
+
+    // If empty, try reading from client storage
+    if (Object.keys(values).length === 0) {
+      values = await ClientStorageProperty.read('tokens/values') ?? {};
+    }
+    if (themes.length === 0) {
+      themes = await ClientStorageProperty.read('tokens/themes') ?? [];
+    }
+
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);

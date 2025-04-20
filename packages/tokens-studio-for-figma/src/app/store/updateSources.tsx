@@ -160,10 +160,16 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
+  let jsonSize;
+
   if (mergedTokens) {
     try {
-      const jsonSize = (new TextEncoder().encode(JSON.stringify(tokenValues)).length) / 1024;
-      track('tokens_size', { jsonSize });
+      const combinedData = { tokens: tokenValues, themes };
+      jsonSize = (new TextEncoder().encode(JSON.stringify(combinedData)).length) / 1024;
+      track('tokens_size', {
+        jsonSize,
+        storageProvider: storageType.provider,
+      });
     } catch (error) {
       console.error('Failed to track tokens size:', error);
     }
@@ -186,6 +192,8 @@ export default async function updateTokensOnSources({
     shouldSwapStyles,
     collapsedTokenSets,
     tokenFormat,
+    storageProvider: storageType.provider,
+    storageSize: jsonSize,
   }).then((result) => {
     if (transaction) {
       transaction.setMeasurement('nodes', result.nodes, '');
