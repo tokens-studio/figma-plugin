@@ -28,6 +28,8 @@ export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
   // Check storage size and storage method
   if (payload.storageSize && payload.storageSize < 100 && payload.storageProvider === StorageProviderType.LOCAL) {
+    await ClientStorageProperty.write('tokens/themes', payload.themes);
+    await ClientStorageProperty.write('tokens/values', payload.tokens); // will help with migration of sharedPluginData to clientstorage as well
     await ThemesProperty.write(payload.themes);
     await ValuesProperty.write(payload.tokens);
   } else {
