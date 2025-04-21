@@ -97,6 +97,17 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
+export async function getSavedStorageType(): Promise<StorageType> {
+  // the saved storage types will never contain credentials
+  // as they should not be shared across
+  const storageType = await StorageTypeProperty.read(figma.root);
+
+  if (storageType) {
+    return storageType;
+  }
+  return { provider: StorageProviderType.LOCAL };
+}
+
 export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
@@ -108,14 +119,15 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
-    let values = await ValuesProperty.read(figma.root) ?? {};
-    let themes = await ThemesProperty.read(figma.root) ?? [];
+    const storageType = await getSavedStorageType();
+    let values = {};
+    let themes: ThemeObjectsList = [];
 
-    // If empty, try reading from client storage
-    if (Object.keys(values).length === 0) {
+    if (storageType.provider === StorageProviderType.LOCAL) {
+      values = await ValuesProperty.read(figma.root) ?? {};
+      themes = await ThemesProperty.read(figma.root) ?? [];
+    } else {
       values = await ClientStorageProperty.read('tokens/values') ?? {};
-    }
-    if (themes.length === 0) {
       themes = await ClientStorageProperty.read('tokens/themes') ?? [];
     }
 
@@ -166,17 +178,6 @@ export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSy
 
 export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: boolean) {
   await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
-}
-
-export async function getSavedStorageType(): Promise<StorageType> {
-  // the saved storage types will never contain credentials
-  // as they should not be shared across
-  const storageType = await StorageTypeProperty.read(figma.root);
-
-  if (storageType) {
-    return storageType;
-  }
-  return { provider: StorageProviderType.LOCAL };
 }
 
 export function goToNode(id: string) {
