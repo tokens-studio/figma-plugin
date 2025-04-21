@@ -15,6 +15,7 @@ import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
 import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
+import { getFileKey } from './helpers';
 
 // @TODO fix typings
 
@@ -127,8 +128,10 @@ export async function getTokenData(): Promise<{
       values = await ValuesProperty.read(figma.root) ?? {};
       themes = await ThemesProperty.read(figma.root) ?? [];
     } else {
-      values = await ClientStorageProperty.read('tokens/values') ?? {};
-      themes = await ClientStorageProperty.read('tokens/themes') ?? [];
+      const fileKey = await getFileKey();
+      const prefix = `${fileKey}/tokens`;
+      values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
+      themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
     }
 
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};

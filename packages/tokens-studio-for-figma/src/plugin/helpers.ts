@@ -6,7 +6,7 @@ import { convertBoxShadowTypeToFigma } from './figmaTransforms/boxShadow';
 import { convertTextCaseToFigma } from './figmaTransforms/textCase';
 import { convertTextDecorationToFigma } from './figmaTransforms/textDecoration';
 import { convertFontWeightToFigma } from './figmaTransforms/fontWeight';
-import { UserIdProperty } from '@/figmaStorage';
+import { UserIdProperty, FileKeyProperty } from '@/figmaStorage';
 import { generateId } from '@/utils/generateId';
 import { Properties } from '@/constants/Properties';
 import { convertFontFamilyToFigma } from './figmaTransforms/convertFontFamilyToFigma';
@@ -27,6 +27,24 @@ export async function getUserId() {
   }
 
   return userId;
+}
+
+export async function getFileKey() {
+  let fileKey = generateId(24);
+
+  try {
+    const key = await FileKeyProperty.read(figma.root);
+    if (key === null) {
+      await FileKeyProperty.write(fileKey);
+    } else {
+      fileKey = key as `${string}-${string}-${string}-${string}-${string}`;
+    }
+  } catch (e) {
+    console.error('error retrieving fileKey', e);
+    await FileKeyProperty.write(fileKey);
+  }
+
+  return fileKey;
 }
 
 export function transformValue(value: string, type: 'fontWeights', baseFontSize: string, shouldOutputForVariables?: boolean): ReturnType<typeof convertFontWeightToFigma>;

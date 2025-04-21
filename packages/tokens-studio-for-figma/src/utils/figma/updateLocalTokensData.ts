@@ -10,6 +10,7 @@ import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsPro
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { StorageProviderType } from '@/types/StorageType';
 import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
+import { getFileKey } from '../../plugin/helpers';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -31,8 +32,10 @@ export async function updateLocalTokensData(payload: Payload) {
     await ThemesProperty.write(payload.themes);
     await ValuesProperty.write(payload.tokens);
   } else {
-    await ClientStorageProperty.write('tokens/themes', payload.themes);
-    await ClientStorageProperty.write('tokens/values', payload.tokens);
+    const fileKey = await getFileKey();
+    const prefix = `${fileKey}/tokens`;
+    await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
+    await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
   }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
