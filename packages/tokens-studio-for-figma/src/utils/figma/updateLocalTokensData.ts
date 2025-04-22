@@ -33,8 +33,7 @@ export async function updateLocalTokensData(payload: Payload) {
     await ValuesProperty.write(payload.tokens);
   } else {
     const fileKey = await getFileKey();
-    const fileName = encodeURIComponent(figma.root.name);
-    const prefix = `${fileKey}/${fileName}/tokens`;
+    const prefix = `${fileKey}/tokens`;
     await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
     await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
   }
