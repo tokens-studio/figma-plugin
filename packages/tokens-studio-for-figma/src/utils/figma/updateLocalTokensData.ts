@@ -3,7 +3,6 @@ import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
-  CheckForChangesProperty,
   ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
@@ -36,11 +35,11 @@ export async function updateLocalTokensData(payload: Payload) {
     const prefix = `${fileKey}/tokens`;
     await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
     await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
+    await ClientStorageProperty.write(`${prefix}/checkForChanges`, payload.checkForChanges);
   }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
-  await CheckForChangesProperty.write(payload.checkForChanges);
   await CollapsedTokenSetsProperty.write(payload.collapsedTokenSets);
   await TokenFormatProperty.write(payload.tokenFormat);
 }

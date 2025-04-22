@@ -9,7 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
+  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
@@ -123,13 +123,13 @@ export async function getTokenData(): Promise<{
     const storageType = await getSavedStorageType();
     let values = {};
     let themes: ThemeObjectsList = [];
+    const fileKey = await getFileKey();
+    const prefix = `${fileKey}/tokens`;
 
     if (storageType.provider === StorageProviderType.LOCAL) {
       values = await ValuesProperty.read(figma.root) ?? {};
       themes = await ThemesProperty.read(figma.root) ?? [];
     } else {
-      const fileKey = await getFileKey();
-      const prefix = `${fileKey}/tokens`;
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
       themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
 
@@ -145,7 +145,7 @@ export async function getTokenData(): Promise<{
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
-    const checkForChanges = await CheckForChangesProperty.read(figma.root);
+    const checkForChanges = await ClientStorageProperty.read(`${prefix}/checkForChanges`) ?? false;
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
