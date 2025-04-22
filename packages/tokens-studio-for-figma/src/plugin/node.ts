@@ -129,7 +129,8 @@ export async function getTokenData(): Promise<{
       themes = await ThemesProperty.read(figma.root) ?? [];
     } else {
       const fileKey = await getFileKey();
-      const prefix = `${fileKey}/tokens`;
+      const fileName = encodeURIComponent(figma.root.name);
+      const prefix = `${fileKey}/${fileName}/tokens`;
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
       themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
     }
