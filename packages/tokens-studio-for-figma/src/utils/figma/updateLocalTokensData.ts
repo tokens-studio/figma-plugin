@@ -1,3 +1,4 @@
+import { compressToUTF16 } from 'lz-string';
 import * as pjs from '../../../package.json';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
@@ -33,8 +34,8 @@ export async function updateLocalTokensData(payload: Payload) {
   } else {
     const fileKey = await getFileKey();
     const prefix = `${fileKey}/tokens`;
-    await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
-    await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
+    await ClientStorageProperty.write(`${prefix}/themes`, compressToUTF16(JSON.stringify(payload.themes)));
+    await ClientStorageProperty.write(`${prefix}/values`, compressToUTF16(JSON.stringify(payload.tokens)));
     await ClientStorageProperty.write(`${prefix}/checkForChanges`, payload.checkForChanges);
   }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
