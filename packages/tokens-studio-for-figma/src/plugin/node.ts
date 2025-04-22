@@ -132,6 +132,14 @@ export async function getTokenData(): Promise<{
       const prefix = `${fileKey}/tokens`;
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
       themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
+
+      // To account for the migration period, if client storage is empty, try reading from ValuesProperty and ThemesProperty to ensure local changes are not lost
+      if (Object.keys(values).length === 0) {
+        values = await ValuesProperty.read(figma.root) ?? {};
+      }
+      if (themes.length === 0) {
+        themes = await ThemesProperty.read(figma.root) ?? [];
+      }
     }
 
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
