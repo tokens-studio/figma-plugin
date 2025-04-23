@@ -1,3 +1,4 @@
+import { decompressFromUTF16 } from 'lz-string';
 import compact from 'just-compact';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
@@ -14,6 +15,7 @@ import {
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
+import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
 
 // @TODO fix typings
 
@@ -107,7 +109,10 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
-    const values = await ValuesProperty.read(figma.root) ?? {};
+    const isCompressed = await IsCompressedProperty.read(figma.root) ?? false;
+    const compressedValues = await ValuesProperty.read(figma.root) ?? '';
+    const values = isCompressed ? JSON.parse(decompressFromUTF16(compressedValues) ?? '{}') : compressedValues;
+    // const compressedThemes = await ThemesProperty.read(figma.root) ?? '';
     const themes = await ThemesProperty.read(figma.root) ?? [];
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);

@@ -1,3 +1,4 @@
+import { compressToUTF16 } from 'lz-string';
 import * as pjs from '../../../package.json';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
@@ -8,6 +9,7 @@ import {
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
+import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -23,7 +25,8 @@ type Payload = {
 export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
   await ThemesProperty.write(payload.themes);
-  await ValuesProperty.write(payload.tokens);
+  await ValuesProperty.write(compressToUTF16(JSON.stringify(payload.tokens)));
+  await IsCompressedProperty.write(true);
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
