@@ -68,7 +68,7 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
-  const handleBadgeClick = useStorageSizeWarning(tokensSize);
+  const handleBadgeClick = useStorageSizeWarning();
 
   return (
     <Box
