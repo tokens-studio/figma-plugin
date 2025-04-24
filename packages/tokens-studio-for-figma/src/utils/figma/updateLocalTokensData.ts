@@ -9,7 +9,6 @@ import {
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
-// import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
