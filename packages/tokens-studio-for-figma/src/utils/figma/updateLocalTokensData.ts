@@ -5,11 +5,11 @@ import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
   CheckForChangesProperty,
-  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty, IsCompressedProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
-import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
+// import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
 
 type Payload = {
   tokens: Record<string, AnyTokenList>
@@ -24,8 +24,8 @@ type Payload = {
 
 export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
-  await ThemesProperty.write(payload.themes);
   await ValuesProperty.write(compressToUTF16(JSON.stringify(payload.tokens)));
+  await ThemesProperty.write(compressToUTF16(JSON.stringify(payload.themes)));
   await IsCompressedProperty.write(true);
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);

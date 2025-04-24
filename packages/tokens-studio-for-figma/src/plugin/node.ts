@@ -10,12 +10,11 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
+  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
-import { IsCompressedProperty } from '@/figmaStorage/isCompressedProperty';
 
 // @TODO fix typings
 
@@ -112,8 +111,8 @@ export async function getTokenData(): Promise<{
     const isCompressed = await IsCompressedProperty.read(figma.root) ?? false;
     const compressedValues = await ValuesProperty.read(figma.root) ?? '';
     const values = isCompressed ? JSON.parse(decompressFromUTF16(compressedValues) ?? '{}') : compressedValues;
-    // const compressedThemes = await ThemesProperty.read(figma.root) ?? '';
-    const themes = await ThemesProperty.read(figma.root) ?? [];
+    const compressedThemes = await ThemesProperty.read(figma.root) ?? '[]';
+    const themes: ThemeObjectsList = isCompressed ? JSON.parse(decompressFromUTF16(compressedThemes) ?? '[]') : JSON.parse(compressedThemes);
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
