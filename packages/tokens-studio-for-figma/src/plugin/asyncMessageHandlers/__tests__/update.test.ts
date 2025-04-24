@@ -1,6 +1,8 @@
+import { compressToUTF16 } from 'lz-string';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UpdateMode } from '@/constants/UpdateMode';
+
 import { AsyncMessageTypes, UpdateAsyncMessage } from '@/types/AsyncMessages';
 import { update } from '../update';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -84,8 +86,8 @@ describe('update', () => {
 
     await update(mockUpdateMessage);
 
-    expect(ThemesPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.themes);
-    expect(ValuesPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.tokenValues);
+    expect(ThemesPropertyWriteSpy).toBeCalledWith(compressToUTF16(JSON.stringify(mockUpdateMessage.themes)));
+    expect(ValuesPropertyWriteSpy).toBeCalledWith(compressToUTF16(JSON.stringify(mockUpdateMessage.tokenValues)));
     expect(UsedTokenSetPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.usedTokenSet);
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
