@@ -1,3 +1,4 @@
+import { compressToUTF16 } from 'lz-string';
 import { startTransaction } from '@sentry/react';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
@@ -165,7 +166,8 @@ export default async function updateTokensOnSources({
   if (mergedTokens) {
     try {
       const combinedData = { tokens: tokenValues, themes };
-      jsonSize = (new TextEncoder().encode(JSON.stringify(combinedData)).length) / 1024;
+      const compressedData = compressToUTF16(JSON.stringify(combinedData));
+      jsonSize = compressedData.length / 1024;
       track('tokens_size', {
         jsonSize,
         storageProvider: storageType.provider,
