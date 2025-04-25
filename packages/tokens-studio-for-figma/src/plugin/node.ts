@@ -10,6 +10,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
   ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
+  CheckForChangesProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
@@ -145,7 +146,7 @@ export async function getTokenData(): Promise<{
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
-    const checkForChanges = await ClientStorageProperty.read(`${prefix}/checkForChanges`) ?? false;
+    const checkForChanges = await ClientStorageProperty.read(`${prefix}/checkForChanges`) ?? await CheckForChangesProperty.read(figma.root) ?? false;
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {

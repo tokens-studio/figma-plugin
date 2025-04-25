@@ -20,3 +20,4 @@ export * from './CollapsedTokenSetsProperty';
 export * from './InitialLoadProperty';
 export * from './TokenFormatProperty';
 export * from './FileKeyProperty';
+export * from './CheckForChangesProperty';
