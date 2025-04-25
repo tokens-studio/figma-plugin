@@ -22,9 +22,16 @@ type Payload = {
 };
 
 export async function updateLocalTokensData(payload: Payload) {
+  // Compress the data using lz-string
+  const compressedTokens = compressToUTF16(JSON.stringify(payload.tokens));
+  const compressedThemes = compressToUTF16(JSON.stringify(payload.themes));
+
+  // Save the compressed data - chunking will happen automatically in FigmaStorageProperty
+  await ValuesProperty.write(compressedTokens);
+  await ThemesProperty.write(compressedThemes);
+
+  // Save other properties
   await VersionProperty.write(pjs.version);
-  await ValuesProperty.write(compressToUTF16(JSON.stringify(payload.tokens)));
-  await ThemesProperty.write(compressToUTF16(JSON.stringify(payload.themes)));
   await IsCompressedProperty.write(true);
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
