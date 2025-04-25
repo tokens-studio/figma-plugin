@@ -65,7 +65,7 @@ function JSONEditor({
           minimap: {
             enabled: false,
           },
-          lineNumbers: 'off',
+          lineNumbers: 'on',
           fontSize: 11,
           wordWrap: 'on',
           contextmenu: false,

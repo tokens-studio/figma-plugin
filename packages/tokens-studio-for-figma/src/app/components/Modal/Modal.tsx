@@ -20,7 +20,7 @@ export type ModalProps = {
   showClose?: boolean;
   backArrow?: boolean;
   icon?: React.ReactNode;
-  close: () => void;
+  close?: () => void;
   modal?: boolean;
   onInteractOutside?: (event: Event) => void;
   scrollContainerRef?: React.RefObject<HTMLDivElement>;
@@ -95,13 +95,17 @@ export function Modal({
   scrollContainerRef,
 }: ModalProps) {
   const handleClose = React.useCallback(() => {
-    close();
+    if (close) {
+      close();
+    }
   }, [close]);
 
   const handleOnOpenChange = React.useCallback(
     (open) => {
       if (!open) {
-        close();
+        if (close) {
+          close();
+        }
       }
     },
     [close],

@@ -12,5 +12,10 @@ export function saveStorageInformationFactory(
     const providers = params.localApiProviders ?? [];
     setStorageType({ provider: params.storageType });
     dispatch.uiState.setAPIProviders(providers);
+    // Find first valid Tokens Studio provider and use its secret as PAT
+    const tokensStudioProvider = providers.find((provider) => provider.provider === 'tokensstudio' && provider.secret);
+    if (tokensStudioProvider?.secret) {
+      dispatch.userState.setTokensStudioPAT(tokensStudioProvider.secret);
+    }
   };
 }

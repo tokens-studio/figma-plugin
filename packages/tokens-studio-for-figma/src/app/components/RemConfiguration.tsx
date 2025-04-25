@@ -7,7 +7,6 @@ import {
 } from '@tokens-studio/ui';
 import remConfigurationImage from '@/app/assets/hints/remConfiguration.png';
 import IconBrokenLink from '@/icons/brokenlink.svg';
-import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '../store';

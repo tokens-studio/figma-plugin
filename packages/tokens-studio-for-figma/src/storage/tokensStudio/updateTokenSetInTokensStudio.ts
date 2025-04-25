@@ -15,22 +15,21 @@ export async function updateTokenSetInTokensStudio({
   data,
   onTokenSetUpdated,
 }: UpdateTokenSetInTokensStudioPayload) {
-  const tokenSet = await pushToTokensStudio({
+  pushToTokensStudio({
     context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
     action: 'UPDATE_TOKEN_SET',
     data,
     metadata: rootState.tokenState.tokenSetMetadata,
+    successCallback: () => {
+      const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
+      delete tokenSetMetadata[data.oldName];
+
+      onTokenSetUpdated({
+        ...tokenSetMetadata,
+        [data.newName]: {
+          isDynamic: false,
+        },
+      });
+    },
   });
-
-  if (typeof tokenSet !== 'boolean' && tokenSet?.urn) {
-    const tokenSetMetadata = { ...rootState.tokenState.tokenSetMetadata };
-    delete tokenSetMetadata[data.oldName];
-
-    onTokenSetUpdated({
-      ...tokenSetMetadata,
-      [data.newName]: {
-        id: tokenSet.urn,
-      },
-    });
-  }
 }

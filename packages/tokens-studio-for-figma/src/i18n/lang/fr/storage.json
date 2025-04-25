@@ -79,7 +79,9 @@
       "descriptionSecondPart": "Si vous utilisez déjà la plateforme Studio et avez besoin d'aide pour configurer la synchronisation, lisez le",
       "tokensStudioSyncGuide": "Guide de synchronisation de Tokens Studio ici.",
       "pat": "Jeton d'accès personnel",
-      "id": "ID de connexion"
+      "id": "ID de connexion",
+      "selectOrgLabel": "Choisir l'organisation",
+      "selectProjectLabel": "Choisir le projet"
     }
   },
   "selectALayerToSeeAppliedTokens": "Sélectionnez un calque pour voir les jetons appliqués",

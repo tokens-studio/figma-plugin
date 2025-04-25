@@ -3,14 +3,14 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
-  Heading, Button, Box, Stack, Text, Dialog,
+  Heading, Button, Box, Stack, Dialog,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
 import StorageItem from './StorageItem';
 import EditStorageItemModal from './modals/EditStorageItemModal';
 import CreateStorageItemModal from './modals/CreateStorageItemModal';
 import { Dispatch } from '../store';
-import { apiProvidersSelector, localApiStateSelector, storageTypeSelector } from '@/selectors';
+import { apiProvidersSelector, localApiStateSelector } from '@/selectors';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import useRemoteTokens from '../store/remoteTokens';
 import { StorageTypeCredentials } from '@/types/StorageType';

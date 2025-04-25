@@ -19,7 +19,7 @@ export async function updateUISettings(uiSettings: Partial<SavedSettings>) {
       updateRemote: uiSettings.updateRemote ?? data?.updateRemote,
       updateOnChange: uiSettings.updateOnChange ?? data?.updateOnChange,
       applyVariablesStylesOrRawValue: uiSettings.applyVariablesStylesOrRawValue ?? data?.applyVariablesStylesOrRawValue,
-      updateStyles: uiSettings.updateStyles ?? data?.updateStyles,
+      shouldUpdateStyles: uiSettings.shouldUpdateStyles ?? data?.shouldUpdateStyles,
       ignoreFirstPartForStyles: uiSettings.ignoreFirstPartForStyles ?? data?.ignoreFirstPartForStyles,
       createStylesWithVariableReferences: uiSettings.createStylesWithVariableReferences ?? data?.createStylesWithVariableReferences,
       prefixStylesWithThemeName: uiSettings.prefixStylesWithThemeName ?? data?.prefixStylesWithThemeName,
@@ -56,7 +56,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
     let updateRemote: boolean;
     let updateOnChange: boolean;
     let applyVariablesStylesOrRawValue: ApplyVariablesStylesOrRawValues;
-    let updateStyles: boolean;
+    let shouldUpdateStyles: boolean;
     let variablesColor: boolean;
     let variablesBoolean: boolean;
     let variablesNumber: boolean;
@@ -87,7 +87,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
       updateRemote = typeof data.updateRemote === 'undefined' ? true : data.updateRemote;
       updateOnChange = typeof data.updateOnChange === 'undefined' ? true : data.updateOnChange;
       applyVariablesStylesOrRawValue = typeof data.applyVariablesStylesOrRawValue === 'undefined' ? ApplyVariablesStylesOrRawValues.VARIABLES_STYLES : data.applyVariablesStylesOrRawValue;
-      updateStyles = typeof data.updateStyles === 'undefined' ? true : data.updateStyles;
+      shouldUpdateStyles = typeof data.shouldUpdateStyles === 'undefined' ? false : data.shouldUpdateStyles;
       variablesColor = typeof data.variablesColor === 'undefined' ? true : data.variablesColor;
       variablesBoolean = typeof data.variablesBoolean === 'undefined' ? true : data.variablesBoolean;
       variablesNumber = typeof data.variablesNumber === 'undefined' ? true : data.variablesNumber;
@@ -117,7 +117,7 @@ export async function getUISettings(notify = true): Promise<SavedSettings> {
         updateOnChange,
         applyVariablesStylesOrRawValue,
         updateRemote,
-        updateStyles,
+        shouldUpdateStyles,
         variablesBoolean,
         variablesColor,
         variablesNumber,

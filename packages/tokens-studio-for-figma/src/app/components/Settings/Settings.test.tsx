@@ -1,7 +1,7 @@
 import React from 'react';
 import Settings from './Settings';
 import {
-  render, screen, resetStore, fireEvent, waitFor,
+  render, resetStore, fireEvent, waitFor,
 } from '../../../../tests/config/setupTest';
 import { store } from '../../store';
 

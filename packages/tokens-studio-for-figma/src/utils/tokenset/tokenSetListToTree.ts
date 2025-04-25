@@ -28,7 +28,7 @@ export function tokenSetListToTree(items: string[]) {
             parent: path.slice(0, index).join('/'),
             level: index,
             label,
-            id: uuidv4()
+            id: uuidv4(),
           });
         }
       });
@@ -43,7 +43,7 @@ export function tokenSetListToTree(items: string[]) {
         parent: parentName,
         level: path.length - 1,
         label: path[path.length - 1],
-        id: uuidv4()
+        id: uuidv4(),
       });
     } else {
       acc.push({
@@ -53,7 +53,7 @@ export function tokenSetListToTree(items: string[]) {
         parent: parentName,
         level: path.length - 1,
         label: path[path.length - 1],
-        id: uuidv4()
+        id: uuidv4(),
       });
     }
     return acc;

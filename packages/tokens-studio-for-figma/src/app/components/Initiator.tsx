@@ -11,9 +11,25 @@ import { Properties } from '@/constants/Properties';
 import { Tabs } from '@/constants/Tabs';
 import { hasTokenValues } from '@/utils/hasTokenValues';
 import { track } from '@/utils/analytics';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageChannelPreview } from '@/AsyncMessageChannelPreview';
 
 // @README this component is not the "Initiator" anymore - as it is named
 // but solely acts as the interface between the plugin and the UI
+
+const parseWsEvent = (event) => {
+  try {
+    const msg = JSON.parse(event.data);
+    if (msg.src === 'server') {
+      const temp = JSON.parse(msg.message);
+      return temp;
+    }
+  } catch (err) {
+    console.error('not a valid message', err);
+    return null;
+  }
+  return null;
+};
 
 export function Initiator() {
   const dispatch = useDispatch<Dispatch>();
@@ -21,7 +37,7 @@ export function Initiator() {
   const { setStorageType } = useStorage();
 
   useEffect(() => {
-    window.onmessage = async (event: {
+    const onMessageEvent = async (event: {
       data: {
         pluginMessage: PostToUIMessage;
       };
@@ -103,10 +119,13 @@ export function Initiator() {
           }
 
           case MessageFromPluginTypes.VARIABLES: {
-            const { values } = pluginMessage;
+            const { values, themes } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokensFromVariables(values);
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            }
+            if (themes) {
+              dispatch.tokenState.setThemesFromVariables(themes);
             }
             break;
           }
@@ -148,6 +167,18 @@ export function Initiator() {
         }
       }
     };
+    if (process.env.PREVIEW_ENV === 'browser') {
+      const listener = (e) => {
+        const event = parseWsEvent(e);
+        onMessageEvent({ data: { pluginMessage: event } });
+      };
+      (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.addEventListener('message', listener);
+      return () => {
+        (AsyncMessageChannel as typeof AsyncMessageChannelPreview).ReactInstance.getWs()?.removeEventListener('message', listener);
+      };
+    }
+    window.onmessage = onMessageEvent;
+    return () => {};
   }, [dispatch, pullTokens, fetchBranches, setStorageType]);
 
   return null;

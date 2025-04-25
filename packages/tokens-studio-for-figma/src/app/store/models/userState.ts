@@ -1,6 +1,5 @@
 import { createModel } from '@rematch/core';
 import { RootModel } from '@/types/RootModel';
-import validateLicense from '@/utils/validateLicense';
 import { notifyToUI } from '@/plugin/notifiers';
 import removeLicense from '@/utils/removeLicense';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -26,6 +25,7 @@ export interface UserState {
   userName: string;
   licenseDetails: LicenseDetails;
   usedEmail: string | undefined;
+  tokensStudioPAT: string | null;
 }
 
 interface LicenseDetails {
@@ -48,9 +48,9 @@ export const userState = createModel<RootModel>()({
       clientEmail: undefined,
       entitlements: [],
     },
+    tokensStudioPAT: null,
   } as UserState,
   reducers: {
-
     setUserId(state, payload: string | null) {
       return {
         ...state,
@@ -91,6 +91,12 @@ export const userState = createModel<RootModel>()({
       return {
         ...state,
         initialLoad: payload,
+      };
+    },
+    setTokensStudioPAT(state, payload: string | null) {
+      return {
+        ...state,
+        tokensStudioPAT: payload,
       };
     },
     ...userStateReducers,

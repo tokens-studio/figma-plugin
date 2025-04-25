@@ -5,7 +5,6 @@ import { SettingsState } from '@/app/store/models/settings';
 import checkIfTokenCanCreateVariable from '@/utils/checkIfTokenCanCreateVariable';
 import setValuesOnVariable from './setValuesOnVariable';
 import { mapTokensToVariableInfo } from '@/utils/mapTokensToVariableInfo';
-import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 
 export type CreateVariableTypes = {
   collection: VariableCollection;
@@ -17,13 +16,22 @@ export type CreateVariableTypes = {
   overallConfig: UsedTokenSetsMap;
 };
 
-export type VariableToken = SingleToken<true, { path: string, variableId: string }>;
+export type VariableToken = SingleToken<true, { path: string; variableId: string }>;
 
 export default async function updateVariables({
-  collection, mode, theme, tokens, settings, filterByTokenSet, overallConfig,
+  collection,
+  mode,
+  theme,
+  tokens,
+  settings,
+  filterByTokenSet,
+  overallConfig,
 }: CreateVariableTypes) {
   const tokensToCreate = generateTokensToCreate({
-    theme, tokens, filterByTokenSet, overallConfig,
+    theme,
+    tokens,
+    filterByTokenSet,
+    overallConfig,
   });
 
   // Do not use getVariablesWithoutZombies. It's not working.
@@ -32,7 +40,9 @@ export default async function updateVariables({
   // but that feels costly? We might need to double check this though.
   // e.g. this wont work.
   // const variablesInCollection = (await figma.variables.getLocalVariablesAsync()).filter((v) => v.variableCollectionId === collection.id);
-  const variablesInCollection = figma.variables.getLocalVariables().filter((v) => v.variableCollectionId === collection.id);
+  const variablesInCollection = figma.variables
+    .getLocalVariables()
+    .filter((v) => v.variableCollectionId === collection.id);
 
   const variablesToCreate: VariableToken[] = [];
   tokensToCreate.forEach((token) => {
@@ -41,7 +51,14 @@ export default async function updateVariables({
     }
   });
 
-  const variableObj = await setValuesOnVariable(variablesInCollection, variablesToCreate, collection, mode, settings.baseFontSize, settings.renameExistingStylesAndVariables);
+  const variableObj = await setValuesOnVariable(
+    variablesInCollection,
+    variablesToCreate,
+    collection,
+    mode,
+    settings.baseFontSize,
+    settings.renameExistingStylesAndVariables,
+  );
   const removedVariables: string[] = [];
 
   // Remove variables not handled in the current theme

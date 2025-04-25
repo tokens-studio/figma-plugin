@@ -208,7 +208,7 @@ export default function BranchSelector() {
               <>
                 <DropdownMenu.Item css={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>{t('upgradeToPro', { ns: 'licence' })}</span>
-                  <ProBadge compact />
+                  <ProBadge campaign="branch-selector" compact />
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator />
               </>

@@ -16,7 +16,8 @@ export function disconnectStyleFromTheme(state: TokenState, data: Payload): Toke
   ) return state;
 
   const updatedThemes = [...state.themes];
-  const updatedFigmaStyleReferences = state.themes[themeObjectIndex].$figmaStyleReferences ?? {};
+  const theme = state.themes[themeObjectIndex];
+  const updatedFigmaStyleReferences = { ...theme.$figmaStyleReferences };
   if (typeof data.key === 'string') {
     delete updatedFigmaStyleReferences[data.key];
   } else {

@@ -1,16 +1,17 @@
-export const UPDATE_THEME_GROUP_MUTATION = `
-mutation UpdateThemeGroup($urn: String!, $input: ThemeGroupInput!) {
-    updateThemeGroup(urn: $urn, input: $input) {
-        urn
+import { gql } from '@tokens-studio/sdk';
+
+export const UPDATE_THEME_GROUP_MUTATION = gql`
+  mutation UpdateThemeGroup($input: ThemeGroupUpdateInput!, $project: String!, $organization: String!) {
+    updateThemeGroup(input: $input, project: $project, organization: $organization) {
+      name
+      options {
         name
-        projectUrn
-        options {
-            name
-            urn
-            figmaStyleReferences
-            figmaVariableReferences
-            selectedTokenSets
-        }
+        selectedTokenSets
+        figmaStyleReferences
+        figmaVariableReferences
+        figmaCollectionId
+        figmaModeId
+      }
     }
-}
+  }
 `;

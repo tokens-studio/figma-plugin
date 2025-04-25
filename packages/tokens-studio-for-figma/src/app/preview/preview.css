@@ -1,0 +1,11 @@
+div:has(> #corner) {
+  position: relative;
+}
+
+#corner {
+  position: absolute;
+}
+
+div[data-testid="figmaloading"] {
+  max-height: 100%;
+}

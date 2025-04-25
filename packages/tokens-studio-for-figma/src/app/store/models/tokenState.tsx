@@ -52,6 +52,7 @@ import {
 import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTokenSetFromTokensStudio';
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
+import { singleTokensToRawTokenSet } from '@/utils/convert';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -74,7 +75,11 @@ export interface TokenState {
   changedState: CompareStateType;
   remoteData: CompareStateType;
   tokenFormat: TokenFormatOptions;
-  tokenSetMetadata: Record<string, { id: string, isDynamic?: boolean }>;
+  tokenSetMetadata: Record<string, { isDynamic?: boolean }>;
+  importedThemes: {
+    newThemes: ThemeObjectsList;
+    updatedThemes: ThemeObjectsList;
+  };
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -111,6 +116,10 @@ export const tokenState = createModel<RootModel>()({
     },
     tokenFormat: TokenFormatOptions.Legacy,
     tokenSetMetadata: {},
+    importedThemes: {
+      newThemes: [],
+      updatedThemes: [],
+    },
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -127,9 +136,8 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: {
         ...state.usedTokenSet,
-        [tokenSet]: state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE
-          ? TokenSetStatus.DISABLED
-          : TokenSetStatus.SOURCE,
+        [tokenSet]:
+          state.usedTokenSet[tokenSet] === TokenSetStatus.SOURCE ? TokenSetStatus.DISABLED : TokenSetStatus.SOURCE,
       },
     }),
     setActiveTokenSet: (state, data: string) => ({
@@ -165,20 +173,13 @@ export const tokenState = createModel<RootModel>()({
         return state;
       }
       const indexOf = Object.keys(state.tokens).indexOf(oldName);
-      return updateTokenSetsInState(
-        state,
-        null,
-        [newName, state.tokens[oldName].map((token) => (
-          extend(true, {}, token) as typeof token
-        )), indexOf + 1],
-      );
+      return updateTokenSetsInState(state, null, [
+        newName,
+        state.tokens[oldName].map((token) => extend(true, {}, token) as typeof token),
+        indexOf + 1,
+      ]);
     },
-    deleteTokenSet: (state, name: string) => updateTokenSetsInState(
-      state,
-      (setName, tokenSet) => (
-        setName === name ? null : [setName, tokenSet]
-      ),
-    ),
+    deleteTokenSet: (state, name: string) => updateTokenSetsInState(state, (setName, tokenSet) => (setName === name ? null : [setName, tokenSet])),
     setLastSyncedState: (state, data: string) => ({
       ...state,
       lastSyncedState: data,
@@ -232,10 +233,7 @@ export const tokenState = createModel<RootModel>()({
       const existingToken = state.tokens[data.parent].find((n) => n.name === data.name);
       if (!existingToken) {
         newTokens = {
-          [data.parent]: [
-            ...state.tokens[data.parent],
-            updateTokenPayloadToSingleToken(data, uuidv4()),
-          ],
+          [data.parent]: [...state.tokens[data.parent], updateTokenPayloadToSingleToken(data, uuidv4())],
         };
       }
 
@@ -256,9 +254,7 @@ export const tokenState = createModel<RootModel>()({
         }
         const existingTokenIndex = newTokens[token.parent].findIndex((n) => n.name === token.name);
         if (existingTokenIndex === -1) {
-          newTokens[token.parent].push(
-            updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()),
-          );
+          newTokens[token.parent].push(updateTokenPayloadToSingleToken(token as UpdateTokenPayload, uuidv4()));
         }
       });
 
@@ -295,31 +291,35 @@ export const tokenState = createModel<RootModel>()({
             const existingTokens = [...state.tokens[tokenSet]];
             existingTokens.splice(existingTokenIndex + 1, 0, {
               ...omit(state.tokens[tokenSet][existingTokenIndex], 'description', '$extensions'),
-              ...updateTokenPayloadToSingleToken({
-                parent: data.parent,
-                name: data.newName,
-                type: data.type,
-                value: data.value,
-                description: data.description,
-                oldName: data.oldName,
-                $extensions: data.$extensions,
-              } as UpdateTokenPayload, uuidv4()),
+              ...updateTokenPayloadToSingleToken(
+                {
+                  parent: data.parent,
+                  name: data.newName,
+                  type: data.type,
+                  value: data.value,
+                  description: data.description,
+                  oldName: data.oldName,
+                  $extensions: data.$extensions,
+                } as UpdateTokenPayload,
+                uuidv4(),
+              ),
             } as SingleToken);
             newTokens[tokenSet] = existingTokens;
           }
         } else if (data.tokenSets.includes(tokenSet)) {
           const existingTokenIndex = state.tokens[tokenSet].findIndex((n) => n.name === data?.newName);
           if (existingTokenIndex < 0) {
-            const newToken = updateTokenPayloadToSingleToken({
-              name: data.newName,
-              type: data.type,
-              value: data.value,
-              description: data.description,
-              $extensions: data.$extensions,
-            } as UpdateTokenPayload, uuidv4());
-            newTokens[tokenSet] = [
-              ...state.tokens[tokenSet], newToken as SingleToken,
-            ];
+            const newToken = updateTokenPayloadToSingleToken(
+              {
+                name: data.newName,
+                type: data.type,
+                value: data.value,
+                description: data.description,
+                $extensions: data.$extensions,
+              } as UpdateTokenPayload,
+              uuidv4(),
+            );
+            newTokens[tokenSet] = [...state.tokens[tokenSet], newToken as SingleToken];
           }
         }
       });
@@ -339,11 +339,20 @@ export const tokenState = createModel<RootModel>()({
       const existingTokens: StyleToCreateToken[] = [];
       const updatedTokens: StyleToCreateToken[] = [];
 
+      // Create a map of token names to tokens once, outside the loop
+      const tokenMap = new Map();
+      Object.values(state.tokens).forEach((tokenSet) => {
+        tokenSet.forEach((token) => {
+          if (!tokenMap.has(token.name)) { // Only store first occurrence
+            tokenMap.set(token.name, token);
+          }
+        });
+      });
+
       // Iterate over received styles and check if they existed before or need updating
       Object.values(receivedStyles).forEach((values) => {
         values.forEach((token) => {
-          const oldValue = state.tokens[state.activeTokenSet].find((t) => t.name === token.name);
-
+          const oldValue = tokenMap.get(token.name);
           if (oldValue) {
             if (isEqual(oldValue.value, token.value)) {
               const normalizedOldValueDescription = oldValue.description ?? '';
@@ -362,6 +371,7 @@ export const tokenState = createModel<RootModel>()({
               updatedTokens.push(updatedToken);
             }
           } else {
+            // Token doesn't exist in any token set
             newTokens.push(token);
           }
         });
@@ -391,7 +401,10 @@ export const tokenState = createModel<RootModel>()({
             if (oldValue) {
               const normalizedOldValueDescription = oldValue.description ?? '';
               const normalizedTokenDescription = token.description ?? '';
-              if (isEqual(oldValue.value, token.value) && isEqual(normalizedOldValueDescription, normalizedTokenDescription)) {
+              if (
+                isEqual(oldValue.value, token.value)
+                && isEqual(normalizedOldValueDescription, normalizedTokenDescription)
+              ) {
                 existingTokens.push(token);
               } else {
                 const updatedToken = { ...token };
@@ -447,19 +460,20 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: typeof data.index === 'number'
-            ? state.tokens[data.parent].filter((token) => {
-              if (token.name === data.path) {
-                if (i === data.index) {
+          [data.parent]:
+            typeof data.index === 'number'
+              ? state.tokens[data.parent].filter((token) => {
+                if (token.name === data.path) {
+                  if (i === data.index) {
+                    i += 1;
+                    return true;
+                  }
                   i += 1;
-                  return true;
+                  return false;
                 }
-                i += 1;
-                return false;
-              }
-              return (token.name !== data.path);
-            })
-            : state.tokens[data.parent].filter((token) => token.name !== data.path),
+                return token.name !== data.path;
+              })
+              : state.tokens[data.parent].filter((token) => token.name !== data.path),
         },
       };
 
@@ -470,7 +484,9 @@ export const tokenState = createModel<RootModel>()({
         ...state,
         tokens: {
           ...state.tokens,
-          [data.parent]: state.tokens[data.parent].filter((token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type)),
+          [data.parent]: state.tokens[data.parent].filter(
+            (token) => !(token.name.startsWith(`${data.path}.`) && token.type === data.type),
+          ),
         },
       };
 
@@ -508,7 +524,9 @@ export const tokenState = createModel<RootModel>()({
       const {
         parent, oldName, newName, tokenSets, type,
       } = data;
-      const selectedTokenGroup = state.tokens[parent].filter((token) => (token.name.startsWith(`${oldName}.`) && token.type === type));
+      const selectedTokenGroup = state.tokens[parent].filter(
+        (token) => token.name.startsWith(`${oldName}.`) && token.type === type,
+      );
       const newTokenGroup = selectedTokenGroup.map((token) => {
         const { name, ...rest } = token;
         const duplicatedTokenGroupName = token.name.replace(oldName, newName);
@@ -532,14 +550,10 @@ export const tokenState = createModel<RootModel>()({
         tokens: newTokens,
       };
     },
-    updateAliases: (state, data: TokenToRename) => {
-      const newTokens = updateAliasesInState(state.tokens, data);
-
-      return {
-        ...state,
-        tokens: newTokens,
-      };
-    },
+    setUpdatedAliases: (state, newTokens: TokenStore['values']) => ({
+      ...state,
+      tokens: newTokens,
+    }),
     setCollapsedTokenSets: (state, data: string[]) => ({
       ...state,
       collapsedTokenSets: data,
@@ -556,7 +570,10 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       collapsedTokens: data,
     }),
-    setChangedState: (state, receivedState: { tokens: Record<string, AnyTokenList>, themes: ThemeObjectsList }): TokenState => {
+    setChangedState: (
+      state,
+      receivedState: { tokens: Record<string, AnyTokenList>; themes: ThemeObjectsList },
+    ): TokenState => {
       const localState = {
         tokens: state.tokens,
         themes: state.themes,
@@ -608,6 +625,36 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
+      const newThemes: ThemeObjectsList = [];
+      const updatedThemes: ThemeObjectsList = [];
+
+      themes.forEach((theme) => {
+        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
+
+        if (existingTheme) {
+          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
+            updatedThemes.push({
+              ...theme,
+              selectedTokenSets: {
+                ...existingTheme.selectedTokenSets,
+                ...theme.selectedTokenSets,
+              },
+            });
+          }
+        } else {
+          newThemes.push(theme);
+        }
+      });
+
+      return {
+        ...state,
+        importedThemes: {
+          newThemes,
+          updatedThemes,
+        },
+      };
+    },
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -621,22 +668,52 @@ export const tokenState = createModel<RootModel>()({
       }
 
       if (payload.shouldUpdate && rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'EDIT_TOKEN',
-          data: payload,
-        });
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        if (tokenSet) {
+          const updatedSet = tokenSet.map((token) => {
+            if (token.name === payload.oldName) {
+              return {
+                name: payload.name,
+                description: payload.description,
+                value: payload.value,
+                type: payload.type,
+                $extensions: payload.$extensions,
+              } as SingleToken;
+            }
+            return token;
+          });
+
+          const rawSet = singleTokensToRawTokenSet(updatedSet, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: {
+              raw: rawSet,
+              name: payload.parent,
+            },
+          });
+        }
       }
     },
     deleteToken(payload: DeleteTokenPayload, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
-        pushToTokensStudio({
-          context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
-          action: 'DELETE_TOKEN',
-          data: payload,
-        });
+        const tokenSet = rootState.tokenState.tokens[payload.parent];
+        if (tokenSet) {
+          const newSet = tokenSet.filter((token) => token.name !== payload.path);
+          const rawSet = singleTokensToRawTokenSet(newSet, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: {
+              raw: rawSet,
+              name: payload.parent,
+            },
+          });
+        }
       }
     },
     deleteDuplicateTokens() {
@@ -662,7 +739,7 @@ export const tokenState = createModel<RootModel>()({
     duplicateTokenGroup() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
     },
-    renameTokenSet(data: { oldName: string, newName: string }, rootState) {
+    renameTokenSet(data: { oldName: string; newName: string }, rootState) {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false });
 
       if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
@@ -691,7 +768,10 @@ export const tokenState = createModel<RootModel>()({
         pushToTokensStudio({
           context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
           action: 'UPDATE_TOKEN_SET_ORDER',
-          data: data.map((name, index) => ({ orderIndex: `${index}`, urn: rootState.tokenState.tokenSetMetadata[name].id })),
+          data: data.map((name, index) => ({
+            orderIndex: index,
+            path: name,
+          })),
         });
       }
     },
@@ -719,7 +799,6 @@ export const tokenState = createModel<RootModel>()({
         duplicateTokenInTokensStudio({
           rootState,
           payload,
-          onTokenDuplicated: dispatch.tokenState.editToken,
         });
       }
     },
@@ -730,7 +809,6 @@ export const tokenState = createModel<RootModel>()({
         createTokenInTokensStudio({
           rootState,
           payload,
-          onTokenCreated: dispatch.tokenState.editToken,
         });
       }
     },
@@ -743,65 +821,90 @@ export const tokenState = createModel<RootModel>()({
       } = data;
 
       const tokensInParent = rootState.tokenState.tokens[parent] ?? [];
-      tokensInParent.filter((token) => token.name.startsWith(`${newName}.`) && token.type === type).forEach((updatedToken) => {
-        dispatch.tokenState.updateAliases({ oldName: updatedToken.name.replace(`${newName}`, `${oldName}`), newName: updatedToken.name });
-      });
+      tokensInParent
+        .filter((token) => token.name.startsWith(`${newName}.`) && token.type === type)
+        .forEach((updatedToken) => {
+          dispatch.tokenState.updateAliases({
+            oldName: updatedToken.name.replace(`${newName}`, `${oldName}`),
+            newName: updatedToken.name,
+          });
+        });
     },
     updateCheckForChanges() {
       dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     renameTokenAcrossSets(data: RenameTokensAcrossSetsPayload) {
-      const {
-        oldName, newName,
-      } = data;
+      const { oldName, newName } = data;
 
       dispatch.tokenState.updateAliases({ oldName, newName });
     },
     updateDocument(options?: UpdateDocumentPayload, rootState?) {
       const defaults = { shouldUpdateNodes: true, updateRemote: true };
       const params = { ...defaults, ...options };
+      if (!rootState) return;
       try {
-        wrapTransaction({
-          name: 'updateDocument',
-          statExtractor: (result, transaction) => {
-            transaction.setMeasurement('tokens', Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
-              acc += tokens.length;
-              return acc;
-            }, 0), '');
-            transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
-            transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+        wrapTransaction(
+          {
+            name: 'updateDocument',
+            statExtractor: (result, transaction) => {
+              transaction.setMeasurement(
+                'tokens',
+                Object.entries(rootState.tokenState.tokens).reduce((acc, [, tokens]) => {
+                  acc += tokens.length;
+                  return acc;
+                }, 0),
+                '',
+              );
+              transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
+              transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+            },
           },
-        }, () => {
-          updateTokensOnSources({
-            tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-            tokenValues: rootState.tokenState.tokens,
-            usedTokenSet: rootState.tokenState.usedTokenSet,
-            themes: rootState.tokenState.themes,
-            activeTheme: rootState.tokenState.activeTheme,
-            settings: rootState.settings,
-            updatedAt: new Date().toISOString(),
-            lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
-            isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
-            editProhibited: rootState.tokenState.editProhibited,
-            api: rootState.uiState.api,
-            storageType: rootState.uiState.storageType,
-            shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-            checkForChanges: rootState.tokenState.checkForChanges,
-            shouldSwapStyles: rootState.settings.shouldSwapStyles,
-            collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
-            storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
-            dispatch,
-            tokenFormat: rootState.tokenState.tokenFormat,
-          });
-        });
+          () => {
+            updateTokensOnSources({
+              tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
+              tokenValues: rootState.tokenState.tokens,
+              usedTokenSet: rootState.tokenState.usedTokenSet,
+              themes: rootState.tokenState.themes,
+              activeTheme: rootState.tokenState.activeTheme,
+              settings: rootState.settings,
+              updatedAt: new Date().toISOString(),
+              lastUpdatedAt: rootState.uiState.lastUpdatedAt ?? new Date().toISOString(),
+              isLocal: rootState.uiState.storageType.provider === StorageProviderType.LOCAL,
+              editProhibited: rootState.tokenState.editProhibited,
+              api: rootState.uiState.api,
+              storageType: rootState.uiState.storageType,
+              shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
+              checkForChanges: rootState.tokenState.checkForChanges,
+              shouldSwapStyles: rootState.settings.shouldSwapStyles,
+              collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
+              storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
+              dispatch,
+              tokenFormat: rootState.tokenState.tokenFormat,
+            });
+          },
+        );
       } catch (e) {
         console.error('Error updating document', e);
       }
     },
-    ...Object.fromEntries(
-      (Object.entries(tokenStateEffects).map(([key, factory]) => (
-        [key, factory(dispatch)]
-      ))),
-    ),
+    async updateAliases(data: TokenToRename, rootState) {
+      const { updatedTokens, updatedSets } = updateAliasesInState(rootState.tokenState.tokens, data);
+
+      dispatch.tokenState.setUpdatedAliases(updatedTokens);
+
+      if (rootState.uiState.api?.provider === StorageProviderType.TOKENS_STUDIO) {
+        for (const set of updatedSets) {
+          const content = updatedTokens[set];
+          const rawSet = singleTokensToRawTokenSet(content, true);
+
+          pushToTokensStudio({
+            context: rootState.uiState.api as StorageTypeCredential<TokensStudioStorageType>,
+            action: 'UPDATE_TOKEN_SET',
+            data: { raw: rawSet, name: set },
+          });
+        }
+      }
+    },
+    ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),
 });

@@ -1,5 +1,103 @@
 # @tokens-studio/figma-plugin
 
+## 2.4.2
+
+### Patch Changes
+
+- 6559565c: Add line numbers to the tokens JSON editor
+- 5c6a3deb: Add warning info when deleting a set when user is synced with the Studio platform
+- 655f910b: Fixed importing text styles that reference variables in properties like font style, font weight, fontSize, lineHeight, letter Spacing, and paragraph Spacing"
+
+## 2.4.1
+
+### Patch Changes
+
+- 476cf137: Fix unintended JSON file deletion during gitlab single file tokens sync
+- d2174fa0: Fix mapping of variables to theme when themes are created via import of variables.
+
+## 2.4.0
+
+### Minor Changes
+
+- 7ef0d006: Add ability to create themes when importing when importing variables from the figma file into the plugin
+
+### Patch Changes
+
+- 15338342: fix a bug where gitkeep file was being created in every commit in Gitlab repo.
+- 4bcd1efb: Fixes the default format of tokens to DTCG when tokens are synced froM Tokens Studio Platform.
+- 259afac3: Fix issue where pro features are not activated for users using Tokens Studio sync with a valid API Key from the platform.
+
+## 2.3.3
+
+### Patch Changes
+
+- 10a77c18: Increase Tokens Studio tokens set sync limit to 1000
+- b87340e5: Fixes an issue where a user is unable to apply a linear gradient fill via a composition token.
+
+## 2.3.2
+
+### Patch Changes
+
+- e15ba659: Raise limit for token sets to 100 when syncing with Tokens Studio provider
+
+## 2.3.1
+
+### Patch Changes
+
+- daba40ff: Fix issue of lingering gitkeep files in non-empty gitlab directories
+- 7ba9f467: Fix Tokens Studio sync missing theme metadata
+- b08d2fde: Fix application of paragraph Indent property via typography tokens
+- 35a0281d: Fix import of decimal values when importing styles and variables
+- 62dced00: Fixes an issue in Gitlab sync where the Initial commit message caused an error due to non-conformance with the user's comapany's commit message rules.
+- c83b514e: Fix ability to add a token with empty or nested empty token groups
+
+## 2.3.0
+
+### Minor Changes
+
+- 8cbef622: Improved Tokens Studio Sync provider creation and updated Tokens Studio SDK to the latest version
+
+### Patch Changes
+
+- 41f7e340: Fix for linear gradient start/end points being outside the node bounding box when using angles that aren't divisible by 45.
+- a60aa4d5: Fixes an issue where a typography token applied with exported variable is not displayed in Figma.
+
+## 2.2.3
+
+### Patch Changes
+
+- 01ccff2a: Fixes an issue when updating a token's value from a reference to a hard value, the check we introduced in the last release caused those to not be updated (and only worked when changing to another reference).
+
+## 2.2.2
+
+### Patch Changes
+
+- 23caccde: Fixes sync with Bitbucket provider:
+
+  - Pull when the option is to sync with a single file was not working
+  - Push was removing all other .json files in the selected folder (either root of the chosen folder)
+
+## 2.2.1
+
+### Patch Changes
+
+- 1af628f1: fixed an issue with pulling token sets from Bitbucket when multi-file sync is enabled, wherein all the token sets were not being pulled.
+- fdfc7be2: Disable cache for Bitbucket
+- 04f3fa67: When updating variables we now properly check if the variable needs to be updated, which fixes an issue where Figma was showing library updates even though the values were the same
+
+## 2.2.0
+
+### Minor Changes
+
+- da1886da: Re-introduces "Update styles". If enabled, the plugin will update any local styles when token values or themes change. By default, this setting is off. It's available from the gear menu in the bottom right
+
+### Patch Changes
+
+- 80a5a92b: Fixed an issue where sometimes duplicate sync providers would show up
+- 4fd3f9b1: fix(tokenState): setTokensFromVariables description comparison
+- 7be0b29d: Fixed an issue where referencing a gradient would result in an empty color style; now the style correctly resolves to the gradient.
+- a6eb07de: fixes a bug where applying a typography token to a text node would override individual property changes (like font size or font family) when "Apply to selection/page/document" is clicked.
+
 ## 2.1.1
 
 ### Patch Changes

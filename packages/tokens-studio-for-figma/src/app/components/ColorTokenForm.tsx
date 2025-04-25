@@ -48,8 +48,6 @@ export default function ColorTokenForm({
   const { t } = useTranslation(['tokens']);
   const [inputHelperOpen, setInputHelperOpen] = React.useState(false);
   const [inputMixHelperOpen, setInputMixHelperOpen] = React.useState(false);
-  const [operationMenuOpened, setOperationMenuOpened] = React.useState(false);
-  const [colorSpaceMenuOpened, setColorSpaceMenuOpened] = React.useState(false);
   const [modifyVisible, setModifyVisible] = React.useState(false);
   const isProUser = useIsProUser();
 
@@ -140,14 +138,6 @@ export default function ColorTokenForm({
     handleRemoveColorModify();
   }, [handleRemoveColorModify]);
 
-  const handleOperationToggleMenu = useCallback(() => {
-    setOperationMenuOpened(!operationMenuOpened);
-  }, [operationMenuOpened]);
-
-  const handleColorSpaceToggleMenu = useCallback(() => {
-    setColorSpaceMenuOpened(!colorSpaceMenuOpened);
-  }, [colorSpaceMenuOpened]);
-
   const onOperationSelected = useCallback((operation: string) => {
     if (internalEditToken?.$extensions?.['studio.tokens']?.modify) {
       handleModifyChange({
@@ -227,7 +217,7 @@ export default function ColorTokenForm({
       <Box css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box css={{ display: 'flex', gap: '$3', alignItems: 'center' }}>
           <Heading size="small">{t('modify')}</Heading>
-          <ProBadge compact />
+          <ProBadge campaign="modify-color" compact />
         </Box>
         {
           !modifyVisible ? (

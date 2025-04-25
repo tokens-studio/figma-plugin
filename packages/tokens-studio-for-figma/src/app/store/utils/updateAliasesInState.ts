@@ -4,39 +4,61 @@ import { TokenState } from '../models/tokenState';
 import { updateModify } from './updateModify';
 
 export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data: TokenToRename) {
-  const newTokens = Object.entries(tokens).reduce<TokenState['tokens']>(
+  const updatedSets: string[] = [];
+  const updatedTokens = Object.entries(tokens).reduce<TokenState['tokens']>(
     (acc, [key, values]) => {
       const newValues = values.map<SingleToken>((token) => {
         try {
         // Update references inside modify
-          token = updateModify(token, data);
+          const newToken = updateModify(token, data);
+          // check if $extensions was updated
+          if (JSON.stringify(newToken.$extensions) !== JSON.stringify(token.$extensions)) {
+            if (!updatedSets.includes(key)) updatedSets.push(key);
+          }
 
           // Update if token is of type array, e.g. box shadows
-          if (Array.isArray(token.value)) {
+          if (Array.isArray(newToken.value)) {
+            const newTokenValue = newToken.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
+              a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+              return a;
+            }, {}));
+
+            if (JSON.stringify(newTokenValue) !== JSON.stringify(newToken.value)) {
+              if (!updatedSets.includes(key)) updatedSets.push(key);
+            }
+
             return {
-              ...token,
-              value: token.value.map((t) => Object.entries(t).reduce<Record<string, string | number>>((a, [k, v]) => {
-                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                return a;
-              }, {})),
+              ...newToken,
+              value: newTokenValue,
             } as SingleToken;
           }
 
           // Update if we have a composite token value, e.g. typography
-          if (typeof token.value === 'object') {
+          if (typeof newToken.value === 'object') {
+            const newTokenValue = Object.entries(newToken.value).reduce<Record<string, string | number>>((a, [k, v]) => {
+              a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
+              return a;
+            }, {});
+
+            if (JSON.stringify(newTokenValue) !== JSON.stringify(newToken.value)) {
+              if (!updatedSets.includes(key)) updatedSets.push(key);
+            }
+
             return {
-              ...token,
-              value: Object.entries(token.value).reduce<Record<string, string | number>>((a, [k, v]) => {
-                a[k] = replaceReferences(v.toString(), data.oldName, data.newName);
-                return a;
-              }, {}),
+              ...newToken,
+              value: newTokenValue,
             } as SingleToken;
+          }
+
+          const newValue = replaceReferences(newToken.value.toString(), data.oldName, data.newName);
+          if (newValue !== newToken.value) {
+            if (!updatedSets.includes(key)) updatedSets.push(key);
           }
 
           // Update for remaining token value types
           return {
-            ...token,
-            value: replaceReferences(token.value.toString(), data.oldName, data.newName),
+            ...newToken,
+            value: newValue,
           } as SingleToken;
         } catch (e) {
           console.error(e);
@@ -49,5 +71,5 @@ export function updateAliasesInState(tokens: Record<string, AnyTokenList>, data:
     },
     {},
   );
-  return newTokens;
+  return { updatedTokens, updatedSets };
 }

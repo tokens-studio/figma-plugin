@@ -51,7 +51,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
   const treeItems = themeListToTree(themes);
   const { t } = useTranslation(['tokens']);
 
-  const themeEditorDefaultValues = useMemo(() => {
+  const themeEditorDefaultValues: Partial<ThemeObject> = useMemo(() => {
     const themeObject = themes.find(({ id }) => id === themeEditorOpen);
     if (themeObject) {
       return {
@@ -94,7 +94,7 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
         setThemeEditorOpen(false);
       }
     }
-  }, [confirm, dispatch.tokenState, themeEditorOpen]);
+  }, [confirm, dispatch.tokenState, t, themeEditorOpen]);
 
   const handleCancelEdit = useCallback(() => {
     setThemeEditorOpen(false);
@@ -112,9 +112,13 @@ export const ManageThemesModal: React.FC<React.PropsWithChildren<React.PropsWith
       name: values.name,
       selectedTokenSets: values.tokenSets,
       ...(values?.group ? { group: values.group } : {}),
+      meta: {
+        oldName: themeEditorDefaultValues?.name,
+        oldGroup: themeEditorDefaultValues?.group,
+      },
     });
     setThemeEditorOpen(false);
-  }, [themeEditorOpen, dispatch]);
+  }, [themeEditorOpen, dispatch.tokenState, themeEditorDefaultValues]);
 
   const handleReorder = React.useCallback((reorderedItems: TreeItem[]) => {
     let currentGroup = '';

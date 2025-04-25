@@ -55,7 +55,7 @@ const mockSettings: SavedSettings = {
   updateMode: UpdateMode.PAGE,
   updateOnChange: false,
   updateRemote: true,
-  updateStyles: true,
+  shouldUpdateStyles: true,
 };
 
 const mockValues: Record<string, AnyTokenList> = {

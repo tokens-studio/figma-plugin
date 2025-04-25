@@ -20,7 +20,10 @@ const applyPaintIfNotEqual = (key, existingPaint, newPaint, target) => {
 };
 
 const getLinearGradientPaint = async (fallbackValue, token) => {
-  const { gradientStops, gradientTransform } = convertStringToFigmaGradient(fallbackValue);
+  const gradientString = typeof fallbackValue === 'object' && fallbackValue.fill
+    ? fallbackValue.fill
+    : fallbackValue;
+  const { gradientStops, gradientTransform } = convertStringToFigmaGradient(gradientString);
 
   const rawValue = defaultTokenValueRetriever.get(token)?.rawValue;
   let gradientStopsWithReferences = gradientStops;

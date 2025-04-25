@@ -45,7 +45,8 @@ jobs:
             ${{ vars.VAULT_PATH }} MIXPANEL_ACCESS_TOKEN | MIXPANEL_ACCESS_TOKEN;
             ${{ vars.VAULT_PATH }} STORYBLOK_ACCESS_TOKEN | STORYBLOK_ACCESS_TOKEN;
             ${{ vars.VAULT_PATH }} SUPABASE_ANON_KEY | SUPABASE_ANON_KEY;
-            ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;            
+            ${{ vars.VAULT_PATH }} SENTRY_AUTH_TOKEN | SENTRY_AUTH_TOKEN;    
+            ${{ vars.VAULT_PATH }} TOKENS_STUDIO_API_HOST | TOKENS_STUDIO_API_HOST;
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Node.js environment
@@ -74,6 +75,7 @@ jobs:
           envkey_STORYBLOK_ACCESS_TOKEN: ${{ steps.secrets.outputs.STORYBLOK_ACCESS_TOKEN }} 
           envkey_SUPABASE_ANON_KEY: ${{ steps.secrets.outputs.SUPABASE_ANON_KEY }} 
           envkey_SENTRY_AUTH_TOKEN: ${{ steps.secrets.outputs.SENTRY_AUTH_TOKEN }}
+          envkey_TOKENS_STUDIO_API_HOST: ${{ steps.secrets.outputs.TOKENS_STUDIO_API_HOST }}
  
       # Build the figma plugin package
       - name: Build Package

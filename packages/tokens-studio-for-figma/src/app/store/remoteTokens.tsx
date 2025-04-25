@@ -24,7 +24,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageTypeCredentials, StorageTypeFormValues } from '@/types/StorageType';
 import { useGenericVersionedStorage } from './providers/generic/versionedStorage';
 import { RemoteResponseData, RemoteResponseStatus } from '@/types/RemoteResponseData';
-import { getFormat, TokenFormat } from '@/plugin/TokenFormatStoreClass';
+import { getFormat, TokenFormat, TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { applyTokenSetOrder } from '@/utils/tokenset';
 import { isEqual } from '@/utils/isEqual';
@@ -33,7 +33,7 @@ import { Tabs } from '@/constants/Tabs';
 import { useTokensStudio } from './providers/tokens-studio';
 import { notifyToUI } from '@/plugin/notifiers';
 
-export type PushOverrides = { branch: string, commitMessage: string };
+export type PushOverrides = { branch: string; commitMessage: string };
 
 type PullTokensOptions = {
   context?: StorageTypeCredentials;
@@ -105,7 +105,12 @@ export default function useRemoteTokens() {
 
   const pullTokens = useCallback(
     async ({
-      context = api, featureFlags, usedTokenSet, activeTheme, collapsedTokenSets, updateLocalTokens = false,
+      context = api,
+      featureFlags,
+      usedTokenSet,
+      activeTheme,
+      collapsedTokenSets,
+      updateLocalTokens = false,
     }: PullTokensOptions) => {
       showPullDialog('loading');
       let remoteData: RemoteResponseData<unknown> | null = null;
@@ -144,6 +149,7 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           remoteData = await pullTokensFromTokensStudio(context);
+          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
           break;
         }
         default:
@@ -156,7 +162,11 @@ export default function useRemoteTokens() {
           metadata: remoteData.metadata,
         });
         dispatch.uiState.setHasRemoteChange(false);
-        const stringifiedRemoteTokens = JSON.stringify(compact([remoteData.tokens, remoteData.themes, TokenFormat.format]), null, 2);
+        const stringifiedRemoteTokens = JSON.stringify(
+          compact([remoteData.tokens, remoteData.themes, TokenFormat.format]),
+          null,
+          2,
+        );
         dispatch.tokenState.setLastSyncedState(stringifiedRemoteTokens);
         if (activeTab !== Tabs.LOADING) {
           if (updateLocalTokens) {
@@ -247,7 +257,11 @@ export default function useRemoteTokens() {
           const themeCount = Object.keys(remoteData.themes).length;
           const tokenFormat = getFormat();
           track('pullTokens', {
-            provider: context.provider, setCount, tokensCount, themeCount, tokenFormat,
+            provider: context.provider,
+            setCount,
+            tokensCount,
+            themeCount,
+            tokenFormat,
           });
         } else {
           track('pullTokens failure', { provider: context.provider });
@@ -311,6 +325,7 @@ export default function useRemoteTokens() {
         }
         case StorageProviderType.TOKENS_STUDIO: {
           content = await syncTokensWithTokensStudio(context);
+          dispatch.tokenState.setTokenFormat(TokenFormatOptions.DTCG);
           break;
         }
         default:
@@ -346,7 +361,7 @@ export default function useRemoteTokens() {
   );
 
   const pushTokens = useCallback(
-    async ({ context = api, overrides }: { context?: StorageTypeCredentials, overrides?: PushOverrides } = {}) => {
+    async ({ context = api, overrides }: { context?: StorageTypeCredentials; overrides?: PushOverrides } = {}) => {
       const isFolder = 'filePath' in context && !context.filePath?.endsWith('.json');
       let pushResult;
       switch (context.provider) {
@@ -384,7 +399,12 @@ export default function useRemoteTokens() {
           const themeCount = Object.keys(themes).length;
           const tokenFormat = getFormat();
           track('pushTokens', {
-            provider: context.provider, isFolder, setCount, tokensCount, themeCount, tokenFormat,
+            provider: context.provider,
+            isFolder,
+            setCount,
+            tokensCount,
+            themeCount,
+            tokenFormat,
           });
         } else {
           track('pushTokens failure', { provider: context.provider, isFolder });
@@ -396,7 +416,17 @@ export default function useRemoteTokens() {
         notifyToUI(pushResult.errorMessage, { error: true });
       }
     },
-    [api, pushTokensToGitHub, pushTokensToGitLab, pushTokensToBitbucket, pushTokensToADO, pushTokensToSupernova, pushTokensToTokensStudio, tokens, themes],
+    [
+      api,
+      pushTokensToGitHub,
+      pushTokensToGitLab,
+      pushTokensToBitbucket,
+      pushTokensToADO,
+      pushTokensToSupernova,
+      pushTokensToTokensStudio,
+      tokens,
+      themes,
+    ],
   );
 
   const addNewProviderItem = useCallback(

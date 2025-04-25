@@ -1,7 +1,6 @@
 import { AliasRegex } from '@/constants/AliasRegex';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { SingleToken } from '@/types/tokens';
-// eslint-disable-next-line import/no-cycle
 import { getAliasValue } from './getAliasValue';
 
 // @TODO -- removed string type logic for now
@@ -11,14 +10,16 @@ export function checkIfAlias(token: SingleToken | string, allTokens: SingleToken
     let aliasToken = false;
     if (typeof token === 'string') {
       aliasToken = Boolean(token.match(AliasRegex));
-    } else if (token.type === TokenTypes.TYPOGRAPHY || token.type === TokenTypes.BOX_SHADOW || token.type === TokenTypes.BORDER) {
-      if (typeof token.value === 'string') { aliasToken = Boolean(String(token.value).match(AliasRegex)); } else {
+    } else if (
+      token.type === TokenTypes.TYPOGRAPHY
+      || token.type === TokenTypes.BOX_SHADOW
+      || token.type === TokenTypes.BORDER
+    ) {
+      if (typeof token.value === 'string') {
+        aliasToken = Boolean(String(token.value).match(AliasRegex));
+      } else {
         const arrayValue = Array.isArray(token.value) ? token.value : [token.value];
-        aliasToken = arrayValue.some((value) => (
-          Object.values(value).some((singleValue) => (
-            Boolean(singleValue?.toString().match(AliasRegex))
-          ))
-        ));
+        aliasToken = arrayValue.some((value) => Object.values(value).some((singleValue) => Boolean(singleValue?.toString().match(AliasRegex))));
       }
     } else if (token.type === TokenTypes.COMPOSITION) {
       return true;

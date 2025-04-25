@@ -160,6 +160,15 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
+  if (mergedTokens) {
+    try {
+      const jsonSize = (new TextEncoder().encode(JSON.stringify(tokenValues)).length) / 1024;
+      track('tokens_size', { jsonSize });
+    } catch (error) {
+      console.error('Failed to track tokens size:', error);
+    }
+  }
+
   const transaction = startTransaction({
     op: 'transaction',
     name: 'Update Tokens',
@@ -178,7 +187,9 @@ export default async function updateTokensOnSources({
     collapsedTokenSets,
     tokenFormat,
   }).then((result) => {
-    transaction.setMeasurement('nodes', result.nodes, '');
-    transaction.finish();
+    if (transaction) {
+      transaction.setMeasurement('nodes', result.nodes, '');
+      transaction.finish();
+    }
   });
 }

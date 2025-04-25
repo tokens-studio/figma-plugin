@@ -72,3 +72,4 @@ export * from './stylesColorSelector';
 export * from './stylesTypographySelector';
 export * from './stylesEffectSelector';
 export * from './createStylesWithVariableReferencesSelector';
+export * from './importedThemesSelector';

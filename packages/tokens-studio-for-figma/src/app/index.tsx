@@ -3,6 +3,7 @@ import './assets/fonts/jetbrainsmono.css';
 import './styles/preflight.css';
 import '@/i18n';
 import * as asyncHandlers from './asyncMessageHandlers';
+import { startup } from './asyncMessageHandlers/startup';
 import { initializeAnalytics } from '../utils/analytics';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
@@ -13,4 +14,5 @@ initializeSentry();
 
 AsyncMessageChannel.ReactInstance.connect();
 AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.GET_THEME_INFO, asyncHandlers.getThemeInfo);
-AsyncMessageChannel.ReactInstance.handle(AsyncMessageTypes.STARTUP, asyncHandlers.startup);
+
+startup();
