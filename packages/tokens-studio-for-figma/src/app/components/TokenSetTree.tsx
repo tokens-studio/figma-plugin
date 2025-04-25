@@ -31,6 +31,7 @@ type ExtendedTreeItem = TreeItem & {
   isActive: boolean
   canDelete: boolean
   checkedState: boolean | 'indeterminate'
+  tokenCount?: number
   onRename: (tokenSet: string) => void
   onDelete: (tokenSet: string) => void
   onDuplicate: (tokenSet: string) => void
@@ -62,20 +63,37 @@ export default function TokenSetTree({
 
   const filteredSetItems = React.useMemo(() => {
     const tokenSetsContainingItemsThatMatchFilter = new Set<string>();
+    const tokenCountMap = new Map<string, number>();
 
     Object.entries(tokens).forEach(([setName, setContent]) => {
-      if (setContent.some((token) => token.name.toLowerCase().includes(tokenFilter.toLowerCase()))
-          || setName.toLowerCase().includes(tokenFilter.toLowerCase())) {
+      const matchingTokens = setContent.filter((token) =>
+        token.name.toLowerCase().includes(tokenFilter.toLowerCase())
+      );
+
+      const setNameMatches = setName.toLowerCase().includes(tokenFilter.toLowerCase());
+
+      if (matchingTokens.length > 0 || setNameMatches) {
         // Add the matching set and all its parent folders
         let currentPath = setName;
         while (currentPath) {
           tokenSetsContainingItemsThatMatchFilter.add(currentPath);
+
+          // Only count direct matches for the specific set, not parent folders
+          if (currentPath === setName) {
+            tokenCountMap.set(currentPath, matchingTokens.length);
+          }
+
           currentPath = currentPath.split('/').slice(0, -1).join('/');
         }
       }
     });
 
-    return externalItems.filter((item) => tokenSetsContainingItemsThatMatchFilter.has(item.path));
+    return externalItems
+      .filter((item) => tokenSetsContainingItemsThatMatchFilter.has(item.path))
+      .map((item) => ({
+        ...item,
+        tokenCount: tokenFilter ? tokenCountMap.get(item.path) || 0 : undefined,
+      }));
   }, [externalItems, tokenFilter, tokens]);
 
   React.useEffect(() => {

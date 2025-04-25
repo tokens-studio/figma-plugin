@@ -14,9 +14,10 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
+import { Count } from '../Count';
 
 export type TokenSetItemProps = {
-  item: TreeItem;
+  item: TreeItem & { tokenCount?: number };
   isCollapsed?: boolean; // eslint-disable-line react/no-unused-prop-types
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
@@ -144,6 +145,9 @@ export function TokenSetItem({
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
               <Box
                 css={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '$2',
                   overflow: 'hidden',
                   height: '1.5em',
                   maxWidth: 'calc(100% - $sizes$6)',
@@ -155,6 +159,9 @@ export function TokenSetItem({
                 <Tooltip label={item.label} side="right">
                   <span>{item.label}</span>
                 </Tooltip>
+                {item.tokenCount !== undefined && item.tokenCount > 0 && (
+                  <Count count={item.tokenCount} />
+                )}
               </Box>
             </StyledDragButton>
           </ContextMenu.Trigger>
