@@ -12,19 +12,17 @@ describe('ThemesProperty', () => {
     },
   ];
 
+  const compressedMockThemes = compressToUTF16(JSON.stringify(mockThemes));
+
   it('should be able to write compressed data', async () => {
-    const compressedValue = compressToUTF16(JSON.stringify(mockThemes));
-    await ThemesProperty.write(compressedValue);
+    await ThemesProperty.write(mockThemes);
     expect(mockRootSetSharedPluginData).toHaveBeenCalledTimes(1);
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedValue);
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedMockThemes);
   });
 
-  it('should be able to read and decompress data', async () => {
-    const compressedValue = compressToUTF16(JSON.stringify(mockThemes));
-    mockRootGetSharedPluginData.mockReturnValueOnce(compressedValue);
-    const result = await ThemesProperty.read();
-    const decompressedResult = decompressFromUTF16(result);
-    expect(JSON.parse(decompressedResult)).toEqual(mockThemes);
+  it('should be able to read', async () => {
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify(mockThemes));
+    expect(await ThemesProperty.read()).toEqual(mockThemes);
   });
 
   it('should handle empty or invalid input when reading', async () => {
