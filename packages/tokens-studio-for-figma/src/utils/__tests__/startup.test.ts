@@ -61,7 +61,7 @@ describe('startup', () => {
       initialLoad: false,
       localTokenData: {
         activeTheme: {},
-        checkForChanges: null,
+        checkForChanges: false,
         collapsedTokenSets: null,
         themes: [],
         tokenFormat: null,
