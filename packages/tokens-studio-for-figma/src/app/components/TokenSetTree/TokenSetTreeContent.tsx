@@ -10,7 +10,6 @@ import {
   collapsedTokenSetsSelector,
 } from '@/selectors';
 import { StyledThemeLabel } from '../ManageThemesModal/StyledThemeLabel';
-import { Count } from '../Count';
 
 type TreeItem<ItemType = unknown> = {
   key: string
@@ -70,9 +69,6 @@ export function TokenSetTreeContent<T extends TreeItem>({
                   {keyPosition === 'start' ? (
                     <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
                       <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
-                      {item.tokenCount !== undefined && item.tokenCount > 0 && (
-                        <Count count={item.tokenCount} />
-                      )}
                     </Box>
                   ) : null}
                   <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
@@ -81,9 +77,6 @@ export function TokenSetTreeContent<T extends TreeItem>({
                   {keyPosition === 'end' ? (
                     <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
                       <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
-                      {item.tokenCount !== undefined && item.tokenCount > 0 && (
-                        <Count count={item.tokenCount} />
-                      )}
                     </Box>
                   ) : null}
                 </StyledFolderButton>
