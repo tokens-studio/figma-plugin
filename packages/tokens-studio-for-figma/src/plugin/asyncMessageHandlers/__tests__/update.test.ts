@@ -20,7 +20,6 @@ describe('update', () => {
   const UsedTokenSetPropertyWriteSpy = jest.spyOn(UsedTokenSetProperty, 'write');
   const UpdatedAtPropertyWriteSpy = jest.spyOn(UpdatedAtProperty, 'write');
   const ActiveThemePropertyWriteSpy = jest.spyOn(ActiveThemeProperty, 'write');
-  const CheckForChangesPropertyWriteSpy = jest.spyOn(CheckForChangesProperty, 'write');
   const mockSwapStyles = jest.spyOn(swapStyles, 'swapStyles');
 
   const mockUpdateMessage: UpdateAsyncMessage = {
