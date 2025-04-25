@@ -1,5 +1,4 @@
 import compact from 'just-compact';
-import { decompressFromUTF16 } from 'lz-string';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { NodeTokenRefMap } from '@/types/NodeTokenRefMap';
 import { AnyTokenList, SingleToken, TokenStore } from '@/types/tokens';
@@ -131,8 +130,8 @@ export async function getTokenData(): Promise<{
       values = await ValuesProperty.read(figma.root) ?? {};
       themes = await ThemesProperty.read(figma.root) ?? [];
     } else {
-      values = JSON.parse(decompressFromUTF16(await ClientStorageProperty.read(`${prefix}/values`))) ?? {};
-      themes = JSON.parse(decompressFromUTF16(await ClientStorageProperty.read(`${prefix}/themes`))) ?? [];
+      values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
+      themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
 
       // To account for the migration period, if client storage is empty, try reading from ValuesProperty and ThemesProperty to ensure local changes are not lost
       if (Object.keys(values).length === 0) {
