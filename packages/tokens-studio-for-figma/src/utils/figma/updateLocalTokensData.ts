@@ -1,4 +1,3 @@
-import { compressToUTF16 } from 'lz-string';
 import * as pjs from '../../../package.json';
 import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
@@ -23,9 +22,9 @@ type Payload = {
 
 export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
-  await ValuesProperty.write(compressToUTF16(JSON.stringify(payload.tokens)));
-  await ThemesProperty.write(compressToUTF16(JSON.stringify(payload.themes)));
   await IsCompressedProperty.write(true);
+  await ThemesProperty.write(payload.themes);
+  await ValuesProperty.write(payload.tokens);
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);
   await ActiveThemeProperty.write(payload.activeTheme);
