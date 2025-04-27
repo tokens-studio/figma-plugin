@@ -181,6 +181,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
   const themesToCreate: ThemeObjectsList = [];
+  const tokenSetsToDelete = new Set<string>();
   // Process themes if pro user
   if (proUser) {
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
@@ -196,6 +197,32 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         const existingTheme = themes.find((theme) => theme.$figmaCollectionId === collection.id && theme.$figmaModeId === mode.modeId);
 
         if (existingTheme) {
+          // Extract old group name from theme ID (e.g., 'old-light' -> 'old')
+          const oldGroupName = existingTheme.id.split('-')[0];
+
+          console.log('Existing theme:', {
+            id: existingTheme.id,
+            oldGroup: oldGroupName,
+            currentGroup: existingTheme.group,
+            selectedTokenSets: existingTheme.selectedTokenSets,
+          });
+
+          // Get all token sets that start with the OLD group name
+          const setsToDelete = Object.keys(existingTheme.selectedTokenSets)
+            .filter((key) => {
+              console.log('Checking key:', key, 'starts with:', `${oldGroupName}/`);
+              return key.startsWith(`${oldGroupName}/`);
+            });
+
+          console.log('Sets filtered for deletion:', setsToDelete);
+
+          setsToDelete.forEach((setName) => {
+            console.log('Adding to delete set:', setName);
+            tokenSetsToDelete.add(setName);
+          });
+
+          console.log('Final token sets to delete:', Array.from(tokenSetsToDelete));
+
           // Update existing theme with new names but keep the same ID
           themesToCreate.push({
             ...existingTheme,
@@ -204,7 +231,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             selectedTokenSets: {
               [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
             },
-            $figmaVariableReferences: variableReferences, // This will replace old references
+            $figmaVariableReferences: variableReferences,
           });
         } else {
           // Create new theme if no matching one exists

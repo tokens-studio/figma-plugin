@@ -634,40 +634,42 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
-      const newThemes: ThemeObjectsList = [];
-      const updatedThemes: ThemeObjectsList = [];
+    setThemesFromVariables(state, themes: ThemeObjectsList): TokenState {
+      const tokenSetsToDelete = new Set<string>();
+      // Find token sets to delete from existing themes
       themes.forEach((theme) => {
         const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
-
         if (existingTheme) {
-          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
-            const filteredTokenSets = Object.entries(existingTheme.selectedTokenSets).reduce((acc, [key, value]) => {
-              if (!key.startsWith(`${existingTheme.group}/`)) {
-                acc[key] = value;
-              }
-              return acc;
-            }, {});
-
-            updatedThemes.push({
-              ...theme,
-              selectedTokenSets: {
-                ...filteredTokenSets,
-                ...theme.selectedTokenSets,
-              },
+          Object.keys(existingTheme.selectedTokenSets)
+            .filter((key) => key.startsWith(`${theme.group}/`))
+            .forEach((setName) => {
+              tokenSetsToDelete.add(setName);
             });
-          }
-        } else {
-          newThemes.push(theme);
         }
+      });
+
+      // Delete the token sets
+      const newTokens = { ...state.tokens };
+      tokenSetsToDelete.forEach((setName) => {
+        delete newTokens[setName];
+      });
+
+      // Update usedTokenSet to remove deleted sets
+      const newUsedTokenSet = { ...state.usedTokenSet };
+      tokenSetsToDelete.forEach((setName) => {
+        delete newUsedTokenSet[setName];
       });
 
       return {
         ...state,
-        importedThemes: {
-          newThemes,
-          updatedThemes,
-        },
+        tokens: newTokens,
+        usedTokenSet: newUsedTokenSet,
+        themes: themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: {
+            [`${theme.group}/${theme.name}`]: TokenSetStatus.ENABLED,
+          },
+        })),
       };
     },
     ...tokenStateReducers,
