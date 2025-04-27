@@ -1,5 +1,13 @@
 # @tokens-studio/figma-plugin
 
+## 2.4.2
+
+### Patch Changes
+
+- 6559565c: Add line numbers to the tokens JSON editor
+- 5c6a3deb: Add warning info when deleting a set when user is synced with the Studio platform
+- 655f910b: Fixed importing text styles that reference variables in properties like font style, font weight, fontSize, lineHeight, letter Spacing, and paragraph Spacing"
+
 ## 2.4.1
 
 ### Patch Changes
