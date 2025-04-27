@@ -420,8 +420,16 @@ export const tokenState = createModel<RootModel>()({
           }
         });
       });
+      // Clean up old tokens that no longer exist
+      const newTokenNames = new Set(newTokens.map((t) => t.name).concat(updatedTokens.map((t) => t.name)));
+      const cleanedTokens = { ...state.tokens };
+      Object.keys(cleanedTokens).forEach((tokenSet) => {
+        cleanedTokens[tokenSet] = cleanedTokens[tokenSet].filter((token) => newTokenNames.has(token.name) || existingTokens.some((et) => et.name === token.name));
+      });
+
       return {
         ...state,
+        tokens: cleanedTokens,
         importedTokens: {
           newTokens,
           updatedTokens,

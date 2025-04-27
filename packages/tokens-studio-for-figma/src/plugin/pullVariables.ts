@@ -192,18 +192,35 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           [normalizeVariableName(variable.name)]: variable.key,
         }), {});
 
-        themesToCreate.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-          name: mode.name,
-          group: collection.name,
-          selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {},
-          $figmaVariableReferences: variableReferences,
-          $figmaModeId: mode.modeId,
-          $figmaCollectionId: collection.id,
-        });
+        // Check if there's an existing theme with the same collection ID
+        const existingTheme = themes.find((theme) => theme.$figmaCollectionId === collection.id && theme.$figmaModeId === mode.modeId);
+
+        if (existingTheme) {
+          // Update existing theme with new names but keep the same ID
+          themesToCreate.push({
+            ...existingTheme,
+            name: mode.name,
+            group: collection.name,
+            selectedTokenSets: {
+              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            },
+            $figmaVariableReferences: variableReferences, // This will replace old references
+          });
+        } else {
+          // Create new theme if no matching one exists
+          themesToCreate.push({
+            id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+            name: mode.name,
+            group: collection.name,
+            selectedTokenSets: {
+              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            },
+            $figmaStyleReferences: {},
+            $figmaVariableReferences: variableReferences,
+            $figmaModeId: mode.modeId,
+            $figmaCollectionId: collection.id,
+          });
+        }
       }));
     }));
   }
