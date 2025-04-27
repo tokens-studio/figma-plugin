@@ -181,7 +181,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
   const themesToCreate: ThemeObjectsList = [];
-  const tokenSetsToDelete = new Set<string>();
+  const tokenSetsToRemove: string[] = [];
   // Process themes if pro user
   if (proUser) {
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
@@ -200,28 +200,13 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           // Extract old group name from theme ID (e.g., 'old-light' -> 'old')
           const oldGroupName = existingTheme.id.split('-')[0];
 
-          console.log('Existing theme:', {
-            id: existingTheme.id,
-            oldGroup: oldGroupName,
-            currentGroup: existingTheme.group,
-            selectedTokenSets: existingTheme.selectedTokenSets,
-          });
-
           // Get all token sets that start with the OLD group name
-          const setsToDelete = Object.keys(existingTheme.selectedTokenSets)
-            .filter((key) => {
-              console.log('Checking key:', key, 'starts with:', `${oldGroupName}/`);
-              return key.startsWith(`${oldGroupName}/`);
-            });
+          const setsToRemove = Object.keys(existingTheme.selectedTokenSets)
+            .filter((key) => key.startsWith(`${oldGroupName}/`));
 
-          console.log('Sets filtered for deletion:', setsToDelete);
-
-          setsToDelete.forEach((setName) => {
-            console.log('Adding to delete set:', setName);
-            tokenSetsToDelete.add(setName);
+          setsToRemove.forEach((setName) => {
+            tokenSetsToRemove.push(setName);
           });
-
-          console.log('Final token sets to delete:', Array.from(tokenSetsToDelete));
 
           // Update existing theme with new names but keep the same ID
           themesToCreate.push({
@@ -259,7 +244,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    notifyVariableValues(processedTokens, themesToCreate);
+    notifyVariableValues(processedTokens, themesToCreate, tokenSetsToRemove);
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

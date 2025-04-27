@@ -87,6 +87,7 @@ export type VariablesFromPluginMessage = {
   type: MessageFromPluginTypes.VARIABLES;
   values?: Record<string, VariableToCreateToken[]>;
   themes?: ThemeObjectsList;
+  setsToRemove?: string[];
 };
 
 export type StartJobFromPluginMessage = {

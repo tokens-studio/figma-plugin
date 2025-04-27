@@ -634,36 +634,13 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    setThemesFromVariables(state, themes: ThemeObjectsList): TokenState {
-      const tokenSetsToDelete = new Set<string>();
-      // Find token sets to delete from existing themes
-      themes.forEach((theme) => {
-        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
-        if (existingTheme) {
-          Object.keys(existingTheme.selectedTokenSets)
-            .filter((key) => key.startsWith(`${theme.group}/`))
-            .forEach((setName) => {
-              tokenSetsToDelete.add(setName);
-            });
-        }
-      });
-
-      // Delete the token sets
-      const newTokens = { ...state.tokens };
-      tokenSetsToDelete.forEach((setName) => {
-        delete newTokens[setName];
-      });
-
-      // Update usedTokenSet to remove deleted sets
-      const newUsedTokenSet = { ...state.usedTokenSet };
-      tokenSetsToDelete.forEach((setName) => {
-        delete newUsedTokenSet[setName];
+    setThemesFromVariables(state, themes: ThemeObjectsList, setsToRemove: string[]): TokenState {
+      setsToRemove.forEach((tokenSetName) => {
+        state = updateTokenSetsInState(state, (currentSetName, tokenSet) => (currentSetName === tokenSetName ? null : [currentSetName, tokenSet]));
       });
 
       return {
         ...state,
-        tokens: newTokens,
-        usedTokenSet: newUsedTokenSet,
         themes: themes.map((theme) => ({
           ...theme,
           selectedTokenSets: {
