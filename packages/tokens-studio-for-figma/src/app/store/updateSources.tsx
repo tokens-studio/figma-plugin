@@ -161,15 +161,23 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
-  let jsonSize;
+  let tokensSize;
+  let themesSize;
 
   if (mergedTokens) {
     try {
-      const combinedData = { tokens: tokenValues, themes };
-      const compressedData = compressToUTF16(JSON.stringify(combinedData));
-      jsonSize = compressedData.length / 1024;
+      const compressedTokens = compressToUTF16(JSON.stringify(tokenValues));
+      const compressedThemes = compressToUTF16(JSON.stringify(themes));
+      tokensSize = compressedTokens.length / 1024;
+      themesSize = compressedThemes.length / 1024;
+
       track('tokens_size', {
-        jsonSize,
+        size: tokensSize,
+        storageProvider: storageType.provider,
+      });
+
+      track('themes_size', {
+        size: themesSize,
         storageProvider: storageType.provider,
       });
     } catch (error) {
@@ -195,7 +203,7 @@ export default async function updateTokensOnSources({
     collapsedTokenSets,
     tokenFormat,
     storageProvider: storageType.provider,
-    storageSize: jsonSize,
+    storageSize: (tokensSize + themesSize),
   }).then((result) => {
     if (transaction) {
       transaction.setMeasurement('nodes', result.nodes, '');
