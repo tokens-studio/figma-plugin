@@ -5,7 +5,7 @@ import { AsyncMessageTypes, UpdateAsyncMessage } from '@/types/AsyncMessages';
 import { update } from '../update';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import {
-  UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty, CheckForChangesProperty,
+  UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty,
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
