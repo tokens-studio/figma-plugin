@@ -33,8 +33,11 @@ export async function updateLocalTokensData(payload: Payload) {
   } else {
     const fileKey = await getFileKey();
     const prefix = `${fileKey}/tokens`;
+    const lastUpdated = new Date().toISOString();
+
     await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
     await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
+    await ClientStorageProperty.write(`${prefix}/lastUpdated`, lastUpdated);
     await ClientStorageProperty.write(`${prefix}/checkForChanges`, payload.checkForChanges);
   }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
