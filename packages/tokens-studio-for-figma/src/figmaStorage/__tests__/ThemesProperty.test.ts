@@ -1,4 +1,4 @@
-import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import { compressToUTF16 } from 'lz-string';
 import { ThemeObjectsList } from '@/types';
 import { mockRootGetSharedPluginData, mockRootSetSharedPluginData } from '../../../tests/__mocks__/figmaMock';
 import { ThemesProperty } from '../ThemesProperty';
