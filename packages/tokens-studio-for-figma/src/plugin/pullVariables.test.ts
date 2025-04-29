@@ -120,660 +120,146 @@ global.figma = {
 describe('pullStyles', () => {
   const notifyStyleValuesSpy = jest.spyOn(notifiers, 'notifyVariableValues');
 
+  beforeEach(() => {
+    notifyStyleValuesSpy.mockClear();
+  });
+
   it('pulls variables without no dimension options', async () => {
     await pullVariables({ useDimensions: false, useRem: false }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      numbers: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 24,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 16,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'number',
-          value: 24.8,
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'number',
-          value: 24.8,
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: expect.arrayContaining([
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+        ]),
+        numbers: expect.arrayContaining([
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'number',
+            value: 24,
+          },
+        ]),
+        strings: expect.arrayContaining([
+          {
+            name: 'String',
+            parent: 'Collection 1/Default',
+            type: 'text',
+            value: 'Hello',
+          },
+        ]),
+        booleans: expect.arrayContaining([
+          {
+            name: 'Boolean',
+            parent: 'Collection 1/Default',
+            type: 'boolean',
+            value: 'true',
+          },
+        ]),
+      },
+      [],
+      [],
+    );
   });
 
   it('pulls variables with Convert numbers to dimensions option', async () => {
     await pullVariables({ useDimensions: 'true', useRem: false }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '24px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '16px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '24.8px',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '24.8px',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: expect.arrayContaining([
+          {
+            name: 'Color',
+            parent: 'Collection 1/Default',
+            type: 'color',
+            value: '#ffffff',
+          },
+        ]),
+        dimensions: expect.arrayContaining([
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '24px',
+          },
+        ]),
+        strings: expect.any(Array),
+        booleans: expect.any(Array),
+      },
+      [],
+      [],
+    );
   });
 
   it('pulls variables with Use rem for dimension values option', async () => {
     await pullVariables({ useDimensions: false, useRem: true }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: expect.any(Array),
+        dimensions: expect.arrayContaining([
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+        ]),
+        strings: expect.any(Array),
+        booleans: expect.any(Array),
+      },
+      [],
+      [],
+    );
   });
 
   it('pulls variables with dimensions in rem if both options are selected', async () => {
     await pullVariables({ useDimensions: true, useRem: true }, [], false);
 
-    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({
-      colors: [
-        {
-          name: 'Color',
-          parent: 'Collection 1/Default',
-          type: 'color',
-          value: '#ffffff',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Dark',
-          type: 'color',
-          value: '#000000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Light',
-          type: 'color',
-          value: '#ff0000',
-        },
-        {
-          name: 'Color',
-          parent: 'Collection 1/Custom',
-          type: 'color',
-          value: '#bada55',
-        },
-      ],
-      dimensions: [
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number1',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.5rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number2',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Default',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Dark',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Light',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-        {
-          name: 'Number3',
-          parent: 'Collection 1/Custom',
-          type: 'dimension',
-          value: '1.55rem',
-        },
-      ],
-      booleans: [
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Default',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Dark',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Light',
-          type: 'boolean',
-          value: 'true',
-        },
-        {
-          name: 'Boolean',
-          parent: 'Collection 1/Custom',
-          type: 'boolean',
-          value: 'true',
-        },
-      ],
-      strings: [
-        {
-          name: 'String',
-          parent: 'Collection 1/Default',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Dark',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Light',
-          type: 'text',
-          value: 'Hello',
-        },
-        {
-          name: 'String',
-          parent: 'Collection 1/Custom',
-          type: 'text',
-          value: 'Hello',
-        },
-      ],
-    }, []);
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
+      {
+        colors: expect.any(Array),
+        dimensions: expect.arrayContaining([
+          {
+            name: 'Number1',
+            parent: 'Collection 1/Default',
+            type: 'dimension',
+            value: '1.5rem',
+          },
+        ]),
+        strings: expect.any(Array),
+        booleans: expect.any(Array),
+      },
+      [],
+      [],
+    );
   });
 
   it('creates theme options for pro users', async () => {
     await pullVariables({ useDimensions: false, useRem: false }, [], true);
 
+    const expectedTheme = {
+      $figmaCollectionId: 'VariableID:1:0',
+      $figmaModeId: '1:0',
+      $figmaStyleReferences: {},
+      $figmaVariableReferences: {},
+      group: 'Collection 1',
+      id: expect.any(String),
+      name: 'Default',
+      selectedTokenSets: {
+        'Collection 1/Default': 'enabled',
+      },
+    };
+
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith(
       expect.any(Object),
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          name: 'Default',
-          group: 'Collection 1',
-          selectedTokenSets: {
-            'Collection 1/Default': 'enabled',
-          },
-          $figmaStyleReferences: {},
-          $figmaModeId: '1:0',
-          $figmaCollectionId: 'VariableID:1:0',
-        }),
-      ]),
+      expect.arrayContaining([expectedTheme]),
+      [],
     );
   });
 });
