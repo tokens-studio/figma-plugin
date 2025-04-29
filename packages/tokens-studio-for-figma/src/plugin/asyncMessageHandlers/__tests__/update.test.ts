@@ -1,6 +1,7 @@
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { UpdateMode } from '@/constants/UpdateMode';
+
 import { AsyncMessageTypes, UpdateAsyncMessage } from '@/types/AsyncMessages';
 import { update } from '../update';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';

@@ -9,7 +9,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty,
+  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
   CheckForChangesProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -121,6 +121,7 @@ export async function getTokenData(): Promise<{
   tokenFormat: TokenFormatOptions | null
 } | null> {
   try {
+    const isCompressed = await IsCompressedProperty.read(figma.root) ?? false;
     const storageType = await getSavedStorageType();
     let values = {};
     let themes: ThemeObjectsList = [];
@@ -128,7 +129,7 @@ export async function getTokenData(): Promise<{
     const prefix = `${fileKey}/tokens`;
 
     if (storageType.provider === StorageProviderType.LOCAL) {
-      values = await ValuesProperty.read(figma.root) ?? {};
+      values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
       themes = await ThemesProperty.read(figma.root) ?? [];
     } else {
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
@@ -139,7 +140,7 @@ export async function getTokenData(): Promise<{
         values = await ValuesProperty.read(figma.root) ?? {};
       }
       if (themes.length === 0) {
-        themes = await ThemesProperty.read(figma.root) ?? [];
+        themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
       }
     }
 

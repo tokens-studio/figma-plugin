@@ -21,3 +21,4 @@ export * from './InitialLoadProperty';
 export * from './TokenFormatProperty';
 export * from './FileKeyProperty';
 export * from './CheckForChangesProperty';
+export * from './IsCompressedProperty';

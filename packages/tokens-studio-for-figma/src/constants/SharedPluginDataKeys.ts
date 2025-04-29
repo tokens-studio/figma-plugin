@@ -15,6 +15,7 @@ export const SharedPluginDataKeys = Object.freeze({
     collapsedTokenSets: 'collapsedTokenSets',
     tokenFormat: 'tokenFormat',
     fileKey: 'fileKey',
+    isCompressed: 'isCompressed',
     ...Properties,
   },
 });

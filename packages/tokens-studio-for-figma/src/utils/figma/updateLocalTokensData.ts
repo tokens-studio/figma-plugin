@@ -3,7 +3,7 @@ import { ThemeObjectsList, UsedTokenSetsMap } from '@/types';
 import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
-  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty, IsCompressedProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
@@ -28,6 +28,7 @@ export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
   // Check storage size and storage method
   if (payload.storageProvider === StorageProviderType.LOCAL) {
+    await IsCompressedProperty.write(true);
     await ThemesProperty.write(payload.themes);
     await ValuesProperty.write(payload.tokens);
   } else {
