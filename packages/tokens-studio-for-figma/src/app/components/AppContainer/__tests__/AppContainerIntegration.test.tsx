@@ -6,7 +6,6 @@ import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import {
   ApiProvidersProperty,
-  CheckForChangesProperty,
   StorageTypeProperty,
   ThemesProperty,
   ValuesProperty,
@@ -29,7 +28,6 @@ const storageTypePropertyReadSpy = jest.spyOn(StorageTypeProperty, 'read');
 const apiProvidersPropertyReadSpy = jest.spyOn(ApiProvidersProperty, 'read');
 const valuesPropertyReadSpy = jest.spyOn(ValuesProperty, 'read');
 const themesPropertyReadSpy = jest.spyOn(ThemesProperty, 'read');
-const checkForChangesPropertyReadSpy = jest.spyOn(CheckForChangesProperty, 'read');
 const licenseKeyPropertyReadSpy = jest.spyOn(LicenseKeyProperty, 'read');
 const validateLicenseSpy = jest.spyOn(validateLicenseModule, 'default');
 
@@ -148,7 +146,6 @@ const resetSuite = () => {
   apiProvidersPropertyReadSpy.mockReset();
   valuesPropertyReadSpy.mockReset();
   themesPropertyReadSpy.mockReset();
-  checkForChangesPropertyReadSpy.mockReset();
   licenseKeyPropertyReadSpy.mockReset();
   validateLicenseSpy.mockReset();
 };

@@ -6,12 +6,13 @@ import { AsyncMessageTypes, UpdateAsyncMessage } from '@/types/AsyncMessages';
 import { update } from '../update';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import {
-  UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty, CheckForChangesProperty,
+  UpdatedAtProperty, UsedTokenSetProperty, ThemesProperty, ValuesProperty, ActiveThemeProperty,
 } from '@/figmaStorage';
 import * as NodeManager from '../../NodeManager';
 import * as swapStyles from '../swapStyles';
 import { INTERNAL_THEMES_NO_GROUP } from '@/constants/InternalTokenGroup';
 import { ApplyVariablesStylesOrRawValues } from '@/constants/ApplyVariablesStyleOrder';
+import { StorageProviderType } from '@/constants/StorageProviderType';
 
 describe('update', () => {
   const findNodesSpy = jest.spyOn(NodeManager.defaultNodeManager, 'findBaseNodesWithData');
@@ -20,7 +21,6 @@ describe('update', () => {
   const UsedTokenSetPropertyWriteSpy = jest.spyOn(UsedTokenSetProperty, 'write');
   const UpdatedAtPropertyWriteSpy = jest.spyOn(UpdatedAtProperty, 'write');
   const ActiveThemePropertyWriteSpy = jest.spyOn(ActiveThemeProperty, 'write');
-  const CheckForChangesPropertyWriteSpy = jest.spyOn(CheckForChangesProperty, 'write');
   const mockSwapStyles = jest.spyOn(swapStyles, 'swapStyles');
 
   const mockUpdateMessage: UpdateAsyncMessage = {
@@ -67,6 +67,8 @@ describe('update', () => {
       global: TokenSetStatus.ENABLED,
     },
     updatedAt: '2022-07-26T10:00:00.000Z',
+    storageProvider: StorageProviderType.LOCAL,
+    storageSize: 1024,
   };
 
   it('should work', async () => {
@@ -90,7 +92,6 @@ describe('update', () => {
     expect(UsedTokenSetPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.usedTokenSet);
     expect(UpdatedAtPropertyWriteSpy).toBeCalledWith(mockUpdateMessage.updatedAt);
     expect(ActiveThemePropertyWriteSpy).toBeCalledWith(mockUpdateMessage.activeTheme);
-    expect(CheckForChangesPropertyWriteSpy).toBeCalledWith(false);
     expect(mockSwapStyles).toBeCalledWith(mockUpdateMessage.activeTheme, mockUpdateMessage.themes, mockUpdateMessage.settings.updateMode);
 
     runAfter.forEach((fn) => fn());

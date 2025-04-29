@@ -9,11 +9,14 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, CheckForChangesProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
+  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
+  CheckForChangesProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
 import { Properties } from '@/constants/Properties';
 import { TokenFormatOptions } from './TokenFormatStoreClass';
+import { ClientStorageProperty } from '@/figmaStorage/ClientStorageProperty';
+import { getFileKey } from './helpers';
 
 // @TODO fix typings
 
@@ -96,6 +99,17 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
   return mappedValues;
 }
 
+export async function getSavedStorageType(): Promise<StorageType> {
+  // the saved storage types will never contain credentials
+  // as they should not be shared across
+  const storageType = await StorageTypeProperty.read(figma.root);
+
+  if (storageType) {
+    return storageType;
+  }
+  return { provider: StorageProviderType.LOCAL };
+}
+
 export async function getTokenData(): Promise<{
   values: TokenStore['values'];
   themes: ThemeObjectsList
@@ -108,12 +122,32 @@ export async function getTokenData(): Promise<{
 } | null> {
   try {
     const isCompressed = await IsCompressedProperty.read(figma.root) ?? false;
-    const values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
-    const themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
+    const storageType = await getSavedStorageType();
+    let values = {};
+    let themes: ThemeObjectsList = [];
+    const fileKey = await getFileKey();
+    const prefix = `${fileKey}/tokens`;
+
+    if (storageType.provider === StorageProviderType.LOCAL) {
+      values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
+      themes = await ThemesProperty.read(figma.root) ?? [];
+    } else {
+      values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
+      themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
+
+      // To account for the migration period, if client storage is empty, try reading from ValuesProperty and ThemesProperty to ensure local changes are not lost
+      if (Object.keys(values).length === 0) {
+        values = await ValuesProperty.read(figma.root) ?? {};
+      }
+      if (themes.length === 0) {
+        themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
+      }
+    }
+
     const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
-    const checkForChanges = await CheckForChangesProperty.read(figma.root);
+    const checkForChanges = await ClientStorageProperty.read(`${prefix}/checkForChanges`) ?? await CheckForChangesProperty.read(figma.root) ?? false;
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
@@ -157,17 +191,6 @@ export async function saveOnboardingExplainerSyncProviders(onboardingExplainerSy
 
 export async function saveOnboardingExplainerInspect(onboardingExplainerInspect: boolean) {
   await OnboardingExplainerInspectProperty.write(onboardingExplainerInspect);
-}
-
-export async function getSavedStorageType(): Promise<StorageType> {
-  // the saved storage types will never contain credentials
-  // as they should not be shared across
-  const storageType = await StorageTypeProperty.read(figma.root);
-
-  if (storageType) {
-    return storageType;
-  }
-  return { provider: StorageProviderType.LOCAL };
 }
 
 export function goToNode(id: string) {
