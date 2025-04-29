@@ -197,16 +197,24 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         const existingTheme = themes.find((theme) => theme.$figmaCollectionId === collection.id && theme.$figmaModeId === mode.modeId);
 
         if (existingTheme) {
-          // Extract old group name from theme ID (e.g., 'old-light' -> 'old')
-          const oldGroupName = existingTheme.id.split('-')[0];
+          // Extract old group name and mode name from theme ID (e.g., 'old-light' -> ['old', 'light'])
+          const [oldGroupName, oldModeName] = existingTheme.id.split('-');
 
-          // Get all token sets that start with the OLD group name
-          const setsToRemove = Object.keys(existingTheme.selectedTokenSets)
-            .filter((key) => key.startsWith(`${oldGroupName}/`));
+          // Determine if collection name has changed
+          const hasCollectionNameChanged = oldGroupName !== collection.name;
 
-          setsToRemove.forEach((setName) => {
-            tokenSetsToRemove.push(setName);
-          });
+          // If collection name changed, remove all old sets
+          // If only mode name changed, remove only that specific mode's set
+          // Handle both collection name changes and mode name changes
+          if (hasCollectionNameChanged || (oldModeName === existingTheme.name && mode.name !== oldModeName)) {
+            const setToRemove = hasCollectionNameChanged
+              ? Object.keys(existingTheme.selectedTokenSets).filter((key) => key.startsWith(`${oldGroupName}/`))
+              : [`${oldGroupName}/${oldModeName}`];
+
+            setToRemove.forEach((setName) => {
+              tokenSetsToRemove.push(setName);
+            });
+          }
 
           // Update existing theme with new names but keep the same ID
           themesToCreate.push({
@@ -214,6 +222,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
             name: mode.name,
             group: collection.name,
             selectedTokenSets: {
+              ...existingTheme.selectedTokenSets, // Preserve existing token sets
               [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
             },
             $figmaVariableReferences: variableReferences,
