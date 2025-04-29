@@ -25,7 +25,7 @@ function getByteLength(str: string): number {
     // Fallback method for environments where TextEncoder is not available
     // This is an approximation that works for ASCII and common Unicode characters
     let length = 0;
-    for (let i = 0; i < str.length; i++) {
+    for (let i = 0; i < str.length; i += 1) {
       const code = str.charCodeAt(i);
       // Count bytes based on character code ranges
       if (code <= 0x7F) {
@@ -35,7 +35,7 @@ function getByteLength(str: string): number {
       } else if (code >= 0xD800 && code <= 0xDFFF) {
         // Surrogate pair (4 bytes for the pair)
         length += 2; // Add 2 here, and 2 more for the next character
-        i++; // Skip the next character as it's part of the surrogate pair
+        i += 1; // Skip the next character as it's part of the surrogate pair
       } else {
         length += 3; // 3-byte character
       }
@@ -56,7 +56,7 @@ function splitIntoChunks(str: string, maxBytes: number): string[] {
   let currentByteLength = 0;
 
   // Process the string character by character
-  for (let i = 0; i < str.length; i++) {
+  for (let i = 0; i < str.length; i += 1) {
     const char = str[i];
     const charByteLength = getByteLength(char);
 
@@ -117,58 +117,59 @@ export class FigmaStorageProperty<V = string> {
     if (this.storageType === FigmaStorageType.CLIENT_STORAGE) {
       const value = await figma.clientStorage.getAsync(this.key);
       return value ? this.parse(value) : null;
-    } if (this.storageType === FigmaStorageType.SHARED_PLUGIN_DATA) {
-      const keyParts = this.key.split('/');
-      const namespace = keyParts[0];
-      const key = keyParts.slice(1).join('/');
+    }
 
-      // First, check if there's metadata for chunked data
+    if (this.storageType === FigmaStorageType.SHARED_PLUGIN_DATA) {
+      const [namespace, ...keyParts] = this.key.split('/');
+      const key = keyParts.join('/');
+
+      // Try reading the data directly first (most common case)
+      const directValue = node?.getSharedPluginData(namespace, key);
+      if (directValue) {
+        return this.parse(directValue);
+      }
+
+      // Only check for chunked data if direct read fails
       const metaKey = `${key}${METADATA_SUFFIX}`;
       const metaValue = node?.getSharedPluginData(namespace, metaKey);
+      if (!metaValue) return null;
 
-      if (metaValue) {
+      let metadata: ChunkedDataMetadata;
+      try {
+        metadata = JSON.parse(metaValue);
+      } catch {
+        return null;
+      }
+
+      // Single chunk case
+      if (metadata.type === 'single') {
+        const value = node?.getSharedPluginData(namespace, key);
+        return value ? this.parse(value) : null;
+      }
+
+      // Chunked case
+      if (metadata.type === 'chunked' && metadata.count) {
+        // Pre-allocate array for better performance
+        const chunks = new Array<string>(metadata.count);
+
+        // Read all chunks in parallel
+        const chunkPromises = Array.from({ length: metadata.count }, async (_, i) => {
+          const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
+          const chunk = node?.getSharedPluginData(namespace, chunkKey);
+          if (!chunk) {
+            throw new Error(`Missing chunk ${i}`);
+          }
+          chunks[i] = chunk;
+        });
+
         try {
-          // Parse the metadata
-          const metadata = JSON.parse(metaValue) as ChunkedDataMetadata;
-
-          if (metadata.type === 'single') {
-            // If it's a single chunk, just read the data
-            const value = node?.getSharedPluginData(namespace, key);
-            return value ? this.parse(value) : null;
-          }
-
-          if (metadata.type === 'chunked' && metadata.count) {
-            // If it's chunked, read and reassemble all chunks
-            const chunks: string[] = [];
-
-            for (let i = 0; i < metadata.count; i++) {
-              const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
-              const chunk = node?.getSharedPluginData(namespace, chunkKey);
-
-              if (!chunk) {
-                console.error(`Missing chunk ${i} of ${metadata.count} for key ${key}`);
-                return null; // Missing chunk
-              }
-
-              chunks.push(chunk);
-            }
-
-            // Reassemble the chunks
-            const value = chunks.join('');
-            return value ? this.parse(value) : null;
-          }
-
-          console.error('Unknown metadata type or missing count:', metadata);
-          return null;
+          await Promise.all(chunkPromises);
+          return this.parse(chunks.join(''));
         } catch (err) {
-          console.error('Error parsing metadata:', err);
+          console.error(`Error reading chunks for key ${key}:`, err);
           return null;
         }
       }
-
-      // If no metadata is found, try reading the data directly (for backward compatibility)
-      const value = node?.getSharedPluginData(namespace, key);
-      return value ? this.parse(value) : null;
     }
 
     return null;
@@ -205,7 +206,7 @@ export class FigmaStorageProperty<V = string> {
             const metadata = JSON.parse(metaValue) as ChunkedDataMetadata;
             if (metadata.type === 'chunked' && metadata.count) {
               // Clear all chunks
-              for (let i = 0; i < metadata.count; i++) {
+              for (let i = 0; i < metadata.count; i += 1) {
                 const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
                 node?.setSharedPluginData(namespace, chunkKey, '');
               }
@@ -240,7 +241,7 @@ export class FigmaStorageProperty<V = string> {
             const metadata = JSON.parse(metaValue) as ChunkedDataMetadata;
             if (metadata.type === 'chunked' && metadata.count) {
               // Clear all old chunks
-              for (let i = 0; i < metadata.count; i++) {
+              for (let i = 0; i < metadata.count; i += 1) {
                 const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
                 node?.setSharedPluginData(namespace, chunkKey, '');
               }
@@ -262,7 +263,7 @@ export class FigmaStorageProperty<V = string> {
         }));
 
         // Store each chunk
-        for (let i = 0; i < numChunks; i++) {
+        for (let i = 0; i < numChunks; i += 1) {
           const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
           node?.setSharedPluginData(namespace, chunkKey, chunks[i]);
         }
@@ -277,7 +278,7 @@ export class FigmaStorageProperty<V = string> {
             const metadata = JSON.parse(metaValue) as ChunkedDataMetadata;
             if (metadata.type === 'chunked' && metadata.count && metadata.count > numChunks) {
               // Clear obsolete chunks
-              for (let i = numChunks; i < metadata.count; i++) {
+              for (let i = numChunks; i < metadata.count; i += 1) {
                 const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
                 node?.setSharedPluginData(namespace, chunkKey, '');
               }
