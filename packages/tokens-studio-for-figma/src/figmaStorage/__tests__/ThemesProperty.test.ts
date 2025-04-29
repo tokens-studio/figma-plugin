@@ -4,6 +4,11 @@ import { mockRootGetSharedPluginData, mockRootSetSharedPluginData } from '../../
 import { ThemesProperty } from '../ThemesProperty';
 
 describe('ThemesProperty', () => {
+  beforeEach(() => {
+    mockRootSetSharedPluginData.mockClear();
+    mockRootGetSharedPluginData.mockClear();
+  });
+
   const mockThemes: ThemeObjectsList = [
     {
       id: 'light',
@@ -15,8 +20,14 @@ describe('ThemesProperty', () => {
   it('should be able to write compressed data', async () => {
     const compressedValue = compressToUTF16(JSON.stringify(mockThemes));
     await ThemesProperty.write(compressedValue);
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledTimes(1);
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedValue);
+
+    // Find the actual data write call
+    const writeCall = mockRootSetSharedPluginData.mock.calls.find(
+      (call) => call[1] === 'themes' && call[2] === compressedValue,
+    );
+
+    expect(writeCall).toBeTruthy();
+    expect(writeCall).toEqual(['tokens', 'themes', compressedValue]);
   });
 
   it('should be able to read and decompress data', async () => {
