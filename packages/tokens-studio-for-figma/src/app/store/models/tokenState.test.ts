@@ -161,6 +161,10 @@ describe('editToken', () => {
               newTokens: [],
               updatedTokens: [],
             },
+            importedThemes: {
+              newThemes: [],
+              updatedThemes: [],
+            },
             themes: [],
             activeTheme: {},
             activeTokenSet: 'global',
