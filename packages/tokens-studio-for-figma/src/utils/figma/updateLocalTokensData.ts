@@ -4,7 +4,7 @@ import { AnyTokenList } from '@/types/tokens';
 import {
   ActiveThemeProperty,
   CheckForChangesProperty,
-  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty,
+  ThemesProperty, TokenFormatProperty, UpdatedAtProperty, UsedTokenSetProperty, ValuesProperty, VersionProperty, IsCompressedProperty,
 } from '@/figmaStorage';
 import { CollapsedTokenSetsProperty } from '@/figmaStorage/CollapsedTokenSetsProperty';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
@@ -22,6 +22,7 @@ type Payload = {
 
 export async function updateLocalTokensData(payload: Payload) {
   await VersionProperty.write(pjs.version);
+  await IsCompressedProperty.write(true);
   await ThemesProperty.write(payload.themes);
   await ValuesProperty.write(payload.tokens);
   await UsedTokenSetProperty.write(payload.usedTokenSets);
