@@ -1,14 +1,19 @@
 import { FigmaStorageProperty, FigmaStorageType } from '../FigmaStorageProperty';
-import { mockGetAsync, mockSetAsync, mockRootGetSharedPluginData, mockRootSetSharedPluginData } from '../../../tests/__mocks__/figmaMock';
+import {
+  mockGetAsync, mockSetAsync, mockRootGetSharedPluginData, mockRootSetSharedPluginData,
+} from '../../../tests/__mocks__/figmaMock';
 
-// Mock TextEncoder
-global.TextEncoder = class {
-  encode(str: string) {
+// Single mock TextEncoder implementation that can be configured per test
+const createMockTextEncoder = (lengthImpl: (str: string) => number) => class {
+  encode(_str: string) {
     return {
-      length: str.length, // Simplified for testing
+      length: lengthImpl(_str),
     };
   }
 } as any;
+
+// Mock TextEncoder with default implementation
+global.TextEncoder = createMockTextEncoder((_str) => _str.length);
 
 describe('FigmaStorageProperty', () => {
   beforeEach(() => {
@@ -115,14 +120,7 @@ describe('FigmaStorageProperty', () => {
       it('should write chunked values when data is large', async () => {
         // Mock TextEncoder to simulate large data
         const originalTextEncoder = global.TextEncoder;
-        global.TextEncoder = class {
-          encode(str: string) {
-            // Return a large size for any string to force chunking
-            return {
-              length: 100000, // Larger than MAX_CHUNK_SIZE
-            };
-          }
-        } as any;
+        global.TextEncoder = createMockTextEncoder((_str) => 100000);
 
         const largeValue = 'large-value';
         await property.write(largeValue);
@@ -199,17 +197,19 @@ describe('FigmaStorageProperty', () => {
       });
 
       it('should clean up obsolete chunks when number of chunks decreases', async () => {
-        // Mock TextEncoder to simulate large data
+        // Mock TextEncoder to simulate large data that will result in exactly 2 chunks
         const originalTextEncoder = global.TextEncoder;
-        global.TextEncoder = class {
-          encode(str: string) {
-            // Return a large size for any string to force chunking
-            // But make it so we only need 2 chunks now
-            return {
-              length: str === 'large-value' ? 200000 : 100000,
-            };
-          }
-        } as any;
+
+        // Create a specific mock implementation that returns different sizes
+        let encoderCallCount = 0;
+        const MockTextEncoder = createMockTextEncoder((_str: string) => {
+          encoderCallCount += 1;
+          // First call (for metadata) returns small size
+          // Second call (for actual data) returns size for 2 chunks
+          return encoderCallCount === 1 ? 100 : 180 * 1024; // Will create 2 chunks
+        });
+
+        global.TextEncoder = MockTextEncoder;
 
         // Mock existing chunked metadata with 3 chunks
         mockRootGetSharedPluginData.mockImplementation((namespace, key) => {
@@ -219,14 +219,19 @@ describe('FigmaStorageProperty', () => {
           return '';
         });
 
-        await property.write('large-value');
+        // Reset the mock before writing
+        mockRootSetSharedPluginData.mockClear();
 
-        // Should clean up obsolete chunks
-        expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
-          'namespace',
-          'test-key_chunk_2',
-          '',
-        );
+        // Write a value that will be split into 2 chunks
+        await property.write('new-value');
+
+        // Verify that the obsolete third chunk is cleaned up
+        const { calls } = mockRootSetSharedPluginData.mock;
+        const cleanupCall = calls.find((call) => call[0] === 'namespace'
+          && call[1] === 'test-key_chunk_2'
+          && call[2] === '');
+
+        expect(cleanupCall).toBeTruthy();
 
         // Restore original TextEncoder
         global.TextEncoder = originalTextEncoder;
