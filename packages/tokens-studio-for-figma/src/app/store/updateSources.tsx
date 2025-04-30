@@ -168,8 +168,8 @@ export default async function updateTokensOnSources({
     try {
       const compressedTokens = compressToUTF16(JSON.stringify(tokenValues));
       const compressedThemes = compressToUTF16(JSON.stringify(themes));
-      tokensSize = compressedTokens.length / 1024;
-      themesSize = compressedThemes.length / 1024;
+      tokensSize = (compressedTokens.length / 1024) * 2; // UTF-16 uses 2 bytes per character
+      themesSize = (compressedThemes.length / 1024) * 2;
 
       track('tokens_size', {
         size: tokensSize,
