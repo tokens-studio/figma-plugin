@@ -20,12 +20,12 @@ describe('ClientStorageCleanup', () => {
   });
 
   it('should delete keys from other prefixes', async () => {
-    // Mock keys
+    // Mock keys with the correct format
     mockKeysAsync.mockResolvedValue([
       'file123/tokens/values',
-      'file123/themes/light',
+      'file123/tokens/themes',
       'file456/tokens/values',
-      'file456/themes/dark',
+      'file456/tokens/themes',
       'otherKey'
     ]);
 
@@ -34,14 +34,14 @@ describe('ClientStorageCleanup', () => {
     // Should delete keys not starting with file123
     expect(mockDeleteAsync).toHaveBeenCalledTimes(2);
     expect(mockDeleteAsync).toHaveBeenCalledWith('file456/tokens/values');
-    expect(mockDeleteAsync).toHaveBeenCalledWith('file456/themes/dark');
+    expect(mockDeleteAsync).toHaveBeenCalledWith('file456/tokens/themes');
   });
 
   it('should not delete keys that start with the current prefix', async () => {
-    // Mock keys
+    // Mock keys with the correct format
     mockKeysAsync.mockResolvedValue([
       'file123/tokens/values',
-      'file123/themes/light',
+      'file123/tokens/themes',
       'file456/tokens/values'
     ]);
 
@@ -49,30 +49,30 @@ describe('ClientStorageCleanup', () => {
 
     // Should not delete keys starting with file123
     expect(mockDeleteAsync).not.toHaveBeenCalledWith('file123/tokens/values');
-    expect(mockDeleteAsync).not.toHaveBeenCalledWith('file123/themes/light');
+    expect(mockDeleteAsync).not.toHaveBeenCalledWith('file123/tokens/themes');
   });
 
   it('should handle empty storage', async () => {
     mockKeysAsync.mockResolvedValue([]);
-
+    
     await cleanupOldTokenPrefixes('file123');
     expect(mockDeleteAsync).not.toHaveBeenCalled();
   });
 
-  it('should only consider keys containing tokens or themes', async () => {
-    // Mock keys
+  it('should only consider keys containing /tokens/', async () => {
+    // Mock keys with the correct format
     mockKeysAsync.mockResolvedValue([
       'file123/tokens/values',
-      'file456/themes/dark',
+      'file456/tokens/themes',
       'file789/other/data',
       'randomKey',
     ]);
 
     await cleanupOldTokenPrefixes('file123');
 
-    // Should only delete file456/themes/dark, not the other non-token/theme keys
+    // Should only delete keys with /tokens/ pattern, not other keys
     expect(mockDeleteAsync).toHaveBeenCalledTimes(1);
-    expect(mockDeleteAsync).toHaveBeenCalledWith('file456/themes/dark');
+    expect(mockDeleteAsync).toHaveBeenCalledWith('file456/tokens/themes');
     expect(mockDeleteAsync).not.toHaveBeenCalledWith('file789/other/data');
     expect(mockDeleteAsync).not.toHaveBeenCalledWith('randomKey');
   });
