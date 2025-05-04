@@ -9,7 +9,7 @@ import type { PullVariablesOptions } from './PullVariablesOptions';
 import type { ThemeObjectsList } from './ThemeObjectsList';
 import type { AnyTokenList } from './tokens';
 import type { UsedTokenSetsMap } from './UsedTokenSetsMap';
-import type { StorageType, StorageTypeCredentials } from './StorageType';
+import type { StorageProviderType, StorageType, StorageTypeCredentials } from './StorageType';
 import type { Direction } from '@/constants/Direction';
 import type { SelectionValue } from './SelectionValue';
 import type { startup } from '@/utils/plugin';
@@ -219,6 +219,8 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   shouldSwapStyles?: boolean;
   collapsedTokenSets: string[];
   tokenFormat: TokenFormatOptions;
+  storageProvider: StorageProviderType;
+  storageSize: number;
 }>;
 export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   nodes: number

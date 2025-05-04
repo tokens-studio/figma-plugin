@@ -1,3 +1,4 @@
+import { compressToUTF16 } from 'lz-string';
 import { startTransaction } from '@sentry/react';
 import { mergeTokenGroups } from '@/utils/tokenHelpers';
 import { Dispatch } from '@/app/store';
@@ -160,12 +161,23 @@ export default async function updateTokensOnSources({
     ? defaultTokenResolver.setTokens(mergeTokenGroups(tokens, usedTokenSet))
     : null;
 
+  let tokensSize;
+  let themesSize;
+
   if (mergedTokens) {
     try {
-      const combinedData = { tokens: tokenValues, themes };
-      const jsonSize = (new TextEncoder().encode(JSON.stringify(combinedData)).length) / 1024;
+      const compressedTokens = compressToUTF16(JSON.stringify(tokenValues));
+      const compressedThemes = compressToUTF16(JSON.stringify(themes));
+      tokensSize = compressedTokens.length / 1024;
+      themesSize = compressedThemes.length / 1024;
+
       track('tokens_size', {
-        jsonSize,
+        size: tokensSize,
+        storageProvider: storageType.provider,
+      });
+
+      track('themes_size', {
+        size: themesSize,
         storageProvider: storageType.provider,
       });
     } catch (error) {
@@ -190,6 +202,8 @@ export default async function updateTokensOnSources({
     shouldSwapStyles,
     collapsedTokenSets,
     tokenFormat,
+    storageProvider: storageType.provider,
+    storageSize: (tokensSize + themesSize),
   }).then((result) => {
     if (transaction) {
       transaction.setMeasurement('nodes', result.nodes, '');
