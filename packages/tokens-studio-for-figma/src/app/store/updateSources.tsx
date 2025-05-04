@@ -47,6 +47,7 @@ type UpdateTokensOnSourcesPayload = {
   storeTokenIdInJsonEditor: boolean
   dispatch: Dispatch
   tokenFormat: TokenFormatOptions
+  tokensSize: number
 };
 
 async function updateRemoteTokens({
