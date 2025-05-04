@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
-import { IconButton, Badge } from '@tokens-studio/ui';
+import { IconButton } from '@tokens-studio/ui';
 import { WarningTriangleSolid } from 'iconoir-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -34,12 +34,6 @@ import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
 import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
-
-const getBadgeVariant = (sizeInKB: number) => {
-  if (sizeInKB >= 100) return 'danger';
-  if (sizeInKB >= 90) return 'danger';
-  return 'success';
-};
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -82,19 +76,22 @@ export default function Footer() {
       }}
     >
       <Stack direction="row" align="center" gap={2}>
-        <Badge
-          variant={getBadgeVariant(tokensSize)}
-          size="small"
-          onClick={handleBadgeClick}
-          style={{ cursor: tokensSize >= 90 ? 'pointer' : 'default' }}
-        >
-          {`${tokensSize} kb`}
-          {tokensSize >= 90 && (
-            <span style={{ marginLeft: '4px', display: 'inline-flex', alignItems: 'center' }}>
-              <WarningTriangleSolid width={12} height={12} />
-            </span>
-          )}
-        </Badge>
+        {tokensSize > 100 && (
+          <Box
+            css={{
+              fontSize: '$xsmall',
+              cursor: 'pointer',
+              color: '$dangerFg',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$2',
+            }}
+            onClick={handleBadgeClick}
+          >
+            <WarningTriangleSolid />
+            {`${tokensSize} KB`}
+          </Box>
+        )}
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />
