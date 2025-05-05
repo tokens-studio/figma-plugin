@@ -63,7 +63,7 @@ export default function ADOForm({
         <Text muted>
           {t('providers.ado.description')}
           {' '}
-          <Link href="https://docs.tokens.studio/sync/ado?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link href="https://docs.tokens.studio/token-storage/remote/sync-git-azure-devops?ref=addprovider" target="_blank" rel="noreferrer">
             {t('providers.ado.readMore')}
           </Link>
         </Text>

@@ -23,7 +23,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const onboardingData = {
     title: t('sets.title'),
     text: t('sets.description'),
-    url: 'https://docs.tokens.studio/themes/token-sets?ref=onboarding_explainer_sets',
+    url: 'https://docs.tokens.studio/manage-tokens/token-sets?ref=onboarding_explainer_sets',
   };
 
   const tokens = useSelector(tokensSelector);
