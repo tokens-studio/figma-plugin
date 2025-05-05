@@ -6,11 +6,6 @@ describe('checkStorageSize', () => {
   it('should calculate correct size for large token set', () => {
     const result = checkStorageSize(sampleTokens);
 
-    // Calculate expected size manually for verification
-    const stringified = JSON.stringify(sampleTokens);
-    const compressed = compressToUTF16(stringified);
-    const expectedSizeKB = (compressed.length * 2) / 1024;
-
     expect(result).toBe(153.7);
   });
 
