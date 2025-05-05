@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { compressToUTF16 } from 'lz-string';
 import omit from 'just-omit';
 import { createModel } from '@rematch/core';
 import extend from 'just-extend';
@@ -80,6 +81,8 @@ export interface TokenState {
     newThemes: ThemeObjectsList;
     updatedThemes: ThemeObjectsList;
   };
+  compressedTokens: string;
+  compressedThemes: string;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -120,6 +123,8 @@ export const tokenState = createModel<RootModel>()({
       newThemes: [],
       updatedThemes: [],
     },
+    compressedTokens: '',
+    compressedThemes: '',
   } as unknown as TokenState,
   reducers: {
     setStringTokens: (state, payload: string) => ({
@@ -655,6 +660,11 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
+    setCompressedData: (state, payload: { compressedTokens: string; compressedThemes: string }) => ({
+      ...state,
+      compressedTokens: payload.compressedTokens,
+      compressedThemes: payload.compressedThemes,
+    }),
     ...tokenStateReducers,
   },
   effects: (dispatch) => ({
@@ -860,11 +870,26 @@ export const tokenState = createModel<RootModel>()({
             },
           },
           () => {
+            // Compress tokens and themes
+            const compressedTokens = compressToUTF16(JSON.stringify(rootState.tokenState.tokens));
+            const compressedThemes = compressToUTF16(JSON.stringify(rootState.tokenState.themes));
+
+            // Update the compressed values in state
+            dispatch.tokenState.setCompressedData({
+              compressedTokens,
+              compressedThemes,
+            });
+
+            console.log('compressed tokens is ', compressedTokens);
+            console.log('compressed themes is ', compressedThemes);
+
             updateTokensOnSources({
               tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
+              compressedTokens: rootState.tokenState.compressedTokens,
               tokenValues: rootState.tokenState.tokens,
               usedTokenSet: rootState.tokenState.usedTokenSet,
               themes: rootState.tokenState.themes,
+              compressedThemes: rootState.tokenState.compressedThemes,
               activeTheme: rootState.tokenState.activeTheme,
               settings: rootState.settings,
               updatedAt: new Date().toISOString(),
