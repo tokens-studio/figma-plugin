@@ -21,6 +21,7 @@ export * from './setUi';
 export * from './createAnnotation';
 export * from './createStyles';
 export * from './update';
+export * from './generateStyleGuide';
 export * from './setLicenseKey';
 export * from './attachLocalStylesToTheme';
 export * from './resolveStyleInfo';
