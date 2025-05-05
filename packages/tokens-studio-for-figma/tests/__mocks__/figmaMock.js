@@ -27,6 +27,7 @@ module.exports.mockCodegenOn = jest.fn((eventName, handler) => {
 });
 module.exports.mockGetAsync = jest.fn(() => Promise.resolve());
 module.exports.mockSetAsync = jest.fn(() => Promise.resolve());
+module.exports.mockKeysAsync = jest.fn(() => Promise.resolve([]));
 module.exports.mockNotify = jest.fn(() => Promise.resolve({}));
 module.exports.mockGetLocalPaintStyles = jest.fn(() => []);
 module.exports.mockGetLocalTextStyles = jest.fn(() => []);
@@ -96,6 +97,7 @@ module.exports.figma = {
   clientStorage: {
     getAsync: module.exports.mockGetAsync,
     setAsync: module.exports.mockSetAsync,
+    keysAsync: module.exports.mockKeysAsync,
   },
   notify: module.exports.mockNotify,
   codegen: {

@@ -1,16 +1,5 @@
 import { getStorageSize } from '../StorageSizeManager';
-
-// Mock the Figma API
-const mockKeysAsync = jest.fn();
-const mockGetAsync = jest.fn();
-
-// Mock the global figma object
-global.figma = {
-  clientStorage: {
-    keysAsync: mockKeysAsync,
-    getAsync: mockGetAsync,
-  },
-} as any;
+import { mockGetAsync, mockKeysAsync } from '../../../tests/__mocks__/figmaMock';
 
 describe('StorageSizeManager', () => {
   beforeEach(() => {
@@ -25,7 +14,7 @@ describe('StorageSizeManager', () => {
       'file123/tokens/values',
       'file123/tokens/themes',
       'file456/tokens/values',
-      'otherKey'
+      'otherKey',
     ]);
 
     // Mock values with different sizes
