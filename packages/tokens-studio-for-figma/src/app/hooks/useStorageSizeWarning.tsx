@@ -5,7 +5,7 @@ import useConfirm from '@/app/hooks/useConfirm';
 import { Dispatch } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
 
-export function useStorageSizeWarning() { // TODO: customise message displayed based on the tokensSize received
+export function useStorageSizeWarning() {
   const { confirm } = useConfirm();
   const { t } = useTranslation(['tokens']);
   const dispatch = useDispatch<Dispatch>();
