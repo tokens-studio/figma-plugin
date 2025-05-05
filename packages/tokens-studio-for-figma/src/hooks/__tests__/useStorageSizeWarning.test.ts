@@ -2,10 +2,17 @@ import { renderHook } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { useStorageSizeWarning } from '@/app/hooks/useStorageSizeWarning';
 import useConfirm from '@/app/hooks/useConfirm';
+import { Tabs } from '@/constants/Tabs';
 
-// Mock useDispatch
+const mockDispatchAction = jest.fn();
+const mockDispatch = jest.fn(() => ({
+  uiState: {
+    setActiveTab: mockDispatchAction,
+  },
+}));
+
 jest.mock('react-redux', () => ({
-  useDispatch: () => jest.fn(),
+  useDispatch: () => mockDispatch(),
 }));
 
 // Mock other modules
@@ -17,9 +24,12 @@ jest.mock('react-i18next', () => ({
 }));
 
 describe('useStorageSizeWarning', () => {
+  let mockConfirm: jest.Mock;
+
   beforeEach(() => {
-    const mockConfirm = jest.fn();
+    mockConfirm = jest.fn();
     (useConfirm as jest.Mock).mockReturnValue({ confirm: mockConfirm });
+    mockDispatchAction.mockClear();
   });
 
   it('should show warning dialog with correct text', () => {
@@ -38,5 +48,18 @@ describe('useStorageSizeWarning', () => {
   it('should call useTranslation with correct namespace', () => {
     renderHook(() => useStorageSizeWarning());
     expect(useTranslation).toHaveBeenCalledWith(['tokens']);
+  });
+
+  it('should navigate to Settings tab when confirm action is clicked', async () => {
+    // Mock confirm to resolve with true (as if user clicked confirm)
+    mockConfirm.mockResolvedValueOnce(true);
+
+    const { result } = renderHook(() => useStorageSizeWarning());
+
+    // Call the hook function
+    await result.current();
+
+    // Verify that dispatch was called to set active tab to Settings
+    expect(mockDispatchAction).toHaveBeenCalledWith(Tabs.SETTINGS);
   });
 });

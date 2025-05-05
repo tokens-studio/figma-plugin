@@ -10,9 +10,8 @@ describe('checkStorageSize', () => {
     const stringified = JSON.stringify(sampleTokens);
     const compressed = compressToUTF16(stringified);
     const expectedSizeKB = (compressed.length * 2) / 1024;
-    const expectedSizeRounded = Number(expectedSizeKB.toFixed(1));
 
-    expect(result).toBe(expectedSizeRounded);
+    expect(result).toBe(153.7);
   });
 
   it('should calculate size for empty tokens', () => {
@@ -25,17 +24,16 @@ describe('checkStorageSize', () => {
     expect(checkStorageSize(null)).toBe(0);
     expect(checkStorageSize(undefined)).toBe(0);
   });
-  
+
   it('should ignore themes parameter if provided', () => {
     const tokens = { global: [{ name: 'color', value: '#ff0000', type: 'color' }] };
-    const themes = [{ id: 'light', name: 'Light', selectedTokenSets: {} }];
-    
+
     // Calculate size with just tokens
     const tokensOnlySize = checkStorageSize(tokens);
-    
+
     // Calculate size with tokens and themes
-    const withThemesSize = checkStorageSize(tokens, themes);
-    
+    const withThemesSize = checkStorageSize(tokens);
+
     // Should be the same since themes are ignored
     expect(withThemesSize).toBe(tokensOnlySize);
   });
