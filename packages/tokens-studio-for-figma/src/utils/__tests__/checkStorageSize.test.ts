@@ -1,4 +1,3 @@
-import { compressToUTF16 } from 'lz-string';
 import { checkStorageSize } from '../checkStorageSize';
 import sampleTokens from '../../../cypress/fixtures/sample_tokens.json';
 
