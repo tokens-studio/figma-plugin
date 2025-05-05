@@ -48,7 +48,6 @@ export default function TokensStudioForm({
   const { t } = useTranslation(['storage']);
   const [fetchOrgsError, setFetchOrgsError] = React.useState<string | null>(null);
   const [orgData, setOrgData] = React.useState<Organization[]>([]);
-  const syncGuideUrl = 'tokens-studio';
   const [isMasked, setIsMasked] = React.useState(true);
   const [showTeaser, setShowTeaser] = React.useState(true);
   const dispatch = useDispatch<Dispatch>();
@@ -185,7 +184,7 @@ export default function TokensStudioForm({
         <Text muted css={{ marginTop: '$2' }}>
           {t('providers.tokensstudio.descriptionSecondPart')}
           <Link
-            href={`https://docs.tokens.studio/sync/${syncGuideUrl}?ref=addprovider`}
+            href="https://docs.tokens.studio/token-storage/remote/sync-cloud-studio-platform?ref=addprovider"
             target="_blank"
             rel="noreferrer"
           >

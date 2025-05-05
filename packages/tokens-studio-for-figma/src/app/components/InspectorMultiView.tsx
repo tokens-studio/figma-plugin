@@ -24,7 +24,7 @@ export default function InspectorMultiView({ resolvedTokens, tokenToSearch }: { 
   const onboardingData = {
     title: t('inspect'),
     text: t('inspectOnboard'),
-    url: 'https://docs.tokens.studio/inspect/multi-inspect?ref=onboarding_explainer_inspect',
+    url: 'https://docs.tokens.studio/debug/inspect-tokens?ref=onboarding_explainer_inspect',
   };
 
   const inspectState = useSelector(inspectStateSelector, isEqual);
