@@ -1,3 +1,5 @@
+import { getUTF16StringSize } from '@/utils/getUTF16StringSize';
+
 export const SAFE_STORAGE_LIMIT = 4 * 1024 * 1024; // 4MB in bytes
 
 export async function getStorageSize(): Promise<number> {
@@ -8,7 +10,7 @@ export async function getStorageSize(): Promise<number> {
   for (const key of storageKeys) {
     const value = await figma.clientStorage.getAsync(key);
     if (value) {
-      totalSize += (value as string).length * 2; // UTF-16 uses 2 bytes per character
+      totalSize += getUTF16StringSize(value as string);
     }
   }
   return totalSize;
