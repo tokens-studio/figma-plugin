@@ -102,7 +102,7 @@ function StartScreen() {
               {t('guides')}
             </Heading>
             <Stack direction="column" gap={3}>
-              <HelpfulLink href="https://docs.tokens.studio/getting-started?ref=startscreen" target="_blank">
+              <HelpfulLink href="https://docs.tokens.studio/get-started/install-figma-plugin?ref=startscreen" target="_blank">
                 <BookmarkIcon />
                 {t('gettingStarted')}
               </HelpfulLink>

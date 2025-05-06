@@ -48,6 +48,7 @@ type UpdateTokensOnSourcesPayload = {
   storeTokenIdInJsonEditor: boolean
   dispatch: Dispatch
   tokenFormat: TokenFormatOptions
+  tokensSize: number
 };
 
 async function updateRemoteTokens({
@@ -182,7 +183,7 @@ export default async function updateTokensOnSources({
         storageProvider: storageType.provider,
       });
     } catch (error) {
-      console.error('Failed to track tokens size:', error);
+      console.error('Failed to track tokens and themes size:', error);
     }
   }
 
