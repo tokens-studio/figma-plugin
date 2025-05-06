@@ -14,6 +14,8 @@ import { getFileKey } from '../../plugin/helpers';
 type Payload = {
   tokens: Record<string, AnyTokenList>
   themes: ThemeObjectsList
+  compressedTokens: string
+  compressedThemes: string
   usedTokenSets: UsedTokenSetsMap
   activeTheme: Record<string, string>
   updatedAt: string
@@ -33,13 +35,10 @@ export async function updateLocalTokensData(payload: Payload) {
     await ValuesProperty.write(payload.tokens);
   } else {
     const fileKey = await getFileKey();
-    const prefix = `${fileKey}/tokens`;
-    const lastUpdated = new Date().toISOString();
 
-    await ClientStorageProperty.write(`${prefix}/themes`, payload.themes);
-    await ClientStorageProperty.write(`${prefix}/values`, payload.tokens);
-    await ClientStorageProperty.write(`${prefix}/lastUpdated`, lastUpdated);
-    await ClientStorageProperty.write(`${prefix}/checkForChanges`, payload.checkForChanges);
+    await ClientStorageProperty.write('themes', fileKey, payload.compressedThemes);
+    await ClientStorageProperty.write('values', fileKey, payload.compressedTokens);
+    await ClientStorageProperty.write('checkForChanges', fileKey, payload.checkForChanges as unknown as string);
   }
   await UsedTokenSetProperty.write(payload.usedTokenSets);
   await UpdatedAtProperty.write(payload.updatedAt);

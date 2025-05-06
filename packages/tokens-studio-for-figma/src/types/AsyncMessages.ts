@@ -211,6 +211,8 @@ export type UpdateAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE, {
   tokenValues: Record<string, AnyTokenList>;
   tokens: AnyTokenList | null;
   themes: ThemeObjectsList
+  compressedTokens: string;
+  compressedThemes: string;
   updatedAt: string;
   settings: SettingsState;
   usedTokenSet: UsedTokenSetsMap;

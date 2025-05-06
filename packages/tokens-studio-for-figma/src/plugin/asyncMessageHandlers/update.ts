@@ -16,6 +16,8 @@ export const update: AsyncMessageChannelHandlers[AsyncMessageTypes.UPDATE] = asy
     await updateLocalTokensData({
       tokens: msg.tokenValues,
       themes: msg.themes,
+      compressedTokens: msg.compressedTokens,
+      compressedThemes: msg.compressedThemes,
       activeTheme: msg.activeTheme,
       usedTokenSets: msg.usedTokenSet,
       updatedAt: msg.updatedAt,
