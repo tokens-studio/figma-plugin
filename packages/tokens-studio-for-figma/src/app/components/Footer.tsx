@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '@tokens-studio/ui';
+import { WarningTriangleSolid } from 'iconoir-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
 import Stack from './Stack';
@@ -16,6 +17,7 @@ import {
   projectURLSelector,
   activeThemeSelector,
   uiStateSelector,
+  tokensSizeSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -31,12 +33,14 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
+import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
+  const tokensSize = useSelector(tokensSizeSelector);
   const projectURL = useSelector(projectURLSelector);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
@@ -58,6 +62,8 @@ export default function Footer() {
     pullTokens({ usedTokenSet, activeTheme, updateLocalTokens: true });
   }, [pullTokens, usedTokenSet, activeTheme]);
 
+  const handleBadgeClick = useStorageSizeWarning();
+
   return (
     <Box
       css={{
@@ -69,8 +75,23 @@ export default function Footer() {
         borderTop: '1px solid $borderMuted',
       }}
     >
-
       <Stack direction="row" align="center" gap={2}>
+        {tokensSize > 100 && (
+          <Box
+            css={{
+              fontSize: '$xsmall',
+              cursor: 'pointer',
+              color: '$dangerFg',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '$2',
+            }}
+            onClick={handleBadgeClick}
+          >
+            <WarningTriangleSolid />
+            {`${tokensSize} KB`}
+          </Box>
+        )}
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
             <BranchSelector />

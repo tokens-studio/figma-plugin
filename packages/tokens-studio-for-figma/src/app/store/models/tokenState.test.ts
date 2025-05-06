@@ -170,6 +170,7 @@ describe('editToken', () => {
               themes: [],
               metadata: null,
             },
+            tokensSize: 0,
           },
           settings: {
             updateRemote: true,
@@ -1905,6 +1906,7 @@ describe('editToken', () => {
     expect(changedState).toEqual({
       tokens: {},
       themes: [],
+      tokensSize: 0,
     });
   });
 

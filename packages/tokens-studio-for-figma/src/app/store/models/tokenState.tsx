@@ -53,6 +53,7 @@ import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTok
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
+import { checkStorageSize } from '@/utils/checkStorageSize';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -80,6 +81,7 @@ export interface TokenState {
     newThemes: ThemeObjectsList;
     updatedThemes: ThemeObjectsList;
   };
+  tokensSize: number;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -120,8 +122,13 @@ export const tokenState = createModel<RootModel>()({
       newThemes: [],
       updatedThemes: [],
     },
+    tokensSize: 0,
   } as unknown as TokenState,
   reducers: {
+    setTokensSize: (state, size: number) => ({
+      ...state,
+      tokensSize: size,
+    }),
     setStringTokens: (state, payload: string) => ({
       ...state,
       stringTokens: payload,
@@ -588,6 +595,7 @@ export const tokenState = createModel<RootModel>()({
       changedState: {
         tokens: {},
         themes: [],
+        tokensSize: 0,
       },
     }),
     setRemoteData: (state, data: CompareStateType): TokenState => ({
@@ -843,6 +851,13 @@ export const tokenState = createModel<RootModel>()({
       const params = { ...defaults, ...options };
       if (!rootState) return;
       try {
+        const tokensSize = checkStorageSize(rootState.tokenState.tokens);
+
+        // Update the tokensSize in state if it has changed
+        if (rootState.tokenState.tokensSize !== tokensSize) {
+          dispatch.tokenState.setTokensSize(tokensSize);
+        }
+
         wrapTransaction(
           {
             name: 'updateDocument',
@@ -857,6 +872,7 @@ export const tokenState = createModel<RootModel>()({
               );
               transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
               transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
+              transaction.setMeasurement('tokensSize', tokensSize, 'KB');
             },
           },
           () => {
@@ -880,6 +896,7 @@ export const tokenState = createModel<RootModel>()({
               storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
               dispatch,
               tokenFormat: rootState.tokenState.tokenFormat,
+              tokensSize: rootState.tokenStatetokensSize,
             });
           },
         );
