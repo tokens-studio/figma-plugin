@@ -880,16 +880,13 @@ export const tokenState = createModel<RootModel>()({
               compressedThemes,
             });
 
-            console.log('compressed tokens is ', compressedTokens);
-            console.log('compressed themes is ', compressedThemes);
-
             updateTokensOnSources({
               tokens: params.shouldUpdateNodes ? rootState.tokenState.tokens : null,
-              compressedTokens: rootState.tokenState.compressedTokens,
+              compressedTokens,
               tokenValues: rootState.tokenState.tokens,
               usedTokenSet: rootState.tokenState.usedTokenSet,
               themes: rootState.tokenState.themes,
-              compressedThemes: rootState.tokenState.compressedThemes,
+              compressedThemes,
               activeTheme: rootState.tokenState.activeTheme,
               settings: rootState.settings,
               updatedAt: new Date().toISOString(),
