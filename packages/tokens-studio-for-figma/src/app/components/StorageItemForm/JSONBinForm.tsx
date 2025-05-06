@@ -67,7 +67,7 @@ export default function JSONBinForm({
       <Stack direction="column" gap={5}>
         <Text muted>{t('providers.jsonbin.description')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
-          <Link href="https://docs.tokens.studio/sync/jsonbin?ref=addprovider" target="_blank" rel="noreferrer">
+          <Link href="https://docs.tokens.studio/token-storage/remote/sync-cloud-jsonbin?ref=addprovider" target="_blank" rel="noreferrer">
             {t('providers.jsonbin.readMore')}
           </Link>
         </Text>

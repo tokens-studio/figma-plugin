@@ -64,7 +64,7 @@ export default function BitbucketForm({
         <Text muted>{t('bitBucketExplained')}</Text>
         <Text muted css={{ marginTop: '$2' }}>
           <Link
-            href={`https://docs.tokens.studio/sync/${values.provider}?ref=addprovider`}
+            href="https://docs.tokens.studio/token-storage/remote/sync-git-bitbucket?ref=addprovider"
             target="_blank"
             rel="noreferrer"
           >

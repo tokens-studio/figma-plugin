@@ -60,7 +60,7 @@ export function ConvertToDTCGModal() {
           <Button variant="primary" onClick={handleConvert} disabled={hasRemoteChanges}>
             {isDTCG ? t('converttolegacy') : t('converttow3c')}
           </Button>
-          <Link href="https://docs.tokens.studio/token-format/token-format-view-change-dtcg" target="_blank">{t('readmoreformat')}</Link>
+          <Link href="https://docs.tokens.studio/manage-settings/token-format" target="_blank">{t('readmoreformat')}</Link>
         </Stack>
         {hasRemoteChanges && <ErrorMessage>{t('pushfirsterror')}</ErrorMessage>}
       </Stack>
