@@ -134,22 +134,22 @@ export class FigmaStorageProperty<V = string> {
           }
 
           if (metadata.type === 'chunked' && metadata.count) {
-            // If it's chunked, read and reassemble all chunks
-            const chunks: string[] = [];
-
-            for (let i = 0; i < metadata.count; i += 1) {
+            // Create an array of promises to read all chunks
+            const chunkPromises = Array.from({ length: metadata.count }, (_, i) => {
               const chunkKey = `${key}${CHUNK_SUFFIX_PREFIX}${i}`;
-              const chunk = node?.getSharedPluginData(namespace, chunkKey);
+              return node?.getSharedPluginData(namespace, chunkKey);
+            });
 
-              if (!chunk) {
-                console.error(`Missing chunk ${i} of ${metadata.count} for key ${key}`);
-                return null; // Missing chunk
-              }
+            // Wait for all chunks to be read
+            const chunks = await Promise.all(chunkPromises);
 
-              chunks.push(chunk);
+            // Check if any chunks are missing
+            if (chunks.some((chunk) => !chunk)) {
+              console.error('One or more chunks are missing');
+              return null;
             }
 
-            // Reassemble the chunks
+            // Join chunks and parse
             const value = chunks.join('');
             return value ? this.parse(value, isCompressed) : null;
           }
