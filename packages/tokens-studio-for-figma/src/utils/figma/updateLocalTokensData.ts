@@ -27,12 +27,25 @@ type Payload = {
 };
 
 export async function updateLocalTokensData(payload: Payload) {
+  console.log('updateLocalTokensData is called ', payload);
   await VersionProperty.write(pjs.version);
   // Check storage size and storage method
   if (payload.storageProvider === StorageProviderType.LOCAL) {
     await IsCompressedProperty.write(true);
-    await ThemesProperty.write(payload.themes);
-    await ValuesProperty.write(payload.tokens);
+
+    // Only write themes if they've changed
+    const currentThemes = await ThemesProperty.read(figma.root, true);
+    const themesChanged = !currentThemes || JSON.stringify(currentThemes) !== JSON.stringify(payload.themes);
+    if (themesChanged) {
+      await ThemesProperty.write(payload.themes);
+    }
+
+    // Only write values if they've changed
+    const currentValues = await ValuesProperty.read(figma.root, true);
+    const valuesChanged = !currentValues || JSON.stringify(currentValues) !== JSON.stringify(payload.tokens);
+    if (valuesChanged) {
+      await ValuesProperty.write(payload.tokens);
+    }
   } else {
     const fileKey = await getFileKey();
 
