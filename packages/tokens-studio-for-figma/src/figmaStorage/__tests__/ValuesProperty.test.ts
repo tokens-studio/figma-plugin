@@ -17,14 +17,54 @@ describe('ValuesProperty', () => {
 
   const compressedMockValues = compressToUTF16(JSON.stringify(mockValues));
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be able to write', async () => {
+    // Mock metadata check for single storage
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+
     await ValuesProperty.write(mockValues);
-    expect(mockRootSetSharedPluginData).toBeCalledTimes(1);
-    expect(mockRootSetSharedPluginData).toBeCalledWith('tokens', 'values', compressedMockValues);
+
+    // Should set metadata first (indicating single storage)
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
+      'tokens',
+      'values_meta',
+      JSON.stringify({ type: 'single' })
+    );
+
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'values', compressedMockValues);
   });
 
   it('should be able to read', async () => {
-    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify(mockValues));
-    expect(await ValuesProperty.read()).toEqual(mockValues);
+    // Mock metadata indicating single storage
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify({ type: 'single' }));
+
+    // Mock the actual data
+    mockRootGetSharedPluginData.mockReturnValueOnce(compressedMockValues);
+
+    expect(await ValuesProperty.read(figma.root, true)).toEqual(mockValues);
+  });
+
+  it('should handle empty or invalid input when reading', async () => {
+    // No metadata found, fallback to direct read
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+
+    // No data found
+    mockRootGetSharedPluginData.mockReturnValueOnce(undefined);
+    const emptyResult = await ValuesProperty.read();
+    expect(emptyResult).toEqual(null);
+
+    // Reset mocks
+    jest.clearAllMocks();
+
+    // No metadata found, fallback to direct read
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+
+    // Null data found
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+    const nullResult = await ValuesProperty.read();
+    expect(nullResult).toEqual(null);
   });
 });
