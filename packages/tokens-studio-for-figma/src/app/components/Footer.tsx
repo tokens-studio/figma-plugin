@@ -78,7 +78,7 @@ export default function Footer() {
       }}
     >
       <Stack direction="row" align="center" gap={2}>
-        {(tokensSize > 100 || themesSize > 100) && (
+        {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
           <Box
             css={{
               fontSize: '$xsmall',
