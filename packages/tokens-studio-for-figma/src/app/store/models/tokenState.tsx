@@ -85,6 +85,7 @@ export interface TokenState {
   compressedTokens: string;
   compressedThemes: string;
   tokensSize: number;
+  themesSize: number;
 }
 
 export const tokenState = createModel<RootModel>()({
@@ -128,11 +129,16 @@ export const tokenState = createModel<RootModel>()({
     compressedTokens: '',
     compressedThemes: '',
     tokensSize: 0,
+    themesSize: 0,
   } as unknown as TokenState,
   reducers: {
     setTokensSize: (state, size: number) => ({
       ...state,
       tokensSize: size,
+    }),
+    setThemesSize: (state, size: number) => ({
+      ...state,
+      themesSize: size,
     }),
     setStringTokens: (state, payload: string) => ({
       ...state,
@@ -862,10 +868,16 @@ export const tokenState = createModel<RootModel>()({
       if (!rootState) return;
       try {
         const tokensSize = checkStorageSize(rootState.tokenState.tokens);
+        const themesSize = checkStorageSize(rootState.tokenState.themes);
 
         // Update the tokensSize in state if it has changed
         if (rootState.tokenState.tokensSize !== tokensSize) {
           dispatch.tokenState.setTokensSize(tokensSize);
+        }
+
+        // Update the themesSize in state if it has changed
+        if (rootState.tokenState.themesSize !== themesSize) {
+          dispatch.tokenState.setThemesSize(Number(themesSize.toFixed(1)));
         }
 
         wrapTransaction(
@@ -883,6 +895,7 @@ export const tokenState = createModel<RootModel>()({
               transaction.setMeasurement('tokenSets', Object.keys(rootState.tokenState.tokens).length, '');
               transaction.setMeasurement('themes', rootState.tokenState.themes.length, '');
               transaction.setMeasurement('tokensSize', tokensSize, 'KB');
+              transaction.setMeasurement('themesSize', themesSize, 'KB');
             },
           },
           () => {
@@ -918,7 +931,8 @@ export const tokenState = createModel<RootModel>()({
               storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
               dispatch,
               tokenFormat: rootState.tokenState.tokenFormat,
-              tokensSize: rootState.tokenStatetokensSize,
+              tokensSize: rootState.tokenState.tokensSize,
+              themesSize: rootState.tokenState.themesSize,
             });
           },
         );

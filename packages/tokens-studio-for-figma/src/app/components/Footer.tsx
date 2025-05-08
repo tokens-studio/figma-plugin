@@ -18,6 +18,7 @@ import {
   activeThemeSelector,
   uiStateSelector,
   tokensSizeSelector,
+  themesSizeSelector,
 } from '@/selectors';
 import DocsIcon from '@/icons/docs.svg';
 import RefreshIcon from '@/icons/refresh.svg';
@@ -41,6 +42,7 @@ export default function Footer() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const tokensSize = useSelector(tokensSizeSelector);
+  const themesSize = useSelector(themesSizeSelector);
   const projectURL = useSelector(projectURLSelector);
   const uiState = useSelector(uiStateSelector, isEqual);
   const { pullTokens, pushTokens, checkRemoteChange } = useRemoteTokens();
@@ -76,7 +78,7 @@ export default function Footer() {
       }}
     >
       <Stack direction="row" align="center" gap={2}>
-        {tokensSize > 100 && (
+        {(tokensSize > 100 || themesSize > 100) && (
           <Box
             css={{
               fontSize: '$xsmall',
@@ -89,7 +91,7 @@ export default function Footer() {
             onClick={handleBadgeClick}
           >
             <WarningTriangleSolid />
-            {`${tokensSize} KB`}
+            {`${tokensSize > 100 ? tokensSize : themesSize} KB`}
           </Box>
         )}
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
