@@ -74,3 +74,4 @@ export * from './stylesEffectSelector';
 export * from './createStylesWithVariableReferencesSelector';
 export * from './importedThemesSelector';
 export * from './tokensSizeSelector';
+export * from './themesSizeSelector';

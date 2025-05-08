@@ -49,6 +49,7 @@ type UpdateTokensOnSourcesPayload = {
   dispatch: Dispatch
   tokenFormat: TokenFormatOptions
   tokensSize: number
+  themesSize: number
 };
 
 async function updateRemoteTokens({
