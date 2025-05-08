@@ -1,3 +1,5 @@
+import { getUTF16StringSize } from '@/utils/getUTF16StringSize';
+
 export enum FigmaStorageType {
   CLIENT_STORAGE = 'client_storage',
   SHARED_PLUGIN_DATA = 'shared_plugin_data',
@@ -12,33 +14,6 @@ const METADATA_SUFFIX = '_meta';
 // Chunk suffix prefix for chunk keys
 const CHUNK_SUFFIX_PREFIX = '_chunk_';
 
-function getByteLength(str: string): number {
-  try {
-    // Try to use TextEncoder if available
-    return new TextEncoder().encode(str).length;
-  } catch (e) {
-    // Fallback method for environments where TextEncoder is not available
-    // This is an approximation that works for ASCII and common Unicode characters
-    let length = 0;
-    for (let i = 0; i < str.length; i += 1) {
-      const code = str.charCodeAt(i);
-      // Count bytes based on character code ranges
-      if (code <= 0x7F) {
-        length += 1; // ASCII character (1 byte)
-      } else if (code <= 0x7FF) {
-        length += 2; // 2-byte character
-      } else if (code >= 0xD800 && code <= 0xDFFF) {
-        // Surrogate pair (4 bytes for the pair)
-        length += 2; // Add 2 here, and 2 more for the next character
-        i += 1; // Skip the next character as it's part of the surrogate pair
-      } else {
-        length += 3; // 3-byte character
-      }
-    }
-    return length;
-  }
-}
-
 /**
  * Splits a string into chunks of specified maximum byte size
  * @param str String to split
@@ -48,21 +23,21 @@ function getByteLength(str: string): number {
 function splitIntoChunks(str: string, maxBytes: number): string[] {
   const chunks: string[] = [];
   let currentChunk = '';
-  let currentByteLength = 0;
+  let currentLength = 0;
+  const maxChars = Math.floor(maxBytes / 2); // Convert bytes to character count for UTF-16
 
   // Process the string character by character
   for (let i = 0; i < str.length; i += 1) {
     const char = str[i];
-    const charByteLength = getByteLength(char);
 
     // If adding this character would exceed the limit, start a new chunk
-    if (currentByteLength + charByteLength > maxBytes) {
+    if (currentLength + 1 > maxChars) {
       chunks.push(currentChunk);
       currentChunk = char;
-      currentByteLength = charByteLength;
+      currentLength = 1;
     } else {
       currentChunk += char;
-      currentByteLength += charByteLength;
+      currentLength += 1;
     }
   }
 
@@ -219,7 +194,7 @@ export class FigmaStorageProperty<V = string> {
       const stringValue = this.stringify(value, isCompressed);
 
       // Get the byte length
-      const byteLength = getByteLength(stringValue);
+      const byteLength = getUTF16StringSize(stringValue);
 
       // If the value is small enough, store it directly
       if (byteLength <= MAX_CHUNK_SIZE) {
