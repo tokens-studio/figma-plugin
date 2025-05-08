@@ -27,7 +27,6 @@ type Payload = {
 };
 
 export async function updateLocalTokensData(payload: Payload) {
-  console.log('updateLocalTokensData is called ', payload);
   await VersionProperty.write(pjs.version);
   // Check storage size and storage method
   if (payload.storageProvider === StorageProviderType.LOCAL) {
