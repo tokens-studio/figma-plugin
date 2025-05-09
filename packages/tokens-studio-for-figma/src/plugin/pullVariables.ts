@@ -181,6 +181,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
   type ResultObject = Record<string, VariableToCreateToken[]>;
 
   const themesToCreate: ThemeObjectsList = [];
+  const tokenSetsToRemove: string[] = [];
   // Process themes if pro user
   if (proUser) {
     await Promise.all(Array.from(collections.values()).map(async (collection) => {
@@ -192,18 +193,55 @@ export default async function pullVariables(options: PullVariablesOptions, theme
           [normalizeVariableName(variable.name)]: variable.key,
         }), {});
 
-        themesToCreate.push({
-          id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
-          name: mode.name,
-          group: collection.name,
-          selectedTokenSets: {
-            [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
-          },
-          $figmaStyleReferences: {},
-          $figmaVariableReferences: variableReferences,
-          $figmaModeId: mode.modeId,
-          $figmaCollectionId: collection.id,
-        });
+        // Check if there's an existing theme with the same collection ID
+        const existingTheme = themes.find((theme) => theme.$figmaCollectionId === collection.id && theme.$figmaModeId === mode.modeId);
+
+        if (existingTheme) {
+          // Extract old group name and mode name from theme ID (e.g., 'old-light' -> ['old', 'light'])
+          const [oldGroupName, oldModeName] = existingTheme.id.split('-');
+
+          // Determine if collection name has changed
+          const hasCollectionNameChanged = oldGroupName !== collection.name;
+
+          // If collection name changed, remove all old sets
+          // If only mode name changed, remove only that specific mode's set
+          // Handle both collection name changes and mode name changes
+          if (hasCollectionNameChanged || (oldModeName === existingTheme.name && mode.name !== oldModeName)) {
+            const setToRemove = hasCollectionNameChanged
+              ? Object.keys(existingTheme.selectedTokenSets).filter((key) => key.startsWith(`${oldGroupName}/`))
+              : [`${oldGroupName}/${oldModeName}`];
+
+            setToRemove.forEach((setName) => {
+              tokenSetsToRemove.push(setName);
+            });
+          }
+
+          // Update existing theme with new names but keep the same ID
+          themesToCreate.push({
+            ...existingTheme,
+            name: mode.name,
+            group: collection.name,
+            selectedTokenSets: {
+              ...existingTheme.selectedTokenSets, // Preserve existing token sets
+              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            },
+            $figmaVariableReferences: variableReferences,
+          });
+        } else {
+          // Create new theme if no matching one exists
+          themesToCreate.push({
+            id: `${collection.name.toLowerCase()}-${mode.name.toLowerCase()}`,
+            name: mode.name,
+            group: collection.name,
+            selectedTokenSets: {
+              [`${collection.name}/${mode.name}`]: TokenSetStatus.ENABLED,
+            },
+            $figmaStyleReferences: {},
+            $figmaVariableReferences: variableReferences,
+            $figmaModeId: mode.modeId,
+            $figmaCollectionId: collection.id,
+          });
+        }
       }));
     }));
   }
@@ -215,7 +253,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
       }
       return acc;
     }, {});
-    notifyVariableValues(processedTokens, themesToCreate);
+    notifyVariableValues(processedTokens, themesToCreate, tokenSetsToRemove);
   } catch (error) {
     console.error('Error processing results:', error);
     notifyVariableValues({});

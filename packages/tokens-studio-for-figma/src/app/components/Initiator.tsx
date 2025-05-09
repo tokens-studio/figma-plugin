@@ -119,13 +119,13 @@ export function Initiator() {
           }
 
           case MessageFromPluginTypes.VARIABLES: {
-            const { values, themes } = pluginMessage;
+            const { values, themes, setsToRemove } = pluginMessage;
             if (values) {
               dispatch.tokenState.setTokensFromVariables(values);
               dispatch.uiState.setActiveTab(Tabs.TOKENS);
             }
             if (themes) {
-              dispatch.tokenState.setThemesFromVariables(themes);
+              dispatch.tokenState.setThemesFromVariables(themes, setsToRemove ?? []);
             }
             break;
           }
