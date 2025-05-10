@@ -52,6 +52,7 @@ export enum AsyncMessageTypes {
   SET_UI = 'async/set-ui',
   CREATE_ANNOTATION = 'async/create-annotation',
   UPDATE = 'async/update',
+  UPDATE_CHECK_FOR_CHANGES = 'async/update-check-for-changes',
   SET_LICENSE_KEY = 'async/set-license-key',
   ATTACH_LOCAL_STYLES_TO_THEME = 'async/attach-local-styles-to-theme',
   RESOLVE_STYLE_INFO = 'async/resolve-style-info',
@@ -228,6 +229,11 @@ export type UpdateAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE, {
   nodes: number
 }>;
 
+export type UpdateCheckForChangesAsyncMessage = AsyncMessage<AsyncMessageTypes.UPDATE_CHECK_FOR_CHANGES, {
+  checkForChanges: boolean;
+}>;
+export type UpdateCheckForChangesAsyncMessageResult = AsyncMessage<AsyncMessageTypes.UPDATE_CHECK_FOR_CHANGES>;
+
 export type SetLicenseKeyMessage = AsyncMessage<AsyncMessageTypes.SET_LICENSE_KEY, {
   licenseKey: string | null
 }>;
@@ -383,6 +389,7 @@ export type AsyncMessages =
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
   | UpdateAsyncMessage
+  | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
   | SetLicenseKeyMessage
   | SetInitialLoadMessage
@@ -430,6 +437,7 @@ export type AsyncMessageResults =
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
   | UpdateAsyncMessageResult
+  | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult
   | SetLicenseKeyMessageResult
   | SetInitialLoadMessageResult
