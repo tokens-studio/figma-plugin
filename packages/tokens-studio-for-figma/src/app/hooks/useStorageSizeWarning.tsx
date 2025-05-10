@@ -17,16 +17,6 @@ export function useStorageSizeWarning() {
         ns="tokens"
         components={{
           br: <br />,
-          // link: (
-          //   <a
-          //     href="https://docs.tokens.studio/token-storage/local/figma-data-limit"
-          //     target="_blank"
-          //     rel="noopener noreferrer"
-          //     aria-label={t('storageLimitWarning.learnMore')}
-          //   >
-          //     {t('storageLimitWarning.learnMore')}
-          //   </a>
-          // ),
         }}
       />
     );
