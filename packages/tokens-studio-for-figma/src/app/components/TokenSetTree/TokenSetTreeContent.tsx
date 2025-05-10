@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box } from '@tokens-studio/ui';
 import { IconExpandArrow } from '@/icons';
 import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
@@ -17,6 +18,7 @@ type TreeItem<ItemType = unknown> = {
   isLeaf: boolean,
   label: string
   id: string
+  tokenCount?: number
 } & ItemType;
 
 type SharedProps<T extends TreeItem> = {
@@ -64,11 +66,19 @@ export function TokenSetTreeContent<T extends TreeItem>({
                   onClick={onToggleCollapsed}
                   size={keyPosition === 'start' ? 'small' : 'default'}
                 >
-                  {keyPosition === 'start' ? <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel> : null}
+                  {keyPosition === 'start' ? (
+                    <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                      <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
+                    </Box>
+                  ) : null}
                   <StyledFolderButtonChevronBox collapsed={collapsed.includes(item.key)}>
                     <IconExpandArrow />
                   </StyledFolderButtonChevronBox>
-                  {keyPosition === 'end' ? <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel> : null}
+                  {keyPosition === 'end' ? (
+                    <Box css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+                      <StyledThemeLabel variant="folder">{item.label}</StyledThemeLabel>
+                    </Box>
+                  ) : null}
                 </StyledFolderButton>
               )}
             </RenderItemContent>

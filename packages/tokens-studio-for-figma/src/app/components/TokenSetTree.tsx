@@ -7,6 +7,7 @@ import {
   activeTokenSetSelector,
   collapsedTokenSetsSelector,
   editProhibitedSelector,
+  tokenFilterSelector,
   tokensSelector,
   usedTokenSetSelector,
 } from '@/selectors';
@@ -30,6 +31,7 @@ type ExtendedTreeItem = TreeItem & {
   isActive: boolean
   canDelete: boolean
   checkedState: boolean | 'indeterminate'
+  tokenCount?: number
   onRename: (tokenSet: string) => void
   onDelete: (tokenSet: string) => void
   onDuplicate: (tokenSet: string) => void
@@ -55,16 +57,53 @@ export default function TokenSetTree({
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const externalItems = useMemo(() => tokenSetListToTree(tokenSets), [tokenSets]);
   const [items, setItems] = React.useState<TreeItem[]>(externalItems);
+  const tokenFilter = useSelector(tokenFilterSelector);
 
   const debouncedOnReorder = React.useMemo(() => debounce(onReorder, 500), [onReorder]);
+
+  const filteredSetItems = React.useMemo(() => {
+    const tokenSetsContainingItemsThatMatchFilter = new Set<string>();
+    const tokenCountMap = new Map<string, number>();
+
+    Object.entries(tokens).forEach(([setName, setContent]) => {
+      const matchingTokens = setContent.filter((token) =>
+        token.name.toLowerCase().includes(tokenFilter.toLowerCase())
+      );
+
+      const setNameMatches = setName.toLowerCase().includes(tokenFilter.toLowerCase());
+
+      if (matchingTokens.length > 0 || setNameMatches) {
+        // Add the matching set and all its parent folders
+        let currentPath = setName;
+        while (currentPath) {
+          tokenSetsContainingItemsThatMatchFilter.add(currentPath);
+
+          // Only count direct matches for the specific set, not parent folders
+          if (currentPath === setName) {
+            tokenCountMap.set(currentPath, matchingTokens.length);
+          }
+
+          currentPath = currentPath.split('/').slice(0, -1).join('/');
+        }
+      }
+    });
+
+    return externalItems
+      .filter((item) => tokenSetsContainingItemsThatMatchFilter.has(item.path))
+      .map((item) => ({
+        ...item,
+        tokenCount: tokenFilter ? tokenCountMap.get(item.path) || 0 : undefined,
+      }));
+  }, [externalItems, tokenFilter, tokens]);
 
   React.useEffect(() => {
     // Compare saved tokenSet order with GUI tokenSet order and update the tokenSet if there is a difference
     if (!isEqual(Object.keys(tokens), externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path))) {
-      debouncedOnReorder(externalItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
+      debouncedOnReorder(filteredSetItems.filter(({ isLeaf }) => isLeaf).map(({ path }) => path));
     }
-    setItems(externalItems);
-  }, [externalItems, tokens, debouncedOnReorder]);
+    // Filter externalItems based on tokenFilter. Filter on the children as well as the name of the set
+    setItems(filteredSetItems);
+  }, [externalItems, tokens, debouncedOnReorder, tokenFilter, filteredSetItems]);
 
   const determineCheckedState = useCallback((item: TreeItem) => {
     if (item.isLeaf) {

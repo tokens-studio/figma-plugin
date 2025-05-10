@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { useTranslation } from 'react-i18next';
 import {
-  Checkbox, ContextMenu, Tooltip, Box,
+  Checkbox, ContextMenu, Tooltip, Box, Text,
 } from '@tokens-studio/ui';
 import { StyledCheckbox } from '../StyledDragger/StyledCheckbox';
 import { StyledWrapper } from './StyledWrapper';
@@ -14,9 +14,10 @@ import IconIndeterminateAlt from '@/icons/indeterminate-alt.svg';
 import { TreeItem } from '@/utils/tokenset';
 import { DragGrabber } from '../StyledDragger/DragGrabber';
 import { StyledDragButton } from '../StyledDragger/StyledDragButton';
+import { formatCount } from '@/utils/formatCount';
 
 export type TokenSetItemProps = {
-  item: TreeItem;
+  item: TreeItem & { tokenCount?: number };
   isCollapsed?: boolean; // eslint-disable-line react/no-unused-prop-types
   isActive?: boolean;
   isChecked: boolean | 'indeterminate';
@@ -144,6 +145,9 @@ export function TokenSetItem({
               <DragGrabber item={item} canReorder={canReorder} onDragStart={handleGrabberPointerDown} />
               <Box
                 css={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '$2',
                   overflow: 'hidden',
                   height: '1.5em',
                   maxWidth: 'calc(100% - $sizes$6)',
@@ -153,8 +157,13 @@ export function TokenSetItem({
                 }}
               >
                 <Tooltip label={item.label} side="right">
-                  <span>{item.label}</span>
+                  <span style={{ overflow: 'hidden' }}>{item.label}</span>
                 </Tooltip>
+                {item.tokenCount !== undefined && item.tokenCount > 0 && (
+                  <Text size="xsmall" muted css={{ flexShrink: 0 }}>
+                    {formatCount(item.tokenCount)}
+                  </Text>
+                )}
               </Box>
             </StyledDragButton>
           </ContextMenu.Trigger>
