@@ -130,14 +130,14 @@ export async function getTokenData(): Promise<{
 
     if (storageType.provider === StorageProviderType.LOCAL) {
       values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
-      themes = await ThemesProperty.read(figma.root) ?? [];
+      themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
     } else {
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
       themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
 
       // To account for the migration period, if client storage is empty, try reading from ValuesProperty and ThemesProperty to ensure local changes are not lost
       if (Object.keys(values).length === 0) {
-        values = await ValuesProperty.read(figma.root) ?? {};
+        values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
       }
       if (themes.length === 0) {
         themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
