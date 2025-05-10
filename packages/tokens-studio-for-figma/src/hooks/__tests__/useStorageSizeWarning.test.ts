@@ -38,11 +38,18 @@ describe('useStorageSizeWarning', () => {
 
     result.current();
 
-    expect(mockConfirm).toHaveBeenCalledWith({
+    expect(mockConfirm).toHaveBeenCalledWith(expect.objectContaining({
       text: 'storageLimitWarning.title',
-      description: 'storageLimitWarning.description',
       confirmAction: 'storageLimitWarning.switchToRemote',
-    });
+    }));
+
+    // Verify description exists and is an object (React element)
+    const callArg = mockConfirm.mock.calls[0][0];
+    expect(callArg.description).toBeTruthy();
+    expect(typeof callArg.description).toBe('object');
+    // Check for key props that should exist on the Trans component
+    expect(callArg.description.props).toHaveProperty('i18nKey', 'storageLimitWarning.description');
+    expect(callArg.description.props).toHaveProperty('ns', 'tokens');
   });
 
   it('should call useTranslation with correct namespace', () => {
