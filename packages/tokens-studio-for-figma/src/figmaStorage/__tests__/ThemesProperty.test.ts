@@ -14,24 +14,59 @@ describe('ThemesProperty', () => {
 
   const compressedMockThemes = compressToUTF16(JSON.stringify(mockThemes));
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be able to write compressed data', async () => {
+    // Mock metadata check for single storage
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+    
     await ThemesProperty.write(mockThemes);
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledTimes(1);
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedMockThemes);
+    
+    // Should set metadata first (indicating single storage)
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
+      'tokens', 
+      'themes_meta', 
+      JSON.stringify({ type: 'single' })
+    );
+    
+    // Then should set the actual data
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
+      'tokens', 
+      'themes', 
+      compressedMockThemes
+    );
   });
 
   it('should be able to read', async () => {
-    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify(mockThemes));
-    expect(await ThemesProperty.read()).toEqual(mockThemes);
+    // Mock metadata indicating single storage
+    mockRootGetSharedPluginData.mockReturnValueOnce(JSON.stringify({ type: 'single' }));
+
+    // Mock the actual data
+    mockRootGetSharedPluginData.mockReturnValueOnce(compressedMockThemes);
+
+    expect(await ThemesProperty.read(figma.root, true)).toEqual(mockThemes);
   });
 
   it('should handle empty or invalid input when reading', async () => {
+    // No metadata found, fallback to direct read
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+
+    // No data found
     mockRootGetSharedPluginData.mockReturnValueOnce(undefined);
     const emptyResult = await ThemesProperty.read();
-    expect(emptyResult).toBe(null);
+    expect(emptyResult).toEqual(null);
 
+    // Reset mocks
+    jest.clearAllMocks();
+    
+    // No metadata found, fallback to direct read
+    mockRootGetSharedPluginData.mockReturnValueOnce(null);
+    
+    // Null data found
     mockRootGetSharedPluginData.mockReturnValueOnce(null);
     const nullResult = await ThemesProperty.read();
-    expect(nullResult).toBe(null);
+    expect(nullResult).toEqual(null);
   });
 });

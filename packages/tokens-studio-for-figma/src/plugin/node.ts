@@ -130,7 +130,7 @@ export async function getTokenData(): Promise<{
 
     if (storageType.provider === StorageProviderType.LOCAL) {
       values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
-      themes = await ThemesProperty.read(figma.root) ?? [];
+      themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
     } else {
       values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
       themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
