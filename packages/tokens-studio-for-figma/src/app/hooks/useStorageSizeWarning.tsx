@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import useConfirm from '@/app/hooks/useConfirm';
 import { Dispatch } from '@/app/store';
 import { Tabs } from '@/constants/Tabs';
@@ -9,10 +9,31 @@ export function useStorageSizeWarning() {
   const { confirm } = useConfirm();
   const { t } = useTranslation(['tokens']);
   const dispatch = useDispatch<Dispatch>();
+
   return useCallback(async () => {
+    const description = (
+      <Trans
+        i18nKey="storageLimitWarning.description"
+        ns="tokens"
+        components={{
+          br: <br />,
+          // link: (
+          //   <a
+          //     href="https://docs.tokens.studio/token-storage/local/figma-data-limit"
+          //     target="_blank"
+          //     rel="noopener noreferrer"
+          //     aria-label={t('storageLimitWarning.learnMore')}
+          //   >
+          //     {t('storageLimitWarning.learnMore')}
+          //   </a>
+          // ),
+        }}
+      />
+    );
+
     const confirmed = await confirm({
       text: t('storageLimitWarning.title'),
-      description: t('storageLimitWarning.description'),
+      description,
       confirmAction: t('storageLimitWarning.switchToRemote'),
     });
     if (confirmed) {
