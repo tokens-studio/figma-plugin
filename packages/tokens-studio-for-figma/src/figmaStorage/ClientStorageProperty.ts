@@ -26,6 +26,9 @@ export const ClientStorageProperty = {
   async read(key: string) {
     try {
       const compressed = await figma.clientStorage.getAsync(key);
+      if (key.endsWith('/checkForChanges')) {
+        return compressed;
+      }
       if (!compressed) {
         return null;
       }
@@ -37,6 +40,7 @@ export const ClientStorageProperty = {
 
       try {
         const result = JSON.parse(decompressed);
+
         return result;
       } catch (parseError) {
         console.error('Error parsing decompressed data:', parseError);
