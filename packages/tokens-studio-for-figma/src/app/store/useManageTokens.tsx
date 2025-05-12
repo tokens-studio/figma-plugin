@@ -150,13 +150,13 @@ export default function useManageTokens() {
         name: BackgroundJobs.UI_DELETETOKEN,
         isInfinite: true,
       });
-      deleteToken(data);
+      deleteToken(data); // This triggers an updateDocument call as expected
       if (Array.isArray(userConfirmation.data) && userConfirmation.data.includes(StyleOptions.REMOVE)) {
         removeStylesFromTokens(data);
       }
       dispatch.uiState.completeJob(BackgroundJobs.UI_DELETETOKEN);
-      dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent);
-      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent);
+      dispatch.tokenState.removeStyleNamesFromThemes(data.path, data.parent); // TODO: This triggers an updateDocument call
+      dispatch.tokenState.removeVariableNamesFromThemes(data.path, data.parent); // TODO: This triggers an updateDocument call - its own!
     }
   }, [confirm, deleteToken, dispatch.uiState]);
 

@@ -220,7 +220,7 @@ export const settings = createModel<RootModel>()({
       };
     },
   },
-  effects: (dispatch) => ({
+  effects: () => ({
     setLanguage: (payload: string, rootState) => {
       i18next.changeLanguage(payload);
       setUI(rootState.settings);
@@ -268,7 +268,6 @@ export const settings = createModel<RootModel>()({
     },
     setBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
     },
     setAliasBaseFontSize: (payload, rootState) => {
       setUI(rootState.settings);

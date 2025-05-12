@@ -24,6 +24,12 @@ export async function readSharedPluginData(
   key: string,
   node: BaseNode = figma.root,
 ): Promise<string | null> {
+  // For any properties other than values and themes, use regular read, no chunking
+  if (!['values', 'themes'].includes(key)) {
+    const value = node?.getSharedPluginData(namespace, key);
+    return value || null;
+  }
+
   // First, check if there's metadata for chunked data
   const metaKey = `${key}${METADATA_SUFFIX}`;
   const metaValue = node?.getSharedPluginData(namespace, metaKey);

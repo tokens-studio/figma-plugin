@@ -14,6 +14,7 @@ import updateTokensOnSources from '../updateSources';
 import {
   AnyTokenList, ImportToken, SingleToken, TokenStore, TokenToRename,
 } from '@/types/tokens';
+import { updateCheckForChangesAtomic } from './effects/updateCheckForChangesAtomic';
 import {
   DeleteTokenPayload,
   SetTokenDataPayload,
@@ -854,8 +855,10 @@ export const tokenState = createModel<RootModel>()({
           });
         });
     },
-    updateCheckForChanges() {
-      dispatch.tokenState.updateDocument({ shouldUpdateNodes: false, updateRemote: false });
+    updateCheckForChanges(checkForChanges: boolean, rootState) {
+      if (rootState.uiState.storageType.provider !== StorageProviderType.LOCAL) {
+        updateCheckForChangesAtomic(checkForChanges);
+      }
     },
     renameTokenAcrossSets(data: RenameTokensAcrossSetsPayload) {
       const { oldName, newName } = data;

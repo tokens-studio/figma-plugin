@@ -60,9 +60,13 @@ export async function writeSharedPluginData(
     return;
   }
 
+  if (!['values', 'themes'].includes(key)) {
+    node?.setSharedPluginData(namespace, key, value);
+    return;
+  }
+
   // Get the byte length
   const byteLength = getUTF16StringSize(value);
-
   // If the value is small enough, store it directly
   if (byteLength <= MAX_CHUNK_SIZE) {
     // Set metadata to indicate single storage
@@ -95,10 +99,14 @@ export async function writeSharedPluginData(
 
     // Set metadata to indicate chunked storage
     const metaKey = `${key}${METADATA_SUFFIX}`;
-    node?.setSharedPluginData(namespace, metaKey, JSON.stringify({
-      type: 'chunked',
-      count: numChunks,
-    }));
+    node?.setSharedPluginData(
+      namespace,
+      metaKey,
+      JSON.stringify({
+        type: 'chunked',
+        count: numChunks,
+      }),
+    );
 
     // Store each chunk
     for (let i = 0; i < numChunks; i += 1) {
