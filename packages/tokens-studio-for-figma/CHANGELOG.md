@@ -1,5 +1,16 @@
 # @tokens-studio/figma-plugin
 
+## 2.5.0
+
+### Minor Changes
+
+- b66441e5: We now compress Figma's shared plugin data for tokens and themes values stored on the document, significantly reducing file sizes for very large token sets.
+
+### Patch Changes
+
+- 68fd997c: We changed search! When you search, you now also search across all token sets, making finding the needle in the haystack much easier. We also show the count of tokens found. Note that Search now also fiters the set list on the left, making it easy to find the set you're looking for.
+- e667cd09: Fixed an issue where if your font family was a number we'd be stuck generating variables
+
 ## 2.4.2
 
 ### Patch Changes
