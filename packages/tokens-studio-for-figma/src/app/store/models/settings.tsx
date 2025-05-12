@@ -220,7 +220,7 @@ export const settings = createModel<RootModel>()({
       };
     },
   },
-  effects: (dispatch) => ({
+  effects: () => ({
     setLanguage: (payload: string, rootState) => {
       i18next.changeLanguage(payload);
       setUI(rootState.settings);
