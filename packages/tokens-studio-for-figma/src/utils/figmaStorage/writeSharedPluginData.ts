@@ -60,7 +60,7 @@ export async function writeSharedPluginData(
     return;
   }
 
-  if (!['tokens', 'themes'].includes(key)) {
+  if (!['values', 'themes'].includes(key)) {
     node?.setSharedPluginData(namespace, key, value);
     return;
   }

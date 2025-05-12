@@ -18,10 +18,10 @@ describe('writeSharedPluginData', () => {
   });
 
   it('should clear data when value is null', async () => {
-    await writeSharedPluginData('namespace', 'key', null, mockNode as unknown as BaseNode);
+    await writeSharedPluginData('namespace', 'values', null, mockNode as unknown as BaseNode);
 
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key', '');
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_meta', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_meta', '');
   });
 
   it('should clear chunks when value is null and chunks exist', async () => {
@@ -31,10 +31,10 @@ describe('writeSharedPluginData', () => {
       count: 2,
     }));
 
-    await writeSharedPluginData('namespace', 'key', null, mockNode as unknown as BaseNode);
+    await writeSharedPluginData('namespace', 'values', null, mockNode as unknown as BaseNode);
 
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_chunk_0', '');
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_chunk_1', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_chunk_0', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_chunk_1', '');
   });
 
   it('should store data directly when size is within limit', async () => {
@@ -43,17 +43,17 @@ describe('writeSharedPluginData', () => {
     // Mock size check to return a small size
     (getUTF16StringSize as jest.Mock).mockReturnValueOnce(1000);
 
-    await writeSharedPluginData('namespace', 'key', testValue, mockNode as unknown as BaseNode);
+    await writeSharedPluginData('namespace', 'values', testValue, mockNode as unknown as BaseNode);
 
     // Should set metadata for single storage
     expect(mockNode.setSharedPluginData).toHaveBeenCalledWith(
       'namespace',
-      'key_meta',
-      JSON.stringify({ type: 'single' })
+      'values_meta',
+      JSON.stringify({ type: 'single' }),
     );
 
     // Should store the data directly
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key', testValue);
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values', testValue);
   });
 
   it('should chunk data when size exceeds limit', async () => {
@@ -66,21 +66,21 @@ describe('writeSharedPluginData', () => {
     // Mock chunk splitting
     (splitIntoChunks as jest.Mock).mockReturnValueOnce(chunks);
 
-    await writeSharedPluginData('namespace', 'key', testValue, mockNode as unknown as BaseNode);
+    await writeSharedPluginData('namespace', 'values', testValue, mockNode as unknown as BaseNode);
 
     // Should set metadata for chunked storage
     expect(mockNode.setSharedPluginData).toHaveBeenCalledWith(
       'namespace',
-      'key_meta',
-      JSON.stringify({ type: 'chunked', count: 2 })
+      'values_meta',
+      JSON.stringify({ type: 'chunked', count: 2 }),
     );
 
     // Should store each chunk
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_chunk_0', 'chunk1');
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_chunk_1', 'chunk2');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_chunk_0', 'chunk1');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_chunk_1', 'chunk2');
 
     // Should clear the main key
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values', '');
   });
 
   it('should clean up obsolete chunks', async () => {
@@ -99,9 +99,9 @@ describe('writeSharedPluginData', () => {
       count: 2,
     }));
 
-    await writeSharedPluginData('namespace', 'key', testValue, mockNode as unknown as BaseNode);
+    await writeSharedPluginData('namespace', 'values', testValue, mockNode as unknown as BaseNode);
 
     // Should clean up the obsolete chunk
-    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'key_chunk_1', '');
+    expect(mockNode.setSharedPluginData).toHaveBeenCalledWith('namespace', 'values_chunk_1', '');
   });
 });
