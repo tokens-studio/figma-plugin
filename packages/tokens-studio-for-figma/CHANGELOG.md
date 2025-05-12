@@ -1,5 +1,11 @@
 # @tokens-studio/figma-plugin
 
+## 2.5.1
+
+### Patch Changes
+
+- 1076e494: Fixed a bug with remote storage providers and our check for recovering local changes causing the Enter credentials to be shown
+
 ## 2.5.0
 
 ### Minor Changes
