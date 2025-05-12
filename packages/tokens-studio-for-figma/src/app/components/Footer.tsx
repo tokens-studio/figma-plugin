@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
-import { IconButton } from '@tokens-studio/ui';
+import { Button, IconButton } from '@tokens-studio/ui';
 import { WarningTriangleSolid } from 'iconoir-react';
 import * as pjs from '../../../package.json';
 import Box from './Box';
@@ -79,20 +79,14 @@ export default function Footer() {
     >
       <Stack direction="row" align="center" gap={2}>
         {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
-          <Box
-            css={{
-              fontSize: '$xsmall',
-              cursor: 'pointer',
-              color: '$dangerFg',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '$2',
-            }}
+          <Button
+            icon={<WarningTriangleSolid />}
+            size="small"
+            variant="invisible"
             onClick={handleBadgeClick}
           >
-            <WarningTriangleSolid />
             {`${tokensSize > 100 ? tokensSize : themesSize} KB`}
-          </Box>
+          </Button>
         )}
         {((isGitProvider(localApiState) && localApiState.branch) || storageType.provider === StorageProviderType.SUPERNOVA) && (
           <>
