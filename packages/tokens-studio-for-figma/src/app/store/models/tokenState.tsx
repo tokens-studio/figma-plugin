@@ -883,6 +883,16 @@ export const tokenState = createModel<RootModel>()({
           dispatch.tokenState.setThemesSize(Number(themesSize.toFixed(1)));
         }
 
+        // Check if there are unsaved changes before updating
+        const { lastSyncedState } = rootState.tokenState;
+        const currentState = JSON.stringify([rootState.tokenState.tokens, rootState.tokenState.themes, rootState.tokenState.tokenFormat], null, 2);
+        const hasChanges = lastSyncedState !== currentState;
+
+        // Update checkForChanges flag before proceeding with updates
+        if (hasChanges !== rootState.tokenState.checkForChanges) {
+          dispatch.tokenState.updateCheckForChanges(hasChanges);
+        }
+
         wrapTransaction(
           {
             name: 'updateDocument',
