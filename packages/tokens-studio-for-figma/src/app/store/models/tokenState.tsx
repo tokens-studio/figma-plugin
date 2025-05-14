@@ -938,7 +938,7 @@ export const tokenState = createModel<RootModel>()({
               api: rootState.uiState.api,
               storageType: rootState.uiState.storageType,
               shouldUpdateRemote: params.updateRemote && rootState.settings.updateRemote,
-              checkForChanges: hasChanges, // Use our local hasChanges instead of rootState.tokenState.checkForChanges
+              checkForChanges: rootState.tokenState.checkForChanges,
               shouldSwapStyles: rootState.settings.shouldSwapStyles,
               collapsedTokenSets: rootState.tokenState.collapsedTokenSets,
               storeTokenIdInJsonEditor: rootState.settings.storeTokenIdInJsonEditor,
