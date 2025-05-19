@@ -59,6 +59,7 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     });
 
     if (!data.data?.project?.branch) {
+      notifyToUI('Project or branch not found in Tokens Studio', { error: true });
       return null;
     }
 
@@ -118,7 +119,26 @@ async function getProjectData(id: string, orgId: string, client: any): Promise<P
     return { ...returnData, tokenSetOrder, themes };
   } catch (e) {
     Sentry.captureException(e);
-    console.error('Error fetching tokens', e);
+    console.error('Error fetching tokens from Tokens Studio', e);
+
+    let errorMessage = 'Error connecting to Tokens Studio';
+
+    if (e instanceof Error) {
+      // Check for common error types and provide more specific messages
+      if (e.message.includes('Network error')) {
+        errorMessage = 'Network error connecting to Tokens Studio. Please check your internet connection.';
+      } else if (e.message.includes('Unauthorized') || e.message.includes('401')) {
+        errorMessage = 'Authentication error. Please check your Tokens Studio API key.';
+      } else if (e.message.includes('Not Found') || e.message.includes('404')) {
+        errorMessage = 'Project or organization not found in Tokens Studio.';
+      } else if (e.message.includes('Permission') || e.message.includes('403')) {
+        errorMessage = 'You do not have permission to access this Tokens Studio project.';
+      } else {
+        errorMessage = `Error connecting to Tokens Studio: ${e.message.substring(0, 100)}`;
+      }
+    }
+
+    notifyToUI(errorMessage, { error: true });
     return null;
   }
 }
