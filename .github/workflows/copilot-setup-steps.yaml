@@ -1,0 +1,108 @@
+name: "Copilot Setup Steps"
+
+on: workflow_dispatch
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # For better relevancy when analyzing code
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
+          
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --immutable
+      
+      # Create environment config files
+      - name: Setup environment configuration
+        run: |
+          # Setup .env file for development
+          cd packages/tokens-studio-for-figma
+          echo "MIXPANEL_ACCESS_TOKEN=${{ secrets.MIXPANEL_ACCESS_TOKEN || '' }}" > .env
+          echo "STORYBLOK_ACCESS_TOKEN=${{ secrets.STORYBLOK_ACCESS_TOKEN || '' }}" >> .env
+          echo "ENVIRONMENT=development" >> .env
+          echo "LICENSE_API_URL=https://licence.tokens.studio" >> .env
+          echo "LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e" >> .env
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN || '' }}" >> .env
+          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN || '' }}" >> .env
+          echo "SENTRY_SAMPLING=0.1" >> .env
+          echo "SENTRY_PROFILE_SAMPLING=0.1" >> .env
+          echo "SENTRY_REPLAY_SAMPLING=0" >> .env
+          echo "TOKEN_FLOW_APP_URL=${{ secrets.TOKEN_FLOW_APP_URL || 'https://token-flow.tokens.studio' }}" >> .env
+
+          # Setup .env.production file (for production builds)
+          echo "MIXPANEL_ACCESS_TOKEN=${{ secrets.MIXPANEL_ACCESS_TOKEN || '' }}" > .env.production
+          echo "STORYBLOK_ACCESS_TOKEN=${{ secrets.STORYBLOK_ACCESS_TOKEN || '' }}" >> .env.production
+          echo "ENVIRONMENT=production" >> .env.production
+          echo "LICENSE_API_URL=https://licence.tokens.studio" >> .env.production
+          echo "LAUNCHDARKLY_SDK_CLIENT=626fb05d52e5c715abd11b5e" >> .env.production
+
+      # Use linting tools from the project
+      - name: Lint code
+        run: |
+          cd packages/tokens-studio-for-figma
+          yarn lint:nofix || true
+
+      # Build steps similar to what is used in node.js.yml workflow
+      - name: Build development version
+        run: |
+          cd packages/tokens-studio-for-figma
+          yarn build:dev || true
+      
+      # Test command setup
+      - name: Setup for unit tests
+        run: |
+          cd packages/tokens-studio-for-figma
+          # Setup mock files needed for tests
+          [ -d ./tests/__mocks__ ] || mkdir -p ./tests/__mocks__
+          
+          # Run tests with minimal output
+          yarn test:quiet || true
+          
+      # Cypress test setup
+      - name: Setup for Cypress
+        run: |
+          cd packages/tokens-studio-for-figma
+          # Install Cypress binary
+          npx cypress install || true
+          
+          # Build with feature flags for Cypress
+          yarn build:cy || true
+          
+          # Install serve for hosting the app during tests
+          npm install -g serve
+          
+          # Note: Not actually running Cypress tests as they require a UI
+          echo "Cypress environment ready for testing"
+      
+      # Benchmark setup
+      - name: Setup for benchmarking
+        run: |
+          cd packages/tokens-studio-for-figma
+          yarn benchmark:build || true
+          
+      # Translation tooling
+      - name: Setup translation tools
+        run: |
+          cd packages/tokens-studio-for-figma
+          # Make sure translation tools are available
+          npm list translate || npm install translate
+          echo "Translation tooling ready"
+
+      # Install additional development tools
+      - name: Setup additional development tools
+        run: |
+          # Install global tools needed for development
+          npm install -g cross-env
+          
+          # Setup Storybook (if needed)
+          cd packages/tokens-studio-for-figma
+          echo "Development environment ready"
