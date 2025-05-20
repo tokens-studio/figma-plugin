@@ -12,32 +12,37 @@ export function processTextStyleProperty(
   idx: number,
   valueTransformer?: (value: any) => string,
 ): StyleToCreateToken {
-  // Check if the style has a bound variable for this property
-  const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
-  if (boundVariables?.[propertyKey]?.id) {
-    const variable = localVariables.find((v) => v.id === boundVariables[propertyKey]?.id);
-    if (variable && tokens) {
-      const normalizedName = variable.name.replace(/\//g, '.');
+  try {
+    // Check if the style has a bound variable for this property
+    const boundVariables = style.boundVariables as Record<string, { id: string; } | undefined>;
+    if (boundVariables?.[propertyKey]?.id) {
+      const variable = localVariables.find((v) => v.id === boundVariables[propertyKey]?.id);
+      if (variable && tokens) {
+        const normalizedName = variable.name.replace(/\//g, '.');
 
-      // Look for an existing token with this name
-      const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
-        if (found) return found;
-        const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
-          && token !== null
-          && 'name' in token
-          && token.name === normalizedName) : null;
-        return foundToken || null;
-      }, null);
+        // Look for an existing token with this name
+        const existingToken = Object.entries(tokens.values).reduce<SingleToken | null>((found, [_, tokenSet]) => {
+          if (found) return found;
+          const foundToken = Array.isArray(tokenSet) ? tokenSet.find((token) => typeof token === 'object'
+            && token !== null
+            && 'name' in token
+            && token.name === normalizedName) : null;
+          return foundToken || null;
+        }, null);
 
-      // If an existing token is found, use it
-      if (existingToken) {
-        return {
-          name: existingToken.name,
-          value: typeof existingToken.value === 'string' ? existingToken.value : String(existingToken.value),
-          type: tokenType,
-        };
+        // If an existing token is found, use it
+        if (existingToken) {
+          return {
+            name: existingToken.name,
+            value: typeof existingToken.value === 'string' ? existingToken.value : String(existingToken.value),
+            type: tokenType,
+          };
+        }
       }
     }
+  } catch (e) {
+    console.log('Error processing text style property, using raw value:', e);
+    // Fall through to use the raw value
   }
 
   // If no variable or existing token is found, create a new token
