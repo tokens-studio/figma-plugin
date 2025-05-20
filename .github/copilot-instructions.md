@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-Tokens Studio for Figma (formerly Figma Tokens) is a plugin for Figma allowing you to define and use design tokens. The repository is a monorepo managed with Yarn workspaces:
+Tokens Studio for Figma is a plugin for Figma allowing you to define and use design tokens. The repository is a monorepo managed with Yarn workspaces:
 
 - `packages/tokens-studio-for-figma` - Main Figma plugin package
 - `developer-knowledgebase` - Technical documentation
@@ -23,14 +23,12 @@ For anything related to the Figma sandbox environment or using the global `figma
 
 - Node.js 18.x
 - Yarn 1.22.x
-- Figma desktop app (for testing)
 
 ### Getting Started
 
 1. Install dependencies: `yarn --frozen-lockfile --immutable`
 2. Start development: `yarn start` (watches for changes)
 3. Build for production: `yarn build`
-4. To import in Figma: Open Figma → Plugins → Development → Import plugin from manifest and select the `manifest.json` file
 
 ## Build System
 
@@ -162,3 +160,5 @@ SENTRY_REPLAY_SAMPLING=0
 5. Use appropriate error handling
 6. Document complex logic with comments
 7. Always use `yarn changeset` on every PR to describe your changes
+8. For UI components, use @tokens-studio/ui components that we use across the codebase instead of creating from scratch
+9. For UI work, use tokens from @tokens-studio/tokens, found in node_modules/@tokens-studio/tokens/dist/css/dark.css and node_modules/@tokens-studio/tokens/dist/css/core.css instead of using raw hex values.
