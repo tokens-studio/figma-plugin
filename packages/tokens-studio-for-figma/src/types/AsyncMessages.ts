@@ -51,6 +51,7 @@ export enum AsyncMessageTypes {
   SET_SHOW_EMPTY_GROUPS = 'async/set-show-empty-groups',
   SET_UI = 'async/set-ui',
   CREATE_ANNOTATION = 'async/create-annotation',
+  GENERATE_DOCUMENTATION = 'async/generate-documentation',
   UPDATE = 'async/update',
   UPDATE_CHECK_FOR_CHANGES = 'async/update-check-for-changes',
   SET_LICENSE_KEY = 'async/set-license-key',
@@ -362,6 +363,22 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
+export interface DocumentationConfig {
+  tokenSets: string[];
+  tokenTypes?: string[];
+  layout?: 'grid' | 'list';
+  showValues?: boolean;
+  showDescription?: boolean;
+}
+
+export type GenerateDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.GENERATE_DOCUMENTATION, {
+  config: DocumentationConfig;
+}>;
+export type GenerateDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.GENERATE_DOCUMENTATION, {
+  success: boolean;
+  message?: string;
+}>;
+
 export type AsyncMessages =
   CreateStylesAsyncMessage
   | RenameStylesAsyncMessage
@@ -388,6 +405,7 @@ export type AsyncMessages =
   | SetShowEmptyGroupsAsyncMessage
   | SetUiAsyncMessage
   | CreateAnnotationAsyncMessage
+  | GenerateDocumentationAsyncMessage
   | UpdateAsyncMessage
   | UpdateCheckForChangesAsyncMessage
   | GetThemeInfoMessage
@@ -436,6 +454,7 @@ export type AsyncMessageResults =
   | SetShowEmptyGroupsAsyncMessageResult
   | SetUiAsyncMessageResult
   | CreateAnnotationAsyncMessageResult
+  | GenerateDocumentationAsyncMessageResult
   | UpdateAsyncMessageResult
   | UpdateCheckForChangesAsyncMessageResult
   | GetThemeInfoMessageResult

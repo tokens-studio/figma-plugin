@@ -7,6 +7,7 @@ import { FileZipIcon } from '@primer/octicons-react';
 import { editProhibitedSelector } from '@/selectors';
 import PresetModal from './modals/PresetModal';
 import ExportModal from './modals/ExportModal';
+import DocumentationModal from './modals/DocumentationModal';
 
 export default function ToolsDropdown() {
   const editProhibited = useSelector(editProhibitedSelector);
@@ -15,6 +16,7 @@ export default function ToolsDropdown() {
 
   const [presetModalVisible, showPresetModal] = React.useState(false);
   const [exportModalVisible, showExportModal] = React.useState(false);
+  const [documentationModalVisible, showDocumentationModal] = React.useState(false);
 
   const handleCloseExportModal = useCallback(() => {
     showExportModal(false);
@@ -24,11 +26,20 @@ export default function ToolsDropdown() {
     showPresetModal(false);
   }, []);
 
+  const handleCloseDocumentationModal = useCallback(() => {
+    showDocumentationModal(false);
+  }, []);
+
   const handleShowPresetModal = useCallback(() => {
     showPresetModal(true);
   }, []);
+  
   const handleShowExportModal = useCallback(() => {
     showExportModal(true);
+  }, []);
+  
+  const handleShowDocumentationModal = useCallback(() => {
+    showDocumentationModal(true);
   }, []);
 
   return (
@@ -42,11 +53,13 @@ export default function ToolsDropdown() {
           <DropdownMenu.Content side="top">
             <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowPresetModal}>{t('loadFromFileOrPreset')}</DropdownMenu.Item>
             <DropdownMenu.Item disabled={editProhibited} onSelect={handleShowExportModal}>{t('exportToFile')}</DropdownMenu.Item>
+            <DropdownMenu.Item onSelect={handleShowDocumentationModal}>{t('generateDocumentation')}</DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu>
       {exportModalVisible && <ExportModal onClose={handleCloseExportModal} />}
       {presetModalVisible && <PresetModal onClose={handleClosePresetModal} />}
+      {documentationModalVisible && <DocumentationModal onClose={handleCloseDocumentationModal} />}
     </>
   );
 }
