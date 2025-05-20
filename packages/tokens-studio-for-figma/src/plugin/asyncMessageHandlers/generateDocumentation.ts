@@ -33,7 +33,7 @@ const FONT_BOLD = { family: 'Inter', style: 'Bold' };
 function parseColor(color: string): { r: number; g: number; b: number; a?: number } {
   // Default to black
   const defaultColor = { r: 0, g: 0, b: 0 };
-  
+
   try {
     // Handle hex colors
     if (color.startsWith('#')) {
@@ -44,7 +44,7 @@ function parseColor(color: string): { r: number; g: number; b: number; a?: numbe
         const g = parseInt(hex.charAt(1) + hex.charAt(1), 16) / 255;
         const b = parseInt(hex.charAt(2) + hex.charAt(2), 16) / 255;
         return { r, g, b };
-      } else if (hex.length >= 6) {
+      } if (hex.length >= 6) {
         // #RRGGBB
         const r = parseInt(hex.substring(0, 2), 16) / 255;
         const g = parseInt(hex.substring(2, 4), 16) / 255;
@@ -52,7 +52,7 @@ function parseColor(color: string): { r: number; g: number; b: number; a?: numbe
         return { r, g, b };
       }
     }
-    
+
     // Handle rgba colors
     if (color.startsWith('rgba')) {
       const rgba = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)/);
@@ -65,7 +65,7 @@ function parseColor(color: string): { r: number; g: number; b: number; a?: numbe
         };
       }
     }
-    
+
     // Handle rgb colors
     if (color.startsWith('rgb')) {
       const rgb = color.match(/rgb?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)/);
@@ -77,7 +77,7 @@ function parseColor(color: string): { r: number; g: number; b: number; a?: numbe
         };
       }
     }
-    
+
     return defaultColor;
   } catch (e) {
     return defaultColor;
@@ -95,21 +95,21 @@ function addTokenDescription(container: FrameNode, description: string): void {
   descFrame.primaryAxisSizingMode = 'AUTO';
   descFrame.fills = [];
   descFrame.itemSpacing = 4;
-  
+
   const descLabel = figma.createText();
   descLabel.fontName = FONT_MEDIUM;
   descLabel.fontSize = BASE_FONT_SIZE;
   descLabel.characters = 'Description:';
   descLabel.fills = [{ type: 'SOLID', color: TYPE_COLOR }];
   descFrame.appendChild(descLabel);
-  
+
   const descText = figma.createText();
   descText.fontName = FONT_REGULAR;
   descText.fontSize = BASE_FONT_SIZE;
   descText.characters = description.substring(0, 200); // Limit description length
   descText.fills = [{ type: 'SOLID', color: TEXT_COLOR }];
   descFrame.appendChild(descText);
-  
+
   container.appendChild(descFrame);
 }
 
@@ -124,23 +124,23 @@ function addTokenValue(container: FrameNode, token: SingleToken): void {
   valueFrame.primaryAxisSizingMode = 'AUTO';
   valueFrame.fills = [];
   valueFrame.itemSpacing = 4;
-  
+
   const valueLabel = figma.createText();
   valueLabel.fontName = FONT_MEDIUM;
   valueLabel.fontSize = BASE_FONT_SIZE;
   valueLabel.characters = 'Value:';
   valueLabel.fills = [{ type: 'SOLID', color: TYPE_COLOR }];
   valueFrame.appendChild(valueLabel);
-  
+
   const valueText = figma.createText();
   valueText.fontName = FONT_REGULAR;
   valueText.fontSize = BASE_FONT_SIZE;
-  valueText.characters = typeof token.value === 'object' 
-    ? JSON.stringify(token.value).substring(0, 100) 
+  valueText.characters = typeof token.value === 'object'
+    ? JSON.stringify(token.value).substring(0, 100)
     : String(token.value).substring(0, 100);
   valueText.fills = [{ type: 'SOLID', color: VALUE_COLOR }];
   valueFrame.appendChild(valueText);
-  
+
   container.appendChild(valueFrame);
 }
 
@@ -153,7 +153,7 @@ function addShadowPreview(container: FrameNode, token: SingleToken): void {
   shadowFrame.resize(container.width - CARD_PADDING * 2, 60);
   shadowFrame.fills = [{ type: 'SOLID', color: { r: 0.3, g: 0.3, b: 0.3 } }];
   shadowFrame.cornerRadius = 4;
-  
+
   try {
     if (typeof token.value === 'object' && token.value !== null) {
       const shadowObj = token.value;
@@ -174,7 +174,9 @@ function addShadowPreview(container: FrameNode, token: SingleToken): void {
     // Use default shadow
     shadowFrame.effects = [{
       type: 'DROP_SHADOW',
-      color: { r: 0, g: 0, b: 0, a: 0.2 },
+      color: {
+        r: 0, g: 0, b: 0, a: 0.2,
+      },
       offset: { x: 0, y: 2 },
       radius: 4,
       spread: 0,
@@ -182,7 +184,7 @@ function addShadowPreview(container: FrameNode, token: SingleToken): void {
       blendMode: 'NORMAL',
     }];
   }
-  
+
   container.appendChild(shadowFrame);
 }
 
@@ -194,17 +196,17 @@ function addBorderWidthPreview(container: FrameNode, token: SingleToken): void {
   borderWidthFrame.name = 'Border Width Preview';
   borderWidthFrame.resize(container.width - CARD_PADDING * 2, 60);
   borderWidthFrame.fills = [];
-  
+
   let value = 1; // Default
   try {
     value = parseFloat(String(token.value));
   } catch (e) {
     // Use default
   }
-  
+
   borderWidthFrame.strokes = [{ type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 } }];
   borderWidthFrame.strokeWeight = value;
-  
+
   container.appendChild(borderWidthFrame);
 }
 
@@ -219,31 +221,31 @@ function addSpacingPreview(container: FrameNode, token: SingleToken): void {
   spacingFrame.primaryAxisSizingMode = 'AUTO';
   spacingFrame.fills = [];
   spacingFrame.itemSpacing = 8;
-  
+
   let value = 16; // Default value
   try {
     value = parseFloat(String(token.value));
   } catch (e) {
     // Use default
   }
-  
+
   // Create two rectangles with spacing between them
   const rect1 = figma.createRectangle();
   rect1.resize(16, 16);
   rect1.fills = [{ type: 'SOLID', color: { r: 0.3, g: 0.3, b: 0.3 } }];
-  
+
   const spacer = figma.createFrame();
   spacer.resize(value, 1);
   spacer.fills = [{ type: 'SOLID', color: { r: 0.5, g: 0.5, b: 0.5 }, opacity: 0.3 }];
-  
+
   const rect2 = figma.createRectangle();
   rect2.resize(16, 16);
   rect2.fills = [{ type: 'SOLID', color: { r: 0.3, g: 0.3, b: 0.3 } }];
-  
+
   spacingFrame.appendChild(rect1);
   spacingFrame.appendChild(spacer);
   spacingFrame.appendChild(rect2);
-  
+
   container.appendChild(spacingFrame);
 }
 
@@ -255,14 +257,14 @@ function addBorderRadiusPreview(container: FrameNode, token: SingleToken): void 
   borderRadiusFrame.name = 'Border Radius Preview';
   borderRadiusFrame.resize(container.width - CARD_PADDING * 2, 60);
   borderRadiusFrame.fills = [{ type: 'SOLID', color: { r: 0.3, g: 0.3, b: 0.3 } }];
-  
+
   try {
     const value = parseFloat(String(token.value));
     borderRadiusFrame.cornerRadius = value;
   } catch {
     borderRadiusFrame.cornerRadius = 0;
   }
-  
+
   container.appendChild(borderRadiusFrame);
 }
 
@@ -276,11 +278,11 @@ function addTypographyPreview(container: FrameNode, token: SingleToken): void {
   typoFrame.counterAxisSizingMode = 'AUTO';
   typoFrame.primaryAxisSizingMode = 'AUTO';
   typoFrame.fills = [];
-  
+
   const preview = figma.createText();
   preview.characters = 'The quick brown fox jumps over the lazy dog';
   preview.fills = [{ type: 'SOLID', color: TEXT_COLOR }];
-  
+
   // Apply typography properties if available
   if (typeof token.value === 'object') {
     if (token.value.fontSize) preview.fontSize = Number(token.value.fontSize);
@@ -296,7 +298,7 @@ function addTypographyPreview(container: FrameNode, token: SingleToken): void {
       }
     }
   }
-  
+
   typoFrame.appendChild(preview);
   container.appendChild(typoFrame);
 }
@@ -309,7 +311,7 @@ function addColorPreview(container: FrameNode, token: SingleToken): void {
   colorFrame.name = 'Color Preview';
   colorFrame.resize(container.width - CARD_PADDING * 2, COLOR_SWATCH_SIZE);
   colorFrame.cornerRadius = 6;
-  
+
   try {
     // Try to parse the color value
     const colorValue = String(token.value);
@@ -317,7 +319,7 @@ function addColorPreview(container: FrameNode, token: SingleToken): void {
   } catch (e) {
     colorFrame.fills = [{ type: 'SOLID', color: { r: 0.8, g: 0.2, b: 0.2 } }];
   }
-  
+
   container.appendChild(colorFrame);
 }
 
@@ -330,20 +332,20 @@ function addGenericPreview(container: FrameNode, token: SingleToken): void {
   previewFrame.resize(container.width - CARD_PADDING * 2, 60);
   previewFrame.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
   previewFrame.cornerRadius = 4;
-  
+
   const label = figma.createText();
   label.fontName = FONT_MEDIUM;
   label.fontSize = BASE_FONT_SIZE;
-  label.characters = typeof token.value === 'object' 
-    ? 'Complex value' 
+  label.characters = typeof token.value === 'object'
+    ? 'Complex value'
     : String(token.value).substring(0, 25);
-    
+
   label.fills = [{ type: 'SOLID', color: TEXT_COLOR }];
-  
+
   // Center the label in the preview frame
   label.x = (previewFrame.width - label.width) / 2;
   label.y = (previewFrame.height - label.height) / 2;
-  
+
   previewFrame.appendChild(label);
   container.appendChild(previewFrame);
 }
@@ -352,10 +354,10 @@ function addGenericPreview(container: FrameNode, token: SingleToken): void {
  * Creates an individual token card
  */
 function createTokenCard(
-  name: string, 
-  token: SingleToken, 
-  type: TokenTypes, 
-  config: DocumentationConfig
+  name: string,
+  token: SingleToken,
+  type: TokenTypes,
+  config: DocumentationConfig,
 ): FrameNode {
   // Create card container
   const card = figma.createFrame();
@@ -369,14 +371,14 @@ function createTokenCard(
   card.fills = [{ type: 'SOLID', color: BG_COLOR }];
   card.strokes = [{ type: 'SOLID', color: STROKE_COLOR }];
   card.strokeWeight = 1;
-  
+
   // Set card width based on layout
   if (config.layout === 'grid') {
     card.resize(CARD_WIDTH, card.height);
   } else {
     card.resize(CARD_WIDTH * 2, card.height);
   }
-  
+
   // Create card header
   const header = figma.createFrame();
   header.name = 'Header';
@@ -389,7 +391,7 @@ function createTokenCard(
   header.paddingRight = CARD_PADDING;
   header.primaryAxisAlignItems = 'SPACE_BETWEEN';
   header.counterAxisAlignItems = 'CENTER';
-  
+
   // Add token name
   const tokenName = figma.createText();
   tokenName.fontName = FONT_BOLD;
@@ -397,7 +399,7 @@ function createTokenCard(
   tokenName.characters = name;
   tokenName.fills = [{ type: 'SOLID', color: TEXT_COLOR }];
   header.appendChild(tokenName);
-  
+
   // Add token type indicator
   const typeText = figma.createText();
   typeText.fontName = FONT_REGULAR;
@@ -405,9 +407,9 @@ function createTokenCard(
   typeText.characters = type;
   typeText.fills = [{ type: 'SOLID', color: TYPE_COLOR }];
   header.appendChild(typeText);
-  
+
   card.appendChild(header);
-  
+
   // Add token content
   const content = figma.createFrame();
   content.name = 'Content';
@@ -415,14 +417,14 @@ function createTokenCard(
   content.counterAxisSizingMode = 'FIXED';
   content.primaryAxisSizingMode = 'AUTO';
   content.fills = [];
-  content.primaryAxisAlignItems = 'SPACE_BETWEEN'; 
+  content.primaryAxisAlignItems = 'SPACE_BETWEEN';
   content.paddingTop = CARD_PADDING;
   content.paddingRight = CARD_PADDING;
   content.paddingBottom = CARD_PADDING;
   content.paddingLeft = CARD_PADDING;
   content.itemSpacing = 12;
   content.resize(card.width, content.height);
-  
+
   // Add visual representation based on token type
   if (type === TokenTypes.COLOR) {
     addColorPreview(content, token);
@@ -440,19 +442,19 @@ function createTokenCard(
     // For other types, just show value
     addGenericPreview(content, token);
   }
-  
+
   // Add token value if configured
   if (config.showValues) {
     addTokenValue(content, token);
   }
-  
+
   // Add token description if configured and available
   if (config.showDescription && token.description) {
     addTokenDescription(content, token.description);
   }
-  
+
   card.appendChild(content);
-  
+
   return card;
 }
 
@@ -460,9 +462,9 @@ function createTokenCard(
  * Creates a section for tokens of a specific type
  */
 function createTokenTypeSection(
-  type: string, 
-  tokens: Record<string, SingleToken>, 
-  config: DocumentationConfig
+  type: string,
+  tokens: Record<string, SingleToken>,
+  config: DocumentationConfig,
 ): FrameNode {
   // Create section frame
   const typeFrame = figma.createFrame();
@@ -472,7 +474,7 @@ function createTokenTypeSection(
   typeFrame.counterAxisSizingMode = 'AUTO';
   typeFrame.primaryAxisSizingMode = 'AUTO';
   typeFrame.itemSpacing = 16;
-  
+
   // Add type title
   const typeTitle = figma.createText();
   typeTitle.fontName = FONT_MEDIUM;
@@ -480,12 +482,12 @@ function createTokenTypeSection(
   typeTitle.characters = type;
   typeTitle.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
   typeFrame.appendChild(typeTitle);
-  
+
   // Create token cards container (grid or list layout)
   const cardsContainer = figma.createFrame();
   cardsContainer.name = 'Token Cards';
   cardsContainer.fills = [];
-  
+
   if (config.layout === 'grid') {
     cardsContainer.layoutMode = 'HORIZONTAL';
     cardsContainer.itemSpacing = CARD_SPACING;
@@ -502,13 +504,13 @@ function createTokenTypeSection(
     cardsContainer.counterAxisSizingMode = 'AUTO';
     cardsContainer.primaryAxisSizingMode = 'AUTO';
   }
-  
+
   // Create token cards
   Object.entries(tokens).forEach(([tokenName, tokenValue]) => {
     const card = createTokenCard(tokenName, tokenValue, type as TokenTypes, config);
     cardsContainer.appendChild(card);
   });
-  
+
   typeFrame.appendChild(cardsContainer);
   return typeFrame;
 }
@@ -517,9 +519,9 @@ function createTokenTypeSection(
  * Creates a section for a token set
  */
 function createTokenSetSection(
-  setName: string, 
-  tokens: AnyTokenList, 
-  config: DocumentationConfig
+  setName: string,
+  tokens: AnyTokenList,
+  config: DocumentationConfig,
 ): FrameNode {
   // Create section container
   const setFrame = figma.createFrame();
@@ -529,7 +531,7 @@ function createTokenSetSection(
   setFrame.counterAxisSizingMode = 'AUTO';
   setFrame.primaryAxisSizingMode = 'AUTO';
   setFrame.itemSpacing = 24;
-  
+
   // Add section title
   const setTitle = figma.createText();
   setTitle.fontName = FONT_BOLD;
@@ -537,13 +539,13 @@ function createTokenSetSection(
   setTitle.characters = setName;
   setTitle.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
   setFrame.appendChild(setTitle);
-  
+
   // Group by token type
   Object.entries(tokens).forEach(([type, typeTokens]) => {
     const typeSection = createTokenTypeSection(type, typeTokens, config);
     setFrame.appendChild(typeSection);
   });
-  
+
   return setFrame;
 }
 
@@ -552,7 +554,7 @@ function createTokenSetSection(
  */
 function createDocumentationFrame(
   tokens: Record<string, AnyTokenList>,
-  config: DocumentationConfig
+  config: DocumentationConfig,
 ): FrameNode {
   // Create main documentation frame
   const docFrame = figma.createFrame();
@@ -566,29 +568,29 @@ function createDocumentationFrame(
   docFrame.itemSpacing = 40;
   docFrame.counterAxisSizingMode = 'AUTO';
   docFrame.primaryAxisSizingMode = 'AUTO';
-  
+
   // Add title
   const titleFrame = figma.createFrame();
   titleFrame.layoutMode = 'VERTICAL';
   titleFrame.fills = [];
   titleFrame.counterAxisSizingMode = 'AUTO';
   titleFrame.primaryAxisSizingMode = 'AUTO';
-  
+
   const title = figma.createText();
   title.fontName = FONT_BOLD;
   title.fontSize = 32;
   title.characters = 'Token Documentation';
   title.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }];
-  
+
   titleFrame.appendChild(title);
   docFrame.appendChild(titleFrame);
-  
+
   // Create sections for each token set
   Object.entries(tokens).forEach(([setName, setTokens]) => {
     const setFrame = createTokenSetSection(setName, setTokens, config);
     docFrame.appendChild(setFrame);
   });
-  
+
   return docFrame;
 }
 
@@ -596,16 +598,16 @@ function createDocumentationFrame(
  * Filters tokens based on configuration
  */
 function filterTokens(
-  allTokens: Record<string, AnyTokenList>, 
-  config: DocumentationConfig
+  allTokens: Record<string, AnyTokenList>,
+  config: DocumentationConfig,
 ): Record<string, AnyTokenList> {
   const result: Record<string, AnyTokenList> = {};
-  
+
   // Filter by token sets
-  config.tokenSets.forEach(set => {
+  config.tokenSets.forEach((set) => {
     if (allTokens[set]) {
       result[set] = {};
-      
+
       // Filter by token types if specified
       if (config.tokenTypes && config.tokenTypes.length > 0) {
         Object.entries(allTokens[set]).forEach(([type, tokens]) => {
@@ -618,7 +620,7 @@ function filterTokens(
       }
     }
   });
-  
+
   return result;
 }
 
@@ -630,11 +632,11 @@ async function getTokens(): Promise<Record<string, AnyTokenList>> {
   const nodeManager = new NodeManager([figma.root]);
 
   const payload = await sharedDataHandler.getSharedData(nodeManager);
-  
+
   if (!payload?.values) {
     throw new Error('No tokens found in the document.');
   }
-  
+
   return payload.values;
 }
 
@@ -649,7 +651,7 @@ async function createDocumentation(config: DocumentationConfig): Promise<{ succe
     await Promise.all([
       figma.loadFontAsync(FONT_REGULAR),
       figma.loadFontAsync(FONT_MEDIUM),
-      figma.loadFontAsync(FONT_BOLD)
+      figma.loadFontAsync(FONT_BOLD),
     ]);
 
     // Get tokens from shared data
@@ -657,7 +659,7 @@ async function createDocumentation(config: DocumentationConfig): Promise<{ succe
 
     // Filter tokens based on token sets and types from config
     const filteredTokens = filterTokens(tokenData, config);
-    
+
     if (Object.keys(filteredTokens).length === 0) {
       return { success: false, message: 'No tokens found for the selected sets and types.' };
     }
@@ -673,9 +675,9 @@ async function createDocumentation(config: DocumentationConfig): Promise<{ succe
     return { success: true };
   } catch (error) {
     console.error('Error creating documentation:', error);
-    return { 
-      success: false, 
-      message: error instanceof Error ? error.message : 'Unknown error creating documentation'
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error creating documentation',
     };
   }
 }
@@ -685,12 +687,12 @@ async function createDocumentation(config: DocumentationConfig): Promise<{ succe
  */
 export const generateDocumentation: AsyncMessageChannelHandlers[AsyncMessageTypes.GENERATE_DOCUMENTATION] = async (msg) => {
   const result = await createDocumentation(msg.config);
-  
+
   if (!result.success && result.message) {
     notifyUI(result.message, { error: true });
   } else if (result.success) {
     notifyUI('Documentation generated successfully!');
   }
-  
+
   return result;
 };

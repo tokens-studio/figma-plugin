@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
@@ -71,6 +71,21 @@ export default function DocumentationModal({ onClose }: Props) {
     onClose();
   }, [dispatch, selectedTokenSets, selectedTokenTypes, layout, showValues, showDescription, onClose]);
 
+  // Create handlers for each token set and type to avoid arrow functions in JSX
+  const tokenSetHandlers = useMemo(() => (
+    Object.entries(usedTokenSets).reduce((acc, [set]) => {
+      acc[set] = () => handleTokenSetChange(set);
+      return acc;
+    }, {} as Record<string, () => void>)
+  ), [usedTokenSets, handleTokenSetChange]);
+
+  const tokenTypeHandlers = useMemo(() => (
+    Object.values(TokenTypes).reduce((acc, type) => {
+      acc[type] = () => handleTokenTypeChange(type);
+      return acc;
+    }, {} as Record<string, () => void>)
+  ), [handleTokenTypeChange]);
+
   return (
     <Modal size="large" isOpen close={onClose} title={t('generateDocumentation')}>
       <Stack gap={4} direction="column">
@@ -105,7 +120,7 @@ export default function DocumentationModal({ onClose }: Props) {
               <Checkbox
                 key={set}
                 checked={selectedTokenSets.includes(set)}
-                onCheckedChange={useCallback(() => handleTokenSetChange(set), [handleTokenSetChange, set])}
+                onCheckedChange={tokenSetHandlers[set]}
                 label={set}
               />
             ))}
@@ -119,7 +134,7 @@ export default function DocumentationModal({ onClose }: Props) {
               <Checkbox
                 key={type}
                 checked={selectedTokenTypes.includes(type)}
-                onCheckedChange={useCallback(() => handleTokenTypeChange(type), [handleTokenTypeChange, type])}
+                onCheckedChange={tokenTypeHandlers[type]}
                 label={type}
               />
             ))}
