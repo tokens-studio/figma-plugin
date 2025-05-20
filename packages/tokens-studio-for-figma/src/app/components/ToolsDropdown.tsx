@@ -33,11 +33,11 @@ export default function ToolsDropdown() {
   const handleShowPresetModal = useCallback(() => {
     showPresetModal(true);
   }, []);
-  
+
   const handleShowExportModal = useCallback(() => {
     showExportModal(true);
   }, []);
-  
+
   const handleShowDocumentationModal = useCallback(() => {
     showDocumentationModal(true);
   }, []);

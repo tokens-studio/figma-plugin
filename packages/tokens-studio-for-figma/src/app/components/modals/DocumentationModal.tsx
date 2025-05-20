@@ -1,16 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroup, Box, Stack, Checkbox, Button, Label, Select } from '@tokens-studio/ui';
+import {
+  ToggleGroup, Box, Stack, Checkbox, Button, Label,
+} from '@tokens-studio/ui';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
 import { TokenTypes } from '@/constants/TokenTypes';
 import Modal from '../Modal';
 import { usedTokenSetSelector } from '@/selectors';
-import { DocumentationConfig } from '@/types/AsyncMessages';
+import { DocumentationConfig, AsyncMessageTypes } from '@/types/AsyncMessages';
 import { Dispatch } from '@/app/store';
-import IconButton from '@/app/components/IconButton';
-import Heading from '@/app/components/Heading';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 type Props = {
   onClose: () => void
@@ -20,17 +19,17 @@ export default function DocumentationModal({ onClose }: Props) {
   const { t } = useTranslation(['tokens']);
   const usedTokenSets = useSelector(usedTokenSetSelector);
   const dispatch = useDispatch<Dispatch>();
-  
+
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const [showValues, setShowValues] = useState<boolean>(true);
   const [showDescription, setShowDescription] = useState<boolean>(true);
   const [selectedTokenSets, setSelectedTokenSets] = useState<string[]>(
     Object.entries(usedTokenSets)
       .filter(([_, status]) => status === TokenSetStatus.ENABLED)
-      .map(([set]) => set)
+      .map(([set]) => set),
   );
   const [selectedTokenTypes, setSelectedTokenTypes] = useState<string[]>(Object.values(TokenTypes));
-  
+
   const handleLayoutChange = useCallback((newLayout: 'grid' | 'list') => {
     if (newLayout) {
       setLayout(newLayout);
@@ -68,7 +67,7 @@ export default function DocumentationModal({ onClose }: Props) {
       type: AsyncMessageTypes.GENERATE_DOCUMENTATION,
       config,
     });
-    
+
     onClose();
   }, [dispatch, selectedTokenSets, selectedTokenTypes, layout, showValues, showDescription, onClose]);
 
@@ -102,11 +101,11 @@ export default function DocumentationModal({ onClose }: Props) {
         <Box>
           <Label>{t('tokenSets')}</Label>
           <Stack direction="column" gap={2}>
-            {Object.entries(usedTokenSets).map(([set, status]) => (
+            {Object.entries(usedTokenSets).map(([set]) => (
               <Checkbox
                 key={set}
                 checked={selectedTokenSets.includes(set)}
-                onCheckedChange={() => handleTokenSetChange(set)}
+                onCheckedChange={useCallback(() => handleTokenSetChange(set), [handleTokenSetChange, set])}
                 label={set}
               />
             ))}
@@ -120,7 +119,7 @@ export default function DocumentationModal({ onClose }: Props) {
               <Checkbox
                 key={type}
                 checked={selectedTokenTypes.includes(type)}
-                onCheckedChange={() => handleTokenTypeChange(type)}
+                onCheckedChange={useCallback(() => handleTokenTypeChange(type), [handleTokenTypeChange, type])}
                 label={type}
               />
             ))}
@@ -129,9 +128,9 @@ export default function DocumentationModal({ onClose }: Props) {
 
         <Stack direction="row" gap={2} justify="end">
           <Button variant="secondary" onClick={onClose}>{t('cancel')}</Button>
-          <Button 
-            variant="primary" 
-            onClick={handleGenerateDocumentation} 
+          <Button
+            variant="primary"
+            onClick={handleGenerateDocumentation}
             disabled={selectedTokenSets.length === 0 || selectedTokenTypes.length === 0}
           >
             {t('generate')}
