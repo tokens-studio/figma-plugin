@@ -6,7 +6,10 @@ import Modal from './Modal';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import {
-  activeTokenSetSelector, importedTokensSelector, importedThemesSelector, themesListSelector,
+  activeTokenSetSelector,
+  importedTokensSelector,
+  importedThemesSelector,
+  themesListSelector,
 } from '@/selectors';
 import Stack from './Stack';
 import AddIcon from '@/icons/add.svg';
@@ -42,39 +45,52 @@ function NewOrExistingToken({
 
   const importedTokens = useSelector(importedTokensSelector);
 
-  const allParents = [...new Set([...importedTokens.newTokens.map((newToken: ImportToken) => newToken.parent), ...importedTokens.updatedTokens.map((updatedToken) => updatedToken.parent)])];
+  const allParents = [
+    ...new Set([
+      ...importedTokens.newTokens.map((newToken: ImportToken) => newToken.parent),
+      ...importedTokens.updatedTokens.map((updatedToken) => updatedToken.parent),
+    ]),
+  ];
   const isMultiParent = allParents.length > 1;
 
   return (
     <Stack direction="row" justify="between">
       <Stack direction="column" gap={1}>
         <Stack direction="row" gap={2}>
-          {isMultiParent && (<Text size="small" muted>{token.parent}</Text>)}
-          <Text bold size="small">{token.name}</Text>
+          {isMultiParent && (
+            <Text size="small" muted>
+              {token.parent}
+            </Text>
+          )}
+          <Text bold size="small">
+            {token.name}
+          </Text>
         </Stack>
         <Stack direction="row" align="center" gap={1}>
-          <Box css={{
-            padding: '$2',
-            wordBreak: 'break-all',
-            fontWeight: '$sansBold',
-            borderRadius: '$small',
-            fontSize: '$xsmall',
-            backgroundColor: '$successBg',
-            color: '$successFg',
-          }}
-          >
-            {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
-          </Box>
-          {token.oldValue ? (
-            <Box css={{
+          <Box
+            css={{
               padding: '$2',
               wordBreak: 'break-all',
               fontWeight: '$sansBold',
               borderRadius: '$small',
               fontSize: '$xsmall',
-              backgroundColor: '$dangerBg',
-              color: '$dangerFg',
+              backgroundColor: '$successBg',
+              color: '$successFg',
             }}
+          >
+            {typeof token.value === 'object' ? JSON.stringify(token.value) : token.value}
+          </Box>
+          {token.oldValue ? (
+            <Box
+              css={{
+                padding: '$2',
+                wordBreak: 'break-all',
+                fontWeight: '$sansBold',
+                borderRadius: '$small',
+                fontSize: '$xsmall',
+                backgroundColor: '$dangerBg',
+                color: '$dangerFg',
+              }}
             >
               {typeof token.oldValue === 'object' ? JSON.stringify(token.oldValue) : token.oldValue}
             </Box>
@@ -82,15 +98,27 @@ function NewOrExistingToken({
         </Stack>
         {(token.description || token.oldDescription) && (
           <Text size="small">
-            {token.description}
-            {' '}
-            {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
+            {token.description} {token.oldDescription ? ` (before: ${token.oldDescription})` : ''}
           </Text>
         )}
       </Stack>
       <Stack direction="row" align="center" gap={1}>
-        <IconButton variant="invisible" size="small" data-testid="imported-tokens-dialog-update-button" tooltip={updateAction} icon={<AddIcon />} onClick={onUpdateToken} />
-        <IconButton variant="invisible" size="small" data-testid="imported-tokens-dialog-remove-button" tooltip={t('ignore')} icon={<TrashIcon />} onClick={onRemoveToken} />
+        <IconButton
+          variant="invisible"
+          size="small"
+          data-testid="imported-tokens-dialog-update-button"
+          tooltip={updateAction}
+          icon={<AddIcon />}
+          onClick={onUpdateToken}
+        />
+        <IconButton
+          variant="invisible"
+          size="small"
+          data-testid="imported-tokens-dialog-remove-button"
+          tooltip={t('ignore')}
+          icon={<TrashIcon />}
+          onClick={onRemoveToken}
+        />
       </Stack>
     </Stack>
   );
@@ -110,14 +138,20 @@ export default function ImportedTokensDialog() {
 
   const { t } = useTranslation(['tokens']);
 
-  const handleIgnoreExistingToken = React.useCallback((token, index) => {
-    const tokens = updatedTokens.filter((updatedToken) => updatedTokens.indexOf(updatedToken) !== index);
-    setUpdatedTokens(tokens);
-  }, [setUpdatedTokens, updatedTokens]);
+  const handleIgnoreExistingToken = React.useCallback(
+    (token, index) => {
+      const tokens = updatedTokens.filter((updatedToken) => updatedTokens.indexOf(updatedToken) !== index);
+      setUpdatedTokens(tokens);
+    },
+    [setUpdatedTokens, updatedTokens],
+  );
 
-  const handleIgnoreNewToken = React.useCallback((token, index) => {
-    setNewTokens(newTokens.filter((newToken) => newTokens.indexOf(newToken) !== index));
-  }, [setNewTokens, newTokens]);
+  const handleIgnoreNewToken = React.useCallback(
+    (token, index) => {
+      setNewTokens(newTokens.filter((newToken) => newTokens.indexOf(newToken) !== index));
+    },
+    [setNewTokens, newTokens],
+  );
 
   const handleCreateAllClick = React.useCallback(() => {
     const multipleNewTokens = newTokens.map((token) => ({
@@ -206,34 +240,40 @@ export default function ImportedTokensDialog() {
     setUpdatedThemes([]);
   }, [activeTokenSet, importMultipleTokens, newTokens, updatedTokens, themes, newThemes, updatedThemes, dispatch]);
 
-  const handleCreateSingleClick = React.useCallback((token: any) => {
-    // Create new tokens according to styles
-    createSingleToken({
-      parent: activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
-      shouldUpdateDocument: false,
-    });
-    track('Import single variable', { type: token.type });
-    setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
-  }, [newTokens, activeTokenSet, createSingleToken]);
+  const handleCreateSingleClick = React.useCallback(
+    (token: any) => {
+      // Create new tokens according to styles
+      createSingleToken({
+        parent: activeTokenSet,
+        name: token.name,
+        value: token.value,
+        type: token.type,
+        description: token.description,
+        shouldUpdateDocument: false,
+      });
+      track('Import single variable', { type: token.type });
+      setNewTokens(newTokens.filter((newToken) => newToken.name !== token.name));
+    },
+    [newTokens, activeTokenSet, createSingleToken],
+  );
 
-  const handleUpdateSingleClick = React.useCallback((token: any) => {
-    // Go through each token that needs to be updated
-    editSingleToken({
-      parent: activeTokenSet,
-      name: token.name,
-      value: token.value,
-      type: token.type,
-      description: token.description,
-      shouldUpdateDocument: false,
-    });
-    track('Update single variable', { type: token.type });
+  const handleUpdateSingleClick = React.useCallback(
+    (token: any) => {
+      // Go through each token that needs to be updated
+      editSingleToken({
+        parent: activeTokenSet,
+        name: token.name,
+        value: token.value,
+        type: token.type,
+        description: token.description,
+        shouldUpdateDocument: false,
+      });
+      track('Update single variable', { type: token.type });
 
-    setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
-  }, [updatedTokens, editSingleToken, activeTokenSet]);
+      setUpdatedTokens(updatedTokens.filter((updatedToken) => updatedToken.name !== token.name));
+    },
+    [updatedTokens, editSingleToken, activeTokenSet],
+  );
 
   const handleClose = React.useCallback(() => {
     dispatch.tokenState.resetImportedTokens();
@@ -260,7 +300,7 @@ export default function ImportedTokensDialog() {
       isOpen={newTokens.length > 0 || updatedTokens.length > 0}
       close={handleClose}
       stickyFooter
-      footer={(
+      footer={
         <Stack direction="row" justify="end" gap={2}>
           <Button variant="secondary" data-testid="button-import-close" onClick={handleClose}>
             {t('cancel')}
@@ -269,91 +309,66 @@ export default function ImportedTokensDialog() {
             {t('importAll')}
           </Button>
         </Stack>
-      )}
+      }
     >
       <Stack direction="column" gap={6}>
         {newTokens.length > 0 && (
           <Accordion
             label={t('newTokens', { ns: 'tokens' })}
             isOpenByDefault
-            extra={(
+            extra={
               <Stack direction="row" gap={2} align="center">
-                <Count count={newTokens.length} />
-                {' '}
+                <Count count={newTokens.length} />{' '}
                 <Button variant="secondary" data-testid="button-import-create-all" onClick={handleCreateAllClick}>
                   {t('createAll', { ns: 'tokens' })}
                 </Button>
               </Stack>
-            )}
+            }
           >
-            {
-              newTokens.slice(0, ListLength - 1).map((token, index) => (
-                <NewOrExistingToken
-                  key={token.parent + token.name}
-                  index={index}
-                  token={token}
-                  updateAction="Create New"
-                  removeToken={handleIgnoreNewToken}
-                  updateToken={handleCreateSingleClick}
-                />
-              ))
-}
-            {' '}
+            {newTokens.slice(0, ListLength - 1).map((token, index) => (
+              <NewOrExistingToken
+                key={token.parent + token.name}
+                index={index}
+                token={token}
+                updateAction="Create New"
+                removeToken={handleIgnoreNewToken}
+                updateToken={handleCreateSingleClick}
+              />
+            ))}{' '}
             {newTokens.length > ListLength && (
-            <Text
-              css={{ marginBlockStart: '$3' }}
-              size="small"
-            >
-              ...
-              {' '}
-              {t('and', { ns: 'general' })}
-              {' '}
-              {newTokens.length - ListLength}
-              {' '}
-              {t('more', { ns: 'general' })}
-
-            </Text>
+              <Text css={{ marginBlockStart: '$3' }} size="small">
+                ... {t('and', { ns: 'general' })} {newTokens.length - ListLength} {t('more', { ns: 'general' })}
+              </Text>
             )}
-
           </Accordion>
         )}
         {updatedTokens.length > 0 && (
           <Accordion
             label={t('existingTokens', { ns: 'tokens' })}
             isOpenByDefault
-            extra={(
+            extra={
               <Stack direction="row" gap={2} align="center">
-                <Count count={updatedTokens.length} />
-                {' '}
+                <Count count={updatedTokens.length} />{' '}
                 <Button variant="secondary" data-testid="button-import-update-all" onClick={handleUpdateAllClick}>
                   {t('updateAll')}
                 </Button>
               </Stack>
-            )}
-          >
-            {
-              updatedTokens.slice(0, ListLength).map((token, index) => (
-                <NewOrExistingToken
-                  key={token.parent + token.name}
-                  token={token}
-                  index={index}
-                  updateAction="Update Existing"
-                  removeToken={handleIgnoreExistingToken}
-                  updateToken={handleUpdateSingleClick}
-                />
-              ))
             }
-            { updatedTokens.length > 4 && (
-
-            <Text css={{ marginBlockStart: '$3' }} size="small">
-              ...
-              {' '}
-              {t('and', { ns: 'general' })}
-              {' '}
-              {updatedTokens.length - ListLength}
-              {' '}
-              {t('more', { ns: 'general' })}
-            </Text>
+          >
+            {updatedTokens.slice(0, ListLength).map((token, index) => (
+              <NewOrExistingToken
+                key={token.parent + token.name}
+                token={token}
+                index={index}
+                updateAction="Update Existing"
+                removeToken={handleIgnoreExistingToken}
+                updateToken={handleUpdateSingleClick}
+              />
+            ))}
+            {updatedTokens.length > 4 && (
+              <Text css={{ marginBlockStart: '$3' }} size="small">
+                ... {t('and', { ns: 'general' })} {updatedTokens.length - ListLength} {t('more', { ns: 'general' })}
+              </Text>
             )}
           </Accordion>
         )}

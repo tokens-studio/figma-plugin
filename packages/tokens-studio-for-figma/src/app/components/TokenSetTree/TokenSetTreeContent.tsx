@@ -6,26 +6,24 @@ import { StyledFolderButton } from './StyledFolderButton';
 import { StyledItem } from './StyledItem';
 import { StyledFolderButtonChevronBox } from './StyledFolderButtonChevronBox';
 import { Dispatch } from '../../store';
-import {
-  collapsedTokenSetsSelector,
-} from '@/selectors';
+import { collapsedTokenSetsSelector } from '@/selectors';
 import { StyledThemeLabel } from '../ManageThemesModal/StyledThemeLabel';
 
 type TreeItem<ItemType = unknown> = {
-  key: string
-  level: number
-  parent: string | null
-  isLeaf: boolean,
-  label: string
-  id: string
-  tokenCount?: number
+  key: string;
+  level: number;
+  parent: string | null;
+  isLeaf: boolean;
+  label: string;
+  id: string;
+  tokenCount?: number;
 } & ItemType;
 
 type SharedProps<T extends TreeItem> = {
-  items: T[]
-  renderItem?: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
-  renderItemContent: (props: { item: T, children: React.ReactNode }) => React.ReactElement | null
-  keyPosition?: 'start' | 'end'
+  items: T[];
+  renderItem?: (props: { item: T; children: React.ReactNode }) => React.ReactElement | null;
+  renderItemContent: (props: { item: T; children: React.ReactNode }) => React.ReactElement | null;
+  keyPosition?: 'start' | 'end';
 };
 
 type Props<T extends TreeItem> = SharedProps<T>;
@@ -39,20 +37,33 @@ export function TokenSetTreeContent<T extends TreeItem>({
   const collapsed = useSelector(collapsedTokenSetsSelector);
   const dispatch = useDispatch<Dispatch>();
 
-  const handleToggleCollapsed = useCallback((key: string) => {
-    dispatch.tokenState.setCollapsedTokenSets(collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key]);
-  }, [dispatch, collapsed]);
+  const handleToggleCollapsed = useCallback(
+    (key: string) => {
+      dispatch.tokenState.setCollapsedTokenSets(
+        collapsed.includes(key) ? collapsed.filter((s) => s !== key) : [...collapsed, key],
+      );
+    },
+    [dispatch, collapsed],
+  );
 
-  const mappedItems = useMemo(() => (
-    items.filter((item) => (
-      // remove items which are in a collapsed parent
-      !collapsed.some((parentKey) => item.parent === parentKey
-      || (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '/'))
-    )).map((item) => ({
-      item,
-      onToggleCollapsed: () => handleToggleCollapsed(item.key),
-    }))
-  ), [items, collapsed, handleToggleCollapsed]);
+  const mappedItems = useMemo(
+    () =>
+      items
+        .filter(
+          (item) =>
+            // remove items which are in a collapsed parent
+            !collapsed.some(
+              (parentKey) =>
+                item.parent === parentKey ||
+                (item.parent?.startsWith(parentKey) && item.parent?.charAt(parentKey.length) === '/'),
+            ),
+        )
+        .map((item) => ({
+          item,
+          onToggleCollapsed: () => handleToggleCollapsed(item.key),
+        })),
+    [items, collapsed, handleToggleCollapsed],
+  );
 
   return (
     <>
@@ -60,7 +71,7 @@ export function TokenSetTreeContent<T extends TreeItem>({
         <RenderItem key={item.id} item={item}>
           <StyledItem>
             <RenderItemContent item={item}>
-              {(!item.isLeaf) && (
+              {!item.isLeaf && (
                 <StyledFolderButton
                   type="button"
                   onClick={onToggleCollapsed}

@@ -24,7 +24,10 @@ const roundToPrecision = (value, precision = 10) => {
 
 // if node type check is needed due to bugs caused by obscure node types, use (value: string/*, node?: BaseNode | PaintStyle) and convertStringToFigmaGradient(value, target)
 export function convertStringToFigmaGradient(value: string) {
-  const parts = value.substring(value.indexOf('(') + 1, value.lastIndexOf(')')).split(', ').map((s) => s.trim());
+  const parts = value
+    .substring(value.indexOf('(') + 1, value.lastIndexOf(')'))
+    .split(', ')
+    .map((s) => s.trim());
 
   // Default angle is to top (180 degrees)
   let angle = 180;

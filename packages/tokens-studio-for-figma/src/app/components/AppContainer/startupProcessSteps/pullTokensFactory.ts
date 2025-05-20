@@ -24,7 +24,8 @@ export function pullTokensFactory(
   useConfirmResult: ReturnType<typeof useConfirm>,
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
-  const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
+  const activeTheme =
+    typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
@@ -49,24 +50,23 @@ export function pullTokensFactory(
     ].includes(storageType.provider);
 
     if (isRemoteStorage) {
-      const matchingSet = params.localApiProviders?.find((provider) => (
-        isSameCredentials(provider, storageType)
-      ));
+      const matchingSet = params.localApiProviders?.find((provider) => isSameCredentials(provider, storageType));
 
       if (matchingSet) {
         // found API credentials
         try {
-          const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
+          const isMultifile =
+            isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
           track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
           if (!matchingSet.internalId) {
             track('missingInternalId', { provider: matchingSet.provider });
           }
 
           if (
-            matchingSet.provider === StorageProviderType.GITHUB
-            || matchingSet.provider === StorageProviderType.GITLAB
-            || matchingSet.provider === StorageProviderType.ADO
-            || matchingSet.provider === StorageProviderType.BITBUCKET
+            matchingSet.provider === StorageProviderType.GITHUB ||
+            matchingSet.provider === StorageProviderType.GITLAB ||
+            matchingSet.provider === StorageProviderType.ADO ||
+            matchingSet.provider === StorageProviderType.BITBUCKET
           ) {
             const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
             if (branches) dispatch.branchState.setBranches(branches);
@@ -134,11 +134,11 @@ export function pullTokensFactory(
       const storageType = storageTypeSelector(state);
 
       if (
-        !checkForChanges
-        || (
-          (storageType && storageType.provider !== StorageProviderType.LOCAL)
-          && checkForChanges && (!await askUserIfRecoverLocalChanges())
-        )
+        !checkForChanges ||
+        (storageType &&
+          storageType.provider !== StorageProviderType.LOCAL &&
+          checkForChanges &&
+          !(await askUserIfRecoverLocalChanges()))
       ) {
         // get API credentials
         await getApiCredentials(true);

@@ -7,9 +7,7 @@ import { Button, Heading } from '@tokens-studio/ui';
 import convertTokensToObject from '@/utils/convertTokensToObject';
 import Stack from '../Stack';
 import { IconFile } from '@/icons';
-import {
-  tokensSelector, themesListSelector, storeTokenIdInJsonEditorSelector,
-} from '@/selectors';
+import { tokensSelector, themesListSelector, storeTokenIdInJsonEditorSelector } from '@/selectors';
 import { SystemFilenames } from '@/constants/SystemFilenames';
 import { track } from '@/utils/analytics';
 
@@ -41,10 +39,9 @@ export default function MultiFilesExport({ onClose }: Props) {
     Object.entries(filesChangeset)?.forEach(([key, value]) => {
       zip.file(key, value);
     });
-    zip.generateAsync({ type: 'blob' })
-      .then((content) => {
-        saveAs(content, 'tokens.zip');
-      });
+    zip.generateAsync({ type: 'blob' }).then((content) => {
+      saveAs(content, 'tokens.zip');
+    });
     track('Export directory');
 
     onClose();
@@ -65,14 +62,12 @@ export default function MultiFilesExport({ onClose }: Props) {
           maxHeight: '200px',
         }}
       >
-        {
-          Object.keys(filesChangeset)?.map((key, index) => (
-            <Stack direction="row" align="start" gap={3} css={{ fontSize: '$xsmall' }} key={seed(index)}>
-              <IconFile />
-              {key}
-            </Stack>
-          ))
-        }
+        {Object.keys(filesChangeset)?.map((key, index) => (
+          <Stack direction="row" align="start" gap={3} css={{ fontSize: '$xsmall' }} key={seed(index)}>
+            <IconFile />
+            {key}
+          </Stack>
+        ))}
       </Stack>
       <Stack width="full" direction="row" justify="end" gap={4}>
         <Button variant="secondary" onClick={onClose}>

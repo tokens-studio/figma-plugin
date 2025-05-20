@@ -18,11 +18,14 @@ export type SingleGenericToken<T extends TokenTypes, V = string, Named extends b
       id?: string;
       modify?: ColorModifier;
       urn?: string;
-    },
+    };
     id?: string;
-  }
-} & (Named extends true ? {
-  name: string;
-} : {
-  name?: string;
-}) & P;
+  };
+} & (Named extends true
+  ? {
+      name: string;
+    }
+  : {
+      name?: string;
+    }) &
+  P;

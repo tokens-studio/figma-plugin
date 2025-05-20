@@ -9,29 +9,21 @@ type Props = {
   onItemSelected: (selectedItem: string) => void;
 };
 
-export const MultiSelectCheckboxItem: React.FunctionComponent<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
-  item,
-  isSelected,
-  onItemSelected,
-}) => {
+export const MultiSelectCheckboxItem: React.FunctionComponent<
+  React.PropsWithChildren<React.PropsWithChildren<Props>>
+> = ({ item, isSelected, onItemSelected }) => {
   const handleSelect = React.useCallback(() => {
     onItemSelected(item);
   }, [item, onItemSelected]);
 
   return (
-    <DropdownMenu.CheckboxItem
-      checked={isSelected}
-      onSelect={handleSelect}
-      css={{ display: 'flex', padding: '$3 0' }}
-    >
+    <DropdownMenu.CheckboxItem checked={isSelected} onSelect={handleSelect} css={{ display: 'flex', padding: '$3 0' }}>
       <Box css={{ width: '$5' }}>
         <DropdownMenu.ItemIndicator css={{ position: 'inherit' }}>
           <Check />
         </DropdownMenu.ItemIndicator>
       </Box>
-      <Box>
-        {item}
-      </Box>
+      <Box>{item}</Box>
     </DropdownMenu.CheckboxItem>
   );
 };

@@ -1,8 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import {
-  Button, Heading, Stack, Text,
-} from '@tokens-studio/ui';
+import { Button, Heading, Stack, Text } from '@tokens-studio/ui';
 import { Dispatch } from '@/app/store';
 import { track } from '@/utils/analytics';
 
@@ -21,10 +19,11 @@ export default function DefaultPreset({ onCancel }: Props) {
   return (
     <Stack direction="column" gap={4}>
       <Stack direction="column" gap={2}>
-        <Heading size="small">
-          Override your current tokens by applying a preset.
-        </Heading>
-        <Text>The preset contains a wide variety of tokens and some token sets to give you an idea of what you can do. Warning: This will override your tokens!</Text>
+        <Heading size="small">Override your current tokens by applying a preset.</Heading>
+        <Text>
+          The preset contains a wide variety of tokens and some token sets to give you an idea of what you can do.
+          Warning: This will override your tokens!
+        </Text>
       </Stack>
       <Stack direction="row" gap={3} justify="end">
         <Button variant="secondary" onClick={onCancel}>

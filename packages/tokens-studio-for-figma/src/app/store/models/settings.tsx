@@ -21,7 +21,7 @@ type WindowSettingsType = {
 type TokenModeType = 'object' | 'array';
 
 export interface SettingsState {
-  language: string,
+  language: string;
   uiWindow?: WindowSettingsType;
   updateMode: UpdateMode;
   updateRemote: boolean;
@@ -35,12 +35,12 @@ export interface SettingsState {
   aliasBaseFontSize: string;
   /**
    * Whether the user has opted in for session recording in Sentry
-  */
+   */
   sessionRecording: boolean;
   storeTokenIdInJsonEditor: boolean;
   /*
    * Export styles and variables options
-  */
+   */
   variablesColor: boolean;
   variablesString: boolean;
   variablesNumber: boolean;
@@ -275,10 +275,6 @@ export const settings = createModel<RootModel>()({
     setStoreTokenIdInJsonEditorSelector: (payload, rootState) => {
       setUI(rootState.settings);
     },
-    ...Object.fromEntries(
-      (Object.entries(settingsStateEffects).map(([key, factory]) => (
-        [key, factory()]
-      ))),
-    ),
+    ...Object.fromEntries(Object.entries(settingsStateEffects).map(([key, factory]) => [key, factory()])),
   }),
 });

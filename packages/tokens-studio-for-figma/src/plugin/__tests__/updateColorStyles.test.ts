@@ -6,12 +6,13 @@ import { defaultTokenValueRetriever } from '../TokenValueRetriever';
 describe('updateColorStyles', () => {
   beforeEach(() => {
     defaultTokenValueRetriever.initiate({
-      tokens: [{
-        name: 'colors.red',
-        value: '#ff0000',
-        rawValue: '#ff0000',
-        type: TokenTypes.COLOR,
-      },
+      tokens: [
+        {
+          name: 'colors.red',
+          value: '#ff0000',
+          rawValue: '#ff0000',
+          type: TokenTypes.COLOR,
+        },
       ],
     });
   });
@@ -24,13 +25,15 @@ describe('updateColorStyles', () => {
     mockCreatePaintStyle.mockImplementationOnce(() => createdStyle);
 
     await updateColorStyles(
-      [{
-        name: 'colors.red',
-        value: '#ff0000',
-        type: TokenTypes.COLOR,
-        path: 'colors/red',
-        styleId: '',
-      }],
+      [
+        {
+          name: 'colors.red',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          path: 'colors/red',
+          styleId: '',
+        },
+      ],
       true,
     );
 
@@ -49,23 +52,27 @@ describe('updateColorStyles', () => {
         type: 'PAINT',
         id: '1234',
         name: 'colors/red',
-        paints: [{
-          type: 'SOLID',
-          color: { r: 1, g: 0.1, b: 0.1 },
-          opacity: 1,
-        }],
+        paints: [
+          {
+            type: 'SOLID',
+            color: { r: 1, g: 0.1, b: 0.1 },
+            opacity: 1,
+          },
+        ],
       },
     ];
     mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
 
     await updateColorStyles(
-      [{
-        name: 'colors.red',
-        value: '#ff0000',
-        type: TokenTypes.COLOR,
-        path: 'colors/red',
-        styleId: '1234',
-      }],
+      [
+        {
+          name: 'colors.red',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          path: 'colors/red',
+          styleId: '1234',
+        },
+      ],
       true,
     );
 
@@ -84,23 +91,27 @@ describe('updateColorStyles', () => {
         type: 'PAINT',
         id: '1234',
         name: 'colors/red',
-        paints: [{
-          type: 'SOLID',
-          color: { r: 1, g: 0.1, b: 0.1 },
-          opacity: 1,
-        }],
+        paints: [
+          {
+            type: 'SOLID',
+            color: { r: 1, g: 0.1, b: 0.1 },
+            opacity: 1,
+          },
+        ],
       },
     ];
     mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
 
     await updateColorStyles(
-      [{
-        name: 'colors.red',
-        value: '#ff0000',
-        type: TokenTypes.COLOR,
-        path: 'colors/red',
-        styleId: '',
-      }],
+      [
+        {
+          name: 'colors.red',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          path: 'colors/red',
+          styleId: '',
+        },
+      ],
       true,
     );
 
@@ -119,23 +130,27 @@ describe('updateColorStyles', () => {
         type: 'PAINT',
         id: '1234',
         name: 'colors/red',
-        paints: [{
-          type: 'SOLID',
-          color: { r: 1, g: 0.1, b: 0.1 },
-          opacity: 1,
-        }],
+        paints: [
+          {
+            type: 'SOLID',
+            color: { r: 1, g: 0.1, b: 0.1 },
+            opacity: 1,
+          },
+        ],
       },
     ];
     mockGetLocalPaintStyles.mockImplementation(() => existingStyles);
 
     await updateColorStyles(
-      [{
-        name: 'colors.red',
-        value: '#ff0000',
-        type: TokenTypes.COLOR,
-        path: 'colors/redRENAMED',
-        styleId: '1234',
-      }],
+      [
+        {
+          name: 'colors.red',
+          value: '#ff0000',
+          type: TokenTypes.COLOR,
+          path: 'colors/redRENAMED',
+          styleId: '1234',
+        },
+      ],
       true,
       true,
     );

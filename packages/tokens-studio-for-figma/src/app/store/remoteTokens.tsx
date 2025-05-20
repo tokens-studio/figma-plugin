@@ -14,9 +14,7 @@ import { useBitbucket } from './providers/bitbucket';
 import { useADO } from './providers/ado';
 import useFile from '@/app/store/providers/file';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
-import {
-  activeTabSelector, apiSelector, themesListSelector, tokensSelector,
-} from '@/selectors';
+import { activeTabSelector, apiSelector, themesListSelector, tokensSelector } from '@/selectors';
 import { ThemeObject, UsedTokenSetsMap } from '@/types';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
@@ -56,7 +54,8 @@ export default function useRemoteTokens() {
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
-  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } = useGenericVersionedStorage();
+  const { addGenericVersionedCredentials, pullTokensFromGenericVersionedStorage, createNewGenericVersionedStorage } =
+    useGenericVersionedStorage();
   const {
     addNewGitHubCredentials,
     syncTokensWithGitHub,
@@ -83,9 +82,8 @@ export default function useRemoteTokens() {
     fetchBitbucketBranches,
     createBitbucketBranch,
   } = useBitbucket();
-  const {
-    addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova,
-  } = useSupernova();
+  const { addNewSupernovaCredentials, syncTokensWithSupernova, pushTokensToSupernova, pullTokensFromSupernova } =
+    useSupernova();
   const {
     addNewTokensStudioCredentials,
     syncTokensWithTokensStudio,
@@ -225,11 +223,11 @@ export default function useRemoteTokens() {
             // remove those active themes that are no longer present in remoteThemes
             const filteredThemes = activeTheme
               ? Object.keys(activeTheme).reduce((acc, key) => {
-                if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
-                  acc[key] = activeTheme[key];
-                }
-                return acc;
-              }, {} as Record<string, string>)
+                  if (remoteThemes.find((theme) => theme.id === activeTheme[key])) {
+                    acc[key] = activeTheme[key];
+                  }
+                  return acc;
+                }, {} as Record<string, string>)
               : {};
 
             if (updateLocalTokens || shouldOverride) {

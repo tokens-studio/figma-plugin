@@ -2,9 +2,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import { MessageFromPluginTypes } from '@/types/messages';
 import { TokenStore } from '@/types/tokens';
 import { mockUiPostMessage } from '../../../tests/__mocks__/figmaMock';
-import {
-  notifyException, notifySelection, notifySetTokens, trackFromPlugin,
-} from '../notifiers';
+import { notifyException, notifySelection, notifySetTokens, trackFromPlugin } from '../notifiers';
 
 describe('notifySelection', () => {
   it('should work', () => {

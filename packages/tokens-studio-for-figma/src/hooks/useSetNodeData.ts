@@ -10,15 +10,18 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 export default function useSetNodeData() {
   const store = useStore<RootState>();
 
-  const setNodeData = useCallback(async (data: SelectionValue, resolvedTokens: AnyTokenList) => {
-    const settings = settingsStateSelector(store.getState());
-    await AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.SET_NODE_DATA,
-      values: data,
-      tokens: resolvedTokens,
-      settings,
-    });
-  }, [store]);
+  const setNodeData = useCallback(
+    async (data: SelectionValue, resolvedTokens: AnyTokenList) => {
+      const settings = settingsStateSelector(store.getState());
+      await AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_NODE_DATA,
+        values: data,
+        tokens: resolvedTokens,
+        settings,
+      });
+    },
+    [store],
+  );
 
   return setNodeData;
 }

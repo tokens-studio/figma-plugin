@@ -5,7 +5,10 @@ import { getVariablesWithoutZombies } from './getVariablesWithoutZombies';
 // Note that this is a bit naive. As the active theme does not have the themes set as active that it should use as a reference, it will not be able to find the correct reference.
 // This is why we also pass in allThemes and merge them together. This is naive because it might be that the reference required is not the "first to detect".
 // We need to refactor this probably. Themes should be able to strictly specify which other theme the references are coming from, like we do for token sets.
-export async function mergeVariableReferencesWithLocalVariables(themes: ThemeObject[] = [], allThemes: ThemeObject[] = []): Promise<Map<string, string>> {
+export async function mergeVariableReferencesWithLocalVariables(
+  themes: ThemeObject[] = [],
+  allThemes: ThemeObject[] = [],
+): Promise<Map<string, string>> {
   const localVariables = await getVariablesWithoutZombies();
 
   const variables = new Map();

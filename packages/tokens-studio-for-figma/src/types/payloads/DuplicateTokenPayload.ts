@@ -16,7 +16,7 @@ export type DuplicateTokenPayload = {
     'studio.tokens'?: {
       [key: string]: any;
       id?: string;
-      modify?: ColorModifier
-    }
-  }
+      modify?: ColorModifier;
+    };
+  };
 };

@@ -1,9 +1,7 @@
 import React from 'react';
 import { TokenTypes } from '@/constants/TokenTypes';
 import { DeepKeyTokenMap, TokenTypeSchema } from '@/types/tokens';
-import {
-  fireEvent, render,
-} from '../../../tests/config/setupTest';
+import { fireEvent, render } from '../../../tests/config/setupTest';
 import TokenListing from './TokenListing';
 import { store } from '../store';
 import tokenTypes from '@/config/tokenType.defs.json';
@@ -35,55 +33,43 @@ const values = {
 
 describe('TokenListing', () => {
   it('should display token list', () => {
-    const { getByText } = render(<TokenListing
-      tokenKey={key}
-      label={key}
-      schema={schema as TokenTypeSchema}
-      values={values as DeepKeyTokenMap}
-    />);
+    const { getByText } = render(
+      <TokenListing tokenKey={key} label={key} schema={schema as TokenTypeSchema} values={values as DeepKeyTokenMap} />,
+    );
     expect(getByText('sizing')).toBeInTheDocument();
     expect(getByText('small')).toBeInTheDocument();
   });
 
   it('should collapse token list', async () => {
-    const { getByTestId } = render(<TokenListing
-      tokenKey={key}
-      label={key}
-      schema={schema as TokenTypeSchema}
-      values={values as DeepKeyTokenMap}
-    />);
+    const { getByTestId } = render(
+      <TokenListing tokenKey={key} label={key} schema={schema as TokenTypeSchema} values={values as DeepKeyTokenMap} />,
+    );
     await fireEvent.click(getByTestId('tokenlisting-sizing-collapse-button'));
     const { collapsedTokenTypeObj } = store.getState().tokenState;
     expect(collapsedTokenTypeObj.sizing).toBe(true);
   });
 
   it('should collapse all token list', async () => {
-    const { getByTestId } = render(<TokenListing
-      tokenKey={key}
-      label={key}
-      schema={schema as TokenTypeSchema}
-      values={values as DeepKeyTokenMap}
-    />);
+    const { getByTestId } = render(
+      <TokenListing tokenKey={key} label={key} schema={schema as TokenTypeSchema} values={values as DeepKeyTokenMap} />,
+    );
     await fireEvent.click(getByTestId('tokenlisting-sizing-collapse-button'), {
       bubbles: true,
       cancelable: true,
       altKey: true,
     });
     const { collapsedTokenTypeObj } = store.getState().tokenState;
-    expect(collapsedTokenTypeObj).toEqual(Object.keys(tokenTypes).reduce<Partial<Record<TokenTypes, boolean>>>((acc, tokenType) => {
-      acc[tokenType as TokenTypes] = true;
-      return acc;
-    }, {}));
+    expect(collapsedTokenTypeObj).toEqual(
+      Object.keys(tokenTypes).reduce<Partial<Record<TokenTypes, boolean>>>((acc, tokenType) => {
+        acc[tokenType as TokenTypes] = true;
+        return acc;
+      }, {}),
+    );
   });
 
   it('should show new form', async () => {
     const { getByTestId } = render(
-      <TokenListing
-        tokenKey={key}
-        label={key}
-        schema={schema as TokenTypeSchema}
-        values={values as DeepKeyTokenMap}
-      />,
+      <TokenListing tokenKey={key} label={key} schema={schema as TokenTypeSchema} values={values as DeepKeyTokenMap} />,
     );
     await fireEvent.click(getByTestId('button-add-new-token'));
     expect(store.getState().uiState.editToken).toEqual({

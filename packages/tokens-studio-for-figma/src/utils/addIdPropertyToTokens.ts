@@ -17,15 +17,17 @@ export default function addIdPropertyToTokens(tokens: Record<string, AnyTokenLis
         return {
           ...token,
           // Only when extensions obj is not empty do we set it again
-          ...(Object.entries(extensionsObj).length > 0 ? {
-            $extensions: {
-              ...token.$extensions,
-              'studio.tokens': {
-                ...studioTokensExtension,
-                id: uuidv4(),
-              },
-            },
-          } : {}),
+          ...(Object.entries(extensionsObj).length > 0
+            ? {
+                $extensions: {
+                  ...token.$extensions,
+                  'studio.tokens': {
+                    ...studioTokensExtension,
+                    id: uuidv4(),
+                  },
+                },
+              }
+            : {}),
         };
       }
       return token;

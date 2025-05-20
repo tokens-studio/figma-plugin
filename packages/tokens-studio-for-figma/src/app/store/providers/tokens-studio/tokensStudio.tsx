@@ -59,9 +59,7 @@ const getStorageClient = (context: TokensStudioCredentials) => {
   return storageClientObject;
 };
 
-export const pushToTokensStudio = async ({
-  context, action, data, metadata, successCallback,
-}: PushToTokensStudio) => {
+export const pushToTokensStudio = async ({ context, action, data, metadata, successCallback }: PushToTokensStudio) => {
   const storageClient = getStorageClient(context);
 
   storageClient.push({

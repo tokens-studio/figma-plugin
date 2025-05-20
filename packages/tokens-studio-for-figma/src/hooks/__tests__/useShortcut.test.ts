@@ -8,9 +8,7 @@ const warnSpy = jest.spyOn(console, 'warn');
 describe('useShortcut', () => {
   it('should work', () => {
     const handler = () => {};
-    const hookResult = renderHook(
-      () => useShortcut(['KeyS'], handler),
-    );
+    const hookResult = renderHook(() => useShortcut(['KeyS'], handler));
     expect(useKeysSpy).toBeCalledTimes(1);
     expect(useKeysSpy).toBeCalledWith(['KeyS'], handler, {
       preventLostKeyup: true,
@@ -25,9 +23,7 @@ describe('useShortcut', () => {
     activeShortcuts.push('KeyS');
 
     const handler = () => {};
-    const hookResult = renderHook(
-      () => useShortcut(['KeyS'], handler),
-    );
+    const hookResult = renderHook(() => useShortcut(['KeyS'], handler));
     expect(useKeysSpy).toBeCalledTimes(1);
     expect(useKeysSpy).toBeCalledWith(['KeyS'], handler, {
       preventLostKeyup: true,

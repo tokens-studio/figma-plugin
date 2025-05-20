@@ -60,10 +60,16 @@ AsyncMessageChannel.PluginInstance.handle(
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_STYLE_INFO, asyncHandlers.resolveStyleInfo);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NONE_VALUES_ON_NODE, asyncHandlers.setNoneValuesOnNode);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.GET_FIGMA_FONTS, asyncHandlers.getFigmaFonts);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION, asyncHandlers.removeStylesWithoutConnection);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.REMOVE_STYLES_WITHOUT_CONNECTION,
+  asyncHandlers.removeStylesWithoutConnection,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_AUTH_DATA, asyncHandlers.setAuthData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES, asyncHandlers.createLocalVariables);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES, asyncHandlers.createLocalVariablesWithoutModes);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.CREATE_LOCAL_VARIABLES_WITHOUT_MODES,
+  asyncHandlers.createLocalVariablesWithoutModes,
+);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RESOLVE_VARIABLE_INFO, asyncHandlers.resolveVariableInfo);
 AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.ATTACH_LOCAL_VARIABLES_TO_THEME,
@@ -72,7 +78,10 @@ AsyncMessageChannel.PluginInstance.handle(
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, asyncHandlers.renameVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STARTUP, asyncHandlers.previewRequestStartup);
+AsyncMessageChannel.PluginInstance.handle(
+  AsyncMessageTypes.PREVIEW_REQUEST_STARTUP,
+  asyncHandlers.previewRequestStartup,
+);
 
 figma.on('close', () => {
   defaultWorker.stop();

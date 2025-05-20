@@ -9,10 +9,7 @@ import { destructureTokenForAlias, mapValuesToTokens } from './node';
 import { NodeManagerNode } from './NodeManager';
 import { defaultTokenValueRetriever } from './TokenValueRetriever';
 
-export async function updateNodes(
-  nodes: readonly NodeManagerNode[],
-  settings: SettingsState,
-) {
+export async function updateNodes(nodes: readonly NodeManagerNode[], settings: SettingsState) {
   // Big O (n * m): (n = amount of nodes, m = amount of applied tokens to the node)
   const { baseFontSize } = settings ?? {};
 
@@ -37,14 +34,12 @@ export async function updateNodes(
         try {
           const rawTokenMap = destructureTokenForAlias(tokens, appliedTokens);
           const tokenValues = mapValuesToTokens(tokens, appliedTokens);
-          setValuesOnNode(
-            {
-              node,
-              values: tokenValues,
-              data: rawTokenMap,
-              baseFontSize,
-            },
-          );
+          setValuesOnNode({
+            node,
+            values: tokenValues,
+            data: rawTokenMap,
+            baseFontSize,
+          });
         } catch (e) {
           console.log('got error', e);
         } finally {

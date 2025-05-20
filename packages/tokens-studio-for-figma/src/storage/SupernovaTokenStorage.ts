@@ -63,12 +63,12 @@ export class SupernovaTokenStorage extends RemoteTokenStorage<SupernovaStorageSa
         },
         ...(payload.$metadata
           ? [
-            {
-              type: 'metadata' as const,
-              path: `${SystemFilenames.METADATA}.json`,
-              data: payload.$metadata,
-            },
-          ]
+              {
+                type: 'metadata' as const,
+                path: `${SystemFilenames.METADATA}.json`,
+                data: payload.$metadata,
+              },
+            ]
           : []),
         ...(
           Object.entries(payload).filter(([key]) => !Object.values<string>(SystemFilenames).includes(key)) as [

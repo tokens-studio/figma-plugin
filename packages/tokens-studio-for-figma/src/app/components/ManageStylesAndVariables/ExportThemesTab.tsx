@@ -1,18 +1,20 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Button, Heading, Tabs, Box, Stack, Checkbox, Label,
-} from '@tokens-studio/ui';
+import { Button, Heading, Tabs, Box, Stack, Checkbox, Label } from '@tokens-studio/ui';
 import { useTranslation } from 'react-i18next';
 import { StyledCard } from './StyledCard';
-import {
-  themesListSelector,
-} from '@/selectors';
+import { themesListSelector } from '@/selectors';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { ThemeObject } from '@/types';
 import { LabelledCheckbox } from './LabelledCheckbox';
 
-export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: { selectedThemes: string[], setSelectedThemes: (themes: string[]) => void }) {
+export default function ExportThemesTab({
+  selectedThemes,
+  setSelectedThemes,
+}: {
+  selectedThemes: string[];
+  setSelectedThemes: (themes: string[]) => void;
+}) {
   const { t } = useTranslation(['manageStylesAndVariables']);
   const themes = useSelector(themesListSelector);
   const isProUser = useIsProUser();
@@ -32,13 +34,16 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
   // TODO: Remeber selected themes in document storage
   // Reloading the plugin shouldn't forget the selected themes
 
-  const handleSelectTheme = React.useCallback((themeId: string) => {
-    if (selectedThemes.includes(themeId)) {
-      setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
-    } else {
-      setSelectedThemes([...selectedThemes, themeId]);
-    }
-  }, [selectedThemes, setSelectedThemes]);
+  const handleSelectTheme = React.useCallback(
+    (themeId: string) => {
+      if (selectedThemes.includes(themeId)) {
+        setSelectedThemes(selectedThemes.filter((id) => id !== themeId));
+      } else {
+        setSelectedThemes([...selectedThemes, themeId]);
+      }
+    },
+    [selectedThemes, setSelectedThemes],
+  );
 
   const handleSelectAllThemes = React.useCallback(() => {
     if (selectedThemes.length === themes.length) {
@@ -50,12 +55,14 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
 
   function createThemeRow(theme: ThemeObject) {
     return (
-      <Stack
-        gap={3}
-        key={theme.id}
-      >
+      <Stack gap={3} key={theme.id}>
         {/* eslint-disable-next-line react/jsx-no-bind */}
-        <LabelledCheckbox id={theme.id} checked={selectedThemes.includes(theme.id)} onChange={() => handleSelectTheme(theme.id)} label={theme.name} />
+        <LabelledCheckbox
+          id={theme.id}
+          checked={selectedThemes.includes(theme.id)}
+          onChange={() => handleSelectTheme(theme.id)}
+          label={theme.name}
+        />
         {/* TODO: Add theme details */}
         {/* <ThemeDetails /> */}
         {/* <IconButton variant="invisible" size="small" tooltip="Details" icon={<ChevronRightIcon />} /> */}
@@ -88,16 +95,18 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
                   {' – '}
                   {t('generic.themes')}
                 </Link> */}
-                <Box css={{
-                  alignSelf: 'flex-end',
-                }}
+                <Box
+                  css={{
+                    alignSelf: 'flex-end',
+                  }}
                 >
-                  <Button variant="secondary" size="small">{t('actions.getPRO')}</Button>
+                  <Button variant="secondary" size="small">
+                    {t('actions.getPRO')}
+                  </Button>
                 </Box>
               </>
             )}
           </Stack>
-
         </StyledCard>
       ) : (
         <StyledCard>
@@ -106,7 +115,11 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
             <p>{t('exportThemesTab.combinationsOfSetsMakeThemes')}</p>
             <Stack direction="column" width="full" gap={4}>
               <Stack direction="row" gap={3} align="center">
-                <Checkbox id="check-all-themes" checked={selectedThemes.length === themes.length} onCheckedChange={handleSelectAllThemes} />
+                <Checkbox
+                  id="check-all-themes"
+                  checked={selectedThemes.length === themes.length}
+                  onCheckedChange={handleSelectAllThemes}
+                />
                 <Label htmlFor="check-all-themes">{t('generic.selectAll')}</Label>
               </Stack>
               {ThemeGroups.map((group) => (
@@ -123,7 +136,6 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
               ) : null}
             </Stack>
           </Stack>
-
         </StyledCard>
       )}
     </Tabs.Content>

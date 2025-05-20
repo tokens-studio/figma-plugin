@@ -6,13 +6,13 @@ import Box from '../Box';
 import Tooltip from '../Tooltip';
 
 type Props<T extends string> = {
-  name: T
-  label?: string
-  activeTab?: T
-  disabled?: boolean
-  onSwitch: (tab: T) => void
-  startEnhancer?: React.ReactNode
-  endEnhancer?: React.ReactNode,
+  name: T;
+  label?: string;
+  activeTab?: T;
+  disabled?: boolean;
+  onSwitch: (tab: T) => void;
+  startEnhancer?: React.ReactNode;
+  endEnhancer?: React.ReactNode;
   tooltip?: string;
   tooltipSide?: 'bottom' | 'left' | 'top' | undefined;
   small?: boolean;
@@ -57,7 +57,16 @@ const StyledButton = styled('button', {
 });
 
 export function TabButton<T extends string = Tabs>({
-  name, label, activeTab, disabled, onSwitch, startEnhancer, endEnhancer, tooltip, tooltipSide, small,
+  name,
+  label,
+  activeTab,
+  disabled,
+  onSwitch,
+  startEnhancer,
+  endEnhancer,
+  tooltip,
+  tooltipSide,
+  small,
 }: Props<T>) {
   const onClick = React.useCallback(() => {
     track('Switched tab', { from: activeTab, to: name });
@@ -79,14 +88,15 @@ export function TabButton<T extends string = Tabs>({
         <>
           {startEnhancer && startEnhancer}
           {label && (
-          <Box css={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-          >
-            {label}
-          </Box>
+            <Box
+              css={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {label}
+            </Box>
           )}
           {endEnhancer && endEnhancer}
         </>

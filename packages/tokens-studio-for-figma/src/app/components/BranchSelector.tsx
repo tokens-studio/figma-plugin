@@ -29,12 +29,12 @@ import { useChangedState } from '@/hooks/useChangedState';
 import { useIsProUser } from '../hooks/useIsProUser';
 
 const BranchSwitchMenuItemElement: React.FC<
-React.PropsWithChildren<
-React.PropsWithChildren<{
-  branch: string;
-  createNewBranchFrom: (branch: string) => void;
-}>
->
+  React.PropsWithChildren<
+    React.PropsWithChildren<{
+      branch: string;
+      createNewBranchFrom: (branch: string) => void;
+    }>
+  >
 > = ({ branch, createNewBranchFrom }) => {
   const onSelect = React.useCallback(() => createNewBranchFrom(branch), [branch, createNewBranchFrom]);
 
@@ -115,7 +115,10 @@ export default function BranchSelector() {
         dispatch.uiState.setApiData({ ...apiData, branch });
         dispatch.uiState.setLocalApiState({ ...localApiState, branch });
         await pullTokens({
-          context: { ...apiData, branch }, usedTokenSet, activeTheme, updateLocalTokens: true,
+          context: { ...apiData, branch },
+          usedTokenSet,
+          activeTheme,
+          updateLocalTokens: true,
         });
         AsyncMessageChannel.ReactInstance.message({
           type: AsyncMessageTypes.CREDENTIALS,
@@ -173,12 +176,14 @@ export default function BranchSelector() {
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
-          <DropdownMenu.Content side="top" sideOffset={0} className="content scroll-container" css={{ maxWidth: '70vw' }}>
+          <DropdownMenu.Content
+            side="top"
+            sideOffset={0}
+            className="content scroll-container"
+            css={{ maxWidth: '70vw' }}
+          >
             <DropdownMenu.Sub>
-              <DropdownMenu.SubTrigger
-                data-testid="branch-selector-create-new-branch-trigger"
-                disabled={!isProUser}
-              >
+              <DropdownMenu.SubTrigger data-testid="branch-selector-create-new-branch-trigger" disabled={!isProUser}>
                 {t('createNewBranch')}
                 <DropdownMenu.TrailingVisual>
                   <ChevronRightIcon />
@@ -193,8 +198,8 @@ export default function BranchSelector() {
                     {t('currentChanges')}
                   </DropdownMenu.Item>
                 )}
-                {branchState.branches.length > 0
-                  && branchState.branches.map((branch, index) => (
+                {branchState.branches.length > 0 &&
+                  branchState.branches.map((branch, index) => (
                     <BranchSwitchMenuItemElement
                       key={seed(index)}
                       branch={branch}
@@ -214,8 +219,8 @@ export default function BranchSelector() {
               </>
             )}
             <DropdownMenu.RadioGroup value={currentBranch}>
-              {branchState.branches.length > 0
-                && branchState.branches.map((branch, index) => (
+              {branchState.branches.length > 0 &&
+                branchState.branches.map((branch, index) => (
                   <BranchSwitchMenuRadioElement
                     disabled={!isProUser}
                     key={`radio_${seed(index)}`}

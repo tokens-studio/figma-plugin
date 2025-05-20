@@ -777,11 +777,13 @@ describe('resolveTokenValues deep nested', () => {
     expect(resolvedTokens).toEqual(output);
   });
 
-  const deepTokens = [{
-    name: '1',
-    value: '#ff0000',
-    type: 'color',
-  }];
+  const deepTokens = [
+    {
+      name: '1',
+      value: '#ff0000',
+      type: 'color',
+    },
+  ];
   for (let i = 2; i < 1000; i += 1) {
     deepTokens.push({
       name: `${i}`,
@@ -805,11 +807,13 @@ describe('resolveTokenValues deep nested', () => {
   });
 
   it('resolves zeros correctly', () => {
-    const resolvedTokens = defaultTokenResolver.setTokens([{
-      name: 'pure-zero',
-      value: '0',
-      type: TokenTypes.DIMENSION,
-    }]);
+    const resolvedTokens = defaultTokenResolver.setTokens([
+      {
+        name: 'pure-zero',
+        value: '0',
+        type: TokenTypes.DIMENSION,
+      },
+    ]);
     expect(resolvedTokens).toEqual([
       {
         name: 'pure-zero',

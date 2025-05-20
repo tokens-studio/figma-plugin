@@ -9,7 +9,18 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { StorageType } from '@/types/StorageType';
 import {
-  ActiveThemeProperty, StorageTypeProperty, ThemesProperty, UpdatedAtProperty, ValuesProperty, VersionProperty, OnboardingExplainerSetsProperty, OnboardingExplainerInspectProperty, OnboardingExplainerSyncProvidersProperty, TokenFormatProperty, OnboardingExplainerExportSetsProperty, IsCompressedProperty,
+  ActiveThemeProperty,
+  StorageTypeProperty,
+  ThemesProperty,
+  UpdatedAtProperty,
+  ValuesProperty,
+  VersionProperty,
+  OnboardingExplainerSetsProperty,
+  OnboardingExplainerInspectProperty,
+  OnboardingExplainerSyncProvidersProperty,
+  TokenFormatProperty,
+  OnboardingExplainerExportSetsProperty,
+  IsCompressedProperty,
   CheckForChangesProperty,
 } from '@/figmaStorage';
 import { ColorModifierTypes } from '@/constants/ColorModifierTypes';
@@ -43,16 +54,25 @@ const borderPropertyMap = new Map<Properties, string>([
   [Properties.borderLeft, 'borderLeft'],
 ]);
 
-type MapValuesToTokensResult = Record<string, string | number | SingleToken['value'] | {
-  property: string
-  value?: SingleToken['value'];
-}[]>;
+type MapValuesToTokensResult = Record<
+  string,
+  | string
+  | number
+  | SingleToken['value']
+  | {
+      property: string;
+      value?: SingleToken['value'];
+    }[]
+>;
 
 // TODO: It feels unecessary to do this like that. whats up with the modify? cant we do that upfront before we send tokens to the document?
 // Ideally, we would build this object upfront so we would not have to iterate over this at all, but could just .get a token and then get the property of it
 // Tokens: The full tokens map
 // Values: The values applied to the node
-export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+export function mapValuesToTokens(
+  tokens: Map<string, AnyTokenList[number]>,
+  values: NodeTokenRefMap,
+): MapValuesToTokensResult {
   const mappedValues = Object.entries(values).reduce<MapValuesToTokensResult>((acc, [key, tokenOnNode]) => {
     const resolvedToken = tokens.get(tokenOnNode);
 
@@ -62,14 +82,22 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
       if (returnValueToLookFor(key) === 'rawValue' && resolvedToken.$extensions?.['studio.tokens']?.modify) {
         const modifier = resolvedToken.$extensions?.['studio.tokens']?.modify;
         if (modifier) {
-          acc[key] = modifier.type === ColorModifierTypes.MIX ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}` : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
+          acc[key] =
+            modifier.type === ColorModifierTypes.MIX
+              ? `${resolvedToken.rawValue} / mix(${modifier.color}, ${modifier.value}) / ${modifier.space}`
+              : `${resolvedToken.rawValue} / ${modifier.type}(${modifier.value}) / ${modifier.space}`;
         }
       } else if (key === TokenTypes.COMPOSITION) {
         Object.entries(resolvedToken.value).forEach(([property, value]) => {
           // Assign the actual value of a composition token property to the applied values
           acc[property as Properties] = value;
           // If we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
-          if (typeof value === 'object' && borderPropertyMap.get(property as Properties) && 'color' in value && typeof value.color === 'string') {
+          if (
+            typeof value === 'object' &&
+            borderPropertyMap.get(property as Properties) &&
+            'color' in value &&
+            typeof value.color === 'string'
+          ) {
             acc.borderColor = value.color;
           }
         });
@@ -77,11 +105,13 @@ export function mapValuesToTokens(tokens: Map<string, AnyTokenList[number]>, val
         // Not all tokens have a description, so we need to treat it special
         acc[key] = resolvedToken.description ? resolvedToken.description : 'No description';
       } else if (
-        borderPropertyMap.get(key as Properties)
-        && resolvedToken.type === TokenTypes.BORDER
-        && typeof resolvedToken.value === 'object'
-        && 'color' in resolvedToken.value && resolvedToken.value.color
-        && !('borderColor' in acc)) {
+        borderPropertyMap.get(key as Properties) &&
+        resolvedToken.type === TokenTypes.BORDER &&
+        typeof resolvedToken.value === 'object' &&
+        'color' in resolvedToken.value &&
+        resolvedToken.value.color &&
+        !('borderColor' in acc)
+      ) {
         // Same as above, if we're dealing with border tokens we want to extract the color part to be applied (we can only apply color on the whole border, not individual sides)
         acc.borderColor = resolvedToken.value.color;
         // We return the value because the token holds its values in the 'value' prop
@@ -112,16 +142,16 @@ export async function getSavedStorageType(): Promise<StorageType> {
 
 export async function getTokenData(): Promise<{
   values: TokenStore['values'];
-  themes: ThemeObjectsList
-  activeTheme: string | Record<string, string>
+  themes: ThemeObjectsList;
+  activeTheme: string | Record<string, string>;
   updatedAt: string;
   version: string;
-  checkForChanges: boolean | null
-  collapsedTokenSets: string[] | null
-  tokenFormat: TokenFormatOptions | null
+  checkForChanges: boolean | null;
+  collapsedTokenSets: string[] | null;
+  tokenFormat: TokenFormatOptions | null;
 } | null> {
   try {
-    const isCompressed = await IsCompressedProperty.read(figma.root) ?? false;
+    const isCompressed = (await IsCompressedProperty.read(figma.root)) ?? false;
     const storageType = await getSavedStorageType();
     let values = {};
     let themes: ThemeObjectsList = [];
@@ -129,25 +159,28 @@ export async function getTokenData(): Promise<{
     const prefix = `${fileKey}/tokens`;
 
     if (storageType.provider === StorageProviderType.LOCAL) {
-      values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
-      themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
+      values = (await ValuesProperty.read(figma.root, isCompressed)) ?? {};
+      themes = (await ThemesProperty.read(figma.root, isCompressed)) ?? [];
     } else {
-      values = await ClientStorageProperty.read(`${prefix}/values`) ?? {};
-      themes = await ClientStorageProperty.read(`${prefix}/themes`) ?? [];
+      values = (await ClientStorageProperty.read(`${prefix}/values`)) ?? {};
+      themes = (await ClientStorageProperty.read(`${prefix}/themes`)) ?? [];
 
       // To account for the migration period, if client storage is empty, try reading from ValuesProperty and ThemesProperty to ensure local changes are not lost
       if (Object.keys(values).length === 0) {
-        values = await ValuesProperty.read(figma.root, isCompressed) ?? {};
+        values = (await ValuesProperty.read(figma.root, isCompressed)) ?? {};
       }
       if (themes.length === 0) {
-        themes = await ThemesProperty.read(figma.root, isCompressed) ?? [];
+        themes = (await ThemesProperty.read(figma.root, isCompressed)) ?? [];
       }
     }
 
-    const activeTheme = await ActiveThemeProperty.read(figma.root) ?? {};
+    const activeTheme = (await ActiveThemeProperty.read(figma.root)) ?? {};
     const version = await VersionProperty.read(figma.root);
     const updatedAt = await UpdatedAtProperty.read(figma.root);
-    const checkForChanges = await ClientStorageProperty.read(`${prefix}/checkForChanges`) ?? await CheckForChangesProperty.read(figma.root) ?? false;
+    const checkForChanges =
+      (await ClientStorageProperty.read(`${prefix}/checkForChanges`)) ??
+      (await CheckForChangesProperty.read(figma.root)) ??
+      false;
     const collapsedTokenSets = await CollapsedTokenSetsProperty.read(figma.root);
     const tokenFormat = await TokenFormatProperty.read(figma.root);
     if (Object.keys(values).length > 0) {
@@ -195,25 +228,24 @@ export async function saveOnboardingExplainerInspect(onboardingExplainerInspect:
 
 export function goToNode(id: string) {
   const node = figma.getNodeById(id);
-  if (
-    node
-    && node.type !== 'PAGE'
-    && node.type !== 'DOCUMENT'
-  ) {
+  if (node && node.type !== 'PAGE' && node.type !== 'DOCUMENT') {
     figma.currentPage.selection = [node];
     figma.viewport.scrollAndZoomIntoView([node]);
   }
 }
 
 export function selectNodes(ids: string[]) {
-  const nodes = compact(ids.map(figma.getNodeById)).filter((node) => (
-    node.type !== 'PAGE' && node.type !== 'DOCUMENT'
-  )) as (Exclude<BaseNode, PageNode | DocumentNode>)[];
+  const nodes = compact(ids.map(figma.getNodeById)).filter(
+    (node) => node.type !== 'PAGE' && node.type !== 'DOCUMENT',
+  ) as Exclude<BaseNode, PageNode | DocumentNode>[];
   figma.currentPage.selection = nodes;
 }
 // Tokens: The full token object
 // Values: The values applied to the node
-export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number]>, values: NodeTokenRefMap): MapValuesToTokensResult {
+export function destructureTokenForAlias(
+  tokens: Map<string, AnyTokenList[number]>,
+  values: NodeTokenRefMap,
+): MapValuesToTokensResult {
   if (values && values.composition) {
     const resolvedToken = tokens.get(values.composition);
     const tokensInCompositionToken: NodeTokenRefMap = {};
@@ -234,28 +266,32 @@ export function destructureTokenForAlias(tokens: Map<string, AnyTokenList[number
     if (resolvedToken && resolvedToken.resolvedValueWithReferences) {
       if (typeof resolvedToken.resolvedValueWithReferences === 'object') {
         if ('color' in resolvedToken.resolvedValueWithReferences) {
-          const borderColorTokenName = (resolvedToken.resolvedValueWithReferences.color as string).replace('{', '').replace('}', '');
+          const borderColorTokenName = (resolvedToken.resolvedValueWithReferences.color as string)
+            .replace('{', '')
+            .replace('}', '');
           values.borderColor = borderColorTokenName;
         }
         if ('width' in resolvedToken.resolvedValueWithReferences) {
-          const borderWidthTokenName = (resolvedToken.resolvedValueWithReferences.width as string).replace('{', '').replace('}', '');
+          const borderWidthTokenName = (resolvedToken.resolvedValueWithReferences.width as string)
+            .replace('{', '')
+            .replace('}', '');
           values.borderWidth = borderWidthTokenName;
         }
       }
     }
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.border }) };
+    values = { ...values, ...(values.borderColor ? {} : { borderColor: values.border }) };
   }
   if (values && values.borderTop) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderTop }) };
+    values = { ...values, ...(values.borderColor ? {} : { borderColor: values.borderTop }) };
   }
   if (values && values.borderRight) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderRight }) };
+    values = { ...values, ...(values.borderColor ? {} : { borderColor: values.borderRight }) };
   }
   if (values && values.borderLeft) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderLeft }) };
+    values = { ...values, ...(values.borderColor ? {} : { borderColor: values.borderLeft }) };
   }
   if (values && values.borderBottom) {
-    values = { ...values, ...(values.borderColor ? { } : { borderColor: values.borderBottom }) };
+    values = { ...values, ...(values.borderColor ? {} : { borderColor: values.borderBottom }) };
   }
   return values;
 }

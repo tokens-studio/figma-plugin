@@ -31,8 +31,7 @@ const tokenTypes = {
         description: '',
       },
     },
-    help:
-      "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
+    help: "If a (local) style is found with the same name it will match to that, if not, will use hex value. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
   },
   borderRadius: {
     label: 'Border Radius',
@@ -104,8 +103,7 @@ const tokenTypes = {
         description: '',
       },
     },
-    help:
-      "If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
+    help: "If a (local) style is found with the same name it will match to that, if not, will use raw font values. Use 'Create Style' to batch-create styles from your tokens (e.g. in your design library). In the future we'll load all 'remote' styles and reference them inside the JSON.",
   },
   fontFamilies: {
     help: 'Only works in combination with a Font Weight',

@@ -26,13 +26,15 @@ export default function TooltipProperty({ label, value, resolvedValue }: Props) 
         <Stack direction="row" align="center" gap={2} css={{ padding: '$1 $2', color: '$tooltipFg' }}>
           {label}
           {typeof value !== 'undefined' && (
-            <Box css={{ color: '$tooltipFgMuted', flexShrink: 1, wordBreak: 'break-word' }}>
-              {value}
-            </Box>
+            <Box css={{ color: '$tooltipFgMuted', flexShrink: 1, wordBreak: 'break-word' }}>{value}</Box>
           )}
         </Stack>
       )}
-      {typeof resolvedValue !== 'undefined' && !isEqual(String(resolvedValue), String(value)) && typeof resolvedValue !== 'object' ? <AliasBadge value={resolvedValue} /> : null}
+      {typeof resolvedValue !== 'undefined' &&
+      !isEqual(String(resolvedValue), String(value)) &&
+      typeof resolvedValue !== 'object' ? (
+        <AliasBadge value={resolvedValue} />
+      ) : null}
     </Stack>
   ) : null;
 }

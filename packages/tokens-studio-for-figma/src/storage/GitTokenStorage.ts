@@ -6,23 +6,21 @@ import { RemoteTokenStorage, RemoteTokenStorageFile, RemoteTokenStorageMetadata 
 import { ErrorMessages } from '@/constants/ErrorMessages';
 
 type StorageFlags = {
-  multiFileEnabled: boolean
+  multiFileEnabled: boolean;
 };
 
 export type GitStorageSaveOptions = {
-  commitMessage?: string,
+  commitMessage?: string;
 };
 
 export type GitStorageSaveOption = {
-  commitMessage?: string,
-  storeTokenIdInJsonEditor: boolean
+  commitMessage?: string;
+  storeTokenIdInJsonEditor: boolean;
 };
 
-export type GitSingleFileObject = Record<string, (
-  Record<string, SingleToken<false> | DeepTokensMap<false>>
-)> & {
-  $themes?: ThemeObjectsList
-  $metadata?: RemoteTokenStorageMetadata
+export type GitSingleFileObject = Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>> & {
+  $themes?: ThemeObjectsList;
+  $metadata?: RemoteTokenStorageMetadata;
 };
 
 export type GitMultiFileObject = AnyTokenSet<false> | ThemeObjectsList | RemoteTokenStorageMetadata;
@@ -46,13 +44,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
 
   protected username: string | undefined = undefined;
 
-  constructor(
-    secret: string,
-    owner: string,
-    repository: string,
-    baseUrl?: string,
-    username?: string,
-  ) {
+  constructor(secret: string, owner: string, repository: string, baseUrl?: string, username?: string) {
     super();
     this.secret = secret;
     this.owner = owner;
@@ -88,7 +80,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     changeset: Record<string, string>,
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
   ): Promise<boolean>;
 
   public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption): Promise<boolean> {
@@ -97,18 +89,22 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
 
     const filesChangeset: Record<string, string> = {};
     if (this.path.endsWith('.json')) {
-      filesChangeset[this.path] = JSON.stringify({
-        ...files.reduce<GitSingleFileObject>((acc, file) => {
-          if (file.type === 'tokenSet') {
-            acc[file.name] = file.data;
-          } else if (file.type === 'themes') {
-            acc.$themes = [...acc.$themes ?? [], ...file.data];
-          } else if (file.type === 'metadata') {
-            acc.$metadata = { ...acc.$metadata ?? {}, ...file.data };
-          }
-          return acc;
-        }, {}),
-      }, null, 2);
+      filesChangeset[this.path] = JSON.stringify(
+        {
+          ...files.reduce<GitSingleFileObject>((acc, file) => {
+            if (file.type === 'tokenSet') {
+              acc[file.name] = file.data;
+            } else if (file.type === 'themes') {
+              acc.$themes = [...(acc.$themes ?? []), ...file.data];
+            } else if (file.type === 'metadata') {
+              acc.$metadata = { ...(acc.$metadata ?? {}), ...file.data };
+            }
+            return acc;
+          }, {}),
+        },
+        null,
+        2,
+      );
     } else if (this.flags.multiFileEnabled) {
       files.forEach((file) => {
         if (file.type === 'tokenSet') {

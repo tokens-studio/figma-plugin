@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
 import Mentions from 'rc-mentions';
-import {
-  Stack,
-  Tooltip,
-} from '@tokens-studio/ui';
+import { Stack, Tooltip } from '@tokens-studio/ui';
 import { SingleToken } from '@/types/tokens';
 import { useReferenceTokenType } from '@/app/hooks/useReferenceTokenType';
 
 // Styles
 import {
-  StyledItem, StyledItemColor, StyledItemColorDiv, StyledItemName, StyledItemValue, StyledPart,
+  StyledItem,
+  StyledItemColor,
+  StyledItemColorDiv,
+  StyledItemName,
+  StyledItemValue,
+  StyledPart,
 } from './StyledDownshiftInput';
 import './mentions.css';
 
@@ -64,25 +66,28 @@ export default function MentionsInput({
   const mentionData = useMemo<SuggestionDataItem[]>(() => {
     if (isDocumentationType(type as Properties)) {
       return resolvedTokens
-        .filter((token: SingleToken) => token.name !== initialName).sort((a, b) => (
-          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
-        )).map((resolvedToken) => ({
+        .filter((token: SingleToken) => token.name !== initialName)
+        .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
+        .map((resolvedToken) => ({
           id: `${resolvedToken.name}}`,
           display: resolvedToken.name,
         }));
     }
     return resolvedTokens
-      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName).sort((a, b) => (
-        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
-      )).map((resolvedToken) => ({
+      .filter((token: SingleToken) => referenceTokenTypes.includes(token?.type) && token.name !== initialName)
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }))
+      .map((resolvedToken) => ({
         id: `${resolvedToken.name}}`,
         display: resolvedToken.name,
       }));
   }, [initialName, resolvedTokens, referenceTokenTypes, type]);
 
-  const handleMentionInputChange = React.useCallback((newValue: string) => {
-    handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}'));
-  }, [handleChange, name]);
+  const handleMentionInputChange = React.useCallback(
+    (newValue: string) => {
+      handleChange(name, newValue.replace(/}(?=\s)[^{}]*}/gi, '}'));
+    },
+    [handleChange, name],
+  );
 
   const handleInputBlur = React.useCallback(() => {
     if (handleBlur) {
@@ -101,53 +106,62 @@ export default function MentionsInput({
           <StyledPart key={i} matches={part.toLowerCase() === String(highlight).toLowerCase()}>
             {part}
           </StyledPart>
-        ))}
-        {' '}
+        ))}{' '}
       </span>
     );
   }, []);
 
-  const renderMentionListItem = React.useCallback((
-    suggestion: SuggestionDataItem,
-  ) => {
-    const resolvedToken = resolvedTokens.find((token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.display);
-    return (
-      <Option
-        key={(suggestion.id as string) || 'not-found'}
-        value={suggestion.id as string}
-        className="mentions-item"
-      >
-        <Tooltip
-          side="bottom"
-          label={(
-            <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
-              <StyledItemName css={{ color: '$tooltipFg' }}>
-                {getHighlightedText(resolvedToken?.name ?? '', value || '')}
-              </StyledItemName>
-              {resolvedToken && (
-                <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
-                  <span>
-                    {getResolvedTextValue(resolvedToken)}
-                  </span>
-                </StyledItemValue>
-              )}
-            </Stack>
-          )}
+  const renderMentionListItem = React.useCallback(
+    (suggestion: SuggestionDataItem) => {
+      const resolvedToken = resolvedTokens.find(
+        (token) => referenceTokenTypes.includes(token?.type) && token.name === suggestion.display,
+      );
+      return (
+        <Option
+          key={(suggestion.id as string) || 'not-found'}
+          value={suggestion.id as string}
+          className="mentions-item"
         >
-          <StyledItem className="dropdown-item">
-            {type === 'color' && <StyledItemColorDiv><StyledItemColor style={resolvedToken?.value ? getColorSwatchStyle(resolvedToken?.value.toString()) : {}} /></StyledItemColorDiv>}
-            <StyledItemName truncate>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
-            {resolvedToken && <StyledItemValue truncate>{getResolvedTextValue(resolvedToken)}</StyledItemValue>}
-          </StyledItem>
-        </Tooltip>
-      </Option>
-    );
-  }, [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value]);
+          <Tooltip
+            side="bottom"
+            label={
+              <Stack direction="column" align="start" gap={1} css={{ wordBreak: 'break-word' }}>
+                <StyledItemName css={{ color: '$tooltipFg' }}>
+                  {getHighlightedText(resolvedToken?.name ?? '', value || '')}
+                </StyledItemName>
+                {resolvedToken && (
+                  <StyledItemValue css={{ color: '$tooltipFgMuted' }}>
+                    <span>{getResolvedTextValue(resolvedToken)}</span>
+                  </StyledItemValue>
+                )}
+              </Stack>
+            }
+          >
+            <StyledItem className="dropdown-item">
+              {type === 'color' && (
+                <StyledItemColorDiv>
+                  <StyledItemColor
+                    style={resolvedToken?.value ? getColorSwatchStyle(resolvedToken?.value.toString()) : {}}
+                  />
+                </StyledItemColorDiv>
+              )}
+              <StyledItemName truncate>{getHighlightedText(resolvedToken?.name ?? '', value || '')}</StyledItemName>
+              {resolvedToken && <StyledItemValue truncate>{getResolvedTextValue(resolvedToken)}</StyledItemValue>}
+            </StyledItem>
+          </Tooltip>
+        </Option>
+      );
+    },
+    [resolvedTokens, type, getHighlightedText, referenceTokenTypes, value],
+  );
 
-  const handleEnterKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    onSubmit?.();
-  }, [onSubmit]);
+  const handleEnterKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      e.preventDefault();
+      onSubmit?.();
+    },
+    [onSubmit],
+  );
 
   return (
     <Mentions
@@ -165,9 +179,7 @@ export default function MentionsInput({
       data-testid={`mention-input-${name}`}
       className={hasPrefix ? '' : 'mentions-no-prefix'}
     >
-      {mentionData.map((item) => (
-        renderMentionListItem(item)
-      ))}
+      {mentionData.map((item) => renderMentionListItem(item))}
     </Mentions>
   );
 }

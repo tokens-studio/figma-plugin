@@ -17,21 +17,22 @@ const genericVersionedSchema = singleFileSchema.extend({
 });
 
 export type GenericVersionedMeta = {
-  version: string
-  updatedAt: string
+  version: string;
+  updatedAt: string;
 };
 
 export type GenericVersionedData = GenericVersionedMeta & {
-  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>
-  $themes?: ThemeObjectsList
+  values: Record<string, Record<string, SingleToken<false> | DeepTokensMap<false>>>;
+  $themes?: ThemeObjectsList;
 };
 
 export type GenericVersionedAdditionalHeaders = Array<{
-  name: string,
-  value: string
+  name: string;
+  value: string;
 }>;
 
-const flattenHeaders = (headers: GenericVersionedAdditionalHeaders): Array<[key: string, val: string]> => headers.map((x) => [x.name, x.value]);
+const flattenHeaders = (headers: GenericVersionedAdditionalHeaders): Array<[key: string, val: string]> =>
+  headers.map((x) => [x.name, x.value]);
 
 // Life cycle is
 
@@ -46,16 +47,28 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
 
   private flow: GenericVersionedStorageFlow;
 
-  public static async create(url: string, updatedAt: string, flow: GenericVersionedStorageFlow, headers: GenericVersionedAdditionalHeaders = []): Promise<false | {
-    metadata: { id: string }
-  }> {
-    let body: string | undefined = JSON.stringify({
-      version: pjs.version,
-      updatedAt,
-      values: {
-        options: {},
+  public static async create(
+    url: string,
+    updatedAt: string,
+    flow: GenericVersionedStorageFlow,
+    headers: GenericVersionedAdditionalHeaders = [],
+  ): Promise<
+    | false
+    | {
+        metadata: { id: string };
+      }
+  > {
+    let body: string | undefined = JSON.stringify(
+      {
+        version: pjs.version,
+        updatedAt,
+        values: {
+          options: {},
+        },
       },
-    }, null, 2);
+      null,
+      2,
+    );
     let method: string;
     switch (flow) {
       case GenericVersionedStorageFlow.READ_ONLY:
@@ -79,10 +92,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       cache: 'no-cache',
       credentials: 'same-origin',
       body,
-      headers: new Headers([
-        ['Content-Type', 'application/json'],
-        ...flattenHeaders(headers),
-      ]),
+      headers: new Headers([['Content-Type', 'application/json'], ...flattenHeaders(headers)]),
     });
 
     if (!response.ok) {
@@ -98,13 +108,12 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
     super();
     this.url = url;
     this.flow = flow;
-    this.defaultHeaders = new Headers([
-      ['Content-Type', 'application/json'],
-      ...flattenHeaders(headers),
-    ]);
+    this.defaultHeaders = new Headers([['Content-Type', 'application/json'], ...flattenHeaders(headers)]);
   }
 
-  private convertGenericVersionedDataToFiles(data: GenericVersionedData): RemoteTokenStorageFile<GenericVersionedMeta>[] {
+  private convertGenericVersionedDataToFiles(
+    data: GenericVersionedData,
+  ): RemoteTokenStorageFile<GenericVersionedMeta>[] {
     return [
       {
         type: 'themes',
@@ -134,9 +143,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       mode: 'cors',
       cache: 'no-cache',
       credentials: 'same-origin',
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-      ]),
+      headers: new Headers([...this.defaultHeaders.entries()]),
     });
 
     if (!response.ok) {
@@ -163,16 +170,13 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
 
     const dataObject: GenericVersionedData = {
       version: pjs.version,
-      updatedAt: (new Date()).toISOString(),
+      updatedAt: new Date().toISOString(),
       values: {},
       $themes: [],
     };
     files.forEach((file) => {
       if (file.type === 'themes') {
-        dataObject.$themes = [
-          ...(dataObject.$themes ?? []),
-          ...file.data,
-        ];
+        dataObject.$themes = [...(dataObject.$themes ?? []), ...file.data];
       } else if (file.type === 'tokenSet') {
         dataObject.values = {
           ...dataObject.values,
@@ -187,9 +191,7 @@ export class GenericVersionedStorage extends RemoteTokenStorage<GenericVersioned
       cache: 'no-cache',
       credentials: 'same-origin',
       body: JSON.stringify(dataObject),
-      headers: new Headers([
-        ...this.defaultHeaders.entries(),
-      ]),
+      headers: new Headers([...this.defaultHeaders.entries()]),
     });
 
     if (!response.ok) {

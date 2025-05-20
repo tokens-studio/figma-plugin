@@ -123,9 +123,7 @@ export function useGenericVersionedStorage() {
     async (
       context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
     ) => {
-      const {
-        id, name, additionalHeaders, internalId, flow,
-      } = context;
+      const { id, name, additionalHeaders, internalId, flow } = context;
       const updatedAt = new Date().toISOString();
       const result = await GenericVersionedStorage.create(id, updatedAt, flow, additionalHeaders);
       if (result) {
@@ -167,9 +165,7 @@ export function useGenericVersionedStorage() {
     async (
       context: Extract<StorageTypeCredentials, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
     ): Promise<RemoteResponseData | null> => {
-      const {
-        id, additionalHeaders, name, internalId, flow,
-      } = context;
+      const { id, additionalHeaders, name, internalId, flow } = context;
       if (!id) return null;
       try {
         const storage = new GenericVersionedStorage(id, flow, additionalHeaders);
@@ -221,9 +217,7 @@ export function useGenericVersionedStorage() {
     async (
       context: Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GENERIC_VERSIONED_STORAGE }>,
     ): Promise<RemoteResponseData | null> => {
-      const {
-        provider, id, name, additionalHeaders, internalId, flow,
-      } = context;
+      const { provider, id, name, additionalHeaders, internalId, flow } = context;
       if (!id) return null;
 
       // Always attempt create first if required

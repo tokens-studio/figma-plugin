@@ -11,9 +11,7 @@ import { ProgressTracker } from '../ProgressTracker';
 
 export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TOKENS] = async (msg) => {
   try {
-    const {
-      oldName, newName, updateMode, category,
-    } = msg;
+    const { oldName, newName, updateMode, category } = msg;
     const allWithData = await defaultNodeManager.findBaseNodesWithData({ updateMode });
     const namespace = SharedPluginDataNamespaces.TOKENS;
     postToUI({
@@ -30,19 +28,21 @@ export const remapTokens: AsyncMessageChannelHandlers[AsyncMessageTypes.REMAP_TO
     const promises: Set<Promise<void>> = new Set();
 
     allWithData.forEach(({ node, tokens }) => {
-      promises.add(defaultWorker.schedule(async () => {
-        Object.entries(tokens).map(async ([key, value]) => {
-          if (typeof category !== 'undefined' && key !== category) {
-            return;
-          }
-          if (value === oldName) {
-            const jsonValue = JSON.stringify(newName);
-            node.setSharedPluginData(namespace, key, jsonValue);
-          }
-        });
-        tracker.next();
-        tracker.reportIfNecessary();
-      }));
+      promises.add(
+        defaultWorker.schedule(async () => {
+          Object.entries(tokens).map(async ([key, value]) => {
+            if (typeof category !== 'undefined' && key !== category) {
+              return;
+            }
+            if (value === oldName) {
+              const jsonValue = JSON.stringify(newName);
+              node.setSharedPluginData(namespace, key, jsonValue);
+            }
+          });
+          tracker.next();
+          tracker.reportIfNecessary();
+        }),
+      );
     });
 
     await Promise.all(promises);

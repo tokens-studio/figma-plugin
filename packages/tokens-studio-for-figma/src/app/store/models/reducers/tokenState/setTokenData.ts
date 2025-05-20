@@ -36,7 +36,9 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
   const tokenValues = Array.isArray(payload.values) ? payload.values : removeIdPropertyFromTokens(payload.values);
 
   // When the remote data has changed, we will update the last synced state
-  const lastSyncedState = payload.hasChangedRemote ? JSON.stringify(compact([tokenValues, payload.themes, TokenFormat.format]), null, 2) : state.lastSyncedState;
+  const lastSyncedState = payload.hasChangedRemote
+    ? JSON.stringify(compact([tokenValues, payload.themes, TokenFormat.format]), null, 2)
+    : state.lastSyncedState;
 
   // @README (1) for the sake of normalization we will set the DISABLED status for all available token sets
   // this way we can always be certain the status is available. This behavior is also reflected in the createTokenSet logic
@@ -56,8 +58,8 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     ...(Object.keys(payload.values).includes(state.activeTokenSet)
       ? {}
       : {
-        activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
-      }),
+          activeTokenSet: Array.isArray(payload.values) ? 'global' : Object.keys(payload.values)[0],
+        }),
     usedTokenSet: Array.isArray(payload.values) ? { global: TokenSetStatus.ENABLED } : usedTokenSets,
     tokensSize,
     themesSize,

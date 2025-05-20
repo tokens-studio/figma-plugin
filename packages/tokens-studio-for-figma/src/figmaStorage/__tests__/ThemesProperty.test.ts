@@ -21,22 +21,18 @@ describe('ThemesProperty', () => {
   it('should be able to write compressed data', async () => {
     // Mock metadata check for single storage
     mockRootGetSharedPluginData.mockReturnValueOnce(null);
-    
+
     await ThemesProperty.write(mockThemes);
-    
+
     // Should set metadata first (indicating single storage)
     expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
-      'tokens', 
-      'themes_meta', 
-      JSON.stringify({ type: 'single' })
+      'tokens',
+      'themes_meta',
+      JSON.stringify({ type: 'single' }),
     );
-    
+
     // Then should set the actual data
-    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith(
-      'tokens', 
-      'themes', 
-      compressedMockThemes
-    );
+    expect(mockRootSetSharedPluginData).toHaveBeenCalledWith('tokens', 'themes', compressedMockThemes);
   });
 
   it('should be able to read', async () => {
@@ -60,10 +56,10 @@ describe('ThemesProperty', () => {
 
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // No metadata found, fallback to direct read
     mockRootGetSharedPluginData.mockReturnValueOnce(null);
-    
+
     // Null data found
     mockRootGetSharedPluginData.mockReturnValueOnce(null);
     const nullResult = await ThemesProperty.read();

@@ -69,10 +69,30 @@ const Navbar: React.FC<React.PropsWithChildren<React.PropsWithChildren<unknown>>
         </Stack>
         <NavbarUndoButton />
       </Stack>
-      <Stack direction="row" align="center" justify="end" gap={1} css={{ paddingRight: '$2', flexBasis: 'min-content' }}>
-        { (existingKey && !licenseKeyError) && <IconButton size="small" variant="invisible" icon={secondScreenIcon} tooltip="Second Screen" onClick={switchToSecondScreen} />}
+      <Stack
+        direction="row"
+        align="center"
+        justify="end"
+        gap={1}
+        css={{ paddingRight: '$2', flexBasis: 'min-content' }}
+      >
+        {existingKey && !licenseKeyError && (
+          <IconButton
+            size="small"
+            variant="invisible"
+            icon={secondScreenIcon}
+            tooltip="Second Screen"
+            onClick={switchToSecondScreen}
+          />
+        )}
         <TokenFlowButton />
-        <IconButton size="small" variant="invisible" tooltip={t('minimize') as string} onClick={handleResize} icon={<Minimize />} />
+        <IconButton
+          size="small"
+          variant="invisible"
+          tooltip={t('minimize') as string}
+          onClick={handleResize}
+          icon={<Minimize />}
+        />
       </Stack>
     </Box>
   );

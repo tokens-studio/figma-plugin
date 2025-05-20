@@ -1,19 +1,17 @@
 import React from 'react';
-import {
-  Button, Box, Text, Checkbox, Label, TextInput, Stack,
-} from '@tokens-studio/ui';
+import { Button, Box, Text, Checkbox, Label, TextInput, Stack } from '@tokens-studio/ui';
 import useConfirm from '../hooks/useConfirm';
 import Modal from './Modal';
 
-const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
-  checked?: boolean
-  choice: { key: string; unique?: boolean; enabled?: boolean }
-  onCheckedChange: (key: string, unique?: boolean) => void
-}>>> = ({
-  checked,
-  choice,
-  onCheckedChange,
-}) => {
+const ChoiceCheckbox: React.FC<
+  React.PropsWithChildren<
+    React.PropsWithChildren<{
+      checked?: boolean;
+      choice: { key: string; unique?: boolean; enabled?: boolean };
+      onCheckedChange: (key: string, unique?: boolean) => void;
+    }>
+  >
+> = ({ checked, choice, onCheckedChange }) => {
   const handleCheckedChange = React.useCallback(() => {
     onCheckedChange(choice.key, choice.unique);
   }, [choice, onCheckedChange]);
@@ -31,9 +29,7 @@ const ChoiceCheckbox: React.FC<React.PropsWithChildren<React.PropsWithChildren<{
 function ConfirmDialog() {
   const confirmButton = React.useRef<HTMLButtonElement | null>(null);
   const firstInput = React.useRef<HTMLInputElement | null>(null);
-  const {
-    onConfirm, onCancel, confirmState,
-  } = useConfirm();
+  const { onConfirm, onCancel, confirmState } = useConfirm();
   const [chosen, setChosen] = React.useState<string[]>([]);
   const [inputValue, setInputValue] = React.useState('');
 
@@ -66,14 +62,17 @@ function ConfirmDialog() {
     setInputValue(event.target.value);
   }, []);
 
-  const handleConfirm = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (confirmState.input) {
-      onConfirm(inputValue);
-    } else {
-      onConfirm(chosen);
-    }
-  }, [chosen, inputValue, confirmState, onConfirm]);
+  const handleConfirm = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (confirmState.input) {
+        onConfirm(inputValue);
+      } else {
+        onConfirm(chosen);
+      }
+    },
+    [chosen, inputValue, confirmState, onConfirm],
+  );
 
   React.useEffect(() => {
     if (confirmState.choices) setChosen(confirmState.choices.filter((c) => c.enabled).map((c) => c.key));
@@ -91,9 +90,7 @@ function ConfirmDialog() {
       <form id={confirmState.formId} onSubmit={handleConfirm}>
         <Stack direction="column" justify="start" gap={4}>
           <Stack direction="column" gap={4}>
-            {confirmState?.description && (
-              <Text muted>{confirmState.description}</Text>
-            )}
+            {confirmState?.description && <Text muted>{confirmState.description}</Text>}
             {confirmState?.input ? (
               <TextInput
                 id="input"
@@ -107,10 +104,7 @@ function ConfirmDialog() {
             {confirmState?.choices?.length ? (
               <Stack direction="column" align="start" gap={2}>
                 {confirmState.choices.map((choice) => (
-                  <Box
-                    css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
-                    key={choice.key}
-                  >
+                  <Box css={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }} key={choice.key}>
                     <ChoiceCheckbox
                       checked={chosen.includes(choice.key)}
                       choice={choice}

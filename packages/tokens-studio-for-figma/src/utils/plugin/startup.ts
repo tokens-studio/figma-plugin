@@ -1,6 +1,4 @@
-import {
-  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
-} from '@/figmaStorage';
+import { ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
@@ -51,15 +49,19 @@ export async function startup() {
     localApiProviders,
     licenseKey,
     initialLoad: initialLoad ?? false,
-    localTokenData: localTokenData ? {
-      ...localTokenData,
-      usedTokenSet,
-    } : null,
-    user: figma.currentUser ? {
-      userId,
-      figmaId: figma.currentUser.id,
-      name: figma.currentUser.name,
-    } : null,
+    localTokenData: localTokenData
+      ? {
+          ...localTokenData,
+          usedTokenSet,
+        }
+      : null,
+    user: figma.currentUser
+      ? {
+          userId,
+          figmaId: figma.currentUser.id,
+          name: figma.currentUser.name,
+        }
+      : null,
     authData,
     usedEmail,
   };

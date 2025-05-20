@@ -8,9 +8,12 @@ describe('TokenSetSelector Component', () => {
     store.dispatch.uiState.setOnboardingExplainerSets('true');
 
     const result = render(<TokenSetSelector />);
-    waitFor(async () => {
-      expect(await result.findByText('sets')).not.toBeUndefined();
-    }, { timeout: 10000 });
+    waitFor(
+      async () => {
+        expect(await result.findByText('sets')).not.toBeUndefined();
+      },
+      { timeout: 10000 },
+    );
   });
 
   it('hide onboarding explainer syncproviders', async () => {

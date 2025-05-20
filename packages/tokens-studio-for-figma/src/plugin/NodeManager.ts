@@ -10,7 +10,7 @@ import { UpdateMode } from '@/constants/UpdateMode';
 
 export type NodeManagerNode = {
   id: string;
-  node: BaseNode
+  node: BaseNode;
   tokens: NodeTokenRefMap;
 };
 
@@ -20,9 +20,7 @@ export class NodeManager {
   private async waitForUpdating() {
     return new Promise<void>((res) => {
       if (this.updating) {
-        this.updating
-          .then(() => res())
-          .catch(() => res());
+        this.updating.then(() => res()).catch(() => res());
       } else {
         res();
       }
@@ -76,17 +74,19 @@ export class NodeManager {
 
     this.updating = (async () => {
       for (let nodeIndex = 0; nodeIndex < relevantNodes.length; nodeIndex += 1) {
-        promises.add(defaultWorker.schedule(async () => {
-          const node = relevantNodes[nodeIndex];
+        promises.add(
+          defaultWorker.schedule(async () => {
+            const node = relevantNodes[nodeIndex];
 
-          returnedNodes.push({
-            node: relevantNodes[nodeIndex],
-            tokens: await tokensSharedDataHandler.getAll(node),
-            id: node.id,
-          });
-          tracker.next();
-          tracker.reportIfNecessary();
-        }));
+            returnedNodes.push({
+              node: relevantNodes[nodeIndex],
+              tokens: await tokensSharedDataHandler.getAll(node),
+              id: node.id,
+            });
+            tracker.next();
+            tracker.reportIfNecessary();
+          }),
+        );
       }
       await Promise.all(promises);
     })();

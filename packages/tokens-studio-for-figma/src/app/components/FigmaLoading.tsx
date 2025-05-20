@@ -31,35 +31,33 @@ const StyledLoadingButton = styled('button', {
 });
 
 type Props = PropsWithChildren<{
-  isLoading?: boolean
-  label?: string
-  onCancel?: () => void
+  isLoading?: boolean;
+  label?: string;
+  onCancel?: () => void;
 }>;
 
-export default function FigmaLoading({
-  isLoading, label, onCancel, children,
-}: Props) {
+export default function FigmaLoading({ isLoading, label, onCancel, children }: Props) {
   const { t } = useTranslation(['startScreen']);
 
   if (!isLoading) {
-    return (
-      <Box>
-        {children}
-      </Box>
-    );
+    return <Box>{children}</Box>;
   }
 
   return (
-    <StyledLoadingScreen data-testid="figmaloading" justify="center" direction="column" gap={4} className="content scroll-container">
+    <StyledLoadingScreen
+      data-testid="figmaloading"
+      justify="center"
+      direction="column"
+      gap={4}
+      className="content scroll-container"
+    >
       <Stack direction="column" gap={4} align="center">
         <Stack direction="column" gap={4} align="center">
           <StyledTokensStudioIcon />
           <StyledTokensStudioWord />
         </Stack>
         <Stack direction="column" gap={4} align="center" css={{ color: '$loadingScreenFgMuted' }}>
-          {t('version')}
-          {' '}
-          {pjs.version}
+          {t('version')} {pjs.version}
         </Stack>
         <Stack direction="row" gap={4} justify="center" align="center">
           <Spinner onAccent />
@@ -68,7 +66,9 @@ export default function FigmaLoading({
           </Stack>
         </Stack>
         <Stack direction="row" gap={4}>
-          <StyledLoadingButton type="button" onClick={onCancel}>{t('cancel')}</StyledLoadingButton>
+          <StyledLoadingButton type="button" onClick={onCancel}>
+            {t('cancel')}
+          </StyledLoadingButton>
         </Stack>
       </Stack>
     </StyledLoadingScreen>

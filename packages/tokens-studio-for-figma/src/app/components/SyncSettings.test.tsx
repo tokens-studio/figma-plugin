@@ -2,10 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
-import {
-  createMockStore,
-  render,
-} from '../../../tests/config/setupTest';
+import { createMockStore, render } from '../../../tests/config/setupTest';
 import SyncSettings from './SyncSettings';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { GitHubStorageType, StorageTypeCredential } from '@/types/StorageType';
@@ -58,9 +55,7 @@ describe('ConfirmDialog', () => {
 
   it('can convert to localStorage', async () => {
     const mockStore = createMockStore(defaultStore);
-    mockConfirm.mockImplementationOnce(() => (
-      Promise.resolve(true)
-    ));
+    mockConfirm.mockImplementationOnce(() => Promise.resolve(true));
     const result = render(
       <Provider store={mockStore}>
         <SyncSettings />

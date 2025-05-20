@@ -1,9 +1,5 @@
-import {
-  track, identify, setUserData, initializeAnalytics,
-} from './analytics';
-import {
-  mockTrack, mockInit, mockIdentify, mockPeopleSet,
-} from '../../tests/__mocks__/mixpanelMock';
+import { track, identify, setUserData, initializeAnalytics } from './analytics';
+import { mockTrack, mockInit, mockIdentify, mockPeopleSet } from '../../tests/__mocks__/mixpanelMock';
 import * as pjs from '../../package.json';
 
 describe('without mixpanel env', () => {

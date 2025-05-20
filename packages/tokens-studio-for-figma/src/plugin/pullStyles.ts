@@ -66,10 +66,10 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
           return styleObject
             ? {
-              ...styleObject,
-              name: normalizedName,
-              type: TokenTypes.COLOR,
-            }
+                ...styleObject,
+                name: normalizedName,
+                type: TokenTypes.COLOR,
+              }
             : null;
         }),
     );
@@ -99,35 +99,40 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       if (!rawTextDecoration.includes(style.textDecoration)) rawTextDecoration.push(style.textDecoration);
     });
 
-    fontSizes = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'fontSize',
-      localVariables,
-      tokens,
-      TokenTypes.FONT_SIZES,
-      'fontSize',
-      idx,
-      (value) => value.toString(),
-    ));
+    fontSizes = figmaTextStyles.map((style, idx) =>
+      processTextStyleProperty(
+        style,
+        'fontSize',
+        localVariables,
+        tokens,
+        TokenTypes.FONT_SIZES,
+        'fontSize',
+        idx,
+        (value) => value.toString(),
+      ),
+    );
 
     const uniqueFontCombinations = fontCombinations.filter(
       (v, i, a) => a.findIndex((t) => t.family === v.family && t.style === v.style) === i,
     );
 
-    lineHeights = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'lineHeight',
-      localVariables,
-      tokens,
-      TokenTypes.LINE_HEIGHTS,
-      'lineHeights',
-      idx,
-      (value) => convertFigmaToLineHeight(value).toString(),
-    ));
+    lineHeights = figmaTextStyles.map((style, idx) =>
+      processTextStyleProperty(
+        style,
+        'lineHeight',
+        localVariables,
+        tokens,
+        TokenTypes.LINE_HEIGHTS,
+        'lineHeights',
+        idx,
+        (value) => convertFigmaToLineHeight(value).toString(),
+      ),
+    );
 
     fontWeights = uniqueFontCombinations.map((font, idx) => {
-      const matchingStyle = figmaTextStyles.find((style) => style.fontName.family === font.family
- && style.fontName.style === font.style);
+      const matchingStyle = figmaTextStyles.find(
+        (style) => style.fontName.family === font.family && style.fontName.style === font.style,
+      );
 
       if (!matchingStyle) {
         return {
@@ -172,16 +177,18 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       );
     });
 
-    paragraphSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'paragraphSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.PARAGRAPH_SPACING,
-      'paragraphSpacing',
-      idx,
-      (value) => value.toString(),
-    ));
+    paragraphSpacing = figmaTextStyles.map((style, idx) =>
+      processTextStyleProperty(
+        style,
+        'paragraphSpacing',
+        localVariables,
+        tokens,
+        TokenTypes.PARAGRAPH_SPACING,
+        'paragraphSpacing',
+        idx,
+        (value) => value.toString(),
+      ),
+    );
 
     paragraphIndent = rawParagraphIndent
       .sort((a, b) => a - b)
@@ -191,16 +198,18 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         type: TokenTypes.DIMENSION,
       }));
 
-    letterSpacing = figmaTextStyles.map((style, idx) => processTextStyleProperty(
-      style,
-      'letterSpacing',
-      localVariables,
-      tokens,
-      TokenTypes.LETTER_SPACING,
-      'letterSpacing',
-      idx,
-      (value) => convertFigmaToLetterSpacing(value).toString(),
-    ));
+    letterSpacing = figmaTextStyles.map((style, idx) =>
+      processTextStyleProperty(
+        style,
+        'letterSpacing',
+        localVariables,
+        tokens,
+        TokenTypes.LETTER_SPACING,
+        'letterSpacing',
+        idx,
+        (value) => convertFigmaToLetterSpacing(value).toString(),
+      ),
+    );
 
     textCase = rawTextCase.map((value) => ({
       name: `textCase.${convertFigmaToTextCase(value)}`,
@@ -216,12 +225,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
 
     typography = figmaTextStyles.map((style) => {
       const foundFamily = fontFamilies.find(
-        findBoundVariable(
-          style,
-          'fontFamily',
-          localVariables,
-          (el) => el.value === style.fontName.family,
-        ),
+        findBoundVariable(style, 'fontFamily', localVariables, (el) => el.value === style.fontName.family),
       );
 
       const foundFontWeight = fontWeights.find(
@@ -242,12 +246,7 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
         ),
       );
       const foundFontSize = fontSizes.find(
-        findBoundVariable(
-          style,
-          'fontSize',
-          localVariables,
-          (el) => el.value === style.fontSize.toString(),
-        ),
+        findBoundVariable(style, 'fontSize', localVariables, (el) => el.value === style.fontSize.toString()),
       );
       const foundLetterSpacing = letterSpacing.find(
         findBoundVariable(
@@ -281,13 +280,23 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
       const obj = {
         fontFamily: foundFamily?.name ? `{${foundFamily.name}}` : style.fontName.family,
         fontWeight: foundFontWeight?.name ? `{${foundFontWeight.name}}` : style.fontName.style,
-        lineHeight: foundLineHeight?.name ? `{${foundLineHeight.name}}` : convertFigmaToLineHeight(style.lineHeight).toString(),
+        lineHeight: foundLineHeight?.name
+          ? `{${foundLineHeight.name}}`
+          : convertFigmaToLineHeight(style.lineHeight).toString(),
         fontSize: foundFontSize?.name ? `{${foundFontSize.name}}` : style.fontSize.toString(),
-        letterSpacing: foundLetterSpacing?.name ? `{${foundLetterSpacing.name}}` : convertFigmaToLetterSpacing(style.letterSpacing).toString(),
-        paragraphSpacing: foundParagraphSpacing?.name ? `{${foundParagraphSpacing.name}}` : style.paragraphSpacing.toString(),
-        paragraphIndent: foundParagraphIndent?.name ? `{${foundParagraphIndent.name}}` : `${style.paragraphIndent.toString()}px`,
+        letterSpacing: foundLetterSpacing?.name
+          ? `{${foundLetterSpacing.name}}`
+          : convertFigmaToLetterSpacing(style.letterSpacing).toString(),
+        paragraphSpacing: foundParagraphSpacing?.name
+          ? `{${foundParagraphSpacing.name}}`
+          : style.paragraphSpacing.toString(),
+        paragraphIndent: foundParagraphIndent?.name
+          ? `{${foundParagraphIndent.name}}`
+          : `${style.paragraphIndent.toString()}px`,
         textCase: foundTextCase?.name ? `{${foundTextCase.name}}` : convertFigmaToTextCase(style.textCase),
-        textDecoration: foundTextDecoration?.name ? `{${foundTextDecoration.name}}` : convertFigmaToTextDecoration(style.textDecoration),
+        textDecoration: foundTextDecoration?.name
+          ? `{${foundTextDecoration.name}}`
+          : convertFigmaToTextDecoration(style.textDecoration),
       };
 
       const normalizedName = style.name
@@ -363,14 +372,14 @@ export default async function pullStyles(styleTypes: PullStyleOptions): Promise<
     paragraphIndent,
   };
 
- type ResultObject = Record<string, StyleToCreateToken[]>;
+  type ResultObject = Record<string, StyleToCreateToken[]>;
 
- const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
-   if (value.length > 0) {
-     acc[key] = value;
-   }
-   return acc;
- }, {});
+  const returnedObject = Object.entries(stylesObject).reduce<ResultObject>((acc, [key, value]) => {
+    if (value.length > 0) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
 
- notifyStyleValues(returnedObject);
+  notifyStyleValues(returnedObject);
 }

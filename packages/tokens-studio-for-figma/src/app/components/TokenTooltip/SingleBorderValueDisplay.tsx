@@ -8,7 +8,10 @@ type Props = {
   resolvedValue: TokenBorderValue;
 };
 
-export const SingleBorderValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({ value, resolvedValue }) => (
+export const SingleBorderValueDisplay: React.FC<React.PropsWithChildren<React.PropsWithChildren<Props>>> = ({
+  value,
+  resolvedValue,
+}) => (
   <Stack direction="column" align="start" gap={1}>
     <TooltipProperty label="Color" value={value.color} resolvedValue={resolvedValue?.color} />
     <TooltipProperty label="Width" value={value.width} resolvedValue={resolvedValue?.width} />

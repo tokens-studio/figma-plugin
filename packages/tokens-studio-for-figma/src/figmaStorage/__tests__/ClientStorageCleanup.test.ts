@@ -26,7 +26,7 @@ describe('ClientStorageCleanup', () => {
       'file123/tokens/themes',
       'file456/tokens/values',
       'file456/tokens/themes',
-      'otherKey'
+      'otherKey',
     ]);
 
     await cleanupOldTokenPrefixes('file123');
@@ -39,11 +39,7 @@ describe('ClientStorageCleanup', () => {
 
   it('should not delete keys that start with the current prefix', async () => {
     // Mock keys with the correct format
-    mockKeysAsync.mockResolvedValue([
-      'file123/tokens/values',
-      'file123/tokens/themes',
-      'file456/tokens/values'
-    ]);
+    mockKeysAsync.mockResolvedValue(['file123/tokens/values', 'file123/tokens/themes', 'file456/tokens/values']);
 
     await cleanupOldTokenPrefixes('file123');
 
@@ -54,7 +50,7 @@ describe('ClientStorageCleanup', () => {
 
   it('should handle empty storage', async () => {
     mockKeysAsync.mockResolvedValue([]);
-    
+
     await cleanupOldTokenPrefixes('file123');
     expect(mockDeleteAsync).not.toHaveBeenCalled();
   });
