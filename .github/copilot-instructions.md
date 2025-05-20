@@ -7,6 +7,16 @@ Tokens Studio for Figma (formerly Figma Tokens) is a plugin for Figma allowing y
 - `packages/tokens-studio-for-figma` - Main Figma plugin package
 - `developer-knowledgebase` - Technical documentation
 
+### Figma Plugin Architecture
+
+As a Figma plugin, our codebase is split into two main environments:
+- **UI (iframe)**: The React-based user interface that runs in a browser-like environment
+- **Figma Sandbox**: The code that interacts directly with the Figma document and API
+
+Figma plugins operate on a message-passing architecture between these two environments. The UI sends messages to the sandbox to request operations on the Figma document, and the sandbox responds with results or events.
+
+For anything related to the Figma sandbox environment or using the global `figma` object, always consult the official Figma Plugin API documentation at https://www.figma.com/plugin-docs/. This documentation is essential for understanding the capabilities and limitations when working with Figma's API.
+
 ## Development Setup
 
 ### Prerequisites
@@ -131,20 +141,6 @@ SENTRY_REPLAY_SAMPLING=0
 
 ## Common Workflows
 
-### Adding New Features
-
-1. Create a feature branch
-2. Implement your changes with tests
-3. Add translations if adding UI text
-4. Create a pull request
-
-### Release Process
-
-1. Changesets are used for version management
-2. PR is merged to main
-3. GitHub Actions automate the release process
-4. Sentry releases created automatically
-
 ## Debugging
 
 - Use console.log in plugin code (visible in Figma's developer console)
@@ -165,3 +161,4 @@ SENTRY_REPLAY_SAMPLING=0
 4. Keep components small and focused
 5. Use appropriate error handling
 6. Document complex logic with comments
+7. Always use `yarn changeset` on every PR to describe your changes
