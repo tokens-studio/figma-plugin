@@ -185,7 +185,7 @@ describe('editToken', () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-    // expect(consoleError).not.toHaveBeenCalled();
+    expect(consoleError).not.toHaveBeenCalled();
   });
 
   it('calls updateAliases if old name differs from new name', async () => {
