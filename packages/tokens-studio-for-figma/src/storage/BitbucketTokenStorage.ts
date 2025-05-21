@@ -246,8 +246,13 @@ export class BitbucketTokenStorage extends GitTokenStorage {
             cache: 'no-cache',
           }).then((rsp) => rsp.text())),
         );
+
+        // First, process all files to find metadata
+        const processedFiles: RemoteTokenStorageFile[] = [];
+        let metadataFile: RemoteTokenStorageFile | null = null;
+
         // Process the content of each JSON file
-        return jsonFileContents.map((fileContent, index) => {
+        jsonFileContents.forEach((fileContent, index) => {
           const { path } = jsonFiles[index];
           const filePath = path.startsWith(this.path) ? path : `${this.path}/${path}`;
           let name = filePath.substring(this.path.length).replace(/^\/+/, '');
@@ -255,28 +260,32 @@ export class BitbucketTokenStorage extends GitTokenStorage {
           const parsed = JSON.parse(fileContent) as GitMultiFileObject;
 
           if (name === SystemFilenames.THEMES) {
-            return {
+            processedFiles.push({
               path: filePath,
               type: 'themes',
               data: parsed as ThemeObjectsList,
-            };
-          }
-
-          if (name === SystemFilenames.METADATA) {
-            return {
+            });
+          } else if (name === SystemFilenames.METADATA) {
+            // Store metadata separately to ensure it's processed first
+            metadataFile = {
               path: filePath,
               type: 'metadata',
               data: parsed as RemoteTokenStorageMetadata,
             };
+          } else {
+            processedFiles.push({
+              path: filePath,
+              name,
+              type: 'tokenSet',
+              data: parsed as AnyTokenSet<false>,
+            });
           }
-
-          return {
-            path: filePath,
-            name,
-            type: 'tokenSet',
-            data: parsed as AnyTokenSet<false>,
-          };
         });
+
+        // Return with metadata first (if it exists) to ensure order is preserved
+        return metadataFile 
+          ? [metadataFile, ...processedFiles] 
+          : processedFiles;
       }
 
       return {
