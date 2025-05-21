@@ -1,0 +1,22 @@
+name: "Copilot Setup Steps"
+
+on: workflow_dispatch
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # For better relevancy when analyzing code
+      
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: yarn
+          cache-dependency-path: "**/yarn.lock"
+          
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --immutable
