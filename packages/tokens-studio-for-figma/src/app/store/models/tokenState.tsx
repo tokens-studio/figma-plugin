@@ -56,6 +56,7 @@ import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -885,8 +886,12 @@ export const tokenState = createModel<RootModel>()({
 
         // Check if there are unsaved changes before updating
         const { lastSyncedState } = rootState.tokenState;
-        const currentState = JSON.stringify([rootState.tokenState.tokens, rootState.tokenState.themes, rootState.tokenState.tokenFormat], null, 2);
-        const hasChanges = lastSyncedState !== currentState;
+        const hasChanges = !compareLastSyncedState(
+          rootState.tokenState.tokens, 
+          rootState.tokenState.themes, 
+          lastSyncedState,
+          rootState.tokenState.tokenFormat
+        );
 
         // Update checkForChanges flag before proceeding with updates
         if (hasChanges !== rootState.tokenState.checkForChanges) {
