@@ -55,7 +55,7 @@ import { deleteTokenSetFromTokensStudio } from '@/storage/tokensStudio/deleteTok
 import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
-import { checkStorageSize } from '@/utils/checkStorageSize';
+import { StorageSizeUtil } from '@/utils/StorageSizeUtil';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -870,8 +870,8 @@ export const tokenState = createModel<RootModel>()({
       const params = { ...defaults, ...options };
       if (!rootState) return;
       try {
-        const tokensSize = checkStorageSize(rootState.tokenState.tokens);
-        const themesSize = checkStorageSize(rootState.tokenState.themes);
+        const tokensSize = StorageSizeUtil.getObjectSize(rootState.tokenState.tokens);
+        const themesSize = StorageSizeUtil.getObjectSize(rootState.tokenState.themes);
 
         // Update the tokensSize in state if it has changed
         if (rootState.tokenState.tokensSize !== tokensSize) {

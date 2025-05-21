@@ -6,7 +6,7 @@ import type { TokenState } from '../../tokenState';
 import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 import { TokenStore } from '@/types/tokens';
-import { checkStorageSize } from '@/utils/checkStorageSize';
+import { StorageSizeUtil } from '@/utils/StorageSizeUtil';
 
 export function setTokenData(state: TokenState, payload: SetTokenDataPayload): TokenState {
   if (payload.values.length === 0) {
@@ -19,8 +19,8 @@ export function setTokenData(state: TokenState, payload: SetTokenDataPayload): T
     values = parseTokenValues(payload.values);
   }
 
-  const tokensSize = payload.values ? checkStorageSize(payload.values) : state.tokensSize;
-  const themesSize = payload.themes ? checkStorageSize(payload.themes) : state.themesSize;
+  const tokensSize = payload.values ? StorageSizeUtil.getObjectSize(payload.values) : state.tokensSize;
+  const themesSize = payload.themes ? StorageSizeUtil.getObjectSize(payload.themes) : state.themesSize;
 
   const allAvailableTokenSets = Object.keys(values);
   const usedTokenSets = Object.fromEntries(
