@@ -120,8 +120,8 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     try {
       const { data } = await this.bitbucketClient.repositories.listPermissions({});
       const permission = data.values?.[0]?.permission;
-
-      const canWrite = !!(permission === 'admin' || 'write');
+      
+      const canWrite = !!(permission === 'admin' || permission === 'write');
       return !!canWrite;
     } catch (e) {
       return false;
@@ -387,6 +387,12 @@ export class BitbucketTokenStorage extends GitTokenStorage {
     branch: string,
     shouldCreateBranch?: boolean,
   ): Promise<boolean> {
+    // Check if user has write access before proceeding
+    const hasWriteAccess = await this.canWrite();
+    if (!hasWriteAccess) {
+      return false;
+    }
+
     const response = this.createOrUpdateFiles({
       owner: this.owner,
       repo: this.repository,
