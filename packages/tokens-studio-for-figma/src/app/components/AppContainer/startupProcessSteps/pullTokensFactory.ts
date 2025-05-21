@@ -128,10 +128,21 @@ export function pullTokensFactory(
 
   return async () => {
     const state = store.getState();
+    const storageType = storageTypeSelector(state);
+    const isRemoteStorage = [
+      StorageProviderType.ADO,
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.BITBUCKET,
+      StorageProviderType.JSONBIN,
+      StorageProviderType.GENERIC_VERSIONED_STORAGE,
+      StorageProviderType.URL,
+      StorageProviderType.SUPERNOVA,
+      StorageProviderType.TOKENS_STUDIO,
+    ].includes(storageType.provider);
 
     if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
-      const storageType = storageTypeSelector(state);
 
       if (
         !checkForChanges
@@ -155,8 +166,12 @@ export function pullTokensFactory(
           dispatch.uiState.setActiveTab(Tabs.START);
         }
       }
+    } else if (isRemoteStorage) {
+      // No local token data but we have remote storage configured
+      // Try to pull tokens from remote
+      await getApiCredentials(true);
     } else {
-      // no local token values - go to start tab
+      // no local token values and no remote storage - go to start tab
       dispatch.uiState.setActiveTab(Tabs.START);
     }
   };
