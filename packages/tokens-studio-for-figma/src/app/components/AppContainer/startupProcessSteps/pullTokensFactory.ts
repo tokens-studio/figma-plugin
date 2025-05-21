@@ -146,6 +146,12 @@ export function pullTokensFactory(
         if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
         // no local changes and user did not confirm to pull tokens
         dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+
+        // Make sure tokens are editable after recovering local changes if the user has write access
+        // For local storage or after recovering local changes, we should enable editing
+        // This allows users to edit tokens after recovering local changes
+        dispatch.tokenState.setEditProhibited(false);
+
         const hasTokens = Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
         if (hasTokens) {
           // local tokens found

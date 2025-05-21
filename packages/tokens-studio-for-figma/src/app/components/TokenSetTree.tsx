@@ -66,9 +66,7 @@ export default function TokenSetTree({
     const tokenCountMap = new Map<string, number>();
 
     Object.entries(tokens).forEach(([setName, setContent]) => {
-      const matchingTokens = setContent.filter((token) =>
-        token.name.toLowerCase().includes(tokenFilter.toLowerCase())
-      );
+      const matchingTokens = setContent.filter((token) => token.name.toLowerCase().includes(tokenFilter.toLowerCase()));
 
       const setNameMatches = setName.toLowerCase().includes(tokenFilter.toLowerCase());
 
