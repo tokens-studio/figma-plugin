@@ -885,17 +885,19 @@ export const tokenState = createModel<RootModel>()({
         }
 
         // Check if there are unsaved changes before updating
-        const { lastSyncedState } = rootState.tokenState;
-        const hasChanges = !compareLastSyncedState(
-          rootState.tokenState.tokens, 
-          rootState.tokenState.themes, 
-          lastSyncedState,
-          rootState.tokenState.tokenFormat
-        );
+        if (rootState.uiState.storageType.provider !== StorageProviderType.TOKENS_STUDIO) {
+          const { lastSyncedState } = rootState.tokenState;
+          const hasChanges = !compareLastSyncedState(
+            rootState.tokenState.tokens,
+            rootState.tokenState.themes,
+            lastSyncedState,
+            rootState.tokenState.tokenFormat,
+          );
 
-        // Update checkForChanges flag before proceeding with updates
-        if (hasChanges !== rootState.tokenState.checkForChanges) {
-          dispatch.tokenState.updateCheckForChanges(hasChanges);
+          // Update checkForChanges flag before proceeding with updates
+          if (hasChanges !== rootState.tokenState.checkForChanges) {
+            dispatch.tokenState.updateCheckForChanges(hasChanges);
+          }
         }
 
         wrapTransaction(
