@@ -1,6 +1,6 @@
 import { decompressFromUTF16 } from 'lz-string';
 import { cleanupOldTokenPrefixes } from './ClientStorageCleanup';
-import { getStorageSize, SAFE_STORAGE_LIMIT } from './StorageSizeManager';
+import { StorageSizeUtil } from '../utils/StorageSizeUtil';
 import { getUTF16StringSize } from '@/utils/getUTF16StringSize';
 
 const MAX_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB in bytes, same as Figma's limit
@@ -15,9 +15,9 @@ export const ClientStorageProperty = {
       console.error(`Cannot write to client storage: Data size (${sizeInMB} MB) exceeds maximum limit in Figma of 5MB`);
       return false;
     }
-    const currentSize = await getStorageSize();
+    const currentSize = await StorageSizeUtil.getUsedStorageSize();
 
-    if (currentSize + newSize > SAFE_STORAGE_LIMIT) {
+    if (currentSize + newSize > StorageSizeUtil.SAFE_STORAGE_LIMIT_BYTES) {
       await cleanupOldTokenPrefixes(fileKey);
     }
 
