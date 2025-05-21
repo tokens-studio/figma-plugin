@@ -11,10 +11,10 @@ package
 storybook-static
 coverage
 .DS_Store
-benchmark/output
-benchmark/build
+packages/tokens-studio-for-figma/benchmark/output
+packages/tokens-studio-for-figma/benchmark/build
 # Temporary flamegraphs between builds
-benchmark/flamegraphs
+packages/tokens-studio-for-figma/benchmark/flamegraphs
 **.0x
 techdocs/
 .turbo
