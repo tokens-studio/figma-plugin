@@ -335,29 +335,60 @@ describe('BitbucketTokenStorage', () => {
     expect(mockCreateOrUpdateFiles).not.toHaveBeenCalled();
   });
 
-  // it('fetchBranches should return a flattened list of all paginated branches', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
+  it('should preserve metadata first when reading from multi-file', async () => {
+    // Enable multi-file mode
+    storageProvider.enableMultiFile();
+    storageProvider.changePath('tokens');
 
-  // it('create a branch should return false when it has failed', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
-  // it('can read from Git in a single file format', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
-  // it('can read from Git in a multifile format', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
-  // it('should return an empty array when reading results in an error', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
-  // it('should be able to write a multifile structure', async () => {
-  //   // TODO
-  //   expect((await 1) + 1).toEqual(3);
-  // });
+    // Mock the fetchJsonFilesFromDirectory method to return files in alphabetical order
+    const mockJsonFiles = [
+      { path: 'tokens/B.json', links: { self: { href: 'B-link' } } },
+      { path: 'tokens/A.json', links: { self: { href: 'A-link' } } },
+      { path: 'tokens/$metadata.json', links: { self: { href: 'metadata-link' } } },
+      { path: 'tokens/$themes.json', links: { self: { href: 'themes-link' } } },
+    ];
+
+    // Mock the implementation of fetchJsonFilesFromDirectory
+    const originalFetchJsonFilesFromDirectory = storageProvider['fetchJsonFilesFromDirectory'];
+    storageProvider['fetchJsonFilesFromDirectory'] = jest.fn().mockResolvedValue(mockJsonFiles);
+
+    // Mock fetch for each file
+    mockFetch
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ type: 'B' })),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ type: 'A' })),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify({ tokenSetOrder: ['Z', 'B', 'A'] })),
+      }))
+      .mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(JSON.stringify([])),
+      }));
+
+    // Call the read method
+    const result = await storageProvider.read();
+
+    // Restore the original method
+    storageProvider['fetchJsonFilesFromDirectory'] = originalFetchJsonFilesFromDirectory;
+
+    // Verify that metadata is first in the result array
+    expect(Array.isArray(result)).toBe(true);
+    if (Array.isArray(result)) {
+      // Check if the result has metadata first
+      const metadataIndex = result.findIndex((file) => file.type === 'metadata');
+      expect(metadataIndex).toBe(0);
+      
+      // Check that the result contains all the files
+      expect(result.length).toBe(4);
+      expect(result.some((file) => file.type === 'themes')).toBe(true);
+      expect(result.some((file) => file.type === 'tokenSet' && file.name === 'A')).toBe(true);
+      expect(result.some((file) => file.type === 'tokenSet' && file.name === 'B')).toBe(true);
+    }
+  });
 });
