@@ -221,7 +221,7 @@ export function useTokensStudio() {
         notifyToUI('Error syncing with Tokens Studio, check credentials', { error: true });
         return {
           status: 'failure',
-          errorMessage: JSON.stringify(e),
+          errorMessage: String(e),
         };
       }
     },
