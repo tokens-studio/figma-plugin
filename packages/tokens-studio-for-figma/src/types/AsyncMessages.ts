@@ -60,6 +60,7 @@ export enum AsyncMessageTypes {
   SET_AUTH_DATA = 'async/set-auth-data',
   SET_USED_EMAIL = 'async/set-used-email',
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
+  GENERATE_LIVING_DOCUMENTATION = 'async/generate-living-documentation',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -359,6 +360,21 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 }
 >;
 
+export type GenerateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.GENERATE_LIVING_DOCUMENTATION, {
+  tokenSets: string[];
+  includeAllTokens: boolean;
+  documentationLayout: 'grid' | 'list';
+}>;
+export type GenerateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.GENERATE_LIVING_DOCUMENTATION, {
+  success: boolean;
+  message: string;
+  stats?: {
+    tokensProcessed: number;
+    componentsCreated: number;
+    componentsUpdated: number;
+  };
+}>;
+
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
@@ -408,7 +424,8 @@ export type AsyncMessages =
   | UpdateVariablesAsyncMessage
   | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage
-  | RemoveStylesWithoutConnectionMessage;
+  | RemoveStylesWithoutConnectionMessage
+  | GenerateLivingDocumentationAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -456,7 +473,8 @@ export type AsyncMessageResults =
   | UpdateVariablesAsyncMessageResult
   | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult
-  | RemoveStylesWithoutConnectionResult;
+  | RemoveStylesWithoutConnectionResult
+  | GenerateLivingDocumentationAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
