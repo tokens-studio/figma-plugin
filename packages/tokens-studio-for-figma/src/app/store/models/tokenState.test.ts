@@ -16,7 +16,7 @@ jest.mock('uuid', () => ({
 }));
 
 // Hide errors unless they are expected
-const consoleError = jest.spyOn(console, 'error').mockImplementation(() => { });
+const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
 const shadowArray = [
   {
@@ -184,6 +184,7 @@ describe('editToken', () => {
     jest.clearAllMocks();
   });
   afterEach(() => {
+    jest.clearAllMocks();
     expect(consoleError).not.toHaveBeenCalled();
   });
 
