@@ -60,6 +60,7 @@ export enum AsyncMessageTypes {
   SET_AUTH_DATA = 'async/set-auth-data',
   SET_USED_EMAIL = 'async/set-used-email',
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
+  WRITE_SHARED_PLUGIN_DATA = 'async/write-shared-plugin-data',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -352,12 +353,12 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 }
 >;
 
-export type RemoveRelaunchDataMessageResult = AsyncMessage<
-AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
-{
-  totalNodes: number;
-}
->;
+export type WriteSharedPluginDataAsyncMessage = AsyncMessage<AsyncMessageTypes.WRITE_SHARED_PLUGIN_DATA, {
+  namespace: string;
+  key: string;
+  value: string;
+}>;
+export type WriteSharedPluginDataAsyncMessageResult = AsyncMessage<AsyncMessageTypes.WRITE_SHARED_PLUGIN_DATA>;
 
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
@@ -408,7 +409,8 @@ export type AsyncMessages =
   | UpdateVariablesAsyncMessage
   | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage
-  | RemoveStylesWithoutConnectionMessage;
+  | RemoveStylesWithoutConnectionMessage
+  | WriteSharedPluginDataAsyncMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -456,7 +458,8 @@ export type AsyncMessageResults =
   | UpdateVariablesAsyncMessageResult
   | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult
-  | RemoveStylesWithoutConnectionResult;
+  | RemoveStylesWithoutConnectionResult
+  | WriteSharedPluginDataAsyncMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>

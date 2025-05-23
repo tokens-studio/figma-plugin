@@ -28,6 +28,7 @@ import {
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { Dispatch } from '../../store';
+import { usePluginData } from '@/app/hooks/usePluginData';
 
 const StyledCheckboxGrid = styled(Box, {
   display: 'grid', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center',
@@ -53,40 +54,71 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesEffect = useSelector(stylesEffectSelector);
 
   const dispatch = useDispatch<Dispatch>();
+  const { saveSharedPluginData } = usePluginData();
+  
+  // Save the current export settings to shared plugin data
+  const saveVariableExportSettings = React.useCallback(() => {
+    const settings = {
+      ignoreFirstPartForStyles: rulesIgnoreFirstPartForStyles,
+      prefixStylesWithThemeName: rulesPrefixStylesWithThemeName,
+      createStylesWithVariableReferences: rulesCreateStylesWithVariableReferences,
+      renameExistingStylesAndVariables: rulesRenameExisting,
+      removeStylesAndVariablesWithoutConnection: rulesRemoveStylesAndVariablesWithoutConnection,
+      variablesColor,
+      variablesNumber,
+      variablesBoolean,
+      variablesString,
+      stylesColor,
+      stylesTypography,
+      stylesEffect,
+    };
+    saveSharedPluginData('variableExportSettings', JSON.stringify(settings));
+  }, [
+    saveSharedPluginData, rulesIgnoreFirstPartForStyles, rulesPrefixStylesWithThemeName, 
+    rulesCreateStylesWithVariableReferences, rulesRenameExisting, 
+    rulesRemoveStylesAndVariablesWithoutConnection, variablesColor, 
+    variablesNumber, variablesBoolean, variablesString, 
+    stylesColor, stylesTypography, stylesEffect
+  ]);
 
   const handleIgnoreChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setIgnoreFirstPartForStyles(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handlePrefixWithThemeNameChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setPrefixStylesWithThemeName(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleCreateStylesWithVariableReferencesChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setCreateStylesWithVariableReferences(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleRenameExistingChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setRenameExistingStylesAndVariables(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleRemoveStylesAndVariablesWithoutConnectionChange = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setRemoveStylesAndVariablesWithoutConnection(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleExportVariablesColor = React.useCallback(
@@ -94,52 +126,60 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       dispatch.settings.setVariablesColor(!!state);
       // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
       if (state) dispatch.settings.setStylesColor(!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleExportVariablesNumber = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesNumber(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
   const handleExportVariablesBoolean = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesBoolean(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
   const handleExportVariablesString = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setVariablesString(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
   const handleExportStylesColor = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setStylesColor(!!state);
       // color can be created *either* styles or variables, we dont want both. if we're setting this to true, disable the other one
       if (state) dispatch.settings.setVariablesColor(!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
   const handleExportStylesTypography = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setStylesTypography(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
   const handleExportStylesEffect = React.useCallback(
     (state: CheckedState) => {
       dispatch.settings.setStylesEffect(!!state);
+      saveVariableExportSettings();
     },
-    [dispatch.settings],
+    [dispatch.settings, saveVariableExportSettings],
   );
 
   const handleSaveOptions = React.useCallback(() => {
+    saveVariableExportSettings();
     closeAction();
-  }, [closeAction]);
+  }, [closeAction, saveVariableExportSettings]);
 
   const onInteractOutside = (event: Event) => {
     event.preventDefault();

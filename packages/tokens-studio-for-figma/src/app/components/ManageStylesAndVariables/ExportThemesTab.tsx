@@ -29,8 +29,8 @@ export default function ExportThemesTab({ selectedThemes, setSelectedThemes }: {
 
   const ungroupedThemes = React.useMemo(() => themes.filter((theme) => !theme.group), [themes]);
 
-  // TODO: Remeber selected themes in document storage
-  // Reloading the plugin shouldn't forget the selected themes
+  // Selected themes are now remembered in document storage
+  // See ManageStylesAndVariables.tsx for implementation
 
   const handleSelectTheme = React.useCallback((themeId: string) => {
     if (selectedThemes.includes(themeId)) {

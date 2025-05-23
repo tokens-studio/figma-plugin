@@ -36,6 +36,16 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainer.syncProviders);
       dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainer.inspect);
       dispatch.settings.setUISettings(settings);
+      
+      // Store the selected export themes in the UI state
+      if (params.selectedExportThemes) {
+        try {
+          const selectedThemes = JSON.parse(params.selectedExportThemes);
+          dispatch.uiState.setSelectedExportThemes(selectedThemes);
+        } catch (err) {
+          console.warn('Error parsing selected export themes', err);
+        }
+      }
     } else {
       throw new Error('User not found');
     }
