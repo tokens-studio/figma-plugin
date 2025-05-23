@@ -1,3 +1,4 @@
+export * from './writeSharedPluginData';
 export * from './credentials';
 export * from './changedTabs';
 export * from './removeSingleCredential';

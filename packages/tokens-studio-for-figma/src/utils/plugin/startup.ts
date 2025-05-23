@@ -9,6 +9,8 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
+import { readSharedPluginData } from '@/utils/figmaStorage/readSharedPluginData';
+import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 
 export async function startup() {
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
@@ -26,6 +28,8 @@ export async function startup() {
     localTokenData,
     authData,
     usedEmail,
+    variableExportSettings,
+    selectedExportThemes,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -40,10 +44,26 @@ export async function startup() {
     getTokenData(),
     AuthDataProperty.read(),
     UsedEmailProperty.read(),
+    readSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'variableExportSettings'),
+    readSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'selectedExportThemes'),
   ]);
 
+  // If we have saved variable export settings, apply them to the settings
+  let finalSettings = settings;
+  if (variableExportSettings) {
+    try {
+      const exportSettings = JSON.parse(variableExportSettings);
+      finalSettings = {
+        ...settings,
+        ...exportSettings,
+      };
+    } catch (err) {
+      console.error('Error parsing variable export settings', err);
+    }
+  }
+
   return {
-    settings,
+    settings: finalSettings,
     activeTheme,
     lastOpened,
     onboardingExplainer,
@@ -62,5 +82,6 @@ export async function startup() {
     } : null,
     authData,
     usedEmail,
+    selectedExportThemes,
   };
 }
