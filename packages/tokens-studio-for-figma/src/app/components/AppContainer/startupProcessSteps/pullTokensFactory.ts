@@ -10,6 +10,7 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '@/app/hooks/useConfirm';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
+import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
@@ -33,77 +34,85 @@ export function pullTokensFactory(
     return shouldRecoverLocalChanges;
   };
 
-  const getApiCredentials = async (shouldPull: boolean) => {
+  const getApiCredentials = async (shouldPull: boolean, isRemoteStorage: boolean) => {
     const state = store.getState();
     const storageType = storageTypeSelector(state);
 
-    const matchingSet = params.localApiProviders?.find((provider) => (
-      isSameCredentials(provider, storageType)
-    ));
+    if (isRemoteStorage) {
+      const matchingSet = params.localApiProviders?.find((provider) => (
+        isSameCredentials(provider, storageType)
+      ));
 
-    if (matchingSet) {
-      // found API credentials
-      try {
-        const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
-        track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
-        if (!matchingSet.internalId) {
-          track('missingInternalId', { provider: matchingSet.provider });
-        }
+      if (matchingSet) {
+        // found API credentials
+        try {
+          const isMultifile = isGitProvider(matchingSet) && 'filePath' in matchingSet && !matchingSet.filePath.endsWith('.json');
+          track('Fetched from remote', { provider: matchingSet.provider, isMultifile });
+          if (!matchingSet.internalId) {
+            track('missingInternalId', { provider: matchingSet.provider });
+          }
 
-        if (
-          matchingSet.provider === StorageProviderType.GITHUB
+          if (
+            matchingSet.provider === StorageProviderType.GITHUB
             || matchingSet.provider === StorageProviderType.GITLAB
             || matchingSet.provider === StorageProviderType.ADO
             || matchingSet.provider === StorageProviderType.BITBUCKET
-        ) {
-          const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
-          if (branches) dispatch.branchState.setBranches(branches);
-        }
-
-        dispatch.uiState.setApiData(matchingSet);
-        dispatch.uiState.setLocalApiState(matchingSet);
-        // we don't want to update nodes if we're pulling from remote
-        dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
-        dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
-
-        const remoteData = await useRemoteTokensResult.pullTokens({
-          context: matchingSet,
-          featureFlags: flags,
-          activeTheme,
-          usedTokenSet: params.localTokenData?.usedTokenSet,
-          collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
-          updateLocalTokens: shouldPull,
-        });
-
-        if (shouldPull) {
-          // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
-          if (!remoteData) {
-            notifyToUI('Failed to fetch tokens from remote storage', { error: true });
-            dispatch.uiState.setActiveTab(Tabs.START);
-            return;
+          ) {
+            const branches = await useRemoteTokensResult.fetchBranches(matchingSet);
+            if (branches) dispatch.branchState.setBranches(branches);
           }
 
-          if (remoteData?.status === 'failure') {
-            // If we have some error reading tokens, we let the user know - e.g. schema validation doesn't pass.
-            notifyToUI(remoteData.errorMessage, { error: true });
-            dispatch.uiState.setActiveTab(Tabs.START);
+          dispatch.uiState.setApiData(matchingSet);
+          dispatch.uiState.setLocalApiState(matchingSet);
+          // we don't want to update nodes if we're pulling from remote
+          dispatch.tokenState.setActiveTheme({ newActiveTheme: activeTheme || null, shouldUpdateNodes: false });
+          dispatch.tokenState.setCollapsedTokenSets(params.localTokenData?.collapsedTokenSets || []);
+
+          const remoteData = await useRemoteTokensResult.pullTokens({
+            context: matchingSet,
+            featureFlags: flags,
+            activeTheme,
+            usedTokenSet: params.localTokenData?.usedTokenSet,
+            collapsedTokenSets: params.localTokenData?.collapsedTokenSets,
+            updateLocalTokens: shouldPull,
+          });
+
+          if (shouldPull) {
+            // If there's no data stored on the remote, show a message - e.g. file doesn't exist.
+            if (!remoteData) {
+              notifyToUI('Failed to fetch tokens from remote storage', { error: true });
+              dispatch.uiState.setActiveTab(Tabs.START);
+              return;
+            }
+
+            if (remoteData?.status === 'failure') {
+              // If we have some error reading tokens, we let the user know - e.g. schema validation doesn't pass.
+              notifyToUI(remoteData.errorMessage, { error: true });
+              dispatch.uiState.setActiveTab(Tabs.START);
+            } else {
+              // If we succeeded we can move on to show the tokens screen
+              dispatch.uiState.setActiveTab(Tabs.TOKENS);
+            }
           } else {
-            // If we succeeded we can move on to show the tokens screen
             dispatch.uiState.setActiveTab(Tabs.TOKENS);
           }
-        } else {
-          dispatch.uiState.setActiveTab(Tabs.TOKENS);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+          dispatch.uiState.setActiveTab(Tabs.START);
+          dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
+          notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
         }
-      } catch (err) {
-        console.error(err);
-        Sentry.captureException(err);
+      } else {
+        // no API credentials available for storage type
         dispatch.uiState.setActiveTab(Tabs.START);
-        dispatch.uiState.completeJob(BackgroundJobs.UI_PULLTOKENS);
-        notifyToUI('Failed to fetch tokens, check your credentials', { error: true });
       }
-    } else {
-      // no API credentials available for storage type
-      dispatch.uiState.setActiveTab(Tabs.START);
+    } else if (params.localTokenData) {
+      if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
+      dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
+      const existTokens = hasTokenValues(params.localTokenData.values);
+      if (existTokens) dispatch.uiState.setActiveTab(Tabs.TOKENS);
+      else dispatch.uiState.setActiveTab(Tabs.START);
     }
   };
 
@@ -128,7 +137,7 @@ export function pullTokensFactory(
     // Check if storage is remote and local data is empty
     if (isRemoteStorage && !hasLocalData) {
       // Pull tokens from remote since local data is empty
-      await getApiCredentials(true);
+      await getApiCredentials(true, isRemoteStorage);
     } else if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
 
@@ -140,7 +149,7 @@ export function pullTokensFactory(
         )
       ) {
         // get API credentials
-        await getApiCredentials(true);
+        await getApiCredentials(true, isRemoteStorage);
       } else {
         if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
         // User confirmed to recover local changes
@@ -148,7 +157,7 @@ export function pullTokensFactory(
 
         if (hasLocalData) {
           // local tokens found
-          await getApiCredentials(false);
+          await getApiCredentials(false, isRemoteStorage);
         } else {
           // no local tokens - go to start
           dispatch.uiState.setActiveTab(Tabs.START);
