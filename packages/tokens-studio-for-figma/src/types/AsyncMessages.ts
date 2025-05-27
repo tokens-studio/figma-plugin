@@ -38,6 +38,7 @@ export enum AsyncMessageTypes {
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
   SET_NODE_DATA = 'async/set-node-data',
+  GENERATE_LIVING_DOCUMENTATION = 'async/generate-living-documentation',
   REMOVE_TOKENS_BY_VALUE = 'async/remove-tokens-by-value',
   REMAP_TOKENS = 'async/remap-tokens',
   BULK_REMAP_TOKENS = 'async/bulk-remap-tokens',
@@ -359,6 +360,15 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
 }
 >;
 
+export type GenerateLivingDocumentationAsyncMessage = AsyncMessage<AsyncMessageTypes.GENERATE_LIVING_DOCUMENTATION, {
+  tokenSet: string;
+  startsWith: string;
+}>;
+export type GenerateLivingDocumentationAsyncMessageResult = AsyncMessage<AsyncMessageTypes.GENERATE_LIVING_DOCUMENTATION, {
+  success: boolean;
+  frameId?: string;
+}>;
+
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 
@@ -375,6 +385,7 @@ export type AsyncMessages =
   | SetOnboardingExplainerInspectAsyncMessage
   | SetOnboardingExplainerSyncProvidersAsyncMessage
   | SetNodeDataAsyncMessage
+  | GenerateLivingDocumentationAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
   | BulkRemapTokensAsyncMessage
@@ -423,6 +434,7 @@ export type AsyncMessageResults =
   | SetOnboardingExplainerSyncProvidersAsyncMessageResult
   | SetOnboardingExplainerInspectAsyncMessageResult
   | SetNodeDataAsyncMessageResult
+  | GenerateLivingDocumentationAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
   | BulkRemapTokensMessageAsyncResult

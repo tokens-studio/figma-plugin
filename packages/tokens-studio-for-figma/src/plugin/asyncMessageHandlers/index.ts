@@ -19,6 +19,7 @@ export * from './resizeWindow';
 export * from './setShowEmptyGroups';
 export * from './setUi';
 export * from './createAnnotation';
+export * from './generateLivingDocumentation';
 export * from './createStyles';
 export * from './update';
 export * from './updateCheckForChanges';

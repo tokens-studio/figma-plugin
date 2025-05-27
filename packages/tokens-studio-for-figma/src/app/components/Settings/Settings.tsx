@@ -21,6 +21,7 @@ import { replay } from '@/app/sentry';
 import { sessionRecordingSelector } from '@/selectors/sessionRecordingSelector';
 import { useFlags } from '../LaunchDarkly';
 import { ExplainerModal } from '../ExplainerModal';
+import LivingDocumentation from '../LivingDocumentation';
 
 // TODO: expose types from @tokens-studio/ui/checkbox
 type CheckedState = boolean | 'indeterminate';
@@ -113,6 +114,8 @@ function Settings() {
           </Stack>
         )}
         <SyncSettings />
+        <Divider />
+        <LivingDocumentation />
         <Divider />
         <Stack direction="column" align="start" gap={4} css={{ padding: '0 $4' }}>
           <Heading size="medium">{t('settings')}</Heading>
