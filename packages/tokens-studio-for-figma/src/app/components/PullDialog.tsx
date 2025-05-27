@@ -12,7 +12,9 @@ import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 
 function PullDialog() {
-  const { onConfirm, onCancel, pullDialogMode, closePullDialog } = usePullDialog();
+  const {
+    onConfirm, onCancel, pullDialogMode, closePullDialog,
+  } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
   const { changedPullState } = useChangedState();
   const { t } = useTranslation(['sync']);
@@ -28,8 +30,8 @@ function PullDialog() {
   // Check if there are any changes to display
   const hasTokenChanges = Object.entries(changedPullState.tokens).length > 0;
   const hasThemeChanges = changedPullState.themes.length > 0;
-  const hasMetadataChanges = changedPullState.metadata?.tokenSetOrder && 
-                            Object.entries(changedPullState.metadata.tokenSetOrder).length > 0;
+  const hasMetadataChanges = changedPullState.metadata?.tokenSetOrder
+                            && Object.entries(changedPullState.metadata.tokenSetOrder).length > 0;
   const hasChanges = hasTokenChanges || hasThemeChanges || hasMetadataChanges;
 
   // Close the dialog if there are no changes to display
@@ -44,7 +46,7 @@ function PullDialog() {
       if (!hasChanges) {
         return null;
       }
-      
+
       return (
         <Modal
           title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
