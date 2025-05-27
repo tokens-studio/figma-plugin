@@ -10,9 +10,9 @@ import { StorageProviderType } from '@/constants/StorageProviderType';
 import useConfirm from '@/app/hooks/useConfirm';
 import isSameCredentials from '@/utils/isSameCredentials';
 import { track } from '@/utils/analytics';
+import { hasTokenValues } from '@/utils/hasTokenValues';
 import { notifyToUI } from '@/plugin/notifiers';
 import type useRemoteTokens from '@/app/store/remoteTokens';
-import { hasTokenValues } from '@/utils/hasTokenValues';
 import { BackgroundJobs } from '@/constants/BackgroundJobs';
 import { isGitProvider } from '@/utils/is';
 
@@ -25,6 +25,7 @@ export function pullTokensFactory(
   useRemoteTokensResult: ReturnType<typeof useRemoteTokens>,
 ) {
   const activeTheme = typeof params.activeTheme === 'string' ? { [INTERNAL_THEMES_NO_GROUP]: params.activeTheme } : params.activeTheme;
+
   const askUserIfRecoverLocalChanges = async () => {
     const shouldRecoverLocalChanges = await useConfirmResult.confirm({
       text: 'Recover local changes?',
@@ -33,20 +34,9 @@ export function pullTokensFactory(
     return shouldRecoverLocalChanges;
   };
 
-  const getApiCredentials = async (shouldPull: boolean) => {
+  const getApiCredentials = async (shouldPull: boolean, isRemoteStorage: boolean) => {
     const state = store.getState();
     const storageType = storageTypeSelector(state);
-    const isRemoteStorage = [
-      StorageProviderType.ADO,
-      StorageProviderType.GITHUB,
-      StorageProviderType.GITLAB,
-      StorageProviderType.BITBUCKET,
-      StorageProviderType.JSONBIN,
-      StorageProviderType.GENERIC_VERSIONED_STORAGE,
-      StorageProviderType.URL,
-      StorageProviderType.SUPERNOVA,
-      StorageProviderType.TOKENS_STUDIO,
-    ].includes(storageType.provider);
 
     if (isRemoteStorage) {
       const matchingSet = params.localApiProviders?.find((provider) => (
@@ -128,28 +118,46 @@ export function pullTokensFactory(
 
   return async () => {
     const state = store.getState();
+    const storageType = storageTypeSelector(state);
+    const isRemoteStorage = [
+      StorageProviderType.ADO,
+      StorageProviderType.GITHUB,
+      StorageProviderType.GITLAB,
+      StorageProviderType.BITBUCKET,
+      StorageProviderType.JSONBIN,
+      StorageProviderType.GENERIC_VERSIONED_STORAGE,
+      StorageProviderType.URL,
+      StorageProviderType.SUPERNOVA,
+      StorageProviderType.TOKENS_STUDIO,
+    ].includes(storageType.provider);
 
-    if (params.localTokenData) {
+    const hasLocalData = params.localTokenData
+                         && Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
+
+    // Check if storage is remote and local data is empty
+    if (isRemoteStorage && !hasLocalData) {
+      // Pull tokens from remote since local data is empty
+      await getApiCredentials(true, isRemoteStorage);
+    } else if (params.localTokenData) {
       const checkForChanges = params.localTokenData.checkForChanges ?? false;
-      const storageType = storageTypeSelector(state);
 
       if (
         !checkForChanges
         || (
-          (storageType && storageType.provider !== StorageProviderType.LOCAL)
+          isRemoteStorage
           && checkForChanges && (!await askUserIfRecoverLocalChanges())
         )
       ) {
         // get API credentials
-        await getApiCredentials(true);
+        await getApiCredentials(true, isRemoteStorage);
       } else {
         if (params.localTokenData.tokenFormat) dispatch.tokenState.setTokenFormat(params.localTokenData.tokenFormat);
-        // no local changes and user did not confirm to pull tokens
+        // User confirmed to recover local changes
         dispatch.tokenState.setTokenData({ ...params.localTokenData, activeTheme });
-        const hasTokens = Object.values(params.localTokenData?.values ?? {}).some((value) => value.length > 0);
-        if (hasTokens) {
+
+        if (hasLocalData) {
           // local tokens found
-          await getApiCredentials(false);
+          await getApiCredentials(false, isRemoteStorage);
         } else {
           // no local tokens - go to start
           dispatch.uiState.setActiveTab(Tabs.START);
