@@ -73,7 +73,8 @@ AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.RENAME_VARIABLES, as
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.UPDATE_VARIABLES, asyncHandlers.updateVariables);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_USED_EMAIL, asyncHandlers.setUsedEmail);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.PREVIEW_REQUEST_STARTUP, asyncHandlers.previewRequestStartup);
-AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.WRITE_SHARED_PLUGIN_DATA, asyncHandlers.writeSharedPluginData);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS, asyncHandlers.setVariableExportSettings);
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES, asyncHandlers.setSelectedExportThemes);
 
 figma.on('close', () => {
   defaultWorker.stop();

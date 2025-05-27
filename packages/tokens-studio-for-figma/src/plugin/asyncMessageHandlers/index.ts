@@ -1,4 +1,3 @@
-export * from './writeSharedPluginData';
 export * from './credentials';
 export * from './changedTabs';
 export * from './removeSingleCredential';
@@ -42,3 +41,5 @@ export * from './updateVariables';
 export * from './setInitialLoad';
 export * from './preview';
 export * from './removeStylesWithoutConnection';
+export * from './setVariableExportSettings';
+export * from './setSelectedExportThemes';

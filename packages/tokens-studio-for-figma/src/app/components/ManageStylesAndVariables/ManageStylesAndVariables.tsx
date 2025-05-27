@@ -18,7 +18,8 @@ import ExportThemesTab from './ExportThemesTab';
 import { allTokenSetsSelector, themesListSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { usePluginData } from '@/app/hooks/usePluginData';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { Dispatch } from '@/app/store';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
@@ -32,13 +33,16 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
   const dispatch = useDispatch<Dispatch>();
-  const savedSelectedThemes = useSelector((state) => state.uiState.selectedExportThemes) || [];
-
-  const { getSharedPluginData, saveSharedPluginData } = usePluginData();
+  const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
   
-  // Default to using all themes if no saved themes are found
-  const initialSelectedThemes = savedSelectedThemes.length > 0 
-    ? savedSelectedThemes 
+  // Validate saved themes to ensure they still exist
+  const validatedSelectedThemes = savedSelectedThemes.filter(themeId => 
+    themes.some(theme => theme.id === themeId)
+  );
+  
+  // Default to using all themes if no valid saved themes are found
+  const initialSelectedThemes = validatedSelectedThemes.length > 0 
+    ? validatedSelectedThemes 
     : themes.map((theme) => theme.id);
 
   const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
@@ -58,10 +62,16 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   // Save selected themes when they change and update redux state
   React.useEffect(() => {
     if (selectedThemes) {
-      saveSharedPluginData('selectedExportThemes', JSON.stringify(selectedThemes));
+      // Update Redux state
       dispatch.uiState.setSelectedExportThemes(selectedThemes);
+      
+      // Save to shared plugin data
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+        themes: JSON.stringify(selectedThemes),
+      });
     }
-  }, [selectedThemes, saveSharedPluginData, dispatch.uiState]);
+  }, [selectedThemes, dispatch.uiState]);
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);

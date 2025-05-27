@@ -28,7 +28,8 @@ import {
 import ignoreFirstPartImage from '@/app/assets/hints/ignoreFirstPartForStyles.png';
 import prefixStylesImage from '@/app/assets/hints/prefixStyles.png';
 import { Dispatch } from '../../store';
-import { usePluginData } from '@/app/hooks/usePluginData';
+import { AsyncMessageChannel } from '@/AsyncMessageChannel';
+import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
 const StyledCheckboxGrid = styled(Box, {
   display: 'grid', gridTemplateColumns: 'min-content 1fr', gridGap: '$3', alignItems: 'center',
@@ -54,7 +55,6 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
   const stylesEffect = useSelector(stylesEffectSelector);
 
   const dispatch = useDispatch<Dispatch>();
-  const { saveSharedPluginData } = usePluginData();
   
   // Save the current export settings to shared plugin data
   const saveVariableExportSettings = React.useCallback(() => {
@@ -72,9 +72,12 @@ export default function OptionsModal({ isOpen, title, closeAction }: { isOpen: b
       stylesTypography,
       stylesEffect,
     };
-    saveSharedPluginData('variableExportSettings', JSON.stringify(settings));
+    AsyncMessageChannel.ReactInstance.message({
+      type: AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS,
+      settings: JSON.stringify(settings),
+    });
   }, [
-    saveSharedPluginData, rulesIgnoreFirstPartForStyles, rulesPrefixStylesWithThemeName, 
+    rulesIgnoreFirstPartForStyles, rulesPrefixStylesWithThemeName, 
     rulesCreateStylesWithVariableReferences, rulesRenameExisting, 
     rulesRemoveStylesAndVariablesWithoutConnection, variablesColor, 
     variablesNumber, variablesBoolean, variablesString, 
