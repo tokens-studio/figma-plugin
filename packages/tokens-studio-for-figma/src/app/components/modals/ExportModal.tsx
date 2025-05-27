@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default function ExportModal({ onClose }: Props) {
-  const [exportMode, setExportMode] = React.useState<string>(ExportProviderType.SINGLE);
+  const [exportMode, setExportMode] = React.useState<string>(ExportProviderType.MULTIPLE);
 
   const handleModeChange = React.useCallback((mode: ExportProviderType.SINGLE | ExportProviderType.MULTIPLE) => {
     if (mode) {
