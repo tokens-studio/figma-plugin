@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,14 +7,14 @@ import {
 import { storageTypeSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Modal from './Modal';
-
+import { useChangedState } from '@/hooks/useChangedState';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 
 function PullDialog() {
-  const { onConfirm, onCancel, pullDialogMode } = usePullDialog();
+  const { onConfirm, onCancel, pullDialogMode, closePullDialog } = usePullDialog();
   const storageType = useSelector(storageTypeSelector);
-
+  const { changedPullState } = useChangedState();
   const { t } = useTranslation(['sync']);
 
   const handleOverrideClick = React.useCallback(() => {
@@ -25,8 +25,26 @@ function PullDialog() {
     onCancel();
   }, [onCancel]);
 
+  // Check if there are any changes to display
+  const hasTokenChanges = Object.entries(changedPullState.tokens).length > 0;
+  const hasThemeChanges = changedPullState.themes.length > 0;
+  const hasMetadataChanges = changedPullState.metadata?.tokenSetOrder && 
+                            Object.entries(changedPullState.metadata.tokenSetOrder).length > 0;
+  const hasChanges = hasTokenChanges || hasThemeChanges || hasMetadataChanges;
+
+  // Close the dialog if there are no changes to display
+  useEffect(() => {
+    if (pullDialogMode === 'initial' && !hasChanges) {
+      closePullDialog();
+    }
+  }, [pullDialogMode, hasChanges, closePullDialog]);
+
   switch (pullDialogMode) {
     case 'initial': {
+      if (!hasChanges) {
+        return null;
+      }
+      
       return (
         <Modal
           title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
