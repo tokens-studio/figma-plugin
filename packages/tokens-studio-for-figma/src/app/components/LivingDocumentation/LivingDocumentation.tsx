@@ -13,7 +13,7 @@ function LivingDocumentation() {
   const { t } = useTranslation(['settings']);
   const tokens = useSelector(tokensSelector);
   const uiState = useSelector(uiStateSelector);
-  
+
   const [selectedTokenSet, setSelectedTokenSet] = useState('');
   const [tokenFilter, setTokenFilter] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -56,6 +56,10 @@ function LivingDocumentation() {
     }
   }, [selectedTokenSet, tokenFilter, hasSelection]);
 
+  const handleTokenFilterChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTokenFilter(e.target.value);
+  }, []);
+
   const canGenerate = selectedTokenSet && tokenFilter && hasSelection && !isGenerating;
 
   return (
@@ -78,27 +82,30 @@ function LivingDocumentation() {
 
         <Stack direction="column" gap={3}>
           <Stack direction="column" gap={2}>
-            <Label htmlFor="tokenSet">Token Set</Label>
+            <Label>Token Set</Label>
             <Select
-              id="tokenSet"
               value={selectedTokenSet}
               onValueChange={setSelectedTokenSet}
-              placeholder="Select a token set"
             >
-              {tokenSetOptions.map(option => (
-                <Select.Item key={option.value} value={option.value}>
-                  {option.label}
-                </Select.Item>
-              ))}
+              <Select.Trigger data-testid="token-set-select">
+                {selectedTokenSet || "Select a token set"}
+              </Select.Trigger>
+              <Select.Content>
+                {tokenSetOptions.map(option => (
+                  <Select.Item key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Item>
+                ))}
+              </Select.Content>
             </Select>
           </Stack>
 
           <Stack direction="column" gap={2}>
-            <Label htmlFor="tokenFilter">Token Name Filter (starts with)</Label>
+            <Label>Token Name Filter (starts with)</Label>
             <TextInput
               id="tokenFilter"
               value={tokenFilter}
-              onChange={(e) => setTokenFilter(e.target.value)}
+              onChange={handleTokenFilterChange}
               placeholder="e.g., colors.primary"
             />
           </Stack>

@@ -104,7 +104,8 @@ export const generateLivingDocumentation: AsyncMessageChannelHandlers[AsyncMessa
     };
   } catch (error) {
     console.error('Error generating living documentation:', error);
-    notifyUI(`Error generating living documentation: ${error.message}`, { error: true });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    notifyUI(`Error generating living documentation: ${errorMessage}`, { error: true });
     return {
       success: false,
     };
