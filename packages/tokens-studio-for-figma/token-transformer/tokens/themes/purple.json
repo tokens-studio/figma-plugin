@@ -1,0 +1,87 @@
+{
+  "theme": {
+    "background": {
+      "value": "{colors.purple.100}",
+      "description": "Light purple background",
+      "type": "color"
+    },
+    "backgroundSubtle": {
+      "value": "rgba({colors.purple.200}, 0.7)",
+      "description": "Subtle purple background with transparency",
+      "type": "color"
+    },
+    "backgroundDark": {
+      "value": "{colors.purple.600}",
+      "description": "Darker purple background",
+      "type": "color",
+      "$extensions": {
+        "modify": {
+          "type": "darken",
+          "amount": 0.2,
+          "space": "hsl"
+        }
+      }
+    },
+    "primary": {
+      "value": "{colors.purple.500}",
+      "description": "Primary purple color",
+      "type": "color"
+    },
+    "primaryLight": {
+      "value": "{colors.purple.300}",
+      "description": "Light purple accent",
+      "type": "color"
+    },
+    "primaryDark": {
+      "value": "{colors.purple.700}",
+      "description": "Dark purple accent",
+      "type": "color"
+    },
+    "text": {
+      "primary": {
+        "value": "{colors.purple.900}",
+        "description": "Primary text in dark purple",
+        "type": "color"
+      },
+      "secondary": {
+        "value": "{colors.purple.700}",
+        "description": "Secondary text in medium purple",
+        "type": "color"
+      },
+      "muted": {
+        "value": "{colors.purple.500}",
+        "description": "Muted text in lighter purple",
+        "type": "color"
+      }
+    },
+    "size": {
+      "default": {
+        "value": "{sizing.large}",
+        "description": "Default sizing for purple theme",
+        "type": "sizing"
+      }
+    },
+    "components": {
+      "cards": {
+        "default": {
+          "type": "composition",
+          "value": {
+            "borderRadius": "{sizing.base}",
+            "fill": "{theme.backgroundSubtle}",
+            "border": "{theme.primary}"
+          }
+        }
+      },
+      "buttons": {
+        "primary": {
+          "type": "composition", 
+          "value": {
+            "borderRadius": "8px",
+            "fill": "{theme.primary}",
+            "border": "{theme.primaryDark}"
+          }
+        }
+      }
+    }
+  }
+}

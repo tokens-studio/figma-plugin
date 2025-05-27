@@ -20,5 +20,16 @@
         "core/shadows": "enabled"
       },
       "$figmaStyleReferences": {}
+    },
+    {
+      "id": "purple-theme-001",
+      "name": "themes-folder-purple",
+      "selectedTokenSets": {
+        "base/options": "source",
+        "base/sizing": "source",
+        "themes/purple": "enabled",
+        "core/shadows": "enabled"
+      },
+      "$figmaStyleReferences": {}
     }
   ]

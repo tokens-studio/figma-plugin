@@ -67,6 +67,32 @@ const darkThemeMode = createTheme('figma-dark', {
   shadows: darkTheme.shadows,
 });
 
+const purpleThemeMode = createTheme('figma-purple', {
+  colors: {
+    ...lightTheme.colors,
+    // Purple theme specific colors
+    bgDefault: '#faf5ff', // purple.100
+    bgMuted: '#e9d8fd', // purple.200
+    bgSubtle: '#d6bcfa', // purple.300
+    fgDefault: '#44337a', // purple.900
+    fgMuted: '#6b46c1', // purple.700
+    fgSubtle: '#9f7aea', // purple.500
+    accentBase: '#805ad5', // purple.600
+    accentEmphasis: '#6b46c1', // purple.700
+    accentFg: '#ffffff', // white
+    // Pro colors updated for purple theme
+    proBg: '#e9d8fd',
+    proBorder: '#805ad5',
+    proFg: '#44337a',
+  },
+  shadows: {
+    ...lightTheme.shadows,
+    small: '0 1px 3px rgba(68, 51, 122, 0.12), 0 1px 2px rgba(68, 51, 122, 0.24)',
+    medium: '0 4px 6px rgba(68, 51, 122, 0.07), 0 2px 4px rgba(68, 51, 122, 0.06)',
+    large: '0 10px 15px rgba(68, 51, 122, 0.1), 0 4px 6px rgba(68, 51, 122, 0.05)',
+  },
+});
+
 export {
-  lightThemeMode, darkThemeMode, styled, css, keyframes, theme, globalCss,
+  lightThemeMode, darkThemeMode, purpleThemeMode, styled, css, keyframes, theme, globalCss,
 };
