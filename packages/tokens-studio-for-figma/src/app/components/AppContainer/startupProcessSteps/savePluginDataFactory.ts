@@ -36,6 +36,9 @@ export function savePluginDataFactory(dispatch: Dispatch, params: StartupMessage
       dispatch.uiState.setOnboardingExplainerSyncProviders(params.onboardingExplainer.syncProviders);
       dispatch.uiState.setOnboardingExplainerInspect(params.onboardingExplainer.inspect);
       dispatch.settings.setUISettings(settings);
+      if (params.exportSettings) {
+        dispatch.uiState.setExportSettings(params.exportSettings);
+      }
     } else {
       throw new Error('User not found');
     }

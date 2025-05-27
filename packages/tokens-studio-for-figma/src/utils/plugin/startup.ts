@@ -1,5 +1,5 @@
 import {
-  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
+  ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty, ExportSettingsProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
 import getLastOpened from '@/utils/getLastOpened';
@@ -26,6 +26,7 @@ export async function startup() {
     localTokenData,
     authData,
     usedEmail,
+    exportSettings,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -40,6 +41,7 @@ export async function startup() {
     getTokenData(),
     AuthDataProperty.read(),
     UsedEmailProperty.read(),
+    ExportSettingsProperty.read(),
   ]);
 
   return {
@@ -62,5 +64,6 @@ export async function startup() {
     } : null,
     authData,
     usedEmail,
+    exportSettings,
   };
 }

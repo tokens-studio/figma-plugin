@@ -33,6 +33,7 @@ AsyncMessageChannel.PluginInstance.handle(
   AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT,
   asyncHandlers.setOnboardingExplainerInspect,
 );
+AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_EXPORT_SETTINGS, asyncHandlers.setExportSettings);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.SET_NODE_DATA, asyncHandlers.setNodeData);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMOVE_TOKENS_BY_VALUE, asyncHandlers.removeTokensByValue);
 AsyncMessageChannel.PluginInstance.handle(AsyncMessageTypes.REMAP_TOKENS, asyncHandlers.remapTokens);

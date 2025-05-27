@@ -6,7 +6,7 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
@@ -15,30 +15,46 @@ import OptionsModal from './OptionsModal';
 import useTokens from '@/app/store/useTokens';
 import ExportSetsTab from './ExportSetsTab';
 import ExportThemesTab from './ExportThemesTab';
-import { allTokenSetsSelector, themesListSelector } from '@/selectors';
+import { allTokenSetsSelector, themesListSelector, exportSettingsSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { Dispatch } from '@/app/store';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
 
   const isProUser = useIsProUser();
+  const dispatch = useDispatch<Dispatch>();
 
   const [showOptions, setShowOptions] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(isProUser ? 'useThemes' : 'useSets');
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
+  const exportSettings = useSelector(exportSettingsSelector);
 
-  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
-
-  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
-    const tokenSet = {
+  // Initialize state from Redux store or defaults
+  const [activeTab, setActiveTab] = React.useState<'useThemes' | 'useSets'>(
+    exportSettings.activeTab || (isProUser ? 'useThemes' : 'useSets')
+  );
+  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(
+    exportSettings.selectedThemes.length > 0 ? exportSettings.selectedThemes : themes.map((theme) => theme.id)
+  );
+  const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(
+    exportSettings.selectedSets.length > 0 ? exportSettings.selectedSets : allSets.map((set) => ({
       set,
       status: TokenSetStatus.ENABLED,
+    }))
+  );
+
+  // Save export settings to Redux store (and shared plugin data) when they change
+  React.useEffect(() => {
+    const newExportSettings = {
+      selectedThemes,
+      selectedSets,
+      activeTab,
     };
-    return tokenSet;
-  }));
+    dispatch.uiState.setExportSettings(newExportSettings);
+  }, [selectedThemes, selectedSets, activeTab, dispatch.uiState]);
 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,

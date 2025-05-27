@@ -15,6 +15,7 @@ import { TokenTypes } from '@/constants/TokenTypes';
 import { EditTokenFormStatus } from '@/constants/EditTokenFormStatus';
 import { TokenFormatOptions } from '@/plugin/TokenFormatStoreClass';
 import { PushOverrides } from '../remoteTokens';
+import { ExportTokenSet } from '@/types/ExportTokenSet';
 
 type DisplayType = 'GRID' | 'LIST';
 
@@ -54,6 +55,13 @@ export type BackgroundJob = {
   completedTasks?: number;
   totalTasks?: number;
 };
+
+export interface ExportSettings {
+  selectedThemes: string[];
+  selectedSets: ExportTokenSet[];
+  activeTab: 'useThemes' | 'useSets';
+}
+
 export interface UIState {
   backgroundJobs: BackgroundJob[]
   selectionValues: SelectionGroup[];
@@ -91,6 +99,7 @@ export interface UIState {
   showConvertTokenFormatModal: boolean;
   sidebarWidth: number;
   hasRemoteChange: boolean;
+  exportSettings: ExportSettings;
 }
 
 const defaultConfirmState: ConfirmProps = {
@@ -151,6 +160,11 @@ export const uiState = createModel<RootModel>()({
     showConvertTokenFormatModal: false,
     sidebarWidth: 150,
     hasRemoteChange: false,
+    exportSettings: {
+      selectedThemes: [],
+      selectedSets: [],
+      activeTab: 'useThemes',
+    },
   } as unknown as UIState,
   reducers: {
     setShowConvertTokenFormatModal: (state, data: boolean) => ({
@@ -421,6 +435,10 @@ export const uiState = createModel<RootModel>()({
       ...state,
       sidebarWidth: data,
     }),
+    setExportSettings: (state, data: ExportSettings) => ({
+      ...state,
+      exportSettings: data,
+    }),
   },
   effects: (dispatch) => ({
     setLastOpened: (payload) => {
@@ -464,6 +482,12 @@ export const uiState = createModel<RootModel>()({
       AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.SET_SHOW_EMPTY_GROUPS,
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
+      });
+    },
+    setExportSettings: (payload: ExportSettings) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_EXPORT_SETTINGS,
+        exportSettings: payload,
       });
     },
   }),

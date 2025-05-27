@@ -35,6 +35,7 @@ export enum AsyncMessageTypes {
   SET_ONBOARDINGEXPLAINEREXPORTSETS = 'async/set-onboardingExplainerExportSets',
   SET_ONBOARDINGEXPLAINERSYNCPROVIDERS = 'async/set-onboardingExplainerSyncProviders',
   SET_ONBOARDINGEXPLAINERINSPECT = 'async/set-onboardingExplainerInspect',
+  SET_EXPORT_SETTINGS = 'async/set-export-settings',
   REMOVE_SINGLE_CREDENTIAL = 'async/remove-single-credential',
   SET_STORAGE_TYPE = 'async/set-storage-type',
   SET_NODE_DATA = 'async/set-node-data',
@@ -96,6 +97,9 @@ export type SetOnboardingExplainerSyncProvidersAsyncMessageResult = AsyncMessage
 
 export type SetOnboardingExplainerInspectAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT, { onboardingExplainerInspect: boolean; }>;
 export type SetOnboardingExplainerInspectAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_ONBOARDINGEXPLAINERINSPECT>;
+
+export type SetExportSettingsAsyncMessage = AsyncMessage<AsyncMessageTypes.SET_EXPORT_SETTINGS, { exportSettings: { selectedThemes: string[]; selectedSets: ExportTokenSet[]; activeTab: 'useThemes' | 'useSets'; }; }>;
+export type SetExportSettingsAsyncMessageResult = AsyncMessage<AsyncMessageTypes.SET_EXPORT_SETTINGS>;
 
 export type RemoveSingleCredentialAsyncMessage = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL, { context: StorageTypeCredentials; }>;
 export type RemoveSingleCredentialAsyncMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_SINGLE_CREDENTIAL>;
@@ -374,6 +378,7 @@ export type AsyncMessages =
   | SetOnboardingExplainerExportSetsAsyncMessage
   | SetOnboardingExplainerInspectAsyncMessage
   | SetOnboardingExplainerSyncProvidersAsyncMessage
+  | SetExportSettingsAsyncMessage
   | SetNodeDataAsyncMessage
   | RemoveTokensByValueAsyncMessage
   | RemapTokensAsyncMessage
@@ -422,6 +427,7 @@ export type AsyncMessageResults =
   | SetOnboardingExplainerExportSetsAsyncMessageResult
   | SetOnboardingExplainerSyncProvidersAsyncMessageResult
   | SetOnboardingExplainerInspectAsyncMessageResult
+  | SetExportSettingsAsyncMessageResult
   | SetNodeDataAsyncMessageResult
   | RemoveTokensByValueAsyncMessageResult
   | RemapTokensMessageAsyncResult
