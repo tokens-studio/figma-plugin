@@ -44,12 +44,7 @@ The purple theme is implemented across several files:
   - Registers the purple theme in the theme system
   - Defines which token sets are enabled for the purple theme
 
-### 3. Color Tokens
-- `packages/tokens-studio-for-figma/src/config/default.json`
-  - Contains the purple color scale definitions
-  - Includes the purple theme variant configuration
-
-### 4. Stitches Integration
+### 3. Stitches Integration
 - `packages/tokens-studio-for-figma/src/stitches.config.ts`
   - Exports `purpleThemeMode` for use in React components
   - Defines purple theme specific styling properties
@@ -103,7 +98,6 @@ Primary buttons will feature:
 
 The purple theme can be customized by modifying the token values in:
 - `purple.json` - Core theme tokens
-- `default.json` - Purple color variants
 - `stitches.config.ts` - React/CSS integration
 
 ## Accessibility

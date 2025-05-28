@@ -677,56 +677,6 @@
       }
     }
   },
-  "purple": {
-    "fg": {
-      "default": {
-        "$value": "{colors.purple.900}",
-        "$type": "color"
-      },
-      "muted": {
-        "$value": "{colors.purple.700}",
-        "$type": "color"
-      },
-      "subtle": {
-        "$value": "{colors.purple.500}",
-        "$type": "color"
-      }
-    },
-    "bg": {
-      "default": {
-        "$value": "{colors.purple.100}",
-        "$type": "color"
-      },
-      "muted": {
-        "$value": "{colors.purple.200}",
-        "$type": "color"
-      },
-      "subtle": {
-        "$value": "{colors.purple.300}",
-        "$type": "color"
-      }
-    },
-    "accent": {
-      "default": {
-        "$value": "{colors.purple.600}",
-        "$type": "color"
-      },
-      "onAccent": {
-        "$value": "{colors.white}",
-        "$type": "color"
-      },
-      "bg": {
-        "$value": "{colors.purple.200}",
-        "$type": "color"
-      }
-    },
-    "shadows": {
-      "default": {
-        "$value": "rgba({colors.purple.900}, 0.25)",
-        "$type": "color"
-      }
-    }
-  },
   "theme": {
     "button": {
       "primary": {
