@@ -18,6 +18,7 @@ import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
+import useRemoteTokens from '../store/remoteTokens';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -39,6 +40,7 @@ const HelpfulLink = styled('a', {
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['startScreen']);
+  const { restoreStoredProvider } = useRemoteTokens();
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
@@ -124,6 +126,13 @@ function StartScreen() {
               action={{
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
+              }}
+              secondaryAction={{
+                onClick: () => {
+                  const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
+                  restoreStoredProvider(matchingProvider || storageType);
+                },
+                text: t('retry'),
               }}
             />
           ) : (

@@ -12,5 +12,6 @@
   "cancel": "Cancel",
   "loadingWait": "Loading, please wait",
   "enterCredentials": "Enter credentials",
+  "retry": "Retry",
   "unableToFetchRemote": "Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
 }
