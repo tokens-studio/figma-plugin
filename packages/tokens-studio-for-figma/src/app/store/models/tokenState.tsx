@@ -56,6 +56,7 @@ import { updateAliasesInState } from '../utils/updateAliasesInState';
 import { CreateSingleTokenData, EditSingleTokenData } from '../useManageTokens';
 import { singleTokensToRawTokenSet } from '@/utils/convert';
 import { checkStorageSize } from '@/utils/checkStorageSize';
+import { compareLastSyncedState } from '@/utils/compareLastSyncedState';
 
 export interface TokenState {
   tokens: Record<string, AnyTokenList>;
@@ -881,6 +882,22 @@ export const tokenState = createModel<RootModel>()({
         // Update the themesSize in state if it has changed
         if (rootState.tokenState.themesSize !== themesSize) {
           dispatch.tokenState.setThemesSize(Number(themesSize.toFixed(1)));
+        }
+
+        // Check if there are unsaved changes before updating
+        if (rootState.uiState.storageType.provider !== StorageProviderType.TOKENS_STUDIO) {
+          const { lastSyncedState } = rootState.tokenState;
+          const hasChanges = !compareLastSyncedState(
+            rootState.tokenState.tokens,
+            rootState.tokenState.themes,
+            lastSyncedState,
+            rootState.tokenState.tokenFormat,
+          );
+
+          // Update checkForChanges flag before proceeding with updates
+          if (hasChanges !== rootState.tokenState.checkForChanges) {
+            dispatch.tokenState.updateCheckForChanges(hasChanges);
+          }
         }
 
         wrapTransaction(
