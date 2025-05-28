@@ -52,7 +52,7 @@ export default function useRemoteTokens() {
   const tokens = useSelector(tokensSelector);
   const themes = useSelector(themesListSelector);
   const activeTab = useSelector(activeTabSelector);
-  const { showPullDialog, closePullDialog } = usePullDialog();
+  const { showPullDialog, closePullDialog, showPullDialogError } = usePullDialog();
 
   const { setStorageType } = useStorage();
   const { pullTokensFromJSONBin, addJSONBinCredentials, createNewJSONBin } = useJSONbin();
@@ -155,6 +155,19 @@ export default function useRemoteTokens() {
         default:
           throw new Error('Not implemented');
       }
+
+      // Handle error response
+      if (remoteData?.status === 'failure') {
+        showPullDialogError(remoteData.errorMessage || 'An error occurred while pulling tokens');
+        return remoteData;
+      }
+
+      // Handle null response
+      if (!remoteData) {
+        showPullDialogError('No data received from the storage provider');
+        return null;
+      }
+
       if (remoteData?.status === 'success') {
         dispatch.tokenState.setRemoteData({
           tokens: remoteData.tokens,
@@ -268,10 +281,16 @@ export default function useRemoteTokens() {
         }
       } catch (e) {
         console.error(e);
+        // Handle unexpected errors
+        showPullDialogError('An unexpected error occurred while pulling tokens');
+        return null;
       }
 
       dispatch.tokenState.resetChangedState();
-      closePullDialog();
+      // Only close dialog on success - error dialog will stay open to show error message
+      if (remoteData?.status === 'success') {
+        closePullDialog();
+      }
       return remoteData;
     },
     [

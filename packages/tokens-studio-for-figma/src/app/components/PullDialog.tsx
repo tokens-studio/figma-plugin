@@ -7,6 +7,7 @@ import {
 import { storageTypeSelector } from '@/selectors';
 import usePullDialog from '../hooks/usePullDialog';
 import Modal from './Modal';
+import Callout from './Callout';
 
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
@@ -65,6 +66,39 @@ function PullDialog() {
       );
     }
     default: {
+      if (typeof pullDialogMode === 'string' && pullDialogMode.startsWith('error:')) {
+        const errorMessage = pullDialogMode.replace('error:', '');
+        return (
+          <Modal
+            title={t('pullFrom', { provider: transformProviderName(storageType.provider) })}
+            showClose
+            full
+            size="large"
+            isOpen
+            close={onCancel}
+            stickyFooter
+            footer={(
+              <Stack direction="row" gap={4} justify="end">
+                <Button variant="primary" id="pullDialog-button-close" onClick={handleClose}>
+                  {t('close', { ns: 'general' })}
+                </Button>
+              </Stack>
+            )}
+          >
+            <Stack direction="column" gap={4} css={{ padding: '$4' }}>
+              <Callout
+                id="pullDialog-error-callout"
+                heading={t('failedToPull', { provider: transformProviderName(storageType.provider) })}
+                description={errorMessage}
+                action={{
+                  onClick: handleClose,
+                  text: t('close', { ns: 'general' }),
+                }}
+              />
+            </Stack>
+          </Modal>
+        );
+      }
       return null;
     }
   }

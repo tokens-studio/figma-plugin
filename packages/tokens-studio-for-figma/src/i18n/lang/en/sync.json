@@ -3,6 +3,7 @@
   "cancel": "Cancel",
   "pullTokens": "Pull Tokens",
   "pullFrom": "Pull from {{provider}}",
+  "failedToPull": "Failed to pull from {{provider}}",
   "pushTo": "Push to {{provider}}",
   "goTo": "Go to {{provider}}",
   "thisWillPushYourLocalChangesToTheBranch": "This will push your local changes to the branch:",
