@@ -97,7 +97,6 @@ export class TokenValueRetriever {
         }
       } catch (e) {
         console.log('error importing variable', e);
-        Promise.reject(e);
       }
     }
 
