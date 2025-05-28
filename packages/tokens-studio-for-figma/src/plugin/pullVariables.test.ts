@@ -776,4 +776,74 @@ describe('pullStyles', () => {
       ]),
     );
   });
+
+  it('filters variables by selected collections and modes', async () => {
+    const selectedCollections = {
+      'VariableID:1:0': {
+        name: 'Collection 1',
+        selectedModes: ['1:0', '1:1'], // Only Default and Dark modes
+      },
+    };
+
+    await pullVariables({ 
+      useDimensions: false, 
+      useRem: false, 
+      selectedCollections 
+    }, [], false);
+
+    const expectedCall = expect.objectContaining({
+      colors: expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Color',
+          parent: 'Collection 1/Default',
+          value: '#ffffff',
+        }),
+        expect.objectContaining({
+          name: 'Color',
+          parent: 'Collection 1/Dark',
+          value: '#000000',
+        }),
+      ]),
+      numbers: expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Number1',
+          parent: 'Collection 1/Default',
+          value: 24,
+        }),
+        expect.objectContaining({
+          name: 'Number1',
+          parent: 'Collection 1/Dark',
+          value: 24,
+        }),
+      ]),
+    });
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith(expectedCall, []);
+
+    // Should NOT include Light or Custom modes
+    const actualCall = notifyStyleValuesSpy.mock.calls[0][0];
+    const lightModeColors = actualCall.colors?.filter(c => c.parent?.includes('/Light'));
+    const customModeColors = actualCall.colors?.filter(c => c.parent?.includes('/Custom'));
+    
+    expect(lightModeColors).toHaveLength(0);
+    expect(customModeColors).toHaveLength(0);
+  });
+
+  it('excludes collections not in selectedCollections', async () => {
+    const selectedCollections = {
+      // Only including collection that doesn't exist in mock data
+      nonExistentCollection: {
+        name: 'Non-existent Collection',
+        selectedModes: ['mode1'],
+      },
+    };
+
+    await pullVariables({ 
+      useDimensions: false, 
+      useRem: false, 
+      selectedCollections 
+    }, [], false);
+
+    expect(notifyStyleValuesSpy).toHaveBeenCalledWith({}, []);
+  });
 });
