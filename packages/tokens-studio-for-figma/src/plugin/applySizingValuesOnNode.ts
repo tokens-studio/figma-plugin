@@ -36,7 +36,23 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.width)
     && !(await tryApplyVariableId(node, 'width', data.width))
   ) {
-    node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+    // Check if width is set to 100% for full width behavior
+    if (String(values.width).trim() === '100%') {
+      // Handle full width property
+      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
+        // If node is a child of an auto layout parent, set layoutAlign to STRETCH
+        node.layoutAlign = 'STRETCH';
+      } else if (node.parent && 'width' in node.parent) {
+        // For regular layers, calculate width based on parent's width
+        node.resize(node.parent.width, node.height);
+      } else {
+        // Fallback for nodes without applicable parent
+        node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+      }
+    } else {
+      // Regular width handling for non-100% values
+      node.resize(transformValue(String(values.width), 'sizing', baseFontSize), node.height);
+    }
   }
 
   // SIZING: HEIGHT
