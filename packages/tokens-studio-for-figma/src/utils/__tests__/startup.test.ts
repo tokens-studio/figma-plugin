@@ -23,6 +23,7 @@ describe('startup', () => {
       localTokenData: null,
       user: null,
       usedEmail: null,
+      selectedExportThemes: null,
     });
   });
 
@@ -80,6 +81,7 @@ describe('startup', () => {
       },
       user: null,
       usedEmail: null,
+      selectedExportThemes: null,
     });
   });
 });
