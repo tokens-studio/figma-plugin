@@ -17,6 +17,7 @@ export function useImportVariables() {
         type: AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS,
       });
       
+      console.log('Received collections in hook:', response.collections);
       setCollections(response.collections);
       setIsDialogOpen(true);
     } catch (error) {

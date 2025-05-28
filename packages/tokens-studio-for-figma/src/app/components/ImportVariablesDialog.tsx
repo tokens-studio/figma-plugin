@@ -18,6 +18,9 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
 
+  // Log collections data for debugging
+  console.log('Collections passed to dialog:', collections);
+
   // Initialize all collections as selected with all modes selected by default
   useEffect(() => {
     if (collections.length > 0) {
@@ -29,6 +32,7 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
         };
       });
       setSelectedCollections(initialSelection);
+      console.log('Initial selection set:', initialSelection);
     }
   }, [collections]);
 
@@ -143,7 +147,9 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
                     onCheckedChange={() => handleCollectionToggle(collection.id, collection.name, collection.modes)}
                     id={`collection-${collection.id}`}
                   >
-                    <strong>{collection.name}</strong>
+                    <Box css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
+                      {collection.name || `Collection ${collection.id.slice(0, 8)}`}
+                    </Box>
                   </Checkbox>
                   
                   {isCollectionSelected && (
@@ -155,7 +161,9 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
                           onCheckedChange={() => handleModeToggle(collection.id, mode.modeId)}
                           id={`mode-${collection.id}-${mode.modeId}`}
                         >
-                          {mode.name}
+                          <Box css={{ color: '$fgDefault', userSelect: 'none' }}>
+                            {mode.name || `Mode ${mode.modeId.slice(0, 8)}`}
+                          </Box>
                         </Checkbox>
                       ))}
                     </Stack>
