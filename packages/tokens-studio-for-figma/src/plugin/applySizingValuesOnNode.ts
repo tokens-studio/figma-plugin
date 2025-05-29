@@ -24,8 +24,25 @@ export async function applySizingValuesOnNode(
       && (await tryApplyVariableId(node, 'height', data.sizing))
     )
   ) {
-    const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
-    node.resize(size, size);
+    // Check if sizing is set to 100% for full width and height behavior
+    if (String(values.sizing).trim() === '100%') {
+      // Handle full width and height property
+      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
+        // If node is a child of an auto layout parent, set layoutAlign to STRETCH for both dimensions
+        node.layoutAlign = 'STRETCH';
+      } else if (node.parent && 'width' in node.parent && 'height' in node.parent) {
+        // For regular layers, calculate size based on parent's dimensions
+        node.resize(node.parent.width, node.parent.height);
+      } else {
+        // Fallback for nodes without applicable parent
+        const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
+        node.resize(size, size);
+      }
+    } else {
+      // Regular sizing handling for non-100% values
+      const size = transformValue(String(values.sizing), 'sizing', baseFontSize);
+      node.resize(size, size);
+    }
   }
 
   // SIZING: WIDTH
@@ -63,7 +80,23 @@ export async function applySizingValuesOnNode(
     && isPrimitiveValue(values.height)
     && !(await tryApplyVariableId(node, 'height', data.height))
   ) {
-    node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+    // Check if height is set to 100% for full height behavior
+    if (String(values.height).trim() === '100%') {
+      // Handle full height property
+      if ('layoutAlign' in node && node.parent && isAutoLayout(node.parent)) {
+        // If node is a child of an auto layout parent, set layoutAlign to STRETCH
+        node.layoutAlign = 'STRETCH';
+      } else if (node.parent && 'height' in node.parent) {
+        // For regular layers, calculate height based on parent's height
+        node.resize(node.width, node.parent.height);
+      } else {
+        // Fallback for nodes without applicable parent
+        node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+      }
+    } else {
+      // Regular height handling for non-100% values
+      node.resize(node.width, transformValue(String(values.height), 'sizing', baseFontSize));
+    }
   }
 
   // min width, max width, min height, max height only are applicable to autolayout frames or their direct children

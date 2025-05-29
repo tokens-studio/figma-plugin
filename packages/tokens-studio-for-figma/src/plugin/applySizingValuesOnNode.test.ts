@@ -50,7 +50,6 @@ describe('applySizingValuesOnNode', () => {
     },
   };
 
-  const mockData = {};
   const baseFontSize = '16';
 
   beforeEach(() => {
@@ -100,6 +99,113 @@ describe('applySizingValuesOnNode', () => {
 
       expect(transformValue).toHaveBeenCalledWith('100%', 'sizing', '16');
       expect(mockNode.resize).toHaveBeenCalledWith(16, undefined);
+    });
+  });
+
+  describe('height property handling', () => {
+    it('should handle normal height values', async () => {
+      const values = { height: '150px' };
+      const data = { height: 'height-token' };
+      (transformValue as jest.Mock).mockReturnValue(150);
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(transformValue).toHaveBeenCalledWith('150px', 'sizing', '16');
+      expect(mockNode.resize).toHaveBeenCalledWith(undefined, 150);
+    });
+
+    it('should set layoutAlign to STRETCH for 100% height in auto layout parent', async () => {
+      const values = { height: '100%' };
+      const data = { height: 'height-token' };
+      (isAutoLayout as jest.Mock).mockReturnValue(true);
+
+      await applySizingValuesOnNode(mockNodeWithLayoutAlign as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNodeWithLayoutAlign.layoutAlign).toBe('STRETCH');
+      expect(mockNodeWithLayoutAlign.resize).not.toHaveBeenCalled();
+    });
+
+    it('should set height to parent height for 100% height in regular parent', async () => {
+      const mockNodeWithParentHeight = {
+        id: 'node-id-parent-height',
+        resize: jest.fn(),
+        type: 'RECTANGLE',
+        parent: {
+          type: 'FRAME',
+          height: 300,
+        },
+      };
+      const values = { height: '100%' };
+      const data = { height: 'height-token' };
+
+      await applySizingValuesOnNode(mockNodeWithParentHeight as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNodeWithParentHeight.resize).toHaveBeenCalledWith(undefined, 300);
+    });
+
+    it('should fallback to normal height handling if 100% but no applicable parent', async () => {
+      const values = { height: '100%' };
+      const data = { height: 'height-token' };
+      (transformValue as jest.Mock).mockReturnValue(16); // Since 100% would be transformed
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(transformValue).toHaveBeenCalledWith('100%', 'sizing', '16');
+      expect(mockNode.resize).toHaveBeenCalledWith(undefined, 16);
+    });
+  });
+
+  describe('sizing (both) property handling', () => {
+    it('should handle normal sizing values', async () => {
+      const values = { sizing: '100px' };
+      const data = { sizing: 'sizing-token' };
+      (transformValue as jest.Mock).mockReturnValue(100);
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(transformValue).toHaveBeenCalledWith('100px', 'sizing', '16');
+      expect(mockNode.resize).toHaveBeenCalledWith(100, 100);
+    });
+
+    it('should set layoutAlign to STRETCH for 100% sizing in auto layout parent', async () => {
+      const values = { sizing: '100%' };
+      const data = { sizing: 'sizing-token' };
+      (isAutoLayout as jest.Mock).mockReturnValue(true);
+
+      await applySizingValuesOnNode(mockNodeWithLayoutAlign as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNodeWithLayoutAlign.layoutAlign).toBe('STRETCH');
+      expect(mockNodeWithLayoutAlign.resize).not.toHaveBeenCalled();
+    });
+
+    it('should set size to parent size for 100% sizing in regular parent', async () => {
+      const mockNodeWithParentSize = {
+        id: 'node-id-parent-size',
+        resize: jest.fn(),
+        type: 'RECTANGLE',
+        parent: {
+          type: 'FRAME',
+          width: 400,
+          height: 300,
+        },
+      };
+      const values = { sizing: '100%' };
+      const data = { sizing: 'sizing-token' };
+
+      await applySizingValuesOnNode(mockNodeWithParentSize as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(mockNodeWithParentSize.resize).toHaveBeenCalledWith(400, 300);
+    });
+
+    it('should fallback to normal sizing handling if 100% but no applicable parent', async () => {
+      const values = { sizing: '100%' };
+      const data = { sizing: 'sizing-token' };
+      (transformValue as jest.Mock).mockReturnValue(16); // Since 100% would be transformed
+
+      await applySizingValuesOnNode(mockNode as unknown as BaseNode, data, values, baseFontSize);
+
+      expect(transformValue).toHaveBeenCalledWith('100%', 'sizing', '16');
+      expect(mockNode.resize).toHaveBeenCalledWith(16, 16);
     });
   });
 });
