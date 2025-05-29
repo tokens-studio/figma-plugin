@@ -16,7 +16,8 @@ export type GitStorageSaveOptions = {
 export type GitStorageSaveOption = {
   commitMessage?: string,
   storeTokenIdInJsonEditor: boolean,
-  useDeltaDiff?: boolean
+  useDeltaDiff?: boolean,
+  lastSyncedState?: string
 };
 
 export type GitSingleFileObject = Record<string, (
@@ -96,7 +97,8 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     files: RemoteTokenStorageFile[],
     message: string,
     branch: string,
-    shouldCreateBranch?: boolean
+    shouldCreateBranch?: boolean,
+    lastSyncedState?: string
   ): Promise<boolean>;
 
   public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption): Promise<boolean> {
@@ -110,6 +112,7 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
         saveOptions.commitMessage ?? 'Commit from Figma',
         this.branch,
         !branches.includes(this.branch),
+        saveOptions.lastSyncedState,
       );
     }
 

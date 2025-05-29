@@ -10,6 +10,7 @@ import {
   activeThemeSelector,
   storeTokenIdInJsonEditorSelector,
   localApiStateSelector, themesListSelector, tokensSelector, usedTokenSetSelector,
+  lastSyncedStateSelector,
 } from '@/selectors';
 import { GithubTokenStorage } from '@/storage/GithubTokenStorage';
 import { isEqual } from '@/utils/isEqual';
@@ -34,6 +35,7 @@ export function useGitHub() {
   const localApiState = useSelector(localApiStateSelector);
   const usedTokenSet = useSelector(usedTokenSetSelector);
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
+  const lastSyncedState = useSelector(lastSyncedStateSelector);
   const isProUser = useIsProUser();
   const flags = useFlags();
   const dispatch = useDispatch<Dispatch>();
@@ -77,6 +79,7 @@ export function useGitHub() {
           commitMessage,
           storeTokenIdInJsonEditor,
           useDeltaDiff: flags.deltaDiffSync ?? false,
+          lastSyncedState,
         });
         const commitSha = await storage.getCommitSha();
         dispatch.uiState.setLocalApiState({ ...localApiState, branch: customBranch } as GithubCredentials);
@@ -135,6 +138,7 @@ export function useGitHub() {
     usedTokenSet,
     activeTheme,
     storeTokenIdInJsonEditor,
+    lastSyncedState,
     flags.deltaDiffSync,
   ]);
 

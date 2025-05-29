@@ -294,13 +294,22 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   /**
-   * Compares local files with remote files and returns only the changed files
+   * Compares local files with last synced state to determine which files need updating
+   * This avoids the need to fetch remote files on every push, saving API calls and time
    */
-  private async getChangedFiles(localFiles: RemoteTokenStorageFile[]): Promise<{
+  private async getChangedFiles(localFiles: RemoteTokenStorageFile[], lastSyncedState?: string): Promise<{
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   }> {
     try {
+      // If we have lastSyncedState, use it instead of fetching remote files
+      if (lastSyncedState) {
+        console.log('Delta diff: Using lastSyncedState for comparison (faster)');
+        return this.getChangedFilesFromSyncedState(localFiles, lastSyncedState);
+      }
+      
+      // Fallback to fetching remote files if no lastSyncedState available
+      console.log('Delta diff: Fetching remote files for comparison (slower fallback)');
       const remoteFiles = await this.read();
       
       if (Array.isArray(remoteFiles) && remoteFiles.length > 0) {
@@ -364,10 +373,143 @@ export class GithubTokenStorage extends GitTokenStorage {
         return { changedFiles, filesToDelete };
       }
     } catch (error) {
-      console.warn('Failed to read remote files for delta diff, falling back to full sync:', error);
+      console.warn('Failed to compare with remote/synced state, falling back to full sync:', error);
     }
 
-    // Fallback: if we can't read remote files, return all local files as changed
+    // Fallback: if we can't compare, return all local files as changed
+    return this.getFallbackChangedFiles(localFiles);
+  }
+
+  /**
+   * Compares local files with lastSyncedState to identify changes
+   * This is much faster than fetching remote files via API
+   */
+  private getChangedFilesFromSyncedState(localFiles: RemoteTokenStorageFile[], lastSyncedState: string): {
+    changedFiles: Record<string, string>;
+    filesToDelete: string[];
+  } {
+    try {
+      // Parse the lastSyncedState - format is [tokens, themes, format]
+      const parsedSyncedState = JSON.parse(lastSyncedState);
+      if (!Array.isArray(parsedSyncedState) || parsedSyncedState.length < 2) {
+        throw new Error('Invalid lastSyncedState format');
+      }
+
+      const [syncedTokens, syncedThemes] = parsedSyncedState;
+      const changedFiles: Record<string, string> = {};
+      const filesToDelete: string[] = [];
+
+      // Create a map of synced token sets and special files
+      const syncedFileMap = new Map<string, any>();
+      
+      // Add token sets from synced state
+      if (syncedTokens && typeof syncedTokens === 'object') {
+        Object.entries(syncedTokens).forEach(([name, data]) => {
+          syncedFileMap.set(name, data);
+        });
+      }
+      
+      // Add themes from synced state
+      if (syncedThemes) {
+        syncedFileMap.set(SystemFilenames.THEMES, syncedThemes);
+      }
+
+      // Check each local file against synced state
+      localFiles.forEach(localFile => {
+        let key: string;
+        let localPath: string;
+
+        if (localFile.type === 'tokenSet') {
+          key = localFile.name;
+          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${localFile.name}.json`);
+        } else if (localFile.type === 'themes') {
+          key = SystemFilenames.THEMES;
+          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.THEMES}.json`);
+        } else if (localFile.type === 'metadata') {
+          // Metadata is not stored in lastSyncedState, so always consider it changed if present
+          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.METADATA}.json`);
+          changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
+          return;
+        } else {
+          return; // Skip unknown file types
+        }
+
+        const syncedData = syncedFileMap.get(key);
+        
+        // If synced data doesn't exist or content is different, mark as changed
+        if (!syncedData || !isEqual(localFile.data, syncedData)) {
+          if (this.path.endsWith('.json')) {
+            // Single file mode - we'll handle this differently below
+            return;
+          }
+          changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
+        }
+
+        // Remove from synced map to track deletions
+        syncedFileMap.delete(key);
+      });
+
+      // Handle single file mode differently
+      if (this.path.endsWith('.json')) {
+        const singleFileData: GitSingleFileObject = {};
+        let hasChanges = false;
+        
+        localFiles.forEach(file => {
+          if (file.type === 'tokenSet') {
+            singleFileData[file.name] = file.data;
+            const syncedData = syncedTokens?.[file.name];
+            if (!syncedData || !isEqual(file.data, syncedData)) {
+              hasChanges = true;
+            }
+          } else if (file.type === 'themes') {
+            singleFileData.$themes = file.data;
+            if (!isEqual(file.data, syncedThemes)) {
+              hasChanges = true;
+            }
+          } else if (file.type === 'metadata') {
+            singleFileData.$metadata = file.data;
+            hasChanges = true; // Always consider metadata as changed
+          }
+        });
+        
+        // Check for deleted token sets in single file mode
+        if (syncedTokens && typeof syncedTokens === 'object') {
+          Object.keys(syncedTokens).forEach(tokenSetName => {
+            if (!localFiles.some(f => f.type === 'tokenSet' && f.name === tokenSetName)) {
+              hasChanges = true; // A token set was deleted
+            }
+          });
+        }
+        
+        if (hasChanges) {
+          changedFiles[this.path] = JSON.stringify(singleFileData, null, 2);
+        }
+      } else if (this.flags.multiFileEnabled) {
+        // Files remaining in syncedFileMap should be deleted (multi-file mode only)
+        syncedFileMap.forEach((_, key) => {
+          if (key === SystemFilenames.THEMES) {
+            filesToDelete.push(joinPath(this.path, `${SystemFilenames.THEMES}.json`));
+          } else {
+            // It's a token set
+            filesToDelete.push(joinPath(this.path, `${key}.json`));
+          }
+        });
+      }
+
+      return { changedFiles, filesToDelete };
+    } catch (error) {
+      console.warn('Failed to parse lastSyncedState, falling back to full sync:', error);
+      return this.getFallbackChangedFiles(localFiles);
+    }
+  }
+
+  /**
+   * Fallback method that returns all local files as changed
+   */
+  private getFallbackChangedFiles(localFiles: RemoteTokenStorageFile[]): {
+    changedFiles: Record<string, string>;
+    filesToDelete: string[];
+  } {
     const fallbackChangedFiles: Record<string, string> = {};
     
     localFiles.forEach(file => {
@@ -413,9 +555,9 @@ export class GithubTokenStorage extends GitTokenStorage {
   /**
    * Enhanced writeChangeset that only pushes changed files
    */
-  public async writeChangesetWithDiff(files: RemoteTokenStorageFile[], message: string, branch: string, shouldCreateBranch?: boolean): Promise<boolean> {
+  public async writeChangesetWithDiff(files: RemoteTokenStorageFile[], message: string, branch: string, shouldCreateBranch?: boolean, lastSyncedState?: string): Promise<boolean> {
     try {
-      const { changedFiles, filesToDelete } = await this.getChangedFiles(files);
+      const { changedFiles, filesToDelete } = await this.getChangedFiles(files, lastSyncedState);
       
       // If no files changed, skip the push
       if (Object.keys(changedFiles).length === 0 && filesToDelete.length === 0) {
