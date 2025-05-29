@@ -73,6 +73,13 @@ function StartScreen() {
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
 
+  const matchingProvider = React.useMemo(() => 
+    storageType && 'internalId' in storageType 
+      ? apiProviders.find((i) => i.internalId === storageType.internalId)
+      : undefined, 
+    [apiProviders, storageType]
+  );
+
   return (
     <Box
       css={{
@@ -122,20 +129,17 @@ function StartScreen() {
             <Callout
               id="callout-action-setupsync"
               heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
-              description={t('unableToFetchRemote')}
+              description={matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials')}
               action={{
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
-              secondaryAction={{
+              secondaryAction={matchingProvider ? {
                 onClick: () => {
-                  const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
-                  if (matchingProvider) {
-                    restoreStoredProvider(matchingProvider);
-                  }
+                  restoreStoredProvider(matchingProvider);
                 },
                 text: t('retry'),
-              }}
+              } : undefined}
             />
           ) : (
             <Stack direction="row" gap={2}>
