@@ -303,12 +303,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     filesToDelete: string[];
   }> {
     console.log('🔍 Delta Diff: Starting file comparison...');
-    console.log(`📁 Local files to process: ${localFiles.length}`, localFiles.map(f => {
-      if (f.type === 'tokenSet') {
-        return `${f.name} (${f.type})`;
-      }
-      return `${f.type}`;
-    }));
+    console.log(`📁 Local files to process: ${localFiles.length}`);
     
     try {
       // If we have lastSyncedState, use it instead of fetching remote files
@@ -340,8 +335,6 @@ export class GithubTokenStorage extends GitTokenStorage {
           }
         });
 
-        console.log(`🗂️ Delta Diff: Remote file map created with ${remoteFileMap.size} entries`);
-
         // Check each local file against remote
         localFiles.forEach(localFile => {
           let key: string;
@@ -357,7 +350,6 @@ export class GithubTokenStorage extends GitTokenStorage {
             key = SystemFilenames.METADATA;
             localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.METADATA}.json`);
           } else {
-            console.log(`❓ Delta Diff: Unknown file type - ${(localFile as any).type}, skipping`);
             return; // Skip unknown file types
           }
 
@@ -379,7 +371,6 @@ export class GithubTokenStorage extends GitTokenStorage {
         // Files remaining in remoteFileMap should be deleted
         if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
           remoteFileMap.forEach((remoteFile, key) => {
-            console.log(`🗑️ Delta Diff: File to delete - ${key} (no longer exists locally)`);
             if (remoteFile.type === 'tokenSet') {
               filesToDelete.push(joinPath(this.path, `${key}.json`));
             } else if (remoteFile.type === 'themes') {
@@ -405,248 +396,106 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   /**
-   * Compares local files with lastSyncedState to identify changes
-   * This is much faster than fetching remote files via API
+   * Simple comparison using stringified local files vs lastSyncedState
+   * Much simpler than parsing and converting data formats
    */
   private getChangedFilesFromSyncedState(localFiles: RemoteTokenStorageFile[], lastSyncedState: string): {
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   } {
-    console.log('🧠 Delta Diff: Parsing lastSyncedState for comparison...');
+    console.log('🧠 Delta Diff: Comparing stringified local files with lastSyncedState...');
     
     try {
-      // Parse the lastSyncedState - format is [tokens, themes, format]
-      const parsedSyncedState = JSON.parse(lastSyncedState);
-      if (!Array.isArray(parsedSyncedState) || parsedSyncedState.length < 2) {
-        throw new Error('Invalid lastSyncedState format');
+      // Create the current state string in the same format as lastSyncedState
+      // Format: [tokens, themes, format] where tokens is { tokenSetName: tokenArray }
+      const currentTokens: Record<string, any> = {};
+      let currentThemes: any = [];
+      let hasMetadata = false;
+      
+      // Build current state from local files
+      localFiles.forEach(file => {
+        if (file.type === 'tokenSet') {
+          // Convert token set from object format to array format (like in lastSyncedState)
+          const tempTokensObject = { [file.name]: file.data as any };
+          const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
+          currentTokens[file.name] = convertedTokens[file.name];
+        } else if (file.type === 'themes') {
+          currentThemes = file.data;
+        } else if (file.type === 'metadata') {
+          hasMetadata = true;
+        }
+      });
+      
+      // Create current state string in same format as lastSyncedState
+      const currentStateString = JSON.stringify([currentTokens, currentThemes], null, 2);
+      
+      console.log(`📊 Delta Diff: Current state string length: ${currentStateString.length}`);
+      console.log(`� Delta Diff: Last synced state length: ${lastSyncedState.length}`);
+      
+      // Simple string comparison
+      const statesMatch = currentStateString === lastSyncedState;
+      console.log(`� Delta Diff: States match: ${statesMatch}`);
+      
+      if (!statesMatch) {
+        console.log(`� Delta Diff: States differ - showing first 200 chars of each:`);
+        console.log(`   Current:  ${currentStateString.substring(0, 200)}...`);
+        console.log(`   Synced:   ${lastSyncedState.substring(0, 200)}...`);
       }
-
-      const [syncedTokens, syncedThemes] = parsedSyncedState;
-      console.log(`📋 Delta Diff: Parsed synced state - ${Object.keys(syncedTokens || {}).length} token sets, ${Array.isArray(syncedThemes) ? syncedThemes.length : 0} themes`);
       
       const changedFiles: Record<string, string> = {};
       const filesToDelete: string[] = [];
-
-      // Create a map of synced token sets and special files
-      // Note: syncedTokens is in array format (AnyTokenList), but we need to compare with object format (AnyTokenSet)
-      const syncedFileMap = new Map<string, any>();
       
-      // Add token sets from synced state (these are in array format)
-      if (syncedTokens && typeof syncedTokens === 'object') {
-        Object.entries(syncedTokens).forEach(([name, data]) => {
-          syncedFileMap.set(name, data);
-        });
-        console.log(`🗃️ Delta Diff: Synced token sets: ${Object.keys(syncedTokens).join(', ')}`);
-      }
-      
-      // Add themes from synced state
-      if (syncedThemes) {
-        syncedFileMap.set(SystemFilenames.THEMES, syncedThemes);
-        console.log(`🎨 Delta Diff: Synced themes count: ${Array.isArray(syncedThemes) ? syncedThemes.length : 'unknown'}`);
-      }
-
-      console.log(`🔍 Delta Diff: Starting file-by-file comparison...`);
-
-      // Check each local file against synced state
-      localFiles.forEach(localFile => {
-        let key: string;
-        let localPath: string;
-
-        if (localFile.type === 'tokenSet') {
-          key = localFile.name;
-          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${localFile.name}.json`);
-        } else if (localFile.type === 'themes') {
-          key = SystemFilenames.THEMES;
-          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.THEMES}.json`);
-        } else if (localFile.type === 'metadata') {
-          // Metadata is not stored in lastSyncedState, so always consider it changed if present
-          localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.METADATA}.json`);
-          console.log(`📊 Delta Diff: Metadata file detected - always marked as changed (not in sync state)`);
-          changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
-          return;
-        } else {
-          console.log(`❓ Delta Diff: Unknown file type - ${(localFile as any).type}, skipping`);
-          return; // Skip unknown file types
-        }
-
-        const syncedData = syncedFileMap.get(key);
-        
-        console.log(`🔍 Delta Diff: Comparing file "${key}"...`);
-        
-        // For token sets, we need to convert local object format to array format for comparison
-        let localDataForComparison = localFile.data;
-        if (localFile.type === 'tokenSet') {
-          // Convert local token set from object format to array format (like in lastSyncedState)
-          // The local data is in AnyTokenSet format (object), but synced data is in AnyTokenList format (array)
-          // We need to convert the local object back to array format for proper comparison
-          
-          console.log(`   🔄 Converting local token set "${key}" from object to array format for comparison...`);
-          
-          // Create a temporary tokens object in the expected format for removeIdPropertyFromTokens
-          const tempTokensObject = { [key]: localFile.data as any };
-          const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
-          localDataForComparison = convertedTokens[key];
-          
-          console.log(`   📊 Converted local data type:`, typeof localDataForComparison, Array.isArray(localDataForComparison) ? '(array)' : '(object)');
-        }
-        
-        console.log(`   � Local data preview:`, JSON.stringify(localDataForComparison).substring(0, 200) + '...');
-        console.log(`   📤 Synced data preview:`, syncedData ? JSON.stringify(syncedData).substring(0, 200) + '...' : 'NOT FOUND');
-        console.log(`   📊 Local data type:`, typeof localDataForComparison, Array.isArray(localDataForComparison) ? '(array)' : '(object)');
-        console.log(`   📊 Synced data type:`, typeof syncedData, Array.isArray(syncedData) ? '(array)' : '(object)');
-        
-        if (!syncedData) {
-          console.log(`   ❌ Synced data not found for "${key}"`);
-        } else {
-          // Let's do a detailed comparison
-          const isEqualResult = isEqual(localDataForComparison, syncedData);
-          console.log(`   🔍 isEqual result:`, isEqualResult);
-          
-          if (!isEqualResult) {
-            // Let's see what's different
-            console.log(`   🔍 Detailed comparison for "${key}":`);
-            
-            if (Array.isArray(localDataForComparison) && Array.isArray(syncedData)) {
-              console.log(`     📊 Array lengths - Local: ${localDataForComparison.length}, Synced: ${syncedData.length}`);
-              if (localDataForComparison.length !== syncedData.length) {
-                console.log(`     ❌ Array lengths differ`);
-              } else {
-                // Check first few items
-                for (let i = 0; i < Math.min(3, localDataForComparison.length); i++) {
-                  const localItem = localDataForComparison[i];
-                  const syncedItem = syncedData[i];
-                  const itemEqual = isEqual(localItem, syncedItem);
-                  console.log(`     [${i}] Equal: ${itemEqual}`);
-                  if (!itemEqual) {
-                    console.log(`       Local [${i}]:`, JSON.stringify(localItem).substring(0, 100) + '...');
-                    console.log(`       Synced [${i}]:`, JSON.stringify(syncedItem).substring(0, 100) + '...');
-                  }
-                }
-              }
-            } else if (typeof localDataForComparison === 'object' && typeof syncedData === 'object') {
-              const localKeys = Object.keys(localDataForComparison || {});
-              const syncedKeys = Object.keys(syncedData || {});
-              console.log(`     📊 Object keys - Local: ${localKeys.length}, Synced: ${syncedKeys.length}`);
-              console.log(`     📋 Local keys:`, localKeys.slice(0, 5).join(', ') + (localKeys.length > 5 ? '...' : ''));
-              console.log(`     📋 Synced keys:`, syncedKeys.slice(0, 5).join(', ') + (syncedKeys.length > 5 ? '...' : ''));
-              
-              // Check if keys are the same
-              const keysDiffer = localKeys.length !== syncedKeys.length || 
-                !localKeys.every(key => syncedKeys.includes(key));
-              console.log(`     🔑 Keys differ:`, keysDiffer);
-              
-              if (!keysDiffer) {
-                // Check first few values
-                for (let i = 0; i < Math.min(3, localKeys.length); i++) {
-                  const key = localKeys[i];
-                  const localValue = (localDataForComparison as any)[key];
-                  const syncedValue = (syncedData as any)[key];
-                  const valueEqual = isEqual(localValue, syncedValue);
-                  console.log(`     ["${key}"] Equal: ${valueEqual}`);
-                  if (!valueEqual) {
-                    console.log(`       Local ["${key}"]:`, JSON.stringify(localValue).substring(0, 100) + '...');
-                    console.log(`       Synced ["${key}"]:`, JSON.stringify(syncedValue).substring(0, 100) + '...');
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        // If synced data doesn't exist or content is different, mark as changed
-        if (!syncedData || !isEqual(localDataForComparison, syncedData)) {
-          const reason = !syncedData ? 'new file (not in sync state)' : 'content differs from sync state';
-          console.log(`📝 Delta Diff: File changed - ${key} (${reason})`);
-          if (this.path.endsWith('.json')) {
-            // Single file mode - we'll handle this differently below
-            return;
-          }
-          changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
-        } else {
-          console.log(`✅ Delta Diff: File unchanged - ${key} (matches sync state)`);
-        }
-
-        // Remove from synced map to track deletions
-        syncedFileMap.delete(key);
-      });
-
-      // Handle single file mode differently
-      if (this.path.endsWith('.json')) {
-        console.log(`📄 Delta Diff: Single file mode detected, checking for any changes...`);
-        const singleFileData: GitSingleFileObject = {};
-        let hasChanges = false;
-        let changeReasons: string[] = [];
+      // If states don't match, we need to push all files (except we can be smarter about this)
+      if (!statesMatch || hasMetadata) {
+        console.log(`� Delta Diff: Changes detected, marking files for push...`);
         
         localFiles.forEach(file => {
+          let filePath: string;
+          
+          if (this.path.endsWith('.json')) {
+            // Single file mode - combine all data into one file
+            if (Object.keys(changedFiles).length === 0) {
+              const singleFileData: GitSingleFileObject = {};
+              
+              localFiles.forEach(localFile => {
+                if (localFile.type === 'tokenSet') {
+                  singleFileData[localFile.name] = localFile.data;
+                } else if (localFile.type === 'themes') {
+                  singleFileData.$themes = localFile.data;
+                } else if (localFile.type === 'metadata') {
+                  singleFileData.$metadata = localFile.data;
+                }
+              });
+              
+              changedFiles[this.path] = JSON.stringify(singleFileData, null, 2);
+              console.log(`📄 Delta Diff: Single file marked for push: ${this.path}`);
+            }
+            return;
+          }
+          
+          // Multi-file mode
           if (file.type === 'tokenSet') {
-            singleFileData[file.name] = file.data;
-            
-            // Convert local data to array format for comparison
-            const tempTokensObject = { [file.name]: file.data as any };
-            const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
-            const localDataForComparison = convertedTokens[file.name];
-            
-            const syncedData = syncedTokens?.[file.name];
-            if (!syncedData || !isEqual(localDataForComparison, syncedData)) {
-              hasChanges = true;
-              const reason = !syncedData ? `new token set: ${file.name}` : `changed token set: ${file.name}`;
-              changeReasons.push(reason);
-            }
+            filePath = joinPath(this.path, `${file.name}.json`);
           } else if (file.type === 'themes') {
-            singleFileData.$themes = file.data;
-            if (!isEqual(file.data, syncedThemes)) {
-              hasChanges = true;
-              changeReasons.push('themes changed');
-            }
+            filePath = joinPath(this.path, `${SystemFilenames.THEMES}.json`);
           } else if (file.type === 'metadata') {
-            singleFileData.$metadata = file.data;
-            hasChanges = true; // Always consider metadata as changed
-            changeReasons.push('metadata present');
-          }
-        });
-        
-        // Check for deleted token sets in single file mode
-        if (syncedTokens && typeof syncedTokens === 'object') {
-          Object.keys(syncedTokens).forEach(tokenSetName => {
-            if (!localFiles.some(f => f.type === 'tokenSet' && f.name === tokenSetName)) {
-              hasChanges = true; // A token set was deleted
-              changeReasons.push(`deleted token set: ${tokenSetName}`);
-            }
-          });
-        }
-        
-        if (hasChanges) {
-          console.log(`📝 Delta Diff: Single file has changes: ${changeReasons.join(', ')}`);
-          changedFiles[this.path] = JSON.stringify(singleFileData, null, 2);
-        } else {
-          console.log(`✅ Delta Diff: Single file unchanged`);
-        }
-      } else if (this.flags.multiFileEnabled) {
-        // Files remaining in syncedFileMap should be deleted (multi-file mode only)
-        syncedFileMap.forEach((_, key) => {
-          console.log(`🗑️ Delta Diff: File to delete - ${key} (exists in sync state but not locally)`);
-          if (key === SystemFilenames.THEMES) {
-            filesToDelete.push(joinPath(this.path, `${SystemFilenames.THEMES}.json`));
+            filePath = joinPath(this.path, `${SystemFilenames.METADATA}.json`);
           } else {
-            // It's a token set
-            filesToDelete.push(joinPath(this.path, `${key}.json`));
+            return;
           }
+          
+          changedFiles[filePath] = JSON.stringify(file.data, null, 2);
+          console.log(`📁 Delta Diff: File marked for push: ${filePath}`);
         });
+      } else {
+        console.log(`✅ Delta Diff: No changes detected - skipping push`);
       }
 
-      console.log(`📊 Delta Diff: lastSyncedState comparison complete`);
-      console.log(`   📝 Files to update: ${Object.keys(changedFiles).length}`);
-      if (Object.keys(changedFiles).length > 0) {
-        console.log(`      Changed files: ${Object.keys(changedFiles).join(', ')}`);
-      }
-      console.log(`   🗑️ Files to delete: ${filesToDelete.length}`);
-      if (filesToDelete.length > 0) {
-        console.log(`      Files to delete: ${filesToDelete.join(', ')}`);
-      }
-
+      console.log(`📊 Delta Diff: Comparison complete - ${Object.keys(changedFiles).length} files to push, ${filesToDelete.length} to delete`);
       return { changedFiles, filesToDelete };
+      
     } catch (error) {
-      console.warn('❌ Delta Diff: Failed to parse lastSyncedState, falling back to full sync:', error);
+      console.warn('❌ Delta Diff: String comparison failed, falling back to full sync:', error);
       return this.getFallbackChangedFiles(localFiles);
     }
   }
