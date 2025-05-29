@@ -531,15 +531,6 @@ function EditTokenForm({ resolvedTokens }: Props) {
     checkAndSubmitTokenValue();
   }, [checkAndSubmitTokenValue]);
 
-  const handleSaveShortcut = React.useCallback(
-    (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey) {
-        checkAndSubmitTokenValue();
-      }
-    },
-    [checkAndSubmitTokenValue],
-  );
-
   // Only register the shortcut when this form is actually being used
   const showEditForm = useSelector(showEditFormSelector);
   
