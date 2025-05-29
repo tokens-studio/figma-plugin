@@ -24,7 +24,6 @@ import { applyTokenSetOrder } from '@/utils/tokenset';
 import { PushOverrides } from '../../remoteTokens';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
 import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
-import { useFlags } from '@/app/components/LaunchDarkly';
 
 type GithubCredentials = Extract<StorageTypeCredentials, { provider: StorageProviderType.GITHUB; }>;
 type GithubFormValues = Extract<StorageTypeFormValues<false>, { provider: StorageProviderType.GITHUB }>;
@@ -37,7 +36,6 @@ export function useGitHub() {
   const storeTokenIdInJsonEditor = useSelector(storeTokenIdInJsonEditorSelector);
   const lastSyncedState = useSelector(lastSyncedStateSelector);
   const isProUser = useIsProUser();
-  const flags = useFlags();
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const { pushDialog, closePushDialog } = usePushDialog();
@@ -139,7 +137,6 @@ export function useGitHub() {
     activeTheme,
     storeTokenIdInJsonEditor,
     lastSyncedState,
-    flags.deltaDiffSync,
   ]);
 
   const checkAndSetAccess = useCallback(async ({
