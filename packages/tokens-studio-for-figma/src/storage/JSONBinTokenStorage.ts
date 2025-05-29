@@ -1,5 +1,5 @@
 import z from 'zod';
-import * as pjs from '../../package.json';
+import pjs from '../../package.json';
 import { DeepTokensMap, ThemeObjectsList } from '@/types';
 import { SingleToken } from '@/types/tokens';
 import {

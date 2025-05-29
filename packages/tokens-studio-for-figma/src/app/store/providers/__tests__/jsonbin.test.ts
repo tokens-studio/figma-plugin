@@ -2,7 +2,7 @@ import { ThemeObjectsList } from '@/types';
 import { StorageTypeCredentials } from '@/types/StorageType';
 import { SingleToken } from '@/types/tokens';
 import { updateJSONBinTokens } from '../jsonbin';
-import * as pjs from '@/../package.json';
+import pjs from '@/../package.json';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { createMockStore } from '@/../tests/config/setupTest';
 import {

@@ -4,7 +4,7 @@ import {
 import {
   mockTrack, mockInit, mockIdentify, mockPeopleSet,
 } from '../../tests/__mocks__/mixpanelMock';
-import * as pjs from '../../package.json';
+import pjs from '../../package.json';
 
 describe('without mixpanel env', () => {
   it('should not track when mixpanel env isnt set', () => {
