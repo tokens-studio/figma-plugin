@@ -47,13 +47,13 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   // Get all folder paths that can be collapsed
   const allFolderPaths = React.useMemo(() => {
     const tree = tokenSetListToTree(allTokenSets);
-    return tree.filter(item => !item.isLeaf).map(item => item.key);
+    return tree.filter((item) => !item.isLeaf).map((item) => item.key);
   }, [allTokenSets]);
 
   // Determine current collapse state
   const collapseState = React.useMemo(() => {
     if (allFolderPaths.length === 0) return 'none'; // No folders to collapse
-    const collapsedCount = allFolderPaths.filter(path => collapsed.includes(path)).length;
+    const collapsedCount = allFolderPaths.filter((path) => collapsed.includes(path)).length;
     if (collapsedCount === 0) return 'all-expanded';
     if (collapsedCount === allFolderPaths.length) return 'all-collapsed';
     return 'mixed';

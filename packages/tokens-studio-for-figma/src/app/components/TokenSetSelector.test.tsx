@@ -4,6 +4,8 @@ import { store } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 
 describe('TokenSetSelector Component', () => {
+  const mockSaveScrollPositionSet = () => {};
+
   beforeEach(() => {
     // Reset the store state before each test
     store.dispatch.tokenState.setTokens({
@@ -15,7 +17,7 @@ describe('TokenSetSelector Component', () => {
   it('show onboarding explainer sets', () => {
     store.dispatch.uiState.setOnboardingExplainerSets('true');
 
-    const result = render(<TokenSetSelector saveScrollPositionSet={() => {}} />);
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
     waitFor(async () => {
       expect(await result.findByText('sets')).not.toBeUndefined();
     }, { timeout: 10000 });
@@ -23,7 +25,7 @@ describe('TokenSetSelector Component', () => {
 
   it('hide onboarding explainer syncproviders', async () => {
     store.dispatch.uiState.setOnboardingExplainerSets('true');
-    const result = render(<TokenSetSelector saveScrollPositionSet={() => {}} />);
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
 
     fireEvent.click(result.getByTestId('closeButton'));
 
@@ -37,9 +39,9 @@ describe('TokenSetSelector Component', () => {
       'folder1/set1': [],
       'folder2/set2': [],
     });
-    
-    const result = render(<TokenSetSelector saveScrollPositionSet={() => {}} />);
-    
+
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
+
     // Simply check that the collapse all button exists
     const collapseAllButton = result.queryByTestId('button-collapse-all-token-sets');
     expect(collapseAllButton).toBeInTheDocument();
@@ -52,16 +54,47 @@ describe('TokenSetSelector Component', () => {
       set1: [],
       set2: [],
     });
-    
-    const result = render(<TokenSetSelector saveScrollPositionSet={() => {}} />);
-    
+
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
+
     // Check that the collapse all button doesn't exist
     const collapseAllButton = result.queryByTestId('button-collapse-all-token-sets');
     expect(collapseAllButton).not.toBeInTheDocument();
   });
 
+  it('should toggle collapse state when collapse all button is clicked', async () => {
+    // Set tokens with folders
+    store.dispatch.tokenState.setTokens({
+      global: [],
+      'folder1/set1': [],
+      'folder1/set2': [],
+      'folder2/set3': [],
+    });
+
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
+
+    // Find the collapse all button
+    const collapseAllButton = result.getByTestId('button-collapse-all-token-sets');
+    expect(collapseAllButton).toBeInTheDocument();
+
+    // Initially all should be expanded (no folders collapsed)
+    expect(store.getState().tokenState.collapsedTokenSets).toEqual([]);
+
+    // Click the collapse all button
+    fireEvent.click(collapseAllButton);
+
+    // Now all folders should be collapsed
+    expect(store.getState().tokenState.collapsedTokenSets).toEqual(['folder1', 'folder2']);
+
+    // Click again to expand all
+    fireEvent.click(collapseAllButton);
+
+    // Now all should be expanded again
+    expect(store.getState().tokenState.collapsedTokenSets).toEqual([]);
+  });
+
   it('create rename duplicate token set', async () => {
-    const result = render(<TokenSetSelector saveScrollPositionSet={() => {}} />);
+    const result = render(<TokenSetSelector saveScrollPositionSet={mockSaveScrollPositionSet} />);
     // create new token set
     const newTokenSetButton = await result.findByTestId('button-new-token-set');
     fireEvent.click(newTokenSetButton);
