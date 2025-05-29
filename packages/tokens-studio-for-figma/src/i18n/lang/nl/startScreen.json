@@ -12,5 +12,8 @@
   "cancel": "Annuleren",
   "loadingWait": "Laden even geduld aub",
   "enterCredentials": "Voer inloggegevens in",
-  "unableToFetchRemote": "Kan geen tokens ophalen uit externe opslag. Als u nog geen inloggegevens heeft toegevoegd, voegt u deze in de volgende stap toe. Zorg er anders voor dat het bestand bestaat en dat u er toegang toe hebt."
+  "unableToFetchRemote": "Kan geen tokens ophalen uit externe opslag. Als u nog geen inloggegevens heeft toegevoegd, voegt u deze in de volgende stap toe. Zorg er anders voor dat het bestand bestaat en dat u er toegang toe hebt.",
+  "unableToFetchRemoteNoCredentials": "Kan geen tokens ophalen uit externe opslag. U moet inloggegevens toevoegen om toegang te krijgen tot deze opslagprovider.",
+  "unableToFetchRemoteWithCredentials": "Kan geen tokens ophalen uit externe opslag. Dit kan te wijten zijn aan onjuiste inloggegevens, of het bestand bestaat mogelijk niet of u hebt er geen toegang toe.",
+  "retry": "Opnieuw proberen"
 }

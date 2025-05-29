@@ -12,5 +12,8 @@
   "cancel": "Cancel",
   "loadingWait": "Loading, please wait",
   "enterCredentials": "Enter credentials",
-  "unableToFetchRemote": "Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it."
+  "retry": "Retry",
+  "unableToFetchRemote": "Unable to fetch tokens from remote storage, if you haven't added credentials yet add them in the next step. Otherwise make sure the file exists and you have access to it.",
+  "unableToFetchRemoteNoCredentials": "Unable to fetch tokens from remote storage. You need to add credentials to access this storage provider.",
+  "unableToFetchRemoteWithCredentials": "Unable to fetch tokens from remote storage. This may be due to incorrect credentials, or the file might not exist or you don't have access to it."
 }

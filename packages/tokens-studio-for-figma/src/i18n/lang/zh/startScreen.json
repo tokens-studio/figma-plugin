@@ -12,5 +12,8 @@
   "cancel": "取消",
   "loadingWait": "加载中...请稍候",
   "enterCredentials": "输入凭据",
-  "unableToFetchRemote": "如果您尚未添加凭据，则无法从远端存储获取 Token，请在下一步中添加它们。否则请确保该文件存在并且您有权访问它。"
+  "unableToFetchRemote": "如果您尚未添加凭据，则无法从远端存储获取 Token，请在下一步中添加它们。否则请确保该文件存在并且您有权访问它。",
+  "unableToFetchRemoteNoCredentials": "Unable to fetch tokens from remote storage. You need to add credentials to access this storage provider.",
+  "unableToFetchRemoteWithCredentials": "Unable to fetch tokens from remote storage. This may be due to incorrect credentials, or the file might not exist or you don't have access to it.",
+  "retry": "Retry"
 }

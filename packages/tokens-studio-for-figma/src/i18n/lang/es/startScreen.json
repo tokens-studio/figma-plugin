@@ -12,5 +12,8 @@
   "cancel": "Cancelar",
   "loadingWait": "Cargando por favor espere",
   "enterCredentials": "Ingrese las credenciales",
-  "unableToFetchRemote": "No se pueden obtener tokens del almacenamiento remoto, si aún no ha agregado credenciales, agréguelas en el siguiente paso. De lo contrario, asegúrese de que el archivo exista y de que tenga acceso a él."
+  "unableToFetchRemote": "No se pueden obtener tokens del almacenamiento remoto, si aún no ha agregado credenciales, agréguelas en el siguiente paso. De lo contrario, asegúrese de que el archivo exista y de que tenga acceso a él.",
+  "unableToFetchRemoteNoCredentials": "No se pueden obtener tokens del almacenamiento remoto. Necesita agregar credenciales para acceder a este proveedor de almacenamiento.",
+  "unableToFetchRemoteWithCredentials": "No se pueden obtener tokens del almacenamiento remoto. Esto puede deberse a credenciales incorrectas, o el archivo puede no existir o no tener acceso a él.",
+  "retry": "Reintentar"
 }

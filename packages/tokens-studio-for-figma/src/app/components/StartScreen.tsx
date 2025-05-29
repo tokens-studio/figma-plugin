@@ -18,6 +18,7 @@ import Box from './Box';
 import { transformProviderName } from '@/utils/transformProviderName';
 import { track } from '@/utils/analytics';
 import Footer from './Footer';
+import useRemoteTokens from '../store/remoteTokens';
 
 const StyledTokensStudioIcon = styled(TokensStudioLogo, {
   width: '200px',
@@ -39,6 +40,7 @@ const HelpfulLink = styled('a', {
 function StartScreen() {
   const dispatch = useDispatch<Dispatch>();
   const { t } = useTranslation(['startScreen']);
+  const { restoreStoredProvider } = useRemoteTokens();
 
   const storageType = useSelector(storageTypeSelector);
   const apiProviders = useSelector(apiProvidersSelector);
@@ -70,6 +72,13 @@ function StartScreen() {
     dispatch.tokenState.setEmptyTokens();
     dispatch.uiState.setLocalApiState(credentialsToSet);
   }, [apiProviders, dispatch.tokenState, dispatch.uiState, storageType]);
+
+  const matchingProvider = React.useMemo(() => 
+    storageType && 'internalId' in storageType 
+      ? apiProviders.find((i) => i.internalId === storageType.internalId)
+      : undefined, 
+    [apiProviders, storageType]
+  );
 
   return (
     <Box
@@ -120,11 +129,17 @@ function StartScreen() {
             <Callout
               id="callout-action-setupsync"
               heading={t('couldNotLoadTokens', { provider: transformProviderName(storageType?.provider) })}
-              description={t('unableToFetchRemote')}
+              description={matchingProvider ? t('unableToFetchRemoteWithCredentials') : t('unableToFetchRemoteNoCredentials')}
               action={{
                 onClick: onSetSyncClick,
                 text: t('enterCredentials'),
               }}
+              secondaryAction={matchingProvider ? {
+                onClick: () => {
+                  restoreStoredProvider(matchingProvider);
+                },
+                text: t('retry'),
+              } : undefined}
             />
           ) : (
             <Stack direction="row" gap={2}>

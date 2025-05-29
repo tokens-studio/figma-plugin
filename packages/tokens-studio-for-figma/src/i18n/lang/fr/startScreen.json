@@ -12,5 +12,8 @@
   "cancel": "Annuler",
   "loadingWait": "Chargement, veuillez patienter",
   "enterCredentials": "Entrez les informations d'identification",
-  "unableToFetchRemote": "Impossible de récupérer les jetons du stockage distant, si vous n'avez pas encore ajouté d'informations d'identification, ajoutez-les à l'étape suivante. Sinon, assurez-vous que le fichier existe et que vous y avez accès."
+  "unableToFetchRemote": "Impossible de récupérer les jetons du stockage distant, si vous n'avez pas encore ajouté d'informations d'identification, ajoutez-les à l'étape suivante. Sinon, assurez-vous que le fichier existe et que vous y avez accès.",
+  "unableToFetchRemoteNoCredentials": "Impossible de récupérer les jetons du stockage distant. Vous devez ajouter des informations d'identification pour accéder à ce fournisseur de stockage.",
+  "unableToFetchRemoteWithCredentials": "Impossible de récupérer les jetons du stockage distant. Cela peut être dû à des informations d'identification incorrectes, ou le fichier peut ne pas exister ou vous n'y avez pas accès.",
+  "retry": "Réessayer"
 }
