@@ -9,13 +9,16 @@ import { track } from '@/utils/analytics';
 import useConfirm from '../hooks/useConfirm';
 import { Dispatch } from '../store';
 import IconAdd from '@/icons/add.svg';
+import IconExpandArrow from '@/icons/expand-arrow.svg';
+import IconCollapseArrow from '@/icons/collapse-arrow.svg';
 import Modal from './Modal';
 import TokenSetTree from './TokenSetTree';
 import {
-  editProhibitedSelector, tokensSelector, uiStateSelector, storageTypeSelector,
+  editProhibitedSelector, tokensSelector, uiStateSelector, storageTypeSelector, collapsedTokenSetsSelector,
 } from '@/selectors';
 import OnboardingExplainer from './OnboardingExplainer';
 import { StorageProviderType } from '@/constants/StorageProviderType';
+import { tokenSetListToTree } from '@/utils/tokenset';
 
 export default function TokenSetSelector({ saveScrollPositionSet }: { saveScrollPositionSet: (tokenSet: string) => void }) {
   const { t } = useTranslation(['tokens']);
@@ -29,6 +32,7 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const tokens = useSelector(tokensSelector);
   const editProhibited = useSelector(editProhibitedSelector);
   const uiState = useSelector(uiStateSelector);
+  const collapsed = useSelector(collapsedTokenSetsSelector);
   const dispatch = useDispatch<Dispatch>();
   const { confirm } = useConfirm();
   const storageType = useSelector(storageTypeSelector);
@@ -39,6 +43,31 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
   const [oldTokenSetName, setOldTokenSetName] = React.useState('');
   const [isDuplicate, setIsDuplicate] = React.useState(false);
   const allTokenSets = React.useMemo(() => Object.keys(tokens), [tokens]);
+
+  // Get all folder paths that can be collapsed
+  const allFolderPaths = React.useMemo(() => {
+    const tree = tokenSetListToTree(allTokenSets);
+    return tree.filter(item => !item.isLeaf).map(item => item.key);
+  }, [allTokenSets]);
+
+  // Determine current collapse state
+  const collapseState = React.useMemo(() => {
+    if (allFolderPaths.length === 0) return 'none'; // No folders to collapse
+    const collapsedCount = allFolderPaths.filter(path => collapsed.includes(path)).length;
+    if (collapsedCount === 0) return 'all-expanded';
+    if (collapsedCount === allFolderPaths.length) return 'all-collapsed';
+    return 'mixed';
+  }, [allFolderPaths, collapsed]);
+
+  const handleCollapseAll = React.useCallback(() => {
+    // If all are expanded or mixed state, collapse all
+    // If all are collapsed, expand all
+    if (collapseState === 'all-collapsed') {
+      dispatch.tokenState.setCollapsedTokenSets([]);
+    } else {
+      dispatch.tokenState.setCollapsedTokenSets(allFolderPaths);
+    }
+  }, [dispatch, allFolderPaths, collapseState]);
 
   React.useEffect(() => {
     const scrollPositionSet = allTokenSets.reduce<Record<string, number>>((acc, crr) => {
@@ -230,7 +259,20 @@ export default function TokenSetSelector({ saveScrollPositionSet }: { saveScroll
             </Stack>
           </form>
         </Modal>
-        <Stack direction="column" css={{ padding: '$3' }}>
+        <Stack direction="column" css={{ padding: '$3' }} gap={2}>
+          {allFolderPaths.length > 0 && (
+            <Button
+              icon={collapseState === 'all-collapsed' ? <IconExpandArrow /> : <IconCollapseArrow />}
+              size="small"
+              data-testid="button-collapse-all-token-sets"
+              type="button"
+              onClick={handleCollapseAll}
+              css={{ justifyContent: 'center' }}
+              variant="secondary"
+            >
+              {collapseState === 'all-collapsed' ? t('toExpandAll') : t('collapseAll')}
+            </Button>
+          )}
           <Button
             icon={<IconAdd />}
             size="small"
