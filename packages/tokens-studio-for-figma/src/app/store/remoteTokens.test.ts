@@ -34,6 +34,7 @@ const mockPushDialog = jest.fn();
 const mockClosePushDialog = jest.fn();
 const mockShowPullDialog = jest.fn();
 const mockClosePullDialog = jest.fn();
+const mockShowPullDialogError = jest.fn();
 const mockCreateBranch = jest.fn();
 const mockSave = jest.fn();
 const mockSetCollapsedTokenSets = jest.fn();
@@ -211,6 +212,7 @@ jest.mock('../hooks/usePullDialog', () => ({
   default: () => ({
     showPullDialog: mockShowPullDialog,
     closePullDialog: mockClosePullDialog,
+    showPullDialogError: mockShowPullDialogError,
   }),
 }));
 jest.mock('../../plugin/notifiers', (() => ({
@@ -451,6 +453,38 @@ describe('remoteTokens', () => {
       status: 'failure',
       errorMessage: ErrorMessages.ID_NON_EXIST_ERROR,
     });
+  });
+
+  // Test that error dialog is shown when pulling fails
+  it('should call showPullDialogError when pull fails', async () => {
+    mockRetrieve.mockImplementation(() => (
+      Promise.resolve({
+        status: 'failure',
+        errorMessage: 'Failed to connect to repository',
+      })
+    ));
+    
+    await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials });
+    
+    expect(mockShowPullDialogError).toHaveBeenCalledWith('Failed to connect to repository');
+  });
+
+  it('should call showPullDialogError when pull throws an error', async () => {
+    mockRetrieve.mockImplementation(() => {
+      throw new Error('Network error');
+    });
+    
+    await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials });
+    
+    expect(mockShowPullDialogError).toHaveBeenCalledWith(ErrorMessages.GITHUB_CREDENTIAL_ERROR);
+  });
+
+  it('should call showPullDialogError when remoteData is null', async () => {
+    mockRetrieve.mockImplementation(() => Promise.resolve(null));
+    
+    await result.current.pullTokens({ context: gitHubContext as StorageTypeCredentials });
+    
+    expect(mockShowPullDialogError).toHaveBeenCalledWith('No data received from the storage provider');
   });
 
   Object.entries(contextMap).forEach(([contextName, context]) => {
