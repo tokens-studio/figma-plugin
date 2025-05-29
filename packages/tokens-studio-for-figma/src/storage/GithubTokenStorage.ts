@@ -469,6 +469,70 @@ export class GithubTokenStorage extends GitTokenStorage {
 
         const syncedData = syncedFileMap.get(key);
         
+        console.log(`🔍 Delta Diff: Comparing file "${key}"...`);
+        console.log(`   📥 Local data preview:`, JSON.stringify(localFile.data).substring(0, 200) + '...');
+        console.log(`   📤 Synced data preview:`, syncedData ? JSON.stringify(syncedData).substring(0, 200) + '...' : 'NOT FOUND');
+        console.log(`   📊 Local data type:`, typeof localFile.data, Array.isArray(localFile.data) ? '(array)' : '(object)');
+        console.log(`   📊 Synced data type:`, typeof syncedData, Array.isArray(syncedData) ? '(array)' : '(object)');
+        
+        if (!syncedData) {
+          console.log(`   ❌ Synced data not found for "${key}"`);
+        } else {
+          // Let's do a detailed comparison
+          const isEqualResult = isEqual(localFile.data, syncedData);
+          console.log(`   🔍 isEqual result:`, isEqualResult);
+          
+          if (!isEqualResult) {
+            // Let's see what's different
+            console.log(`   🔍 Detailed comparison for "${key}":`);
+            
+            if (Array.isArray(localFile.data) && Array.isArray(syncedData)) {
+              console.log(`     📊 Array lengths - Local: ${localFile.data.length}, Synced: ${syncedData.length}`);
+              if (localFile.data.length !== syncedData.length) {
+                console.log(`     ❌ Array lengths differ`);
+              } else {
+                // Check first few items
+                for (let i = 0; i < Math.min(3, localFile.data.length); i++) {
+                  const localItem = localFile.data[i];
+                  const syncedItem = syncedData[i];
+                  const itemEqual = isEqual(localItem, syncedItem);
+                  console.log(`     [${i}] Equal: ${itemEqual}`);
+                  if (!itemEqual) {
+                    console.log(`       Local [${i}]:`, JSON.stringify(localItem).substring(0, 100) + '...');
+                    console.log(`       Synced [${i}]:`, JSON.stringify(syncedItem).substring(0, 100) + '...');
+                  }
+                }
+              }
+            } else if (typeof localFile.data === 'object' && typeof syncedData === 'object') {
+              const localKeys = Object.keys(localFile.data || {});
+              const syncedKeys = Object.keys(syncedData || {});
+              console.log(`     📊 Object keys - Local: ${localKeys.length}, Synced: ${syncedKeys.length}`);
+              console.log(`     📋 Local keys:`, localKeys.slice(0, 5).join(', ') + (localKeys.length > 5 ? '...' : ''));
+              console.log(`     📋 Synced keys:`, syncedKeys.slice(0, 5).join(', ') + (syncedKeys.length > 5 ? '...' : ''));
+              
+              // Check if keys are the same
+              const keysDiffer = localKeys.length !== syncedKeys.length || 
+                !localKeys.every(key => syncedKeys.includes(key));
+              console.log(`     🔑 Keys differ:`, keysDiffer);
+              
+              if (!keysDiffer) {
+                // Check first few values
+                for (let i = 0; i < Math.min(3, localKeys.length); i++) {
+                  const key = localKeys[i];
+                  const localValue = (localFile.data as any)[key];
+                  const syncedValue = (syncedData as any)[key];
+                  const valueEqual = isEqual(localValue, syncedValue);
+                  console.log(`     ["${key}"] Equal: ${valueEqual}`);
+                  if (!valueEqual) {
+                    console.log(`       Local ["${key}"]:`, JSON.stringify(localValue).substring(0, 100) + '...');
+                    console.log(`       Synced ["${key}"]:`, JSON.stringify(syncedValue).substring(0, 100) + '...');
+                  }
+                }
+              }
+            }
+          }
+        }
+        
         // If synced data doesn't exist or content is different, mark as changed
         if (!syncedData || !isEqual(localFile.data, syncedData)) {
           const reason = !syncedData ? 'new file (not in sync state)' : 'content differs from sync state';
