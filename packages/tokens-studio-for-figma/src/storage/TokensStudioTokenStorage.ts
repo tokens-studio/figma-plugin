@@ -21,6 +21,9 @@ import {
   UPDATE_TOKEN_SET_MUTATION,
   DELETE_TOKEN_SET_MUTATION,
   UPDATE_TOKEN_SET_ORDER_MUTATION,
+  CREATE_TOKEN_MUTATION,
+  UPDATE_TOKEN_MUTATION,
+  DELETE_TOKEN_MUTATION,
 } from './tokensStudio/graphql';
 import { track } from '@/utils/analytics';
 import { ThemeObjectsList } from '@/types';
@@ -449,6 +452,89 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
     }
   }
 
+  private async handleCreateToken(data: any, successCallback: () => void) {
+    try {
+      if (!data.set || !data.input) {
+        throw new Error('Invalid data');
+      }
+
+      const responseData = await this.client.mutate({
+        mutation: CREATE_TOKEN_MUTATION,
+        variables: {
+          set: data.set,
+          input: data.input,
+        },
+      });
+
+      if (!responseData?.data) {
+        throw new Error('No response data');
+      }
+
+      track('Create token in Tokens Studio');
+      notifyToUI('Token created in Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error creating token in Tokens Studio', e);
+    }
+  }
+
+  private async handleUpdateToken(data: any, successCallback: () => void) {
+    try {
+      if (!data.urn || !data.input) {
+        throw new Error('Invalid data');
+      }
+
+      const responseData = await this.client.mutate({
+        mutation: UPDATE_TOKEN_MUTATION,
+        variables: {
+          urn: data.urn,
+          input: data.input,
+        },
+      });
+
+      if (!responseData?.data) {
+        throw new Error('No response data');
+      }
+
+      track('Update token in Tokens Studio');
+      notifyToUI('Token updated in Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error updating token in Tokens Studio', e);
+    }
+  }
+
+  private async handleDeleteToken(data: any, successCallback: () => void) {
+    try {
+      if (!data.urn) {
+        throw new Error('Invalid data');
+      }
+
+      const responseData = await this.client.mutate({
+        mutation: DELETE_TOKEN_MUTATION,
+        variables: {
+          urn: data.urn,
+        },
+      });
+
+      if (!responseData?.data) {
+        throw new Error('No response data');
+      }
+
+      track('Delete token in Tokens Studio');
+      notifyToUI('Token deleted from Tokens Studio', { error: false });
+
+      successCallback?.();
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('Error deleting token in Tokens Studio', e);
+    }
+  }
+
   private async processQueue() {
     const actionsToProcess = [...this.actionsQueue];
     this.actionsQueue = [];
@@ -478,6 +564,15 @@ export class TokensStudioTokenStorage extends RemoteTokenStorage<TokensStudioSav
           break;
         case 'DELETE_THEME_GROUP':
           await this.handleDeleteThemeGroup(data, successCallback);
+          break;
+        case 'CREATE_TOKEN':
+          await this.handleCreateToken(data, successCallback);
+          break;
+        case 'EDIT_TOKEN':
+          await this.handleUpdateToken(data, successCallback);
+          break;
+        case 'DELETE_TOKEN':
+          await this.handleDeleteToken(data, successCallback);
           break;
         default:
           throw new Error(`Unimplemented storage provider for ${action}`);
