@@ -130,7 +130,9 @@ function StartScreen() {
               secondaryAction={{
                 onClick: () => {
                   const matchingProvider = apiProviders.find((i) => i.internalId === storageType?.internalId);
-                  restoreStoredProvider(matchingProvider || storageType);
+                  if (matchingProvider) {
+                    restoreStoredProvider(matchingProvider);
+                  }
                 },
                 text: t('retry'),
               }}

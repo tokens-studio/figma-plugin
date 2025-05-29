@@ -40,10 +40,10 @@ export default function Callout({
               {action.text}
             </Button>
             {secondaryAction && (
-              <Button 
-                data-testid={`${id}-secondary`} 
-                size="small" 
-                variant="secondary" 
+              <Button
+                data-testid={`${id}-secondary`}
+                size="small"
+                variant="secondary"
                 onClick={secondaryAction.onClick}
               >
                 {secondaryAction.text}
