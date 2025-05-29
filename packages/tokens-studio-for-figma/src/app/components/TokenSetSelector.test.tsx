@@ -3,9 +3,9 @@ import { fireEvent, render, waitFor } from '../../../tests/config/setupTest';
 import { store } from '../store';
 import TokenSetSelector from './TokenSetSelector';
 
-describe('TokenSetSelector Component', () => {
-  const mockSaveScrollPositionSet = () => {};
+const mockSaveScrollPositionSet = () => {};
 
+describe('TokenSetSelector Component', () => {
   beforeEach(() => {
     // Reset the store state before each test
     store.dispatch.tokenState.setTokens({
