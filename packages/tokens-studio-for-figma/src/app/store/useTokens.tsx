@@ -189,10 +189,7 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-  const pullVariables = useCallback(async () => {
-    // This will be handled by the ImportVariablesDialog component
-    // The dialog will be opened by the component using the useImportVariables hook
-  }, []);
+
 
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
@@ -760,7 +757,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,
@@ -786,7 +782,6 @@ export default function useTokens() {
       createStylesFromSelectedTokenSets,
       createStylesFromSelectedThemes,
       pullStyles,
-      pullVariables,
       remapToken,
       remapTokensInGroup,
       removeTokensByValue,

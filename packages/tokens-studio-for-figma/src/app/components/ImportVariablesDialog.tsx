@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, Stack, Heading } from '@tokens-studio/ui';
+import { Button, Checkbox, Label, Stack, Heading } from '@tokens-studio/ui';
 import Modal from './Modal';
 import Box from './Box';
 import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCollectionSelection';
@@ -115,26 +115,37 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
         {/* Options */}
         <Stack direction="column" gap={2}>
           <Heading size="small">Options</Heading>
-          <Checkbox
-            checked={useDimensions}
-            onCheckedChange={(checked) => setUseDimensions(checked === true)}
-            id="useDimensions"
-          >
-            Convert numbers to dimensions
-          </Checkbox>
-          <Checkbox
-            checked={useRem}
-            onCheckedChange={(checked) => setUseRem(checked === true)}
-            id="useRem"
-          >
-            Use rem for dimension values
-          </Checkbox>
+          <Stack direction="row" gap={2} align="center">
+            <Checkbox
+              checked={useDimensions}
+              onCheckedChange={(checked) => setUseDimensions(checked === true)}
+              id="useDimensions"
+            />
+            <Label htmlFor="useDimensions">
+              Convert numbers to dimensions
+            </Label>
+          </Stack>
+          <Stack direction="row" gap={2} align="center">
+            <Checkbox
+              checked={useRem}
+              onCheckedChange={(checked) => setUseRem(checked === true)}
+              id="useRem"
+            />
+            <Label htmlFor="useRem">
+              Use rem for dimension values
+            </Label>
+          </Stack>
         </Stack>
 
         {/* Collections */}
         <Stack direction="column" gap={3}>
           <Heading size="small">Variable Collections</Heading>
-          {collections.map((collection) => {
+          {collections.length === 0 ? (
+            <Box css={{ padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center' }}>
+              There are no collections present in this file
+            </Box>
+          ) : (
+            collections.map((collection) => {
             const isCollectionSelected = !!selectedCollections[collection.id];
             const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
             const allModesSelected = isCollectionSelected && selectedModes.length === collection.modes.length;
@@ -142,36 +153,38 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
             return (
               <Box key={collection.id} css={{ borderLeft: '2px solid $borderMuted', paddingLeft: '$3' }}>
                 <Stack direction="column" gap={2}>
-                  <Checkbox
-                    checked={isCollectionSelected}
-                    onCheckedChange={() => handleCollectionToggle(collection.id, collection.name, collection.modes)}
-                    id={`collection-${collection.id}`}
-                  >
-                    <Box css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
+                  <Stack direction="row" gap={2} align="center">
+                    <Checkbox
+                      checked={isCollectionSelected}
+                      onCheckedChange={() => handleCollectionToggle(collection.id, collection.name, collection.modes)}
+                      id={`collection-${collection.id}`}
+                    />
+                    <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
                       {collection.name || `Collection ${collection.id.slice(0, 8)}`}
-                    </Box>
-                  </Checkbox>
+                    </Label>
+                  </Stack>
                   
                   {isCollectionSelected && (
                     <Stack direction="column" gap={1} css={{ marginLeft: '$4' }}>
                       {collection.modes.map((mode) => (
-                        <Checkbox
-                          key={mode.modeId}
-                          checked={selectedModes.includes(mode.modeId)}
-                          onCheckedChange={() => handleModeToggle(collection.id, mode.modeId)}
-                          id={`mode-${collection.id}-${mode.modeId}`}
-                        >
-                          <Box css={{ color: '$fgDefault', userSelect: 'none' }}>
+                        <Stack key={mode.modeId} direction="row" gap={2} align="center">
+                          <Checkbox
+                            checked={selectedModes.includes(mode.modeId)}
+                            onCheckedChange={() => handleModeToggle(collection.id, mode.modeId)}
+                            id={`mode-${collection.id}-${mode.modeId}`}
+                          />
+                          <Label htmlFor={`mode-${collection.id}-${mode.modeId}`} css={{ color: '$fgDefault', userSelect: 'none' }}>
                             {mode.name || `Mode ${mode.modeId.slice(0, 8)}`}
-                          </Box>
-                        </Checkbox>
+                          </Label>
+                        </Stack>
                       ))}
                     </Stack>
                   )}
                 </Stack>
               </Box>
             );
-          })}
+          })
+          )}
         </Stack>
 
         {!hasSelections && (
