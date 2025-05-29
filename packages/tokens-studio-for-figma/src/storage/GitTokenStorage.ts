@@ -15,7 +15,8 @@ export type GitStorageSaveOptions = {
 
 export type GitStorageSaveOption = {
   commitMessage?: string,
-  storeTokenIdInJsonEditor: boolean
+  storeTokenIdInJsonEditor: boolean,
+  useDeltaDiff?: boolean
 };
 
 export type GitSingleFileObject = Record<string, (
@@ -91,9 +92,26 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
     shouldCreateBranch?: boolean
   ): Promise<boolean>;
 
+  public writeChangesetWithDiff?(
+    files: RemoteTokenStorageFile[],
+    message: string,
+    branch: string,
+    shouldCreateBranch?: boolean
+  ): Promise<boolean>;
+
   public async write(files: RemoteTokenStorageFile[], saveOptions: GitStorageSaveOption): Promise<boolean> {
     const branches = await this.fetchBranches();
     if (!branches.length) return false;
+
+    if (saveOptions.useDeltaDiff && this.writeChangesetWithDiff) {
+      console.log('Using delta diff mode for optimized sync');
+      return this.writeChangesetWithDiff(
+        files,
+        saveOptions.commitMessage ?? 'Commit from Figma',
+        this.branch,
+        !branches.includes(this.branch),
+      );
+    }
 
     const filesChangeset: Record<string, string> = {};
     if (this.path.endsWith('.json')) {
@@ -120,7 +138,6 @@ export abstract class GitTokenStorage extends RemoteTokenStorage<GitStorageSaveO
         }
       });
     } else {
-      // When path is a directory and multiFile is disabled return
       throw new Error(ErrorMessages.GIT_MULTIFILE_PERMISSION_ERROR);
     }
     return this.writeChangeset(
