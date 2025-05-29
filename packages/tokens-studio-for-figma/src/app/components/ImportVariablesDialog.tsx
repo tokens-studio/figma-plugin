@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Checkbox, Label, Stack, Heading } from '@tokens-studio/ui';
+import {
+  Button, Checkbox, Label, Stack, Heading,
+} from '@tokens-studio/ui';
 import Modal from './Modal';
 import Box from './Box';
 import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCollectionSelection';
@@ -12,14 +13,12 @@ type Props = {
   collections: VariableCollectionInfo[];
 };
 
-export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, collections }: Props) {
-  const { t } = useTranslation();
+export default function ImportVariablesDialog({
+  isOpen, onClose, onConfirm, collections,
+}: Props) {
   const [selectedCollections, setSelectedCollections] = useState<SelectedCollections>({});
   const [useDimensions, setUseDimensions] = useState(false);
   const [useRem, setUseRem] = useState(false);
-
-  // Log collections data for debugging
-  console.log('Collections passed to dialog:', collections);
 
   // Initialize all collections as selected with all modes selected by default
   useEffect(() => {
@@ -32,7 +31,6 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
         };
       });
       setSelectedCollections(initialSelection);
-      console.log('Initial selection set:', initialSelection);
     }
   }, [collections]);
 
@@ -44,16 +42,15 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
         const newSelection = { ...prev };
         delete newSelection[collectionId];
         return newSelection;
-      } else {
-        // Add collection with all modes selected
-        return {
-          ...prev,
-          [collectionId]: {
-            name: collectionName,
-            selectedModes: modes.map((mode) => mode.modeId),
-          },
-        };
       }
+      // Add collection with all modes selected
+      return {
+        ...prev,
+        [collectionId]: {
+          name: collectionName,
+          selectedModes: modes.map((mode) => mode.modeId),
+        },
+      };
     });
   }, []);
 
@@ -141,30 +138,33 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
         <Stack direction="column" gap={3}>
           <Heading size="small">Variable Collections</Heading>
           {collections.length === 0 ? (
-            <Box css={{ padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center' }}>
+            <Box css={{
+              padding: '$3', backgroundColor: '$bgMuted', borderRadius: '$small', textAlign: 'center',
+            }}
+            >
               There are no collections present in this file
             </Box>
           ) : (
             collections.map((collection) => {
-            const isCollectionSelected = !!selectedCollections[collection.id];
-            const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
-            const allModesSelected = isCollectionSelected && selectedModes.length === collection.modes.length;
+              const isCollectionSelected = !!selectedCollections[collection.id];
+              const selectedModes = selectedCollections[collection.id]?.selectedModes || [];
+              const allModesSelected = isCollectionSelected && selectedModes.length === collection.modes.length;
 
-            return (
-              <Box key={collection.id} css={{ borderLeft: '2px solid $borderMuted', paddingLeft: '$3' }}>
-                <Stack direction="column" gap={2}>
-                  <Stack direction="row" gap={2} align="center">
-                    <Checkbox
-                      checked={isCollectionSelected}
-                      onCheckedChange={() => handleCollectionToggle(collection.id, collection.name, collection.modes)}
-                      id={`collection-${collection.id}`}
-                    />
-                    <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
-                      {collection.name || `Collection ${collection.id.slice(0, 8)}`}
-                    </Label>
-                  </Stack>
-                  
-                  {isCollectionSelected && (
+              return (
+                <Box key={collection.id} css={{ borderLeft: '2px solid $borderMuted', paddingLeft: '$3' }}>
+                  <Stack direction="column" gap={2}>
+                    <Stack direction="row" gap={2} align="center">
+                      <Checkbox
+                        checked={isCollectionSelected}
+                        onCheckedChange={() => handleCollectionToggle(collection.id, collection.name, collection.modes)}
+                        id={`collection-${collection.id}`}
+                      />
+                      <Label htmlFor={`collection-${collection.id}`} css={{ color: '$fgDefault', fontWeight: 'bold', userSelect: 'none' }}>
+                        {collection.name || `Collection ${collection.id.slice(0, 8)}`}
+                      </Label>
+                    </Stack>
+
+                    {isCollectionSelected && (
                     <Stack direction="column" gap={1} css={{ marginLeft: '$4' }}>
                       {collection.modes.map((mode) => (
                         <Stack key={mode.modeId} direction="row" gap={2} align="center">
@@ -179,16 +179,19 @@ export default function ImportVariablesDialog({ isOpen, onClose, onConfirm, coll
                         </Stack>
                       ))}
                     </Stack>
-                  )}
-                </Stack>
-              </Box>
-            );
-          })
+                    )}
+                  </Stack>
+                </Box>
+              );
+            })
           )}
         </Stack>
 
         {!hasSelections && (
-          <Box css={{ padding: '$3', backgroundColor: '$dangerBg', color: '$dangerFg', borderRadius: '$small' }}>
+          <Box css={{
+            padding: '$3', backgroundColor: '$dangerBg', color: '$dangerFg', borderRadius: '$small',
+          }}
+          >
             Please select at least one collection and mode to import.
           </Box>
         )}

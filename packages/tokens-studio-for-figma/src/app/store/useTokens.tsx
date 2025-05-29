@@ -189,8 +189,6 @@ export default function useTokens() {
     }
   }, [confirm]);
 
-
-
   const removeTokensByValue = useCallback((data: RemoveTokensByValueData) => {
     track('removeTokensByValue', { count: data.length });
 

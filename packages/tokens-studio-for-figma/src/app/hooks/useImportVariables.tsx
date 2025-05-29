@@ -3,6 +3,7 @@ import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { VariableCollectionInfo, SelectedCollections } from '@/types/VariableCollectionSelection';
 import { ThemeObjectsList } from '@/types/ThemeObjectsList';
+import { track } from '@/utils/analytics';
 
 export function useImportVariables() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -16,8 +17,7 @@ export function useImportVariables() {
       const response = await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.GET_AVAILABLE_VARIABLE_COLLECTIONS,
       });
-      
-      console.log('Received collections in hook:', response.collections);
+
       setCollections(response.collections);
       setIsDialogOpen(true);
     } catch (error) {
@@ -37,9 +37,24 @@ export function useImportVariables() {
     selectedCollections: SelectedCollections,
     options: { useDimensions: boolean; useRem: boolean },
     themes: ThemeObjectsList,
-    proUser: boolean
+    proUser: boolean,
   ) => {
     try {
+      // Calculate analytics data
+      const selectedCollectionIds = Object.keys(selectedCollections);
+      const totalSelectedModes = selectedCollectionIds.reduce((count, collectionId) => count + selectedCollections[collectionId].selectedModes.length, 0);
+      const totalAvailableModes = collections.reduce((count, collection) => count + collection.modes.length, 0);
+
+      // Track analytics
+      track('Import Variables', {
+        useDimensions: options.useDimensions,
+        useRem: options.useRem,
+        selectedCollections: selectedCollectionIds.length,
+        totalCollections: collections.length,
+        selectedModes: totalSelectedModes,
+        totalModes: totalAvailableModes,
+      });
+
       await AsyncMessageChannel.ReactInstance.message({
         type: AsyncMessageTypes.PULL_VARIABLES,
         options: {
@@ -54,7 +69,7 @@ export function useImportVariables() {
     } catch (error) {
       console.error('Error importing variables:', error);
     }
-  }, [closeDialog]);
+  }, [closeDialog, collections]);
 
   return {
     isDialogOpen,

@@ -8,11 +8,11 @@ export const getAvailableVariableCollections: AsyncMessageChannelHandlers[AsyncM
   try {
     const allCollections = await figma.variables.getLocalVariableCollectionsAsync();
     console.log('All collections from Figma API:', JSON.stringify(allCollections, null, 2));
-    
+
     const collections: VariableCollectionInfo[] = allCollections.map((collection) => {
       console.log(`Processing collection: ${collection.id}, name: "${collection.name}"`);
       console.log(`Modes for collection ${collection.name}:`, JSON.stringify(collection.modes, null, 2));
-      
+
       return {
         id: collection.id,
         name: collection.name || `Collection ${collection.id.slice(0, 8)}`,

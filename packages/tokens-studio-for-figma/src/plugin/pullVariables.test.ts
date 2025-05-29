@@ -785,10 +785,10 @@ describe('pullStyles', () => {
       },
     };
 
-    await pullVariables({ 
-      useDimensions: false, 
-      useRem: false, 
-      selectedCollections 
+    await pullVariables({
+      useDimensions: false,
+      useRem: false,
+      selectedCollections,
     }, [], false);
 
     const expectedCall = expect.objectContaining({
@@ -822,9 +822,9 @@ describe('pullStyles', () => {
 
     // Should NOT include Light or Custom modes
     const actualCall = notifyStyleValuesSpy.mock.calls[0][0];
-    const lightModeColors = actualCall.colors?.filter(c => c.parent?.includes('/Light'));
-    const customModeColors = actualCall.colors?.filter(c => c.parent?.includes('/Custom'));
-    
+    const lightModeColors = actualCall.colors?.filter((c) => c.parent?.includes('/Light'));
+    const customModeColors = actualCall.colors?.filter((c) => c.parent?.includes('/Custom'));
+
     expect(lightModeColors).toHaveLength(0);
     expect(customModeColors).toHaveLength(0);
   });
@@ -838,10 +838,10 @@ describe('pullStyles', () => {
       },
     };
 
-    await pullVariables({ 
-      useDimensions: false, 
-      useRem: false, 
-      selectedCollections 
+    await pullVariables({
+      useDimensions: false,
+      useRem: false,
+      selectedCollections,
     }, [], false);
 
     expect(notifyStyleValuesSpy).toHaveBeenCalledWith({}, []);

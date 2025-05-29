@@ -64,7 +64,7 @@ export default async function pullVariables(options: PullVariablesOptions, theme
         continue; // Skip this collection if it's not selected
       }
     }
-    
+
     if (collection) {
       collections.set(collection.name, collection);
     }
