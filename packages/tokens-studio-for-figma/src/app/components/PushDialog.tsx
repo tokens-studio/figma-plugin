@@ -106,15 +106,15 @@ function PushDialog() {
   }, [branch, commitMessage, onConfirm, localApiState]);
 
   const handleSaveShortcut = React.useCallback(
-    (event: KeyboardEvent) => {
-      if (showPushDialog?.state === 'initial' && (event.metaKey || event.ctrlKey)) {
+    () => {
+      if (showPushDialog?.state === 'initial') {
         handlePushChanges();
       }
     },
     [handlePushChanges, showPushDialog],
   );
 
-  useShortcut(['Enter'], handleSaveShortcut);
+  useShortcut(['cmd+Enter', 'ctrl+Enter'], handleSaveShortcut);
 
   switch (showPushDialog?.state) {
     case 'dtcgconversion':

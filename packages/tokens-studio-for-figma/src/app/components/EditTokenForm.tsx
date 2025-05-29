@@ -532,15 +532,13 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [checkAndSubmitTokenValue]);
 
   const handleSaveShortcut = React.useCallback(
-    (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey) {
-        checkAndSubmitTokenValue();
-      }
+    () => {
+      checkAndSubmitTokenValue();
     },
     [checkAndSubmitTokenValue],
   );
 
-  useShortcut(['Enter'], handleSaveShortcut);
+  useShortcut(['cmd+Enter', 'ctrl+Enter'], handleSaveShortcut);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);
