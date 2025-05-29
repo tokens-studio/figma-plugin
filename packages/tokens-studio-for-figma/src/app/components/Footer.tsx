@@ -4,7 +4,7 @@ import { DownloadIcon, UploadIcon } from '@primer/octicons-react';
 import { useTranslation } from 'react-i18next';
 import { Button, IconButton } from '@tokens-studio/ui';
 import { WarningTriangleSolid } from 'iconoir-react';
-import * as pjs from '../../../package.json';
+import pjs from '../../../package.json';
 import Box from './Box';
 import Stack from './Stack';
 import BranchSelector from './BranchSelector';

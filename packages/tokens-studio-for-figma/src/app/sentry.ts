@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import * as Sentry from '@sentry/react';
-import * as pjs from '../../package.json';
+import pjs from '../../package.json';
 
 const DSN = process.env.SENTRY_DSN;
 
