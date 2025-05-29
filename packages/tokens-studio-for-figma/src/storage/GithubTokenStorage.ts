@@ -11,7 +11,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
 import { isEqual } from '@/utils/isEqual';
-import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
+import { TokenFormat } from '@/plugin/TokenFormatStoreClass';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -396,58 +396,50 @@ export class GithubTokenStorage extends GitTokenStorage {
   }
 
   /**
-   * Simple comparison using stringified local files vs lastSyncedState
-   * Much simpler than parsing and converting data formats
+   * Simple comparison using the exact same logic as remoteTokens.tsx
+   * Creates current state string in same format as lastSyncedState and compares
    */
   private getChangedFilesFromSyncedState(localFiles: RemoteTokenStorageFile[], lastSyncedState: string): {
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   } {
-    console.log('🧠 Delta Diff: Comparing stringified local files with lastSyncedState...');
+    console.log('🧠 Delta Diff: Comparing with lastSyncedState using same logic as remoteTokens.tsx...');
     
     try {
-      // Create the current state string in the same format as lastSyncedState
-      // Format: [tokens, themes, format] where tokens is { tokenSetName: tokenArray }
+      // Build current state using EXACT same logic as remoteTokens.tsx lines 161-165
       const currentTokens: Record<string, any> = {};
       let currentThemes: any = [];
-      let hasMetadata = false;
       
-      // Build current state from local files
+      // Extract tokens and themes from local files
       localFiles.forEach(file => {
         if (file.type === 'tokenSet') {
-          // Convert token set from object format to array format (like in lastSyncedState)
-          const tempTokensObject = { [file.name]: file.data as any };
-          const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
-          currentTokens[file.name] = convertedTokens[file.name];
+          currentTokens[file.name] = file.data;
         } else if (file.type === 'themes') {
           currentThemes = file.data;
-        } else if (file.type === 'metadata') {
-          hasMetadata = true;
         }
       });
       
-      // Create current state string in same format as lastSyncedState
-      const currentStateString = JSON.stringify([currentTokens, currentThemes], null, 2);
+      // Create current state string using EXACT same format as remoteTokens.tsx
+      // compact([remoteData.tokens, remoteData.themes, TokenFormat.format])
+      const currentStateString = JSON.stringify(
+        compact([currentTokens, currentThemes, TokenFormat.format]),
+        null,
+        2,
+      );
       
       console.log(`📊 Delta Diff: Current state string length: ${currentStateString.length}`);
-      console.log(`� Delta Diff: Last synced state length: ${lastSyncedState.length}`);
+      console.log(`📊 Delta Diff: Last synced state length: ${lastSyncedState.length}`);
       
       // Simple string comparison
       const statesMatch = currentStateString === lastSyncedState;
-      console.log(`� Delta Diff: States match: ${statesMatch}`);
-      
-      if (!statesMatch) {
-        console.log(`� Delta Diff: States differ - showing first 200 chars of each:`);
-        console.log(`   Current:  ${currentStateString.substring(0, 200)}...`);
-        console.log(`   Synced:   ${lastSyncedState.substring(0, 200)}...`);
-      }
+      console.log(`🔍 Delta Diff: States match: ${statesMatch}`);
       
       const changedFiles: Record<string, string> = {};
       const filesToDelete: string[] = [];
       
-      // If states don't match, we need to push all files (except we can be smarter about this)
-      if (!statesMatch || hasMetadata) {
-        console.log(`� Delta Diff: Changes detected, marking files for push...`);
+      // If states don't match, we need to push all files
+      if (!statesMatch) {
+        console.log(`📝 Delta Diff: Changes detected, marking all files for push...`);
         
         localFiles.forEach(file => {
           let filePath: string;
@@ -488,7 +480,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           console.log(`📁 Delta Diff: File marked for push: ${filePath}`);
         });
       } else {
-        console.log(`✅ Delta Diff: No changes detected - skipping push`);
+        console.log(`✅ Delta Diff: No changes detected - skipping push entirely!`);
       }
 
       console.log(`📊 Delta Diff: Comparison complete - ${Object.keys(changedFiles).length} files to push, ${filesToDelete.length} to delete`);
