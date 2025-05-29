@@ -11,6 +11,7 @@ import { SystemFilenames } from '@/constants/SystemFilenames';
 import { ErrorMessages } from '@/constants/ErrorMessages';
 import { joinPath } from '@/utils/string';
 import { isEqual } from '@/utils/isEqual';
+import removeIdPropertyFromTokens from '@/utils/removeIdPropertyFromTokens';
 
 type ExtendedOctokitClient = Omit<Octokit, 'repos'> & {
   repos: Octokit['repos'] & {
@@ -427,9 +428,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       const filesToDelete: string[] = [];
 
       // Create a map of synced token sets and special files
+      // Note: syncedTokens is in array format (AnyTokenList), but we need to compare with object format (AnyTokenSet)
       const syncedFileMap = new Map<string, any>();
       
-      // Add token sets from synced state
+      // Add token sets from synced state (these are in array format)
       if (syncedTokens && typeof syncedTokens === 'object') {
         Object.entries(syncedTokens).forEach(([name, data]) => {
           syncedFileMap.set(name, data);
@@ -470,30 +472,48 @@ export class GithubTokenStorage extends GitTokenStorage {
         const syncedData = syncedFileMap.get(key);
         
         console.log(`🔍 Delta Diff: Comparing file "${key}"...`);
-        console.log(`   📥 Local data preview:`, JSON.stringify(localFile.data).substring(0, 200) + '...');
+        
+        // For token sets, we need to convert local object format to array format for comparison
+        let localDataForComparison = localFile.data;
+        if (localFile.type === 'tokenSet') {
+          // Convert local token set from object format to array format (like in lastSyncedState)
+          // The local data is in AnyTokenSet format (object), but synced data is in AnyTokenList format (array)
+          // We need to convert the local object back to array format for proper comparison
+          
+          console.log(`   🔄 Converting local token set "${key}" from object to array format for comparison...`);
+          
+          // Create a temporary tokens object in the expected format for removeIdPropertyFromTokens
+          const tempTokensObject = { [key]: localFile.data as any };
+          const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
+          localDataForComparison = convertedTokens[key];
+          
+          console.log(`   📊 Converted local data type:`, typeof localDataForComparison, Array.isArray(localDataForComparison) ? '(array)' : '(object)');
+        }
+        
+        console.log(`   � Local data preview:`, JSON.stringify(localDataForComparison).substring(0, 200) + '...');
         console.log(`   📤 Synced data preview:`, syncedData ? JSON.stringify(syncedData).substring(0, 200) + '...' : 'NOT FOUND');
-        console.log(`   📊 Local data type:`, typeof localFile.data, Array.isArray(localFile.data) ? '(array)' : '(object)');
+        console.log(`   📊 Local data type:`, typeof localDataForComparison, Array.isArray(localDataForComparison) ? '(array)' : '(object)');
         console.log(`   📊 Synced data type:`, typeof syncedData, Array.isArray(syncedData) ? '(array)' : '(object)');
         
         if (!syncedData) {
           console.log(`   ❌ Synced data not found for "${key}"`);
         } else {
           // Let's do a detailed comparison
-          const isEqualResult = isEqual(localFile.data, syncedData);
+          const isEqualResult = isEqual(localDataForComparison, syncedData);
           console.log(`   🔍 isEqual result:`, isEqualResult);
           
           if (!isEqualResult) {
             // Let's see what's different
             console.log(`   🔍 Detailed comparison for "${key}":`);
             
-            if (Array.isArray(localFile.data) && Array.isArray(syncedData)) {
-              console.log(`     📊 Array lengths - Local: ${localFile.data.length}, Synced: ${syncedData.length}`);
-              if (localFile.data.length !== syncedData.length) {
+            if (Array.isArray(localDataForComparison) && Array.isArray(syncedData)) {
+              console.log(`     📊 Array lengths - Local: ${localDataForComparison.length}, Synced: ${syncedData.length}`);
+              if (localDataForComparison.length !== syncedData.length) {
                 console.log(`     ❌ Array lengths differ`);
               } else {
                 // Check first few items
-                for (let i = 0; i < Math.min(3, localFile.data.length); i++) {
-                  const localItem = localFile.data[i];
+                for (let i = 0; i < Math.min(3, localDataForComparison.length); i++) {
+                  const localItem = localDataForComparison[i];
                   const syncedItem = syncedData[i];
                   const itemEqual = isEqual(localItem, syncedItem);
                   console.log(`     [${i}] Equal: ${itemEqual}`);
@@ -503,8 +523,8 @@ export class GithubTokenStorage extends GitTokenStorage {
                   }
                 }
               }
-            } else if (typeof localFile.data === 'object' && typeof syncedData === 'object') {
-              const localKeys = Object.keys(localFile.data || {});
+            } else if (typeof localDataForComparison === 'object' && typeof syncedData === 'object') {
+              const localKeys = Object.keys(localDataForComparison || {});
               const syncedKeys = Object.keys(syncedData || {});
               console.log(`     📊 Object keys - Local: ${localKeys.length}, Synced: ${syncedKeys.length}`);
               console.log(`     📋 Local keys:`, localKeys.slice(0, 5).join(', ') + (localKeys.length > 5 ? '...' : ''));
@@ -519,7 +539,7 @@ export class GithubTokenStorage extends GitTokenStorage {
                 // Check first few values
                 for (let i = 0; i < Math.min(3, localKeys.length); i++) {
                   const key = localKeys[i];
-                  const localValue = (localFile.data as any)[key];
+                  const localValue = (localDataForComparison as any)[key];
                   const syncedValue = (syncedData as any)[key];
                   const valueEqual = isEqual(localValue, syncedValue);
                   console.log(`     ["${key}"] Equal: ${valueEqual}`);
@@ -534,7 +554,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         }
         
         // If synced data doesn't exist or content is different, mark as changed
-        if (!syncedData || !isEqual(localFile.data, syncedData)) {
+        if (!syncedData || !isEqual(localDataForComparison, syncedData)) {
           const reason = !syncedData ? 'new file (not in sync state)' : 'content differs from sync state';
           console.log(`📝 Delta Diff: File changed - ${key} (${reason})`);
           if (this.path.endsWith('.json')) {
@@ -560,8 +580,14 @@ export class GithubTokenStorage extends GitTokenStorage {
         localFiles.forEach(file => {
           if (file.type === 'tokenSet') {
             singleFileData[file.name] = file.data;
+            
+            // Convert local data to array format for comparison
+            const tempTokensObject = { [file.name]: file.data as any };
+            const convertedTokens = removeIdPropertyFromTokens(tempTokensObject);
+            const localDataForComparison = convertedTokens[file.name];
+            
             const syncedData = syncedTokens?.[file.name];
-            if (!syncedData || !isEqual(file.data, syncedData)) {
+            if (!syncedData || !isEqual(localDataForComparison, syncedData)) {
               hasChanges = true;
               const reason = !syncedData ? `new token set: ${file.name}` : `changed token set: ${file.name}`;
               changeReasons.push(reason);
