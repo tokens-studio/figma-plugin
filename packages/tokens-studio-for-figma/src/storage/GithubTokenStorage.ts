@@ -301,18 +301,29 @@ export class GithubTokenStorage extends GitTokenStorage {
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   }> {
+    console.log('🔍 Delta Diff: Starting file comparison...');
+    console.log(`📁 Local files to process: ${localFiles.length}`, localFiles.map(f => {
+      if (f.type === 'tokenSet') {
+        return `${f.name} (${f.type})`;
+      }
+      return `${f.type}`;
+    }));
+    
     try {
       // If we have lastSyncedState, use it instead of fetching remote files
       if (lastSyncedState) {
-        console.log('Delta diff: Using lastSyncedState for comparison (faster)');
-        return this.getChangedFilesFromSyncedState(localFiles, lastSyncedState);
+        console.log('⚡ Delta Diff: Using lastSyncedState for comparison (fastest path)');
+        const result = this.getChangedFilesFromSyncedState(localFiles, lastSyncedState);
+        console.log(`✅ Delta Diff: lastSyncedState comparison complete`);
+        return result;
       }
       
       // Fallback to fetching remote files if no lastSyncedState available
-      console.log('Delta diff: Fetching remote files for comparison (slower fallback)');
+      console.log('🌐 Delta Diff: No lastSyncedState available, fetching remote files (slower fallback)');
       const remoteFiles = await this.read();
       
       if (Array.isArray(remoteFiles) && remoteFiles.length > 0) {
+        console.log(`📥 Delta Diff: Fetched ${remoteFiles.length} remote files for comparison`);
         const changedFiles: Record<string, string> = {};
         const filesToDelete: string[] = [];
         
@@ -327,6 +338,8 @@ export class GithubTokenStorage extends GitTokenStorage {
             remoteFileMap.set(SystemFilenames.METADATA, file);
           }
         });
+
+        console.log(`🗂️ Delta Diff: Remote file map created with ${remoteFileMap.size} entries`);
 
         // Check each local file against remote
         localFiles.forEach(localFile => {
@@ -343,6 +356,7 @@ export class GithubTokenStorage extends GitTokenStorage {
             key = SystemFilenames.METADATA;
             localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.METADATA}.json`);
           } else {
+            console.log(`❓ Delta Diff: Unknown file type - ${(localFile as any).type}, skipping`);
             return; // Skip unknown file types
           }
 
@@ -350,7 +364,11 @@ export class GithubTokenStorage extends GitTokenStorage {
           
           // If remote file doesn't exist or content is different, mark as changed
           if (!remoteFile || !isEqual(localFile.data, remoteFile.data)) {
+            const reason = !remoteFile ? 'new file' : 'content changed';
+            console.log(`📝 Delta Diff: File changed - ${key} (${reason})`);
             changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
+          } else {
+            console.log(`✅ Delta Diff: File unchanged - ${key}`);
           }
 
           // Remove from remote map to track deletions
@@ -360,6 +378,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         // Files remaining in remoteFileMap should be deleted
         if (this.flags.multiFileEnabled && !this.path.endsWith('.json')) {
           remoteFileMap.forEach((remoteFile, key) => {
+            console.log(`🗑️ Delta Diff: File to delete - ${key} (no longer exists locally)`);
             if (remoteFile.type === 'tokenSet') {
               filesToDelete.push(joinPath(this.path, `${key}.json`));
             } else if (remoteFile.type === 'themes') {
@@ -370,13 +389,17 @@ export class GithubTokenStorage extends GitTokenStorage {
           });
         }
 
+        console.log(`📊 Delta Diff: Remote comparison complete - ${Object.keys(changedFiles).length} changed, ${filesToDelete.length} to delete`);
         return { changedFiles, filesToDelete };
+      } else {
+        console.log('📂 Delta Diff: No remote files found, treating all local files as new');
       }
     } catch (error) {
-      console.warn('Failed to compare with remote/synced state, falling back to full sync:', error);
+      console.warn('❌ Delta Diff: Failed to compare with remote/synced state, falling back to full sync:', error);
     }
 
     // Fallback: if we can't compare, return all local files as changed
+    console.log('🔄 Delta Diff: Using fallback - all files marked as changed');
     return this.getFallbackChangedFiles(localFiles);
   }
 
@@ -388,6 +411,8 @@ export class GithubTokenStorage extends GitTokenStorage {
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   } {
+    console.log('🧠 Delta Diff: Parsing lastSyncedState for comparison...');
+    
     try {
       // Parse the lastSyncedState - format is [tokens, themes, format]
       const parsedSyncedState = JSON.parse(lastSyncedState);
@@ -396,6 +421,8 @@ export class GithubTokenStorage extends GitTokenStorage {
       }
 
       const [syncedTokens, syncedThemes] = parsedSyncedState;
+      console.log(`📋 Delta Diff: Parsed synced state - ${Object.keys(syncedTokens || {}).length} token sets, ${Array.isArray(syncedThemes) ? syncedThemes.length : 0} themes`);
+      
       const changedFiles: Record<string, string> = {};
       const filesToDelete: string[] = [];
 
@@ -407,12 +434,16 @@ export class GithubTokenStorage extends GitTokenStorage {
         Object.entries(syncedTokens).forEach(([name, data]) => {
           syncedFileMap.set(name, data);
         });
+        console.log(`🗃️ Delta Diff: Synced token sets: ${Object.keys(syncedTokens).join(', ')}`);
       }
       
       // Add themes from synced state
       if (syncedThemes) {
         syncedFileMap.set(SystemFilenames.THEMES, syncedThemes);
+        console.log(`🎨 Delta Diff: Synced themes count: ${Array.isArray(syncedThemes) ? syncedThemes.length : 'unknown'}`);
       }
+
+      console.log(`🔍 Delta Diff: Starting file-by-file comparison...`);
 
       // Check each local file against synced state
       localFiles.forEach(localFile => {
@@ -428,9 +459,11 @@ export class GithubTokenStorage extends GitTokenStorage {
         } else if (localFile.type === 'metadata') {
           // Metadata is not stored in lastSyncedState, so always consider it changed if present
           localPath = this.path.endsWith('.json') ? this.path : joinPath(this.path, `${SystemFilenames.METADATA}.json`);
+          console.log(`📊 Delta Diff: Metadata file detected - always marked as changed (not in sync state)`);
           changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
           return;
         } else {
+          console.log(`❓ Delta Diff: Unknown file type - ${(localFile as any).type}, skipping`);
           return; // Skip unknown file types
         }
 
@@ -438,11 +471,15 @@ export class GithubTokenStorage extends GitTokenStorage {
         
         // If synced data doesn't exist or content is different, mark as changed
         if (!syncedData || !isEqual(localFile.data, syncedData)) {
+          const reason = !syncedData ? 'new file (not in sync state)' : 'content differs from sync state';
+          console.log(`📝 Delta Diff: File changed - ${key} (${reason})`);
           if (this.path.endsWith('.json')) {
             // Single file mode - we'll handle this differently below
             return;
           }
           changedFiles[localPath] = JSON.stringify(localFile.data, null, 2);
+        } else {
+          console.log(`✅ Delta Diff: File unchanged - ${key} (matches sync state)`);
         }
 
         // Remove from synced map to track deletions
@@ -451,8 +488,10 @@ export class GithubTokenStorage extends GitTokenStorage {
 
       // Handle single file mode differently
       if (this.path.endsWith('.json')) {
+        console.log(`📄 Delta Diff: Single file mode detected, checking for any changes...`);
         const singleFileData: GitSingleFileObject = {};
         let hasChanges = false;
+        let changeReasons: string[] = [];
         
         localFiles.forEach(file => {
           if (file.type === 'tokenSet') {
@@ -460,15 +499,19 @@ export class GithubTokenStorage extends GitTokenStorage {
             const syncedData = syncedTokens?.[file.name];
             if (!syncedData || !isEqual(file.data, syncedData)) {
               hasChanges = true;
+              const reason = !syncedData ? `new token set: ${file.name}` : `changed token set: ${file.name}`;
+              changeReasons.push(reason);
             }
           } else if (file.type === 'themes') {
             singleFileData.$themes = file.data;
             if (!isEqual(file.data, syncedThemes)) {
               hasChanges = true;
+              changeReasons.push('themes changed');
             }
           } else if (file.type === 'metadata') {
             singleFileData.$metadata = file.data;
             hasChanges = true; // Always consider metadata as changed
+            changeReasons.push('metadata present');
           }
         });
         
@@ -477,16 +520,21 @@ export class GithubTokenStorage extends GitTokenStorage {
           Object.keys(syncedTokens).forEach(tokenSetName => {
             if (!localFiles.some(f => f.type === 'tokenSet' && f.name === tokenSetName)) {
               hasChanges = true; // A token set was deleted
+              changeReasons.push(`deleted token set: ${tokenSetName}`);
             }
           });
         }
         
         if (hasChanges) {
+          console.log(`📝 Delta Diff: Single file has changes: ${changeReasons.join(', ')}`);
           changedFiles[this.path] = JSON.stringify(singleFileData, null, 2);
+        } else {
+          console.log(`✅ Delta Diff: Single file unchanged`);
         }
       } else if (this.flags.multiFileEnabled) {
         // Files remaining in syncedFileMap should be deleted (multi-file mode only)
         syncedFileMap.forEach((_, key) => {
+          console.log(`🗑️ Delta Diff: File to delete - ${key} (exists in sync state but not locally)`);
           if (key === SystemFilenames.THEMES) {
             filesToDelete.push(joinPath(this.path, `${SystemFilenames.THEMES}.json`));
           } else {
@@ -496,9 +544,19 @@ export class GithubTokenStorage extends GitTokenStorage {
         });
       }
 
+      console.log(`📊 Delta Diff: lastSyncedState comparison complete`);
+      console.log(`   📝 Files to update: ${Object.keys(changedFiles).length}`);
+      if (Object.keys(changedFiles).length > 0) {
+        console.log(`      Changed files: ${Object.keys(changedFiles).join(', ')}`);
+      }
+      console.log(`   🗑️ Files to delete: ${filesToDelete.length}`);
+      if (filesToDelete.length > 0) {
+        console.log(`      Files to delete: ${filesToDelete.join(', ')}`);
+      }
+
       return { changedFiles, filesToDelete };
     } catch (error) {
-      console.warn('Failed to parse lastSyncedState, falling back to full sync:', error);
+      console.warn('❌ Delta Diff: Failed to parse lastSyncedState, falling back to full sync:', error);
       return this.getFallbackChangedFiles(localFiles);
     }
   }
@@ -510,6 +568,7 @@ export class GithubTokenStorage extends GitTokenStorage {
     changedFiles: Record<string, string>;
     filesToDelete: string[];
   } {
+    console.log('🔄 Delta Diff: Using fallback method - marking all files as changed');
     const fallbackChangedFiles: Record<string, string> = {};
     
     localFiles.forEach(file => {
@@ -531,6 +590,7 @@ export class GithubTokenStorage extends GitTokenStorage {
           });
           
           fallbackChangedFiles[this.path] = JSON.stringify(singleFileData, null, 2);
+          console.log(`📄 Delta Diff: Fallback single file: ${this.path}`);
         }
         return;
       }
@@ -547,8 +607,10 @@ export class GithubTokenStorage extends GitTokenStorage {
       }
       
       fallbackChangedFiles[filePath] = JSON.stringify(file.data, null, 2);
+      console.log(`📁 Delta Diff: Fallback file: ${filePath}`);
     });
 
+    console.log(`📊 Delta Diff: Fallback complete - ${Object.keys(fallbackChangedFiles).length} files marked as changed`);
     return { changedFiles: fallbackChangedFiles, filesToDelete: [] };
   }
 
@@ -556,20 +618,48 @@ export class GithubTokenStorage extends GitTokenStorage {
    * Enhanced writeChangeset that only pushes changed files
    */
   public async writeChangesetWithDiff(files: RemoteTokenStorageFile[], message: string, branch: string, shouldCreateBranch?: boolean, lastSyncedState?: string): Promise<boolean> {
+    console.log('🚀 Delta Diff: Starting optimized sync process...');
+    console.log(`📋 Input: ${files.length} files, branch: ${branch}, message: "${message}"`);
+    
     try {
       const { changedFiles, filesToDelete } = await this.getChangedFiles(files, lastSyncedState);
       
       // If no files changed, skip the push
       if (Object.keys(changedFiles).length === 0 && filesToDelete.length === 0) {
-        console.log('No files changed, skipping push');
+        console.log('✨ Delta Diff: No changes detected - skipping push entirely!');
+        console.log('   💡 This saves significant time and API calls');
         return true;
       }
 
-      console.log(`Delta diff: Pushing ${Object.keys(changedFiles).length} changed files and deleting ${filesToDelete.length} files`);
+      console.log('🎯 Delta Diff: Changes detected, proceeding with optimized push...');
+      console.log(`   📝 Files to push: ${Object.keys(changedFiles).length}`);
+      console.log(`   🗑️ Files to delete: ${filesToDelete.length}`);
+      console.log(`   💡 Skipped files: ${files.length - Object.keys(changedFiles).length - filesToDelete.length}`);
       
-      return this.createOrUpdate(changedFiles, message, branch, shouldCreateBranch, filesToDelete, true);
+      if (Object.keys(changedFiles).length > 0) {
+        console.log(`   📋 Push list: ${Object.keys(changedFiles).join(', ')}`);
+      }
+      if (filesToDelete.length > 0) {
+        console.log(`   🗑️ Delete list: ${filesToDelete.join(', ')}`);
+      }
+      
+      const result = await this.createOrUpdate(changedFiles, message, branch, shouldCreateBranch, filesToDelete, true);
+      
+      if (result) {
+        console.log('✅ Delta Diff: Optimized push completed successfully!');
+        const totalFiles = files.length;
+        const pushedFiles = Object.keys(changedFiles).length + filesToDelete.length;
+        const skippedFiles = totalFiles - Object.keys(changedFiles).length;
+        const efficiency = totalFiles > 0 ? Math.round((skippedFiles / totalFiles) * 100) : 0;
+        console.log(`   📊 Efficiency: ${efficiency}% of files skipped (${skippedFiles}/${totalFiles})`);
+      } else {
+        console.log('❌ Delta Diff: Push failed');
+      }
+      
+      return result;
     } catch (error) {
-      console.warn('Delta diff failed, falling back to traditional sync:', error);
+      console.warn('❌ Delta Diff: Optimization failed, falling back to traditional sync:', error);
+      console.log('🔄 Delta Diff: Attempting full file sync as fallback...');
       
       // Fallback to traditional writeChangeset behavior
       const filesChangeset: Record<string, string> = {};
@@ -589,6 +679,7 @@ export class GithubTokenStorage extends GitTokenStorage {
         });
         
         filesChangeset[this.path] = JSON.stringify(singleFileData, null, 2);
+        console.log(`📄 Delta Diff: Fallback single file: ${this.path}`);
       } else if (this.flags.multiFileEnabled) {
         // Multi-file mode
         files.forEach((file) => {
@@ -600,9 +691,19 @@ export class GithubTokenStorage extends GitTokenStorage {
             filesChangeset[joinPath(this.path, `${SystemFilenames.METADATA}.json`)] = JSON.stringify(file.data, null, 2);
           }
         });
+        console.log(`📁 Delta Diff: Fallback multi-files: ${Object.keys(filesChangeset).join(', ')}`);
       }
       
-      return this.writeChangeset(filesChangeset, message, branch, shouldCreateBranch);
+      console.log(`🔄 Delta Diff: Fallback pushing ${Object.keys(filesChangeset).length} files (traditional method)`);
+      const result = await this.writeChangeset(filesChangeset, message, branch, shouldCreateBranch);
+      
+      if (result) {
+        console.log('✅ Delta Diff: Fallback sync completed successfully');
+      } else {
+        console.log('❌ Delta Diff: Fallback sync also failed');
+      }
+      
+      return result;
     }
   }
 

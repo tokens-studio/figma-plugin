@@ -78,7 +78,7 @@ export function useGitHub() {
         }, {
           commitMessage,
           storeTokenIdInJsonEditor,
-          useDeltaDiff: flags.deltaDiffSync ?? false,
+          useDeltaDiff: true,
           lastSyncedState,
         });
         const commitSha = await storage.getCommitSha();
