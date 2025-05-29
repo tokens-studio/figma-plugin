@@ -5,7 +5,6 @@ import {
   Button, Heading, Textarea, Label, Stack,
 } from '@tokens-studio/ui';
 import { track } from '@/utils/analytics';
-import { useShortcut } from '@/hooks/useShortcut';
 import { Dispatch } from '../store';
 import useManageTokens from '../store/useManageTokens';
 import CompositionTokenForm from './CompositionTokenForm';
@@ -43,6 +42,7 @@ import { ColorModifier } from '@/types/Modifier';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import { tokenTypesToCreateVariable } from '@/constants/VariableTypes';
 import { ModalOptions } from '@/constants/ModalOptions';
+import { showEditFormSelector } from '@/selectors';
 
 let lastUsedRenameOption: UpdateMode = UpdateMode.SELECTION;
 let lastUsedRenameStyles = false;
@@ -532,13 +532,33 @@ function EditTokenForm({ resolvedTokens }: Props) {
   }, [checkAndSubmitTokenValue]);
 
   const handleSaveShortcut = React.useCallback(
-    () => {
-      checkAndSubmitTokenValue();
+    (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey) {
+        checkAndSubmitTokenValue();
+      }
     },
     [checkAndSubmitTokenValue],
   );
 
-  useShortcut(['cmd+Enter', 'ctrl+Enter'], handleSaveShortcut);
+  // Only register the shortcut when this form is actually being used
+  const showEditForm = useSelector(showEditFormSelector);
+  
+  // Conditionally register the shortcut only when the form is active
+  React.useEffect(() => {
+    if (showEditForm) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          checkAndSubmitTokenValue();
+        }
+      };
+      
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [showEditForm, checkAndSubmitTokenValue]);
 
   const handleReset = React.useCallback(() => {
     dispatch.uiState.setShowEditForm(false);

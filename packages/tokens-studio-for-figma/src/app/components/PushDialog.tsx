@@ -12,7 +12,6 @@ import { getGitlabCreatePullRequestUrl } from '../store/providers/gitlab';
 import { getADOCreatePullRequestUrl } from '../store/providers/ado';
 import { StorageProviderType } from '@/constants/StorageProviderType';
 import { isGitProvider } from '@/utils/is';
-import { useShortcut } from '@/hooks/useShortcut';
 import { transformProviderName } from '@/utils/transformProviderName';
 import ChangedStateList from './ChangedStateList';
 import PushJSON from './PushJSON';
@@ -105,16 +104,22 @@ function PushDialog() {
     }
   }, [branch, commitMessage, onConfirm, localApiState]);
 
-  const handleSaveShortcut = React.useCallback(
-    () => {
-      if (showPushDialog?.state === 'initial') {
-        handlePushChanges();
-      }
-    },
-    [handlePushChanges, showPushDialog],
-  );
-
-  useShortcut(['cmd+Enter', 'ctrl+Enter'], handleSaveShortcut);
+  // Conditionally register the shortcut only when the dialog is in initial state
+  React.useEffect(() => {
+    if (showPushDialog?.state === 'initial') {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+          e.preventDefault();
+          handlePushChanges();
+        }
+      };
+      
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [showPushDialog?.state, handlePushChanges]);
 
   switch (showPushDialog?.state) {
     case 'dtcgconversion':
