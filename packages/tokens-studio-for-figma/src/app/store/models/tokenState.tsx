@@ -168,10 +168,21 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: data,
     }),
-    setThemes: (state, data: ThemeObjectsList) => ({
-      ...state,
-      themes: [...data],
-    }),
+    setThemes: (state, data: ThemeObjectsList) => {
+      const { newThemes, updatedThemes } = state.importedThemes;
+
+      return {
+        ...state,
+        themes: [
+          ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
+          ...state.themes.map((existingTheme) => {
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
+          }),
+          ...newThemes,
+        ],
+      };
+    },
     setNewTokenData: (state, data: TokenData['synced_data']) => ({
       ...state,
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
@@ -439,8 +450,16 @@ export const tokenState = createModel<RootModel>()({
           }
         });
       });
+      // Clean up old tokens that no longer exist
+      const newTokenNames = new Set(newTokens.map((t) => t.name).concat(updatedTokens.map((t) => t.name)));
+      const cleanedTokens = { ...state.tokens };
+      Object.keys(cleanedTokens).forEach((tokenSet) => {
+        cleanedTokens[tokenSet] = cleanedTokens[tokenSet].filter((token) => newTokenNames.has(token.name) || existingTokens.some((et) => et.name === token.name));
+      });
+
       return {
         ...state,
+        tokens: cleanedTokens,
         importedTokens: {
           newTokens,
           updatedTokens,
@@ -646,34 +665,19 @@ export const tokenState = createModel<RootModel>()({
         },
       };
     },
-    setThemesFromVariables: (state, themes: ThemeObjectsList): TokenState => {
-      const newThemes: ThemeObjectsList = [];
-      const updatedThemes: ThemeObjectsList = [];
-
-      themes.forEach((theme) => {
-        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
-
-        if (existingTheme) {
-          if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
-            updatedThemes.push({
-              ...theme,
-              selectedTokenSets: {
-                ...existingTheme.selectedTokenSets,
-                ...theme.selectedTokenSets,
-              },
-            });
-          }
-        } else {
-          newThemes.push(theme);
-        }
+    setThemesFromVariables(state, themes: ThemeObjectsList, setsToRemove: string[]): TokenState {
+      setsToRemove.forEach((tokenSetName) => {
+        state = updateTokenSetsInState(state, (currentSetName, tokenSet) => (currentSetName === tokenSetName ? null : [currentSetName, tokenSet]));
       });
 
       return {
         ...state,
-        importedThemes: {
-          newThemes,
-          updatedThemes,
-        },
+        themes: themes.map((theme) => ({
+          ...theme,
+          selectedTokenSets: {
+            [`${theme.group}/${theme.name}`]: TokenSetStatus.ENABLED,
+          },
+        })),
       };
     },
     setCompressedData: (state, payload: { compressedTokens: string; compressedThemes: string }) => ({
@@ -977,6 +981,18 @@ export const tokenState = createModel<RootModel>()({
           });
         }
       }
+    },
+    setThemesFromVariables(themes: ThemeObjectsList, rootState) {
+      themes.forEach((theme) => {
+        const existingTheme = rootState.tokenState.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
+        if (existingTheme) {
+          Object.keys(existingTheme.selectedTokenSets)
+            .filter((key) => key.startsWith(`${existingTheme.group}/`))
+            .forEach((setName) => {
+              dispatch.tokenState.deleteTokenSet(setName);
+            });
+        }
+      });
     },
     ...Object.fromEntries(Object.entries(tokenStateEffects).map(([key, factory]) => [key, factory(dispatch)])),
   }),

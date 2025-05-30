@@ -168,11 +168,13 @@ export function notifyStyleValues(values: Record<string, StyleToCreateToken[]>) 
 export function notifyVariableValues(
   values: Record<string, VariableToCreateToken[]>,
   themes?: ThemeObjectsList,
+  setsToRemove?: string[],
 ) {
   postToUI({
     type: MessageFromPluginTypes.VARIABLES,
     values,
     themes,
+    setsToRemove,
   });
 }
 
