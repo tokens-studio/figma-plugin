@@ -168,10 +168,21 @@ export const tokenState = createModel<RootModel>()({
       ...state,
       usedTokenSet: data,
     }),
-    setThemes: (state, data: ThemeObjectsList) => ({
-      ...state,
-      themes: [...data],
-    }),
+    setThemes: (state, data: ThemeObjectsList) => {
+      const { newThemes, updatedThemes } = state.importedThemes;
+
+      return {
+        ...state,
+        themes: [
+          ...(newThemes.length === 0 && updatedThemes.length === 0 ? data : []),
+          ...state.themes.map((existingTheme) => {
+            const updateTheme = updatedThemes.find((importedTheme) => importedTheme.$figmaCollectionId === existingTheme.$figmaCollectionId && importedTheme.$figmaModeId === existingTheme.$figmaModeId);
+            return updateTheme ? { ...existingTheme, ...updateTheme } : existingTheme;
+          }),
+          ...newThemes,
+        ],
+      };
+    },
     setNewTokenData: (state, data: TokenData['synced_data']) => ({
       ...state,
       usedTokenSet: data.usedTokenSets || state.usedTokenSet,
@@ -651,7 +662,7 @@ export const tokenState = createModel<RootModel>()({
       const updatedThemes: ThemeObjectsList = [];
 
       themes.forEach((theme) => {
-        const existingTheme = state.themes.find((t) => t.group === theme.group && t.name === theme.name);
+        const existingTheme = state.themes.find((t) => t.$figmaCollectionId === theme.$figmaCollectionId);
 
         if (existingTheme) {
           if (!isEqual(existingTheme.selectedTokenSets, theme.selectedTokenSets)) {
