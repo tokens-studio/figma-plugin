@@ -18,8 +18,6 @@ import ExportThemesTab from './ExportThemesTab';
 import { allTokenSetsSelector, themesListSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
-import { AsyncMessageChannel } from '@/AsyncMessageChannel';
-import { AsyncMessageTypes } from '@/types/AsyncMessages';
 import { Dispatch } from '@/app/store';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
@@ -34,15 +32,13 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const themes = useSelector(themesListSelector);
   const dispatch = useDispatch<Dispatch>();
   const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
-  
+
   // Validate saved themes to ensure they still exist
-  const validatedSelectedThemes = savedSelectedThemes.filter(themeId => 
-    themes.some(theme => theme.id === themeId)
-  );
-  
+  const validatedSelectedThemes = savedSelectedThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
+
   // Default to using all themes if no valid saved themes are found
-  const initialSelectedThemes = validatedSelectedThemes.length > 0 
-    ? validatedSelectedThemes 
+  const initialSelectedThemes = validatedSelectedThemes.length > 0
+    ? validatedSelectedThemes
     : themes.map((theme) => theme.id);
 
   const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
@@ -62,14 +58,8 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   // Save selected themes when they change and update redux state
   React.useEffect(() => {
     if (selectedThemes) {
-      // Update Redux state
+      // Update Redux state - this will trigger the effect to save to shared plugin data
       dispatch.uiState.setSelectedExportThemes(selectedThemes);
-      
-      // Save to shared plugin data
-      AsyncMessageChannel.ReactInstance.message({
-        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
-        themes: JSON.stringify(selectedThemes),
-      });
     }
   }, [selectedThemes, dispatch.uiState]);
 

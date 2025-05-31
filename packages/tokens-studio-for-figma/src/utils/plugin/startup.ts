@@ -2,6 +2,8 @@ import {
   ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
+import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
+import { getVariableExportSettings } from '@/utils/getVariableExportSettings';
 import getLastOpened from '@/utils/getLastOpened';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
@@ -9,8 +11,6 @@ import { getUISettings } from '@/utils/uiSettings';
 import { getUserId } from '../../plugin/helpers';
 import { getSavedStorageType, getTokenData } from '../../plugin/node';
 import { UsedEmailProperty } from '@/figmaStorage/UsedEmailProperty';
-import { readSharedPluginData } from '@/utils/figmaStorage/readSharedPluginData';
-import { SharedPluginDataNamespaces } from '@/constants/SharedPluginDataNamespaces';
 
 export async function startup() {
   // on startup we need to fetch all the locally available data so we can bootstrap our UI
@@ -44,22 +44,17 @@ export async function startup() {
     getTokenData(),
     AuthDataProperty.read(),
     UsedEmailProperty.read(),
-    readSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'variableExportSettings'),
-    readSharedPluginData(SharedPluginDataNamespaces.TOKENS, 'selectedExportThemes'),
+    getVariableExportSettings(),
+    getSelectedExportThemes(),
   ]);
 
   // If we have saved variable export settings, apply them to the settings
   let finalSettings = settings;
-  if (variableExportSettings) {
-    try {
-      const exportSettings = JSON.parse(variableExportSettings);
-      finalSettings = {
-        ...settings,
-        ...exportSettings,
-      };
-    } catch (err) {
-      console.error('Error parsing variable export settings', err);
-    }
+  if (variableExportSettings && Object.keys(variableExportSettings).length > 0) {
+    finalSettings = {
+      ...settings,
+      ...variableExportSettings,
+    };
   }
 
   return {

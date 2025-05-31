@@ -6,8 +6,8 @@ import { SharedPluginDataKeys } from '@/constants/SharedPluginDataKeys';
 
 export const setSelectedExportThemes: AsyncMessageChannelHandlers[AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES] = async (msg) => {
   await writeSharedPluginData(
-    SharedPluginDataNamespaces.TOKENS, 
-    SharedPluginDataKeys[SharedPluginDataNamespaces.TOKENS].selectedExportThemes, 
-    msg.themes
+    SharedPluginDataNamespaces.TOKENS,
+    SharedPluginDataKeys[SharedPluginDataNamespaces.TOKENS].selectedExportThemes,
+    msg.themes,
   );
 };

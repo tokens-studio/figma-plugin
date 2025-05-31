@@ -85,7 +85,7 @@ const mockStartupParams: Omit<StartupMessage, 'licenseKey'> = {
     tokenFormat: TokenFormatOptions.Legacy,
     version: '91',
   },
-  selectedExportThemes: "",
+  selectedExportThemes: [],
 };
 
 const mockActions = {

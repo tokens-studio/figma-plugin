@@ -472,5 +472,11 @@ export const uiState = createModel<RootModel>()({
         showEmptyGroups: payload == null ? rootState.uiState.showEmptyGroups : payload,
       });
     },
+    setSelectedExportThemes: (payload: string[]) => {
+      AsyncMessageChannel.ReactInstance.message({
+        type: AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES,
+        themes: JSON.stringify(payload),
+      });
+    },
   }),
 });
