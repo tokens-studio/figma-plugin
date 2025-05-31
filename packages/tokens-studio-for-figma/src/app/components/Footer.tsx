@@ -35,6 +35,7 @@ import { docUrls } from '@/constants/docUrls';
 import { TokenFormatBadge } from './TokenFormatBadge';
 import { isEqual } from '@/utils/isEqual';
 import { useStorageSizeWarning } from '../hooks/useStorageSizeWarning';
+import { BrokenReferencesIndicator } from './BrokenReferencesIndicator';
 
 export default function Footer() {
   const storageType = useSelector(storageTypeSelector);
@@ -78,6 +79,7 @@ export default function Footer() {
       }}
     >
       <Stack direction="row" align="center" gap={2}>
+        <BrokenReferencesIndicator />
         {storageType.provider === StorageProviderType.LOCAL && (tokensSize > 100 || themesSize > 100) && (
           <Button
             icon={<WarningTriangleSolid />}
