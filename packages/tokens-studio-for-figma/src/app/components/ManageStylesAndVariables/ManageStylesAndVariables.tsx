@@ -6,7 +6,7 @@ import {
 import {
   ChevronLeftIcon, SlidersIcon,
 } from '@primer/octicons-react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { StyledProBadge } from '../ProBadge';
 import Modal from '../Modal';
 import { useIsProUser } from '@/app/hooks/useIsProUser';
@@ -18,6 +18,7 @@ import ExportThemesTab from './ExportThemesTab';
 import { allTokenSetsSelector, themesListSelector } from '@/selectors';
 import { ExportTokenSet } from '@/types/ExportTokenSet';
 import { TokenSetStatus } from '@/constants/TokenSetStatus';
+import { Dispatch } from '@/app/store';
 
 export default function ManageStylesAndVariables({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) {
   const { t } = useTranslation(['manageStylesAndVariables']);
@@ -29,8 +30,18 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
 
   const allSets = useSelector(allTokenSetsSelector);
   const themes = useSelector(themesListSelector);
+  const dispatch = useDispatch<Dispatch>();
+  const savedSelectedThemes = useSelector((state: any) => state.uiState.selectedExportThemes) || [];
 
-  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(themes.map((theme) => theme.id));
+  // Validate saved themes to ensure they still exist
+  const validatedSelectedThemes = savedSelectedThemes.filter((themeId) => themes.some((theme) => theme.id === themeId));
+
+  // Default to using all themes if no valid saved themes are found
+  const initialSelectedThemes = validatedSelectedThemes.length > 0
+    ? validatedSelectedThemes
+    : themes.map((theme) => theme.id);
+
+  const [selectedThemes, setSelectedThemes] = React.useState<string[]>(initialSelectedThemes);
 
   const [selectedSets, setSelectedSets] = React.useState<ExportTokenSet[]>(allSets.map((set) => {
     const tokenSet = {
@@ -43,6 +54,14 @@ export default function ManageStylesAndVariables({ showModal, setShowModal }: { 
   const {
     createVariablesFromSets, createVariablesFromThemes, createStylesFromSelectedTokenSets, createStylesFromSelectedThemes,
   } = useTokens();
+
+  // Save selected themes when they change and update redux state
+  React.useEffect(() => {
+    if (selectedThemes) {
+      // Update Redux state - this will trigger the effect to save to shared plugin data
+      dispatch.uiState.setSelectedExportThemes(selectedThemes);
+    }
+  }, [selectedThemes, dispatch.uiState]);
 
   const handleShowOptions = React.useCallback(() => {
     setShowOptions(true);

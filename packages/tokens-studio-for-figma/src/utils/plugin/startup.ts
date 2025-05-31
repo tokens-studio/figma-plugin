@@ -2,6 +2,8 @@ import {
   ApiProvidersProperty, AuthDataProperty, LicenseKeyProperty, InitialLoadProperty,
 } from '@/figmaStorage';
 import { getActiveTheme } from '@/utils/getActiveTheme';
+import { getSelectedExportThemes } from '@/utils/getSelectedExportThemes';
+import { getVariableExportSettings } from '@/utils/getVariableExportSettings';
 import getLastOpened from '@/utils/getLastOpened';
 import getOnboardingExplainer from '@/utils/getOnboardingExplainer';
 import { getUsedTokenSet } from '@/utils/getUsedTokenSet';
@@ -26,6 +28,8 @@ export async function startup() {
     localTokenData,
     authData,
     usedEmail,
+    variableExportSettings,
+    selectedExportThemes,
   ] = await Promise.all([
     getUISettings(false),
     getUsedTokenSet(),
@@ -40,10 +44,21 @@ export async function startup() {
     getTokenData(),
     AuthDataProperty.read(),
     UsedEmailProperty.read(),
+    getVariableExportSettings(),
+    getSelectedExportThemes(),
   ]);
 
+  // If we have saved variable export settings, apply them to the settings
+  let finalSettings = settings;
+  if (variableExportSettings && Object.keys(variableExportSettings).length > 0) {
+    finalSettings = {
+      ...settings,
+      ...variableExportSettings,
+    };
+  }
+
   return {
-    settings,
+    settings: finalSettings,
     activeTheme,
     lastOpened,
     onboardingExplainer,
@@ -62,5 +77,6 @@ export async function startup() {
     } : null,
     authData,
     usedEmail,
+    selectedExportThemes,
   };
 }

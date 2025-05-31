@@ -2,20 +2,14 @@ import type { RootState } from '@/app/store';
 import { AsyncMessageChannel } from '@/AsyncMessageChannel';
 import { AsyncMessageTypes } from '@/types/AsyncMessages';
 
-export function setRemoveStylesAndVariablesWithoutConnection() {
-  return (payload: boolean, rootState: RootState): void => {
-    AsyncMessageChannel.ReactInstance.message({
-      type: AsyncMessageTypes.SET_UI,
-      ...rootState.settings,
-    });
-
-    // Save variable export settings to shared plugin data
+export function saveVariableExportSettings() {
+  return (_payload: unknown, rootState: RootState): void => {
     const settings = {
       ignoreFirstPartForStyles: rootState.settings.ignoreFirstPartForStyles,
       prefixStylesWithThemeName: rootState.settings.prefixStylesWithThemeName,
       createStylesWithVariableReferences: rootState.settings.createStylesWithVariableReferences,
       renameExistingStylesAndVariables: rootState.settings.renameExistingStylesAndVariables,
-      removeStylesAndVariablesWithoutConnection: payload,
+      removeStylesAndVariablesWithoutConnection: rootState.settings.removeStylesAndVariablesWithoutConnection,
     };
 
     AsyncMessageChannel.ReactInstance.message({

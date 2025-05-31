@@ -60,6 +60,8 @@ export enum AsyncMessageTypes {
   SET_AUTH_DATA = 'async/set-auth-data',
   SET_USED_EMAIL = 'async/set-used-email',
   REMOVE_RELAUNCH_DATA = 'async/remove-relaunch-data',
+  SET_VARIABLE_EXPORT_SETTINGS = 'async/set-variable-export-settings',
+  SET_SELECTED_EXPORT_THEMES = 'async/set-selected-export-themes',
   // the below messages are going from plugin to UI
   STARTUP = 'async/startup',
   GET_THEME_INFO = 'async/get-theme-info',
@@ -351,13 +353,17 @@ AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
   area: UpdateMode;
 }
 >;
+export type RemoveRelaunchDataMessageResult = AsyncMessage<AsyncMessageTypes.REMOVE_RELAUNCH_DATA>;
 
-export type RemoveRelaunchDataMessageResult = AsyncMessage<
-AsyncMessageTypes.REMOVE_RELAUNCH_DATA,
-{
-  totalNodes: number;
-}
->;
+export type SetVariableExportSettingsMessage = AsyncMessage<AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS, {
+  settings: string;
+}>;
+export type SetVariableExportSettingsMessageResult = AsyncMessage<AsyncMessageTypes.SET_VARIABLE_EXPORT_SETTINGS>;
+
+export type SetSelectedExportThemesMessage = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES, {
+  themes: string;
+}>;
+export type SetSelectedExportThemesMessageResult = AsyncMessage<AsyncMessageTypes.SET_SELECTED_EXPORT_THEMES>;
 
 export type PreviewRequestStartupAsyncMessage = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
 export type PreviewRequestStartupAsyncMessageResult = AsyncMessage<AsyncMessageTypes.PREVIEW_REQUEST_STARTUP>;
@@ -408,7 +414,9 @@ export type AsyncMessages =
   | UpdateVariablesAsyncMessage
   | PreviewRequestStartupAsyncMessage
   | RemoveRelaunchDataMessage
-  | RemoveStylesWithoutConnectionMessage;
+  | RemoveStylesWithoutConnectionMessage
+  | SetVariableExportSettingsMessage
+  | SetSelectedExportThemesMessage;
 
 export type AsyncMessageResults =
   CreateStylesAsyncMessageResult
@@ -456,7 +464,9 @@ export type AsyncMessageResults =
   | UpdateVariablesAsyncMessageResult
   | PreviewRequestStartupAsyncMessageResult
   | RemoveRelaunchDataMessageResult
-  | RemoveStylesWithoutConnectionResult;
+  | RemoveStylesWithoutConnectionResult
+  | SetVariableExportSettingsMessageResult
+  | SetSelectedExportThemesMessageResult;
 
 export type AsyncMessagesMap = {
   [K in AsyncMessageTypes]: Extract<AsyncMessages, { type: K }>
