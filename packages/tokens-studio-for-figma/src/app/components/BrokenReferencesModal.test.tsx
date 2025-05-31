@@ -19,13 +19,11 @@ jest.mock('react-i18next', () => ({
 
 const mockStore = createMockStore({});
 
-const renderWithProps = (props: any) => {
-  return render(
-    <Provider store={mockStore}>
-      <BrokenReferencesModal {...props} />
-    </Provider>
-  );
-};
+const renderWithProps = (props: any) => render(
+  <Provider store={mockStore}>
+    <BrokenReferencesModal {...props} />
+  </Provider>,
+);
 
 describe('BrokenReferencesModal', () => {
   const mockOnClose = jest.fn();
@@ -109,7 +107,7 @@ describe('BrokenReferencesModal', () => {
     // Check if sets are displayed
     expect(screen.getByText('global')).toBeInTheDocument();
     expect(screen.getByText('theme')).toBeInTheDocument();
-    
+
     // Check if token names are displayed
     expect(screen.getByText('colors.broken1')).toBeInTheDocument();
     expect(screen.getByText('spacing.broken')).toBeInTheDocument();
@@ -197,7 +195,7 @@ describe('BrokenReferencesModal', () => {
 
     // Check string value
     expect(screen.getByText('{colors.nonexistent}')).toBeInTheDocument();
-    
+
     // Check object value (JSON stringified)
     expect(screen.getByText('{"fontFamily":"{fonts.nonexistent}","fontSize":"16px"}')).toBeInTheDocument();
   });

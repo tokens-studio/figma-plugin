@@ -10,9 +10,7 @@ export function BrokenReferencesIndicator() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const tokensContext = React.useContext(TokensContext);
 
-  const brokenReferencesCount = React.useMemo(() => {
-    return tokensContext.resolvedTokens.filter((token) => token.failedToResolve).length;
-  }, [tokensContext.resolvedTokens]);
+  const brokenReferencesCount = React.useMemo(() => tokensContext.resolvedTokens.filter((token) => token.failedToResolve).length, [tokensContext.resolvedTokens]);
 
   const handleOpenDialog = React.useCallback(() => {
     setIsDialogOpen(true);
@@ -35,7 +33,9 @@ export function BrokenReferencesIndicator() {
         onClick={handleOpenDialog}
         data-testid="broken-references-indicator"
       >
-        {brokenReferencesCount} {brokenReferencesCount === 1 ? t('brokenReference') : t('brokenReferences')}
+        {brokenReferencesCount}
+        {' '}
+        {brokenReferencesCount === 1 ? t('brokenReference') : t('brokenReferences')}
       </Button>
       <BrokenReferencesModal
         isOpen={isDialogOpen}

@@ -31,7 +31,7 @@ const renderWithContext = (resolvedTokens: any[]) => {
       <TokensContext.Provider value={mockContextValue}>
         <BrokenReferencesIndicator />
       </TokensContext.Provider>
-    </Provider>
+    </Provider>,
   );
 };
 
@@ -164,7 +164,7 @@ describe('BrokenReferencesIndicator', () => {
     // Check if sets are displayed
     expect(screen.getByText('global')).toBeInTheDocument();
     expect(screen.getByText('theme')).toBeInTheDocument();
-    
+
     // Check if token names are displayed
     expect(screen.getByText('colors.broken1')).toBeInTheDocument();
     expect(screen.getByText('spacing.broken')).toBeInTheDocument();

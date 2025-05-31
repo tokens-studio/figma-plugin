@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { Button } from '@tokens-studio/ui';
@@ -47,10 +48,10 @@ export function BrokenReferencesModal({
   const handleEditToken = React.useCallback((token: ResolveTokenValuesResult) => {
     // Close the broken references dialog first
     onTokenEdit();
-    
+
     // Get the appropriate schema for this token type
     const schema = (tokenTypes as Record<string, TokenTypeSchema>)[token.type] || (tokenTypes as Record<string, TokenTypeSchema>)[TokenTypes.OTHER];
-    
+
     // Set up the edit token with proper structure
     dispatch.uiState.setShowEditForm(true);
     dispatch.uiState.setEditToken({
@@ -83,50 +84,56 @@ export function BrokenReferencesModal({
           </Text>
 
           <Stack direction="column" gap={3}>
-            {brokenTokensBySet.map(([setName, tokens]) => (
-              <Accordion
-                key={setName}
-                label={setName}
-                isOpenByDefault={false}
-                extra={(
-                  <Count count={tokens.length} />
-                )}
-              >
-                <Stack direction="column" gap={2}>
-                  {tokens.map((token) => (
-                    <Box
-                      key={token.name}
-                      css={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '$2',
-                        backgroundColor: '$bgSubtle',
-                        borderRadius: '$small',
-                      }}
-                    >
-                      <Stack direction="column" gap={1}>
-                        <Text size="small">
-                          <strong>{token.name}</strong>
-                        </Text>
-                        <Text size="xsmall" muted>
-                          {typeof token.value === 'object' 
-                            ? JSON.stringify(token.value)
-                            : String(token.value)}
-                        </Text>
-                      </Stack>
-                      <Button
-                        size="small"
-                        variant="secondary"
-                        onClick={() => handleEditToken(token)}
-                      >
-                        {t('edit')}
-                      </Button>
-                    </Box>
-                  ))}
-                </Stack>
-              </Accordion>
-            ))}
+            {brokenTokensBySet.map(([setName, tokens]) => {
+              const countElement = <Count count={tokens.length} />;
+
+              return (
+                <Accordion
+                  key={setName}
+                  label={setName}
+                  isOpenByDefault={false}
+                  extra={countElement}
+                >
+                  <Stack direction="column" gap={2}>
+                    {tokens.map((token) => {
+                      const handleTokenEdit = () => handleEditToken(token);
+
+                      return (
+                        <Box
+                          key={token.name}
+                          css={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '$2',
+                            backgroundColor: '$bgSubtle',
+                            borderRadius: '$small',
+                          }}
+                        >
+                          <Stack direction="column" gap={1}>
+                            <Text size="small">
+                              <strong>{token.name}</strong>
+                            </Text>
+                            <Text size="xsmall" muted>
+                              {typeof token.value === 'object'
+                                ? JSON.stringify(token.value)
+                                : String(token.value)}
+                            </Text>
+                          </Stack>
+                          <Button
+                            size="small"
+                            variant="secondary"
+                            onClick={handleTokenEdit}
+                          >
+                            {t('edit')}
+                          </Button>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                </Accordion>
+              );
+            })}
           </Stack>
 
           <Box css={{ display: 'flex', justifyContent: 'flex-end' }}>
